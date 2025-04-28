@@ -2,7 +2,6 @@
   "version": 2,
   "routes": [
     { "handle": "filesystem" },
-    { "src": "/api-config.js", "dest": "/api-config.js", "headers": { "cache-control": "public, max-age=0, must-revalidate" } },
     { "src": "/js/(.*)", "dest": "/js/$1", "headers": { "cache-control": "public, max-age=0, must-revalidate" } },
     { "src": "/pages/(.*)", "dest": "/pages/$1" },
     { "src": "/components/(.*)", "dest": "/components/$1" },
