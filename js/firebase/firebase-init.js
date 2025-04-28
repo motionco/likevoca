@@ -1,10 +1,10 @@
-// import { apiKeys } from "../api-config.js";
+import { apiKeys } from "../../utils/api-config.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCPQVYE7h7odTDCkoH6mrsEtT1giWk8yDM",
+  apiKey: apiKeys.FIREBASE_API_KEY,
   authDomain: "uploadfile-e6f81.firebaseapp.com",
   databaseURL:
     "https://uploadfile-e6f81-default-rtdb.asia-southeast1.firebasedatabase.app",
