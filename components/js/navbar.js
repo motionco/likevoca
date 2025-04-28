@@ -41,8 +41,19 @@ function initializeNavbar() {
   }
 
   if (avatar && profileDropdown) {
-    avatar.addEventListener("click", () => {
+    avatar.addEventListener("click", (e) => {
+      e.stopPropagation();
       profileDropdown.classList.toggle("hidden");
+    });
+
+    document.addEventListener("click", () => {
+      if (!profileDropdown.classList.contains("hidden")) {
+        profileDropdown.classList.add("hidden");
+      }
+    });
+
+    profileDropdown.addEventListener("click", (e) => {
+      e.stopPropagation();
     });
   }
 

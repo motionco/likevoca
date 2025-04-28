@@ -30,6 +30,12 @@ const firebaseConfig = {
 app.use(express.static("./"));
 app.use(express.json());
 
+// 로그 미들웨어
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  next();
+});
+
 // Firebase API 키를 클라이언트에 안전하게 제공하는 엔드포인트
 app.get("/api/config", (req, res) => {
   // 설정이 유효한지 확인
@@ -41,6 +47,19 @@ app.get("/api/config", (req, res) => {
   res.json({
     firebase: firebaseConfig,
   });
+});
+
+// 인증 오류 로깅 엔드포인트
+app.post("/api/log-auth-error", (req, res) => {
+  const { errorCode, errorMessage, provider, email } = req.body;
+
+  console.error(
+    `인증 오류 발생 [${provider}] - ${errorCode}: ${errorMessage} ${
+      email ? `(${email})` : ""
+    }`
+  );
+
+  res.status(200).json({ success: true });
 });
 
 // Gemini API를 프록시하는 엔드포인트
@@ -101,4 +120,5 @@ app.listen(PORT, () => {
     "Firebase 설정:",
     firebaseConfig.projectId ? "유효함" : "유효하지 않음"
   );
+  console.log("Firebase가 성공적으로 초기화되었습니다.");
 });
