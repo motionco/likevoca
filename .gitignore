@@ -1,0 +1,9 @@
+api-config.js
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.tmp
+*.temp
+.env

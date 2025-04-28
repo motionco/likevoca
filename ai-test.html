@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h2>Gemini Ai 한자 추천</h2>
+    <input id="title" placeholder="주제 입력: " />
+    <input id="amount" type="number" value="5" />
+    <button onclick="getHanja()">추천받기</button>
+
+    <script>
+          const GEMINI_API_KEY = "apiKeys.GEMINI_API_KEY";
+          const GEMINI_API_URL = "apiKeys.GEMINI_API_URL";
+
+          async function getHanja() {
+            const title = document.getElementById("title").value;
+            const amount = document.getElementById("amount").value;
+
+            const prompt = `Recommend ${amount} Chinese characters (Hanja) related to the following topic: ${title}.
+      Follow this exact format for each character:
+      Hanja|Korean Pronunciation|Stroke Count|Description (in Korean, max 10 characters)
+
+      ### Important Rules:
+      1. The Korean pronunciation must strictly follow the format: "meaning + pronunciation" (e.g., "나무 목", "물 수").
+      2. Each response must contain exactly **one** Hanja character (no two-character words).
+      3. The stroke count must be **100% accurate**, matching the standard stroke order.
+      4. The description and pronunciation must be written in **Korean**.
+      5. Each line should contain only one entry, and the format should be followed exactly.`;
+
+            try {
+                const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                    })
+                })
+
+                const data = await response.json();
+                console.log(data);
+            } catch (error) {
+                console.error(error);
+            }
+          }
+    </script>
+  </body>
+</html>
