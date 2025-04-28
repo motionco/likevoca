@@ -20,8 +20,19 @@ import {
   getDoc,
 } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 
+// Firebase가 초기화되었는지 확인하는 함수
+function checkFirebaseInitialized() {
+  if (!auth || !db) {
+    throw new Error(
+      "Firebase가 초기화되지 않았습니다. 페이지를 새로고침하고 다시 시도해주세요."
+    );
+  }
+}
+
 // 회원가입 함수
 export const signup = async (email, password, displayName) => {
+  checkFirebaseInitialized();
+
   const userCredential = await createUserWithEmailAndPassword(
     auth,
     email,
@@ -39,6 +50,8 @@ export const signup = async (email, password, displayName) => {
 
 // 로그인 함수
 export const login = async (email, password) => {
+  checkFirebaseInitialized();
+
   try {
     const userCredential = await signInWithEmailAndPassword(
       auth,
@@ -66,12 +79,19 @@ export const login = async (email, password) => {
 };
 
 export const resetPassword = async (email) => {
+  checkFirebaseInitialized();
   await sendPasswordResetEmail(auth, email);
 };
 
 export const googleLogin = async () => {
+  checkFirebaseInitialized();
+
   try {
     const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({
+      prompt: "select_account",
+    });
+
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
 
@@ -80,22 +100,37 @@ export const googleLogin = async () => {
     console.log("google 로그인 성공: ", user);
     return user;
   } catch (error) {
+    console.error("Google 로그인 오류:", error);
+
     if (error.code === "auth/popup-closed-by-user") {
       throw new Error("로그인 창이 닫혔습니다. 다시 시도해주세요.");
     } else if (error.code === "auth/network-request-failed") {
       throw new Error(
         "네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요."
       );
+    } else if (error.code === "auth/popup-blocked") {
+      throw new Error(
+        "팝업이 차단되었습니다. 팝업 차단을 해제하고 다시 시도해주세요."
+      );
+    } else if (error.code === "auth/cancelled-popup-request") {
+      throw new Error("로그인 요청이 취소되었습니다. 다시 시도해주세요.");
     } else {
-      console.error("google 로그인 실패: ", error);
-      throw new Error("구글 로그인에 실패했습니다. 다시 시도해주세요");
+      throw new Error(
+        `구글 로그인에 실패했습니다(${error.code}). 다시 시도해주세요`
+      );
     }
   }
 };
 
 export const githubLogin = async () => {
+  checkFirebaseInitialized();
+
   try {
     const provider = new GithubAuthProvider();
+    provider.setCustomParameters({
+      prompt: "select_account",
+    });
+
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
 
@@ -104,38 +139,56 @@ export const githubLogin = async () => {
     console.log("Github 로그인 성공: ", user);
     return user;
   } catch (error) {
+    console.error("Github 로그인 오류:", error);
+
     if (error.code === "auth/popup-closed-by-user") {
       throw new Error("로그인 창이 닫혔습니다. 다시 시도해주세요.");
     } else if (error.code === "auth/network-request-failed") {
       throw new Error(
         "네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요."
       );
+    } else if (error.code === "auth/popup-blocked") {
+      throw new Error(
+        "팝업이 차단되었습니다. 팝업 차단을 해제하고 다시 시도해주세요."
+      );
+    } else if (error.code === "auth/cancelled-popup-request") {
+      throw new Error("로그인 요청이 취소되었습니다. 다시 시도해주세요.");
     } else {
-      console.error("Github 로그인 실패: ", error);
-      throw new Error("깃허브 로그인에 실패했습니다. 다시 시도해주세요");
+      throw new Error(
+        `깃허브 로그인에 실패했습니다(${error.code}). 다시 시도해주세요`
+      );
     }
   }
 };
 
 const saveUserData = async (user) => {
-  const userRef = doc(db, "users", user.email);
-  const userSnap = await getDoc(userRef);
+  checkFirebaseInitialized();
 
-  if (!userSnap.exists()) {
-    await setDoc(userRef, {
-      wordCount: 0,
-      aiUsage: 0,
-      maxWordCount: 50,
-      maxAiUsage: 10,
-    });
+  try {
+    const userRef = doc(db, "users", user.email);
+    const userSnap = await getDoc(userRef);
 
-    console.log("사용자 데이터 생성 성공");
-  } else {
-    console.log("이미 firestore에 사용자 데이터가 존재합니다.");
+    if (!userSnap.exists()) {
+      await setDoc(userRef, {
+        wordCount: 0,
+        aiUsage: 0,
+        maxWordCount: 50,
+        maxAiUsage: 10,
+      });
+
+      console.log("사용자 데이터 생성 성공");
+    } else {
+      console.log("이미 firestore에 사용자 데이터가 존재합니다.");
+    }
+  } catch (error) {
+    console.error("사용자 데이터 저장 중 오류:", error);
+    // 로그인은 성공하도록 오류를 무시
   }
 };
 
 export const logout = async () => {
+  checkFirebaseInitialized();
+
   try {
     await signOut(auth);
     console.log("로그아웃 성공");
@@ -143,10 +196,13 @@ export const logout = async () => {
     window.location.href = "login.html";
   } catch (error) {
     console.error("로그아웃 실패: ", error);
+    alert("로그아웃 중 오류가 발생했습니다: " + error.message);
   }
 };
 
 export const deleteAccount = async () => {
+  checkFirebaseInitialized();
+
   try {
     const user = auth.currentUser;
 
@@ -156,13 +212,13 @@ export const deleteAccount = async () => {
     }
 
     if (
-      user.providerData.some((provider) => provider.providerId == "google.com")
+      user.providerData.some((provider) => provider.providerId === "google.com")
     ) {
       const provider = new GoogleAuthProvider();
       await reauthenticateWithPopup(user, provider);
       alert("Google 사용자 재인증 성공");
     } else if (
-      user.providerData.some((provider) => provider.providerId == "github.com")
+      user.providerData.some((provider) => provider.providerId === "github.com")
     ) {
       const provider = new GithubAuthProvider();
       await reauthenticateWithPopup(user, provider);
@@ -183,11 +239,16 @@ export const deleteAccount = async () => {
     alert("계정이 성공적으로 삭제되었습니다.");
     window.location.href = "signup.html";
   } catch (error) {
+    console.error("계정 삭제 오류:", error);
+
     if (error.code === "auth/requires-recent-login") {
       alert("최근 인증 정보가 필요합니다. 다시 로그인 후 시도해주세요.");
+    } else if (error.code === "auth/popup-blocked") {
+      alert("팝업이 차단되었습니다. 팝업 차단을 해제하고 다시 시도해주세요.");
     } else {
-      console.error("계정 삭제 실패: ", error.message);
-      alert("계정을 삭제할 수 없습니다. 다시 시도해주세요.");
+      alert(
+        "계정을 삭제할 수 없습니다: " + (error.message || "알 수 없는 오류")
+      );
     }
   }
 };
