@@ -6,9 +6,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 import { fetchAndDisplayWords } from "./word-list-utils.js";
 
-const GEMINI_API_KEY = "apiKeys.GEMINI_API_KEY";
-const GEMINI_API_URL = "apiKeys.GEMINI_API_URL";
-
+// 서버 API를 사용하도록 수정
 export async function handleAIRecommendation(currentUser, db) {
   const subject = prompt("추천받을 주제를 입력해주세요.");
   if (!subject) return;
@@ -56,7 +54,8 @@ async function getHangulRecommendation(subject, amount) {
       5. The description and pronunciation must be written in **Korean**.  
       6. Each line should contain only one entry, and the format should be followed exactly.`;
 
-  const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+  // 서버 API 엔드포인트를 사용
+  const response = await fetch("/api/gemini", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

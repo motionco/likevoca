@@ -1,21 +1,30 @@
-import { apiKeys } from "../../utils/api-config.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: apiKeys.FIREBASE_API_KEY,
-  authDomain: "uploadfile-e6f81.firebaseapp.com",
-  databaseURL:
-    "https://uploadfile-e6f81-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "uploadfile-e6f81",
-  storageBucket: "uploadfile-e6f81.appspot.com",
-  messagingSenderId: "663760434128",
-  appId: "1:663760434128:web:1ccbc92ab3e34670783fd5",
-};
+// 서버에서 설정 가져오기
+let firebaseConfig = null;
+let app, auth, db;
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+async function initializeFirebase() {
+  try {
+    const response = await fetch("/api/config");
+    const config = await response.json();
+    firebaseConfig = config.firebase;
+
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getFirestore(app);
+
+    // Firebase 초기화 완료 이벤트 발생
+    const event = new CustomEvent("firebase-initialized");
+    window.dispatchEvent(event);
+  } catch (error) {
+    console.error("Firebase 초기화 오류:", error);
+  }
+}
+
+// 페이지 로드 시 Firebase 초기화
+initializeFirebase();
 
 export { app, auth, db };
