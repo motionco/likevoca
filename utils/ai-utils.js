@@ -109,13 +109,27 @@ export async function handleAIRecommendation(currentUser, db) {
 }
 
 async function getHangulRecommendation(subject, amount) {
-  // 더 단순한 프롬프트로 변경
-  const prompt = `Generate ${amount} Korean words related to: ${subject}
+  // 프롬프트 개선 - 구체적인 지시사항과 명확한 포맷 요구, 예제 추가
+  const prompt = `You are a Korean language expert. Generate exactly ${amount} Korean words related to the topic: "${subject}".
     
-    Format each line as: 한글|English meaning / pronunciation|Korean description|English translation
-    
-    Example: 바다|sea / bada|넓은 물|wide water
-             학교|school / hakgyo|배우는 곳|place of learning`;
+For each word, follow this EXACT format with pipe (|) as separators. Do not add any additional text or explanations:
+한글|English meaning / pronunciation in romanization|Korean description|English translation
+
+Examples:
+바다|sea / bada|넓은 물|wide water
+학교|school / hakgyo|배우는 곳|place of learning
+가방|bag / gabang|물건을 넣는 주머니|pouch for putting things
+의자|chair / uija|앉는 가구|furniture for sitting
+컴퓨터|computer / keompyuteo|정보 처리 기계|information processing machine
+
+IMPORTANT RULES:
+1. ONLY use the format above with exactly 4 sections separated by | symbols
+2. The first section MUST be a single Korean word in Hangul
+3. The second section MUST have English meaning, forward slash, then pronunciation
+4. The Korean description must be short and simple
+5. Provide exactly ${amount} words, no more and no less
+6. Each word must be on a separate line
+7. Do not number the lines or add any other text`;
 
   console.log("AI 프롬프트:", prompt);
 
@@ -133,44 +147,99 @@ async function getHangulRecommendation(subject, amount) {
   } else {
     // 서버 API 엔드포인트를 사용
     console.log("배포 환경에서 AI API 호출");
-    try {
-      const response = await fetch("/api/gemini", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-        }),
-      });
 
-      console.log("API 응답 상태:", response.status);
+    // 최대 3번 재시도
+    let retryCount = 0;
+    const maxRetries = 3;
 
-      if (!response.ok) {
-        console.error(
-          "AI 서버 응답 오류:",
-          response.status,
-          response.statusText
-        );
+    while (retryCount < maxRetries) {
+      try {
+        console.log(`API 요청 시도 ${retryCount + 1}/${maxRetries}`);
 
-        // 사용자에게 오류 알림 대신 긴급 로컬 데이터 대체
-        console.log("API 오류로 인해 로컬 데이터로 대체합니다");
-        aiResponse = getLocalTestData(subject, amount);
-        // 오류 알림 없이 계속 진행
-      } else {
+        const response = await fetch("/api/gemini", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+          }),
+        });
+
+        console.log("API 응답 상태:", response.status);
+
+        if (!response.ok) {
+          const errorData = await response.text();
+          console.error(
+            `API 오류 응답 (시도 ${retryCount + 1}/${maxRetries}):`,
+            response.status,
+            response.statusText,
+            errorData
+          );
+
+          // 429(Too Many Requests) 또는 5xx 오류의 경우 재시도
+          if (response.status === 429 || response.status >= 500) {
+            retryCount++;
+            if (retryCount < maxRetries) {
+              // 지수 백오프 적용 (1초, 2초, 4초...)
+              const waitTime = Math.pow(2, retryCount) * 1000;
+              console.log(`${waitTime}ms 후 재시도합니다...`);
+              await new Promise((resolve) => setTimeout(resolve, waitTime));
+              continue;
+            }
+          }
+
+          // 재시도 횟수 초과 또는 다른 오류인 경우 로컬 데이터로 대체
+          console.log("API 오류로 인해 로컬 데이터로 대체합니다");
+          aiResponse = getLocalTestData(subject, amount);
+          break;
+        }
+
         const data = await response.json();
         console.log("API 응답 데이터:", data);
 
         if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
           console.error("AI 응답에 텍스트 없음:", data);
-          // 로컬 데이터로 대체
+
+          // 응답 형식 오류의 경우 재시도
+          retryCount++;
+          if (retryCount < maxRetries) {
+            const waitTime = Math.pow(2, retryCount) * 1000;
+            console.log(`응답 형식 오류, ${waitTime}ms 후 재시도합니다...`);
+            await new Promise((resolve) => setTimeout(resolve, waitTime));
+            continue;
+          }
+
+          // 재시도 횟수 초과 시 로컬 데이터로 대체
           aiResponse = getLocalTestData(subject, amount);
         } else {
           aiResponse = data.candidates[0].content.parts[0].text;
           console.log("AI 응답 원본:", aiResponse);
+          // 성공적인 응답 받음, 루프 종료
+          break;
         }
+      } catch (error) {
+        console.error(
+          `API 호출 중 예외 발생 (시도 ${retryCount + 1}/${maxRetries}):`,
+          error
+        );
+
+        // 네트워크 오류 등의 경우 재시도
+        retryCount++;
+        if (retryCount < maxRetries) {
+          const waitTime = Math.pow(2, retryCount) * 1000;
+          console.log(`예외 발생, ${waitTime}ms 후 재시도합니다...`);
+          await new Promise((resolve) => setTimeout(resolve, waitTime));
+          continue;
+        }
+
+        // 재시도 횟수 초과 시 로컬 데이터로 대체
+        aiResponse = getLocalTestData(subject, amount);
+        break;
       }
-    } catch (error) {
-      console.error("API 호출 중 예외 발생:", error);
-      // 오류 시 로컬 데이터로 대체
+    }
+
+    // 모든 시도 후에도 aiResponse가 설정되지 않은 경우 로컬 데이터 사용
+    if (!aiResponse) {
+      console.warn("모든 API 시도 실패, 로컬 데이터로 대체합니다.");
       aiResponse = getLocalTestData(subject, amount);
     }
   }
@@ -199,7 +268,13 @@ async function getHangulRecommendation(subject, amount) {
     .map((line) => {
       console.log("처리 중인 라인:", line);
 
-      const parts = line.split("|").map((s) => s.trim());
+      // 불필요한 마크다운 기호나 숫자 제거
+      const cleanLine = line.replace(/^[-*0-9.\s]+/, "").trim();
+
+      // 여러 개의 파이프(|)가 연속으로 있는 경우 하나로 통합
+      const normalizedLine = cleanLine.replace(/\|\s*\|/g, "|");
+
+      const parts = normalizedLine.split("|").map((s) => s.trim());
 
       // 필드 수 확인 및 디버깅
       console.log(`분할된 필드 수: ${parts.length}`, parts);
@@ -232,6 +307,9 @@ async function getHangulRecommendation(subject, amount) {
         return null;
       }
 
+      // 한글에서 불필요한 문자 제거
+      hangul = hangul.replace(/[^가-힣]/g, "");
+
       // 영어 의미와 로마자 발음 분리
       let meaning = hangul;
       let pronunciation = hangul;
@@ -258,6 +336,9 @@ async function getHangulRecommendation(subject, amount) {
           pronunciation = hangul;
         }
       }
+
+      // 발음에서 불필요한 문자 제거
+      pronunciation = pronunciation.replace(/[^\w\s-]/g, "");
 
       // 한글 설명과 영어 설명 처리
       const description = korDesc || `${hangul}에 대한 설명`;
