@@ -305,10 +305,85 @@ export function showLearnHangulModal(word) {
   quizBtn.textContent = "발음 듣기";
   animateBtn.textContent = "이미지 보기";
 
-  // 영어 의미가 있는 경우 한글 설명과 함께 표시
+  // 한글 설명에 대한 영어 번역 매핑
+  const descriptionTranslations = {
+    // 기본 설명 번역들
+    주식: "Staple food",
+    "국물 요리": "Soup dish",
+    "밥과 함께 먹는 음식": "Side dish eaten with rice",
+    "대표적인 발효 음식": "Representative fermented food",
+    "쌀로 만든 음식": "Food made from rice",
+    "배우는 사람": "Person who learns",
+    "가르치는 사람": "Person who teaches",
+    "수업하는 공간": "Space for classes",
+    "공부하는 가구": "Furniture for studying",
+    "배우는 행위": "Act of learning",
+    "높은 지형": "High terrain",
+    "넓은 물": "Wide body of water",
+    "흐르는 물": "Flowing water",
+    "나무가 많은 곳": "Place with many trees",
+    "아름다운 식물": "Beautiful plant",
+    "가정에서 키우는 동물": "Animal raised at home",
+    "우아한 반려동물": "Elegant pet",
+    "빠르게 달리는 동물": "Animal that runs fast",
+    "우유를 주는 동물": "Animal that gives milk",
+    "알을 낳는 새": "Bird that lays eggs",
+    "공을 차는 운동": "Sport of kicking a ball",
+    "공을 던지는 운동": "Sport of throwing a ball",
+    "물에서 하는 운동": "Sport done in water",
+    "빠르게 움직이는 운동": "Sport of moving quickly",
+    "공을 치는 운동": "Sport of hitting a ball",
+    "밥과 야채를 섞은 요리": "Dish of mixed rice and vegetables",
+    "쇠고기 요리": "Beef dish",
+    "인스턴트 면 요리": "Instant noodle dish",
+    "교육 활동": "Educational activity",
+    "평가 활동": "Evaluation activity",
+    "학습 자료": "Learning materials",
+    "공기 위 공간": "Space above the air",
+    "움직이는 공기": "Moving air",
+    "수증기 덩어리": "Mass of water vapor",
+    "긴 귀의 동물": "Animal with long ears",
+    "농장의 동물": "Farm animal",
+    "큰 고양이과 동물": "Large feline animal",
+    "라켓으로 치는 운동": "Sport of hitting with a racket",
+    "네트 너머로 공을 넘기는 운동": "Sport of sending a ball over a net",
+    "공을 홀에 넣는 운동": "Sport of putting a ball in a hole",
+
+    // 추가적인 설명에 대한 매핑
+    "바다에 사는 동물": "Animal living in the sea",
+    "하늘을 나는 동물": "Animal that flies in the sky",
+    "추운 지역에 사는 동물": "Animal living in cold regions",
+    "열대 지방에 사는 동물": "Animal living in tropical regions",
+    "한국의 전통 음식": "Traditional Korean food",
+    "일본의 전통 음식": "Traditional Japanese food",
+    "중국의 전통 음식": "Traditional Chinese food",
+    "이탈리아의 전통 음식": "Traditional Italian food",
+    "매운 음식": "Spicy food",
+    "달콤한 음식": "Sweet food",
+    "짠 음식": "Salty food",
+    "신 음식": "Sour food",
+    "쓴 음식": "Bitter food",
+    "아름다운 경치": "Beautiful scenery",
+    "잔잔한 물": "Calm water",
+    "맑은 하늘": "Clear sky",
+    "어두운 밤": "Dark night",
+    "밝은 아침": "Bright morning",
+    "따뜻한 날씨": "Warm weather",
+    "추운 날씨": "Cold weather",
+    "비오는 날": "Rainy day",
+    "눈 오는 날": "Snowy day",
+    "화창한 날": "Sunny day",
+  };
+
+  // 상세 설명에 영어 번역 추가
   let displayDescription = word.description || "";
-  if (word.meaning && !displayDescription.includes(word.meaning)) {
-    displayDescription = displayDescription + ` (${word.meaning})`;
+  const translatedDesc = descriptionTranslations[displayDescription] || "";
+
+  if (translatedDesc) {
+    displayDescription = `${displayDescription} (${translatedDesc})`;
+  } else if (word.meaning) {
+    // 번역이 없는 경우에만 기존 영어 의미 사용
+    displayDescription = `${displayDescription} (${word.meaning})`;
   }
 
   // 정보 표시
