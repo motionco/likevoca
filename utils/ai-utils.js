@@ -111,15 +111,17 @@ export async function handleAIRecommendation(currentUser, db) {
 async function getHangulRecommendation(subject, amount) {
   const prompt = `Recommend ${amount} Korean words (Hangul) related to the following topic: ${subject}.  
       Follow this exact format for each word:  
-      Hangul|English Meaning / Romanized Pronunciation|Stroke Count|Description (in Korean, max 10 characters)  
+      Hangul|English Meaning / Romanized Pronunciation|Korean Description|English Description
       
       ### Important Rules:  
       1. Each entry should have 4 parts separated by | (pipe).
       2. For the second part (Meaning/Pronunciation), use format: "english_meaning / romanized_pronunciation" (e.g., "rice / bap", "water / mul").
       3. Each response must contain exactly one complete Korean word.
       4. DO NOT include single consonants or vowels. Only complete syllables.
-      5. The stroke count must be accurate for the entire word.
-      6. The description must be in Korean, the meaning in English, and pronunciation in romanized Korean.`;
+      5. Korean Description: Write a brief description in Korean (max 10 characters).
+      6. English Description: Provide an English translation of the Korean description.
+      7. The meaning should be in English, pronunciation in romanized Korean, description first in Korean then in English.
+      8. Example format: 바다|sea / bada|넓은 물|wide body of water`;
 
   // 로컬 환경인지 확인
   const isLocalEnvironment =
@@ -160,7 +162,7 @@ async function getHangulRecommendation(subject, amount) {
     .split("\n")
     .filter((line) => line.trim() && line.includes("|"))
     .map((line) => {
-      const [hangul, infoText, stroke, description] = line
+      const [hangul, infoText, korDesc, engDesc] = line
         .split("|")
         .map((s) => s.trim());
 
@@ -201,12 +203,16 @@ async function getHangulRecommendation(subject, amount) {
         }
       }
 
+      // 한글 설명과 영어 설명 처리
+      const description = korDesc || `${hangul}에 대한 설명`;
+      const englishDescription = engDesc || "";
+
       return {
         hangul,
         meaning,
         pronunciation,
-        stroke: parseInt(stroke) || HangulWriter.getStrokeCount(hangul) || 1,
-        description: description || `${hangul}에 대한 설명`,
+        description,
+        englishDescription,
         createdAt: new Date().toISOString(),
       };
     })
@@ -226,77 +232,85 @@ function getLocalTestData(subject, amount) {
   // 주제별 기본 단어 목록 (영어 의미와 로마자 발음 분리)
   const topicWords = {
     음식: [
-      "밥|rice / bap|8|주식",
-      "국|soup / guk|9|국물 요리",
-      "반찬|side dish / banchan|18|밥과 함께 먹는 음식",
-      "김치|kimchi / gimchi|19|대표적인 발효 음식",
-      "떡|rice cake / tteok|10|쌀로 만든 음식",
-      "비빔밥|bibimbap / bibimbap|20|밥과 야채를 섞은 요리",
-      "불고기|bulgogi / bulgogi|22|쇠고기 요리",
-      "라면|ramen / ramyeon|18|인스턴트 면 요리",
+      "밥|rice / bap|주식|Staple food",
+      "국|soup / guk|국물 요리|Soup dish",
+      "반찬|side dish / banchan|밥과 함께 먹는 음식|Side dish eaten with rice",
+      "김치|kimchi / gimchi|대표적인 발효 음식|Representative fermented food",
+      "떡|rice cake / tteok|쌀로 만든 음식|Food made from rice",
+      "비빔밥|bibimbap / bibimbap|밥과 야채를 섞은 요리|Dish of mixed rice and vegetables",
+      "불고기|bulgogi / bulgogi|쇠고기 요리|Beef dish",
+      "라면|ramen / ramyeon|인스턴트 면 요리|Instant noodle dish",
     ],
     학교: [
-      "학생|student / haksaeng|20|배우는 사람",
-      "선생|teacher / seonsaeng|22|가르치는 사람",
-      "교실|classroom / gyosil|17|수업하는 공간",
-      "책상|desk / chaeksang|18|공부하는 가구",
-      "공부|study / gongbu|13|배우는 행위",
-      "수업|class / sueop|16|교육 활동",
-      "시험|exam / siheom|18|평가 활동",
-      "교과서|textbook / gyogwaseo|25|학습 자료",
+      "학생|student / haksaeng|배우는 사람|Person who learns",
+      "선생|teacher / seonsaeng|가르치는 사람|Person who teaches",
+      "교실|classroom / gyosil|수업하는 공간|Space for classes",
+      "책상|desk / chaeksang|공부하는 가구|Furniture for studying",
+      "공부|study / gongbu|배우는 행위|Act of learning",
+      "수업|class / sueop|교육 활동|Educational activity",
+      "시험|exam / siheom|평가 활동|Evaluation activity",
+      "교과서|textbook / gyogwaseo|학습 자료|Learning materials",
     ],
     자연: [
-      "산|mountain / san|5|높은 지형",
-      "바다|sea / bada|8|넓은 물",
-      "강|river / gang|5|흐르는 물",
-      "숲|forest / sup|16|나무가 많은 곳",
-      "꽃|flower / kkot|10|아름다운 식물",
-      "하늘|sky / haneul|12|공기 위 공간",
-      "바람|wind / baram|10|움직이는 공기",
-      "구름|cloud / gureum|14|수증기 덩어리",
+      "산|mountain / san|높은 지형|High terrain",
+      "바다|sea / bada|넓은 물|Wide body of water",
+      "강|river / gang|흐르는 물|Flowing water",
+      "숲|forest / sup|나무가 많은 곳|Place with many trees",
+      "꽃|flower / kkot|아름다운 식물|Beautiful plant",
+      "하늘|sky / haneul|공기 위 공간|Space above the air",
+      "바람|wind / baram|움직이는 공기|Moving air",
+      "구름|cloud / gureum|수증기 덩어리|Mass of water vapor",
     ],
     동물: [
-      "개|dog / gae|4|가정에서 키우는 동물",
-      "고양이|cat / goyangi|17|우아한 반려동물",
-      "말|horse / mal|4|빠르게 달리는 동물",
-      "소|cow / so|4|우유를 주는 동물",
-      "닭|chicken / dak|9|알을 낳는 새",
-      "토끼|rabbit / tokki|12|긴 귀의 동물",
-      "돼지|pig / dwaeji|14|농장의 동물",
-      "호랑이|tiger / horangi|21|큰 고양이과 동물",
+      "개|dog / gae|가정에서 키우는 동물|Animal raised at home",
+      "고양이|cat / goyang-i|우아한 반려동물|Elegant pet",
+      "말|horse / mal|빠르게 달리는 동물|Animal that runs fast",
+      "소|cow / so|우유를 주는 동물|Animal that gives milk",
+      "닭|chicken / dak|알을 낳는 새|Bird that lays eggs",
+      "토끼|rabbit / tokki|긴 귀의 동물|Animal with long ears",
+      "돼지|pig / dwaeji|농장의 동물|Farm animal",
+      "호랑이|tiger / horangi|큰 고양이과 동물|Large feline animal",
     ],
     스포츠: [
-      "축구|soccer / chukgu|17|공을 차는 운동",
-      "농구|basketball / nonggu|22|공을 던지는 운동",
-      "수영|swimming / suyeong|11|물에서 하는 운동",
-      "달리기|running / dalligi|15|빠르게 움직이는 운동",
-      "야구|baseball / yagu|18|공을 치는 운동",
-      "테니스|tennis / teniseu|21|라켓으로 치는 운동",
-      "배구|volleyball / baegu|18|네트 너머로 공을 넘기는 운동",
-      "골프|golf / golpeu|16|공을 홀에 넣는 운동",
+      "축구|soccer / chukgu|공을 차는 운동|Sport of kicking a ball",
+      "농구|basketball / nonggu|공을 던지는 운동|Sport of throwing a ball",
+      "수영|swimming / suyeong|물에서 하는 운동|Sport done in water",
+      "달리기|running / dalligi|빠르게 움직이는 운동|Sport of moving quickly",
+      "야구|baseball / yagu|공을 치는 운동|Sport of hitting a ball",
+      "테니스|tennis / teniseu|라켓으로 치는 운동|Sport of hitting with a racket",
+      "배구|volleyball / baegu|네트 너머로 공을 넘기는 운동|Sport of sending a ball over a net",
+      "골프|golf / golpeu|공을 홀에 넣는 운동|Sport of putting a ball in a hole",
     ],
   };
 
-  // 주제에 맞는 단어 목록 선택
-  let words = [];
-  for (const [topic, wordList] of Object.entries(topicWords)) {
-    if (subject.includes(topic) || topic.includes(subject)) {
-      words = wordList;
-      break;
+  // 주제에 해당하는 단어 목록 가져오기
+  let words = topicWords[subject] || [];
+
+  // 주제에 해당하는 단어가 없으면 모든 단어를 병합
+  if (words.length === 0) {
+    console.log("주제에 맞는 단어 없음, 모든 단어 사용");
+    Object.values(topicWords).forEach((wordList) => {
+      words = words.concat(wordList);
+    });
+  }
+
+  // 단어 수가 부족하면 중복 허용
+  if (words.length < amount) {
+    console.log(`단어 부족 (${words.length}개), 중복 허용`);
+    const originalWords = [...words];
+    while (words.length < amount) {
+      words.push(
+        originalWords[Math.floor(Math.random() * originalWords.length)]
+      );
     }
   }
 
-  // 매칭되는 주제가 없으면 모든 목록에서 랜덤 선택
-  if (words.length === 0) {
-    words = Object.values(topicWords).flat();
-  }
-
-  // 결과를 담을 배열
+  // 요청 개수만큼 무작위로 단어 선택
   const selectedWords = [];
   const usedIndices = new Set();
 
-  // 중복 없이 최대한 선택
-  while (selectedWords.length < amount && usedIndices.size < words.length) {
+  // 먼저 중복 없이 가능한 만큼 선택
+  for (let i = 0; i < Math.min(amount, words.length); i++) {
     let randomIndex;
     do {
       randomIndex = Math.floor(Math.random() * words.length);
@@ -346,7 +360,7 @@ async function saveRecommendedHangul(currentUser, db, hangulData) {
       pronunciation: hangulData.pronunciation || "",
       meaning: hangulData.meaning || hangulData.hangul,
       description: hangulData.description || `${hangulData.hangul}에 대한 설명`,
-      stroke: hangulData.stroke || 1,
+      englishDescription: hangulData.englishDescription || "",
       createdAt: hangulData.createdAt || new Date().toISOString(),
       image: hangulData.image || "📝", // 이모지 저장
     };

@@ -381,20 +381,24 @@ export function showLearnHangulModal(word) {
   // 디버깅: 상세 설명 로깅
   console.log("원본 설명:", displayDescription);
 
-  // 더 안전한 방식으로 번역 찾기 (점 표기법 대신 대괄호 표기법 사용)
-  let translatedDesc = "";
+  // englishDescription이 있으면 우선 사용
+  let translatedDesc = word.englishDescription || "";
+  console.log("단어에서 가져온 영어 설명:", translatedDesc);
 
-  // 객체에 직접 접근하는 대신 항목을 순회하며 일치하는 키 찾기
-  for (const [key, value] of Object.entries(descriptionTranslations)) {
-    if (key === displayDescription) {
-      translatedDesc = value;
-      console.log("번역 찾음:", key, "->", value);
-      break;
+  // englishDescription이 없으면 매핑에서 찾기
+  if (!translatedDesc) {
+    // 객체에 직접 접근하는 대신 항목을 순회하며 일치하는 키 찾기
+    for (const [key, value] of Object.entries(descriptionTranslations)) {
+      if (key === displayDescription) {
+        translatedDesc = value;
+        console.log("번역 매핑에서 찾음:", key, "->", value);
+        break;
+      }
     }
   }
 
   // 결과 로깅
-  console.log("찾은 번역:", translatedDesc);
+  console.log("최종 사용 영어 설명:", translatedDesc);
 
   if (translatedDesc) {
     displayDescription = `${displayDescription} (${translatedDesc})`;
