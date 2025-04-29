@@ -109,19 +109,17 @@ export async function handleAIRecommendation(currentUser, db) {
 }
 
 async function getHangulRecommendation(subject, amount) {
-  const prompt = `Recommend ${amount} Korean words (Hangul) related to the following topic: ${subject}.  
-      Follow this exact format for each word:  
-      Hangul|English Meaning / Romanized Pronunciation|Korean Description|English Translation of Korean Description
+  const prompt = `Recommend ${amount} Korean words (Hangul) related to the following topic: ${subject}.
       
-      ### Important Rules:  
-      1. Each entry should have 4 parts separated by | (pipe).
-      2. For the second part (Meaning/Pronunciation), use format: "english_meaning / romanized_pronunciation" (e.g., "rice / bap", "water / mul").
-      3. Each response must contain exactly one complete Korean word.
-      4. DO NOT include single consonants or vowels. Only complete syllables.
-      5. Korean Description: Write a brief description in Korean (max 10 characters).
-      6. English Translation: MUST provide the English translation of the Korean description (not just the meaning of the word again).
-      7. The meaning should be in English, pronunciation in romanized Korean, description first in Korean then in English.
-      8. Example format: 바다|sea / bada|넓은 물|wide body of water`;
+      Format: Hangul|English Meaning / Romanized Pronunciation|Korean Description|English Translation
+      
+      Rules:
+      1. Each complete Korean word (no single consonants/vowels) with 4 fields separated by | (pipe)
+      2. Second field: "english_meaning / romanized_pronunciation" (e.g., "sea / bada")
+      3. Third field: Brief description in Korean (max 10 characters)
+      4. Fourth field: English translation of the Korean description
+      
+      Example: 바다|sea / bada|넓은 물|wide body of water`;
 
   console.log("AI 프롬프트:", prompt);
 
