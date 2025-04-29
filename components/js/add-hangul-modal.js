@@ -1073,7 +1073,7 @@ function validateForm() {
 
 // 모달 닫기 함수
 function closeModal() {
-  const modal = document.getElementById("add-hangul-modal");
+  const modal = document.getElementById("hangul-modal");
   if (modal) {
     modal.classList.add("hidden");
   }

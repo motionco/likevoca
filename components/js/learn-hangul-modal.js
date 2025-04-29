@@ -305,12 +305,18 @@ export function showLearnHangulModal(word) {
   quizBtn.textContent = "발음 듣기";
   animateBtn.textContent = "이미지 보기";
 
+  // 영어 의미가 있는 경우 한글 설명과 함께 표시
+  let displayDescription = word.description || "";
+  if (word.meaning && !displayDescription.includes(word.meaning)) {
+    displayDescription = displayDescription + ` (${word.meaning})`;
+  }
+
   // 정보 표시
   document.getElementById("learn-hangul").textContent = word.hangul;
   document.getElementById("learn-pronunciation").textContent =
     word.pronunciation || "";
   document.getElementById("learn-meaning").textContent = word.meaning;
-  document.getElementById("learn-description").textContent = word.description;
+  document.getElementById("learn-description").textContent = displayDescription;
   document.getElementById("learn-date").textContent = new Date(
     word.createdAt
   ).toLocaleString("ko-KR", {
