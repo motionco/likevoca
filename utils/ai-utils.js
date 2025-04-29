@@ -111,7 +111,7 @@ export async function handleAIRecommendation(currentUser, db) {
 async function getHangulRecommendation(subject, amount) {
   const prompt = `Recommend ${amount} Korean words (Hangul) related to the following topic: ${subject}.  
       Follow this exact format for each word:  
-      Hangul|English Meaning / Romanized Pronunciation|Korean Description|English Description
+      Hangul|English Meaning / Romanized Pronunciation|Korean Description|English Translation of Korean Description
       
       ### Important Rules:  
       1. Each entry should have 4 parts separated by | (pipe).
@@ -119,9 +119,11 @@ async function getHangulRecommendation(subject, amount) {
       3. Each response must contain exactly one complete Korean word.
       4. DO NOT include single consonants or vowels. Only complete syllables.
       5. Korean Description: Write a brief description in Korean (max 10 characters).
-      6. English Description: Provide an English translation of the Korean description.
+      6. English Translation: MUST provide the English translation of the Korean description (not just the meaning of the word again).
       7. The meaning should be in English, pronunciation in romanized Korean, description first in Korean then in English.
       8. Example format: 바다|sea / bada|넓은 물|wide body of water`;
+
+  console.log("AI 프롬프트:", prompt);
 
   // 로컬 환경인지 확인
   const isLocalEnvironment =
@@ -136,6 +138,7 @@ async function getHangulRecommendation(subject, amount) {
     aiResponse = getLocalTestData(subject, amount);
   } else {
     // 서버 API 엔드포인트를 사용
+    console.log("배포 환경에서 AI API 호출");
     const response = await fetch("/api/gemini", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -145,26 +148,66 @@ async function getHangulRecommendation(subject, amount) {
     });
 
     if (!response.ok) {
+      console.error("AI 서버 응답 오류:", response.status, response.statusText);
       alert("AI 서버 응답에 실패했습니다.");
       return;
     }
 
     const data = await response.json();
     if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
+      console.error("AI 응답에 텍스트 없음:", data);
       alert("AI로부터 응답을 받지 못했습니다.");
       return;
     }
 
     aiResponse = data.candidates[0].content.parts[0].text;
+    console.log("AI 응답 원본:", aiResponse);
   }
+
+  // 응답에서 각 줄 로깅
+  console.log("AI 응답 라인별 분석:");
+  aiResponse.split("\n").forEach((line, index) => {
+    console.log(`라인 ${index + 1}:`, line);
+  });
 
   const recommendations = aiResponse
     .split("\n")
-    .filter((line) => line.trim() && line.includes("|"))
+    .filter((line) => {
+      const isValid = line.trim() && line.includes("|");
+      if (!isValid) {
+        console.log("유효하지 않은 라인 무시:", line);
+      }
+      return isValid;
+    })
     .map((line) => {
-      const [hangul, infoText, korDesc, engDesc] = line
-        .split("|")
-        .map((s) => s.trim());
+      console.log("처리 중인 라인:", line);
+
+      const parts = line.split("|").map((s) => s.trim());
+
+      // 필드 수 확인 및 디버깅
+      console.log(`분할된 필드 수: ${parts.length}`, parts);
+
+      let hangul, infoText, korDesc, engDesc;
+
+      // 최소 2개 이상의 필드가 있어야 함
+      if (parts.length >= 2) {
+        hangul = parts[0];
+        infoText = parts[1];
+
+        // 한글 설명과 영어 설명 처리
+        korDesc = parts.length >= 3 ? parts[2] : "";
+        engDesc = parts.length >= 4 ? parts[3] : "";
+
+        console.log("파싱 결과:", {
+          hangul,
+          infoText,
+          korDesc,
+          engDesc,
+        });
+      } else {
+        console.warn("필드 수 부족:", parts);
+        return null;
+      }
 
       // 단일 자음/모음만 있는지 검사
       const isSingleConsonantOrVowel = /^[ㄱ-ㅎㅏ-ㅣ]$/.test(hangul);
@@ -174,6 +217,7 @@ async function getHangulRecommendation(subject, amount) {
 
       // 유효하지 않은 한글이면 건너뜀
       if (isSingleConsonantOrVowel || !isProperHangul) {
+        console.warn("유효하지 않은 한글:", hangul);
         return null;
       }
 
@@ -205,7 +249,17 @@ async function getHangulRecommendation(subject, amount) {
 
       // 한글 설명과 영어 설명 처리
       const description = korDesc || `${hangul}에 대한 설명`;
-      const englishDescription = engDesc || "";
+
+      // 영어 설명이 없는 경우 의미를 기본값으로 사용
+      const englishDescription = engDesc || meaning || "";
+
+      console.log("최종 데이터:", {
+        hangul,
+        meaning,
+        pronunciation,
+        description,
+        englishDescription,
+      });
 
       return {
         hangul,
@@ -222,6 +276,8 @@ async function getHangulRecommendation(subject, amount) {
     alert("유효한 한글 추천을 받지 못했습니다.");
     return;
   }
+
+  console.log("최종 추천 목록:", recommendations);
 
   // 정확히 요청한 개수만큼 반환
   return recommendations.slice(0, amount);
@@ -354,6 +410,9 @@ async function saveRecommendedHangul(currentUser, db, hangulData) {
 
     await updateDoc(userRef, { aiUsage });
 
+    // 입력 데이터 로깅
+    console.log("AI 추천 저장 - 입력 데이터:", hangulData);
+
     // 올바른 형식으로 데이터 확인
     const validHangulData = {
       hangul: hangulData.hangul || "",
@@ -378,11 +437,23 @@ async function saveRecommendedHangul(currentUser, db, hangulData) {
       );
     }
 
+    // 영어 설명이 비어 있으면 영어 의미를 사용
+    if (!validHangulData.englishDescription) {
+      validHangulData.englishDescription = validHangulData.meaning;
+      console.log(
+        "영어 설명 없음, 의미를 영어 설명으로 설정:",
+        validHangulData.meaning
+      );
+    }
+
     // 올바른 한글인지 확인 (완전한 음절)
     if (!/^[가-힣]+$/.test(validHangulData.hangul)) {
       console.error("올바르지 않은 한글:", validHangulData.hangul);
       return false;
     }
+
+    // 최종 저장 데이터 로깅
+    console.log("AI 추천 저장 - 최종 데이터:", validHangulData);
 
     const recommendRef = doc(
       db,
