@@ -377,14 +377,35 @@ export function showLearnHangulModal(word) {
 
   // 상세 설명에 영어 번역 추가
   let displayDescription = word.description || "";
-  const translatedDesc = descriptionTranslations[displayDescription] || "";
+
+  // 디버깅: 상세 설명 로깅
+  console.log("원본 설명:", displayDescription);
+
+  // 더 안전한 방식으로 번역 찾기 (점 표기법 대신 대괄호 표기법 사용)
+  let translatedDesc = "";
+
+  // 객체에 직접 접근하는 대신 항목을 순회하며 일치하는 키 찾기
+  for (const [key, value] of Object.entries(descriptionTranslations)) {
+    if (key === displayDescription) {
+      translatedDesc = value;
+      console.log("번역 찾음:", key, "->", value);
+      break;
+    }
+  }
+
+  // 결과 로깅
+  console.log("찾은 번역:", translatedDesc);
 
   if (translatedDesc) {
     displayDescription = `${displayDescription} (${translatedDesc})`;
   } else if (word.meaning) {
     // 번역이 없는 경우에만 기존 영어 의미 사용
+    console.log("번역 없음, 기본 의미 사용:", word.meaning);
     displayDescription = `${displayDescription} (${word.meaning})`;
   }
+
+  // 최종 표시 텍스트 로깅
+  console.log("최종 표시 텍스트:", displayDescription);
 
   // 정보 표시
   document.getElementById("learn-hangul").textContent = word.hangul;
