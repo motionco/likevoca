@@ -205,11 +205,10 @@ function showImage(emoji) {
         align-items: center;
         justify-content: center;
         font-size: 180px;
+        text-align: center;
         padding: 20px;
-        box-sizing: border-box;
-        overflow: hidden;
       ">
-        ${emoji}
+        ${emoji || "📝"}
       </div>
     `;
   }
@@ -519,37 +518,25 @@ function closeModal() {
 
 // 이미지 보기 버튼 함수
 function toggleImage() {
-  console.log("이미지 보기 버튼 클릭됨");
-  if (!currentHangul || !currentImage) {
-    console.error("표시할 한글 또는 이미지가 없습니다.");
+  console.log("이미지 토글");
+  const target = document.getElementById("character-target-div");
+  const animateBtn = document.getElementById("animate-button");
+
+  if (!target || !animateBtn) {
+    console.error("이미지 토글에 필요한 요소를 찾을 수 없습니다.");
     return;
   }
 
-  try {
-    if (isShowingImage) {
-      // 한글로 되돌리기
-      showHangulOnly(currentHangul);
-      const animateBtn = document.getElementById("animate-button");
-      if (animateBtn) {
-        animateBtn.textContent = "이미지 보기";
-      }
-    } else {
-      // 이미지 표시
-      showImage(currentImage);
-      const animateBtn = document.getElementById("animate-button");
-      if (animateBtn) {
-        animateBtn.textContent = "한글 보기";
-      }
-    }
-
-    isShowingImage = !isShowingImage;
-
-    console.log("이미지 토글 완료");
-  } catch (error) {
-    console.error("이미지 표시 중 오류:", error);
-    // 오류 시 글자만 표시
+  if (isShowingImage) {
+    // 한글로 돌아가기
     showHangulOnly(currentHangul);
+    animateBtn.textContent = "이미지 보기";
     isShowingImage = false;
+  } else {
+    // 이미지 표시
+    showImage(currentImage);
+    animateBtn.textContent = "한글 보기";
+    isShowingImage = true;
   }
 }
 

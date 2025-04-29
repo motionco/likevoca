@@ -18,10 +18,12 @@ export function createWordCard(word) {
         )})"
       >
         <div class="overflow-hidden mb-4 flex-grow-0 flex justify-center items-center" style="height: 160px;">
-          <h1 class="text-3xl lg:text-4xl font-extrabold text-center text-black overflow-hidden" 
-             style="word-break: keep-all; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-          ${word.hangul}
-        </h1>
+          <div class="flex flex-col items-center">
+            <h1 class="text-5xl lg:text-6xl font-extrabold text-center text-black overflow-hidden" 
+               style="word-break: keep-all; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+            ${word.hangul}
+            </h1>
+          </div>
         </div>
         <div class="space-y-3 flex-grow-0">
           <p class="flex items-center text-gray-700 text-lg">
