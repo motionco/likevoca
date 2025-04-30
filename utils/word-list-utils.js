@@ -89,7 +89,7 @@ export function filterWords(allWords, searchInput, filterType) {
   const filterValue = filterType.value;
 
   return allWords.filter((word) => {
-    const valueToSearch = word[filterValue].toString().toLowerCase() || "";
+    const valueToSearch = (word[filterValue] || "").toString().toLowerCase();
     return valueToSearch.includes(searchValue);
   });
 }

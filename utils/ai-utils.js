@@ -60,7 +60,7 @@ export async function handleAIRecommendation(currentUser, db) {
     recommendations = recommendations.map((hangulData) => {
       return {
         ...hangulData,
-        image: selectEmojiForWord(hangulData.meaning, hangulData.hangul),
+        image: selectEmojiForWord(hangulData.hangul, hangulData.meaning),
       };
     });
 
@@ -625,8 +625,8 @@ async function saveRecommendedHangul(currentUser, db, hangulData) {
     // 이모지가 없으면 단어에 맞는 이모지 생성
     if (!validHangulData.image) {
       validHangulData.image = selectEmojiForWord(
-        validHangulData.meaning,
-        validHangulData.hangul
+        validHangulData.hangul,
+        validHangulData.meaning
       );
     }
 

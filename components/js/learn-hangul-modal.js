@@ -225,8 +225,16 @@ function setupModalEventListeners() {
     const animateBtn = document.getElementById("animate-button");
     const quizBtn = document.getElementById("quiz-button");
     const deleteBtn = document.getElementById("delete-hangul");
+    const editBtn = document.getElementById("edit-hangul");
 
-    if (!modal || !closeBtn || !animateBtn || !quizBtn || !deleteBtn) {
+    if (
+      !modal ||
+      !closeBtn ||
+      !animateBtn ||
+      !quizBtn ||
+      !deleteBtn ||
+      !editBtn
+    ) {
       console.error("필요한 요소를 찾을 수 없습니다.");
       return;
     }
@@ -236,18 +244,21 @@ function setupModalEventListeners() {
     animateBtn.replaceWith(animateBtn.cloneNode(true));
     quizBtn.replaceWith(quizBtn.cloneNode(true));
     deleteBtn.replaceWith(deleteBtn.cloneNode(true));
+    editBtn.replaceWith(editBtn.cloneNode(true));
 
     // 새 요소 참조 다시 가져오기
     const newCloseBtn = document.getElementById("close-learn-modal");
     const newAnimateBtn = document.getElementById("animate-button");
     const newQuizBtn = document.getElementById("quiz-button");
     const newDeleteBtn = document.getElementById("delete-hangul");
+    const newEditBtn = document.getElementById("edit-hangul");
 
     // 이벤트 리스너 추가
     newCloseBtn.addEventListener("click", closeModal);
     newAnimateBtn.addEventListener("click", toggleImage);
     newQuizBtn.addEventListener("click", playPronunciation);
     newDeleteBtn.addEventListener("click", deleteHangul);
+    newEditBtn.addEventListener("click", editHangul);
 
     console.log("모달 이벤트 리스너 설정 완료");
   } catch (error) {
@@ -259,11 +270,13 @@ function setupModalEventListeners() {
       const animateBtn = document.getElementById("animate-button");
       const quizBtn = document.getElementById("quiz-button");
       const deleteBtn = document.getElementById("delete-hangul");
+      const editBtn = document.getElementById("edit-hangul");
 
       if (closeBtn) closeBtn.addEventListener("click", closeModal);
       if (animateBtn) animateBtn.addEventListener("click", toggleImage);
       if (quizBtn) quizBtn.addEventListener("click", playPronunciation);
       if (deleteBtn) deleteBtn.addEventListener("click", deleteHangul);
+      if (editBtn) editBtn.addEventListener("click", editHangul);
 
       console.log("백업 방식으로 이벤트 리스너 설정 완료");
     } catch (secondError) {
@@ -400,13 +413,8 @@ export function showLearnHangulModal(word) {
   // 결과 로깅
   console.log("최종 사용 영어 설명:", translatedDesc);
 
-  if (translatedDesc) {
-    displayDescription = `${displayDescription} (${translatedDesc})`;
-  } else if (word.meaning) {
-    // 번역이 없는 경우에만 기존 영어 의미 사용
-    console.log("번역 없음, 기본 의미 사용:", word.meaning);
-    displayDescription = `${displayDescription} (${word.meaning})`;
-  }
+  // 원본 설명만 사용하도록 수정 (소괄호와 영어 설명 제거)
+  displayDescription = word.description || "";
 
   // 최종 표시 텍스트 로깅
   console.log("최종 표시 텍스트:", displayDescription);
@@ -436,6 +444,7 @@ export function showLearnHangulModal(word) {
   // 이전 이벤트 리스너 모두 제거 후 새로 설정
   const closeBtn = document.getElementById("close-learn-modal");
   const deleteBtn = document.getElementById("delete-hangul");
+  const editBtn = document.getElementById("edit-hangul");
 
   // 모든 이벤트 리스너 제거 시도 (최대한 많은 방법으로)
   try {
@@ -443,18 +452,21 @@ export function showLearnHangulModal(word) {
     animateBtn.replaceWith(animateBtn.cloneNode(true));
     quizBtn.replaceWith(quizBtn.cloneNode(true));
     deleteBtn.replaceWith(deleteBtn.cloneNode(true));
+    editBtn.replaceWith(editBtn.cloneNode(true));
 
     // 새 요소 다시 가져오기
     const newCloseBtn = document.getElementById("close-learn-modal");
     const newAnimateBtn = document.getElementById("animate-button");
     const newQuizBtn = document.getElementById("quiz-button");
     const newDeleteBtn = document.getElementById("delete-hangul");
+    const newEditBtn = document.getElementById("edit-hangul");
 
     // 모달이 표시된 후 이벤트 리스너 설정 (새 요소에)
     newCloseBtn.addEventListener("click", closeModal);
     newAnimateBtn.addEventListener("click", toggleImage);
     newQuizBtn.addEventListener("click", playPronunciation);
     newDeleteBtn.addEventListener("click", deleteHangul);
+    newEditBtn.addEventListener("click", editHangul);
 
     console.log("모달 이벤트 리스너 새로 설정 완료");
   } catch (error) {
@@ -792,4 +804,78 @@ async function deleteHangul() {
       alert("한글 삭제에 실패했습니다.");
     }
   }
+}
+
+// 수정 버튼 함수
+function editHangul() {
+  console.log("수정 버튼 클릭됨");
+
+  // 추가 모달 가져오기
+  const modal = document.getElementById("hangul-modal");
+  if (!modal) {
+    console.error("한글 추가 모달을 찾을 수 없습니다.");
+    alert("수정 기능을 사용할 수 없습니다.");
+    return;
+  }
+
+  // 현재 표시중인 단어 정보 가져오기
+  const hangul = document.getElementById("learn-hangul").textContent;
+  const pronunciation = document.getElementById(
+    "learn-pronunciation"
+  ).textContent;
+  const meaning = document.getElementById("learn-meaning").textContent;
+  const description = document.getElementById("learn-description").textContent; // 원본 설명 그대로 사용
+
+  // 이미지(이모지) 정보 가져오기 - 전역 변수에서 가져옴
+  const image = currentImage;
+
+  // 폼 요소 가져오기
+  const hangulInput = document.getElementById("hangul-input");
+  const pronunciationInput = document.getElementById("pronunciation-input");
+  const meaningInput = document.getElementById("meaning-input");
+  const descriptionInput = document.getElementById("description-input");
+  const imageInput = document.getElementById("image-input");
+  const addButton = document.getElementById("add-hangul");
+  const modalTitle = modal.querySelector("h2");
+
+  // 기존 값으로 폼 채우기
+  if (hangulInput) hangulInput.value = hangul;
+  if (hangulInput) hangulInput.readOnly = true; // 한글은 수정 불가 (키로 사용하기 때문)
+  if (pronunciationInput) pronunciationInput.value = pronunciation;
+  if (meaningInput) meaningInput.value = meaning;
+  if (descriptionInput) descriptionInput.value = description;
+  if (imageInput) imageInput.value = image;
+
+  // 버튼 텍스트 변경
+  if (addButton) addButton.textContent = "수정";
+  if (modalTitle) modalTitle.textContent = "한글 정보 수정";
+
+  // 발음 생성 및 이모지 옵션 생성을 위해 input 이벤트 트리거
+  if (hangulInput) {
+    // 기존의 input 이벤트 핸들러 호출을 위한 인공 이벤트 생성
+    const inputEvent = new Event("input", {
+      bubbles: true,
+      cancelable: true,
+    });
+    hangulInput.dispatchEvent(inputEvent);
+
+    // 이모지 선택 상태 업데이트
+    setTimeout(() => {
+      const emojiButtons = document.querySelectorAll("#emoji-options button");
+      emojiButtons.forEach((button) => {
+        if (button.textContent === image) {
+          button.click(); // 현재 이모지와 일치하는 버튼 클릭
+        }
+      });
+    }, 100);
+  }
+
+  // 수정 모드 플래그 설정
+  sessionStorage.setItem("isEditMode", "true");
+
+  // 현재 모달 닫기
+  closeModal();
+
+  // 수정 모달 열기
+  modal.classList.remove("hidden");
 }

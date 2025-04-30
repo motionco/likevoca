@@ -1008,37 +1008,77 @@ export async function initAddHangul() {
           return;
         }
 
-        const userData = userSnap.data();
-        if (userData.wordCount >= userData.maxWordCount) {
-          alert(
-            `최대 한글 추가 개수를 초과했습니다. (최대: ${userData.maxWordCount}개)`
-          );
-          return;
-        }
-
         const hangul = hangulInput.value.trim();
         const pronunciation = pronunciationInput.value.trim();
         const meaning = meaningInput.value.trim();
         const description = descriptionInput.value.trim();
         const image = imageInput.value.trim();
 
-        // 단어 추가
-        const wordlistRef = doc(db, "wordlist", userEmail, "wordlist", hangul);
-        await setDoc(wordlistRef, {
-          hangul: hangul,
-          pronunciation: pronunciation,
-          meaning: meaning,
-          description: description,
-          image: image,
-          createdAt: new Date().toISOString(),
-        });
+        // 수정 모드인지 확인
+        const isEditMode = sessionStorage.getItem("isEditMode") === "true";
 
-        // 사용자 단어 수 증가
-        await updateDoc(userRef, {
-          wordCount: userData.wordCount + 1,
-        });
+        if (isEditMode) {
+          // 수정 모드일 경우
+          const wordlistRef = doc(
+            db,
+            "wordlist",
+            userEmail,
+            "wordlist",
+            hangul
+          );
 
-        alert("한글이 성공적으로 추가되었습니다.");
+          // 기존 데이터 업데이트
+          await setDoc(
+            wordlistRef,
+            {
+              hangul: hangul,
+              pronunciation: pronunciation,
+              meaning: meaning,
+              description: description,
+              image: image,
+              createdAt: new Date().toISOString(), // 수정 시간으로 업데이트
+            },
+            { merge: true }
+          );
+
+          alert("한글이 성공적으로 수정되었습니다.");
+
+          // 수정 모드 해제
+          sessionStorage.removeItem("isEditMode");
+        } else {
+          // 추가 모드일 경우
+          const userData = userSnap.data();
+          if (userData.wordCount >= userData.maxWordCount) {
+            alert(
+              `최대 한글 추가 개수를 초과했습니다. (최대: ${userData.maxWordCount}개)`
+            );
+            return;
+          }
+
+          // 단어 추가
+          const wordlistRef = doc(
+            db,
+            "wordlist",
+            userEmail,
+            "wordlist",
+            hangul
+          );
+          await setDoc(wordlistRef, {
+            hangul: hangul,
+            pronunciation: pronunciation,
+            meaning: meaning,
+            description: description,
+            image: image,
+            createdAt: new Date().toISOString(),
+          });
+
+          // 사용자 단어 수 증가 - 추가할 때만 필요
+          await updateDoc(userRef, {
+            wordCount: userData.wordCount + 1,
+          });
+
+          alert("한글이 성공적으로 추가되었습니다.");
+        }
 
         // 모달 닫기 및 폼 초기화
         closeModal();
@@ -1047,8 +1087,8 @@ export async function initAddHangul() {
         // 페이지 새로고침 (단어 목록 업데이트를 위해)
         window.location.reload();
       } catch (error) {
-        console.error("한글 추가 중 오류 발생: ", error);
-        alert("한글 추가에 실패했습니다.");
+        console.error("한글 처리 중 오류 발생: ", error);
+        alert("처리에 실패했습니다.");
       }
     });
   }
@@ -1076,6 +1116,8 @@ function closeModal() {
   const modal = document.getElementById("hangul-modal");
   if (modal) {
     modal.classList.add("hidden");
+    // 폼 초기화 (수정 모드 상태 제거 포함)
+    resetForm();
   }
 }
 
@@ -1087,13 +1129,26 @@ function resetForm() {
   const descriptionInput = document.getElementById("description-input");
   const emojiOptions = document.getElementById("emoji-options");
   const imageInput = document.getElementById("image-input");
+  const addButton = document.getElementById("add-hangul");
+  const modalTitle = document.querySelector("#hangul-modal h2");
 
-  if (hangulInput) hangulInput.value = "";
+  // 수정 모드 해제
+  sessionStorage.removeItem("isEditMode");
+
+  // 입력 필드 초기화
+  if (hangulInput) {
+    hangulInput.value = "";
+    hangulInput.readOnly = false; // 읽기 전용 해제
+  }
   if (pronunciationInput) pronunciationInput.value = "";
   if (meaningInput) meaningInput.value = "";
   if (descriptionInput) descriptionInput.value = "";
   if (emojiOptions) emojiOptions.innerHTML = "";
   if (imageInput) imageInput.value = "";
+
+  // 버튼 텍스트와 제목 복원
+  if (addButton) addButton.textContent = "추가";
+  if (modalTitle) modalTitle.textContent = "새로운 한글 추가";
 }
 
 // 한글에 해당하는 이모지 목록 생성
