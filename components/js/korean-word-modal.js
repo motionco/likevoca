@@ -11,6 +11,15 @@ import {
 let currentWordId = null;
 let currentWordData = null;
 
+// supportedLanguages 객체 추가
+const supportedLanguages = {
+  korean: { tabId: "korean-tab", contentId: "korean-content" },
+  english: { tabId: "english-tab", contentId: "english-content" },
+  japanese: { tabId: "japanese-tab", contentId: "japanese-content" },
+  chinese: { tabId: "chinese-tab", contentId: "chinese-content" },
+  vietnamese: { tabId: "vietnamese-tab", contentId: "vietnamese-content" }, // 베트남어 추가
+};
+
 // 초기화 함수 추가
 export function initialize() {
   // 모달 요소 참조
@@ -18,11 +27,6 @@ export function initialize() {
   const closeBtn = document.getElementById("close-view-modal");
   const editBtn = document.getElementById("edit-word-btn");
   const deleteBtn = document.getElementById("delete-word-btn");
-
-  // 탭 요소 참조
-  const enTab = document.getElementById("en-tab");
-  const jaTab = document.getElementById("ja-tab");
-  const zhTab = document.getElementById("zh-tab");
 
   // 이벤트 리스너 등록
   if (closeBtn) {
@@ -35,19 +39,6 @@ export function initialize() {
 
   if (deleteBtn) {
     deleteBtn.addEventListener("click", deleteWord);
-  }
-
-  // 탭 이벤트 리스너
-  if (enTab) {
-    enTab.addEventListener("click", () => switchTab("en"));
-  }
-
-  if (jaTab) {
-    jaTab.addEventListener("click", () => switchTab("ja"));
-  }
-
-  if (zhTab) {
-    zhTab.addEventListener("click", () => switchTab("zh"));
   }
 
   console.log("한국어 단어 상세보기 모달 초기화 완료");
@@ -68,15 +59,12 @@ export async function showKoreanWordModal(wordId, activeLanguage = "all") {
     // 모달 표시
     modal.classList.remove("hidden");
 
-    // 기본 탭 설정 (선택된 언어에 따라)
-    let defaultTab = "en";
-    if (activeLanguage === "japanese") {
-      defaultTab = "ja";
-    } else if (activeLanguage === "chinese") {
-      defaultTab = "zh";
-    }
+    // 탭 이벤트 리스너를 한 번만 추가하도록 정리
+    removeAllTabListeners();
+    addTabListeners();
 
-    switchTab(defaultTab);
+    // 초기 탭 설정 (영어)
+    switchTab("english");
   } catch (error) {
     console.error("단어 상세 정보를 불러오는 중 오류 발생:", error);
     alert("단어 정보를 불러올 수 없습니다.");
@@ -162,6 +150,9 @@ function displayWordData(wordData) {
   // 중국어 번역 표시
   displayTranslation("chinese", wordData.translations.chinese);
 
+  // 베트남어 번역 표시 추가
+  displayTranslation("vietnamese", wordData.translations.vietnamese);
+
   // 관련 단어 표시
   const relatedWordsContainer = document.getElementById("view-related-words");
   if (relatedWordsContainer) {
@@ -192,50 +183,30 @@ function displayWordData(wordData) {
 
 // 번역 정보 표시
 function displayTranslation(language, translationData) {
-  // language에 따른 display ID 접두사 설정
-  const langPrefix =
-    language === "english"
-      ? "english"
-      : language === "japanese"
-      ? "japanese"
-      : "chinese";
-
-  // 해당 언어 탭이 없는 경우 (번역 정보가 없는 경우)
+  // 번역 정보가 없으면 해당 탭 비활성화하고 종료
   if (!translationData) {
-    // 탭 버튼 비활성화
-    const tabBtn = document.getElementById(
-      language === "english"
-        ? "en-tab"
-        : language === "japanese"
-        ? "ja-tab"
-        : "zh-tab"
+    const tabBtn = document.querySelector(
+      `.tab-button[data-tab="${language}"]`
     );
-
     if (tabBtn) {
-      tabBtn.classList.add("opacity-50", "cursor-not-allowed");
+      tabBtn.classList.add("opacity-50");
       tabBtn.disabled = true;
+      console.log(`${language} 탭 비활성화 (번역 정보 없음)`);
     }
-
     return;
   }
 
   // 탭 버튼 활성화
-  const tabBtn = document.getElementById(
-    language === "english"
-      ? "en-tab"
-      : language === "japanese"
-      ? "ja-tab"
-      : "zh-tab"
-  );
-
+  const tabBtn = document.querySelector(`.tab-button[data-tab="${language}"]`);
   if (tabBtn) {
-    tabBtn.classList.remove("opacity-50", "cursor-not-allowed");
+    tabBtn.classList.remove("opacity-50");
     tabBtn.disabled = false;
+    console.log(`${language} 탭 활성화됨`);
   }
 
   // 의미 표시
   const meaningsContainer = document.getElementById(
-    `view-${langPrefix}-meanings`
+    `view-${language}-meanings`
   );
   if (meaningsContainer && translationData.meaning) {
     meaningsContainer.innerHTML = translationData.meaning
@@ -245,7 +216,7 @@ function displayTranslation(language, translationData) {
 
   // 예문 표시
   const examplesContainer = document.getElementById(
-    `view-${langPrefix}-examples`
+    `view-${language}-examples`
   );
   if (examplesContainer && translationData.examples) {
     examplesContainer.innerHTML = translationData.examples
@@ -262,7 +233,7 @@ function displayTranslation(language, translationData) {
 
   // 유의어 표시
   const synonymsContainer = document.getElementById(
-    `view-${langPrefix}-synonyms`
+    `view-${language}-synonyms`
   );
   if (synonymsContainer && translationData.synonyms) {
     synonymsContainer.innerHTML = translationData.synonyms
@@ -274,22 +245,56 @@ function displayTranslation(language, translationData) {
   }
 
   // 노트 표시
-  const notesElement = document.getElementById(`view-${langPrefix}-notes`);
+  const notesElement = document.getElementById(`view-${language}-notes`);
   if (notesElement) {
     notesElement.textContent = translationData.notes || "노트 없음";
   }
 }
 
+// 모든 탭 리스너 제거
+function removeAllTabListeners() {
+  console.log("모든 탭 리스너 제거");
+  const tabButtons = document.querySelectorAll(".tab-button");
+  tabButtons.forEach((button) => {
+    // 기존 클릭 이벤트를 제거하기 위해 새 클론으로 요소 교체
+    const newButton = button.cloneNode(true);
+    button.parentNode.replaceChild(newButton, button);
+  });
+}
+
+// 탭 리스너 추가
+function addTabListeners() {
+  const tabButtons = document.querySelectorAll(".tab-button");
+  console.log("새 탭 리스너 추가, 버튼 수:", tabButtons.length);
+
+  if (tabButtons.length === 0) {
+    console.error("탭 버튼을 찾을 수 없습니다.");
+    return;
+  }
+
+  tabButtons.forEach((button) => {
+    const tabId = button.getAttribute("data-tab");
+    console.log(`'${tabId}' 탭에 클릭 이벤트 리스너 추가`);
+
+    button.addEventListener("click", function () {
+      console.log(`'${tabId}' 탭 클릭됨`);
+      switchTab(tabId);
+    });
+  });
+}
+
 // 탭 전환
 function switchTab(tabId) {
+  console.log("탭 전환 시작:", tabId);
+
   // 모든 탭 내용 숨기기
-  const tabContents = document.querySelectorAll("[id$='-content']");
+  const tabContents = document.querySelectorAll(".tab-content");
   tabContents.forEach((content) => {
     content.classList.add("hidden");
   });
 
   // 모든 탭 버튼 비활성화
-  const tabButtons = document.querySelectorAll("[id$='-tab']");
+  const tabButtons = document.querySelectorAll(".tab-button");
   tabButtons.forEach((button) => {
     button.classList.remove(
       "text-blue-600",
@@ -303,19 +308,29 @@ function switchTab(tabId) {
   // 선택한 탭 내용 표시
   const selectedContent = document.getElementById(`${tabId}-content`);
   if (selectedContent) {
+    console.log(`'${tabId}-content' 표시`);
     selectedContent.classList.remove("hidden");
+  } else {
+    console.error(`'${tabId}-content' 요소를 찾을 수 없음`);
   }
 
   // 선택한 탭 버튼 활성화
-  const selectedButton = document.getElementById(`${tabId}-tab`);
-  if (selectedButton) {
-    selectedButton.classList.remove("text-gray-500", "hover:text-gray-700");
-    selectedButton.classList.add(
-      "text-blue-600",
-      "border-b-2",
-      "border-blue-600",
-      "font-medium"
-    );
+  const selectedButtons = document.querySelectorAll(
+    `.tab-button[data-tab="${tabId}"]`
+  );
+  if (selectedButtons.length > 0) {
+    console.log(`'${tabId}' 탭 버튼 활성화, 개수: ${selectedButtons.length}`);
+    selectedButtons.forEach((button) => {
+      button.classList.remove("text-gray-500", "hover:text-gray-700");
+      button.classList.add(
+        "text-blue-600",
+        "border-b-2",
+        "border-blue-600",
+        "font-medium"
+      );
+    });
+  } else {
+    console.error(`'${tabId}' 탭 버튼을 찾을 수 없음`);
   }
 }
 
@@ -404,8 +419,8 @@ async function deleteWord() {
 
 // 인덱스에서 단어 삭제
 async function deleteFromIndices(userEmail, koreanWord) {
-  // 영어, 일본어, 중국어 인덱스를 순회하며 단어 참조 삭제
-  const languages = ["english", "japanese", "chinese"];
+  // 영어, 일본어, 중국어, 베트남어 인덱스를 순회하며 단어 참조 삭제
+  const languages = ["english", "japanese", "chinese", "vietnamese"];
 
   for (const language of languages) {
     // 현재 단어의 번역 데이터가 있는 경우

@@ -61,13 +61,14 @@
       <!-- 번역 정보 Tabs -->
       <div>
         <div class="border-b flex overflow-x-auto">
-          <button id="en-tab" class="py-2 px-4 text-blue-600 border-b-2 border-blue-600 font-medium">영어</button>
-          <button id="ja-tab" class="py-2 px-4 text-gray-500 hover:text-gray-700">일본어</button>
-          <button id="zh-tab" class="py-2 px-4 text-gray-500 hover:text-gray-700">중국어</button>
+          <button id="en-tab" data-tab="english" class="tab-button py-2 px-4 text-blue-600 border-b-2 border-blue-600 font-medium">영어</button>
+          <button id="ja-tab" data-tab="japanese" class="tab-button py-2 px-4 text-gray-500 hover:text-gray-700">일본어</button>
+          <button id="zh-tab" data-tab="chinese" class="tab-button py-2 px-4 text-gray-500 hover:text-gray-700">중국어</button>
+          <button id="vi-tab" data-tab="vietnamese" class="tab-button py-2 px-4 text-gray-500 hover:text-gray-700">베트남어</button>
         </div>
         
         <!-- 영어 탭 콘텐츠 -->
-        <div id="en-content" class="py-4">
+        <div id="english-content" class="tab-content py-4">
           <div class="space-y-4">
             <div>
               <h4 class="font-medium text-gray-700 mb-2">의미</h4>
@@ -103,7 +104,7 @@
         </div>
         
         <!-- 일본어 탭 콘텐츠 -->
-        <div id="ja-content" class="py-4 hidden">
+        <div id="japanese-content" class="tab-content py-4 hidden">
           <div class="space-y-4">
             <div>
               <h4 class="font-medium text-gray-700 mb-2">의미</h4>
@@ -138,7 +139,7 @@
         </div>
         
         <!-- 중국어 탭 콘텐츠 -->
-        <div id="zh-content" class="py-4 hidden">
+        <div id="chinese-content" class="tab-content py-4 hidden">
           <div class="space-y-4">
             <div>
               <h4 class="font-medium text-gray-700 mb-2">의미</h4>
@@ -168,6 +169,41 @@
             <div>
               <h4 class="font-medium text-gray-700 mb-2">노트</h4>
               <p id="view-chinese-notes" class="text-gray-600">노트 내용</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 베트남어 탭 콘텐츠 -->
+        <div id="vietnamese-content" class="tab-content py-4 hidden">
+          <div class="space-y-4">
+            <div>
+              <h4 class="font-medium text-gray-700 mb-2">의미</h4>
+              <ul id="view-vietnamese-meanings" class="list-disc pl-5 space-y-1">
+                <li>의미 1</li>
+                <li>의미 2</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 class="font-medium text-gray-700 mb-2">예문</h4>
+              <div id="view-vietnamese-examples" class="space-y-3">
+                <div class="bg-gray-50 p-3 rounded">
+                  <p class="font-medium">나는 사과를 좋아해요.</p>
+                  <p class="text-gray-600">Tôi thích táo.</p>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h4 class="font-medium text-gray-700 mb-2">유의어</h4>
+              <div id="view-vietnamese-synonyms" class="flex flex-wrap gap-2">
+                <span class="bg-green-100 text-green-800 px-2 py-1 rounded">trái cây</span>
+              </div>
+            </div>
+            
+            <div>
+              <h4 class="font-medium text-gray-700 mb-2">노트</h4>
+              <p id="view-vietnamese-notes" class="text-gray-600">노트 내용</p>
             </div>
           </div>
         </div>
