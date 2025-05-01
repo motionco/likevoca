@@ -183,23 +183,57 @@ function displayWordData(wordData) {
 
 // 번역 정보 표시
 function displayTranslation(language, translationData) {
-  // 번역 정보가 없으면 해당 탭 비활성화하고 종료
+  // 탭 버튼 찾기
+  const tabBtn = document.querySelector(
+    `.view-tab-button[data-tab="${language}"]`
+  );
+
+  // 번역 정보가 없는 경우
   if (!translationData) {
-    const tabBtn = document.querySelector(
-      `.tab-button[data-tab="${language}"]`
-    );
     if (tabBtn) {
-      tabBtn.classList.add("opacity-50");
-      tabBtn.disabled = true;
-      console.log(`${language} 탭 비활성화 (번역 정보 없음)`);
+      // 탭은 비활성화하지 않음 (클릭 가능하게 유지)
+      tabBtn.classList.add("text-gray-400");
+      console.log(`${language} 탭에 번역 정보가 없음 (클릭 가능)`);
     }
+
+    // 각 요소에 "번역 정보 없음" 메시지 표시
+    const meaningsContainer = document.getElementById(
+      `view-${language}-meanings`
+    );
+    if (meaningsContainer) {
+      meaningsContainer.innerHTML = "<li>번역 정보가 없습니다</li>";
+    }
+
+    const examplesContainer = document.getElementById(
+      `view-${language}-examples`
+    );
+    if (examplesContainer) {
+      examplesContainer.innerHTML = `
+        <div class="bg-gray-50 p-3 rounded">
+          <p class="text-gray-500">예문이 없습니다</p>
+        </div>
+      `;
+    }
+
+    const synonymsContainer = document.getElementById(
+      `view-${language}-synonyms`
+    );
+    if (synonymsContainer) {
+      synonymsContainer.innerHTML =
+        "<span class='text-gray-500'>유의어 정보가 없습니다</span>";
+    }
+
+    const notesElement = document.getElementById(`view-${language}-notes`);
+    if (notesElement) {
+      notesElement.textContent = "노트가 없습니다";
+    }
+
     return;
   }
 
-  // 탭 버튼 활성화
-  const tabBtn = document.querySelector(`.tab-button[data-tab="${language}"]`);
+  // 번역 정보가 있는 경우
   if (tabBtn) {
-    tabBtn.classList.remove("opacity-50");
+    tabBtn.classList.remove("opacity-50", "text-gray-400");
     tabBtn.disabled = false;
     console.log(`${language} 탭 활성화됨`);
   }
@@ -243,18 +277,12 @@ function displayTranslation(language, translationData) {
       )
       .join(" ");
   }
-
-  // 노트 표시
-  const notesElement = document.getElementById(`view-${language}-notes`);
-  if (notesElement) {
-    notesElement.textContent = translationData.notes || "노트 없음";
-  }
 }
 
 // 모든 탭 리스너 제거
 function removeAllTabListeners() {
   console.log("모든 탭 리스너 제거");
-  const tabButtons = document.querySelectorAll(".tab-button");
+  const tabButtons = document.querySelectorAll(".view-tab-button");
   tabButtons.forEach((button) => {
     // 기존 클릭 이벤트를 제거하기 위해 새 클론으로 요소 교체
     const newButton = button.cloneNode(true);
@@ -264,7 +292,7 @@ function removeAllTabListeners() {
 
 // 탭 리스너 추가
 function addTabListeners() {
-  const tabButtons = document.querySelectorAll(".tab-button");
+  const tabButtons = document.querySelectorAll(".view-tab-button");
   console.log("새 탭 리스너 추가, 버튼 수:", tabButtons.length);
 
   if (tabButtons.length === 0) {
@@ -294,7 +322,7 @@ function switchTab(tabId) {
   });
 
   // 모든 탭 버튼 비활성화
-  const tabButtons = document.querySelectorAll(".tab-button");
+  const tabButtons = document.querySelectorAll(".view-tab-button");
   tabButtons.forEach((button) => {
     button.classList.remove(
       "text-blue-600",
@@ -316,7 +344,7 @@ function switchTab(tabId) {
 
   // 선택한 탭 버튼 활성화
   const selectedButtons = document.querySelectorAll(
-    `.tab-button[data-tab="${tabId}"]`
+    `.view-tab-button[data-tab="${tabId}"]`
   );
   if (selectedButtons.length > 0) {
     console.log(`'${tabId}' 탭 버튼 활성화, 개수: ${selectedButtons.length}`);

@@ -487,9 +487,9 @@ function createWordData(rowData) {
   };
 
   // 각 지원 언어에 대해 번역 정보 구성
-  for (const [koreanName, langCode] of Object.entries(supportedLanguages)) {
+  for (const [langCode, langInfo] of Object.entries(supportedLanguages)) {
     // 해당 언어의 의미가 있는지 확인
-    const meaningKey = `${koreanName}의미`;
+    const meaningKey = `${langInfo.nameKo}의미`;
     if (rowData[meaningKey]) {
       const meanings = rowData[meaningKey]
         .split(";")
@@ -499,8 +499,8 @@ function createWordData(rowData) {
       if (meanings.length > 0) {
         const examples = [];
         // 예문 추가
-        const exampleKey = `${koreanName}예문`;
-        const exampleTransKey = `${koreanName}예문번역`;
+        const exampleKey = `${langInfo.nameKo}예문`;
+        const exampleTransKey = `${langInfo.nameKo}예문번역`;
         if (rowData[exampleKey] && rowData[exampleTransKey]) {
           examples.push({
             sentence: rowData[exampleKey],
@@ -509,7 +509,7 @@ function createWordData(rowData) {
         }
 
         // 유의어 파싱
-        const synonymKey = `${koreanName}유의어`;
+        const synonymKey = `${langInfo.nameKo}유의어`;
         const synonyms = rowData[synonymKey]
           ? rowData[synonymKey]
               .split(";")
@@ -522,7 +522,6 @@ function createWordData(rowData) {
           meaning: meanings,
           examples: examples,
           synonyms: synonyms,
-          notes: "",
         };
       }
     }
@@ -635,7 +634,7 @@ function downloadTemplate() {
         영어유의어: "fruit;red fruit",
         일본어의미: "りんご",
         일본어예문: "사과는 맛있어요.",
-        일본어예문번역: "りんごは美味しいです。",
+        일본어예문번역: "りんご는美味しいです。",
         일본어유의어: "果物;フルーツ",
         중국어의미: "苹果",
         중국어예문: "사과는 건강에 좋아요.",
@@ -720,7 +719,7 @@ function downloadTemplate() {
         중국어예문번역: "有很多朋友。",
         중국어유의어: "伙伴;好友",
         베트남어의미: "bạn bè",
-        베트남어예문: "Tôi đã nói chuyện điện thoại với bạn.",
+        베트남어예문: "친구와 전화 통화했어요.",
         베트남어예문번역: "Tôi đã nói chuyện điện thoại với bạn.",
         베트남어유의어: "bạn;người bạn",
       },

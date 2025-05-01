@@ -235,54 +235,62 @@ function fillFormWithWordData(wordData) {
 
 // 번역 데이터 채우기
 function fillTranslationData(lang, data) {
-  // 의미 필드 초기화
-  document.querySelectorAll(`.${lang}-meaning`).forEach((input, index) => {
-    if (index === 0 && data.meaning && data.meaning.length > 0) {
-      input.value = data.meaning[0];
-    } else if (index > 0) {
-      input.parentElement.remove(); // 추가 의미 필드 제거
-    }
-  });
+  if (!data) return;
 
-  // 추가 의미 필드 생성
-  if (data.meaning && data.meaning.length > 1) {
+  // 의미 설정
+  if (data.meaning && data.meaning.length > 0) {
+    const container = document.getElementById(`${lang}-meanings`);
+    // 첫 번째 의미는 기본 필드에 설정
+    const firstInput = container.querySelector(`.${lang}-meaning`);
+    if (firstInput) {
+      firstInput.value = data.meaning[0];
+    }
+
+    // 두 번째 이상의 의미는 새 필드 추가
     for (let i = 1; i < data.meaning.length; i++) {
-      addMeaningField(lang, data.meaning[i]);
+      addMeaningField(lang);
+      const inputs = container.querySelectorAll(`.${lang}-meaning`);
+      if (inputs.length > i) {
+        inputs[i].value = data.meaning[i];
+      }
     }
   }
 
-  // 예문 필드 초기화
-  const exampleContainer = document.getElementById(`${lang}-examples`);
-  const exampleFields = exampleContainer.querySelectorAll(
-    `.${lang}-example-sentence`
-  );
-
-  // 처음 있는 예문 필드에 첫 번째 예문 설정
-  if (exampleFields.length > 0 && data.examples && data.examples.length > 0) {
-    exampleFields[0].value = data.examples[0].sentence;
-    const translationFields = exampleContainer.querySelectorAll(
+  // 예문 설정
+  if (data.examples && data.examples.length > 0) {
+    const container = document.getElementById(`${lang}-examples`);
+    // 첫 번째 예문은 기본 필드에 설정
+    const firstSentence = container.querySelector(`.${lang}-example-sentence`);
+    const firstTranslation = container.querySelector(
       `.${lang}-example-translation`
     );
-    if (translationFields.length > 0) {
-      translationFields[0].value = data.examples[0].translation;
-    }
-  }
 
-  // 추가 예문 필드 생성
-  if (data.examples && data.examples.length > 1) {
+    if (firstSentence && firstTranslation && data.examples[0]) {
+      firstSentence.value = data.examples[0].sentence || "";
+      firstTranslation.value = data.examples[0].translation || "";
+    }
+
+    // 두 번째 이상의 예문은 새 필드 추가
     for (let i = 1; i < data.examples.length; i++) {
-      addExampleField(lang, data.examples[i]);
+      addExampleField(lang);
+      const sentences = container.querySelectorAll(`.${lang}-example-sentence`);
+      const translations = container.querySelectorAll(
+        `.${lang}-example-translation`
+      );
+
+      if (sentences.length > i && translations.length > i && data.examples[i]) {
+        sentences[i].value = data.examples[i].sentence || "";
+        translations[i].value = data.examples[i].translation || "";
+      }
     }
   }
 
-  // 유의어 및 노트 설정
-  if (data.synonyms) {
-    document.getElementById(`${lang}-synonyms`).value =
-      data.synonyms.join(", ");
-  }
-
-  if (data.notes) {
-    document.getElementById(`${lang}-notes`).value = data.notes;
+  // 유의어 설정
+  if (data.synonyms && data.synonyms.length > 0) {
+    const synonymsInput = document.getElementById(`${lang}-synonyms`);
+    if (synonymsInput) {
+      synonymsInput.value = data.synonyms.join(", ");
+    }
   }
 }
 
@@ -618,26 +626,29 @@ function collectFormData() {
 }
 
 // 번역 데이터 수집
-function collectTranslationData(lang) {
+function collectTranslationData(language) {
+  // 의미 수집
+  const meaningInputs = document.querySelectorAll(`.${language}-meaning`);
   const meanings = [];
-  document.querySelectorAll(`.${lang}-meaning`).forEach((input) => {
-    const value = input.value.trim();
-    if (value) {
-      meanings.push(value);
+  meaningInputs.forEach((input) => {
+    if (input.value.trim()) {
+      meanings.push(input.value.trim());
     }
   });
 
+  // 예문 수집
   const examples = [];
-  const sentenceInputs = document.querySelectorAll(`.${lang}-example-sentence`);
+  const sentenceInputs = document.querySelectorAll(
+    `.${language}-example-sentence`
+  );
   const translationInputs = document.querySelectorAll(
-    `.${lang}-example-translation`
+    `.${language}-example-translation`
   );
 
   for (let i = 0; i < sentenceInputs.length; i++) {
     const sentence = sentenceInputs[i].value.trim();
-    const translation = translationInputs[i]
-      ? translationInputs[i].value.trim()
-      : "";
+    const translation =
+      i < translationInputs.length ? translationInputs[i].value.trim() : "";
 
     if (sentence && translation) {
       examples.push({
@@ -647,31 +658,20 @@ function collectTranslationData(lang) {
     }
   }
 
-  const synonymsInput = document.getElementById(`${lang}-synonyms`);
-  const notesInput = document.getElementById(`${lang}-notes`);
-
+  // 유의어 수집
+  const synonymsInput = document.getElementById(`${language}-synonyms`);
   const synonyms =
-    synonymsInput && synonymsInput.value.trim()
-      ? synonymsInput.value.split(",").map((s) => s.trim())
+    synonymsInput && synonymsInput.value
+      ? synonymsInput.value
+          .split(",")
+          .map((s) => s.trim())
+          .filter((s) => s)
       : [];
 
-  const notes = notesInput ? notesInput.value.trim() : "";
-
-  // 모든 필드가 비어있는지 확인
-  if (
-    meanings.length === 0 &&
-    examples.length === 0 &&
-    synonyms.length === 0 &&
-    !notes
-  ) {
-    return null;
-  }
-
   return {
-    meaning: meanings,
+    meanings: meanings,
     examples: examples,
     synonyms: synonyms,
-    notes: notes,
   };
 }
 
@@ -923,8 +923,8 @@ function addLanguageTab(code, nameKo, example) {
 // 언어 패널 생성 함수
 function createLanguagePanel(code, nameKo, example) {
   const panel = document.createElement("div");
-  panel.className = "language-panel hidden"; // 초기에는 숨김 상태로
-  panel.setAttribute("data-lang", code);
+  panel.className = "language-panel hidden";
+  panel.setAttribute("data-tab", code);
 
   panel.innerHTML = `
     <div class="p-4 bg-gray-50 rounded-lg">
@@ -934,9 +934,7 @@ function createLanguagePanel(code, nameKo, example) {
           <label class="block text-gray-700 mb-1">의미</label>
           <div id="${code}-meanings" class="space-y-2">
             <div class="flex space-x-2">
-              <input type="text" class="${code}-meaning w-full p-2 border rounded-lg" placeholder="예: ${
-    example || "의미 입력"
-  }">
+              <input type="text" class="${code}-meaning w-full p-2 border rounded-lg" placeholder="예: ${example}">
               <button class="add-meaning bg-green-500 text-white px-3 py-1 rounded-lg" data-lang="${code}">+</button>
             </div>
           </div>
@@ -953,35 +951,11 @@ function createLanguagePanel(code, nameKo, example) {
         </div>
         <div>
           <label class="block text-gray-700 mb-1">유의어</label>
-          <input type="text" id="${code}-synonyms" class="w-full p-2 border rounded-lg" placeholder="쉼표로 구분">
-        </div>
-        <div>
-          <label class="block text-gray-700 mb-1">노트</label>
-          <textarea id="${code}-notes" class="w-full p-2 border rounded-lg" rows="2" placeholder="단어에 대한 추가 설명"></textarea>
+          <input type="text" id="${code}-synonyms" class="w-full p-2 border rounded-lg" placeholder="예: ${example}, ... (쉼표로 구분)">
         </div>
       </div>
     </div>
   `;
-
-  // 새 의미 추가 버튼 이벤트 등록
-  setTimeout(() => {
-    const addMeaningBtn = panel.querySelector(".add-meaning");
-    if (addMeaningBtn) {
-      addMeaningBtn.addEventListener("click", function () {
-        const langCode = this.getAttribute("data-lang");
-        addMeaningField(langCode);
-      });
-    }
-
-    // 예문 추가 버튼 이벤트 등록
-    const addExampleBtn = panel.querySelector(".add-example");
-    if (addExampleBtn) {
-      addExampleBtn.addEventListener("click", function () {
-        const langCode = this.getAttribute("data-lang");
-        addExampleField(langCode);
-      });
-    }
-  }, 10);
 
   return panel;
 }
