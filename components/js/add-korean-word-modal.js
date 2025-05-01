@@ -15,6 +15,12 @@ import {
 let selectedCategories = [];
 let isEditMode = false;
 let originalWordId = null;
+let supportedLanguages = {
+  english: { nameKo: "영어", example: "apple" },
+  japanese: { nameKo: "일본어", example: "りんご" },
+  chinese: { nameKo: "중국어", example: "苹果" },
+  vietnamese: { nameKo: "베트남어", example: "táo" },
+};
 
 // DOMContentLoaded 이벤트가 아닌 initialize 함수로 변경
 export function initialize() {
@@ -68,6 +74,66 @@ export function initialize() {
 
   // 이전에 세션 스토리지에 저장된 수정 모드 상태 확인
   checkEditMode();
+
+  // 언어 탭 설정
+  setupLanguageTabs();
+
+  // 언어 추가 버튼 이벤트
+  const addLanguageBtn = document.getElementById("add-language-btn");
+  if (addLanguageBtn) {
+    console.log("언어 추가 버튼 발견");
+    addLanguageBtn.addEventListener("click", function () {
+      console.log("언어 추가 버튼 클릭됨");
+      const modal = document.getElementById("add-language-modal");
+      if (modal) {
+        modal.classList.remove("hidden");
+      } else {
+        console.error("언어 추가 모달을 찾을 수 없습니다.");
+      }
+    });
+  }
+
+  // 새 언어 추가 모달 이벤트
+  const cancelAddLangBtn = document.getElementById("cancel-add-language");
+  if (cancelAddLangBtn) {
+    cancelAddLangBtn.addEventListener("click", function () {
+      const modal = document.getElementById("add-language-modal");
+      if (modal) {
+        modal.classList.add("hidden");
+      }
+    });
+  }
+
+  const confirmAddLangBtn = document.getElementById("confirm-add-language");
+  if (confirmAddLangBtn) {
+    confirmAddLangBtn.addEventListener("click", function () {
+      const nameKo = document
+        .getElementById("new-language-name-ko")
+        .value.trim();
+      const code = document
+        .getElementById("new-language-code")
+        .value.trim()
+        .toLowerCase();
+      const example = document
+        .getElementById("new-language-example")
+        .value.trim();
+
+      if (!nameKo || !code) {
+        alert("언어 이름과 코드를 입력해주세요.");
+        return;
+      }
+
+      // 언어 정보 저장 및 UI 업데이트
+      supportedLanguages[code] = { nameKo, example };
+      addLanguageTab(code, nameKo, example);
+
+      // 모달 닫기
+      const modal = document.getElementById("add-language-modal");
+      if (modal) {
+        modal.classList.add("hidden");
+      }
+    });
+  }
 
   console.log("한국어 단어장 모달 초기화 완료");
 }
@@ -518,11 +584,19 @@ function collectFormData() {
     : [];
 
   // 번역 정보 수집
-  const translations = {
-    english: collectTranslationData("english"),
-    japanese: collectTranslationData("japanese"),
-    chinese: collectTranslationData("chinese"),
-  };
+  const translations = {};
+
+  // 모든 언어 패널 가져오기
+  const languagePanels = document.querySelectorAll(".language-panel");
+  languagePanels.forEach((panel) => {
+    const lang = panel.getAttribute("data-lang");
+    if (lang) {
+      const translationData = collectTranslationData(lang);
+      if (translationData && translationData.meaning.length > 0) {
+        translations[lang] = translationData;
+      }
+    }
+  });
 
   return {
     _id: koreanWord, // 단어를 ID로 사용
@@ -640,32 +714,17 @@ async function updateIndices(userEmail, wordData) {
     await deleteIndices(userEmail, koreanWord);
   }
 
-  // 영어 인덱스 업데이트
-  if (wordData.translations.english && wordData.translations.english.meaning) {
-    for (const meaning of wordData.translations.english.meaning) {
-      await updateIndex(
-        userEmail,
-        "english",
-        meaning.toLowerCase(),
-        koreanWord
-      );
-    }
-  }
-
-  // 일본어 인덱스 업데이트
-  if (
-    wordData.translations.japanese &&
-    wordData.translations.japanese.meaning
-  ) {
-    for (const meaning of wordData.translations.japanese.meaning) {
-      await updateIndex(userEmail, "japanese", meaning, koreanWord);
-    }
-  }
-
-  // 중국어 인덱스 업데이트
-  if (wordData.translations.chinese && wordData.translations.chinese.meaning) {
-    for (const meaning of wordData.translations.chinese.meaning) {
-      await updateIndex(userEmail, "chinese", meaning, koreanWord);
+  // 모든 번역 언어에 대해 인덱스 생성
+  for (const [lang, translation] of Object.entries(wordData.translations)) {
+    if (translation && translation.meaning) {
+      for (const meaning of translation.meaning) {
+        await updateIndex(
+          userEmail,
+          lang,
+          typeof meaning === "string" ? meaning.toLowerCase() : meaning,
+          koreanWord
+        );
+      }
     }
   }
 }
@@ -703,9 +762,18 @@ async function updateIndex(userEmail, language, foreignWord, koreanWord) {
 
 // 기존 인덱스 삭제
 async function deleteIndices(userEmail, koreanWord) {
-  // 각 언어별 인덱스에서 해당 단어를 찾아 제거
-  const languages = ["english", "japanese", "chinese"];
+  // 기존 코드 유지하되, 모든 언어 인덱스를 확인하도록 수정
+  const languages = Object.keys(supportedLanguages);
 
+  // 추가된 언어도 확인
+  document.querySelectorAll(".language-panel").forEach((panel) => {
+    const lang = panel.getAttribute("data-lang");
+    if (lang && !languages.includes(lang)) {
+      languages.push(lang);
+    }
+  });
+
+  // 각 언어별 인덱스에서 해당 단어를 찾아 제거
   for (const language of languages) {
     const indexCollection = collection(
       db,
@@ -736,6 +804,186 @@ async function deleteIndices(userEmail, koreanWord) {
       }
     });
   }
+}
+
+// 언어 탭 설정 함수
+function setupLanguageTabs() {
+  console.log("탭 기능 설정 시작");
+
+  const tabButtons = document.querySelectorAll(".tab-button");
+  console.log(`탭 버튼 수: ${tabButtons.length}`);
+
+  tabButtons.forEach((button) => {
+    const tabId = button.getAttribute("data-tab");
+    console.log(`탭 발견: ${tabId}`);
+
+    button.addEventListener("click", function () {
+      console.log(`탭 클릭: ${tabId}`);
+
+      // 모든 탭 버튼 비활성화
+      tabButtons.forEach((btn) => {
+        btn.classList.remove("border-blue-500", "text-blue-500");
+      });
+
+      // 클릭한 탭 활성화
+      this.classList.add("border-blue-500", "text-blue-500");
+
+      // 모든 패널 숨기기
+      const panels = document.querySelectorAll(".language-panel");
+      console.log(`패널 수: ${panels.length}`);
+
+      panels.forEach((panel) => {
+        panel.classList.add("hidden");
+      });
+
+      // 선택한 패널 표시
+      const selectedPanel = document.querySelector(
+        `.language-panel[data-tab="${tabId}"]`
+      );
+      console.log(`선택된 패널: ${selectedPanel ? "찾음" : "못찾음"}`);
+
+      if (selectedPanel) {
+        selectedPanel.classList.remove("hidden");
+        console.log(`${tabId} 패널 표시됨`);
+      } else {
+        console.error(`패널을 찾을 수 없음: ${tabId}`);
+      }
+    });
+  });
+}
+
+// 새 언어 탭 추가 함수
+function addLanguageTab(code, nameKo, example) {
+  // 탭 추가
+  const tabsContainer = document.getElementById("language-tabs");
+  if (!tabsContainer) {
+    console.error("언어 탭 컨테이너를 찾을 수 없습니다.");
+    return;
+  }
+
+  // 이미 존재하는 탭인지 확인
+  if (document.querySelector(`#language-tabs button[data-lang="${code}"]`)) {
+    alert("이미 동일한 코드의 언어가 존재합니다.");
+    return;
+  }
+
+  // 탭 버튼 생성
+  const tab = document.createElement("button");
+  tab.className = "py-2 px-4 border-b-2 border-transparent";
+  tab.setAttribute("data-lang", code);
+  tab.textContent = nameKo;
+
+  // 탭 클릭 이벤트
+  tab.addEventListener("click", function () {
+    // 모든 탭 비활성화
+    document.querySelectorAll("#language-tabs button").forEach((t) => {
+      t.classList.remove("border-[#4B63AC]");
+      t.classList.add("border-transparent");
+    });
+
+    // 클릭한 탭 활성화
+    this.classList.remove("border-transparent");
+    this.classList.add("border-[#4B63AC]");
+
+    // 모든 패널 숨기기
+    document.querySelectorAll(".language-panel").forEach((p) => {
+      p.classList.add("hidden");
+    });
+
+    // 해당 패널 표시 (없으면 생성)
+    let panel = document.querySelector(`.language-panel[data-lang="${code}"]`);
+    if (!panel) {
+      panel = createLanguagePanel(code, nameKo, example);
+      const panelsContainer = document.getElementById("language-panels");
+      if (panelsContainer) {
+        panelsContainer.appendChild(panel);
+      }
+    }
+
+    panel.classList.remove("hidden");
+  });
+
+  // 탭 추가
+  tabsContainer.appendChild(tab);
+
+  // 번역 패널 생성
+  const panel = createLanguagePanel(code, nameKo, example);
+
+  // 패널 컨테이너에 추가
+  const panelsContainer = document.getElementById("language-panels");
+  if (panelsContainer) {
+    panelsContainer.appendChild(panel);
+    // 초기에는 패널 숨기기
+    panel.classList.add("hidden");
+  }
+
+  console.log(`${nameKo}(${code}) 언어가 추가되었습니다.`);
+}
+
+// 언어 패널 생성 함수
+function createLanguagePanel(code, nameKo, example) {
+  const panel = document.createElement("div");
+  panel.className = "language-panel hidden"; // 초기에는 숨김 상태로
+  panel.setAttribute("data-lang", code);
+
+  panel.innerHTML = `
+    <div class="p-4 bg-gray-50 rounded-lg">
+      <h4 class="font-medium text-gray-800 mb-3">${nameKo}</h4>
+      <div class="space-y-3">
+        <div>
+          <label class="block text-gray-700 mb-1">의미</label>
+          <div id="${code}-meanings" class="space-y-2">
+            <div class="flex space-x-2">
+              <input type="text" class="${code}-meaning w-full p-2 border rounded-lg" placeholder="예: ${
+    example || "의미 입력"
+  }">
+              <button class="add-meaning bg-green-500 text-white px-3 py-1 rounded-lg" data-lang="${code}">+</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <label class="block text-gray-700 mb-1">예문</label>
+          <div id="${code}-examples" class="space-y-2">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <input type="text" class="${code}-example-sentence p-2 border rounded-lg" placeholder="한국어 예문">
+              <input type="text" class="${code}-example-translation p-2 border rounded-lg" placeholder="${nameKo} 번역">
+            </div>
+            <button class="add-example bg-green-500 text-white px-3 py-1 rounded-lg" data-lang="${code}">예문 추가</button>
+          </div>
+        </div>
+        <div>
+          <label class="block text-gray-700 mb-1">유의어</label>
+          <input type="text" id="${code}-synonyms" class="w-full p-2 border rounded-lg" placeholder="쉼표로 구분">
+        </div>
+        <div>
+          <label class="block text-gray-700 mb-1">노트</label>
+          <textarea id="${code}-notes" class="w-full p-2 border rounded-lg" rows="2" placeholder="단어에 대한 추가 설명"></textarea>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // 새 의미 추가 버튼 이벤트 등록
+  setTimeout(() => {
+    const addMeaningBtn = panel.querySelector(".add-meaning");
+    if (addMeaningBtn) {
+      addMeaningBtn.addEventListener("click", function () {
+        const langCode = this.getAttribute("data-lang");
+        addMeaningField(langCode);
+      });
+    }
+
+    // 예문 추가 버튼 이벤트 등록
+    const addExampleBtn = panel.querySelector(".add-example");
+    if (addExampleBtn) {
+      addExampleBtn.addEventListener("click", function () {
+        const langCode = this.getAttribute("data-lang");
+        addExampleField(langCode);
+      });
+    }
+  }, 10);
+
+  return panel;
 }
 
 // checkEditMode 함수를 전역으로 노출

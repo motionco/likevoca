@@ -13,6 +13,7 @@
     </div>
 
     <div class="space-y-6">
+      <!-- 파일 형식 안내 섹션 -->
       <div class="p-4 bg-blue-50 rounded-lg">
         <div class="flex justify-between items-center mb-2">
           <h3 class="text-lg font-semibold">파일 형식 안내</h3>
@@ -28,13 +29,25 @@
           </div>
         </div>
         
+        <!-- CSV/JSON 설명 -->
+        <div class="mb-4">
+          <p class="text-sm text-gray-700">
+            파일 형식은 다음과 같은 순서로 정보를 포함해야 합니다:
+          </p>
+          <ol class="list-decimal pl-5 text-sm">
+            <li>한국어 정보 (단어, 발음, 품사, 수준, 카테고리)</li>
+            <li>공통 정보 (이모지, 사용빈도, 관련단어)</li>
+            <li>번역 정보 (영어, 일본어, 중국어 등)</li>
+          </ol>
+        </div>
+        
         <!-- CSV 형식 가이드 -->
-        <div id="csv-format-guide">
+        <div id="csv-format-guide" class="guide-content">
           <p class="text-sm text-gray-700 mb-2">
             한국어 단어를 대량으로 추가하기 위한 CSV 파일 형식은 다음과 같습니다:
           </p>
           <div class="bg-white p-3 rounded border text-xs overflow-x-auto">
-            <code>한국어,발음,품사,수준,카테고리,영어의미,영어예문,영어예문번역,영어유의어,일본어의미,일본어예문,일본어예문번역,일본어유의어,중국어의미,중국어예문,중국어예문번역,중국어유의어,이모지,사용빈도,관련단어</code>
+            <code>한국어,발음,품사,수준,카테고리,이모지,사용빈도,관련단어,영어의미,영어예문,영어예문번역,영어유의어,일본어의미,일본어예문,일본어예문번역,일본어유의어,중국어의미,중국어예문,중국어예문번역,중국어유의어,베트남어의미,베트남어예문,베트남어예문번역,베트남어유의어</code>
           </div>
           <p class="text-sm text-gray-700 mt-2">
             - <span class="font-semibold">한국어, 발음, 영어의미</span>는 필수 항목입니다.<br>
@@ -46,13 +59,33 @@
             &nbsp;&nbsp;· 유의어: 여러 유의어는 세미콜론(;)으로 구분 (예: fruit;red fruit)<br>
             &nbsp;&nbsp;· 관련단어: 여러 관련 단어는 세미콜론(;)으로 구분 (예: 사과나무;사과즙)<br>
             - <span class="font-semibold">예문</span>: 각 언어별로 한국어 예문과 해당 언어 번역을 입력<br>
+            - <span class="font-semibold">새 언어 추가</span>: 새로운 언어를 추가하려면 '언어명의미', '언어명예문', '언어명예문번역', '언어명유의어' 형식의 열을 추가하면 됩니다.<br>
             - <span class="font-semibold">이모지</span>: 이모지 문자 (예: 🍎)<br>
             - <span class="font-semibold">사용빈도</span>: 1-100 사이 숫자
           </p>
+          <h4 class="font-bold mt-2">필드 설명</h4>
+          <ul class="list-disc pl-5 text-sm">
+            <li><strong>영어의미</strong>: 단어의 영어 의미 (세미콜론으로 구분)</li>
+            <li><strong>영어예문</strong>: 단어를 사용한 영어 예문</li>
+            <li><strong>영어예문번역</strong>: 영어 예문의 한국어 번역</li>
+            <li><strong>영어유의어</strong>: 영어 유의어 (세미콜론으로 구분)</li>
+            <li><strong>일본어의미</strong>: 단어의 일본어 의미 (세미콜론으로 구분)</li>
+            <li><strong>일본어예문</strong>: 단어를 사용한 일본어 예문</li>
+            <li><strong>일본어예문번역</strong>: 일본어 예문의 한국어 번역</li>
+            <li><strong>일본어유의어</strong>: 일본어 유의어 (세미콜론으로 구분)</li>
+            <li><strong>중국어의미</strong>: 단어의 중국어 의미 (세미콜론으로 구분)</li>
+            <li><strong>중국어예문</strong>: 단어를 사용한 중국어 예문</li>
+            <li><strong>중국어예문번역</strong>: 중국어 예문의 한국어 번역</li>
+            <li><strong>중국어유의어</strong>: 중국어 유의어 (세미콜론으로 구분)</li>
+            <li><strong>베트남어의미</strong>: 단어의 베트남어 의미 (세미콜론으로 구분)</li>
+            <li><strong>베트남어예문</strong>: 단어를 사용한 베트남어 예문</li>
+            <li><strong>베트남어예문번역</strong>: 베트남어 예문의 한국어 번역</li>
+            <li><strong>베트남어유의어</strong>: 베트남어 유의어 (세미콜론으로 구분)</li>
+          </ul>
         </div>
         
         <!-- JSON 형식 가이드 -->
-        <div id="json-format-guide" class="hidden">
+        <div id="json-format-guide" class="guide-content hidden">
           <p class="text-sm text-gray-700 mb-2">
             JSON 파일은 다음과 같은 형식을 따라야 합니다:
           </p>
@@ -64,6 +97,9 @@
     "품사": "명사",
     "수준": "초급",
     "카테고리": "음식;과일",
+    "이모지": "🍎",
+    "사용빈도": 90,
+    "관련단어": "사과나무;사과즙",
     "영어의미": "apple;fruit",
     "영어예문": "저는 사과를 좋아해요.",
     "영어예문번역": "I like apples.",
@@ -76,15 +112,17 @@
     "중국어예문": "사과는 빨간색입니다.",
     "중국어예문번역": "苹果是红色的。",
     "중국어유의어": "水果",
-    "이모지": "🍎",
-    "사용빈도": 90,
-    "관련단어": "사과나무;사과즙"
+    "베트남어의미": "táo",
+    "베트남어예문": "저는 사과를 먹습니다.",
+    "베트남어예문번역": "Tôi ăn táo.",
+    "베트남어유의어": "quả;trái cây"
   }
 ]</code></pre>
           </div>
           <p class="text-sm text-gray-700 mt-2">
             - 단어 배열 형식으로 여러 단어를 한 번에 추가할 수 있습니다.<br>
             - <span class="font-semibold">필수 항목</span>: 한국어, 발음, 영어의미<br>
+            - <span class="font-semibold">순서</span>: 한국어 정보 → 공통 정보 → 번역 정보 순으로 입력<br>
             - <span class="font-semibold">품사</span>: 명사, 동사, 형용사, 부사, 조사, 감탄사 중 하나<br>
             - <span class="font-semibold">수준</span>: 초급, 중급, 고급 중 하나<br>
             - <span class="font-semibold">세미콜론(;) 사용 필드</span>:<br>

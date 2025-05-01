@@ -475,53 +475,58 @@ function createWordData(rowData) {
         .filter((c) => c)
     : ["일반"];
 
-  // 영어 의미 파싱
-  const englishMeanings = rowData["영어의미"]
-    ? rowData["영어의미"]
+  // 번역 정보 구성
+  const translations = {};
+
+  // 동적으로 언어 처리
+  let supportedLanguages = {
+    english: { nameKo: "영어", example: "apple" },
+    japanese: { nameKo: "일본어", example: "りんご" },
+    chinese: { nameKo: "중국어", example: "苹果" },
+    vietnamese: { nameKo: "베트남어", example: "táo" }, // 프랑스어를 베트남어로 변경
+  };
+
+  // 각 지원 언어에 대해 번역 정보 구성
+  for (const [koreanName, langCode] of Object.entries(supportedLanguages)) {
+    // 해당 언어의 의미가 있는지 확인
+    const meaningKey = `${koreanName}의미`;
+    if (rowData[meaningKey]) {
+      const meanings = rowData[meaningKey]
         .split(";")
         .map((m) => m.trim())
-        .filter((m) => m)
-    : [];
+        .filter((m) => m);
 
-  // 영어 유의어 파싱
-  const englishSynonyms = rowData["영어유의어"]
-    ? rowData["영어유의어"]
-        .split(";")
-        .map((s) => s.trim())
-        .filter((s) => s)
-    : [];
+      if (meanings.length > 0) {
+        const examples = [];
+        // 예문 추가
+        const exampleKey = `${koreanName}예문`;
+        const exampleTransKey = `${koreanName}예문번역`;
+        if (rowData[exampleKey] && rowData[exampleTransKey]) {
+          examples.push({
+            sentence: rowData[exampleKey],
+            translation: rowData[exampleTransKey],
+          });
+        }
 
-  // 일본어 의미 파싱
-  const japaneseMeanings = rowData["일본어의미"]
-    ? rowData["일본어의미"]
-        .split(";")
-        .map((m) => m.trim())
-        .filter((m) => m)
-    : [];
+        // 유의어 파싱
+        const synonymKey = `${koreanName}유의어`;
+        const synonyms = rowData[synonymKey]
+          ? rowData[synonymKey]
+              .split(";")
+              .map((s) => s.trim())
+              .filter((s) => s)
+          : [];
 
-  // 일본어 유의어 파싱
-  const japaneseSynonyms = rowData["일본어유의어"]
-    ? rowData["일본어유의어"]
-        .split(";")
-        .map((s) => s.trim())
-        .filter((s) => s)
-    : [];
-
-  // 중국어 의미 파싱
-  const chineseMeanings = rowData["중국어의미"]
-    ? rowData["중국어의미"]
-        .split(";")
-        .map((m) => m.trim())
-        .filter((m) => m)
-    : [];
-
-  // 중국어 유의어 파싱
-  const chineseSynonyms = rowData["중국어유의어"]
-    ? rowData["중국어유의어"]
-        .split(";")
-        .map((s) => s.trim())
-        .filter((s) => s)
-    : [];
+        // 번역 정보 추가
+        translations[langCode] = {
+          meaning: meanings,
+          examples: examples,
+          synonyms: synonyms,
+          notes: "",
+        };
+      }
+    }
+  }
 
   // 이모지 파싱
   const emojis = rowData["이모지"] ? [rowData["이모지"].trim()] : [];
@@ -538,63 +543,6 @@ function createWordData(rowData) {
         .map((w) => w.trim())
         .filter((w) => w)
     : [];
-
-  // 번역 정보 구성
-  const translations = {};
-
-  if (englishMeanings.length > 0) {
-    const examples = [];
-    // 영어 예문 추가
-    if (rowData["영어예문"] && rowData["영어예문번역"]) {
-      examples.push({
-        sentence: rowData["영어예문"],
-        translation: rowData["영어예문번역"],
-      });
-    }
-
-    translations.english = {
-      meaning: englishMeanings,
-      examples: examples,
-      synonyms: englishSynonyms,
-      notes: "",
-    };
-  }
-
-  if (japaneseMeanings.length > 0) {
-    const examples = [];
-    // 일본어 예문 추가
-    if (rowData["일본어예문"] && rowData["일본어예문번역"]) {
-      examples.push({
-        sentence: rowData["일본어예문"],
-        translation: rowData["일본어예문번역"],
-      });
-    }
-
-    translations.japanese = {
-      meaning: japaneseMeanings,
-      examples: examples,
-      synonyms: japaneseSynonyms,
-      notes: "",
-    };
-  }
-
-  if (chineseMeanings.length > 0) {
-    const examples = [];
-    // 중국어 예문 추가
-    if (rowData["중국어예문"] && rowData["중국어예문번역"]) {
-      examples.push({
-        sentence: rowData["중국어예문"],
-        translation: rowData["중국어예문번역"],
-      });
-    }
-
-    translations.chinese = {
-      meaning: chineseMeanings,
-      examples: examples,
-      synonyms: chineseSynonyms,
-      notes: "",
-    };
-  }
 
   return {
     _id: rowData["한국어"], // 단어를 ID로 사용
@@ -619,32 +567,17 @@ function createWordData(rowData) {
 async function updateIndices(userEmail, wordData) {
   const koreanWord = wordData.korean.word;
 
-  // 영어 인덱스 업데이트
-  if (wordData.translations.english && wordData.translations.english.meaning) {
-    for (const meaning of wordData.translations.english.meaning) {
-      await updateIndex(
-        userEmail,
-        "english",
-        meaning.toLowerCase(),
-        koreanWord
-      );
-    }
-  }
-
-  // 일본어 인덱스 업데이트
-  if (
-    wordData.translations.japanese &&
-    wordData.translations.japanese.meaning
-  ) {
-    for (const meaning of wordData.translations.japanese.meaning) {
-      await updateIndex(userEmail, "japanese", meaning, koreanWord);
-    }
-  }
-
-  // 중국어 인덱스 업데이트
-  if (wordData.translations.chinese && wordData.translations.chinese.meaning) {
-    for (const meaning of wordData.translations.chinese.meaning) {
-      await updateIndex(userEmail, "chinese", meaning, koreanWord);
+  // 모든 번역 언어에 대해 인덱스 업데이트
+  for (const [language, translation] of Object.entries(wordData.translations)) {
+    if (translation && translation.meaning) {
+      for (const meaning of translation.meaning) {
+        await updateIndex(
+          userEmail,
+          language,
+          meaning.toLowerCase(),
+          koreanWord
+        );
+      }
     }
   }
 }
@@ -693,43 +626,129 @@ function downloadTemplate() {
         품사: "명사",
         수준: "초급",
         카테고리: "음식;과일",
+        이모지: "🍎",
+        사용빈도: 95,
+        관련단어: "사과나무;사과즙",
         영어의미: "apple;fruit",
-        영어예문: "저는 사과를 좋아해요.",
-        영어예문번역: "I like apples.",
+        영어예문: "저는 매일 사과를 먹어요.",
+        영어예문번역: "I eat an apple every day.",
         영어유의어: "fruit;red fruit",
         일본어의미: "りんご",
-        일본어예문: "사과를 먹고 싶어요.",
-        일본어예문번역: "りんご를食べたいです。",
-        일본어유의어: "果物",
+        일본어예문: "사과는 맛있어요.",
+        일본어예문번역: "りんごは美味しいです。",
+        일본어유의어: "果物;フルーツ",
         중국어의미: "苹果",
-        중국어예문: "사과는 빨간색입니다.",
-        중국어예문번역: "苹果是红色的。",
-        중국어유의어: "水果",
-        이모지: "🍎",
-        사용빈도: 90,
-        관련단어: "사과나무;사과즙",
+        중국어예문: "사과는 건강에 좋아요.",
+        중국어예문번역: "苹果对健康有好处。",
+        중국어유의어: "水果;红果",
+        베트남어의미: "táo",
+        베트남어예문: "이 사과는 정말 달아요.",
+        베트남어예문번역: "Quả táo này rất ngọt.",
+        베트남어유의어: "quả;trái cây",
       },
       {
-        한국어: "안녕하세요",
-        발음: "an-nyeong-ha-se-yo",
-        품사: "감탄사",
+        한국어: "바다",
+        발음: "ba-da",
+        품사: "명사",
         수준: "초급",
-        카테고리: "인사;일상",
-        영어의미: "hello;hi",
-        영어예문: "안녕하세요, 만나서 반갑습니다.",
-        영어예문번역: "Hello, nice to meet you.",
-        영어유의어: "greeting;salutation",
-        일본어의미: "こんにちは",
-        일본어예문: "안녕하세요, 어떻게 지내세요?",
-        일본어예문번역: "こんにちは、お元気ですか？",
-        일본어유의어: "挨拶",
-        중국어의미: "你好",
-        중국어예문: "안녕하세요, 처음 뵙겠습니다.",
-        중국어예문번역: "你好，初次见面。",
-        중국어유의어: "问候",
-        이모지: "👋",
-        사용빈도: 100,
-        관련단어: "안녕;반갑습니다",
+        카테고리: "자연;여행",
+        이모지: "🌊",
+        사용빈도: 85,
+        관련단어: "해변;파도",
+        영어의미: "sea;ocean",
+        영어예문: "여름에 바다에 가요.",
+        영어예문번역: "I go to the sea in summer.",
+        영어유의어: "ocean;waters",
+        일본어의미: "海",
+        일본어예문: "바다가 아름다워요.",
+        일본어예문번역: "海がきれいです。",
+        일본어유의어: "海洋",
+        중국어의미: "海",
+        중국어예문: "바다에서 수영해요.",
+        중국어예문번역: "在海里游泳。",
+        중국어유의어: "海洋;大海",
+        베트남어의미: "biển",
+        베트남어예문: "바다를 보면 마음이 편안해져요.",
+        베트남어예문번역: "Nhìn biển làm tôi cảm thấy bình yên.",
+        베트남어유의어: "đại dương;biển cả",
+      },
+      {
+        한국어: "학교",
+        발음: "hak-gyo",
+        품사: "명사",
+        수준: "초급",
+        카테고리: "교육;학교",
+        이모지: "🏫",
+        사용빈도: 90,
+        관련단어: "학생;선생님",
+        영어의미: "school;academy",
+        영어예문: "학교에 매일 가요.",
+        영어예문번역: "I go to school every day.",
+        영어유의어: "academy;educational institution",
+        일본어의미: "学校",
+        일본어예문: "학교는 9시에 시작해요.",
+        일본어예문번역: "学校は9時に始まります。",
+        일본어유의어: "教育機関",
+        중국어의미: "学校",
+        중국어예문: "학교에서 한국어를 배워요.",
+        중국어예문번역: "在学校学习韩语。",
+        중국어유의어: "校园;学院",
+        베트남어의미: "trường học",
+        베트남어예문: "학교는 주말에 쉬어요.",
+        베트남어예문번역: "Trường học nghỉ vào cuối tuần.",
+        베트남어유의어: "học viện;trường",
+      },
+      {
+        한국어: "친구",
+        발음: "chin-gu",
+        품사: "명사",
+        수준: "초급",
+        카테고리: "인간관계;일상",
+        이모지: "👫",
+        사용빈도: 98,
+        관련단어: "우정;동료",
+        영어의미: "friend;companion",
+        영어예문: "친구와 영화를 봤어요.",
+        영어예문번역: "I watched a movie with my friend.",
+        영어유의어: "buddy;pal",
+        일본어의미: "友達",
+        일본어예문: "친구와 함께 공부해요.",
+        일본어예문번역: "友達と一緒に勉強します。",
+        일본어유의어: "仲間;友人",
+        중국어의미: "朋友",
+        중국어예문: "친구가 많아요.",
+        중국어예문번역: "有很多朋友。",
+        중국어유의어: "伙伴;好友",
+        베트남어의미: "bạn bè",
+        베트남어예문: "Tôi đã nói chuyện điện thoại với bạn.",
+        베트남어예문번역: "Tôi đã nói chuyện điện thoại với bạn.",
+        베트남어유의어: "bạn;người bạn",
+      },
+      {
+        한국어: "음악",
+        발음: "eum-ak",
+        품사: "명사",
+        수준: "초급",
+        카테고리: "예술;취미",
+        이모지: "🎵",
+        사용빈도: 88,
+        관련단어: "노래;콘서트",
+        영어의미: "music;melody",
+        영어예문: "음악을 들으면서 공부해요.",
+        영어예문번역: "I study while listening to music.",
+        영어유의어: "melody;tune",
+        일본어의미: "音楽",
+        일본어예문: "음악 수업이 재미있어요.",
+        일본어예문번역: "音楽の授業が面白いです。",
+        일본어유의어: "曲;メロディー",
+        중국어의미: "音乐",
+        중국어예문: "좋아하는 음악이 뭐예요?",
+        중국어예문번역: "你喜欢什么音乐?",
+        중국어유의어: "旋律;歌曲",
+        베트남어의미: "âm nhạc",
+        베트남어예문: "음악은 스트레스를 줄여줘요.",
+        베트남어예문번역: "Âm nhạc giúp giảm căng thẳng.",
+        베트남어유의어: "giai điệu;bản nhạc",
       },
     ];
     content = JSON.stringify(jsonTemplate, null, 2);
@@ -738,9 +757,12 @@ function downloadTemplate() {
   } else {
     // CSV 템플릿
     content =
-      "한국어,발음,품사,수준,카테고리,영어의미,영어예문,영어예문번역,영어유의어,일본어의미,일본어예문,일본어예문번역,일본어유의어,중국어의미,중국어예문,중국어예문번역,중국어유의어,이모지,사용빈도,관련단어\n" +
-      "사과,sa-gwa,명사,초급,음식;과일,apple;fruit,저는 사과를 좋아해요.,I like apples.,fruit;red fruit,りんご,사과를 먹고 싶어요.,りんごを食べたいです。,果物,苹果,사과는 빨간색입니다.,苹果是红色的。,水果,🍎,90,사과나무;사과즙\n" +
-      "안녕하세요,an-nyeong-ha-se-yo,감탄사,초급,인사;일상,hello;hi,안녕하세요 만나서 반갑습니다.,Hello nice to meet you.,greeting;salutation,こんにちは,안녕하세요 어떻게 지내세요?,こんにちは、お元気ですか？,挨拶,你好,안녕하세요 처음 뵙겠습니다.,你好，初次见面。,问候,👋,100,안녕;반갑습니다";
+      "한국어,발음,품사,수준,카테고리,이모지,사용빈도,관련단어,영어의미,영어예문,영어예문번역,영어유의어,일본어의미,일본어예문,일본어예문번역,일본어유의어,중국어의미,중국어예문,중국어예문번역,중국어유의어,베트남어의미,베트남어예문,베트남어예문번역,베트남어유의어\n" +
+      "사과,sa-gwa,명사,초급,음식;과일,🍎,95,사과나무;사과즙,apple;fruit,저는 매일 사과를 먹어요.,I eat an apple every day.,fruit;red fruit,りんご,사과는 맛있어요.,りんごは美味しいです。,果物;フルーツ,苹果,사과는 건강에 좋아요.,苹果对健康有好处。,水果;红果,táo,이 사과는 정말 달아요.,Quả táo này rất ngọt.,quả;trái cây\n" +
+      "바다,ba-da,명사,초급,자연;여행,🌊,85,해변;파도,sea;ocean,여름에 바다에 가요.,I go to the sea in summer.,ocean;waters,海,바다가 아름다워요.,海がきれいです。,海洋,海,바다에서 수영해요.,在海里游泳。,海洋;大海,biển,바다를 보면 마음이 편안해져요.,Nhìn biển làm tôi cảm thấy bình yên.,đại dương;biển cả\n" +
+      "학교,hak-gyo,명사,초급,교육;학교,🏫,90,학생;선생님,school;academy,학교에 매일 가요.,I go to school every day.,academy;educational institution,学校,학교는 9시에 시작해요.,学校は9時に始まります。,教育機関,学校,학교에서 한국어를 배워요.,在学校学习韩语。,校园;学院,trường học,학교는 주말에 쉬어요.,Trường học nghỉ vào cuối tuần.,học viện;trường\n" +
+      "친구,chin-gu,명사,초급,인간관계;일상,👫,98,우정;동료,friend;companion,친구와 영화를 봤어요.,I watched a movie with my friend.,buddy;pal,友達,친구와 함께 공부해요.,友達と一緒に勉強します。,仲間;友人,朋友,친구가 많아요.,有很多朋友。,伙伴;好友,bạn bè,친구와 전화 통화했어요.,Tôi đã nói chuyện điện thoại với bạn.,bạn;người bạn\n" +
+      "음악,eum-ak,명사,초급,예술;취미,🎵,88,노래;콘서트,music;melody,음악을 들으면서 공부해요.,I study while listening to music.,melody;tune,音楽,음악 수업이 재미있어요.,音楽の授業が面白いです。,曲;メロディー,音乐,좋아하는 음악이 뭐예요?,你喜欢什么音乐?,旋律;歌曲,âm nhạc,음악은 스트레스를 줄여줘요.,Âm nhạc giúp giảm căng thẳng.,giai điệu;bản nhạc";
     filename = "korean_words_template.csv";
     type = "text/csv";
   }
