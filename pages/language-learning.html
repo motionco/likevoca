@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>다국어 학습 - LikeVoca</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+
+    <link rel="stylesheet" href="../css/style.css" />
+    <style>
+      .flip-card {
+        perspective: 1000px;
+        height: 400px;
+      }
+      .flip-card-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.6s;
+        transform-style: preserve-3d;
+      }
+      .flip-card.flipped .flip-card-inner {
+        transform: rotateY(180deg);
+      }
+      .flip-card-front,
+      .flip-card-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      .flip-card-back {
+        transform: rotateY(180deg);
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      .fade-in {
+        animation: fadeIn 0.5s;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100">
+    <div id="navbar-container"></div>
+
+    <main class="container mx-auto max-w-7xl px-4 py-8">
+      <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">다국어 학습</h1>
+        <div class="flex space-x-4">
+          <select id="source-language" class="border p-2 rounded">
+            <option value="korean">한국어</option>
+            <option value="english">영어</option>
+            <option value="japanese">일본어</option>
+            <option value="chinese">중국어</option>
+          </select>
+          <select id="target-language" class="border p-2 rounded">
+            <option value="english">영어</option>
+            <option value="korean">한국어</option>
+            <option value="japanese">일본어</option>
+            <option value="chinese">중국어</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 학습 모드 선택 -->
+      <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 class="text-xl font-bold mb-4">학습 모드</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <button id="flashcard-mode" class="bg-[#4B63AC] text-white p-4 rounded-lg hover:bg-[#3A4F8B] transition">
+            <i class="fas fa-copy text-2xl mb-2"></i>
+            <div class="font-bold">플래시카드</div>
+            <p class="text-sm opacity-80">단어 앞면/뒷면으로 학습</p>
+          </button>
+          <button id="quiz-mode" class="bg-[#2E7D32] text-white p-4 rounded-lg hover:bg-[#1B5E20] transition">
+            <i class="fas fa-question-circle text-2xl mb-2"></i>
+            <div class="font-bold">퀴즈</div>
+            <p class="text-sm opacity-80">객관식 문제로 학습</p>
+          </button>
+          <button id="typing-mode" class="bg-[#1565CD] text-white p-4 rounded-lg hover:bg-[#0D47A1] transition">
+            <i class="fas fa-keyboard text-2xl mb-2"></i>
+            <div class="font-bold">타이핑</div>
+            <p class="text-sm opacity-80">직접 입력하며 학습</p>
+          </button>
+        </div>
+      </div>
+
+      <!-- 플래시카드 학습 영역 -->
+      <div id="flashcard-container" class="mb-8 hidden">
+        <div class="flip-card w-full max-w-2xl mx-auto">
+          <div class="flip-card-inner">
+            <div class="flip-card-front bg-white rounded-lg shadow-lg p-8 text-center">
+              <div id="card-category" class="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full inline-block mb-4"></div>
+              <h2 id="front-word" class="text-4xl font-bold mb-4"></h2>
+              <p id="front-pronunciation" class="text-xl text-gray-600 mb-4"></p>
+              <p class="text-gray-500 mt-8">(카드를 클릭하여 뒤집기)</p>
+            </div>
+            <div class="flip-card-back bg-white rounded-lg shadow-lg p-8 text-center">
+              <div id="back-word" class="text-4xl font-bold mb-4"></div>
+              <p id="back-pronunciation" class="text-xl text-gray-600 mb-2"></p>
+              <div id="back-definition" class="text-lg text-gray-700 mb-6"></div>
+              
+              <div id="example-container" class="border-t border-gray-200 pt-4 mt-4">
+                <p class="text-sm text-gray-500 mb-2">예문:</p>
+                <div id="example" class="text-md"></div>
+                <div id="example-translation" class="text-md text-gray-600 mt-2"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex justify-center space-x-4 mt-6">
+          <button id="prev-card" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
+            <i class="fas fa-arrow-left mr-2"></i> 이전
+          </button>
+          <button id="flip-card" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+            뒤집기
+          </button>
+          <button id="next-card" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
+            다음 <i class="fas fa-arrow-right ml-2"></i>
+          </button>
+        </div>
+        
+        <div class="mt-6 text-center">
+          <span id="card-progress">0/0</span>
+        </div>
+      </div>
+
+      <!-- 퀴즈 학습 영역 -->
+      <div id="quiz-container" class="mb-8 hidden">
+        <div class="bg-white rounded-lg shadow-lg p-8 max-w-2xl mx-auto">
+          <div id="quiz-category" class="text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full inline-block mb-4"></div>
+          <h2 id="quiz-question" class="text-2xl font-bold mb-6"></h2>
+          
+          <div id="quiz-options" class="grid grid-cols-1 gap-3">
+            <!-- 선택지는 JavaScript로 동적 생성됨 -->
+          </div>
+          
+          <div id="quiz-result" class="mt-6 p-4 rounded hidden"></div>
+          
+          <button id="next-question" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded mt-6 float-right hidden">
+            다음 문제
+          </button>
+          <div class="clearfix"></div>
+        </div>
+        
+        <div class="mt-6 text-center">
+          <span id="quiz-progress">0/0</span>
+        </div>
+      </div>
+
+      <!-- 타이핑 학습 영역 -->
+      <div id="typing-container" class="mb-8 hidden">
+        <div class="bg-white rounded-lg shadow-lg p-8 max-w-2xl mx-auto">
+          <div id="typing-category" class="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full inline-block mb-4"></div>
+          <h2 id="typing-word" class="text-2xl font-bold mb-2"></h2>
+          <p id="typing-pronunciation" class="text-gray-600 mb-6"></p>
+          
+          <div class="mb-4">
+            <label for="typing-answer" class="block text-sm font-medium mb-2">정답을 입력하세요:</label>
+            <input 
+              type="text" 
+              id="typing-answer" 
+              class="w-full p-3 border rounded-lg text-lg"
+              placeholder="정답 입력..."
+            >
+          </div>
+          
+          <div id="typing-result" class="mt-4 p-4 rounded hidden"></div>
+          
+          <div class="flex justify-end mt-4">
+            <button id="check-answer" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded">
+              정답 확인
+            </button>
+            <button id="next-typing" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded ml-3 hidden">
+              다음 단어
+            </button>
+          </div>
+        </div>
+        
+        <div class="mt-6 text-center">
+          <span id="typing-progress">0/0</span>
+          <div class="mt-2">
+            <span id="typing-correct" class="text-green-600 font-medium">맞춘 개수: 0</span>
+            <span class="mx-2">|</span>
+            <span id="typing-wrong" class="text-red-600 font-medium">틀린 개수: 0</span>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Firebase -->
+    <script type="module" src="../js/firebase/firebase-init.js"></script>
+    <script type="module" src="./js/language-learning.js"></script>
+  </body>
+</html> 

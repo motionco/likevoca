@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>다국어 단어장 - LikeVoca</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+
+    <link rel="stylesheet" href="../css/style.css" />
+    <style>
+      .dropdown-container {
+        position: relative;
+      }
+      .dropdown {
+        position: absolute;
+        z-index: 10;
+        width: 100%;
+      }
+      .word-card {
+        transition: transform 0.3s;
+      }
+      .word-card:hover {
+        transform: translateY(-5px);
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100">
+    <div id="navbar-container"></div>
+
+    <main class="container mx-auto max-w-7xl px-4 py-8">
+      <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">다국어 단어장</h1>
+        <div class="flex space-x-2">
+          <button
+            id="add-concept"
+            class="bg-[#4B63AC] text-white px-4 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300 flex items-center"
+          >
+            <i class="fas fa-plus mr-2"></i> 새 개념 추가
+          </button>
+          <button
+            id="bulk-add-concept"
+            class="bg-[#4B63AC] text-white px-4 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300 flex items-center"
+          >
+            <i class="fas fa-file-import mr-2"></i> 대량 개념 추가
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
+          <div>
+            <label for="search-input" class="block text-sm font-medium mb-1 text-gray-700">검색</label>
+            <div class="relative">
+              <input
+                type="text"
+                id="search-input"
+                class="w-full p-2 border rounded pl-8"
+                placeholder="검색어 입력..."
+              />
+              <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+            </div>
+          </div>
+
+          <div>
+            <label for="source-language" class="block text-sm font-medium mb-1 text-gray-700">
+              원본 언어
+            </label>
+            <select id="source-language" class="w-full p-2 border rounded">
+              <option value="korean">한국어</option>
+              <option value="english">영어</option>
+              <option value="japanese">일본어</option>
+              <option value="chinese">중국어</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="target-language" class="block text-sm font-medium mb-1 text-gray-700">
+              대상 언어
+            </label>
+            <select id="target-language" class="w-full p-2 border rounded">
+              <option value="english">영어</option>
+              <option value="korean">한국어</option>
+              <option value="japanese">일본어</option>
+              <option value="chinese">중국어</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="category-filter" class="block text-sm font-medium mb-1 text-gray-700">
+              카테고리
+            </label>
+            <select id="category-filter" class="w-full p-2 border rounded">
+              <option value="all">모든 카테고리</option>
+              <option value="fruit">과일</option>
+              <option value="food">음식</option>
+              <option value="animal">동물</option>
+              <option value="daily">일상</option>
+              <option value="travel">여행</option>
+              <option value="business">비즈니스</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center">
+          <div class="text-sm text-gray-600">
+            <span id="concept-count">0</span>개의 개념
+          </div>
+
+          <div class="flex items-center space-x-2">
+            <label for="sort-option" class="text-sm font-medium text-gray-700">정렬</label>
+            <select id="sort-option" class="p-2 border rounded text-sm">
+              <option value="latest">최신순</option>
+              <option value="oldest">오래된순</option>
+              <option value="a-z">가나다순</option>
+              <option value="z-a">역가나다순</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 사용량 표시 -->
+      <div class="bg-white rounded-lg shadow-md p-4 mb-8">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm font-medium">개념 사용량:</span>
+          <span id="concept-usage-text" class="text-sm">0/100</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2.5">
+          <div id="concept-usage-bar" class="bg-[#4B63AC] h-2.5 rounded-full" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- 개념 카드 표시 영역 -->
+      <div id="concept-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+      <!-- 더 보기 버튼 -->
+      <div class="flex justify-center mt-8">
+        <button
+          id="load-more"
+          class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-6 rounded-lg transition duration-300 hidden"
+        >
+          더 보기 <i class="fas fa-chevron-down ml-1"></i>
+        </button>
+      </div>
+    </main>
+
+    <div id="modal-container"></div>
+
+    <!-- Firebase -->
+    <script type="module" src="../js/firebase/firebase-init.js"></script>
+    <script type="module" src="./js/multilingual-dictionary.js"></script>
+  </body>
+</html> 

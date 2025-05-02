@@ -1,0 +1,472 @@
+[
+  {
+    "domain": "daily",
+    "category": "greeting",
+    "expressions": {
+      "korean": {
+        "word": "안녕하세요",
+        "pronunciation": "annyeonghaseyo",
+        "definition": "인사말",
+        "part_of_speech": "interjection",
+        "level": "beginner"
+      },
+      "english": {
+        "word": "hello",
+        "pronunciation": "həˈloʊ",
+        "definition": "greeting",
+        "part_of_speech": "interjection",
+        "level": "beginner"
+      },
+      "japanese": {
+        "word": "こんにちは",
+        "pronunciation": "konnichiwa",
+        "definition": "挨拶",
+        "part_of_speech": "interjection",
+        "level": "beginner"
+      },
+      "chinese": {
+        "word": "你好",
+        "pronunciation": "nǐ hǎo",
+        "definition": "问候语",
+        "part_of_speech": "interjection",
+        "level": "beginner"
+      }
+    },
+    "concept_info": {
+      "domain": "daily",
+      "category": "greeting",
+      "emoji": "👋"
+    },
+    "examples": [
+      {
+        "korean": "안녕하세요, 만나서 반갑습니다.",
+        "english": "Hello, nice to meet you.",
+        "japanese": "はじめまして、よろしくお願いします。",
+        "chinese": "你好，很高兴见到你。"
+      }
+    ]
+  },
+  {
+    "domain": "food",
+    "category": "fruit",
+    "expressions": {
+      "korean": {
+        "word": "사과",
+        "pronunciation": "sagwa",
+        "definition": "과일의 일종",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      },
+      "english": {
+        "word": "apple",
+        "pronunciation": "ˈæpl",
+        "definition": "a round fruit with red or green skin",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      },
+      "japanese": {
+        "word": "りんご",
+        "pronunciation": "ringo",
+        "definition": "果物の一種",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      },
+      "chinese": {
+        "word": "苹果",
+        "pronunciation": "píng guǒ",
+        "definition": "一种水果",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      }
+    },
+    "concept_info": {
+      "domain": "food",
+      "category": "fruit",
+      "emoji": "🍎"
+    },
+    "examples": [
+      {
+        "korean": "나는 사과를 좋아합니다.",
+        "english": "I like apples.",
+        "japanese": "私はりんごが好きです。",
+        "chinese": "我喜欢苹果。"
+      }
+    ]
+  },
+  {
+    "domain": "daily",
+    "category": "weather",
+    "expressions": {
+      "korean": {
+        "word": "비",
+        "pronunciation": "bi",
+        "definition": "하늘에서 내리는 물",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      },
+      "english": {
+        "word": "rain",
+        "pronunciation": "reɪn",
+        "definition": "water that falls from clouds",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      },
+      "japanese": {
+        "word": "雨",
+        "pronunciation": "ame",
+        "definition": "空から降る水",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      },
+      "chinese": {
+        "word": "雨",
+        "pronunciation": "yǔ",
+        "definition": "从云中落下的水",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      }
+    },
+    "concept_info": {
+      "domain": "daily",
+      "category": "weather",
+      "emoji": "🌧️"
+    },
+    "examples": [
+      {
+        "korean": "오늘은 비가 많이 옵니다.",
+        "english": "It's raining a lot today.",
+        "japanese": "今日はたくさん雨が降っています。",
+        "chinese": "今天下了很多雨。"
+      }
+    ]
+  },
+  {
+    "domain": "food",
+    "category": "vegetable",
+    "expressions": {
+      "korean": {
+        "word": "토마토",
+        "pronunciation": "tomato",
+        "definition": "빨간 채소",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      },
+      "english": {
+        "word": "tomato",
+        "pronunciation": "təˈmeɪtoʊ",
+        "definition": "a red vegetable",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      },
+      "japanese": {
+        "word": "トマト",
+        "pronunciation": "tomato",
+        "definition": "赤い野菜",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      },
+      "chinese": {
+        "word": "番茄",
+        "pronunciation": "fān qié",
+        "definition": "一种红色蔬菜",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      }
+    },
+    "concept_info": {
+      "domain": "food",
+      "category": "vegetable",
+      "emoji": "🍅"
+    },
+    "examples": [
+      {
+        "korean": "토마토 샐러드를 만들었어요.",
+        "english": "I made a tomato salad.",
+        "japanese": "トマトサラダを作りました。",
+        "chinese": "我做了番茄沙拉。"
+      }
+    ]
+  },
+  {
+    "domain": "animal",
+    "category": "mammal",
+    "expressions": {
+      "korean": {
+        "word": "강아지",
+        "pronunciation": "gangaji",
+        "definition": "개의 새끼",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      },
+      "english": {
+        "word": "puppy",
+        "pronunciation": "ˈpʌpi",
+        "definition": "a young dog",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      },
+      "japanese": {
+        "word": "子犬",
+        "pronunciation": "koinu",
+        "definition": "犬の赤ちゃん",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      },
+      "chinese": {
+        "word": "小狗",
+        "pronunciation": "xiǎo gǒu",
+        "definition": "幼犬",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      }
+    },
+    "concept_info": {
+      "domain": "animal",
+      "category": "mammal",
+      "emoji": "🐶"
+    },
+    "examples": [
+      {
+        "korean": "그 강아지는 너무 귀여워요.",
+        "english": "That puppy is so cute.",
+        "japanese": "その子犬はとても可愛いです。",
+        "chinese": "那只小狗很可爱。"
+      }
+    ]
+  },
+  {
+    "domain": "daily",
+    "category": "time",
+    "expressions": {
+      "korean": {
+        "word": "오늘",
+        "pronunciation": "oneul",
+        "definition": "지금의 날짜",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      },
+      "english": {
+        "word": "today",
+        "pronunciation": "təˈdeɪ",
+        "definition": "the current day",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      },
+      "japanese": {
+        "word": "今日",
+        "pronunciation": "kyou",
+        "definition": "現在の日",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      },
+      "chinese": {
+        "word": "今天",
+        "pronunciation": "jīn tiān",
+        "definition": "当前的日子",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      }
+    },
+    "concept_info": {
+      "domain": "daily",
+      "category": "time",
+      "emoji": "📅"
+    },
+    "examples": [
+      {
+        "korean": "오늘은 날씨가 좋아요.",
+        "english": "Today the weather is nice.",
+        "japanese": "今日は天気がいいです。",
+        "chinese": "今天天气很好。"
+      }
+    ]
+  },
+  {
+    "domain": "travel",
+    "category": "transportation",
+    "expressions": {
+      "korean": {
+        "word": "기차",
+        "pronunciation": "gicha",
+        "definition": "철로 위를 달리는 대중교통",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      },
+      "english": {
+        "word": "train",
+        "pronunciation": "treɪn",
+        "definition": "a public transport that runs on rails",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      },
+      "japanese": {
+        "word": "電車",
+        "pronunciation": "densha",
+        "definition": "線路の上を走る公共交通機関",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      },
+      "chinese": {
+        "word": "火车",
+        "pronunciation": "huǒ chē",
+        "definition": "铁路上行驶的公共交通工具",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      }
+    },
+    "concept_info": {
+      "domain": "travel",
+      "category": "transportation",
+      "emoji": "🚆"
+    },
+    "examples": [
+      {
+        "korean": "기차로 서울에 갈 거예요.",
+        "english": "I will go to Seoul by train.",
+        "japanese": "電車でソウルに行きます。",
+        "chinese": "我将乘火车去首尔。"
+      }
+    ]
+  },
+  {
+    "domain": "education",
+    "category": "subject",
+    "expressions": {
+      "korean": {
+        "word": "수학",
+        "pronunciation": "suhak",
+        "definition": "숫자와 공식을 다루는 학문",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      },
+      "english": {
+        "word": "mathematics",
+        "pronunciation": "ˌmæθəˈmætɪks",
+        "definition": "the study of numbers and formulas",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      },
+      "japanese": {
+        "word": "数学",
+        "pronunciation": "suugaku",
+        "definition": "数字と公式を扱う学問",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      },
+      "chinese": {
+        "word": "数学",
+        "pronunciation": "shù xué",
+        "definition": "研究数字和公式的科学",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      }
+    },
+    "concept_info": {
+      "domain": "education",
+      "category": "subject",
+      "emoji": "🧮"
+    },
+    "examples": [
+      {
+        "korean": "수학은 제 가장 좋아하는 과목입니다.",
+        "english": "Mathematics is my favorite subject.",
+        "japanese": "数学は私の一番好きな科目です。",
+        "chinese": "数学是我最喜欢的学科。"
+      }
+    ]
+  },
+  {
+    "domain": "daily",
+    "category": "emotion",
+    "expressions": {
+      "korean": {
+        "word": "행복",
+        "pronunciation": "haengbok",
+        "definition": "기쁨을 느끼는 상태",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      },
+      "english": {
+        "word": "happiness",
+        "pronunciation": "ˈhæpinəs",
+        "definition": "state of feeling joy",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      },
+      "japanese": {
+        "word": "幸せ",
+        "pronunciation": "shiawase",
+        "definition": "喜びを感じる状態",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      },
+      "chinese": {
+        "word": "幸福",
+        "pronunciation": "xìng fú",
+        "definition": "感到喜悦的状态",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      }
+    },
+    "concept_info": {
+      "domain": "daily",
+      "category": "emotion",
+      "emoji": "😊"
+    },
+    "examples": [
+      {
+        "korean": "행복은 건강에 좋습니다.",
+        "english": "Happiness is good for health.",
+        "japanese": "幸せは健康に良いです。",
+        "chinese": "幸福对健康有好处。"
+      }
+    ]
+  },
+  {
+    "domain": "food",
+    "category": "beverage",
+    "expressions": {
+      "korean": {
+        "word": "커피",
+        "pronunciation": "keopi",
+        "definition": "카페인이 들어있는 음료",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      },
+      "english": {
+        "word": "coffee",
+        "pronunciation": "ˈkɔfi",
+        "definition": "a caffeinated beverage",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      },
+      "japanese": {
+        "word": "コーヒー",
+        "pronunciation": "koohii",
+        "definition": "カフェインの入った飲み物",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      },
+      "chinese": {
+        "word": "咖啡",
+        "pronunciation": "kā fēi",
+        "definition": "含有咖啡因的饮料",
+        "part_of_speech": "noun",
+        "level": "beginner"
+      }
+    },
+    "concept_info": {
+      "domain": "food",
+      "category": "beverage",
+      "emoji": "☕"
+    },
+    "examples": [
+      {
+        "korean": "아침에 커피를 마십니다.",
+        "english": "I drink coffee in the morning.",
+        "japanese": "朝にコーヒーを飲みます。",
+        "chinese": "我早上喝咖啡。"
+      }
+    ]
+  }
+] 
