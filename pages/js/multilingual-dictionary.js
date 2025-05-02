@@ -201,9 +201,19 @@ function createConceptCard(concept) {
       
       <div class="border-t border-gray-200 pt-3 mt-3">
         <div class="flex items-center">
-          <span class="text-gray-500 text-sm mr-2">${
-            supportedLanguages[targetLanguage].nameKo
-          }:</span>
+          <span class="text-gray-500 text-sm mr-2">
+            ${
+              targetLanguage === "korean"
+                ? "뜻:"
+                : targetLanguage === "english"
+                ? "Meaning:"
+                : targetLanguage === "japanese"
+                ? "意味:"
+                : targetLanguage === "chinese"
+                ? "意思:"
+                : "뜻:"
+            }
+          </span>
           <span class="font-medium">${targetExpression.word}</span>
         </div>
         <p class="text-sm text-gray-600 mt-1">${
@@ -215,7 +225,19 @@ function createConceptCard(concept) {
         example && example.source && example.target
           ? `
       <div class="border-t border-gray-200 pt-3 mt-3">
-        <p class="text-xs text-gray-500 mb-1">예문:</p>
+        <p class="text-xs text-gray-500 mb-1">
+          ${
+            targetLanguage === "korean"
+              ? "예문:"
+              : targetLanguage === "english"
+              ? "Example:"
+              : targetLanguage === "japanese"
+              ? "例文:"
+              : targetLanguage === "chinese"
+              ? "例句:"
+              : "예문:"
+          }
+        </p>
         <p class="text-sm mb-1">${example.source}</p>
         <p class="text-sm text-gray-600">${example.target}</p>
       </div>
@@ -535,11 +557,37 @@ function fillConceptViewModal(conceptData) {
   // 언어 표현 탭 생성
   const tabContainer = document.getElementById("concept-view-tabs");
   const contentContainer = document.getElementById("concept-view-content");
+  const expressionsTitle = document.getElementById(
+    "concept-view-expressions-title"
+  );
 
   if (!tabContainer || !contentContainer) return;
 
   tabContainer.innerHTML = "";
   contentContainer.innerHTML = "";
+
+  // 초기 언어 설정 (첫 번째 탭 언어)
+  let currentLangCode = Object.keys(conceptData.expressions)[0] || "korean";
+
+  // 언어별 표현 제목 업데이트 함수
+  const updateExpressionsTitle = (langCode) => {
+    if (!expressionsTitle) return;
+
+    if (langCode === "korean") {
+      expressionsTitle.textContent = "언어별 표현";
+    } else if (langCode === "english") {
+      expressionsTitle.textContent = "Expressions";
+    } else if (langCode === "japanese") {
+      expressionsTitle.textContent = "言語表現";
+    } else if (langCode === "chinese") {
+      expressionsTitle.textContent = "语言表达";
+    } else {
+      expressionsTitle.textContent = "언어별 표현";
+    }
+  };
+
+  // 초기 언어별 표현 제목 설정
+  updateExpressionsTitle(currentLangCode);
 
   // 각 언어별 탭과 컨텐츠 생성
   Object.entries(conceptData.expressions).forEach(
@@ -568,22 +616,47 @@ function fillConceptViewModal(conceptData) {
       // 이모지 사용
       const emoji = conceptData.concept_info.emoji || "";
 
+      // 언어에 따른 레이블 설정
+      let definitionLabel, partOfSpeechLabel, levelLabel;
+
+      if (langCode === "korean") {
+        definitionLabel = "의미/정의:";
+        partOfSpeechLabel = "품사:";
+        levelLabel = "난이도:";
+      } else if (langCode === "english") {
+        definitionLabel = "Definition:";
+        partOfSpeechLabel = "Part of Speech:";
+        levelLabel = "Level:";
+      } else if (langCode === "japanese") {
+        definitionLabel = "意味/定義:";
+        partOfSpeechLabel = "品詞:";
+        levelLabel = "レベル:";
+      } else if (langCode === "chinese") {
+        definitionLabel = "意思/定义:";
+        partOfSpeechLabel = "词性:";
+        levelLabel = "级别:";
+      } else {
+        definitionLabel = "의미/정의:";
+        partOfSpeechLabel = "품사:";
+        levelLabel = "난이도:";
+      }
+
       panel.innerHTML = `
       <div class="mb-4">
         <h3 class="text-xl font-bold">${emoji} ${expression.word}</h3>
         <p class="text-gray-500">${expression.pronunciation || ""}</p>
       </div>
       <div class="mb-4">
-        <p class="text-sm text-gray-700 mb-1">의미/정의:</p>
+        <p class="text-sm text-gray-700 mb-1">${definitionLabel}</p>
         <p>${expression.definition || "정의 없음"}</p>
       </div>
       <div class="grid grid-cols-2 gap-4 mb-4">
         <div>
-          <p class="text-sm text-gray-700 mb-1">품사:</p>
+          <p class="text-sm text-gray-700 mb-1">${partOfSpeechLabel}</p>
           <p>${expression.part_of_speech || "정보 없음"}</p>
         </div>
         <div>
-          <p class="text-sm text-gray-700 mb-1">난이도:</p>
+          <p class="text-sm text-gray-700 mb-1">${levelLabel}</p>
           <p>${expression.level || "정보 없음"}</p>
         </div>
       </div>
@@ -595,8 +668,108 @@ function fillConceptViewModal(conceptData) {
 
   // 예문 표시
   const examplesContainer = document.getElementById("concept-view-examples");
-  if (examplesContainer) {
+  const exampleTitle = document.getElementById("concept-view-examples-title");
+
+  if (examplesContainer && exampleTitle) {
     examplesContainer.innerHTML = "";
+
+    // 초기 언어 설정 (첫 번째 탭 언어)
+    let currentLangCode = Object.keys(conceptData.expressions)[0] || "korean";
+
+    // 예문 제목 업데이트 함수
+    const updateExampleTitle = (langCode) => {
+      if (langCode === "korean") {
+        exampleTitle.textContent = "예문";
+      } else if (langCode === "english") {
+        exampleTitle.textContent = "Examples";
+      } else if (langCode === "japanese") {
+        exampleTitle.textContent = "例文";
+      } else if (langCode === "chinese") {
+        exampleTitle.textContent = "例句";
+      } else {
+        exampleTitle.textContent = "예문";
+      }
+    };
+
+    // 버튼 텍스트 업데이트 함수
+    const updateButtonTexts = (langCode) => {
+      const closeBtn = document.getElementById("close-concept-view-btn");
+      const editBtn = document.getElementById("edit-concept-button");
+
+      if (closeBtn) {
+        if (langCode === "korean") closeBtn.textContent = "닫기";
+        else if (langCode === "english") closeBtn.textContent = "Close";
+        else if (langCode === "japanese") closeBtn.textContent = "閉じる";
+        else if (langCode === "chinese") closeBtn.textContent = "关闭";
+        else closeBtn.textContent = "닫기";
+      }
+
+      if (editBtn) {
+        if (langCode === "korean") editBtn.textContent = "편집";
+        else if (langCode === "english") editBtn.textContent = "Edit";
+        else if (langCode === "japanese") editBtn.textContent = "編集";
+        else if (langCode === "chinese") editBtn.textContent = "编辑";
+        else editBtn.textContent = "편집";
+      }
+    };
+
+    // 초기 텍스트 설정
+    updateExampleTitle(currentLangCode);
+    updateButtonTexts(currentLangCode);
+
+    // 탭 전환 함수 정의
+    window.switchViewTab = (langCode) => {
+      currentLangCode = langCode;
+
+      // 모든 탭 비활성화
+      document.querySelectorAll("[id^='view-'][id$='-tab']").forEach((tab) => {
+        tab.classList.remove("bg-blue-500", "text-white");
+        tab.classList.add("bg-gray-200");
+      });
+
+      // 모든 컨텐츠 패널 숨기기
+      document
+        .querySelectorAll("[id^='view-'][id$='-content']")
+        .forEach((content) => {
+          content.classList.add("hidden");
+        });
+
+      // 선택된 탭 활성화
+      const selectedTab = document.getElementById(`view-${langCode}-tab`);
+      if (selectedTab) {
+        selectedTab.classList.remove("bg-gray-200");
+        selectedTab.classList.add("bg-blue-500", "text-white");
+      }
+
+      // 선택된 컨텐츠 표시
+      const selectedContent = document.getElementById(
+        `view-${langCode}-content`
+      );
+      if (selectedContent) {
+        selectedContent.classList.remove("hidden");
+      }
+
+      // 모든 제목과 버튼 텍스트 업데이트
+      updateExpressionsTitle(langCode);
+      updateExampleTitle(langCode);
+      updateButtonTexts(langCode);
+
+      // "예문 없음" 메시지도 언어에 맞게 업데이트
+      if (conceptData.examples && conceptData.examples.length === 0) {
+        const noExamplesMessage =
+          langCode === "korean"
+            ? "등록된 예문이 없습니다."
+            : langCode === "english"
+            ? "No examples available."
+            : langCode === "japanese"
+            ? "例文はありません。"
+            : langCode === "chinese"
+            ? "没有例句。"
+            : "등록된 예문이 없습니다.";
+
+        examplesContainer.innerHTML = `<p class="text-gray-500">${noExamplesMessage}</p>`;
+      }
+    };
 
     if (conceptData.examples && conceptData.examples.length > 0) {
       conceptData.examples.forEach((example) => {
@@ -619,7 +792,19 @@ function fillConceptViewModal(conceptData) {
         examplesContainer.appendChild(exampleDiv);
       });
     } else {
-      examplesContainer.innerHTML = `<p class="text-gray-500">등록된 예문이 없습니다.</p>`;
+      // 언어에 따른, "등록된 예문이 없습니다." 메시지
+      const noExamplesMessage =
+        currentLangCode === "korean"
+          ? "등록된 예문이 없습니다."
+          : currentLangCode === "english"
+          ? "No examples available."
+          : currentLangCode === "japanese"
+          ? "例文はありません。"
+          : currentLangCode === "chinese"
+          ? "没有例句。"
+          : "등록된 예문이 없습니다.";
+
+      examplesContainer.innerHTML = `<p class="text-gray-500">${noExamplesMessage}</p>`;
     }
   }
 
@@ -636,31 +821,4 @@ function fillConceptViewModal(conceptData) {
   }
 }
 
-// 상세 보기 탭 전환 함수
-function switchViewTab(langCode) {
-  // 모든 탭 비활성화
-  document.querySelectorAll("[id^='view-'][id$='-tab']").forEach((tab) => {
-    tab.classList.remove("bg-blue-500", "text-white");
-    tab.classList.add("bg-gray-200");
-  });
-
-  // 모든 컨텐츠 패널 숨기기
-  document
-    .querySelectorAll("[id^='view-'][id$='-content']")
-    .forEach((content) => {
-      content.classList.add("hidden");
-    });
-
-  // 선택된 탭 활성화
-  const selectedTab = document.getElementById(`view-${langCode}-tab`);
-  if (selectedTab) {
-    selectedTab.classList.remove("bg-gray-200");
-    selectedTab.classList.add("bg-blue-500", "text-white");
-  }
-
-  // 선택된 컨텐츠 표시
-  const selectedContent = document.getElementById(`view-${langCode}-content`);
-  if (selectedContent) {
-    selectedContent.classList.remove("hidden");
-  }
-}
+// 상세 보기 탭 전환 함수는 fillConceptViewModal 함수 내에서 정의했으므로 여기서는 제거합니다.

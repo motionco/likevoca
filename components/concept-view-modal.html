@@ -8,7 +8,7 @@
     </div>
 
     <div class="mb-6">
-      <h3 class="text-lg font-medium mb-2">언어별 표현</h3>
+      <h3 id="concept-view-expressions-title" class="text-lg font-medium mb-2">언어별 표현</h3>
       <div id="concept-view-tabs" class="flex border-b mb-4">
         <!-- 탭은 JavaScript로 동적 생성됨 -->
       </div>
@@ -18,7 +18,7 @@
     </div>
 
     <div class="mb-6">
-      <h3 class="text-lg font-medium mb-2">예문</h3>
+      <h3 id="concept-view-examples-title" class="text-lg font-medium mb-2">예문</h3>
       <div id="concept-view-examples" class="mt-2">
         <!-- 예문은 JavaScript로 동적 생성됨 -->
       </div>
@@ -26,6 +26,7 @@
 
     <div class="flex justify-end space-x-4 mt-6">
       <button 
+        id="close-concept-view-btn"
         type="button" 
         class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded"
         onclick="document.getElementById('concept-view-modal').classList.add('hidden')"
