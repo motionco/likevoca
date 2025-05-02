@@ -1,7 +1,7 @@
 {
   "name": "actionlingo",
   "version": "1.0.0",
-  "description": "Learn Hangul application",
+  "description": "Likevoca application",
   "scripts": {
     "build:css": "tailwindcss -i ./css/tailwind.css -o ./css/styles.css",
     "watch:css": "tailwindcss -i ./css/tailwind.css -o ./css/styles.css --watch"
