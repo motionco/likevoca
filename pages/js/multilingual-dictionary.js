@@ -695,6 +695,7 @@ function fillConceptViewModal(conceptData) {
     const updateButtonTexts = (langCode) => {
       const closeBtn = document.getElementById("close-concept-view-btn");
       const editBtn = document.getElementById("edit-concept-button");
+      const deleteBtn = document.getElementById("delete-concept-button");
 
       if (closeBtn) {
         if (langCode === "korean") closeBtn.textContent = "닫기";
@@ -710,6 +711,14 @@ function fillConceptViewModal(conceptData) {
         else if (langCode === "japanese") editBtn.textContent = "編集";
         else if (langCode === "chinese") editBtn.textContent = "编辑";
         else editBtn.textContent = "편집";
+      }
+
+      if (deleteBtn) {
+        if (langCode === "korean") deleteBtn.textContent = "삭제";
+        else if (langCode === "english") deleteBtn.textContent = "Delete";
+        else if (langCode === "japanese") deleteBtn.textContent = "削除";
+        else if (langCode === "chinese") deleteBtn.textContent = "删除";
+        else deleteBtn.textContent = "삭제";
       }
     };
 
@@ -817,6 +826,75 @@ function fillConceptViewModal(conceptData) {
       if (viewModal) viewModal.classList.add("hidden");
 
       window.openConceptModal(conceptData._id);
+    };
+  }
+
+  // 삭제 버튼 이벤트
+  const deleteButton = document.getElementById("delete-concept-button");
+  if (deleteButton) {
+    deleteButton.onclick = async () => {
+      // 확인 메시지 (현재 언어에 맞게)
+      let confirmMessage;
+      if (currentLangCode === "korean") {
+        confirmMessage = "정말로 이 개념을 삭제하시겠습니까?";
+      } else if (currentLangCode === "english") {
+        confirmMessage = "Are you sure you want to delete this concept?";
+      } else if (currentLangCode === "japanese") {
+        confirmMessage = "本当にこの概念を削除しますか？";
+      } else if (currentLangCode === "chinese") {
+        confirmMessage = "您确定要删除这个概念吗？";
+      } else {
+        confirmMessage = "정말로 이 개념을 삭제하시겠습니까?";
+      }
+
+      if (confirm(confirmMessage)) {
+        try {
+          await conceptUtils.deleteConcept(conceptData._id);
+
+          // 성공 메시지 (현재 언어에 맞게)
+          let successMessage;
+          if (currentLangCode === "korean") {
+            successMessage = "개념이 성공적으로 삭제되었습니다.";
+          } else if (currentLangCode === "english") {
+            successMessage = "The concept has been successfully deleted.";
+          } else if (currentLangCode === "japanese") {
+            successMessage = "概念が正常に削除されました。";
+          } else if (currentLangCode === "chinese") {
+            successMessage = "概念已成功删除。";
+          } else {
+            successMessage = "개념이 성공적으로 삭제되었습니다.";
+          }
+
+          alert(successMessage);
+
+          // 모달 닫기
+          const viewModal = document.getElementById("concept-view-modal");
+          if (viewModal) viewModal.classList.add("hidden");
+
+          // 목록 새로고침
+          window.dispatchEvent(new CustomEvent("concept-saved"));
+        } catch (error) {
+          console.error("개념 삭제 중 오류 발생:", error);
+
+          // 오류 메시지 (현재 언어에 맞게)
+          let errorMessage;
+          if (currentLangCode === "korean") {
+            errorMessage = "개념 삭제 중 오류가 발생했습니다: " + error.message;
+          } else if (currentLangCode === "english") {
+            errorMessage =
+              "An error occurred while deleting the concept: " + error.message;
+          } else if (currentLangCode === "japanese") {
+            errorMessage =
+              "概念の削除中にエラーが発生しました: " + error.message;
+          } else if (currentLangCode === "chinese") {
+            errorMessage = "删除概念时发生错误: " + error.message;
+          } else {
+            errorMessage = "개념 삭제 중 오류가 발생했습니다: " + error.message;
+          }
+
+          alert(errorMessage);
+        }
+      }
     };
   }
 }

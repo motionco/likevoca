@@ -252,17 +252,64 @@ export const conceptUtils = {
         );
 
         if (remainingConcepts.length > 0) {
-          // 다른 개념들이 남아있으면 업데이트
+          // 다른 개념들이 있으면 개념만 제거
           await updateDoc(indexDoc.ref, {
             concepts: remainingConcepts,
           });
         } else {
-          // 남은 개념이 없으면 인덱스 삭제
+          // 마지막 개념이면 인덱스 자체를 삭제
           await deleteDoc(indexDoc.ref);
         }
       }
     } catch (error) {
       console.error(`${language} 인덱스에서 개념 제거 중 오류 발생:`, error);
+      throw error;
+    }
+  },
+
+  // 개념 삭제
+  async deleteConcept(conceptId) {
+    try {
+      // 먼저 개념 정보를 가져옵니다
+      const conceptRef = doc(db, "concepts", conceptId);
+      const conceptDoc = await getDoc(conceptRef);
+
+      if (!conceptDoc.exists()) {
+        throw new Error("삭제할 개념을 찾을 수 없습니다");
+      }
+
+      const conceptData = conceptDoc.data();
+
+      // 각 언어 인덱스에서 개념을 제거합니다
+      for (const [lang, expression] of Object.entries(
+        conceptData.expressions
+      )) {
+        await this.removeFromLanguageIndex(lang, expression.word, conceptId);
+      }
+
+      // 개념 문서 자체를 삭제합니다
+      await deleteDoc(conceptRef);
+
+      // 사용자의 개념 수 업데이트
+      if (auth.currentUser) {
+        const userRef = doc(db, "users", auth.currentUser.email);
+        const userDoc = await getDoc(userRef);
+
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          const currentCount = userData.conceptCount || 0;
+
+          if (currentCount > 0) {
+            await updateDoc(userRef, {
+              conceptCount: currentCount - 1,
+            });
+          }
+        }
+      }
+
+      return true;
+    } catch (error) {
+      console.error("개념 삭제 중 오류 발생:", error);
       throw error;
     }
   },
