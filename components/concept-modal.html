@@ -1,7 +1,7 @@
 <div id="concept-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
   <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-4xl max-h-[90vh] overflow-y-auto">
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-bold text-gray-800">새 개념 추가</h2>
+      <h2 class="text-xl font-bold text-gray-800" data-i18n="add_new_concept">새 개념 추가</h2>
       <button id="close-concept-modal" class="text-gray-500 hover:text-gray-700">
         <i class="fas fa-times text-xl"></i>
       </button>
@@ -10,22 +10,22 @@
     <div class="mb-6">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="mb-4">
-          <label for="concept-domain" class="block text-sm font-medium mb-1">도메인</label>
-          <input type="text" id="concept-domain" class="w-full p-2 border rounded" placeholder="예: daily, food, business">
+          <label for="concept-domain" class="block text-sm font-medium mb-1" data-i18n="domain">도메인</label>
+          <input type="text" id="concept-domain" class="w-full p-2 border rounded" placeholder="예: daily, food, business" data-i18n-placeholder="domain_placeholder">
         </div>
         <div class="mb-4">
-          <label for="concept-emoji" class="block text-sm font-medium mb-1">이모지</label>
-          <input type="text" id="concept-emoji" class="w-full p-2 border rounded" placeholder="예: 🍎, 🚆, 👋">
+          <label for="concept-emoji" class="block text-sm font-medium mb-1" data-i18n="emoji">이모지</label>
+          <input type="text" id="concept-emoji" class="w-full p-2 border rounded" placeholder="예: 🍎, 🚆, 👋" data-i18n-placeholder="emoji_placeholder">
         </div>
         <div class="mb-4">
-          <label for="concept-category" class="block text-sm font-medium mb-1">카테고리</label>
-          <input type="text" id="concept-category" class="w-full p-2 border rounded" placeholder="예: fruit, greeting, vehicle">
+          <label for="concept-category" class="block text-sm font-medium mb-1" data-i18n="category">카테고리</label>
+          <input type="text" id="concept-category" class="w-full p-2 border rounded" placeholder="예: fruit, greeting, vehicle" data-i18n-placeholder="category_placeholder">
         </div>
       </div>
     </div>
 
     <div class="mb-6">
-      <h3 class="text-lg font-medium mb-2">언어 표현</h3>
+      <h3 class="text-lg font-medium mb-2" data-i18n="expressions_by_language">언어 표현</h3>
       <div id="language-tabs" class="flex border-b mb-4">
         <!-- 탭은 JavaScript로 동적 생성됨 -->
       </div>
@@ -36,9 +36,9 @@
 
     <div class="mb-6">
       <div class="flex justify-between items-center mb-2">
-        <h3 class="text-lg font-medium">예문</h3>
+        <h3 class="text-lg font-medium" data-i18n="examples">예문</h3>
         <button id="add-example" type="button" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">
-          <i class="fas fa-plus mr-1"></i> 예문 추가
+          <i class="fas fa-plus mr-1"></i> <span data-i18n="add_example">예문 추가</span>
         </button>
       </div>
       <div id="examples-container">
@@ -47,10 +47,10 @@
     </div>
 
     <div class="flex justify-end space-x-4 mt-6">
-      <button id="reset-concept-form" type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded">
+      <button id="reset-concept-form" type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded" data-i18n="reset">
         초기화
       </button>
-      <button id="save-concept" type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+      <button id="save-concept" type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" data-i18n="add">
         추가하기
       </button>
     </div>
@@ -61,32 +61,32 @@
 <div id="add-language-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
   <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-lg">
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-bold text-gray-800">새 언어 추가</h2>
+      <h2 class="text-xl font-bold text-gray-800" data-i18n="add_new_language">새 언어 추가</h2>
       <button id="close-add-language-modal" class="text-gray-500 hover:text-gray-700">
         <i class="fas fa-times text-xl"></i>
       </button>
     </div>
 
     <div class="mb-4">
-      <label for="new-language-name-ko" class="block text-sm font-medium mb-1">언어 이름 (한국어)</label>
-      <input type="text" id="new-language-name-ko" class="w-full p-2 border rounded" placeholder="예: 스페인어, 프랑스어">
+      <label for="new-language-name-ko" class="block text-sm font-medium mb-1" data-i18n="language_name_ko">언어 이름 (한국어)</label>
+      <input type="text" id="new-language-name-ko" class="w-full p-2 border rounded" placeholder="예: 스페인어, 프랑스어" data-i18n-placeholder="language_name_ko_placeholder">
     </div>
 
     <div class="mb-4">
-      <label for="new-language-code" class="block text-sm font-medium mb-1">언어 코드</label>
-      <input type="text" id="new-language-code" class="w-full p-2 border rounded" placeholder="예: spanish, french">
+      <label for="new-language-code" class="block text-sm font-medium mb-1" data-i18n="language_code">언어 코드</label>
+      <input type="text" id="new-language-code" class="w-full p-2 border rounded" placeholder="예: spanish, french" data-i18n-placeholder="language_code_placeholder">
     </div>
 
     <div class="mb-4">
-      <label for="new-language-example" class="block text-sm font-medium mb-1">예시 단어</label>
-      <input type="text" id="new-language-example" class="w-full p-2 border rounded" placeholder="예: manzana, pomme">
+      <label for="new-language-example" class="block text-sm font-medium mb-1" data-i18n="example_word">예시 단어</label>
+      <input type="text" id="new-language-example" class="w-full p-2 border rounded" placeholder="예: manzana, pomme" data-i18n-placeholder="example_word_placeholder">
     </div>
 
     <div class="flex justify-end space-x-4">
-      <button id="cancel-add-language" type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded">
+      <button id="cancel-add-language" type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded" data-i18n="cancel">
         취소
       </button>
-      <button id="confirm-add-language" type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+      <button id="confirm-add-language" type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" data-i18n="add">
         추가
       </button>
     </div>

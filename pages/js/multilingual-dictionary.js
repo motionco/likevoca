@@ -24,6 +24,7 @@ import {
 
 import { initialize as initializeConceptModal } from "../../components/js/add-concept-modal.js";
 import { initialize as initializeBulkImportModal } from "../../components/js/bulk-import-modal.js";
+import { getActiveLanguage } from "../../utils/language-utils.js";
 
 let currentUser = null;
 let allConcepts = [];
@@ -31,9 +32,54 @@ let filteredConcepts = [];
 let displayCount = 12;
 let lastVisibleConcept = null;
 let firstVisibleConcept = null;
+let userLanguage = "ko";
+
+// 페이지별 번역 키
+const pageTranslations = {
+  ko: {
+    meaning: "뜻:",
+    example: "예문:",
+    error_title: "오류 발생!",
+    error_message: "페이지를 불러오는 중 문제가 발생했습니다.",
+    error_details: "자세한 내용:",
+    login_required: "로그인이 필요합니다.",
+  },
+  en: {
+    meaning: "Meaning:",
+    example: "Example:",
+    error_title: "Error!",
+    error_message: "A problem occurred while loading the page.",
+    error_details: "Details:",
+    login_required: "Login required.",
+  },
+  ja: {
+    meaning: "意味:",
+    example: "例文:",
+    error_title: "エラーが発生しました!",
+    error_message: "ページの読み込み中に問題が発生しました。",
+    error_details: "詳細:",
+    login_required: "ログインが必要です。",
+  },
+  zh: {
+    meaning: "意思:",
+    example: "例句:",
+    error_title: "发生错误!",
+    error_message: "加载页面时出现问题。",
+    error_details: "详细信息:",
+    login_required: "需要登录。",
+  },
+};
+
+// 다국어 번역 텍스트 가져오기 함수
+function getTranslatedText(key) {
+  return pageTranslations[userLanguage][key] || pageTranslations.en[key];
+}
 
 document.addEventListener("DOMContentLoaded", async () => {
   try {
+    // 현재 활성화된 언어 코드 가져오기
+    userLanguage = await getActiveLanguage();
+
     // 네비게이션바 로드
     loadNavbar();
 
@@ -118,6 +164,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       await updateUsageUI();
     });
 
+    // 언어 변경 이벤트 리스너
+    document.addEventListener("languageChanged", async (event) => {
+      userLanguage = event.detail.language;
+      displayConceptList(); // 언어 변경 시 카드 재표시
+    });
+
     // 사용자 인증 상태 관찰
     onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -125,7 +177,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         await fetchAndDisplayConcepts();
         await updateUsageUI();
       } else {
-        alert("로그인이 필요합니다.");
+        alert(getTranslatedText("login_required"));
         window.location.href = "../login.html";
       }
     });
@@ -136,9 +188,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (container) {
       container.innerHTML += `
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative my-4" role="alert">
-          <strong class="font-bold">오류 발생!</strong>
-          <span class="block sm:inline">페이지를 불러오는 중 문제가 발생했습니다.</span>
-          <span class="block mt-2">자세한 내용: ${error.message}</span>
+          <strong class="font-bold">${getTranslatedText("error_title")}</strong>
+          <span class="block sm:inline">${getTranslatedText(
+            "error_message"
+          )}</span>
+          <span class="block mt-2">${getTranslatedText("error_details")} ${
+        error.message
+      }</span>
         </div>
       `;
     }
@@ -202,17 +258,7 @@ function createConceptCard(concept) {
       <div class="border-t border-gray-200 pt-3 mt-3">
         <div class="flex items-center">
           <span class="text-gray-500 text-sm mr-2">
-            ${
-              targetLanguage === "korean"
-                ? "뜻:"
-                : targetLanguage === "english"
-                ? "Meaning:"
-                : targetLanguage === "japanese"
-                ? "意味:"
-                : targetLanguage === "chinese"
-                ? "意思:"
-                : "뜻:"
-            }
+            ${getTranslatedText("meaning")}
           </span>
           <span class="font-medium">${targetExpression.word}</span>
         </div>
@@ -226,17 +272,7 @@ function createConceptCard(concept) {
           ? `
       <div class="border-t border-gray-200 pt-3 mt-3">
         <p class="text-xs text-gray-500 mb-1">
-          ${
-            targetLanguage === "korean"
-              ? "예문:"
-              : targetLanguage === "english"
-              ? "Example:"
-              : targetLanguage === "japanese"
-              ? "例文:"
-              : targetLanguage === "chinese"
-              ? "例句:"
-              : "예문:"
-          }
+          ${getTranslatedText("example")}
         </p>
         <p class="text-sm mb-1">${example.source}</p>
         <p class="text-sm text-gray-600">${example.target}</p>
@@ -247,14 +283,10 @@ function createConceptCard(concept) {
       
       <div class="flex justify-between text-xs text-gray-500 mt-3">
         <span class="flex items-center">
-          <i class="fas fa-language mr-1"></i> ${
-            Object.keys(concept.expressions).length
-          }개 언어
+          <i class="fas fa-language mr-1"></i> ${sourceLanguage} → ${targetLanguage}
         </span>
         <span class="flex items-center">
-          <i class="fas fa-calendar-alt mr-1"></i> ${formatDate(
-            concept.created_at
-          )}
+          <i class="fas fa-clock mr-1"></i> ${formatDate(concept.timestamp)}
         </span>
       </div>
     </div>

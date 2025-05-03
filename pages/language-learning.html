@@ -5,6 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>다국어 학습 - LikeVoca</title>
 
+    <!-- 기본 메타 태그 -->
+    <meta name="description" content="플래시카드, 퀴즈, 타이핑 등 다양한 방식으로 언어를 학습하세요." />
+    <meta name="keywords" content="다국어 학습, 언어 학습, 플래시카드, 퀴즈, 영어, 일본어, 중국어, 한국어" />
+    
+    <!-- Open Graph / 소셜 미디어 메타 태그 -->
+    <meta property="og:title" content="LikeVoca - 다국어 학습" />
+    <meta property="og:description" content="플래시카드, 퀴즈, 타이핑 등 다양한 방식으로 언어를 학습하세요." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://likevoca.com/pages/language-learning.html" />
+    <meta property="og:locale" content="ko" />
+    
+    <!-- 표준 링크 -->
+    <link rel="canonical" href="https://likevoca.com/ko/pages/language-learning.html" />
+    
+    <!-- 대체 언어 링크 (초기값) -->
+    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/pages/language-learning.html" />
+    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/pages/language-learning.html" />
+    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/pages/language-learning.html" />
+    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/pages/language-learning.html" />
+    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/pages/language-learning.html" />
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       rel="stylesheet"
@@ -50,47 +71,48 @@
         animation: fadeIn 0.5s;
       }
     </style>
+    <script type="module" src="../js/language-init.js"></script>
   </head>
   <body class="bg-gray-100">
     <div id="navbar-container"></div>
 
     <main class="container mx-auto max-w-7xl px-4 py-8">
       <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800">다국어 학습</h1>
+        <h1 class="text-3xl font-bold text-gray-800" data-i18n="language_learning_title">다국어 학습</h1>
         <div class="flex space-x-4">
           <select id="source-language" class="border p-2 rounded">
-            <option value="korean">한국어</option>
-            <option value="english">영어</option>
-            <option value="japanese">일본어</option>
-            <option value="chinese">중국어</option>
+            <option value="korean" data-i18n="korean">한국어</option>
+            <option value="english" data-i18n="english">영어</option>
+            <option value="japanese" data-i18n="japanese">일본어</option>
+            <option value="chinese" data-i18n="chinese">중국어</option>
           </select>
           <select id="target-language" class="border p-2 rounded">
-            <option value="english">영어</option>
-            <option value="korean">한국어</option>
-            <option value="japanese">일본어</option>
-            <option value="chinese">중국어</option>
+            <option value="english" data-i18n="english">영어</option>
+            <option value="korean" data-i18n="korean">한국어</option>
+            <option value="japanese" data-i18n="japanese">일본어</option>
+            <option value="chinese" data-i18n="chinese">중국어</option>
           </select>
         </div>
       </div>
 
       <!-- 학습 모드 선택 -->
       <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-        <h2 class="text-xl font-bold mb-4">학습 모드</h2>
+        <h2 class="text-xl font-bold mb-4" data-i18n="learning_mode">학습 모드</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <button id="flashcard-mode" class="bg-[#4B63AC] text-white p-4 rounded-lg hover:bg-[#3A4F8B] transition">
             <i class="fas fa-copy text-2xl mb-2"></i>
-            <div class="font-bold">플래시카드</div>
-            <p class="text-sm opacity-80">단어 앞면/뒷면으로 학습</p>
+            <div class="font-bold" data-i18n="flashcards">플래시카드</div>
+            <p class="text-sm opacity-80" data-i18n="flashcards_desc">단어 앞면/뒷면으로 학습</p>
           </button>
           <button id="quiz-mode" class="bg-[#2E7D32] text-white p-4 rounded-lg hover:bg-[#1B5E20] transition">
             <i class="fas fa-question-circle text-2xl mb-2"></i>
-            <div class="font-bold">퀴즈</div>
-            <p class="text-sm opacity-80">객관식 문제로 학습</p>
+            <div class="font-bold" data-i18n="quiz">퀴즈</div>
+            <p class="text-sm opacity-80" data-i18n="quiz_desc">객관식 문제로 학습</p>
           </button>
           <button id="typing-mode" class="bg-[#1565CD] text-white p-4 rounded-lg hover:bg-[#0D47A1] transition">
             <i class="fas fa-keyboard text-2xl mb-2"></i>
-            <div class="font-bold">타이핑</div>
-            <p class="text-sm opacity-80">직접 입력하며 학습</p>
+            <div class="font-bold" data-i18n="typing">타이핑</div>
+            <p class="text-sm opacity-80" data-i18n="typing_desc">직접 입력하며 학습</p>
           </button>
         </div>
       </div>
@@ -111,7 +133,7 @@
               <div id="back-definition" class="text-lg text-gray-700 mb-6"></div>
               
               <div id="example-container" class="border-t border-gray-200 pt-4 mt-4">
-                <p class="text-sm text-gray-500 mb-2">예문:</p>
+                <p class="text-sm text-gray-500 mb-2" data-i18n="examples">예문:</p>
                 <div id="example" class="text-md"></div>
                 <div id="example-translation" class="text-md text-gray-600 mt-2"></div>
               </div>
@@ -121,18 +143,18 @@
         
         <div class="flex justify-center space-x-4 mt-6">
           <button id="prev-card" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-            <i class="fas fa-arrow-left mr-2"></i> 이전
+            <i class="fas fa-arrow-left mr-2"></i> <span data-i18n="previous">이전</span>
           </button>
-          <button id="flip-card" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+          <button id="flip-card" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" data-i18n="flip">
             뒤집기
           </button>
           <button id="next-card" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-            다음 <i class="fas fa-arrow-right ml-2"></i>
+            <span data-i18n="next">다음</span> <i class="fas fa-arrow-right ml-2"></i>
           </button>
         </div>
         
         <div class="mt-6 text-center">
-          <span id="card-progress">0/0</span>
+          <span id="card-progress" data-i18n="card_progress">0/0</span>
         </div>
       </div>
 
@@ -140,7 +162,7 @@
       <div id="quiz-container" class="mb-8 hidden">
         <div class="bg-white rounded-lg shadow-lg p-8 max-w-2xl mx-auto">
           <div id="quiz-category" class="text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full inline-block mb-4"></div>
-          <h2 id="quiz-question" class="text-2xl font-bold mb-6"></h2>
+          <h2 id="quiz-question" class="text-2xl font-bold mb-6" data-i18n="quiz_question"></h2>
           
           <div id="quiz-options" class="grid grid-cols-1 gap-3">
             <!-- 선택지는 JavaScript로 동적 생성됨 -->
@@ -148,14 +170,14 @@
           
           <div id="quiz-result" class="mt-6 p-4 rounded hidden"></div>
           
-          <button id="next-question" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded mt-6 float-right hidden">
+          <button id="next-question" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded mt-6 float-right hidden" data-i18n="next_question">
             다음 문제
           </button>
           <div class="clearfix"></div>
         </div>
         
         <div class="mt-6 text-center">
-          <span id="quiz-progress">0/0</span>
+          <span id="quiz-progress" data-i18n="quiz_progress">0/0</span>
         </div>
       </div>
 
@@ -167,33 +189,34 @@
           <p id="typing-pronunciation" class="text-gray-600 mb-6"></p>
           
           <div class="mb-4">
-            <label for="typing-answer" class="block text-sm font-medium mb-2">정답을 입력하세요:</label>
+            <label for="typing-answer" class="block text-sm font-medium mb-2" data-i18n="typing_prompt">정답을 입력하세요:</label>
             <input 
               type="text" 
               id="typing-answer" 
               class="w-full p-3 border rounded-lg text-lg"
               placeholder="정답 입력..."
+              data-i18n-placeholder="typing_placeholder"
             >
           </div>
           
           <div id="typing-result" class="mt-4 p-4 rounded hidden"></div>
           
           <div class="flex justify-end mt-4">
-            <button id="check-answer" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded">
+            <button id="check-answer" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded" data-i18n="check_answer">
               정답 확인
             </button>
-            <button id="next-typing" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded ml-3 hidden">
+            <button id="next-typing" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded ml-3 hidden" data-i18n="next_word">
               다음 단어
             </button>
           </div>
         </div>
         
         <div class="mt-6 text-center">
-          <span id="typing-progress">0/0</span>
+          <span id="typing-progress" data-i18n="typing_progress">0/0</span>
           <div class="mt-2">
-            <span id="typing-correct" class="text-green-600 font-medium">맞춘 개수: 0</span>
+            <span id="typing-correct" class="text-green-600 font-medium"><span data-i18n="correct_count">맞춘 개수:</span> 0</span>
             <span class="mx-2">|</span>
-            <span id="typing-wrong" class="text-red-600 font-medium">틀린 개수: 0</span>
+            <span id="typing-wrong" class="text-red-600 font-medium"><span data-i18n="wrong_count">틀린 개수:</span> 0</span>
           </div>
         </div>
       </div>
@@ -202,5 +225,13 @@
     <!-- Firebase -->
     <script type="module" src="../js/firebase/firebase-init.js"></script>
     <script type="module" src="./js/language-learning.js"></script>
+    <script type="module">
+      import { updateMetadata } from '../utils/language-utils.js';
+      
+      // 페이지 로드 후 메타데이터 업데이트
+      document.addEventListener('DOMContentLoaded', async () => {
+        await updateMetadata('learning');
+      });
+    </script>
   </body>
 </html> 

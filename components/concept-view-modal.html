@@ -1,14 +1,14 @@
 <div id="concept-view-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
   <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-4xl max-h-[90vh] overflow-y-auto">
     <div class="flex justify-between items-center mb-4">
-      <h2 id="concept-view-title" class="text-xl font-bold text-gray-800">개념 상세 보기</h2>
+      <h2 id="concept-view-title" class="text-xl font-bold text-gray-800" data-i18n="concept_detail_view">개념 상세 보기</h2>
       <button id="close-concept-view-modal" class="text-gray-500 hover:text-gray-700" onclick="this.parentNode.parentNode.parentNode.classList.add('hidden')">
         <i class="fas fa-times text-xl"></i>
       </button>
     </div>
 
     <div class="mb-6">
-      <h3 id="concept-view-expressions-title" class="text-lg font-medium mb-2">언어별 표현</h3>
+      <h3 id="concept-view-expressions-title" class="text-lg font-medium mb-2" data-i18n="expressions_by_language">언어별 표현</h3>
       <div id="concept-view-tabs" class="flex border-b mb-4">
         <!-- 탭은 JavaScript로 동적 생성됨 -->
       </div>
@@ -18,7 +18,7 @@
     </div>
 
     <div class="mb-6">
-      <h3 id="concept-view-examples-title" class="text-lg font-medium mb-2">예문</h3>
+      <h3 id="concept-view-examples-title" class="text-lg font-medium mb-2" data-i18n="examples">예문</h3>
       <div id="concept-view-examples" class="mt-2">
         <!-- 예문은 JavaScript로 동적 생성됨 -->
       </div>
@@ -30,6 +30,7 @@
         type="button" 
         class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded"
         onclick="document.getElementById('concept-view-modal').classList.add('hidden')"
+        data-i18n="close"
       >
         닫기
       </button>
@@ -37,6 +38,7 @@
         id="delete-concept-button" 
         type="button" 
         class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+        data-i18n="delete"
       >
         삭제
       </button>
@@ -44,6 +46,7 @@
         id="edit-concept-button" 
         type="button" 
         class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+        data-i18n="edit"
       >
         편집
       </button>

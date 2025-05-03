@@ -12,22 +12,23 @@
       rel="stylesheet"
     />
     <script type="module" src="./js/auth/login.js"></script>
+    <script type="module" src="./js/language-init.js"></script>
   </head>
   <body class="bg-gray-100 flex items-center justify-center h-screen">
     <div class="bg-white shadow-lg rounded-lg w-11/12 sm:w-96 p-6">
-      <h1 class="text-3xl font-bold text-gray-800 text-center mb-6">로그인</h1>
+      <h1 class="text-3xl font-bold text-gray-800 text-center mb-6" data-i18n="login">로그인</h1>
       <div class="space-y-4">
         <button
           id="google-login-btn"
           class="w-full flex items-center justify-center bg-red-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-red-600"
         >
-        <i class="fa-brands fa-google mr-2"></i>Google로 로그인
+        <i class="fa-brands fa-google mr-2"></i><span data-i18n="login_with_google">Google로 로그인</span>
         </button>
         <button
           id="github-login-btn"
           class="w-full flex items-center justify-center bg-gray-800 text-white py-2 px-4 rounded-lg shadow-md hover:bg-gray-900"
         >
-        <i class="fa-brands fa-github mr-2"></i> Github로 로그인
+        <i class="fa-brands fa-github mr-2"></i> <span data-i18n="login_with_github">Github로 로그인</span>
         </button>
       </div>
 
@@ -36,13 +37,13 @@
           <div class="w-full border-t border-gray-300"></div>
         </div>
         <div class="relative flex justify-center text-sm">
-          <span class="px-2 bg-white text-gray-500">또는</span>
+          <span class="px-2 bg-white text-gray-500" data-i18n="or">또는</span>
         </div>
       </div>
 
       <form id="login-form" class="space-y-4">
         <div>
-          <label for="email" class="block text-sm font-medium text-gray-700"
+          <label for="email" class="block text-sm font-medium text-gray-700" data-i18n="email"
             >이메일</label
           >
           <input
@@ -50,12 +51,13 @@
             id="email"
             name="email"
             required
+            data-i18n-placeholder="email_placeholder"
             placeholder="이메일을 입력하세요"
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#4B63AC] focus:border-[#4B63AC] sm:text-sm"
           />
         </div>
         <div>
-          <label for="password" class="block text-sm font-medium text-gray-700"
+          <label for="password" class="block text-sm font-medium text-gray-700" data-i18n="password"
             >비밀번호</label
           >
           <input
@@ -63,6 +65,7 @@
             id="password"
             name="password"
             required
+            data-i18n-placeholder="password_placeholder"
             placeholder="비밀번호를 입력하세요"
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#4B63AC] focus:border-[#4B63AC] sm:text-sm"
           />
@@ -73,9 +76,9 @@
             <input
               type="checkbox"
               class="h-4 w-4 text-[#4B63AC] border-gray-300 rounded"
-            /><span class="ml-2 text-sm text-gray-700">자동 로그인</span>
+            /><span class="ml-2 text-sm text-gray-700" data-i18n="auto_login">자동 로그인</span>
           </label>
-          <a href="forgotpassword.html" class="text-sm text-[#4B63AC] hover:underline"
+          <a href="forgotpassword.html" class="text-sm text-[#4B63AC] hover:underline" data-i18n="forgot_password"
             >비밀번호를 잊으셨나요?</a
           >
         </div>
@@ -89,15 +92,49 @@
           id="login-button"
           type="button"
           class="w-full bg-[#4B63AC] text-white px-4 py-2 rounded-lg shadow-md hover:bg-[#3A4F8B] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          data-i18n="login"
         >
           로그인
         </button>
       </form>
 
       <p class="mt-6 text-sm text-center text-gray-600">
-        계정이 없으신가요?
-        <a href="signup.html" class="text-[#4B63AC] hover:underline">회원가입</a>
+        <span data-i18n="no_account">계정이 없으신가요?</span>
+        <a href="signup.html" class="text-[#4B63AC] hover:underline" data-i18n="signup">회원가입</a>
       </p>
     </div>
+    
+    <!-- 언어 선택 버튼 추가 -->
+    <div class="absolute top-4 right-4">
+      <button 
+        id="language-button"
+        class="border-2 border-[#4B63AC] bg-white text-[#4B63AC] font-semibold px-4 py-2 rounded-lg hover:bg-[#4B63AC] hover:text-white transition duration-300"
+      >
+        <i class="fas fa-globe mr-1"></i>
+      </button>
+    </div>
+
+    <script type="module">
+      import { showLanguageSettingsModal, getActiveLanguage } from './utils/language-utils.js';
+      
+      // 언어 설정 버튼에 이벤트 리스너 추가
+      document.addEventListener('DOMContentLoaded', async () => {
+        const languageButton = document.getElementById('language-button');
+        if (languageButton) {
+          languageButton.addEventListener('click', showLanguageSettingsModal);
+          
+          // 언어 설정 표시 업데이트
+          const activeLang = await getActiveLanguage();
+          const langFlags = {
+            'ko': '🇰🇷',
+            'en': '🇺🇸',
+            'ja': '🇯🇵',
+            'zh': '🇨🇳'
+          };
+          const flag = langFlags[activeLang] || '🌐';
+          languageButton.innerHTML = `<i class="fas fa-globe mr-1"></i> ${flag}`;
+        }
+      });
+    </script>
   </body>
 </html>

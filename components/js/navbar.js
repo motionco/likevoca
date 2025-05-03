@@ -4,6 +4,26 @@ import {
   signOut,
 } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
 import { deleteAccount } from "../../js/firebase/firebase-auth.js";
+import {
+  showLanguageSettingsModal,
+  applyLanguage,
+  getActiveLanguage,
+  updateMetadata,
+} from "../../utils/language-utils.js";
+
+const uiToDbLanguageMap = {
+  ko: "korean",
+  en: "english",
+  ja: "japanese",
+  zh: "chinese",
+};
+
+const dbToUiLanguageMap = {
+  korean: "ko",
+  english: "en",
+  japanese: "ja",
+  chinese: "zh",
+};
 
 export async function loadNavbar() {
   try {
@@ -12,6 +32,9 @@ export async function loadNavbar() {
     document.getElementById("navbar-container").innerHTML = html;
 
     initializeNavbar();
+
+    // 언어 설정 적용
+    await applyLanguage();
 
     // Firebase 초기화 완료 이벤트를 기다림
     window.addEventListener("firebase-initialized", () => {
@@ -23,6 +46,12 @@ export async function loadNavbar() {
     if (auth) {
       initializeAuthStateListener();
     }
+
+    // 언어 설정 표시 업데이트
+    updateLanguageDisplay();
+
+    // 페이지 초기화 시 메타데이터 업데이트
+    await updateMetadata("dictionary");
   } catch (error) {
     console.error("Navbar 로드 실패: ", error);
   }
@@ -80,6 +109,46 @@ function initializeNavbar() {
   if (mobileDeleteAccountButton) {
     mobileDeleteAccountButton.addEventListener("click", handleDeleteAccount);
   }
+
+  // 언어 설정 버튼 이벤트 리스너 추가
+  const languageButton = document.getElementById("language-button");
+  const mobileLanguageButton = document.getElementById(
+    "mobile-language-button"
+  );
+
+  if (languageButton) {
+    languageButton.addEventListener("click", showLanguageSettingsModal);
+  }
+
+  if (mobileLanguageButton) {
+    mobileLanguageButton.addEventListener("click", showLanguageSettingsModal);
+  }
+
+  // 언어 변경 이벤트 리스너
+  document.addEventListener("languageChanged", async (event) => {
+    userLanguage = event.detail.language;
+    // UI 언어만 변경하고 학습 언어 선택은 그대로 유지
+    displayConceptList(); // 언어 변경 시 카드 재표시 (UI 텍스트만 변경)
+  });
+}
+
+// 언어 설정 표시 업데이트
+async function updateLanguageDisplay() {
+  const languageButton = document.getElementById("language-button");
+  if (!languageButton) return;
+
+  const activeLang = await getActiveLanguage();
+
+  // 언어 코드에 따른 국기 이모지 (간단한 예시)
+  const langFlags = {
+    ko: "🇰🇷",
+    en: "🇺🇸",
+    ja: "🇯🇵",
+    zh: "🇨🇳",
+  };
+
+  const flag = langFlags[activeLang] || "🌐";
+  languageButton.innerHTML = `<i class="fas fa-globe mr-1"></i> ${flag}`;
 }
 
 function handleLogout() {
@@ -171,4 +240,41 @@ function initializeAuthStateListener() {
   } catch (error) {
     console.error("인증 상태 리스너 설정 중 오류:", error);
   }
+}
+
+function createConceptCard(concept) {
+  // 학습 관련 언어 설정 (DB 키 사용)
+  const sourceLanguage = document.getElementById("source-language").value; // korean, english, japanese, chinese
+  const targetLanguage = document.getElementById("target-language").value; // korean, english, japanese, chinese
+
+  // 원본 언어와 타겟 언어 표현 가져오기 (DB에서)
+  const sourceExpression = concept.expressions[sourceLanguage];
+  const targetExpression = concept.expressions[targetLanguage];
+
+  // ... 카드 생성 코드 ...
+
+  // UI 텍스트에 현재 UI 언어 사용, 컨텐츠는 DB 언어 그대로 사용
+  return `
+    <div>
+      <!-- UI 텍스트 -->
+      <span>${getTranslatedText("meaning")}</span>
+      
+      <!-- 학습 컨텐츠 -->
+      <span>${targetExpression.word}</span>
+    </div>
+  `;
+}
+
+function setLanguage(langCode) {
+  if (langCode === "auto") {
+    localStorage.removeItem("userLanguage");
+  } else {
+    localStorage.setItem("userLanguage", langCode);
+
+    // URL에 언어 파라미터 추가
+    const url = new URL(window.location.href);
+    url.searchParams.set("lang", langCode);
+    window.history.replaceState({}, "", url.toString());
+  }
+  applyLanguage();
 }
