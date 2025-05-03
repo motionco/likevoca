@@ -184,6 +184,26 @@
             </a>
           </div>
         </div>
+        <div
+          class="bg-[#F3E5F5] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
+        >
+          <div class="h-auto md:h-48 flex flex-col justify-between space-y-4">
+            <div>
+              <h3 class="text-2xl font-bold text-[#9C27B0] mb-4" data-i18n="language_games">다국어 게임</h3>
+              <p class="text-gray-700 text-sm lg:text-lg" data-i18n="language_games_desc">
+                재미있는 게임을 통해 다양한 언어를 즐겁게 배워보세요.
+              </p>
+            </div>
+            <a href="./pages/language-games.html" class="self-end">
+              <button
+                class="self-end bg-[#9C27B0] text-white px-6 py-2 rounded-lg hover:bg-[#7B1FA2] transition duration-300"
+                data-i18n="start"
+              >
+                시작하기
+              </button>
+            </a>
+          </div>
+        </div>
       </div>
     </main>
     <script type="module">
@@ -194,6 +214,8 @@
         await applyLanguage();
         await updateMetadata('home');
       });
+
+      console.log("게임 단어 목록:", gameWords);
     </script>
   </body>
 </html>

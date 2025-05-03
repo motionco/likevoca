@@ -116,6 +116,37 @@ const seoMetadata = {
       canonical: "https://likevoca.com/zh/pages/language-learning.html",
     },
   },
+  // 다국어 게임 페이지 메타데이터
+  games: {
+    ko: {
+      title: "LikeVoca - 다국어 게임",
+      description: "재미있는 게임을 통해 다양한 언어를 즐겁게 배워보세요.",
+      keywords:
+        "언어 게임, 다국어 게임, 단어 게임, 언어 학습 게임, 영어, 일본어, 중국어, 한국어",
+      canonical: "https://likevoca.com/ko/pages/language-games.html",
+    },
+    en: {
+      title: "LikeVoca - Language Games",
+      description: "Learn various languages enjoyably through fun games.",
+      keywords:
+        "language games, multilingual games, word games, language learning games, English, Japanese, Chinese, Korean",
+      canonical: "https://likevoca.com/en/pages/language-games.html",
+    },
+    ja: {
+      title: "LikeVoca - 多言語ゲーム",
+      description: "楽しいゲームを通して様々な言語を楽しく学びましょう。",
+      keywords:
+        "言語ゲーム, 多言語ゲーム, 単語ゲーム, 言語学習ゲーム, 英語, 日本語, 中国語, 韓国語",
+      canonical: "https://likevoca.com/ja/pages/language-games.html",
+    },
+    zh: {
+      title: "LikeVoca - 多语言游戏",
+      description: "通过有趣的游戏愉快地学习各种语言。",
+      keywords:
+        "语言游戏, 多语言游戏, 单词游戏, 语言学习游戏, 英语, 日语, 中文, 韩语",
+      canonical: "https://likevoca.com/zh/pages/language-games.html",
+    },
+  },
 };
 
 // 번역 텍스트 저장소
@@ -245,6 +276,10 @@ const translations = {
     example_word: "예시 단어",
     example_word_placeholder: "예: manzana, pomme",
     cancel: "취소",
+    // 다국어 게임 번역
+    language_games: "다국어 게임",
+    language_games_desc:
+      "재미있는 게임을 통해 다양한 언어를 즐겁게 배워보세요.",
   },
   en: {
     home: "Home",
@@ -372,6 +407,9 @@ const translations = {
     example_word: "Example Word",
     example_word_placeholder: "Ex: manzana, pomme",
     cancel: "Cancel",
+    // 다국어 게임 번역
+    language_games: "Language Games",
+    language_games_desc: "Learn various languages enjoyably through fun games.",
   },
   ja: {
     home: "ホーム",
@@ -499,6 +537,9 @@ const translations = {
     example_word: "例の単語",
     example_word_placeholder: "例：manzana, pomme",
     cancel: "キャンセル",
+    // 다국어 게임 번역
+    language_games: "多言語ゲーム",
+    language_games_desc: "楽しいゲームを通して様々な言語を楽しく学びましょう。",
   },
   zh: {
     home: "首页",
@@ -623,6 +664,9 @@ const translations = {
     example_word: "示例单词",
     example_word_placeholder: "例如：manzana, pomme",
     cancel: "取消",
+    // 다국어 게임 번역
+    language_games: "多语言游戏",
+    language_games_desc: "通过有趣的游戏愉快地学习各种语言。",
   },
 };
 

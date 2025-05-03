@@ -126,9 +126,11 @@ function initializeNavbar() {
 
   // 언어 변경 이벤트 리스너
   document.addEventListener("languageChanged", async (event) => {
-    userLanguage = event.detail.language;
+    const userLanguage = event.detail.language;
     // UI 언어만 변경하고 학습 언어 선택은 그대로 유지
-    displayConceptList(); // 언어 변경 시 카드 재표시 (UI 텍스트만 변경)
+    if (typeof displayConceptList === "function") {
+      displayConceptList(); // 언어 변경 시 카드 재표시 (UI 텍스트만 변경)
+    }
   });
 }
 
@@ -278,3 +280,17 @@ function setLanguage(langCode) {
   }
   applyLanguage();
 }
+
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    // 사용자 언어 초기화 - 오류 수정
+    let userLanguage = localStorage.getItem("userLanguage") || "korean";
+
+    // 네비게이션 바 초기화
+    await loadNavbar();
+
+    // 추가 코드...
+  } catch (error) {
+    console.error("네비게이션 바 초기화 중 오류 발생:", error);
+  }
+});
