@@ -78,7 +78,7 @@
       </div>
 
       <div
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8 md:mb-16"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 lg:gap-8 md:mb-16"
       >
         <div
           class="bg-[#E6F0FF] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
@@ -92,12 +92,14 @@
                 학습할 단어를 입력하고 나만의 다국어 단어장을 만들어보세요.
               </p>
             </div>
-            <button
-              class="self-end bg-[#4B63AC] text-white px-6 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300"
-              data-i18n="start"
-            >
-              시작하기
-            </button>
+            <a href="./pages/my-word-list.html" class="self-end">
+              <button
+                class="self-end bg-[#4B63AC] text-white px-6 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300"
+                data-i18n="start"
+              >
+                시작하기
+              </button>
+            </a>
           </div>
         </div>
         <div
@@ -112,12 +114,14 @@
                 Google Gemini AI로 맞춤 단어를 추천받고, 언어 실력을 키우세요.
               </p>
             </div>
-            <button
-              class="self-end bg-[#2E7D32] text-white px-6 py-2 rounded-lg hover:bg-[#1B5E20] transition duration-300"
-              data-i18n="start"
-            >
-              시작하기
-            </button>
+            <a href="./pages/ai-hangul-suggest.html" class="self-end">
+              <button
+                class="self-end bg-[#2E7D32] text-white px-6 py-2 rounded-lg hover:bg-[#1B5E20] transition duration-300"
+                data-i18n="start"
+              >
+                시작하기
+              </button>
+            </a>
           </div>
         </div>
         <div
@@ -130,12 +134,54 @@
                 궁금한 점이 있거나 도움이 필요하시면 언제든지 문의하세요.
               </p>
             </div>
-            <button
-              class="self-end bg-[#1565CD] text-white px-6 py-2 rounded-lg hover:bg-[#0D47A1] transition duration-300"
-              data-i18n="inquiry"
-            >
-              문의하기
-            </button>
+            <a href="./pages/inquiry.html" class="self-end">
+              <button
+                class="self-end bg-[#1565CD] text-white px-6 py-2 rounded-lg hover:bg-[#0D47A1] transition duration-300"
+                data-i18n="inquiry"
+              >
+                문의하기
+              </button>
+            </a>
+          </div>
+        </div>
+        <div
+          class="bg-[#FFF3E0] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
+        >
+          <div class="h-auto md:h-48 flex flex-col justify-between space-y-4">
+            <div>
+              <h3 class="text-2xl font-bold text-[#E65100] mb-4" data-i18n="multilingual_dictionary">다국어 단어장</h3>
+              <p class="text-gray-700 text-sm lg:text-lg" data-i18n="wordbook_desc">
+                나만의 다국어 단어장을 만들고 효과적으로 학습하세요.
+              </p>
+            </div>
+            <a href="./pages/multilingual-dictionary.html" class="self-end">
+              <button
+                class="self-end bg-[#E65100] text-white px-6 py-2 rounded-lg hover:bg-[#BF360C] transition duration-300"
+                data-i18n="start"
+              >
+                시작하기
+              </button>
+            </a>
+          </div>
+        </div>
+        <div
+          class="bg-[#E0F7FA] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
+        >
+          <div class="h-auto md:h-48 flex flex-col justify-between space-y-4">
+            <div>
+              <h3 class="text-2xl font-bold text-[#0097A7] mb-4" data-i18n="language_learning">다국어 학습</h3>
+              <p class="text-gray-700 text-sm lg:text-lg" data-i18n="language_learning_desc">
+                플래시카드, 퀴즈, 타이핑 등 다양한 방식으로 언어를 학습하세요.
+              </p>
+            </div>
+            <a href="./pages/language-learning.html" class="self-end">
+              <button
+                class="self-end bg-[#0097A7] text-white px-6 py-2 rounded-lg hover:bg-[#00838F] transition duration-300"
+                data-i18n="start"
+              >
+                시작하기
+              </button>
+            </a>
           </div>
         </div>
       </div>
