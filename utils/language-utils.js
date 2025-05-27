@@ -157,6 +157,8 @@ const translations = {
     multilingual_dictionary: "다국어 단어장",
     ai_wordbook: "AI 단어장",
     language_learning: "다국어 학습",
+    language_learning_desc:
+      "플래시카드, 퀴즈, 타이핑 등 다양한 방식으로 언어를 학습하세요.",
     inquiry: "문의하기",
     login: "로그인",
     signup: "회원가입",
@@ -287,6 +289,8 @@ const translations = {
     multilingual_dictionary: "Multilingual Dictionary",
     ai_wordbook: "AI Wordbook",
     language_learning: "Language Learning",
+    language_learning_desc:
+      "Learn languages in various ways such as flashcards, quizzes, and typing.",
     inquiry: "Inquiry",
     login: "Login",
     signup: "Sign Up",
@@ -417,6 +421,8 @@ const translations = {
     multilingual_dictionary: "多言語辞書",
     ai_wordbook: "AI単語帳",
     language_learning: "多言語学習",
+    language_learning_desc:
+      "フラッシュカード、クイズ、タイピングなど、様々な方法で言語を学びましょう。",
     inquiry: "お問い合わせ",
     login: "ログイン",
     signup: "会員登録",
@@ -547,6 +553,7 @@ const translations = {
     multilingual_dictionary: "多语言词典",
     ai_wordbook: "AI单词本",
     language_learning: "多语言学习",
+    language_learning_desc: "通过闪卡、测验和打字等多种方式学习语言。",
     inquiry: "咨询",
     login: "登录",
     signup: "注册",
