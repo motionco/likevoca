@@ -18,37 +18,66 @@ const SUPPORTED_LANGUAGES = {
   },
 };
 
+// 공통으로 사용되는 텍스트 정의
+const commonTexts = {
+  ko: {
+    language_learning: "다국어 학습",
+    language_learning_desc:
+      "플래시카드, 퀴즈, 타이핑 등 다양한 방식으로 언어를 학습하세요.",
+    language_games: "다국어 게임",
+    language_games_desc:
+      "재미있는 게임을 통해 다양한 언어를 즐겁게 배워보세요.",
+  },
+  en: {
+    language_learning: "Language Learning",
+    language_learning_desc:
+      "Learn languages in various ways such as flashcards, quizzes, and typing.",
+    language_games: "Language Games",
+    language_games_desc: "Learn various languages enjoyably through fun games.",
+  },
+  ja: {
+    language_learning: "多言語学習",
+    language_learning_desc:
+      "フラッシュカード、クイズ、タイピングなど、様々な方法で言語を学びましょう。",
+    language_games: "多言語ゲーム",
+    language_games_desc: "楽しいゲームを通して様々な言語を楽しく学びましょう。",
+  },
+  zh: {
+    language_learning: "多语言学习",
+    language_learning_desc: "通过闪卡、测验和打字等多种方式学习语言。",
+    language_games: "多语言游戏",
+    language_games_desc: "通过有趣的游戏愉快地学习各种语言。",
+  },
+};
+
 // SEO를 위한 메타데이터 설정
 const seoMetadata = {
   // 홈페이지 메타데이터
   home: {
     ko: {
-      title: "LikeVoca - 다국어 학습 플랫폼",
-      description:
-        "체계적인 커리큘럼과 직관적인 학습 시스템으로 언어 학습을 더욱 효과적으로 만들어드립니다.",
+      title: "LikeVoca - " + commonTexts.ko.language_learning,
+      description: commonTexts.ko.language_learning_desc,
       keywords:
         "언어 학습, 다국어, 단어장, AI 단어장, 영어, 일본어, 중국어, 한국어",
       canonical: "https://likevoca.com/ko",
     },
     en: {
-      title: "LikeVoca - Multilingual Learning Platform",
-      description:
-        "Make your language learning more effective with systematic curriculum and intuitive learning system.",
+      title: "LikeVoca - " + commonTexts.en.language_learning,
+      description: commonTexts.en.language_learning_desc,
       keywords:
         "language learning, multilingual, wordbook, AI wordbook, English, Japanese, Chinese, Korean",
       canonical: "https://likevoca.com/en",
     },
     ja: {
-      title: "LikeVoca - 多言語学習プラットフォーム",
-      description:
-        "体系的なカリキュラムと直感的な学習システムで、あなたの語学学習をより効果的にします。",
+      title: "LikeVoca - " + commonTexts.ja.language_learning,
+      description: commonTexts.ja.language_learning_desc,
       keywords:
         "語学学習, 多言語, 単語帳, AI単語帳, 英語, 日本語, 中国語, 韓国語",
       canonical: "https://likevoca.com/ja",
     },
     zh: {
-      title: "LikeVoca - 多语言学习平台",
-      description: "通过系统的课程和直观的学习系统，使您的语言学习更加有效。",
+      title: "LikeVoca - " + commonTexts.zh.language_learning,
+      description: commonTexts.zh.language_learning_desc,
       keywords: "语言学习, 多语言, 单词本, AI单词本, 英语, 日语, 中文, 韩语",
       canonical: "https://likevoca.com/zh",
     },
@@ -86,32 +115,29 @@ const seoMetadata = {
   // 다국어 학습 페이지 메타데이터
   learning: {
     ko: {
-      title: "LikeVoca - 다국어 학습",
-      description:
-        "플래시카드, 퀴즈, 타이핑 등 다양한 방식으로 언어를 학습하세요.",
+      title: "LikeVoca - " + commonTexts.ko.language_learning,
+      description: commonTexts.ko.language_learning_desc,
       keywords:
         "다국어 학습, 언어 학습, 플래시카드, 퀴즈, 영어, 일본어, 중국어, 한국어",
       canonical: "https://likevoca.com/ko/pages/language-learning.html",
     },
     en: {
-      title: "LikeVoca - Language Learning",
-      description:
-        "Learn languages in various ways such as flashcards, quizzes, and typing.",
+      title: "LikeVoca - " + commonTexts.en.language_learning,
+      description: commonTexts.en.language_learning_desc,
       keywords:
         "language learning, multilingual learning, flashcards, quiz, English, Japanese, Chinese, Korean",
       canonical: "https://likevoca.com/en/pages/language-learning.html",
     },
     ja: {
-      title: "LikeVoca - 多言語学習",
-      description:
-        "フラッシュカード、クイズ、タイピングなど、様々な方法で言語を学びましょう。",
+      title: "LikeVoca - " + commonTexts.ja.language_learning,
+      description: commonTexts.ja.language_learning_desc,
       keywords:
         "多言語学習, 言語学習, フラッシュカード, クイズ, 英語, 日本語, 中国語, 韓国語",
       canonical: "https://likevoca.com/ja/pages/language-learning.html",
     },
     zh: {
-      title: "LikeVoca - 多语言学习",
-      description: "通过闪卡、测验和打字等多种方式学习语言。",
+      title: "LikeVoca - " + commonTexts.zh.language_learning,
+      description: commonTexts.zh.language_learning_desc,
       keywords: "多语言学习, 语言学习, 闪卡, 测验, 英语, 日语, 中文, 韩语",
       canonical: "https://likevoca.com/zh/pages/language-learning.html",
     },
@@ -156,9 +182,10 @@ const translations = {
     wordbook: "단어장",
     multilingual_dictionary: "다국어 단어장",
     ai_wordbook: "AI 단어장",
-    language_learning: "다국어 학습",
-    language_learning_desc:
-      "플래시카드, 퀴즈, 타이핑 등 다양한 방식으로 언어를 학습하세요.",
+    language_learning: commonTexts.ko.language_learning,
+    language_learning_desc: commonTexts.ko.language_learning_desc,
+    language_games: commonTexts.ko.language_games,
+    language_games_desc: commonTexts.ko.language_games_desc,
     inquiry: "문의하기",
     login: "로그인",
     signup: "회원가입",
@@ -279,18 +306,18 @@ const translations = {
     example_word_placeholder: "예: manzana, pomme",
     cancel: "취소",
     // 다국어 게임 번역
-    language_games: "다국어 게임",
-    language_games_desc:
-      "재미있는 게임을 통해 다양한 언어를 즐겁게 배워보세요.",
+    language_games: commonTexts.ko.language_games,
+    language_games_desc: commonTexts.ko.language_games_desc,
   },
   en: {
     home: "Home",
     wordbook: "Wordbook",
     multilingual_dictionary: "Multilingual Dictionary",
     ai_wordbook: "AI Wordbook",
-    language_learning: "Language Learning",
-    language_learning_desc:
-      "Learn languages in various ways such as flashcards, quizzes, and typing.",
+    language_learning: commonTexts.en.language_learning,
+    language_learning_desc: commonTexts.en.language_learning_desc,
+    language_games: commonTexts.en.language_games,
+    language_games_desc: commonTexts.en.language_games_desc,
     inquiry: "Inquiry",
     login: "Login",
     signup: "Sign Up",
@@ -412,17 +439,18 @@ const translations = {
     example_word_placeholder: "Ex: manzana, pomme",
     cancel: "Cancel",
     // 다국어 게임 번역
-    language_games: "Language Games",
-    language_games_desc: "Learn various languages enjoyably through fun games.",
+    language_games: commonTexts.en.language_games,
+    language_games_desc: commonTexts.en.language_games_desc,
   },
   ja: {
     home: "ホーム",
     wordbook: "単語帳",
     multilingual_dictionary: "多言語辞書",
     ai_wordbook: "AI単語帳",
-    language_learning: "多言語学習",
-    language_learning_desc:
-      "フラッシュカード、クイズ、タイピングなど、様々な方法で言語を学びましょう。",
+    language_learning: commonTexts.ja.language_learning,
+    language_learning_desc: commonTexts.ja.language_learning_desc,
+    language_games: commonTexts.ja.language_games,
+    language_games_desc: commonTexts.ja.language_games_desc,
     inquiry: "お問い合わせ",
     login: "ログイン",
     signup: "会員登録",
@@ -544,16 +572,18 @@ const translations = {
     example_word_placeholder: "例：manzana, pomme",
     cancel: "キャンセル",
     // 다국어 게임 번역
-    language_games: "多言語ゲーム",
-    language_games_desc: "楽しいゲームを通して様々な言語を楽しく学びましょう。",
+    language_games: commonTexts.ja.language_games,
+    language_games_desc: commonTexts.ja.language_games_desc,
   },
   zh: {
     home: "首页",
     wordbook: "单词本",
     multilingual_dictionary: "多语言词典",
     ai_wordbook: "AI单词本",
-    language_learning: "多语言学习",
-    language_learning_desc: "通过闪卡、测验和打字等多种方式学习语言。",
+    language_learning: commonTexts.zh.language_learning,
+    language_learning_desc: commonTexts.zh.language_learning_desc,
+    language_games: commonTexts.zh.language_games,
+    language_games_desc: commonTexts.zh.language_games_desc,
     inquiry: "咨询",
     login: "登录",
     signup: "注册",
@@ -672,8 +702,8 @@ const translations = {
     example_word_placeholder: "例如：manzana, pomme",
     cancel: "取消",
     // 다국어 게임 번역
-    language_games: "多语言游戏",
-    language_games_desc: "通过有趣的游戏愉快地学习各种语言。",
+    language_games: commonTexts.zh.language_games,
+    language_games_desc: commonTexts.zh.language_games_desc,
   },
 };
 
@@ -720,11 +750,6 @@ function setLanguage(langCode) {
     localStorage.removeItem("userLanguage");
   } else {
     localStorage.setItem("userLanguage", langCode);
-
-    // URL에 언어 파라미터 추가
-    const url = new URL(window.location.href);
-    url.searchParams.set("lang", langCode);
-    window.history.replaceState({}, "", url.toString());
   }
 
   // 언어 적용 및 메타데이터 업데이트
@@ -744,10 +769,31 @@ function setLanguage(langCode) {
     currentPath.includes("learning")
   ) {
     pageType = "learning";
+  } else if (
+    currentPath.includes("language-games") ||
+    currentPath.includes("games")
+  ) {
+    pageType = "games";
   }
 
   updateMetadata(pageType);
 }
+
+// 페이지 로드 시 URL 처리
+document.addEventListener("DOMContentLoaded", async () => {
+  const path = window.location.pathname;
+  const pathParts = path.split("/").filter((part) => part); // 빈 문자열 제거
+  const langCode = pathParts[0];
+
+  if (SUPPORTED_LANGUAGES[langCode]) {
+    // URL에 유효한 언어 코드가 있으면 해당 언어 설정
+    await setLanguage(langCode);
+  } else {
+    // 언어 코드가 없거나 유효하지 않은 경우
+    const defaultLang = await detectLanguageFromLocation();
+    await setLanguage(defaultLang);
+  }
+});
 
 // 현재 활성화된 언어 코드 가져오기
 async function getActiveLanguage() {

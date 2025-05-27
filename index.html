@@ -27,14 +27,14 @@
     <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en" />
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="./js/hangul-writer.js"></script>
-    <script src="./js/index.js" type="module"></script>
+    <script src="js/hangul-writer.js"></script>
+    <script src="js/index.js" type="module"></script>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
 
-    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="css/style.css" />
   </head>
   <body class="bg-gray-100">
     <div id="navbar-container"></div>
@@ -66,7 +66,7 @@
         <div class="lg:w-1/2 mt-8 lg:mt-0 w-full px-4 lg:px-0">
           <div class="h-64 md:h-80 lg:h-96 rounded-xl overflow-hidden">
             <img
-              src="assets/hero.webp"
+              src="/assets/hero.webp"
               class="w-full h-full object-cover rounded-xl"
               alt="Hero Image"
             />
@@ -87,7 +87,7 @@
               <p class="text-gray-700 text-sm lg:text-lg" data-i18n="wordbook_desc">
               </p>
             </div>
-            <a href="./pages/my-word-list.html" class="self-end">
+            <a href="/pages/my-word-list.html" class="self-end">
               <button
                 class="self-end bg-[#4B63AC] text-white px-6 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300"
                 data-i18n="start"
@@ -106,7 +106,7 @@
               <p class="text-gray-700 text-sm lg:text-lg" data-i18n="ai_wordbook_desc">
               </p>
             </div>
-            <a href="./pages/ai-wordbook.html" class="self-end">
+            <a href="/pages/ai-wordbook.html" class="self-end">
               <button
                 class="self-end bg-[#2E7D32] text-white px-6 py-2 rounded-lg hover:bg-[#1B5E20] transition duration-300"
                 data-i18n="start"
@@ -124,7 +124,7 @@
               <p class="text-gray-700 text-sm lg:text-lg" data-i18n="inquiry_desc">
               </p>
             </div>
-            <a href="./pages/inquiry.html" class="self-end">
+            <a href="/pages/inquiry.html" class="self-end">
               <button
                 class="self-end bg-[#1565CD] text-white px-6 py-2 rounded-lg hover:bg-[#0D47A1] transition duration-300"
                 data-i18n="inquiry"
@@ -142,7 +142,7 @@
               <p class="text-gray-700 text-sm lg:text-lg" data-i18n="wordbook_desc">
               </p>
             </div>
-            <a href="./pages/multilingual-dictionary.html" class="self-end">
+            <a href="/pages/multilingual-dictionary.html" class="self-end">
               <button
                 class="self-end bg-[#E65100] text-white px-6 py-2 rounded-lg hover:bg-[#BF360C] transition duration-300"
                 data-i18n="start"
@@ -159,7 +159,7 @@
               <h3 class="text-2xl font-bold text-[#0097A7] mb-4" data-i18n="language_learning"></h3>
               <p class="text-gray-700 text-sm lg:text-lg" data-i18n="language_learning_desc"></p>
             </div>
-            <a href="./pages/language-learning.html" class="self-end">
+            <a href="/pages/language-learning.html" class="self-end">
               <button
                 class="self-end bg-[#0097A7] text-white px-6 py-2 rounded-lg hover:bg-[#00838F] transition duration-300"
                 data-i18n="start"
@@ -177,7 +177,7 @@
               <p class="text-gray-700 text-sm lg:text-lg" data-i18n="language_games_desc">
               </p>
             </div>
-            <a href="./pages/language-games.html" class="self-end">
+            <a href="/pages/language-games.html" class="self-end">
               <button
                 class="self-end bg-[#9C27B0] text-white px-6 py-2 rounded-lg hover:bg-[#7B1FA2] transition duration-300"
                 data-i18n="start"
@@ -189,16 +189,16 @@
       </div>
     </main>
     <script type="module">
-      import { applyLanguage, updateMetadata, getActiveLanguage, setLanguage } from './utils/language-utils.js';
+      import { applyLanguage, updateMetadata, getActiveLanguage } from './utils/language-utils.js';
       
-      // 페이지 로드 후 언어 설정 적용 및 메타데이터 업데이트
       document.addEventListener('DOMContentLoaded', async () => {
-        // 기존 언어 설정 확인 (사용자 설정 존중)
-        const currentLang = await getActiveLanguage();
-        
-        // 언어 설정 적용 및 메타데이터 업데이트
-        await applyLanguage();
-        await updateMetadata('home');
+        try {
+          const currentLang = await getActiveLanguage();
+          await applyLanguage();
+          await updateMetadata('home');
+        } catch (error) {
+          console.error('언어 설정 적용 중 오류:', error);
+        }
       });
     </script>
   </body>

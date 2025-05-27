@@ -15,6 +15,15 @@
     { "src": "/api/gemini", "dest": "/api/gemini.js" },
     { "src": "/api/log-auth-error", "dest": "/api/log-auth-error.js" },
     { "handle": "filesystem" },
+    { "src": "^/(?!ko|en|ja|zh).*", "dest": "/index.html" },
+    { "src": "/ko", "dest": "/ko/index.html" },
+    { "src": "/en", "dest": "/en/index.html" },
+    { "src": "/ja", "dest": "/ja/index.html" },
+    { "src": "/zh", "dest": "/zh/index.html" },
+    { "src": "/ko/(.*)", "dest": "/$1" },
+    { "src": "/en/(.*)", "dest": "/$1" },
+    { "src": "/ja/(.*)", "dest": "/$1" },
+    { "src": "/zh/(.*)", "dest": "/$1" },
     { "src": "/(.*)", "dest": "/$1" }
   ]
 } 

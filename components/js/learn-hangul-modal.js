@@ -879,3 +879,32 @@ function editHangul() {
   // 수정 모달 열기
   modal.classList.remove("hidden");
 }
+
+// 현재 URL 구조를 변경
+function setLanguage(langCode) {
+  if (langCode === "auto") {
+    localStorage.removeItem("userLanguage");
+  } else {
+    localStorage.setItem("userLanguage", langCode);
+
+    // URL 경로 방식으로 변경
+    const currentPath = window.location.pathname.split("/").pop();
+    const newPath = `/${langCode}/${currentPath}`;
+    window.history.replaceState({}, "", newPath);
+  }
+  // ... 나머지 코드
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const path = window.location.pathname;
+  const langCode = path.split("/")[1];
+
+  if (SUPPORTED_LANGUAGES[langCode]) {
+    setLanguage(langCode);
+  } else {
+    // 언어 코드가 없는 경우 기본 언어로 리다이렉트
+    const defaultLang = detectBrowserLanguage();
+    const newPath = `/${defaultLang}${path}`;
+    window.location.href = newPath;
+  }
+});
