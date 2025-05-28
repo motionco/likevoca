@@ -249,7 +249,8 @@ export async function loadModals(modalPaths) {
     const pathParts = path.split("/");
     const fileName = pathParts.pop();
     const dirPath = pathParts.join("/");
-    return `${dirPath}/${lang}/${fileName}`;
+    // components/templates/{lang} 경로로 변경
+    return `${dirPath}/templates/${lang}/${fileName}`;
   });
 
   try {
@@ -269,7 +270,8 @@ export async function loadModals(modalPaths) {
         const pathParts = path.split("/");
         const fileName = pathParts.pop();
         const dirPath = pathParts.join("/");
-        return `${dirPath}/en/${fileName}`;
+        // components/templates/en 경로로 변경
+        return `${dirPath}/templates/en/${fileName}`;
       });
       const responses = await Promise.all(
         englishModalPaths.map((path) => fetch(path))
