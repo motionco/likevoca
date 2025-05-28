@@ -239,11 +239,48 @@ export async function fetchAndDisplayWords(currentUser, db, type) {
 }
 
 export async function loadModals(modalPaths) {
-  const responses = await Promise.all(modalPaths.map((path) => fetch(path)));
-  const htmlContents = await Promise.all(
-    responses.map((response) => response.text())
-  );
-  document.getElementById("modal-container").innerHTML = htmlContents.join("");
+  // 현재 언어 감지 (기본값: 영어)
+  const userLang = navigator.language.toLowerCase().split("-")[0] || "en";
+  const supportedLangs = ["ko", "en", "ja", "zh"];
+  const lang = supportedLangs.includes(userLang) ? userLang : "en";
+
+  // 각 모달 경로를 언어별 경로로 변환
+  const localizedModalPaths = modalPaths.map((path) => {
+    const pathParts = path.split("/");
+    const fileName = pathParts.pop();
+    const dirPath = pathParts.join("/");
+    return `${dirPath}/${lang}/${fileName}`;
+  });
+
+  try {
+    const responses = await Promise.all(
+      localizedModalPaths.map((path) => fetch(path))
+    );
+    const htmlContents = await Promise.all(
+      responses.map((response) => response.text())
+    );
+    document.getElementById("modal-container").innerHTML =
+      htmlContents.join("");
+  } catch (error) {
+    console.error("모달 로드 중 오류 발생:", error);
+    // 오류 발생 시 영어 버전으로 폴백
+    if (lang !== "en") {
+      const englishModalPaths = modalPaths.map((path) => {
+        const pathParts = path.split("/");
+        const fileName = pathParts.pop();
+        const dirPath = pathParts.join("/");
+        return `${dirPath}/en/${fileName}`;
+      });
+      const responses = await Promise.all(
+        englishModalPaths.map((path) => fetch(path))
+      );
+      const htmlContents = await Promise.all(
+        responses.map((response) => response.text())
+      );
+      document.getElementById("modal-container").innerHTML =
+        htmlContents.join("");
+    }
+  }
 }
 
 let allWords = [];
