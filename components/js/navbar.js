@@ -27,7 +27,22 @@ const dbToUiLanguageMap = {
 
 export async function loadNavbar() {
   try {
-    const response = await fetch("../components/navbar.html");
+    // 현재 페이지 위치에 따라 경로 결정
+    const currentPath = window.location.pathname;
+    let navbarPath;
+
+    if (currentPath.includes("/pages/")) {
+      // pages 폴더 내의 페이지인 경우
+      navbarPath = "../components/navbar.html";
+    } else if (currentPath.includes("/locales/")) {
+      // locales 폴더 내의 페이지인 경우
+      navbarPath = "../../components/navbar.html";
+    } else {
+      // 루트 폴더의 페이지인 경우
+      navbarPath = "components/navbar.html";
+    }
+
+    const response = await fetch(navbarPath);
     const html = await response.text();
     document.getElementById("navbar-container").innerHTML = html;
 

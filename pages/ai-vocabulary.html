@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI 단어장 - LikeVoca</title>
+
+    <!-- 기본 메타 태그 -->
+    <meta name="description" content="AI가 추천하는 다국어 단어장을 만들고 효과적으로 학습하세요." />
+    <meta name="keywords" content="AI 단어장, 다국어 단어장, 영어 단어장, 일본어 단어장, 중국어 단어장, AI 언어 학습" />
+    
+    <!-- Open Graph / 소셜 미디어 메타 태그 -->
+    <meta property="og:title" content="LikeVoca - AI 단어장" />
+    <meta property="og:description" content="AI가 추천하는 다국어 단어장을 만들고 효과적으로 학습하세요." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://likevoca.com/pages/ai-vocabulary.html" />
+    <meta property="og:locale" content="ko" />
+    
+    <!-- 표준 링크 -->
+    <link rel="canonical" href="https://likevoca.com/ko/pages/ai-vocabulary.html" />
+    
+    <!-- 대체 언어 링크 (초기값) -->
+    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/pages/ai-vocabulary.html" />
+    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/pages/ai-vocabulary.html" />
+    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/pages/ai-vocabulary.html" />
+    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/pages/ai-vocabulary.html" />
+    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/pages/ai-vocabulary.html" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../css/style.css" />
+
+    <style>
+      .dropdown-container {
+        position: relative;
+      }
+      .dropdown {
+        position: absolute;
+        z-index: 10;
+        width: 100%;
+      }
+      .word-card {
+        transition: transform 0.3s;
+      }
+      .word-card:hover {
+        transform: translateY(-5px);
+      }
+    </style>
+    <script type="module" src="../js/language-init.js"></script>
+  </head>
+  <body class="bg-gray-100">
+    <div id="navbar-container"></div>
+
+    <main class="container mx-auto max-w-7xl px-4 py-8">
+      <div class="flex justify-between items-center mb-8">
+        <div>
+          <h1 class="text-4xl font-bold text-gray-800" data-i18n="ai_vocabulary">AI 단어장</h1>
+          <p class="text-gray-600">
+            <span data-i18n="total_concepts">전체 개념 수:</span> <span id="concept-count" class="font-semibold">0</span><span data-i18n="concepts_unit">개</span>
+          </p>
+        </div>
+        <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
+          <div class="bg-white rounded-lg shadow-sm p-3 min-w-[200px]">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm text-gray-600" data-i18n="ai_usage">AI 사용량</span>
+              <span class="text-sm font-medium" id="ai-usage-text">0/0</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2.5">
+              <div
+                class="bg-[#4B63AC] h-2.5 rounded-full"
+                id="ai-usage-bar"
+                style="width: 0%"
+              ></div>
+            </div>
+          </div>
+          <button
+            id="ai-add-concept"
+            class="bg-[#4B63AC] text-white px-4 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300 whitespace-nowrap flex items-center"
+            data-i18n="ai_recommend_concept"
+          >
+            <i class="fas fa-robot mr-2"></i> AI 개념 추천받기
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
+          <div>
+            <label for="search-input" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="search">검색</label>
+            <div class="relative">
+              <input
+                type="text"
+                id="search-input"
+                class="w-full p-2 border rounded pl-8"
+                placeholder="검색어 입력..."
+                data-i18n-placeholder="search_placeholder"
+              />
+              <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+            </div>
+          </div>
+
+          <div>
+            <label for="source-language" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="source_language">
+              원본 언어
+            </label>
+            <select id="source-language" class="w-full p-2 border rounded">
+              <option value="korean" data-i18n="korean">한국어</option>
+              <option value="english" data-i18n="english">영어</option>
+              <option value="japanese" data-i18n="japanese">일본어</option>
+              <option value="chinese" data-i18n="chinese">중국어</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="target-language" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="target_language">
+              대상 언어
+            </label>
+            <select id="target-language" class="w-full p-2 border rounded">
+              <option value="english" data-i18n="english">영어</option>
+              <option value="korean" data-i18n="korean">한국어</option>
+              <option value="japanese" data-i18n="japanese">일본어</option>
+              <option value="chinese" data-i18n="chinese">중국어</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="category-filter" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="category">
+              카테고리
+            </label>
+            <select id="category-filter" class="w-full p-2 border rounded">
+              <option value="all" data-i18n="all_categories">모든 카테고리</option>
+              <option value="fruit" data-i18n="fruit">과일</option>
+              <option value="food" data-i18n="food">음식</option>
+              <option value="animal" data-i18n="animal">동물</option>
+              <option value="daily" data-i18n="daily">일상</option>
+              <option value="travel" data-i18n="travel">여행</option>
+              <option value="business" data-i18n="business">비즈니스</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center">
+          <div class="text-sm text-gray-600">
+            <span id="filtered-count">0</span><span data-i18n="concept_count">개의 개념</span>
+          </div>
+
+          <div class="flex items-center space-x-2">
+            <label for="sort-option" class="text-sm font-medium text-gray-700" data-i18n="sort">정렬</label>
+            <select id="sort-option" class="p-2 border rounded text-sm">
+              <option value="latest" data-i18n="latest">최신순</option>
+              <option value="oldest" data-i18n="oldest">오래된순</option>
+              <option value="a-z" data-i18n="alphabetical">가나다순</option>
+              <option value="z-a" data-i18n="reverse_alphabetical">역가나다순</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 개념 카드 표시 영역 -->
+      <div id="concept-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+      <!-- 더 보기 버튼 -->
+      <div class="flex justify-center mt-8">
+        <button
+          id="load-more"
+          class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-6 rounded-lg transition duration-300 hidden"
+          data-i18n="load_more"
+        >
+          더 보기 <i class="fas fa-chevron-down ml-1"></i>
+        </button>
+      </div>
+    </main>
+
+    <div id="modal-container"></div>
+
+    <!-- Firebase -->
+    <script type="module" src="../js/firebase/firebase-init.js"></script>
+    <script type="module" src="./js/ai-vocabulary.js"></script>
+    <script type="module">
+      import { updateMetadata } from '../utils/language-utils.js';
+      
+      // 페이지 로드 후 메타데이터 업데이트
+      document.addEventListener('DOMContentLoaded', async () => {
+        await updateMetadata('ai-vocabulary');
+      });
+    </script>
+  </body>
+</html> 

@@ -90,7 +90,6 @@ export const supportedLanguages = {
   english: { nameKo: "영어", code: "en", example: "apple" },
   japanese: { nameKo: "일본어", code: "ja", example: "りんご" },
   chinese: { nameKo: "중국어", code: "zh", example: "苹果" },
-  vietnamese: { nameKo: "베트남어", code: "vi", example: "táo" },
 };
 
 // 다국어 개념 유틸리티 함수
@@ -399,6 +398,107 @@ export const conceptUtils = {
       return concepts.sort(() => Math.random() - 0.5).slice(0, limit);
     } catch (error) {
       console.error("학습용 개념 가져오기 중 오류 발생:", error);
+      throw error;
+    }
+  },
+
+  // 사용자의 모든 개념 가져오기
+  async getUserConcepts(userId) {
+    try {
+      const conceptsRef = collection(db, "concepts");
+      const q = query(conceptsRef, where("userId", "==", userId));
+      const querySnapshot = await getDocs(q);
+
+      const concepts = [];
+      querySnapshot.forEach((doc) => {
+        concepts.push({
+          id: doc.id,
+          ...doc.data(),
+        });
+      });
+
+      return concepts;
+    } catch (error) {
+      console.error("사용자 개념 가져오기 중 오류 발생:", error);
+      throw error;
+    }
+  },
+
+  // 사용자 사용량 정보 가져오기
+  async getUsage(userId) {
+    try {
+      const userRef = doc(db, "users", userId);
+      const userDoc = await getDoc(userRef);
+
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        return {
+          aiUsed: userData.aiUsed || 0,
+          aiLimit: userData.aiLimit || 100,
+          conceptCount: userData.conceptCount || 0,
+        };
+      } else {
+        // 사용자 문서가 없으면 기본값으로 생성
+        await setDoc(userRef, {
+          aiUsed: 0,
+          aiLimit: 100,
+          conceptCount: 0,
+          createdAt: new Date(),
+        });
+        return {
+          aiUsed: 0,
+          aiLimit: 100,
+          conceptCount: 0,
+        };
+      }
+    } catch (error) {
+      console.error("사용량 정보 가져오기 중 오류 발생:", error);
+      throw error;
+    }
+  },
+
+  // 사용자 사용량 정보 업데이트
+  async updateUsage(userId, updates) {
+    try {
+      const userRef = doc(db, "users", userId);
+      await updateDoc(userRef, {
+        ...updates,
+        updatedAt: new Date(),
+      });
+    } catch (error) {
+      console.error("사용량 정보 업데이트 중 오류 발생:", error);
+      throw error;
+    }
+  },
+
+  // 개념 추가 (간단한 버전)
+  async addConcept(conceptData) {
+    try {
+      const conceptRef = doc(collection(db, "concepts"));
+      await setDoc(conceptRef, {
+        ...conceptData,
+        id: conceptRef.id,
+        createdAt: conceptData.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+
+      // 사용자의 개념 수 업데이트
+      if (conceptData.userId) {
+        const userRef = doc(db, "users", conceptData.userId);
+        const userDoc = await getDoc(userRef);
+
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          const currentCount = userData.conceptCount || 0;
+          await updateDoc(userRef, {
+            conceptCount: currentCount + 1,
+          });
+        }
+      }
+
+      return conceptRef.id;
+    } catch (error) {
+      console.error("개념 추가 중 오류 발생:", error);
       throw error;
     }
   },

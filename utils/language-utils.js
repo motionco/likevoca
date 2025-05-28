@@ -173,6 +173,39 @@ const seoMetadata = {
       canonical: "https://likevoca.com/zh/pages/language-games.html",
     },
   },
+  // AI 단어장 페이지 메타데이터
+  "ai-vocabulary": {
+    ko: {
+      title: "LikeVoca - AI 단어장",
+      description:
+        "AI가 추천하는 다국어 단어장을 만들고 효과적으로 학습하세요.",
+      keywords:
+        "AI 단어장, 다국어 단어장, 영어 단어장, 일본어 단어장, 중국어 단어장, AI 언어 학습",
+      canonical: "https://likevoca.com/ko/pages/ai-vocabulary.html",
+    },
+    en: {
+      title: "LikeVoca - AI Vocabulary",
+      description:
+        "Create AI-recommended multilingual vocabulary and learn effectively.",
+      keywords:
+        "AI vocabulary, multilingual vocabulary, English vocabulary, Japanese vocabulary, Chinese vocabulary, AI language learning",
+      canonical: "https://likevoca.com/en/pages/ai-vocabulary.html",
+    },
+    ja: {
+      title: "LikeVoca - AI単語帳",
+      description: "AIが推薦する多言語単語帳を作成し、効果的に学習しましょう。",
+      keywords:
+        "AI単語帳, 多言語単語帳, 英語単語帳, 日本語単語帳, 中国語単語帳, AI言語学習",
+      canonical: "https://likevoca.com/ja/pages/ai-vocabulary.html",
+    },
+    zh: {
+      title: "LikeVoca - AI词汇本",
+      description: "创建AI推荐的多语言词汇本并有效学习。",
+      keywords:
+        "AI词汇本, 多语言词汇本, 英语词汇本, 日语词汇本, 中文词汇本, AI语言学习",
+      canonical: "https://likevoca.com/zh/pages/ai-vocabulary.html",
+    },
+  },
 };
 
 // 번역 텍스트 저장소
@@ -182,6 +215,7 @@ const translations = {
     wordbook: "단어장",
     multilingual_dictionary: "다국어 단어장",
     ai_wordbook: "AI 단어장",
+    ai_vocabulary: "AI 단어장",
     language_learning: commonTexts.ko.language_learning,
     language_learning_desc: commonTexts.ko.language_learning_desc,
     language_games: commonTexts.ko.language_games,
@@ -200,10 +234,16 @@ const translations = {
       "학습할 단어를 입력하고 나만의 다국어 단어장을 만들어보세요.",
     ai_wordbook_desc:
       "Google Gemini AI로 맞춤 단어를 추천받고, 언어 실력을 키우세요.",
+    ai_vocabulary_desc:
+      "AI가 추천하는 다국어 개념을 학습하고 언어 실력을 향상시키세요.",
     inquiry_desc: "궁금한 점이 있거나 도움이 필요하시면 언제든지 문의하세요.",
     start: "시작하기",
     language_settings: "언어 설정",
     save: "저장",
+    total_concepts: "전체 개념 수",
+    concepts_unit: "개",
+    ai_usage: "AI 사용량",
+    ai_recommend_concept: "AI 개념 추천받기",
     // 로그인 페이지 번역
     login_with_google: "Google로 로그인",
     login_with_github: "Github로 로그인",
@@ -314,6 +354,7 @@ const translations = {
     wordbook: "Wordbook",
     multilingual_dictionary: "Multilingual Dictionary",
     ai_wordbook: "AI Wordbook",
+    ai_vocabulary: "AI Vocabulary",
     language_learning: commonTexts.en.language_learning,
     language_learning_desc: commonTexts.en.language_learning_desc,
     language_games: commonTexts.en.language_games,
@@ -332,11 +373,17 @@ const translations = {
       "Enter words to learn and create your own multilingual wordbook.",
     ai_wordbook_desc:
       "Get custom word recommendations from Google Gemini AI and improve your language skills.",
+    ai_vocabulary_desc:
+      "Learn AI-recommended multilingual concepts and improve your language skills.",
     inquiry_desc:
       "If you have any questions or need help, please feel free to inquire.",
     start: "Start",
     language_settings: "Language Settings",
     save: "Save",
+    total_concepts: "Total Concepts",
+    concepts_unit: "concepts",
+    ai_usage: "AI Usage",
+    ai_recommend_concept: "AI Concept Recommendation",
     // 로그인 페이지 번역
     login_with_google: "Login with Google",
     login_with_github: "Login with Github",
@@ -447,6 +494,7 @@ const translations = {
     wordbook: "単語帳",
     multilingual_dictionary: "多言語辞書",
     ai_wordbook: "AI単語帳",
+    ai_vocabulary: "AI単語帳",
     language_learning: commonTexts.ja.language_learning,
     language_learning_desc: commonTexts.ja.language_learning_desc,
     language_games: commonTexts.ja.language_games,
@@ -465,11 +513,17 @@ const translations = {
       "学習する単語を入力して、自分だけの多言語単語帳を作りましょう。",
     ai_wordbook_desc:
       "Google Gemini AIからカスタム単語のおすすめを受け取り、語学力を向上させましょう。",
+    ai_vocabulary_desc:
+      "AIが推薦する多言語概念を学び、語学力を向上させましょう。",
     inquiry_desc:
       "質問がある場合や助けが必要な場合は、お気軽にお問い合わせください。",
     start: "始める",
     language_settings: "言語設定",
     save: "保存",
+    total_concepts: "総概念数",
+    concepts_unit: "個",
+    ai_usage: "AI使用量",
+    ai_recommend_concept: "AI概念推薦",
     // 로그인 페이지 번역
     login_with_google: "Googleでログイン",
     login_with_github: "Githubでログイン",
@@ -580,6 +634,7 @@ const translations = {
     wordbook: "单词本",
     multilingual_dictionary: "多语言词典",
     ai_wordbook: "AI单词本",
+    ai_vocabulary: "AI词汇本",
     language_learning: commonTexts.zh.language_learning,
     language_learning_desc: commonTexts.zh.language_learning_desc,
     language_games: commonTexts.zh.language_games,
@@ -596,10 +651,15 @@ const translations = {
       "通过系统的课程和直观的学习系统，使您的语言学习更加有效。",
     wordbook_desc: "输入要学习的单词，创建您自己的多语言单词本。",
     ai_wordbook_desc: "从Google Gemini AI获取定制单词推荐，提高您的语言技能。",
+    ai_vocabulary_desc: "学习AI推荐的多语言概念，提高您的语言技能。",
     inquiry_desc: "如果您有任何问题或需要帮助，请随时咨询。",
     start: "开始",
     language_settings: "语言设置",
     save: "保存",
+    total_concepts: "总概念数",
+    concepts_unit: "个",
+    ai_usage: "AI使用量",
+    ai_recommend_concept: "AI概念推荐",
     // 로그인 페이지 번역
     login_with_google: "使用Google登录",
     login_with_github: "使用Github登录",
