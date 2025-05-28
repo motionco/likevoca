@@ -142,6 +142,10 @@ function initializeNavbar() {
   // 언어 변경 이벤트 리스너
   document.addEventListener("languageChanged", async (event) => {
     const userLanguage = event.detail.language;
+
+    // 언어 버튼 표시 업데이트
+    await updateLanguageDisplay();
+
     // UI 언어만 변경하고 학습 언어 선택은 그대로 유지
     if (typeof displayConceptList === "function") {
       displayConceptList(); // 언어 변경 시 카드 재표시 (UI 텍스트만 변경)

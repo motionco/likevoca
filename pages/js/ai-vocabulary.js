@@ -357,15 +357,17 @@ function createConceptCard(concept, sourceLanguage, targetLanguage) {
 
   card.innerHTML = `
     <div class="flex items-center justify-between mb-4">
-      <span class="text-3xl">${emoji}</span>
+      <div class="flex items-center space-x-3">
+        <span class="text-3xl">${emoji}</span>
+        <span class="text-xl font-bold text-gray-800">${
+          sourceExpr.word || "N/A"
+        }</span>
+      </div>
       <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">${category}</span>
     </div>
     <div class="space-y-2">
-      <div class="text-xl font-bold text-gray-800">${
-        sourceExpr.word || "N/A"
-      }</div>
-      <div class="text-lg text-gray-600">${targetExpr.word || "N/A"}</div>
       <div class="text-sm text-gray-500">${sourceExpr.pronunciation || ""}</div>
+      <div class="text-lg text-gray-600">${targetExpr.word || "N/A"}</div>
       <div class="text-sm text-gray-700 line-clamp-2">${
         targetExpr.definition || sourceExpr.definition || ""
       }</div>
