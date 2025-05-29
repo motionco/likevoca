@@ -256,17 +256,17 @@ function displayFlashcard(concept) {
   document.getElementById("card-category").textContent =
     concept.conceptInfo.domain + " / " + concept.conceptInfo.category;
 
-  // 앞면 (원본 언어)
-  document.getElementById("front-word").textContent = sourceExpression.word;
+  // 앞면 (대상 언어 - 학습할 언어)
+  document.getElementById("front-word").textContent = targetExpression.word;
   document.getElementById("front-pronunciation").textContent =
-    sourceExpression.pronunciation || "";
-
-  // 뒷면 (대상 언어)
-  document.getElementById("back-word").textContent = targetExpression.word;
-  document.getElementById("back-pronunciation").textContent =
     targetExpression.pronunciation || "";
+
+  // 뒷면 (원본 언어 - 의미/설명)
+  document.getElementById("back-word").textContent = sourceExpression.word;
+  document.getElementById("back-pronunciation").textContent =
+    sourceExpression.pronunciation || "";
   document.getElementById("back-definition").textContent =
-    targetExpression.definition || "";
+    sourceExpression.definition || "";
 
   // 예문
   const exampleContainer = document.getElementById("example-container");
@@ -274,9 +274,9 @@ function displayFlashcard(concept) {
   if (concept.examples && concept.examples.length > 0) {
     exampleContainer.classList.remove("hidden");
     document.getElementById("example").textContent =
-      concept.examples[0].from || "";
-    document.getElementById("example-translation").textContent =
       concept.examples[0].to || "";
+    document.getElementById("example-translation").textContent =
+      concept.examples[0].from || "";
   } else {
     exampleContainer.classList.add("hidden");
   }
@@ -323,10 +323,10 @@ function displayQuiz(concept) {
   document.getElementById("quiz-category").textContent =
     concept.conceptInfo.domain + " / " + concept.conceptInfo.category;
 
-  // 문제 표시
+  // 문제 표시 (대상언어 → 원본언어)
   document.getElementById(
     "quiz-question"
-  ).textContent = `"${sourceExpression.word}"의 ${supportedLanguages[targetLanguage].nameKo} 표현은?`;
+  ).textContent = `"${targetExpression.word}"의 ${supportedLanguages[sourceLanguage].nameKo} 의미는?`;
 
   // 정답 선택지 만들기
   createQuizOptions(concept);
@@ -341,8 +341,8 @@ function displayQuiz(concept) {
 
 // 퀴즈 선택지 생성
 function createQuizOptions(concept) {
-  // 정답
-  const correctAnswer = concept.toExpression.word;
+  // 정답 (원본언어 단어)
+  const correctAnswer = concept.fromExpression.word;
 
   // 오답 가져오기 (최대 3개)
   const wrongAnswers = getWrongAnswers(correctAnswer, 3);
@@ -379,9 +379,9 @@ function getWrongAnswers(correctAnswer, count) {
   // 다른 단어들에서 오답 선택
   const wrongAnswers = [];
 
-  // 현재 단어와 다른 언어 표현에서 가져오기
+  // 현재 단어와 다른 원본언어 표현에서 가져오기
   for (const concept of currentLearningConcepts) {
-    const wrongOption = concept.toExpression.word;
+    const wrongOption = concept.fromExpression.word;
 
     if (wrongOption !== correctAnswer && !wrongAnswers.includes(wrongOption)) {
       wrongAnswers.push(wrongOption);
@@ -407,7 +407,7 @@ function checkQuizAnswer(index) {
 
   selectedAnswerIndex = index;
   const currentConcept = currentLearningConcepts[currentConceptIndex];
-  const correctAnswer = currentConcept.toExpression.word;
+  const correctAnswer = currentConcept.fromExpression.word;
   const selectedAnswer = currentQuizOptions[index];
 
   // 모든 선택지 비활성화
@@ -438,9 +438,9 @@ function checkQuizAnswer(index) {
     // 오답
     selectedOption.classList.add("bg-red-100", "border-red-500");
 
-    // 정답 표시
-    optionElements.forEach((elem) => {
-      if (elem.textContent === correctAnswer) {
+    // 정답 선택지 강조
+    optionElements.forEach((elem, elemIndex) => {
+      if (currentQuizOptions[elemIndex] === correctAnswer) {
         elem.classList.add("bg-green-100", "border-green-500", "font-bold");
       }
     });
@@ -448,8 +448,8 @@ function checkQuizAnswer(index) {
     // 결과 메시지
     const resultElement = document.getElementById("quiz-result");
     resultElement.innerHTML = `<p>오답입니다. 정답은 <strong>"${correctAnswer}"</strong> 입니다.</p>`;
-    if (currentConcept.toExpression.pronunciation) {
-      resultElement.innerHTML += `<p class="mt-2">발음: ${currentConcept.toExpression.pronunciation}</p>`;
+    if (currentConcept.fromExpression.pronunciation) {
+      resultElement.innerHTML += `<p class="mt-2">발음: ${currentConcept.fromExpression.pronunciation}</p>`;
     }
     resultElement.className = "mt-6 p-4 rounded bg-red-100 text-red-800";
     resultElement.classList.remove("hidden");
@@ -481,16 +481,16 @@ function initTypingMode() {
 function displayTypingQuestion(concept) {
   if (!concept) return;
 
-  const sourceExpression = concept.fromExpression;
+  const targetExpression = concept.toExpression;
 
   // 카테고리 표시
   document.getElementById("typing-category").textContent =
     concept.conceptInfo.domain + " / " + concept.conceptInfo.category;
 
-  // 문제 단어 표시
-  document.getElementById("typing-word").textContent = sourceExpression.word;
+  // 문제 단어 표시 (대상언어)
+  document.getElementById("typing-word").textContent = targetExpression.word;
   document.getElementById("typing-pronunciation").textContent =
-    sourceExpression.pronunciation || "";
+    targetExpression.pronunciation || "";
 
   // 입력창 초기화
   const answerInput = document.getElementById("typing-answer");
@@ -510,7 +510,7 @@ function displayTypingQuestion(concept) {
 // 타이핑 답변 확인
 function checkTypingAnswer() {
   const currentConcept = currentLearningConcepts[currentConceptIndex];
-  const correctAnswer = currentConcept.toExpression.word;
+  const correctAnswer = currentConcept.fromExpression.word;
   const userAnswer = document.getElementById("typing-answer").value.trim();
 
   // 입력창 비활성화
@@ -533,13 +533,13 @@ function checkTypingAnswer() {
     resultElement.innerHTML = `
       <p>오답입니다. 정답은 <strong>"${correctAnswer}"</strong> 입니다.</p>
       ${
-        currentConcept.toExpression.pronunciation
-          ? `<p class="mt-2">발음: ${currentConcept.toExpression.pronunciation}</p>`
+        currentConcept.fromExpression.pronunciation
+          ? `<p class="mt-2">발음: ${currentConcept.fromExpression.pronunciation}</p>`
           : ""
       }
       ${
-        currentConcept.toExpression.definition
-          ? `<p class="mt-2">의미: ${currentConcept.toExpression.definition}</p>`
+        currentConcept.fromExpression.definition
+          ? `<p class="mt-2">의미: ${currentConcept.fromExpression.definition}</p>`
           : ""
       }
     `;

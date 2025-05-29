@@ -804,8 +804,10 @@ function getCurrentLanguage() {
   return localStorage.getItem("userLanguage") || "auto";
 }
 
-// 언어 설정 저장
+// 언어 설정 저장 및 적용
 function setLanguage(langCode) {
+  console.log("언어 설정 변경:", langCode);
+
   if (langCode === "auto") {
     localStorage.removeItem("userLanguage");
   } else {
@@ -834,37 +836,45 @@ function setLanguage(langCode) {
     currentPath.includes("games")
   ) {
     pageType = "games";
+  } else if (
+    currentPath.includes("ai-vocabulary") ||
+    currentPath.includes("ai")
+  ) {
+    pageType = "ai-vocabulary";
   }
 
   updateMetadata(pageType);
 }
 
-// 페이지 로드 시 URL 처리
-document.addEventListener("DOMContentLoaded", async () => {
-  const path = window.location.pathname;
-  const pathParts = path.split("/").filter((part) => part); // 빈 문자열 제거
-  const langCode = pathParts[0];
-
-  if (SUPPORTED_LANGUAGES[langCode]) {
-    // URL에 유효한 언어 코드가 있으면 해당 언어 설정
-    await setLanguage(langCode);
-  } else {
-    // 언어 코드가 없거나 유효하지 않은 경우
-    const defaultLang = await detectLanguageFromLocation();
-    await setLanguage(defaultLang);
-  }
-});
-
-// 현재 활성화된 언어 코드 가져오기
+// 현재 활성화된 언어 코드 가져오기 (우선순위 수정)
 async function getActiveLanguage() {
+  // 1. 먼저 localStorage에서 사용자가 직접 설정한 언어 확인
   const savedLang = localStorage.getItem("userLanguage");
 
-  if (savedLang && savedLang !== "auto") {
+  if (savedLang && savedLang !== "auto" && SUPPORTED_LANGUAGES[savedLang]) {
+    console.log("저장된 언어 사용:", savedLang);
     return savedLang;
   }
 
-  // 자동 설정인 경우 위치 기반으로 감지
-  return await detectLanguageFromLocation();
+  // 2. 자동 설정이거나 저장된 언어가 없는 경우
+  console.log("자동 언어 감지 시도...");
+
+  // 먼저 브라우저 언어 시도
+  const browserLang = detectBrowserLanguage();
+  if (SUPPORTED_LANGUAGES[browserLang]) {
+    console.log("브라우저 언어 사용:", browserLang);
+    return browserLang;
+  }
+
+  // 브라우저 언어가 지원되지 않으면 위치 기반 감지
+  try {
+    const locationLang = await detectLanguageFromLocation();
+    console.log("위치 기반 언어 사용:", locationLang);
+    return locationLang;
+  } catch (error) {
+    console.error("위치 기반 언어 감지 실패, 기본 언어 사용");
+    return "ko"; // 최종 기본값: 한국어
+  }
 }
 
 // 언어 변경 적용
@@ -968,8 +978,17 @@ function showLanguageSettingsModal() {
     const selectedLang = document.querySelector(
       'input[name="language"]:checked'
     ).value;
+
+    console.log("언어 설정 저장:", selectedLang);
+
+    // 언어 설정 저장 및 적용
     setLanguage(selectedLang);
+
+    // 모달 닫기
     document.getElementById("language-settings-modal").classList.add("hidden");
+
+    // 성공 메시지 (선택사항)
+    console.log("언어 설정이 저장되었습니다:", selectedLang);
   });
 }
 

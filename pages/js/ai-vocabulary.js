@@ -440,8 +440,8 @@ function createConceptCard(concept, sourceLanguage, targetLanguage) {
   card.innerHTML = `
     <div class="mb-4 flex justify-between items-start">
       <div>
-        <h2 class="text-xl font-bold">${emoji} ${sourceExpr.word || "N/A"}</h2>
-        <p class="text-sm text-gray-500">${sourceExpr.pronunciation || ""}</p>
+        <h2 class="text-xl font-bold">${emoji} ${targetExpr.word || "N/A"}</h2>
+        <p class="text-sm text-gray-500">${targetExpr.pronunciation || ""}</p>
       </div>
       <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
         ${domain}${domain && category ? "/" : ""}${category}
@@ -453,10 +453,10 @@ function createConceptCard(concept, sourceLanguage, targetLanguage) {
         <span class="text-gray-500 text-sm mr-2">${getTranslatedText(
           "meaning"
         )}</span>
-        <span class="font-medium">${targetExpr.word || ""}</span>
+        <span class="font-medium">${sourceExpr.word || ""}</span>
       </div>
       <p class="text-sm text-gray-600 mt-1">${
-        targetExpr.definition || sourceExpr.definition || ""
+        sourceExpr.definition || targetExpr.definition || ""
       }</p>
     </div>
     
@@ -465,8 +465,8 @@ function createConceptCard(concept, sourceLanguage, targetLanguage) {
         ? `
     <div class="border-t border-gray-200 pt-3 mt-3">
       <p class="text-xs text-gray-500 mb-1">${getTranslatedText("examples")}</p>
-      <p class="text-sm mb-1">${sourceExample}</p>
-      <p class="text-sm text-gray-600">${targetExample}</p>
+      <p class="text-sm mb-1">${targetExample}</p>
+      <p class="text-sm text-gray-600">${sourceExample}</p>
     </div>
     `
         : ""

@@ -245,9 +245,9 @@ function createConceptCard(concept) {
     >
       <div class="mb-4 flex justify-between items-start">
         <div>
-          <h2 class="text-xl font-bold">${emoji} ${sourceExpression.word}</h2>
+          <h2 class="text-xl font-bold">${emoji} ${targetExpression.word}</h2>
           <p class="text-sm text-gray-500">${
-            sourceExpression.pronunciation || ""
+            targetExpression.pronunciation || ""
           }</p>
         </div>
         <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
@@ -260,10 +260,10 @@ function createConceptCard(concept) {
           <span class="text-gray-500 text-sm mr-2">
             ${getTranslatedText("meaning")}
           </span>
-          <span class="font-medium">${targetExpression.word}</span>
+          <span class="font-medium">${sourceExpression.word}</span>
         </div>
         <p class="text-sm text-gray-600 mt-1">${
-          targetExpression.definition || ""
+          sourceExpression.definition || ""
         }</p>
       </div>
       
@@ -274,8 +274,8 @@ function createConceptCard(concept) {
         <p class="text-xs text-gray-500 mb-1">
           ${getTranslatedText("example")}
         </p>
-        <p class="text-sm mb-1">${example.source}</p>
-        <p class="text-sm text-gray-600">${example.target}</p>
+        <p class="text-sm mb-1">${example.target}</p>
+        <p class="text-sm text-gray-600">${example.source}</p>
       </div>
       `
           : ""
@@ -623,7 +623,7 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
   const sourceExpression = conceptData.expressions[sourceLanguage];
   const targetExpression = conceptData.expressions[targetLanguage];
 
-  // 간단하게 innerHTML로 상단 영역 구성 (언어탭 방식과 동일)
+  // 간단하게 innerHTML로 상단 영역 구성 (언어탭 방식과 동일) - 대상언어 우선
   if (conceptEmoji) {
     console.log("concept-view-emoji 요소 찾음:", conceptEmoji);
     console.log("설정할 이모지:", emoji);
@@ -641,17 +641,17 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
   }
 
   if (conceptPrimaryWord) {
-    if (sourceExpression) {
-      conceptPrimaryWord.textContent = sourceExpression.word;
+    if (targetExpression) {
+      conceptPrimaryWord.textContent = targetExpression.word;
     } else {
       conceptPrimaryWord.textContent = "N/A";
     }
   }
 
   if (conceptPrimaryPronunciation) {
-    if (sourceExpression) {
+    if (targetExpression) {
       conceptPrimaryPronunciation.textContent =
-        sourceExpression.pronunciation || "";
+        targetExpression.pronunciation || "";
     } else {
       conceptPrimaryPronunciation.textContent = "";
     }
@@ -677,20 +677,20 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
   tabContainer.innerHTML = "";
   contentContainer.innerHTML = "";
 
-  // 언어탭 순서: 대상 언어, 원본 언어, 나머지 언어들
+  // 언어탭 순서: 원본 언어, 대상 언어, 나머지 언어들
   const orderedLanguages = [];
 
-  // 1. 대상 언어가 있으면 먼저 추가
-  if (conceptData.expressions[targetLanguage]) {
-    orderedLanguages.push(targetLanguage);
+  // 1. 원본 언어가 있으면 먼저 추가
+  if (conceptData.expressions[sourceLanguage]) {
+    orderedLanguages.push(sourceLanguage);
   }
 
-  // 2. 원본 언어가 있고 대상 언어와 다르면 추가
+  // 2. 대상 언어가 있고 원본 언어와 다르면 추가
   if (
-    conceptData.expressions[sourceLanguage] &&
+    conceptData.expressions[targetLanguage] &&
     sourceLanguage !== targetLanguage
   ) {
-    orderedLanguages.push(sourceLanguage);
+    orderedLanguages.push(targetLanguage);
   }
 
   // 3. 나머지 언어들 추가
@@ -734,18 +734,19 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
     // 이모지 제거된 패널 내용
     panel.innerHTML = `
       <div class="mb-4">
-        <h3 class="text-xl font-bold">${expression.word}</h3>
+        <div class="flex items-center gap-2 mb-1">
+          <h3 class="text-xl font-bold">${expression.word}</h3>
+          <span class="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">${
+            expression.part_of_speech || "정보 없음"
+          }</span>
+        </div>
         <p class="text-gray-500">${expression.pronunciation || ""}</p>
       </div>
       <div class="mb-4">
         <p class="text-sm text-gray-700 mb-1">${definitionLabel}</p>
         <p>${expression.definition || "정의 없음"}</p>
       </div>
-      <div class="grid grid-cols-2 gap-4 mb-4">
-        <div>
-          <p class="text-sm text-gray-700 mb-1">${partOfSpeechLabel}</p>
-          <p>${expression.part_of_speech || "정보 없음"}</p>
-        </div>
+      <div class="grid grid-cols-1 gap-4 mb-4">
         <div>
           <p class="text-sm text-gray-700 mb-1">${levelLabel}</p>
           <p>${expression.level || "정보 없음"}</p>
@@ -871,41 +872,71 @@ function updateExamples(langCode, conceptData) {
 
         let exampleContent = "";
 
-        // 현재 탭 언어의 예문
-        const currentLangInfo = supportedLanguages[langCode] || {
-          nameKo: langCode,
-        };
-        exampleContent += `
-          <div class="mb-3">
-            <span class="text-sm font-medium text-blue-600">${currentLangInfo.nameKo}:</span>
-            <p class="ml-2 font-medium text-gray-800">${example[langCode]}</p>
-          </div>
-        `;
+        // 대상언어 → 원본언어 순서로 표시 (현재 탭 언어와 관계없이)
+        const languagesToShow = [];
 
-        // 원본 언어와 대상 언어가 현재 탭 언어와 다르면 추가 표시
-        if (langCode !== sourceLanguage && example[sourceLanguage]) {
-          const sourceLangInfo = supportedLanguages[sourceLanguage] || {
-            nameKo: sourceLanguage,
-          };
-          exampleContent += `
-            <div class="mb-2 pl-4 border-l-2 border-gray-300">
-              <span class="text-sm text-gray-600">${sourceLangInfo.nameKo} (원본):</span>
-              <p class="ml-2 text-gray-700">${example[sourceLanguage]}</p>
-            </div>
-          `;
-        }
-
-        if (langCode !== targetLanguage && example[targetLanguage]) {
+        // 1. 대상언어 먼저 추가 (있는 경우)
+        if (targetLanguage && example[targetLanguage]) {
           const targetLangInfo = supportedLanguages[targetLanguage] || {
             nameKo: targetLanguage,
           };
+          languagesToShow.push({
+            code: targetLanguage,
+            name: targetLangInfo.nameKo,
+            text: example[targetLanguage],
+            label: "(대상)",
+          });
+        }
+
+        // 2. 원본언어 추가 (있고, 대상언어와 다른 경우)
+        if (
+          sourceLanguage &&
+          example[sourceLanguage] &&
+          sourceLanguage !== targetLanguage
+        ) {
+          const sourceLangInfo = supportedLanguages[sourceLanguage] || {
+            nameKo: sourceLanguage,
+          };
+          languagesToShow.push({
+            code: sourceLanguage,
+            name: sourceLangInfo.nameKo,
+            text: example[sourceLanguage],
+            label: "(원본)",
+          });
+        }
+
+        // 3. 현재 탭 언어 추가 (위에 추가되지 않은 경우만)
+        if (
+          example[langCode] &&
+          !languagesToShow.find((lang) => lang.code === langCode)
+        ) {
+          const currentLangInfo = supportedLanguages[langCode] || {
+            nameKo: langCode,
+          };
+          languagesToShow.push({
+            code: langCode,
+            name: currentLangInfo.nameKo,
+            text: example[langCode],
+            label: "",
+          });
+        }
+
+        // 언어들을 순서대로 표시
+        languagesToShow.forEach((lang, index) => {
+          const isFirst = index === 0;
           exampleContent += `
-            <div class="mb-2 pl-4 border-l-2 border-gray-300">
-              <span class="text-sm text-gray-600">${targetLangInfo.nameKo} (대상):</span>
-              <p class="ml-2 text-gray-700">${example[targetLanguage]}</p>
+            <div class="${
+              isFirst ? "mb-3" : "mb-2 pl-4 border-l-2 border-gray-300"
+            }">
+              <span class="text-sm ${
+                isFirst ? "font-medium text-blue-600" : "text-gray-600"
+              }">${lang.name}${lang.label}:</span>
+              <p class="ml-2 ${
+                isFirst ? "font-medium text-gray-800" : "text-gray-700"
+              }">${lang.text}</p>
             </div>
           `;
-        }
+        });
 
         exampleDiv.innerHTML = exampleContent;
         examplesContainer.appendChild(exampleDiv);

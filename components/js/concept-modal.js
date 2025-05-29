@@ -198,7 +198,7 @@ export async function showConceptModal(
     return;
   }
 
-  // 기본 언어 결정 (첫 번째 사용 가능한 언어)
+  // 언어 탭 순서 재정렬: 원본언어, 대상언어, 나머지 언어 순
   const availableLanguages = Object.keys(concept.expressions || {});
   console.log("사용 가능한 언어 목록:", availableLanguages);
 
@@ -207,9 +207,40 @@ export async function showConceptModal(
     return;
   }
 
-  // 기본 개념 정보 설정
-  const primaryLang = availableLanguages[0];
+  // 언어 탭 순서 재정렬
+  const orderedLanguages = [];
+
+  // 1. 원본언어 먼저 추가 (있는 경우)
+  if (sourceLanguage && availableLanguages.includes(sourceLanguage)) {
+    orderedLanguages.push(sourceLanguage);
+  }
+
+  // 2. 대상언어 추가 (있고, 원본언어와 다른 경우)
+  if (
+    targetLanguage &&
+    availableLanguages.includes(targetLanguage) &&
+    targetLanguage !== sourceLanguage
+  ) {
+    orderedLanguages.push(targetLanguage);
+  }
+
+  // 3. 나머지 언어들 추가
+  availableLanguages.forEach((lang) => {
+    if (!orderedLanguages.includes(lang)) {
+      orderedLanguages.push(lang);
+    }
+  });
+
+  console.log("재정렬된 언어 순서:", orderedLanguages);
+
+  // 기본 개념 정보 설정 - 대상언어 우선, 없으면 첫 번째 언어 사용
+  const primaryLang =
+    targetLanguage && availableLanguages.includes(targetLanguage)
+      ? targetLanguage
+      : orderedLanguages[0];
   const primaryExpr = concept.expressions[primaryLang];
+
+  console.log("기본 언어 설정:", primaryLang, "표현:", primaryExpr);
 
   document.getElementById("concept-view-emoji").textContent =
     concept.concept_info?.emoji || "📝";
@@ -238,8 +269,8 @@ export async function showConceptModal(
   if (tabsContainer && contentContainer) {
     console.log("탭 컨테이너 찾음, 탭 생성 중...");
 
-    // 탭 버튼들 생성
-    const tabsHTML = availableLanguages
+    // 탭 버튼들 생성 (재정렬된 순서 사용)
+    const tabsHTML = orderedLanguages
       .map((lang, index) => {
         console.log(`탭 생성: ${lang} (${getLanguageName(lang)})`);
         return `
@@ -260,9 +291,9 @@ export async function showConceptModal(
     console.log("생성된 탭 HTML:", tabsHTML);
     tabsContainer.innerHTML = tabsHTML;
 
-    // 첫 번째 언어 내용 표시
-    console.log("첫 번째 언어 내용 표시:", availableLanguages[0]);
-    showLanguageContent(availableLanguages[0], concept);
+    // 첫 번째 언어 내용 표시 (재정렬된 순서의 첫 번째)
+    console.log("첫 번째 언어 내용 표시:", orderedLanguages[0]);
+    showLanguageContent(orderedLanguages[0], concept);
   } else {
     console.error("탭 컨테이너를 찾을 수 없습니다:", {
       tabsContainer,
@@ -271,12 +302,7 @@ export async function showConceptModal(
   }
 
   // 예문 표시 (개선된 버전)
-  displayExamples(
-    concept,
-    availableLanguages[0],
-    sourceLanguage,
-    targetLanguage
-  );
+  displayExamples(concept, orderedLanguages[0], sourceLanguage, targetLanguage);
 
   // 모달 표시
   modal.classList.remove("hidden");
@@ -322,7 +348,12 @@ function showLanguageContent(lang, concept) {
           "meaning"
         )}</h4>
         <div class="bg-gray-50 p-3 rounded">
-          <p class="text-lg font-medium">${expression.word || "N/A"}</p>
+          <div class="flex items-center gap-2 mb-1">
+            <p class="text-lg font-medium">${expression.word || "N/A"}</p>
+            <span class="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">${
+              expression.part_of_speech || "N/A"
+            }</span>
+          </div>
           <p class="text-sm text-gray-500 mt-1">${
             expression.pronunciation || ""
           }</p>
@@ -330,15 +361,7 @@ function showLanguageContent(lang, concept) {
         </div>
       </div>
       
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <h4 class="font-medium text-gray-700 mb-2">${getTranslatedText(
-            "part_of_speech"
-          )}</h4>
-          <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">${
-            expression.part_of_speech || "N/A"
-          }</span>
-        </div>
+      <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
         <div>
           <h4 class="font-medium text-gray-700 mb-2">${getTranslatedText(
             "level"
@@ -354,10 +377,17 @@ function showLanguageContent(lang, concept) {
 
 // 기본 정보 업데이트 함수 추가
 function updateBasicInfo(lang, concept) {
-  const expression = concept.expressions[lang];
+  // 대상언어 정보로 고정 (전달받은 언어가 아닌 targetLanguage 사용)
+  const targetLanguage = window.currentTargetLanguage;
+  const fixedLang =
+    targetLanguage && concept.expressions[targetLanguage]
+      ? targetLanguage
+      : lang; // 대상언어가 없으면 현재 언어 사용
+
+  const expression = concept.expressions[fixedLang];
   if (!expression) return;
 
-  // 상단 기본 정보 업데이트
+  // 상단 기본 정보 업데이트 (항상 대상언어로)
   const emojiElement = document.getElementById("concept-view-emoji");
   const wordElement = document.getElementById("concept-primary-word");
   const pronunciationElement = document.getElementById(
@@ -518,43 +548,62 @@ function displayExamples(
 
         let exampleContent = "";
 
-        // 현재 탭 언어의 예문
-        const currentLangInfo = getLanguageName(currentLang);
-        exampleContent += `
-          <div class="mb-3">
-            <span class="text-sm font-medium text-blue-600">${currentLangInfo}:</span>
-            <p class="ml-2 font-medium text-gray-800">${example[currentLang]}</p>
-          </div>
-        `;
+        // 대상언어 → 원본언어 순서로 표시 (현재 탭 언어와 관계없이)
+        const languagesToShow = [];
 
-        // 원본 언어와 대상 언어가 전달되었고, 현재 탭 언어와 다르면 추가 표시
+        // 1. 대상언어 먼저 추가 (있는 경우)
+        if (targetLanguage && example[targetLanguage]) {
+          languagesToShow.push({
+            code: targetLanguage,
+            name: getLanguageName(targetLanguage),
+            text: example[targetLanguage],
+            label: "(대상)",
+          });
+        }
+
+        // 2. 원본언어 추가 (있고, 대상언어와 다른 경우)
         if (
           sourceLanguage &&
-          currentLang !== sourceLanguage &&
-          example[sourceLanguage]
+          example[sourceLanguage] &&
+          sourceLanguage !== targetLanguage
         ) {
-          const sourceLangInfo = getLanguageName(sourceLanguage);
-          exampleContent += `
-            <div class="mb-2 pl-4 border-l-2 border-gray-300">
-              <span class="text-sm text-gray-600">${sourceLangInfo} (원본):</span>
-              <p class="ml-2 text-gray-700">${example[sourceLanguage]}</p>
-            </div>
-          `;
+          languagesToShow.push({
+            code: sourceLanguage,
+            name: getLanguageName(sourceLanguage),
+            text: example[sourceLanguage],
+            label: "(원본)",
+          });
         }
 
+        // 3. 현재 탭 언어 추가 (위에 추가되지 않은 경우만)
         if (
-          targetLanguage &&
-          currentLang !== targetLanguage &&
-          example[targetLanguage]
+          example[currentLang] &&
+          !languagesToShow.find((lang) => lang.code === currentLang)
         ) {
-          const targetLangInfo = getLanguageName(targetLanguage);
+          languagesToShow.push({
+            code: currentLang,
+            name: getLanguageName(currentLang),
+            text: example[currentLang],
+            label: "",
+          });
+        }
+
+        // 언어들을 순서대로 표시
+        languagesToShow.forEach((lang, index) => {
+          const isFirst = index === 0;
           exampleContent += `
-            <div class="mb-2 pl-4 border-l-2 border-gray-300">
-              <span class="text-sm text-gray-600">${targetLangInfo} (대상):</span>
-              <p class="ml-2 text-gray-700">${example[targetLanguage]}</p>
+            <div class="${
+              isFirst ? "mb-3" : "mb-2 pl-4 border-l-2 border-gray-300"
+            }">
+              <span class="text-sm ${
+                isFirst ? "font-medium text-blue-600" : "text-gray-600"
+              }">${lang.name}${lang.label}:</span>
+              <p class="ml-2 ${
+                isFirst ? "font-medium text-gray-800" : "text-gray-700"
+              }">${lang.text}</p>
             </div>
           `;
-        }
+        });
 
         exampleDiv.innerHTML = exampleContent;
         examplesContainer.appendChild(exampleDiv);

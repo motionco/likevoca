@@ -48,8 +48,9 @@ export async function loadNavbar() {
 
     initializeNavbar();
 
-    // 언어 설정 적용
-    await applyLanguage();
+    // 언어 설정 초기화 및 적용
+    console.log("네비게이션바 로드 완료, 언어 설정 초기화 중...");
+    await initializeLanguageSettings();
 
     // Firebase 초기화 완료 이벤트를 기다림
     window.addEventListener("firebase-initialized", () => {
@@ -66,7 +67,8 @@ export async function loadNavbar() {
     updateLanguageDisplay();
 
     // 페이지 초기화 시 메타데이터 업데이트
-    await updateMetadata("dictionary");
+    const pageType = getPageType();
+    await updateMetadata(pageType);
   } catch (error) {
     console.error("Navbar 로드 실패: ", error);
   }
@@ -298,6 +300,65 @@ function setLanguage(langCode) {
     window.history.replaceState({}, "", url.toString());
   }
   applyLanguage();
+}
+
+// 언어 설정 초기화 함수 추가
+async function initializeLanguageSettings() {
+  try {
+    // 저장된 언어 설정이 있는지 확인
+    const savedLang = localStorage.getItem("userLanguage");
+
+    if (savedLang && savedLang !== "auto") {
+      console.log("저장된 언어 설정 발견:", savedLang);
+      // 저장된 언어 설정 적용
+      await applyLanguage();
+    } else {
+      console.log("저장된 언어 설정이 없음, 자동 감지 시작");
+      // 자동 감지된 언어로 초기 설정
+      const detectedLang = await getActiveLanguage();
+
+      // 처음 방문하는 경우에만 자동 감지된 언어로 설정
+      if (!savedLang) {
+        localStorage.setItem("userLanguage", detectedLang);
+      }
+
+      await applyLanguage();
+    }
+  } catch (error) {
+    console.error("언어 설정 초기화 실패:", error);
+    // 실패 시 기본 언어로 설정
+    localStorage.setItem("userLanguage", "ko");
+    await applyLanguage();
+  }
+}
+
+// 페이지 타입 감지 함수 추가
+function getPageType() {
+  const currentPath = window.location.pathname.toLowerCase();
+
+  if (
+    currentPath.includes("multilingual-dictionary") ||
+    currentPath.includes("dictionary")
+  ) {
+    return "dictionary";
+  } else if (
+    currentPath.includes("language-learning") ||
+    currentPath.includes("learning")
+  ) {
+    return "learning";
+  } else if (
+    currentPath.includes("language-games") ||
+    currentPath.includes("games")
+  ) {
+    return "games";
+  } else if (
+    currentPath.includes("ai-vocabulary") ||
+    currentPath.includes("ai")
+  ) {
+    return "ai-vocabulary";
+  }
+
+  return "home";
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
