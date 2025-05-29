@@ -552,7 +552,23 @@ async function loadModals(modalPaths) {
 // 개념 상세 보기 모달 열기 함수 (전역 함수)
 window.openConceptViewModal = async function (conceptId) {
   try {
+    console.log("모달 열기 시도, conceptId:", conceptId);
+
+    // conceptUtils가 정의되어 있는지 확인
+    if (!conceptUtils) {
+      throw new Error("conceptUtils가 정의되지 않았습니다.");
+    }
+
+    // 현재 선택된 언어 설정 가져오기
+    const sourceLanguage = document.getElementById("source-language").value;
+    const targetLanguage = document.getElementById("target-language").value;
+
+    console.log("현재 언어 설정:", { sourceLanguage, targetLanguage });
+
+    console.log("conceptUtils.getConcept 호출 중...");
     const conceptData = await conceptUtils.getConcept(conceptId);
+
+    console.log("개념 데이터 조회 결과:", conceptData);
 
     if (!conceptData) {
       alert("개념 정보를 찾을 수 없습니다.");
@@ -560,122 +576,165 @@ window.openConceptViewModal = async function (conceptId) {
     }
 
     const modal = document.getElementById("concept-view-modal");
-    if (!modal) return;
+    if (!modal) {
+      throw new Error("concept-view-modal 요소를 찾을 수 없습니다.");
+    }
 
-    // 모달 콘텐츠 채우기
-    fillConceptViewModal(conceptData);
+    console.log("모달 콘텐츠 채우기 시작...");
+    // 모달 콘텐츠 채우기 (언어 설정 전달)
+    fillConceptViewModal(conceptData, sourceLanguage, targetLanguage);
 
+    console.log("모달 표시...");
     // 모달 표시
     modal.classList.remove("hidden");
+
+    console.log("모달 열기 완료");
   } catch (error) {
     console.error("개념 상세 보기 모달 열기 중 오류 발생:", error);
+    console.error("Error stack:", error.stack);
     alert("개념 정보를 불러올 수 없습니다.");
   }
 };
 
 // 개념 상세 보기 모달 내용 채우기
-function fillConceptViewModal(conceptData) {
+function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
   const modal = document.getElementById("concept-view-modal");
   if (!modal) return;
 
-  // 이모지 가져오기
-  const emoji = conceptData.concept_info.emoji || "";
+  console.log("모달 요소 구조 확인:", modal);
+  console.log("사용할 언어 설정:", { sourceLanguage, targetLanguage });
 
-  // 기본 정보
-  document.getElementById(
-    "concept-view-title"
-  ).textContent = `${emoji} ${conceptData.concept_info.domain} / ${conceptData.concept_info.category}`;
+  console.log("개념 데이터의 이모지:", conceptData.concept_info.emoji);
+  console.log("개념 데이터 전체:", conceptData);
+
+  // 이모지 가져오기
+  const emoji = conceptData.concept_info.emoji || "📝";
+
+  // 기본 정보 설정 (선택된 언어에 맞게)
+  const conceptEmoji = document.getElementById("concept-view-emoji");
+  const conceptPrimaryWord = document.getElementById("concept-primary-word");
+  const conceptPrimaryPronunciation = document.getElementById(
+    "concept-primary-pronunciation"
+  );
+  const conceptCategory = document.getElementById("concept-category");
+  const conceptDomain = document.getElementById("concept-domain");
+
+  // 원본 언어의 표현 가져오기
+  const sourceExpression = conceptData.expressions[sourceLanguage];
+  const targetExpression = conceptData.expressions[targetLanguage];
+
+  // 간단하게 innerHTML로 상단 영역 구성 (언어탭 방식과 동일)
+  if (conceptEmoji) {
+    console.log("concept-view-emoji 요소 찾음:", conceptEmoji);
+    console.log("설정할 이모지:", emoji);
+    conceptEmoji.innerHTML = emoji;
+    console.log("이모지 설정 후 innerHTML:", conceptEmoji.innerHTML);
+    console.log("이모지 설정 후 textContent:", conceptEmoji.textContent);
+  } else {
+    console.error("concept-view-emoji 요소를 찾을 수 없습니다!");
+    // 모든 이모지 관련 요소 확인
+    const allElements = document.querySelectorAll('[id*="emoji"]');
+    console.log("이모지 관련 요소들:", allElements);
+    // 모달 내부의 모든 요소 확인
+    const modalElements = modal.querySelectorAll("*[id]");
+    console.log("모달 내부 ID 요소들:", modalElements);
+  }
+
+  if (conceptPrimaryWord) {
+    if (sourceExpression) {
+      conceptPrimaryWord.textContent = sourceExpression.word;
+    } else {
+      conceptPrimaryWord.textContent = "N/A";
+    }
+  }
+
+  if (conceptPrimaryPronunciation) {
+    if (sourceExpression) {
+      conceptPrimaryPronunciation.textContent =
+        sourceExpression.pronunciation || "";
+    } else {
+      conceptPrimaryPronunciation.textContent = "";
+    }
+  }
+
+  if (conceptCategory)
+    conceptCategory.textContent = conceptData.concept_info?.category || "기타";
+  if (conceptDomain)
+    conceptDomain.textContent = conceptData.concept_info?.domain || "일반";
 
   // 언어 표현 탭 생성
   const tabContainer = document.getElementById("concept-view-tabs");
   const contentContainer = document.getElementById("concept-view-content");
-  const expressionsTitle = document.getElementById(
-    "concept-view-expressions-title"
-  );
 
-  if (!tabContainer || !contentContainer) return;
+  if (!tabContainer || !contentContainer) {
+    console.error("탭 컨테이너를 찾을 수 없습니다:", {
+      tabContainer,
+      contentContainer,
+    });
+    return;
+  }
 
   tabContainer.innerHTML = "";
   contentContainer.innerHTML = "";
 
-  // 초기 언어 설정 (첫 번째 탭 언어)
-  let currentLangCode = Object.keys(conceptData.expressions)[0] || "korean";
+  // 언어탭 순서: 대상 언어, 원본 언어, 나머지 언어들
+  const orderedLanguages = [];
 
-  // 언어별 표현 제목 업데이트 함수
-  const updateExpressionsTitle = (langCode) => {
-    if (!expressionsTitle) return;
+  // 1. 대상 언어가 있으면 먼저 추가
+  if (conceptData.expressions[targetLanguage]) {
+    orderedLanguages.push(targetLanguage);
+  }
 
-    if (langCode === "korean") {
-      expressionsTitle.textContent = "언어별 표현";
-    } else if (langCode === "english") {
-      expressionsTitle.textContent = "Expressions";
-    } else if (langCode === "japanese") {
-      expressionsTitle.textContent = "言語表現";
-    } else if (langCode === "chinese") {
-      expressionsTitle.textContent = "语言表达";
-    } else {
-      expressionsTitle.textContent = "언어별 표현";
+  // 2. 원본 언어가 있고 대상 언어와 다르면 추가
+  if (
+    conceptData.expressions[sourceLanguage] &&
+    sourceLanguage !== targetLanguage
+  ) {
+    orderedLanguages.push(sourceLanguage);
+  }
+
+  // 3. 나머지 언어들 추가
+  Object.keys(conceptData.expressions).forEach((langCode) => {
+    if (!orderedLanguages.includes(langCode)) {
+      orderedLanguages.push(langCode);
     }
-  };
+  });
 
-  // 초기 언어별 표현 제목 설정
-  updateExpressionsTitle(currentLangCode);
+  // 각 언어별 탭과 컨텐츠 생성 (순서 변경됨)
+  orderedLanguages.forEach((langCode, index) => {
+    const expression = conceptData.expressions[langCode];
+    const langInfo = supportedLanguages[langCode] || {
+      nameKo: langCode,
+      code: langCode,
+    };
 
-  // 각 언어별 탭과 컨텐츠 생성
-  Object.entries(conceptData.expressions).forEach(
-    ([langCode, expression], index) => {
-      const langInfo = supportedLanguages[langCode] || {
-        nameKo: langCode,
-        code: langCode,
-      };
+    // 탭 생성
+    const tab = document.createElement("button");
+    tab.id = `view-${langCode}-tab`;
+    tab.className = `px-4 py-2 border-b-2 ${
+      index === 0
+        ? "border-blue-500 text-blue-600"
+        : "border-transparent text-gray-500 hover:text-gray-700"
+    }`;
+    tab.textContent = langInfo.nameKo;
+    tab.onclick = () => switchViewTab(langCode);
 
-      // 탭 생성
-      const tab = document.createElement("button");
-      tab.id = `view-${langCode}-tab`;
-      tab.className = `px-4 py-2 ${
-        index === 0 ? "bg-blue-500 text-white" : "bg-gray-200"
-      }`;
-      tab.textContent = langInfo.nameKo;
-      tab.onclick = () => switchViewTab(langCode);
+    tabContainer.appendChild(tab);
 
-      tabContainer.appendChild(tab);
+    // 컨텐츠 패널 생성
+    const panel = document.createElement("div");
+    panel.id = `view-${langCode}-content`;
+    panel.className = `${index === 0 ? "" : "hidden"} p-4`;
 
-      // 컨텐츠 패널 생성
-      const panel = document.createElement("div");
-      panel.id = `view-${langCode}-content`;
-      panel.className = `${index === 0 ? "" : "hidden"} p-4`;
+    // 언어에 따른 레이블 설정
+    let definitionLabel = "의미/정의:";
+    let partOfSpeechLabel = "품사:";
+    let levelLabel = "난이도:";
 
-      // 이모지 사용
-      const emoji = conceptData.concept_info.emoji || "";
-
-      // 언어에 따른 레이블 설정
-      let definitionLabel, partOfSpeechLabel, levelLabel;
-
-      if (langCode === "korean") {
-        definitionLabel = "의미/정의:";
-        partOfSpeechLabel = "품사:";
-        levelLabel = "난이도:";
-      } else if (langCode === "english") {
-        definitionLabel = "Definition:";
-        partOfSpeechLabel = "Part of Speech:";
-        levelLabel = "Level:";
-      } else if (langCode === "japanese") {
-        definitionLabel = "意味/定義:";
-        partOfSpeechLabel = "品詞:";
-        levelLabel = "レベル:";
-      } else if (langCode === "chinese") {
-        definitionLabel = "意思/定义:";
-        partOfSpeechLabel = "词性:";
-        levelLabel = "级别:";
-      } else {
-        definitionLabel = "의미/정의:";
-        partOfSpeechLabel = "품사:";
-        levelLabel = "난이도:";
-      }
-
-      panel.innerHTML = `
+    // 이모지 제거된 패널 내용
+    panel.innerHTML = `
       <div class="mb-4">
-        <h3 class="text-xl font-bold">${emoji} ${expression.word}</h3>
+        <h3 class="text-xl font-bold">${expression.word}</h3>
         <p class="text-gray-500">${expression.pronunciation || ""}</p>
       </div>
       <div class="mb-4">
@@ -694,160 +753,10 @@ function fillConceptViewModal(conceptData) {
       </div>
     `;
 
-      contentContainer.appendChild(panel);
-    }
-  );
+    contentContainer.appendChild(panel);
+  });
 
-  // 예문 표시
-  const examplesContainer = document.getElementById("concept-view-examples");
-  const exampleTitle = document.getElementById("concept-view-examples-title");
-
-  if (examplesContainer && exampleTitle) {
-    examplesContainer.innerHTML = "";
-
-    // 초기 언어 설정 (첫 번째 탭 언어)
-    let currentLangCode = Object.keys(conceptData.expressions)[0] || "korean";
-
-    // 예문 제목 업데이트 함수
-    const updateExampleTitle = (langCode) => {
-      if (langCode === "korean") {
-        exampleTitle.textContent = "예문";
-      } else if (langCode === "english") {
-        exampleTitle.textContent = "Examples";
-      } else if (langCode === "japanese") {
-        exampleTitle.textContent = "例文";
-      } else if (langCode === "chinese") {
-        exampleTitle.textContent = "例句";
-      } else {
-        exampleTitle.textContent = "예문";
-      }
-    };
-
-    // 버튼 텍스트 업데이트 함수
-    const updateButtonTexts = (langCode) => {
-      const closeBtn = document.getElementById("close-concept-view-btn");
-      const editBtn = document.getElementById("edit-concept-button");
-      const deleteBtn = document.getElementById("delete-concept-button");
-
-      if (closeBtn) {
-        if (langCode === "korean") closeBtn.textContent = "닫기";
-        else if (langCode === "english") closeBtn.textContent = "Close";
-        else if (langCode === "japanese") closeBtn.textContent = "閉じる";
-        else if (langCode === "chinese") closeBtn.textContent = "关闭";
-        else closeBtn.textContent = "닫기";
-      }
-
-      if (editBtn) {
-        if (langCode === "korean") editBtn.textContent = "편집";
-        else if (langCode === "english") editBtn.textContent = "Edit";
-        else if (langCode === "japanese") editBtn.textContent = "編集";
-        else if (langCode === "chinese") editBtn.textContent = "编辑";
-        else editBtn.textContent = "편집";
-      }
-
-      if (deleteBtn) {
-        if (langCode === "korean") deleteBtn.textContent = "삭제";
-        else if (langCode === "english") deleteBtn.textContent = "Delete";
-        else if (langCode === "japanese") deleteBtn.textContent = "削除";
-        else if (langCode === "chinese") deleteBtn.textContent = "删除";
-        else deleteBtn.textContent = "삭제";
-      }
-    };
-
-    // 초기 텍스트 설정
-    updateExampleTitle(currentLangCode);
-    updateButtonTexts(currentLangCode);
-
-    // 탭 전환 함수 정의
-    window.switchViewTab = (langCode) => {
-      currentLangCode = langCode;
-
-      // 모든 탭 비활성화
-      document.querySelectorAll("[id^='view-'][id$='-tab']").forEach((tab) => {
-        tab.classList.remove("bg-blue-500", "text-white");
-        tab.classList.add("bg-gray-200");
-      });
-
-      // 모든 컨텐츠 패널 숨기기
-      document
-        .querySelectorAll("[id^='view-'][id$='-content']")
-        .forEach((content) => {
-          content.classList.add("hidden");
-        });
-
-      // 선택된 탭 활성화
-      const selectedTab = document.getElementById(`view-${langCode}-tab`);
-      if (selectedTab) {
-        selectedTab.classList.remove("bg-gray-200");
-        selectedTab.classList.add("bg-blue-500", "text-white");
-      }
-
-      // 선택된 컨텐츠 표시
-      const selectedContent = document.getElementById(
-        `view-${langCode}-content`
-      );
-      if (selectedContent) {
-        selectedContent.classList.remove("hidden");
-      }
-
-      // 모든 제목과 버튼 텍스트 업데이트
-      updateExpressionsTitle(langCode);
-      updateExampleTitle(langCode);
-      updateButtonTexts(langCode);
-
-      // "예문 없음" 메시지도 언어에 맞게 업데이트
-      if (conceptData.examples && conceptData.examples.length === 0) {
-        const noExamplesMessage =
-          langCode === "korean"
-            ? "등록된 예문이 없습니다."
-            : langCode === "english"
-            ? "No examples available."
-            : langCode === "japanese"
-            ? "例文はありません。"
-            : langCode === "chinese"
-            ? "没有例句。"
-            : "등록된 예문이 없습니다.";
-
-        examplesContainer.innerHTML = `<p class="text-gray-500">${noExamplesMessage}</p>`;
-      }
-    };
-
-    if (conceptData.examples && conceptData.examples.length > 0) {
-      conceptData.examples.forEach((example) => {
-        const exampleDiv = document.createElement("div");
-        exampleDiv.className = "border p-4 rounded mb-4";
-
-        let exampleContent = "";
-
-        Object.entries(example).forEach(([langCode, text]) => {
-          const langInfo = supportedLanguages[langCode] || { nameKo: langCode };
-          exampleContent += `
-            <div class="mb-2">
-              <span class="text-sm text-gray-600">${langInfo.nameKo}:</span>
-              <p class="ml-2">${text}</p>
-            </div>
-          `;
-        });
-
-        exampleDiv.innerHTML = exampleContent;
-        examplesContainer.appendChild(exampleDiv);
-      });
-    } else {
-      // 언어에 따른, "등록된 예문이 없습니다." 메시지
-      const noExamplesMessage =
-        currentLangCode === "korean"
-          ? "등록된 예문이 없습니다."
-          : currentLangCode === "english"
-          ? "No examples available."
-          : currentLangCode === "japanese"
-          ? "例文はありません。"
-          : currentLangCode === "chinese"
-          ? "没有例句。"
-          : "등록된 예문이 없습니다.";
-
-      examplesContainer.innerHTML = `<p class="text-gray-500">${noExamplesMessage}</p>`;
-    }
-  }
+  // 예문 표시는 탭 전환 시 동적으로 처리
 
   // 편집 버튼 이벤트
   const editButton = document.getElementById("edit-concept-button");
@@ -865,39 +774,10 @@ function fillConceptViewModal(conceptData) {
   const deleteButton = document.getElementById("delete-concept-button");
   if (deleteButton) {
     deleteButton.onclick = async () => {
-      // 확인 메시지 (현재 언어에 맞게)
-      let confirmMessage;
-      if (currentLangCode === "korean") {
-        confirmMessage = "정말로 이 개념을 삭제하시겠습니까?";
-      } else if (currentLangCode === "english") {
-        confirmMessage = "Are you sure you want to delete this concept?";
-      } else if (currentLangCode === "japanese") {
-        confirmMessage = "本当にこの概念を削除しますか？";
-      } else if (currentLangCode === "chinese") {
-        confirmMessage = "您确定要删除这个概念吗？";
-      } else {
-        confirmMessage = "정말로 이 개념을 삭제하시겠습니까?";
-      }
-
-      if (confirm(confirmMessage)) {
+      if (confirm("정말로 이 개념을 삭제하시겠습니까?")) {
         try {
           await conceptUtils.deleteConcept(conceptData._id);
-
-          // 성공 메시지 (현재 언어에 맞게)
-          let successMessage;
-          if (currentLangCode === "korean") {
-            successMessage = "개념이 성공적으로 삭제되었습니다.";
-          } else if (currentLangCode === "english") {
-            successMessage = "The concept has been successfully deleted.";
-          } else if (currentLangCode === "japanese") {
-            successMessage = "概念が正常に削除されました。";
-          } else if (currentLangCode === "chinese") {
-            successMessage = "概念已成功删除。";
-          } else {
-            successMessage = "개념이 성공적으로 삭제되었습니다.";
-          }
-
-          alert(successMessage);
+          alert("개념이 성공적으로 삭제되었습니다.");
 
           // 모달 닫기
           const viewModal = document.getElementById("concept-view-modal");
@@ -907,28 +787,135 @@ function fillConceptViewModal(conceptData) {
           window.dispatchEvent(new CustomEvent("concept-saved"));
         } catch (error) {
           console.error("개념 삭제 중 오류 발생:", error);
-
-          // 오류 메시지 (현재 언어에 맞게)
-          let errorMessage;
-          if (currentLangCode === "korean") {
-            errorMessage = "개념 삭제 중 오류가 발생했습니다: " + error.message;
-          } else if (currentLangCode === "english") {
-            errorMessage =
-              "An error occurred while deleting the concept: " + error.message;
-          } else if (currentLangCode === "japanese") {
-            errorMessage =
-              "概念の削除中にエラーが発生しました: " + error.message;
-          } else if (currentLangCode === "chinese") {
-            errorMessage = "删除概念时发生错误: " + error.message;
-          } else {
-            errorMessage = "개념 삭제 중 오류가 발생했습니다: " + error.message;
-          }
-
-          alert(errorMessage);
+          alert("개념 삭제 중 오류가 발생했습니다: " + error.message);
         }
       }
     };
   }
+
+  // 모달 닫기 버튼 이벤트
+  const closeButton = document.getElementById("close-concept-view-modal");
+  if (closeButton) {
+    closeButton.onclick = () => {
+      modal.classList.add("hidden");
+    };
+  }
+
+  // 탭 전환 함수 정의 (예문 필터링 포함)
+  window.switchViewTab = (langCode) => {
+    // 모든 탭 비활성화
+    document.querySelectorAll("[id^='view-'][id$='-tab']").forEach((tab) => {
+      tab.className =
+        "px-4 py-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700";
+    });
+
+    // 모든 컨텐츠 패널 숨기기
+    document
+      .querySelectorAll("[id^='view-'][id$='-content']")
+      .forEach((content) => {
+        content.classList.add("hidden");
+      });
+
+    // 선택된 탭 활성화
+    const selectedTab = document.getElementById(`view-${langCode}-tab`);
+    if (selectedTab) {
+      selectedTab.className =
+        "px-4 py-2 border-b-2 border-blue-500 text-blue-600";
+    }
+
+    // 선택된 컨텐츠 표시
+    const selectedContent = document.getElementById(`view-${langCode}-content`);
+    if (selectedContent) {
+      selectedContent.classList.remove("hidden");
+    }
+
+    // 해당 언어의 예문만 표시
+    updateExamples(langCode, conceptData);
+  };
+
+  // 초기 예문 표시 (첫 번째 탭 언어)
+  if (orderedLanguages.length > 0) {
+    updateExamples(orderedLanguages[0], conceptData);
+  }
 }
 
-// 상세 보기 탭 전환 함수는 fillConceptViewModal 함수 내에서 정의했으므로 여기서는 제거합니다.
+// 특정 언어의 예문만 표시하는 함수
+function updateExamples(langCode, conceptData) {
+  const examplesContainer = document.getElementById("concept-view-examples");
+
+  console.log("예문 업데이트 - 언어:", langCode);
+  console.log("전체 예문 데이터:", conceptData.examples);
+
+  if (!examplesContainer) return;
+
+  examplesContainer.innerHTML = "";
+
+  if (conceptData.examples && conceptData.examples.length > 0) {
+    console.log("예문 개수:", conceptData.examples.length);
+
+    const filteredExamples = conceptData.examples.filter(
+      (example) => example[langCode]
+    );
+    console.log("필터링된 예문:", filteredExamples);
+
+    if (filteredExamples.length > 0) {
+      filteredExamples.forEach((example, index) => {
+        console.log(`예문 ${index + 1}:`, example);
+
+        const exampleDiv = document.createElement("div");
+        exampleDiv.className = "border p-4 rounded mb-4 bg-gray-50";
+
+        // 현재 탭 언어, 원본 언어, 대상 언어의 예문을 모두 표시
+        const sourceLanguage = document.getElementById("source-language").value;
+        const targetLanguage = document.getElementById("target-language").value;
+
+        let exampleContent = "";
+
+        // 현재 탭 언어의 예문
+        const currentLangInfo = supportedLanguages[langCode] || {
+          nameKo: langCode,
+        };
+        exampleContent += `
+          <div class="mb-3">
+            <span class="text-sm font-medium text-blue-600">${currentLangInfo.nameKo}:</span>
+            <p class="ml-2 font-medium text-gray-800">${example[langCode]}</p>
+          </div>
+        `;
+
+        // 원본 언어와 대상 언어가 현재 탭 언어와 다르면 추가 표시
+        if (langCode !== sourceLanguage && example[sourceLanguage]) {
+          const sourceLangInfo = supportedLanguages[sourceLanguage] || {
+            nameKo: sourceLanguage,
+          };
+          exampleContent += `
+            <div class="mb-2 pl-4 border-l-2 border-gray-300">
+              <span class="text-sm text-gray-600">${sourceLangInfo.nameKo} (원본):</span>
+              <p class="ml-2 text-gray-700">${example[sourceLanguage]}</p>
+            </div>
+          `;
+        }
+
+        if (langCode !== targetLanguage && example[targetLanguage]) {
+          const targetLangInfo = supportedLanguages[targetLanguage] || {
+            nameKo: targetLanguage,
+          };
+          exampleContent += `
+            <div class="mb-2 pl-4 border-l-2 border-gray-300">
+              <span class="text-sm text-gray-600">${targetLangInfo.nameKo} (대상):</span>
+              <p class="ml-2 text-gray-700">${example[targetLanguage]}</p>
+            </div>
+          `;
+        }
+
+        exampleDiv.innerHTML = exampleContent;
+        examplesContainer.appendChild(exampleDiv);
+      });
+    } else {
+      console.log(`${langCode} 언어의 예문이 없음`);
+      examplesContainer.innerHTML = `<p class="text-gray-500">이 언어의 예문이 없습니다.</p>`;
+    }
+  } else {
+    console.log("전체 예문이 없음");
+    examplesContainer.innerHTML = `<p class="text-gray-500">등록된 예문이 없습니다.</p>`;
+  }
+}

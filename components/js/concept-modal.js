@@ -3,6 +3,7 @@ import {
   db,
   supportedLanguages,
 } from "../../js/firebase/firebase-init.js";
+import { getActiveLanguage } from "../../utils/language-utils.js";
 import {
   deleteDoc,
   doc,
@@ -11,6 +12,90 @@ import {
 
 // 전역 변수
 let currentConcept = null;
+let userLanguage = "ko"; // 기본값
+
+// 다국어 번역 텍스트
+const pageTranslations = {
+  ko: {
+    concept_detail_view: "개념 상세 보기",
+    meaning: "의미",
+    part_of_speech: "품사",
+    level: "수준",
+    examples: "예문",
+    last_updated: "마지막 업데이트",
+    edit: "편집",
+    delete: "삭제",
+    close: "닫기",
+    no_examples: "예문이 없습니다.",
+    category: "카테고리",
+    domain: "도메인",
+  },
+  en: {
+    concept_detail_view: "Concept Detail View",
+    meaning: "Meaning",
+    part_of_speech: "Part of Speech",
+    level: "Level",
+    examples: "Examples",
+    last_updated: "Last Updated",
+    edit: "Edit",
+    delete: "Delete",
+    close: "Close",
+    no_examples: "No examples available.",
+    category: "Category",
+    domain: "Domain",
+  },
+  ja: {
+    concept_detail_view: "概念詳細表示",
+    meaning: "意味",
+    part_of_speech: "品詞",
+    level: "レベル",
+    examples: "例文",
+    last_updated: "最終更新",
+    edit: "編集",
+    delete: "削除",
+    close: "閉じる",
+    no_examples: "例文がありません。",
+    category: "カテゴリ",
+    domain: "ドメイン",
+  },
+  zh: {
+    concept_detail_view: "概念详细视图",
+    meaning: "意思",
+    part_of_speech: "词性",
+    level: "级别",
+    examples: "例句",
+    last_updated: "最后更新",
+    edit: "编辑",
+    delete: "删除",
+    close: "关闭",
+    no_examples: "没有例句。",
+    category: "类别",
+    domain: "领域",
+  },
+};
+
+// 다국어 번역 텍스트 가져오기 함수
+function getTranslatedText(key) {
+  return pageTranslations[userLanguage][key] || pageTranslations.en[key];
+}
+
+// 사용자 언어 초기화
+async function initializeUserLanguage() {
+  try {
+    // getActiveLanguage가 정의되어 있는지 확인
+    if (typeof getActiveLanguage === "function") {
+      userLanguage = await getActiveLanguage();
+    } else {
+      console.warn(
+        "getActiveLanguage 함수를 찾을 수 없습니다. 기본값을 사용합니다."
+      );
+      userLanguage = "ko";
+    }
+  } catch (error) {
+    console.error("언어 설정 로드 실패:", error);
+    userLanguage = "ko"; // 기본값
+  }
+}
 
 // 발음 효과 스타일 추가
 function addSpeakingStyles() {
@@ -76,10 +161,27 @@ function setupModalEventListeners() {
 }
 
 // 개념 모달 표시
-export function showConceptModal(concept) {
+export async function showConceptModal(
+  concept,
+  sourceLanguage = null,
+  targetLanguage = null
+) {
+  // 사용자 언어 설정 업데이트 (실패해도 계속 진행)
+  try {
+    await initializeUserLanguage();
+  } catch (error) {
+    console.error("모달 언어 초기화 실패, 기본값 사용:", error);
+    userLanguage = "ko";
+  }
+
   console.log("개념 모달 열기:", concept);
   console.log("개념 표현들:", concept.expressions);
   console.log("사용 가능한 언어들:", Object.keys(concept.expressions || {}));
+  console.log("전달받은 언어 설정:", { sourceLanguage, targetLanguage });
+
+  // 언어 설정을 전역 변수로 저장
+  window.currentSourceLanguage = sourceLanguage;
+  window.currentTargetLanguage = targetLanguage;
 
   if (!concept) {
     console.error("개념 데이터가 없습니다.");
@@ -109,16 +211,16 @@ export function showConceptModal(concept) {
   const primaryLang = availableLanguages[0];
   const primaryExpr = concept.expressions[primaryLang];
 
-  document.getElementById("concept-emoji").textContent =
+  document.getElementById("concept-view-emoji").textContent =
     concept.concept_info?.emoji || "📝";
   document.getElementById("concept-primary-word").textContent =
     primaryExpr?.word || "N/A";
   document.getElementById("concept-primary-pronunciation").textContent =
     primaryExpr?.pronunciation || "";
   document.getElementById("concept-category").textContent =
-    concept.concept_info?.category || "기타";
+    concept.concept_info?.category || getTranslatedText("category");
   document.getElementById("concept-domain").textContent =
-    concept.concept_info?.domain || "일반";
+    concept.concept_info?.domain || getTranslatedText("domain");
 
   // 업데이트 날짜 설정
   const updatedAt =
@@ -168,38 +270,13 @@ export function showConceptModal(concept) {
     });
   }
 
-  // 예문 표시
-  const examplesContainer = document.getElementById("concept-view-examples");
-  if (examplesContainer && concept.examples && concept.examples.length > 0) {
-    examplesContainer.innerHTML = concept.examples
-      .map(
-        (example, index) => `
-      <div class="mb-4 bg-gray-50 p-4 rounded-lg">
-        <h4 class="font-medium mb-3">예문 ${index + 1}</h4>
-        <div class="space-y-2">
-          ${availableLanguages
-            .map((lang) =>
-              example[lang]
-                ? `<div>
-                    <p class="text-sm text-gray-500">${getLanguageName(
-                      lang
-                    )}</p>
-                    <p class="font-medium">${example[lang]}</p>
-                   </div>`
-                : ""
-            )
-            .join("")}
-        </div>
-      </div>
-    `
-      )
-      .join("");
-  } else {
-    if (examplesContainer) {
-      examplesContainer.innerHTML =
-        '<p class="text-gray-500 text-sm">예문이 없습니다.</p>';
-    }
-  }
+  // 예문 표시 (개선된 버전)
+  displayExamples(
+    concept,
+    availableLanguages[0],
+    sourceLanguage,
+    targetLanguage
+  );
 
   // 모달 표시
   modal.classList.remove("hidden");
@@ -241,7 +318,9 @@ function showLanguageContent(lang, concept) {
   contentContainer.innerHTML = `
     <div class="space-y-4">
       <div>
-        <h4 class="font-medium text-gray-700 mb-2">의미</h4>
+        <h4 class="font-medium text-gray-700 mb-2">${getTranslatedText(
+          "meaning"
+        )}</h4>
         <div class="bg-gray-50 p-3 rounded">
           <p class="text-lg font-medium">${expression.word || "N/A"}</p>
           <p class="text-sm text-gray-500 mt-1">${
@@ -253,13 +332,17 @@ function showLanguageContent(lang, concept) {
       
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <h4 class="font-medium text-gray-700 mb-2">품사</h4>
+          <h4 class="font-medium text-gray-700 mb-2">${getTranslatedText(
+            "part_of_speech"
+          )}</h4>
           <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">${
             expression.part_of_speech || "N/A"
           }</span>
         </div>
         <div>
-          <h4 class="font-medium text-gray-700 mb-2">수준</h4>
+          <h4 class="font-medium text-gray-700 mb-2">${getTranslatedText(
+            "level"
+          )}</h4>
           <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-sm">${
             expression.level || "N/A"
           }</span>
@@ -275,7 +358,7 @@ function updateBasicInfo(lang, concept) {
   if (!expression) return;
 
   // 상단 기본 정보 업데이트
-  const emojiElement = document.getElementById("concept-emoji");
+  const emojiElement = document.getElementById("concept-view-emoji");
   const wordElement = document.getElementById("concept-primary-word");
   const pronunciationElement = document.getElementById(
     "concept-primary-pronunciation"
@@ -322,6 +405,11 @@ window.showLanguageTab = function (lang, button) {
 
   // 내용 업데이트
   showLanguageContent(lang, currentConcept);
+
+  // 예문 업데이트 (현재 언어 설정을 유지)
+  const sourceLanguage = window.currentSourceLanguage || null;
+  const targetLanguage = window.currentTargetLanguage || null;
+  displayExamples(currentConcept, lang, sourceLanguage, targetLanguage);
 
   console.log(`${lang} 언어로 전환 완료`);
 };
@@ -376,7 +464,107 @@ function editConcept() {
   alert("개념 편집 기능은 곧 추가될 예정입니다.");
 }
 
+// 언어 변경 이벤트 리스너 추가
+document.addEventListener("languageChanged", async (event) => {
+  try {
+    await initializeUserLanguage();
+  } catch (error) {
+    console.error("모달 언어 변경 실패:", error);
+    userLanguage = "ko";
+  }
+
+  // 현재 모달이 열려있다면 새로운 언어로 업데이트
+  if (
+    currentConcept &&
+    !document.getElementById("concept-view-modal").classList.contains("hidden")
+  ) {
+    const currentTab = document.querySelector(
+      "#concept-view-tabs button.text-blue-600"
+    );
+    if (currentTab) {
+      const lang = currentTab.getAttribute("onclick").match(/'([^']+)'/)[1];
+      showLanguageContent(lang, currentConcept);
+    }
+  }
+});
+
 // 초기화
 document.addEventListener("DOMContentLoaded", () => {
   setupModalEventListeners();
 });
+
+// 개선된 예문 표시 함수
+function displayExamples(
+  concept,
+  currentLang,
+  sourceLanguage = null,
+  targetLanguage = null
+) {
+  const examplesContainer = document.getElementById("concept-view-examples");
+
+  if (!examplesContainer) return;
+
+  examplesContainer.innerHTML = "";
+
+  if (concept.examples && concept.examples.length > 0) {
+    const filteredExamples = concept.examples.filter(
+      (example) => example[currentLang]
+    );
+
+    if (filteredExamples.length > 0) {
+      filteredExamples.forEach((example, index) => {
+        const exampleDiv = document.createElement("div");
+        exampleDiv.className = "border p-4 rounded mb-4 bg-gray-50";
+
+        let exampleContent = "";
+
+        // 현재 탭 언어의 예문
+        const currentLangInfo = getLanguageName(currentLang);
+        exampleContent += `
+          <div class="mb-3">
+            <span class="text-sm font-medium text-blue-600">${currentLangInfo}:</span>
+            <p class="ml-2 font-medium text-gray-800">${example[currentLang]}</p>
+          </div>
+        `;
+
+        // 원본 언어와 대상 언어가 전달되었고, 현재 탭 언어와 다르면 추가 표시
+        if (
+          sourceLanguage &&
+          currentLang !== sourceLanguage &&
+          example[sourceLanguage]
+        ) {
+          const sourceLangInfo = getLanguageName(sourceLanguage);
+          exampleContent += `
+            <div class="mb-2 pl-4 border-l-2 border-gray-300">
+              <span class="text-sm text-gray-600">${sourceLangInfo} (원본):</span>
+              <p class="ml-2 text-gray-700">${example[sourceLanguage]}</p>
+            </div>
+          `;
+        }
+
+        if (
+          targetLanguage &&
+          currentLang !== targetLanguage &&
+          example[targetLanguage]
+        ) {
+          const targetLangInfo = getLanguageName(targetLanguage);
+          exampleContent += `
+            <div class="mb-2 pl-4 border-l-2 border-gray-300">
+              <span class="text-sm text-gray-600">${targetLangInfo} (대상):</span>
+              <p class="ml-2 text-gray-700">${example[targetLanguage]}</p>
+            </div>
+          `;
+        }
+
+        exampleDiv.innerHTML = exampleContent;
+        examplesContainer.appendChild(exampleDiv);
+      });
+    } else {
+      examplesContainer.innerHTML = `<p class="text-gray-500">이 언어의 예문이 없습니다.</p>`;
+    }
+  } else {
+    examplesContainer.innerHTML = `<p class="text-gray-500 text-sm">${getTranslatedText(
+      "no_examples"
+    )}</p>`;
+  }
+}

@@ -5,6 +5,7 @@ import {
   conceptUtils,
   supportedLanguages,
 } from "../../js/firebase/firebase-init.js";
+import { getActiveLanguage } from "../../utils/language-utils.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
 import { showConceptModal } from "../../components/js/concept-modal.js";
 import { handleAIConceptRecommendation } from "../../utils/ai-concept-utils.js";
@@ -20,6 +21,54 @@ let filteredConcepts = [];
 let displayedConcepts = [];
 const CONCEPTS_PER_PAGE = 12;
 let currentPage = 1;
+let userLanguage = "ko"; // 기본값
+
+// 다국어 번역 텍스트
+const pageTranslations = {
+  ko: {
+    meaning: "의미",
+    examples: "예문",
+    ai_generated: "AI 생성",
+  },
+  en: {
+    meaning: "Meaning",
+    examples: "Examples",
+    ai_generated: "AI Generated",
+  },
+  ja: {
+    meaning: "意味",
+    examples: "例文",
+    ai_generated: "AI生成",
+  },
+  zh: {
+    meaning: "意思",
+    examples: "例句",
+    ai_generated: "AI生成",
+  },
+};
+
+// 다국어 번역 텍스트 가져오기 함수
+function getTranslatedText(key) {
+  return pageTranslations[userLanguage][key] || pageTranslations.en[key];
+}
+
+// 사용자 언어 초기화
+async function initializeUserLanguage() {
+  try {
+    // getActiveLanguage가 정의되어 있는지 확인
+    if (typeof getActiveLanguage === "function") {
+      userLanguage = await getActiveLanguage();
+    } else {
+      console.warn(
+        "getActiveLanguage 함수를 찾을 수 없습니다. 기본값을 사용합니다."
+      );
+      userLanguage = "ko";
+    }
+  } catch (error) {
+    console.error("언어 설정 로드 실패:", error);
+    userLanguage = "ko"; // 기본값
+  }
+}
 
 // 전역 함수로 내보내기
 window.showConceptModal = showConceptModal;
@@ -49,6 +98,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   console.log("AI 단어장 페이지 초기화 시작");
 
   try {
+    // 사용자 언어 설정 초기화 (실패해도 계속 진행)
+    try {
+      await initializeUserLanguage();
+      console.log("언어 초기화 완료:", userLanguage);
+    } catch (error) {
+      console.error("언어 초기화 실패, 기본값 사용:", error);
+      userLanguage = "ko";
+    }
+
     await loadNavbar();
 
     // 모달 직접 로드
@@ -127,6 +185,20 @@ function initializeEventListeners() {
   if (loadMoreBtn) {
     loadMoreBtn.addEventListener("click", loadMoreConcepts);
   }
+
+  // 언어 변경 이벤트 리스너 추가
+  document.addEventListener("languageChanged", async (event) => {
+    console.log("언어 변경 감지:", event.detail.language);
+    // 사용자 언어 설정 업데이트 (실패해도 계속 진행)
+    try {
+      await initializeUserLanguage();
+    } catch (error) {
+      console.error("언어 변경 시 초기화 실패:", error);
+      userLanguage = "ko";
+    }
+    // 카드 재렌더링
+    applyFiltersAndSort();
+  });
 }
 
 async function initializePage() {
@@ -345,52 +417,89 @@ function renderConcepts() {
     });
 }
 
+// 개념 카드 생성 함수
 function createConceptCard(concept, sourceLanguage, targetLanguage) {
   const card = document.createElement("div");
   card.className =
-    "word-card bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-all duration-300";
+    "bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-transform duration-300 border border-gray-200 cursor-pointer word-card";
 
   const sourceExpr = concept.expressions?.[sourceLanguage] || {};
   const targetExpr = concept.expressions?.[targetLanguage] || {};
   const emoji = concept.concept_info?.emoji || "📝";
   const category = concept.concept_info?.category || "기타";
+  const domain = concept.concept_info?.domain || "";
+
+  // 예문 찾기 (첫 번째 예문의 해당 언어 표현)
+  const example =
+    concept.examples && concept.examples.length > 0
+      ? concept.examples[0]
+      : null;
+  const sourceExample = example?.[sourceLanguage];
+  const targetExample = example?.[targetLanguage];
 
   card.innerHTML = `
-    <div class="flex items-center justify-between mb-4">
-      <div class="flex items-center space-x-3">
-        <span class="text-3xl">${emoji}</span>
-        <span class="text-xl font-bold text-gray-800">${
-          sourceExpr.word || "N/A"
-        }</span>
+    <div class="mb-4 flex justify-between items-start">
+      <div>
+        <h2 class="text-xl font-bold">${emoji} ${sourceExpr.word || "N/A"}</h2>
+        <p class="text-sm text-gray-500">${sourceExpr.pronunciation || ""}</p>
       </div>
-      <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">${category}</span>
+      <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+        ${domain}${domain && category ? "/" : ""}${category}
+      </span>
     </div>
-    <div class="space-y-2">
-      <div class="text-sm text-gray-500">${sourceExpr.pronunciation || ""}</div>
-      <div class="text-lg text-gray-600">${targetExpr.word || "N/A"}</div>
-      <div class="text-sm text-gray-700 line-clamp-2">${
+    
+    <div class="border-t border-gray-200 pt-3 mt-3">
+      <div class="flex items-center">
+        <span class="text-gray-500 text-sm mr-2">${getTranslatedText(
+          "meaning"
+        )}</span>
+        <span class="font-medium">${targetExpr.word || ""}</span>
+      </div>
+      <p class="text-sm text-gray-600 mt-1">${
         targetExpr.definition || sourceExpr.definition || ""
-      }</div>
+      }</p>
     </div>
-    <div class="mt-4 flex items-center justify-between">
-      <span class="text-xs text-gray-400">
-        ${
+    
+    ${
+      sourceExample && targetExample
+        ? `
+    <div class="border-t border-gray-200 pt-3 mt-3">
+      <p class="text-xs text-gray-500 mb-1">${getTranslatedText("examples")}</p>
+      <p class="text-sm mb-1">${sourceExample}</p>
+      <p class="text-sm text-gray-600">${targetExample}</p>
+    </div>
+    `
+        : ""
+    }
+    
+    <div class="flex justify-between text-xs text-gray-500 mt-3">
+      <span class="flex items-center">
+        <i class="fas fa-robot mr-1 text-blue-500"></i> ${getTranslatedText(
+          "ai_generated"
+        )}
+      </span>
+      <span class="flex items-center">
+        <i class="fas fa-clock mr-1"></i> ${
           concept.createdAt || concept.created_at
             ? new Date(
                 concept.createdAt || concept.created_at
-              ).toLocaleDateString()
+              ).toLocaleDateString("ko-KR", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+              })
             : ""
         }
       </span>
-      <div class="flex items-center space-x-1">
-        <i class="fas fa-robot text-blue-500 text-xs"></i>
-        <span class="text-xs text-blue-500">AI</span>
-      </div>
     </div>
   `;
 
   card.addEventListener("click", () => {
-    showConceptModal(concept);
+    const sourceLanguage =
+      document.getElementById("source-language")?.value || "korean";
+    const targetLanguage =
+      document.getElementById("target-language")?.value || "english";
+    showConceptModal(concept, sourceLanguage, targetLanguage);
   });
 
   return card;
