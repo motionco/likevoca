@@ -160,6 +160,14 @@ function initializeEventListeners() {
     });
   }
 
+  // 언어 전환 버튼
+  const swapLanguagesBtn = document.getElementById("swap-languages");
+  if (swapLanguagesBtn) {
+    swapLanguagesBtn.addEventListener("click", () => {
+      swapLanguages();
+    });
+  }
+
   // 검색 입력
   const searchInput = document.getElementById("search-input");
   if (searchInput) {
@@ -213,28 +221,15 @@ async function initializePage() {
 
 async function loadConcepts() {
   try {
-    console.log("개념 로드 시작");
-    allConcepts = await conceptUtils.getUserConcepts(currentUser.uid);
-    console.log("로드된 개념 수:", allConcepts.length);
-    console.log("로드된 개념 샘플:", allConcepts.slice(0, 2));
-
-    // 로컬 환경에서는 모든 개념 표시, 실제 환경에서는 AI 생성 개념만 표시
-    if (isLocalEnvironment) {
-      console.log("로컬 환경: 모든 개념 표시");
-    } else {
-      // AI 생성 개념만 필터링
-      const originalCount = allConcepts.length;
-      allConcepts = allConcepts.filter(
-        (concept) => concept.isAIGenerated === true
-      );
-      console.log(
-        `AI 생성 개념 필터링: ${originalCount} -> ${allConcepts.length}`
-      );
-    }
+    console.log("AI 개념 로드 시작");
+    // ai-recommend 컬렉션에서 사용자의 AI 개념 가져오기
+    allConcepts = await conceptUtils.getUserAIConcepts(currentUser.email);
+    console.log("로드된 AI 개념 수:", allConcepts.length);
+    console.log("로드된 AI 개념 샘플:", allConcepts.slice(0, 2));
 
     updateConceptCount();
   } catch (error) {
-    console.error("개념 로드 중 오류:", error);
+    console.error("AI 개념 로드 중 오류:", error);
     allConcepts = [];
   }
 }
@@ -248,6 +243,7 @@ function updateConceptCount() {
 
 async function updateUsageDisplay() {
   try {
+    // 기존 users 컬렉션의 사용량 관리 사용
     const usage = await conceptUtils.getUsage(currentUser.uid);
     const usageText = document.getElementById("ai-usage-text");
     const usageBar = document.getElementById("ai-usage-bar");
@@ -259,9 +255,21 @@ async function updateUsageDisplay() {
 
       usageText.textContent = `${aiUsed}/${aiLimit}`;
       usageBar.style.width = `${percentage}%`;
+
+      // 색상 업데이트
+      if (percentage >= 90) {
+        usageBar.classList.remove("bg-[#4B63AC]", "bg-yellow-500");
+        usageBar.classList.add("bg-red-500");
+      } else if (percentage >= 70) {
+        usageBar.classList.remove("bg-[#4B63AC]", "bg-red-500");
+        usageBar.classList.add("bg-yellow-500");
+      } else {
+        usageBar.classList.remove("bg-red-500", "bg-yellow-500");
+        usageBar.classList.add("bg-[#4B63AC]");
+      }
     }
   } catch (error) {
-    console.error("사용량 표시 업데이트 중 오류:", error);
+    console.error("AI 사용량 표시 업데이트 중 오류:", error);
   }
 }
 
@@ -347,12 +355,14 @@ function applyFiltersAndSort() {
           new Date(b.createdAt || b.created_at || 0)
         );
       case "a-z":
-        const aWord = a.expressions?.[sourceLanguage]?.word || "";
-        const bWord = b.expressions?.[sourceLanguage]?.word || "";
+        const aWord = a.expressions?.[targetLanguage]?.word || "";
+        const bWord = b.expressions?.[targetLanguage]?.word || "";
         return aWord.localeCompare(bWord);
       case "z-a":
-        const aWordRev = a.expressions?.[sourceLanguage]?.word || "";
-        const bWordRev = b.expressions?.[sourceLanguage]?.word || "";
+        const targetLanguageRev =
+          document.getElementById("target-language")?.value || "english";
+        const aWordRev = a.expressions?.[targetLanguageRev]?.word || "";
+        const bWordRev = b.expressions?.[targetLanguageRev]?.word || "";
         return bWordRev.localeCompare(aWordRev);
       default:
         return 0;
@@ -425,23 +435,41 @@ function createConceptCard(concept, sourceLanguage, targetLanguage) {
 
   const sourceExpr = concept.expressions?.[sourceLanguage] || {};
   const targetExpr = concept.expressions?.[targetLanguage] || {};
-  const emoji = concept.concept_info?.emoji || "📝";
+
+  // 새로운 구조에서 이모지와 정보 가져오기
+  const emoji =
+    concept.concept_info?.unicode_emoji || concept.concept_info?.emoji || "📝";
   const category = concept.concept_info?.category || "기타";
   const domain = concept.concept_info?.domain || "";
+  const colorTheme = concept.concept_info?.color_theme || "#9C27B0";
 
-  // 예문 찾기 (첫 번째 예문의 해당 언어 표현)
-  const example =
-    concept.examples && concept.examples.length > 0
-      ? concept.examples[0]
-      : null;
-  const sourceExample = example?.[sourceLanguage];
-  const targetExample = example?.[targetLanguage];
+  // 예문 찾기 (새로운 구조 우선, 기존 구조 fallback)
+  let example = null;
+  if (concept.featured_examples && concept.featured_examples.length > 0) {
+    const firstExample = concept.featured_examples[0];
+    if (firstExample.translations) {
+      example = {
+        source: firstExample.translations[sourceLanguage]?.text || "",
+        target: firstExample.translations[targetLanguage]?.text || "",
+      };
+    }
+  }
+  // 기존 구조의 examples도 지원
+  else if (concept.examples && concept.examples.length > 0) {
+    const firstExample = concept.examples[0];
+    example = {
+      source: firstExample[sourceLanguage] || "",
+      target: firstExample[targetLanguage] || "",
+    };
+  }
 
   card.innerHTML = `
-    <div class="mb-4 flex justify-between items-start">
+    <div class="mb-4 flex justify-between items-start" style="border-left: 4px solid ${colorTheme}; padding-left: 12px;">
       <div>
         <h2 class="text-xl font-bold">${emoji} ${targetExpr.word || "N/A"}</h2>
-        <p class="text-sm text-gray-500">${targetExpr.pronunciation || ""}</p>
+        <p class="text-sm text-gray-500">${
+          targetExpr.pronunciation || targetExpr.romanization || ""
+        }</p>
       </div>
       <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
         ${domain}${domain && category ? "/" : ""}${category}
@@ -461,12 +489,12 @@ function createConceptCard(concept, sourceLanguage, targetLanguage) {
     </div>
     
     ${
-      sourceExample && targetExample
+      example && example.source && example.target
         ? `
     <div class="border-t border-gray-200 pt-3 mt-3">
       <p class="text-xs text-gray-500 mb-1">${getTranslatedText("examples")}</p>
-      <p class="text-sm mb-1">${targetExample}</p>
-      <p class="text-sm text-gray-600">${sourceExample}</p>
+      <p class="text-sm mb-1">${example.target}</p>
+      <p class="text-sm text-gray-600">${example.source}</p>
     </div>
     `
         : ""
@@ -480,9 +508,9 @@ function createConceptCard(concept, sourceLanguage, targetLanguage) {
       </span>
       <span class="flex items-center">
         <i class="fas fa-clock mr-1"></i> ${
-          concept.createdAt || concept.created_at
+          concept.created_at || concept.createdAt
             ? new Date(
-                concept.createdAt || concept.created_at
+                concept.created_at || concept.createdAt
               ).toLocaleDateString("ko-KR", {
                 year: "numeric",
                 month: "2-digit",
@@ -516,4 +544,47 @@ function debounce(func, wait) {
     clearTimeout(timeout);
     timeout = setTimeout(later, wait);
   };
+}
+
+// 언어 전환 함수
+function swapLanguages() {
+  const sourceLanguageElement = document.getElementById("source-language");
+  const targetLanguageElement = document.getElementById("target-language");
+  const swapButton = document.getElementById("swap-languages");
+
+  if (!sourceLanguageElement || !targetLanguageElement || !swapButton) {
+    console.error("언어 전환 요소를 찾을 수 없습니다.");
+    return;
+  }
+
+  const sourceLanguage = sourceLanguageElement.value;
+  const targetLanguage = targetLanguageElement.value;
+
+  // 같은 언어인 경우 전환하지 않음
+  if (sourceLanguage === targetLanguage) {
+    return;
+  }
+
+  // 버튼 애니메이션 효과
+  const icon = swapButton.querySelector("i");
+
+  // 회전 애니메이션 추가
+  icon.style.transform = "rotate(180deg)";
+  icon.style.transition = "transform 0.3s ease";
+
+  // 언어 순서 변경
+  sourceLanguageElement.value = targetLanguage;
+  targetLanguageElement.value = sourceLanguage;
+
+  // 버튼 색상 변경으로 피드백 제공
+  swapButton.classList.add("text-[#4B63AC]", "bg-gray-100");
+
+  // 필터 및 정렬 다시 적용
+  applyFiltersAndSort();
+
+  // 애니메이션 후 원래 상태로 복원
+  setTimeout(() => {
+    icon.style.transform = "rotate(0deg)";
+    swapButton.classList.remove("text-[#4B63AC]", "bg-gray-100");
+  }, 300);
 }

@@ -40,6 +40,7 @@
         "synonyms": [],
         "antonyms": [],
         "word_family": ["사과나무", "사과즙", "사과파이"],
+        "compound_words": ["사과가게", "사과상자", "사과밭", "사과껍질"],
         "conjugations": null,
         "collocations": [
           {"phrase": "사과를 먹다", "frequency": "high"},
@@ -58,6 +59,7 @@
         "synonyms": [],
         "antonyms": [],
         "word_family": ["apple tree", "apple juice", "apple pie"],
+        "compound_words": ["appleshop", "applebox", "applesauce", "apple-picking"],
         "conjugations": {
           "plural": "apples"
         },
@@ -81,6 +83,7 @@
         "synonyms": ["アップル"],
         "antonyms": [],
         "word_family": ["りんごの木", "りんごジュース"],
+        "compound_words": ["りんご屋", "りんご箱", "りんご畑", "りんご狩り"],
         "conjugations": null,
         "collocations": [
           {"phrase": "りんごを食べる", "frequency": "high"},
@@ -211,6 +214,7 @@
         "synonyms": ["안녕", "반갑습니다"],
         "antonyms": ["안녕히 가세요"],
         "word_family": ["안녕", "안녕히", "안녕하다"],
+        "compound_words": ["안녕인사", "안녕소식", "안녕메시지"],
         "conjugations": null,
         "collocations": [
           {"phrase": "안녕하세요, 만나서 반갑습니다", "frequency": "high"}
@@ -227,6 +231,7 @@
         "synonyms": ["hi", "hey", "greetings"],
         "antonyms": ["goodbye", "bye"],
         "word_family": ["hello", "hi", "hey"],
+        "compound_words": ["hello-world", "hello-sign", "hello-message"],
         "conjugations": null,
         "collocations": [
           {"phrase": "say hello", "frequency": "high"},
@@ -247,6 +252,7 @@
         "synonyms": ["おはよう", "こんばんは"],
         "antonyms": ["さようなら"],
         "word_family": ["こんにちは", "おはよう", "こんばんは"],
+        "compound_words": ["こんにちは挨拶", "こんにちはメッセージ"],
         "conjugations": null,
         "collocations": [
           {"phrase": "こんにちは、元気ですか", "frequency": "high"}

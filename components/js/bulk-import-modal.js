@@ -161,6 +161,7 @@ function downloadCSVTemplate() {
     "korean_synonyms",
     "korean_antonyms",
     "korean_word_family",
+    "korean_compound_words",
     "korean_collocations",
     "korean_audio",
     "english_word",
@@ -172,6 +173,7 @@ function downloadCSVTemplate() {
     "english_synonyms",
     "english_antonyms",
     "english_word_family",
+    "english_compound_words",
     "english_collocations",
     "english_audio",
     "japanese_word",
@@ -186,6 +188,7 @@ function downloadCSVTemplate() {
     "japanese_synonyms",
     "japanese_antonyms",
     "japanese_word_family",
+    "japanese_compound_words",
     "japanese_collocations",
     "japanese_audio",
     "chinese_word",
@@ -196,6 +199,7 @@ function downloadCSVTemplate() {
     "chinese_synonyms",
     "chinese_antonyms",
     "chinese_word_family",
+    "chinese_compound_words",
     "chinese_collocations",
     "chinese_audio",
     "primary_image",
@@ -248,7 +252,8 @@ function downloadCSVTemplate() {
       "초급",
       "",
       "",
-      "사과나무|사과즙|사과파이",
+      "과일|과실|열매",
+      "사과나무|사과즙|사과파이|사과가게|사과상자",
       "사과를 먹다:high|빨간 사과:high|사과 한 개:medium",
       "",
       "apple",
@@ -259,7 +264,8 @@ function downloadCSVTemplate() {
       "beginner",
       "",
       "",
-      "apple tree|apple juice|apple pie",
+      "fruit|produce|orchard fruit",
+      "apple tree|apple juice|apple pie|appleshop|applesauce",
       "eat an apple:high|red apple:high|green apple:medium",
       "",
       "りんご",
@@ -273,7 +279,8 @@ function downloadCSVTemplate() {
       "初級",
       "アップル",
       "",
-      "りんごの木|りんごジュース",
+      "果物|果実|青果",
+      "りんごの木|りんごジュース|りんご屋|りんご箱",
       "りんごを食べる:high|赤いりんご:high",
       "",
       "苹果",
@@ -283,7 +290,8 @@ function downloadCSVTemplate() {
       "初级",
       "",
       "",
-      "苹果树|苹果汁",
+      "水果|果实|鲜果",
+      "苹果树|苹果汁|苹果派|苹果店",
       "吃苹果:high|红苹果:high",
       "",
       "https://source.unsplash.com/400x300/?apple",
@@ -333,7 +341,8 @@ function downloadCSVTemplate() {
       "초급",
       "안녕|반갑습니다",
       "안녕히 가세요",
-      "안녕|안녕히|안녕하다",
+      "인사|인사말|예의",
+      "안녕인사|안녕소식|안녕메시지",
       "안녕하세요, 만나서 반갑습니다:high",
       "",
       "hello",
@@ -342,9 +351,10 @@ function downloadCSVTemplate() {
       "used as a greeting or to begin a phone conversation",
       "exclamation",
       "beginner",
-      "hi,hey,greetings",
-      "goodbye,bye",
-      "hello,hi,hey",
+      "hi|hey|greetings",
+      "goodbye|bye",
+      "greeting|salutation|welcome",
+      "hello-world|hello-sign|hello-message",
       "say hello:high|hello there:medium",
       "",
       "こんにちは",
@@ -356,20 +366,22 @@ function downloadCSVTemplate() {
       "昼間の挨拶",
       "感動詞",
       "初級",
-      "おはよう,こんばんは",
+      "おはよう|こんばんは",
       "さようなら",
-      "こんにちは,おはよう,こんばんは",
+      "挨拶|礼儀|言葉",
+      "こんにちは挨拶|こんにちはメッセージ",
       "こんにちは、元気ですか:high",
       "",
       "你好",
       "nǐ hǎo",
-      "用作问候语或开始电话对话",
+      "见面时的礼貌问候语",
       "感叹词",
       "初级",
-      "您好,嗨",
-      "再见,拜拜",
-      "你好,您好,嗨",
-      "说你好:high|你好吗:medium",
+      "您好|你们好",
+      "再见|拜拜",
+      "问候|礼貌|招呼",
+      "你好问候|你好信息",
+      "你好，很高兴见到你:high",
       "",
       "https://source.unsplash.com/400x300/?greeting",
       "",
@@ -479,7 +491,14 @@ function downloadJSONTemplate() {
           unicode_emoji: "🍎",
           synonyms: [],
           antonyms: [],
-          word_family: ["사과나무", "사과즙", "사과파이"],
+          word_family: ["과일", "과실", "열매"],
+          compound_words: [
+            "사과나무",
+            "사과즙",
+            "사과파이",
+            "사과가게",
+            "사과상자",
+          ],
           conjugations: null,
           collocations: [
             { phrase: "사과를 먹다", frequency: "high" },
@@ -498,7 +517,14 @@ function downloadJSONTemplate() {
           unicode_emoji: "🍎",
           synonyms: [],
           antonyms: [],
-          word_family: ["apple tree", "apple juice", "apple pie"],
+          word_family: ["fruit", "produce", "orchard fruit"],
+          compound_words: [
+            "apple tree",
+            "apple juice",
+            "apple pie",
+            "apple store",
+            "apple sauce",
+          ],
           conjugations: { plural: "apples" },
           collocations: [
             { phrase: "eat an apple", frequency: "high" },
@@ -510,7 +536,7 @@ function downloadJSONTemplate() {
           word: "りんご",
           hiragana: "りんご",
           katakana: "リンゴ",
-          kanji: "",
+          kanji: null,
           pronunciation: "ringo",
           romanization: "ringo",
           definition: "赤や緑の皮をもつ、甘くて丸い果物",
@@ -519,7 +545,13 @@ function downloadJSONTemplate() {
           unicode_emoji: "🍎",
           synonyms: ["アップル"],
           antonyms: [],
-          word_family: ["りんごの木", "りんごジュース"],
+          word_family: ["果物", "果実", "青果"],
+          compound_words: [
+            "りんごの木",
+            "りんごジュース",
+            "りんご屋",
+            "りんご箱",
+          ],
           conjugations: null,
           collocations: [
             { phrase: "りんごを食べる", frequency: "high" },
@@ -535,7 +567,8 @@ function downloadJSONTemplate() {
           unicode_emoji: "🍎",
           synonyms: [],
           antonyms: [],
-          word_family: ["苹果树", "苹果汁"],
+          word_family: ["水果", "果实", "鲜果"],
+          compound_words: ["苹果树", "苹果汁", "苹果派", "苹果店"],
           conjugations: null,
           collocations: [
             { phrase: "吃苹果", frequency: "high" },
@@ -656,7 +689,8 @@ function downloadJSONTemplate() {
           unicode_emoji: "👋",
           synonyms: ["안녕", "반갑습니다"],
           antonyms: ["안녕히 가세요"],
-          word_family: ["안녕", "안녕히", "안녕하다"],
+          word_family: ["인사", "인사말", "예의"],
+          compound_words: ["안녕인사", "안녕소식", "안녕메시지"],
           conjugations: null,
           collocations: [
             { phrase: "안녕하세요, 만나서 반갑습니다", frequency: "high" },
@@ -672,7 +706,8 @@ function downloadJSONTemplate() {
           unicode_emoji: "👋",
           synonyms: ["hi", "hey", "greetings"],
           antonyms: ["goodbye", "bye"],
-          word_family: ["hello", "hi", "hey"],
+          word_family: ["greeting", "salutation", "welcome"],
+          compound_words: ["hello-world", "hello-sign", "hello-message"],
           conjugations: null,
           collocations: [
             { phrase: "say hello", frequency: "high" },
@@ -682,7 +717,7 @@ function downloadJSONTemplate() {
         japanese: {
           word: "こんにちは",
           hiragana: "こんにちは",
-          katakana: "",
+          katakana: null,
           kanji: "今日は",
           pronunciation: "konnichiwa",
           romanization: "konnichiwa",
@@ -692,7 +727,8 @@ function downloadJSONTemplate() {
           unicode_emoji: "👋",
           synonyms: ["おはよう", "こんばんは"],
           antonyms: ["さようなら"],
-          word_family: ["こんにちは", "おはよう", "こんばんは"],
+          word_family: ["挨拶", "礼儀", "言葉"],
+          compound_words: ["こんにちは挨拶", "こんにちはメッセージ"],
           conjugations: null,
           collocations: [
             { phrase: "こんにちは、元気ですか", frequency: "high" },
@@ -701,18 +737,16 @@ function downloadJSONTemplate() {
         chinese: {
           word: "你好",
           pronunciation: "nǐ hǎo",
-          definition: "用作问候语或开始电话对话",
+          definition: "见面时的礼貌问候语",
           part_of_speech: "感叹词",
           level: "初级",
           unicode_emoji: "👋",
-          synonyms: ["您好", "嗨"],
+          synonyms: ["您好", "你们好"],
           antonyms: ["再见", "拜拜"],
-          word_family: ["你好", "您好", "嗨"],
+          word_family: ["问候", "礼貌", "招呼"],
+          compound_words: ["你好问候", "你好信息"],
           conjugations: null,
-          collocations: [
-            { phrase: "说你好", frequency: "high" },
-            { phrase: "你好吗", frequency: "medium" },
-          ],
+          collocations: [{ phrase: "你好，很高兴见到你", frequency: "high" }],
         },
       },
       featured_examples: [
@@ -1032,6 +1066,15 @@ function createConceptFromCSV(
           definition: valueMap[`${langCode}_definition`] || "",
           part_of_speech: valueMap[`${langCode}_part_of_speech`] || "noun",
           level: valueMap[`${langCode}_level`] || "beginner",
+          synonyms: parseArrayField(valueMap[`${langCode}_synonyms`]),
+          antonyms: parseArrayField(valueMap[`${langCode}_antonyms`]),
+          word_family: parseArrayField(valueMap[`${langCode}_word_family`]),
+          compound_words: parseArrayField(
+            valueMap[`${langCode}_compound_words`]
+          ),
+          collocations: parseCollocationsField(
+            valueMap[`${langCode}_collocations`]
+          ),
         };
       }
     }
@@ -1126,7 +1169,7 @@ function createConceptFromCSV(
     return null;
   }
 
-  // 개념 객체 반환
+  // 개념 객체 반환 (created_at을 concept_info 바깥으로)
   return {
     concept_info: {
       domain: domain,
@@ -1136,7 +1179,35 @@ function createConceptFromCSV(
     },
     expressions: expressions,
     examples: examples,
+    created_at: new Date(), // concept_info 바깥으로 이동
   };
+}
+
+// 배열 필드 파싱 헬퍼 함수
+function parseArrayField(value) {
+  if (!value || typeof value !== "string") return [];
+  return value
+    .split("|")
+    .map((item) => item.trim())
+    .filter((item) => item);
+}
+
+// 연어 필드 파싱 헬퍼 함수
+function parseCollocationsField(value) {
+  if (!value || typeof value !== "string") return [];
+  return value
+    .split("|")
+    .map((item) => {
+      const parts = item.split(":");
+      if (parts.length === 2) {
+        return {
+          phrase: parts[0].trim(),
+          frequency: parts[1].trim(),
+        };
+      }
+      return { phrase: item.trim(), frequency: "medium" };
+    })
+    .filter((item) => item.phrase);
 }
 
 // JSON 파일 파싱
@@ -1216,6 +1287,7 @@ function createConceptFromJSON(item, defaultDomain, defaultCategory) {
         synonyms: expr.synonyms || [],
         antonyms: expr.antonyms || [],
         word_family: expr.word_family || [],
+        compound_words: expr.compound_words || [],
         conjugations: expr.conjugations || null,
         collocations: expr.collocations || [],
         // 일본어 특수 필드
@@ -1233,7 +1305,7 @@ function createConceptFromJSON(item, defaultDomain, defaultCategory) {
     return null;
   }
 
-  // 개념 정보 구성 (확장된 구조)
+  // 개념 정보 구성 (확장된 구조, created_at 제거)
   const conceptInfo = {
     domain: domain,
     category: category,
@@ -1242,7 +1314,6 @@ function createConceptFromJSON(item, defaultDomain, defaultCategory) {
     unicode_emoji:
       item.concept_info?.unicode_emoji || item.concept_info?.emoji || "",
     color_theme: item.concept_info?.color_theme || "#9C27B0",
-    created_at: new Date(),
     updated_at: new Date(),
     total_examples_count: 0, // 나중에 계산
     quiz_frequency: item.concept_info?.quiz_frequency || "medium",
@@ -1346,7 +1417,7 @@ function createConceptFromJSON(item, defaultDomain, defaultCategory) {
   // 관련 개념 처리
   const relatedConcepts = item.related_concepts || [];
 
-  // 완전한 개념 객체 반환
+  // 완전한 개념 객체 반환 (created_at을 concept_info 바깥으로)
   const conceptObject = {
     concept_info: conceptInfo,
     media: media,
@@ -1356,6 +1427,7 @@ function createConceptFromJSON(item, defaultDomain, defaultCategory) {
     game_data: gameData,
     related_concepts: relatedConcepts,
     learning_metadata: learningMetadata,
+    created_at: new Date(), // concept_info 바깥으로 이동
   };
 
   // 기존 형식의 예제가 있으면 추가

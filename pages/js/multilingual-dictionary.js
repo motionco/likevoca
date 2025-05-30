@@ -106,6 +106,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       categoryFilter: document.getElementById("category-filter"),
       sortOption: document.getElementById("sort-option"),
       loadMoreBtn: document.getElementById("load-more"),
+      swapLanguagesBtn: document.getElementById("swap-languages"),
     };
 
     // 개념 추가 버튼 클릭 이벤트
@@ -119,6 +120,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (elements.bulkAddConceptBtn) {
       elements.bulkAddConceptBtn.addEventListener("click", () => {
         window.openBulkImportModal();
+      });
+    }
+
+    // 언어 전환 버튼 클릭 이벤트
+    if (elements.swapLanguagesBtn) {
+      elements.swapLanguagesBtn.addEventListener("click", () => {
+        swapLanguages(elements);
       });
     }
 
@@ -478,66 +486,55 @@ function handleSearch(elements) {
 
 // 정렬 함수 (확장된 구조 지원)
 function sortFilteredConcepts(sortOption) {
+  const getConceptTime = (concept) => {
+    // 최상위 레벨 created_at만 처리
+    if (concept.created_at instanceof Timestamp) {
+      return concept.created_at.toMillis();
+    }
+    if (concept.created_at) {
+      return new Date(concept.created_at).getTime();
+    }
+
+    // timestamp 확인 (더 오래된 데이터)
+    if (concept.timestamp instanceof Timestamp) {
+      return concept.timestamp.toMillis();
+    }
+    if (concept.timestamp) {
+      return new Date(concept.timestamp).getTime();
+    }
+
+    // 시간 정보가 없으면 현재 시간으로 간주
+    return Date.now();
+  };
+
   switch (sortOption) {
     case "latest":
       filteredConcepts.sort((a, b) => {
-        const dateA =
-          a.created_at instanceof Timestamp
-            ? a.created_at.toMillis()
-            : a.created_at
-            ? new Date(a.created_at).getTime()
-            : a.timestamp instanceof Timestamp
-            ? a.timestamp.toMillis()
-            : new Date(a.timestamp || 0).getTime();
-        const dateB =
-          b.created_at instanceof Timestamp
-            ? b.created_at.toMillis()
-            : b.created_at
-            ? new Date(b.created_at).getTime()
-            : b.timestamp instanceof Timestamp
-            ? b.timestamp.toMillis()
-            : new Date(b.timestamp || 0).getTime();
-        return dateB - dateA;
+        return getConceptTime(b) - getConceptTime(a);
       });
       break;
     case "oldest":
       filteredConcepts.sort((a, b) => {
-        const dateA =
-          a.created_at instanceof Timestamp
-            ? a.created_at.toMillis()
-            : a.created_at
-            ? new Date(a.created_at).getTime()
-            : a.timestamp instanceof Timestamp
-            ? a.timestamp.toMillis()
-            : new Date(a.timestamp || 0).getTime();
-        const dateB =
-          b.created_at instanceof Timestamp
-            ? b.created_at.toMillis()
-            : b.created_at
-            ? new Date(b.created_at).getTime()
-            : b.timestamp instanceof Timestamp
-            ? b.timestamp.toMillis()
-            : new Date(b.timestamp || 0).getTime();
-        return dateA - dateB;
+        return getConceptTime(a) - getConceptTime(b);
       });
       break;
     case "a-z":
       filteredConcepts.sort((a, b) => {
-        const sourceLanguage = document.getElementById("source-language").value;
+        const targetLanguage = document.getElementById("target-language").value;
         const wordA =
-          a.expressions?.[sourceLanguage]?.word?.toLowerCase() || "";
+          a.expressions?.[targetLanguage]?.word?.toLowerCase() || "";
         const wordB =
-          b.expressions?.[sourceLanguage]?.word?.toLowerCase() || "";
+          b.expressions?.[targetLanguage]?.word?.toLowerCase() || "";
         return wordA.localeCompare(wordB);
       });
       break;
     case "z-a":
       filteredConcepts.sort((a, b) => {
-        const sourceLanguage = document.getElementById("source-language").value;
+        const targetLanguage = document.getElementById("target-language").value;
         const wordA =
-          a.expressions?.[sourceLanguage]?.word?.toLowerCase() || "";
+          a.expressions?.[targetLanguage]?.word?.toLowerCase() || "";
         const wordB =
-          b.expressions?.[sourceLanguage]?.word?.toLowerCase() || "";
+          b.expressions?.[targetLanguage]?.word?.toLowerCase() || "";
         return wordB.localeCompare(wordA);
       });
       break;
@@ -728,22 +725,79 @@ async function fetchAndDisplayConcepts() {
 
     console.log("개념 데이터 가져오기 시작...");
 
-    // concepts 컬렉션에서 모든 데이터 가져오기 (orderBy 없이)
+    // concepts 컬렉션에서 created_at 기준으로 정렬하여 가져오기
     const conceptsRef = collection(db, "concepts");
-    // created_at 필드가 없는 문서도 포함하기 위해 orderBy 제거
-    const querySnapshot = await getDocs(conceptsRef);
 
-    allConcepts = [];
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      // 문서 ID 추가
-      data.id = doc.id;
-      // 기존 _id 필드가 없으면 doc.id로 설정
-      if (!data._id) {
-        data._id = doc.id;
-      }
-      allConcepts.push(data);
+    try {
+      // created_at으로 정렬해서 가져오기 시도
+      const queryWithOrder = query(conceptsRef, orderBy("created_at", "desc"));
+      const querySnapshot = await getDocs(queryWithOrder);
 
+      allConcepts = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        data.id = doc.id;
+        if (!data._id) {
+          data._id = doc.id;
+        }
+
+        // AI 생성 개념 제외 (다국어 단어장에서는 수동 생성 개념만 표시)
+        if (!data.isAIGenerated) {
+          allConcepts.push(data);
+        }
+      });
+
+      console.log(
+        `orderBy(created_at)로 ${allConcepts.length}개의 수동 생성 개념을 가져왔습니다.`
+      );
+    } catch (orderByError) {
+      console.warn("created_at으로 정렬 실패, 전체 조회로 대체:", orderByError);
+
+      // orderBy 실패 시 전체 조회 후 JavaScript 정렬
+      const querySnapshot = await getDocs(conceptsRef);
+
+      allConcepts = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        data.id = doc.id;
+        if (!data._id) {
+          data._id = doc.id;
+        }
+
+        // AI 생성 개념 제외 (다국어 단어장에서는 수동 생성 개념만 표시)
+        if (!data.isAIGenerated) {
+          allConcepts.push(data);
+        }
+      });
+
+      // JavaScript에서 정렬 (created_at이 없는 경우 최신으로 간주)
+      allConcepts.sort((a, b) => {
+        const getTime = (concept) => {
+          // 최상위 레벨 created_at만 처리
+          if (concept.created_at) {
+            return concept.created_at.toDate
+              ? concept.created_at.toDate().getTime()
+              : new Date(concept.created_at).getTime();
+          }
+          // timestamp 확인 (더 오래된 데이터)
+          if (concept.timestamp) {
+            return concept.timestamp.toDate
+              ? concept.timestamp.toDate().getTime()
+              : new Date(concept.timestamp).getTime();
+          }
+          // 시간 정보가 없으면 현재 시간으로 간주 (최신으로 표시)
+          return Date.now();
+        };
+
+        return getTime(b) - getTime(a); // 내림차순 정렬
+      });
+
+      console.log(
+        `전체 조회 후 정렬로 ${allConcepts.length}개의 수동 생성 개념을 가져왔습니다.`
+      );
+    }
+
+    allConcepts.forEach((data) => {
       // 생성 시간 정보도 로그에 포함
       const createdAt = data.created_at
         ? data.created_at.toDate
@@ -769,28 +823,6 @@ async function fetchAndDisplayConcepts() {
         hasCreatedAt: !!data.created_at,
         hasTimestamp: !!data.timestamp,
       });
-    });
-
-    console.log(`총 ${allConcepts.length}개의 개념을 가져왔습니다.`);
-
-    // JavaScript에서 직접 정렬 (created_at이 없는 경우 최신으로 간주)
-    allConcepts.sort((a, b) => {
-      const getTime = (concept) => {
-        if (concept.created_at) {
-          return concept.created_at.toDate
-            ? concept.created_at.toDate().getTime()
-            : new Date(concept.created_at).getTime();
-        }
-        if (concept.timestamp) {
-          return concept.timestamp.toDate
-            ? concept.timestamp.toDate().getTime()
-            : new Date(concept.timestamp).getTime();
-        }
-        // 시간 정보가 없으면 현재 시간으로 간주 (최신으로 표시)
-        return Date.now();
-      };
-
-      return getTime(b) - getTime(a); // 내림차순 정렬
     });
 
     // 즉시 DOM 상태 확인 (디버깅용)
@@ -1086,6 +1118,9 @@ function fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage) {
     const wordFamily = expression.word_family
       ? expression.word_family.join(", ")
       : "";
+    const compoundWords = expression.compound_words
+      ? expression.compound_words.join(", ")
+      : "";
 
     // 연어 정보 처리
     let collocationsText = "";
@@ -1159,6 +1194,16 @@ function fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage) {
         <div>
           <p class="text-sm text-gray-700 mb-1">어족:</p>
           <p>${wordFamily}</p>
+        </div>
+        `
+            : ""
+        }
+        ${
+          compoundWords
+            ? `
+        <div>
+          <p class="text-sm text-gray-700 mb-1">복합어:</p>
+          <p>${compoundWords}</p>
         </div>
         `
             : ""
@@ -1442,4 +1487,39 @@ function updateExamples(langCode, conceptData) {
       </div>
     `;
   }
+}
+
+// 언어 전환 함수
+function swapLanguages(elements) {
+  const sourceLanguage = elements.sourceLanguage.value;
+  const targetLanguage = elements.targetLanguage.value;
+
+  // 같은 언어인 경우 전환하지 않음
+  if (sourceLanguage === targetLanguage) {
+    return;
+  }
+
+  // 버튼 애니메이션 효과
+  const swapButton = elements.swapLanguagesBtn;
+  const icon = swapButton.querySelector("i");
+
+  // 회전 애니메이션 추가
+  icon.style.transform = "rotate(180deg)";
+  icon.style.transition = "transform 0.3s ease";
+
+  // 언어 순서 변경
+  elements.sourceLanguage.value = targetLanguage;
+  elements.targetLanguage.value = sourceLanguage;
+
+  // 버튼 색상 변경으로 피드백 제공
+  swapButton.classList.add("text-[#4B63AC]", "bg-gray-100");
+
+  // 검색 및 화면 업데이트
+  handleSearch(elements);
+
+  // 애니메이션 후 원래 상태로 복원
+  setTimeout(() => {
+    icon.style.transform = "rotate(0deg)";
+    swapButton.classList.remove("text-[#4B63AC]", "bg-gray-100");
+  }, 300);
 }

@@ -103,6 +103,7 @@ export const conceptUtils = {
       // 새로운 확장된 구조로 데이터 준비
       const enhancedConceptData = {
         _id: conceptRef.id,
+        created_at: conceptData.created_at || new Date(), // 최상위 레벨로 이동
         concept_info: {
           domain:
             conceptData.concept_info?.domain || conceptData.domain || "general",
@@ -117,7 +118,6 @@ export const conceptUtils = {
             conceptData.concept_info?.emoji ||
             "📚",
           color_theme: conceptData.concept_info?.color_theme || "#9C27B0",
-          created_at: new Date(),
           updated_at: new Date(),
           total_examples_count: conceptData.featured_examples?.length || 0,
           quiz_frequency: conceptData.concept_info?.quiz_frequency || "medium",
@@ -731,34 +731,147 @@ export const conceptUtils = {
     }
   },
 
-  // 개념 추가 (간단한 버전)
-  async addConcept(conceptData) {
+  // AI 개념을 ai-recommend 컬렉션에 저장
+  async createAIConcept(userEmail, conceptData) {
     try {
-      const conceptRef = doc(collection(db, "concepts"));
-      await setDoc(conceptRef, {
-        ...conceptData,
-        id: conceptRef.id,
-        createdAt: conceptData.createdAt || new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
+      // 사용자 이메일을 문서 ID로 사용
+      const userAIRef = doc(db, "ai-recommend", userEmail);
+      const userAIDoc = await getDoc(userAIRef);
 
-      // 사용자의 개념 수 업데이트
-      if (conceptData.userId) {
-        const userRef = doc(db, "users", conceptData.userId);
-        const userDoc = await getDoc(userRef);
+      // AI 개념 데이터 준비
+      const aiConceptData = {
+        _id: `ai_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        created_at: new Date(),
+        concept_info: {
+          domain: conceptData.concept_info?.domain || "general",
+          category: conceptData.concept_info?.category || "common",
+          difficulty: conceptData.concept_info?.difficulty || "basic",
+          tags: conceptData.concept_info?.tags || [],
+          unicode_emoji: conceptData.concept_info?.unicode_emoji || "📚",
+          color_theme: conceptData.concept_info?.color_theme || "#9C27B0",
+          quiz_frequency: conceptData.concept_info?.quiz_frequency || "medium",
+          game_types: conceptData.concept_info?.game_types || [
+            "matching",
+            "pronunciation",
+            "spelling",
+          ],
+        },
+        media: conceptData.media || {
+          images: {
+            primary: null,
+            secondary: null,
+            illustration: null,
+            emoji_style: null,
+            line_art: null,
+          },
+          videos: { intro: null, pronunciation: null },
+          audio: {
+            pronunciation_slow: null,
+            pronunciation_normal: null,
+            word_in_sentence: null,
+          },
+        },
+        expressions: conceptData.expressions || {},
+        featured_examples: conceptData.featured_examples || [],
+        quiz_data: conceptData.quiz_data || {
+          question_types: ["translation", "matching"],
+          difficulty_multiplier: 1.0,
+          common_mistakes: [],
+          hint_text: {},
+        },
+        game_data: conceptData.game_data || {
+          memory_card: {},
+          word_puzzle: {},
+          pronunciation_game: {},
+        },
+        related_concepts: conceptData.related_concepts || [],
+        learning_metadata: conceptData.learning_metadata || {
+          memorization_difficulty: 2,
+          pronunciation_difficulty: 2,
+          usage_frequency: "medium",
+          cultural_importance: "medium",
+        },
+      };
 
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          const currentCount = userData.conceptCount || 0;
-          await updateDoc(userRef, {
-            conceptCount: currentCount + 1,
-          });
-        }
+      if (userAIDoc.exists()) {
+        // 기존 문서가 있으면 concepts 배열에 추가
+        const userData = userAIDoc.data();
+        const existingConcepts = userData.concepts || [];
+
+        await updateDoc(userAIRef, {
+          concepts: [...existingConcepts, aiConceptData],
+          totalConcepts: existingConcepts.length + 1,
+          lastUpdated: new Date(),
+        });
+      } else {
+        // 새 문서 생성
+        await setDoc(userAIRef, {
+          userEmail: userEmail,
+          concepts: [aiConceptData],
+          totalConcepts: 1,
+          createdAt: new Date(),
+          lastUpdated: new Date(),
+        });
       }
 
-      return conceptRef.id;
+      return aiConceptData._id;
     } catch (error) {
-      console.error("개념 추가 중 오류 발생:", error);
+      console.error("AI 개념 생성 중 오류 발생:", error);
+      throw error;
+    }
+  },
+
+  // 사용자의 AI 개념 목록 가져오기
+  async getUserAIConcepts(userEmail) {
+    try {
+      const userAIRef = doc(db, "ai-recommend", userEmail);
+      const userAIDoc = await getDoc(userAIRef);
+
+      if (userAIDoc.exists()) {
+        const userData = userAIDoc.data();
+        const concepts = userData.concepts || [];
+
+        // 각 개념에 id 필드 추가 (기존 _id를 id로 매핑)
+        return concepts.map((concept) => ({
+          ...concept,
+          id: concept._id || concept.id,
+        }));
+      } else {
+        return [];
+      }
+    } catch (error) {
+      console.error("사용자 AI 개념 가져오기 중 오류 발생:", error);
+      return [];
+    }
+  },
+
+  // AI 개념 삭제
+  async deleteAIConcept(userEmail, conceptId) {
+    try {
+      const userAIRef = doc(db, "ai-recommend", userEmail);
+      const userAIDoc = await getDoc(userAIRef);
+
+      if (userAIDoc.exists()) {
+        const userData = userAIDoc.data();
+        const concepts = userData.concepts || [];
+
+        // 해당 개념 제거
+        const updatedConcepts = concepts.filter(
+          (concept) => concept._id !== conceptId && concept.id !== conceptId
+        );
+
+        await updateDoc(userAIRef, {
+          concepts: updatedConcepts,
+          totalConcepts: updatedConcepts.length,
+          lastUpdated: new Date(),
+        });
+
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      console.error("AI 개념 삭제 중 오류 발생:", error);
       throw error;
     }
   },
