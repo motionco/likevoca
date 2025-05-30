@@ -1,0 +1,571 @@
+[
+  {
+    "concept_info": {
+      "domain": "nature",
+      "category": "weather",
+      "difficulty": "basic",
+      "tags": ["natural", "daily", "common"],
+      "unicode_emoji": "☀️",
+      "color_theme": "#FFD54F",
+      "quiz_frequency": "high",
+      "game_types": ["matching", "pronunciation", "spelling"]
+    },
+    "media": {
+      "images": {
+        "primary": "https://source.unsplash.com/400x300/?sun,sunny",
+        "secondary": "https://source.unsplash.com/400x300/?sunshine",
+        "illustration": "https://api.iconify.design/noto:sun.svg?width=400",
+        "emoji_style": "https://api.iconify.design/twemoji:sun.svg?width=200",
+        "line_art": "https://api.iconify.design/carbon:sun.svg?width=300"
+      },
+      "videos": {
+        "intro": null,
+        "pronunciation": null
+      },
+      "audio": {
+        "pronunciation_slow": null,
+        "pronunciation_normal": null,
+        "word_in_sentence": null
+      }
+    },
+    "expressions": {
+      "korean": {
+        "word": "태양",
+        "pronunciation": "tae-yang",
+        "romanization": "taeyang",
+        "definition": "지구에 빛과 열을 주는 별",
+        "part_of_speech": "명사",
+        "level": "초급",
+        "unicode_emoji": "☀️",
+        "synonyms": ["해", "일"],
+        "antonyms": ["달", "별"],
+        "word_family": ["태양광", "태양열", "태양계"],
+        "conjugations": null,
+        "collocations": [
+          {"phrase": "태양이 뜨다", "frequency": "high"},
+          {"phrase": "뜨거운 태양", "frequency": "high"},
+          {"phrase": "태양 빛", "frequency": "medium"}
+        ]
+      },
+      "english": {
+        "word": "sun",
+        "pronunciation": "sʌn",
+        "phonetic": "/sʌn/",
+        "definition": "the star around which the earth orbits",
+        "part_of_speech": "noun",
+        "level": "beginner",
+        "unicode_emoji": "☀️",
+        "synonyms": ["sunshine", "sunlight"],
+        "antonyms": ["moon", "darkness"],
+        "word_family": ["sunny", "sunrise", "sunset", "solar"],
+        "conjugations": null,
+        "collocations": [
+          {"phrase": "sun rises", "frequency": "high"},
+          {"phrase": "hot sun", "frequency": "high"},
+          {"phrase": "under the sun", "frequency": "medium"}
+        ]
+      },
+      "japanese": {
+        "word": "太陽",
+        "hiragana": "たいよう",
+        "katakana": null,
+        "kanji": "太陽",
+        "pronunciation": "taiyou",
+        "romanization": "taiyou",
+        "definition": "地球に光と熱を与える恒星",
+        "part_of_speech": "名詞",
+        "level": "初級",
+        "unicode_emoji": "☀️",
+        "synonyms": ["日", "お日様"],
+        "antonyms": ["月", "夜"],
+        "word_family": ["太陽光", "太陽熱", "太陽系"],
+        "conjugations": null,
+        "collocations": [
+          {"phrase": "太陽が昇る", "frequency": "high"},
+          {"phrase": "暑い太陽", "frequency": "high"}
+        ]
+      },
+      "chinese": {
+        "word": "太阳",
+        "pronunciation": "tài yáng",
+        "definition": "给地球提供光和热的恒星",
+        "part_of_speech": "名词",
+        "level": "初级",
+        "unicode_emoji": "☀️",
+        "synonyms": ["阳光", "日头"],
+        "antonyms": ["月亮", "黑暗"],
+        "word_family": ["太阳光", "太阳能", "太阳系"],
+        "conjugations": null,
+        "collocations": [
+          {"phrase": "太阳升起", "frequency": "high"},
+          {"phrase": "炎热的太阳", "frequency": "high"}
+        ]
+      }
+    },
+    "featured_examples": [
+      {
+        "example_id": "example_sun_1",
+        "level": "beginner",
+        "context": "weather",
+        "priority": "high",
+        "unicode_emoji": "🌅",
+        "quiz_weight": 10,
+        "translations": {
+          "korean": {
+            "text": "오늘 태양이 매우 밝아요.",
+            "grammar_notes": "현재 시제, 형용사 활용"
+          },
+          "english": {
+            "text": "The sun is very bright today.",
+            "grammar_notes": "Present continuous tense, adjective"
+          },
+          "japanese": {
+            "text": "今日太陽がとても明るいです。",
+            "grammar_notes": "現在形、形容詞"
+          },
+          "chinese": {
+            "text": "今天太阳很亮。",
+            "grammar_notes": "现在时态，形容词"
+          }
+        }
+      },
+      {
+        "example_id": "example_sun_2",
+        "level": "beginner",
+        "context": "daily_routine",
+        "priority": "medium",
+        "unicode_emoji": "🌄",
+        "quiz_weight": 8,
+        "translations": {
+          "korean": {
+            "text": "태양이 동쪽에서 떠요.",
+            "grammar_notes": "방향 표현, 동사 활용"
+          },
+          "english": {
+            "text": "The sun rises in the east.",
+            "grammar_notes": "Simple present tense, direction"
+          },
+          "japanese": {
+            "text": "太陽は東から昇ります。",
+            "grammar_notes": "方向表現、動詞"
+          },
+          "chinese": {
+            "text": "太阳从东方升起。",
+            "grammar_notes": "方向表达，动词"
+          }
+        }
+      }
+    ],
+    "quiz_data": {
+      "question_types": ["translation", "pronunciation", "matching", "multiple_choice"],
+      "difficulty_multiplier": 1.0,
+      "common_mistakes": [
+        {"mistake": "son", "correction": "sun", "type": "spelling"},
+        {"mistake": "sonne", "correction": "sun", "type": "language_confusion"}
+      ],
+      "hint_text": {
+        "korean": "하늘에서 빛나는 뜨거운 별",
+        "english": "Hot bright star in the sky",
+        "japanese": "空で輝く熱い星",
+        "chinese": "天空中闪亮的热星"
+      }
+    },
+    "game_data": {
+      "memory_card": {
+        "front_image": "https://api.iconify.design/noto:sun.svg",
+        "back_text": "sun / 태양 / 太陽 / 太阳"
+      },
+      "word_puzzle": {
+        "scrambled": ["s", "u", "n"],
+        "hints": ["Bright star", "Source of light", "☀️"]
+      },
+      "pronunciation_game": {
+        "target_phoneme": "/sʌn/",
+        "similar_sounds": ["/sən/", "/sɑn/"],
+        "practice_words": ["sun", "fun", "run"]
+      }
+    },
+    "related_concepts": [],
+    "learning_metadata": {
+      "memorization_difficulty": 2,
+      "pronunciation_difficulty": 1,
+      "usage_frequency": "very_high",
+      "cultural_importance": "high"
+    }
+  },
+  {
+    "concept_info": {
+      "domain": "education",
+      "category": "school",
+      "difficulty": "basic",
+      "tags": ["learning", "knowledge", "common"],
+      "unicode_emoji": "📚",
+      "color_theme": "#4CAF50",
+      "quiz_frequency": "high",
+      "game_types": ["matching", "pronunciation", "spelling", "memory"]
+    },
+    "media": {
+      "images": {
+        "primary": "https://source.unsplash.com/400x300/?book,reading",
+        "secondary": "https://source.unsplash.com/400x300/?library",
+        "illustration": "https://api.iconify.design/noto:books.svg?width=400",
+        "emoji_style": "https://api.iconify.design/twemoji:books.svg?width=200",
+        "line_art": "https://api.iconify.design/carbon:book.svg?width=300"
+      },
+      "videos": {
+        "intro": null,
+        "pronunciation": null
+      },
+      "audio": {
+        "pronunciation_slow": null,
+        "pronunciation_normal": null,
+        "word_in_sentence": null
+      }
+    },
+    "expressions": {
+      "korean": {
+        "word": "책",
+        "pronunciation": "chaek",
+        "romanization": "chaek",
+        "definition": "종이에 글이나 그림을 인쇄하여 묶은 것",
+        "part_of_speech": "명사",
+        "level": "초급",
+        "unicode_emoji": "📚",
+        "synonyms": ["서적", "도서"],
+        "antonyms": [],
+        "word_family": ["책가방", "책상", "책장"],
+        "conjugations": null,
+        "collocations": [
+          {"phrase": "책을 읽다", "frequency": "very_high"},
+          {"phrase": "재미있는 책", "frequency": "high"},
+          {"phrase": "책 한 권", "frequency": "high"}
+        ]
+      },
+      "english": {
+        "word": "book",
+        "pronunciation": "bʊk",
+        "phonetic": "/bʊk/",
+        "definition": "a written or printed work consisting of pages glued or sewn together",
+        "part_of_speech": "noun",
+        "level": "beginner",
+        "unicode_emoji": "📚",
+        "synonyms": ["volume", "tome", "publication"],
+        "antonyms": [],
+        "word_family": ["booklet", "bookmark", "bookshelf", "booking"],
+        "conjugations": {
+          "plural": "books"
+        },
+        "collocations": [
+          {"phrase": "read a book", "frequency": "very_high"},
+          {"phrase": "interesting book", "frequency": "high"},
+          {"phrase": "book cover", "frequency": "medium"}
+        ]
+      },
+      "japanese": {
+        "word": "本",
+        "hiragana": "ほん",
+        "katakana": null,
+        "kanji": "本",
+        "pronunciation": "hon",
+        "romanization": "hon",
+        "definition": "文字や絵を印刷して綴じたもの",
+        "part_of_speech": "名詞",
+        "level": "初級",
+        "unicode_emoji": "📚",
+        "synonyms": ["書籍", "図書"],
+        "antonyms": [],
+        "word_family": ["本屋", "本棚", "教科書"],
+        "conjugations": null,
+        "collocations": [
+          {"phrase": "本を読む", "frequency": "very_high"},
+          {"phrase": "面白い本", "frequency": "high"},
+          {"phrase": "本一冊", "frequency": "high"}
+        ]
+      },
+      "chinese": {
+        "word": "书",
+        "pronunciation": "shū",
+        "definition": "装订成册的印刷品",
+        "part_of_speech": "名词",
+        "level": "初级",
+        "unicode_emoji": "📚",
+        "synonyms": ["书籍", "图书"],
+        "antonyms": [],
+        "word_family": ["书店", "书架", "教科书"],
+        "conjugations": null,
+        "collocations": [
+          {"phrase": "看书", "frequency": "very_high"},
+          {"phrase": "有趣的书", "frequency": "high"},
+          {"phrase": "一本书", "frequency": "high"}
+        ]
+      }
+    },
+    "featured_examples": [
+      {
+        "example_id": "example_book_1",
+        "level": "beginner",
+        "context": "studying",
+        "priority": "very_high",
+        "unicode_emoji": "📖",
+        "quiz_weight": 15,
+        "translations": {
+          "korean": {
+            "text": "저는 매일 책을 읽어요.",
+            "grammar_notes": "현재 시제, 부사 활용"
+          },
+          "english": {
+            "text": "I read books every day.",
+            "grammar_notes": "Simple present tense, adverb"
+          },
+          "japanese": {
+            "text": "私は毎日本を読みます。",
+            "grammar_notes": "現在形、副詞"
+          },
+          "chinese": {
+            "text": "我每天看书。",
+            "grammar_notes": "现在时态，副词"
+          }
+        }
+      },
+      {
+        "example_id": "example_book_2",
+        "level": "beginner",
+        "context": "shopping",
+        "priority": "medium",
+        "unicode_emoji": "🛒",
+        "quiz_weight": 10,
+        "translations": {
+          "korean": {
+            "text": "이 책은 얼마예요?",
+            "grammar_notes": "의문문, 가격 묻기"
+          },
+          "english": {
+            "text": "How much is this book?",
+            "grammar_notes": "Question form, price inquiry"
+          },
+          "japanese": {
+            "text": "この本はいくらですか？",
+            "grammar_notes": "疑問文、値段を聞く"
+          },
+          "chinese": {
+            "text": "这本书多少钱？",
+            "grammar_notes": "疑问句，询问价格"
+          }
+        }
+      }
+    ],
+    "quiz_data": {
+      "question_types": ["translation", "pronunciation", "matching", "fill_blank", "multiple_choice"],
+      "difficulty_multiplier": 0.8,
+      "common_mistakes": [
+        {"mistake": "buk", "correction": "book", "type": "spelling"},
+        {"mistake": "booke", "correction": "book", "type": "spelling"}
+      ],
+      "hint_text": {
+        "korean": "종이에 글자가 적혀 있는 것",
+        "english": "You read this to learn",
+        "japanese": "読むもの、文字が書いてある",
+        "chinese": "用来阅读的印刷品"
+      }
+    },
+    "game_data": {
+      "memory_card": {
+        "front_image": "https://api.iconify.design/noto:books.svg",
+        "back_text": "book / 책 / 本 / 书"
+      },
+      "word_puzzle": {
+        "scrambled": ["b", "o", "o", "k"],
+        "hints": ["You read this", "Made of pages", "📚"]
+      },
+      "pronunciation_game": {
+        "target_phoneme": "/bʊk/",
+        "similar_sounds": ["/buk/", "/bɔk/"],
+        "practice_words": ["book", "look", "took"]
+      }
+    },
+    "related_concepts": [],
+    "learning_metadata": {
+      "memorization_difficulty": 1,
+      "pronunciation_difficulty": 2,
+      "usage_frequency": "very_high",
+      "cultural_importance": "very_high"
+    }
+  },
+  {
+    "concept_info": {
+      "domain": "emotion",
+      "category": "feeling",
+      "difficulty": "basic",
+      "tags": ["positive", "common", "daily"],
+      "unicode_emoji": "😊",
+      "color_theme": "#FF9800",
+      "quiz_frequency": "very_high",
+      "game_types": ["matching", "pronunciation"]
+    },
+    "media": {
+      "images": {
+        "primary": "https://source.unsplash.com/400x300/?happy,smile",
+        "secondary": "https://source.unsplash.com/400x300/?joy",
+        "illustration": "https://api.iconify.design/noto:smiling-face.svg?width=400",
+        "emoji_style": "https://api.iconify.design/twemoji:smiling-face.svg?width=200",
+        "line_art": null
+      },
+      "videos": {
+        "intro": null,
+        "pronunciation": null
+      },
+      "audio": {
+        "pronunciation_slow": null,
+        "pronunciation_normal": null,
+        "word_in_sentence": null
+      }
+    },
+    "expressions": {
+      "korean": {
+        "word": "행복하다",
+        "pronunciation": "haeng-bok-ha-da",
+        "romanization": "haengbokhada",
+        "definition": "마음이 즐겁고 기쁘다",
+        "part_of_speech": "형용사",
+        "level": "초급",
+        "unicode_emoji": "😊",
+        "synonyms": ["기쁘다", "즐겁다"],
+        "antonyms": ["슬프다", "우울하다"],
+        "word_family": ["행복", "행복감", "행복해하다"],
+        "conjugations": {
+          "present": "행복해요",
+          "past": "행복했어요",
+          "future": "행복할 거예요"
+        },
+        "collocations": [
+          {"phrase": "행복한 사람", "frequency": "high"},
+          {"phrase": "행복하게 살다", "frequency": "high"}
+        ]
+      },
+      "english": {
+        "word": "happy",
+        "pronunciation": "ˈhæpi",
+        "phonetic": "/ˈhæpi/",
+        "definition": "feeling or showing pleasure or contentment",
+        "part_of_speech": "adjective",
+        "level": "beginner",
+        "unicode_emoji": "😊",
+        "synonyms": ["joyful", "cheerful", "glad"],
+        "antonyms": ["sad", "unhappy", "depressed"],
+        "word_family": ["happiness", "happily", "unhappy"],
+        "conjugations": {
+          "comparative": "happier",
+          "superlative": "happiest"
+        },
+        "collocations": [
+          {"phrase": "happy person", "frequency": "high"},
+          {"phrase": "feel happy", "frequency": "very_high"},
+          {"phrase": "happy life", "frequency": "high"}
+        ]
+      },
+      "japanese": {
+        "word": "幸せ",
+        "hiragana": "しあわせ",
+        "katakana": null,
+        "kanji": "幸せ",
+        "pronunciation": "shiawase",
+        "romanization": "shiawase",
+        "definition": "心が満ち足りている状態",
+        "part_of_speech": "形容動詞",
+        "level": "初級",
+        "unicode_emoji": "😊",
+        "synonyms": ["嬉しい", "楽しい"],
+        "antonyms": ["悲しい", "不幸"],
+        "word_family": ["幸福", "幸運"],
+        "conjugations": {
+          "present": "幸せです",
+          "past": "幸せでした"
+        },
+        "collocations": [
+          {"phrase": "幸せな人", "frequency": "high"},
+          {"phrase": "幸せになる", "frequency": "high"}
+        ]
+      },
+      "chinese": {
+        "word": "快乐",
+        "pronunciation": "kuài lè",
+        "definition": "心情愉快",
+        "part_of_speech": "形容词",
+        "level": "初级",
+        "unicode_emoji": "😊",
+        "synonyms": ["高兴", "开心"],
+        "antonyms": ["伤心", "难过"],
+        "word_family": ["快乐感", "快快乐乐"],
+        "conjugations": null,
+        "collocations": [
+          {"phrase": "快乐的人", "frequency": "high"},
+          {"phrase": "感到快乐", "frequency": "very_high"}
+        ]
+      }
+    },
+    "featured_examples": [
+      {
+        "example_id": "example_happy_1",
+        "level": "beginner",
+        "context": "emotion",
+        "priority": "very_high",
+        "unicode_emoji": "🎉",
+        "quiz_weight": 15,
+        "translations": {
+          "korean": {
+            "text": "저는 오늘 정말 행복해요.",
+            "grammar_notes": "현재 시제, 부사 활용"
+          },
+          "english": {
+            "text": "I am really happy today.",
+            "grammar_notes": "Present continuous, adverb"
+          },
+          "japanese": {
+            "text": "今日は本当に幸せです。",
+            "grammar_notes": "現在形、副詞"
+          },
+          "chinese": {
+            "text": "我今天真的很快乐。",
+            "grammar_notes": "现在时态，副词"
+          }
+        }
+      }
+    ],
+    "quiz_data": {
+      "question_types": ["translation", "pronunciation", "matching"],
+      "difficulty_multiplier": 1.0,
+      "common_mistakes": [
+        {"mistake": "hapy", "correction": "happy", "type": "spelling"},
+        {"mistake": "happi", "correction": "happy", "type": "spelling"}
+      ],
+      "hint_text": {
+        "korean": "기분이 좋은 상태",
+        "english": "Feeling good and joyful",
+        "japanese": "気分が良い状態",
+        "chinese": "心情愉快的状态"
+      }
+    },
+    "game_data": {
+      "memory_card": {
+        "front_image": "https://api.iconify.design/noto:smiling-face.svg",
+        "back_text": "happy / 행복하다 / 幸せ / 快乐"
+      },
+      "word_puzzle": {
+        "scrambled": ["h", "a", "p", "p", "y"],
+        "hints": ["Good feeling", "Opposite of sad", "😊"]
+      },
+      "pronunciation_game": {
+        "target_phoneme": "/ˈhæpi/",
+        "similar_sounds": ["/ˈhɑpi/", "/ˈhepi/"],
+        "practice_words": ["happy", "snappy", "sappy"]
+      }
+    },
+    "related_concepts": [],
+    "learning_metadata": {
+      "memorization_difficulty": 2,
+      "pronunciation_difficulty": 2,
+      "usage_frequency": "very_high",
+      "cultural_importance": "very_high"
+    }
+  }
+] 

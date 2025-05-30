@@ -164,6 +164,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       await updateUsageUI();
     });
 
+    // 대량 개념 추가 완료 이벤트 리스너 추가
+    window.addEventListener("bulk-import-completed", async () => {
+      console.log("대량 개념 추가 완료, 목록 새로고침 중...");
+      await fetchAndDisplayConcepts();
+      await updateUsageUI();
+    });
+
     // 언어 변경 이벤트 리스너
     document.addEventListener("languageChanged", async (event) => {
       userLanguage = event.detail.language;
@@ -201,57 +208,112 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-// 개념 카드 생성 함수
+// 개념 카드 생성 함수 (확장된 구조 지원 및 디버깅 개선)
 function createConceptCard(concept) {
   const sourceLanguage = document.getElementById("source-language").value;
   const targetLanguage = document.getElementById("target-language").value;
 
-  // 원본 언어와 타겟 언어 표현 가져오기
-  const sourceExpression = concept.expressions[sourceLanguage];
-  const targetExpression = concept.expressions[targetLanguage];
+  console.log("카드 생성 중:", {
+    conceptId: concept.id || concept._id,
+    sourceLanguage,
+    targetLanguage,
+    expressionsAvailable: Object.keys(concept.expressions || {}),
+    conceptInfo: concept.concept_info ? "new structure" : "legacy structure",
+  });
 
-  if (!sourceExpression || !targetExpression) {
-    return ""; // 두 언어 모두 없으면 표시하지 않음
+  // 새로운 구조와 기존 구조 모두 지원
+  const sourceExpression = concept.expressions?.[sourceLanguage] || {};
+  const targetExpression = concept.expressions?.[targetLanguage] || {};
+
+  console.log("표현 정보:", {
+    sourceWord: sourceExpression.word,
+    targetWord: targetExpression.word,
+    sourceExpression,
+    targetExpression,
+  });
+
+  // 빈 표현인 경우 건너뛰기
+  if (!sourceExpression.word || !targetExpression.word) {
+    console.log("카드 생성 건너뛰기: 단어가 없음");
+    return "";
   }
 
-  // 예제 문장 (첫 번째만 사용)
-  const example =
-    concept.examples && concept.examples.length > 0
-      ? {
-          source: concept.examples[0][sourceLanguage],
-          target: concept.examples[0][targetLanguage],
-        }
-      : null;
-
-  // 카드 색상
-  const colors = {
-    daily: "bg-blue-50",
-    food: "bg-green-50",
-    animal: "bg-yellow-50",
-    travel: "bg-purple-50",
-    business: "bg-gray-50",
-    education: "bg-orange-50",
+  // concept_info 가져오기 (새 구조 우선, 기존 구조 fallback)
+  const conceptInfo = concept.concept_info || {
+    domain: concept.domain || "기타",
+    category: concept.category || "일반",
+    unicode_emoji: concept.emoji || concept.unicode_emoji || "📝",
+    color_theme: concept.color_theme || "#4B63AC",
   };
 
-  const cardColor = colors[concept.concept_info.domain] || "bg-gray-50";
+  console.log("개념 정보:", conceptInfo);
 
-  // 이모지 표시를 위한 코드 추가
-  const emoji = concept.concept_info.emoji || "";
+  // 색상 테마 가져오기 (안전한 fallback)
+  const colorTheme =
+    conceptInfo.color_theme || concept.color_theme || "#4B63AC";
+
+  // 이모지 가져오기 (실제 데이터 구조에 맞게 우선순위 조정)
+  const emoji =
+    conceptInfo.unicode_emoji ||
+    conceptInfo.emoji ||
+    concept.emoji ||
+    concept.unicode_emoji ||
+    "📝";
+
+  // 예문 가져오기 (새 구조에서 featured_examples 사용)
+  let example = null;
+  if (concept.featured_examples && concept.featured_examples.length > 0) {
+    const firstExample = concept.featured_examples[0];
+    if (firstExample.translations) {
+      example = {
+        source: firstExample.translations[sourceLanguage]?.text || "",
+        target: firstExample.translations[targetLanguage]?.text || "",
+      };
+    }
+  }
+  // 기존 구조의 examples도 지원
+  else if (concept.examples && concept.examples.length > 0) {
+    const firstExample = concept.examples[0];
+    example = {
+      source: firstExample[sourceLanguage] || "",
+      target: firstExample[targetLanguage] || "",
+    };
+  }
+
+  // 개념 ID 생성 (document ID 우선 사용)
+  const conceptId =
+    concept.id ||
+    concept._id ||
+    `${sourceExpression.word}_${targetExpression.word}`;
+
+  console.log("카드 생성 완료:", {
+    conceptId,
+    targetWord: targetExpression.word,
+    sourceWord: sourceExpression.word,
+  });
 
   return `
     <div 
-      class="${cardColor} p-6 rounded-lg shadow-md hover:shadow-xl transition-transform duration-300 border border-gray-200 cursor-pointer word-card"
-      onclick="window.openConceptViewModal('${concept._id}')"
+      class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200 cursor-pointer concept-card"
+      onclick="openConceptViewModal('${conceptId}')"
+      style="border-left: 4px solid ${colorTheme}"
     >
-      <div class="mb-4 flex justify-between items-start">
-        <div>
-          <h2 class="text-xl font-bold">${emoji} ${targetExpression.word}</h2>
-          <p class="text-sm text-gray-500">${
-            targetExpression.pronunciation || ""
-          }</p>
+      <div class="flex items-start justify-between mb-4">
+        <div class="flex items-center space-x-3">
+          <span class="text-3xl">${emoji}</span>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-800 mb-1">
+              ${targetExpression.word || "N/A"}
+            </h3>
+            <p class="text-sm text-gray-500">${
+              targetExpression.pronunciation ||
+              targetExpression.romanization ||
+              ""
+            }</p>
+          </div>
         </div>
         <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-          ${concept.concept_info.domain}/${concept.concept_info.category}
+          ${conceptInfo.domain}/${conceptInfo.category}
         </span>
       </div>
       
@@ -260,7 +322,7 @@ function createConceptCard(concept) {
           <span class="text-gray-500 text-sm mr-2">
             ${getTranslatedText("meaning")}
           </span>
-          <span class="font-medium">${sourceExpression.word}</span>
+          <span class="font-medium">${sourceExpression.word || "N/A"}</span>
         </div>
         <p class="text-sm text-gray-600 mt-1">${
           sourceExpression.definition || ""
@@ -286,7 +348,9 @@ function createConceptCard(concept) {
           <i class="fas fa-language mr-1"></i> ${sourceLanguage} → ${targetLanguage}
         </span>
         <span class="flex items-center">
-          <i class="fas fa-clock mr-1"></i> ${formatDate(concept.timestamp)}
+          <i class="fas fa-clock mr-1"></i> ${formatDate(
+            concept.created_at || concept.timestamp
+          )}
         </span>
       </div>
     </div>
@@ -311,7 +375,7 @@ function formatDate(timestamp) {
   });
 }
 
-// 검색 및 필터링 함수
+// 검색 및 필터링 함수 (확장된 구조 지원 및 디버깅 개선)
 function handleSearch(elements) {
   displayCount = 12;
   lastVisibleConcept = null;
@@ -323,40 +387,87 @@ function handleSearch(elements) {
   const categoryFilter = elements.categoryFilter.value;
   const sortOption = elements.sortOption.value;
 
-  // 필터링 로직
+  console.log("검색 및 필터링 시작:", {
+    searchValue,
+    sourceLanguage,
+    targetLanguage,
+    categoryFilter,
+    sortOption,
+    totalConcepts: allConcepts.length,
+  });
+
+  // 필터링 로직 (새 구조와 기존 구조 모두 지원)
   filteredConcepts = allConcepts.filter((concept) => {
-    // 두 언어가 모두 있는지 확인
-    if (
-      !concept.expressions[sourceLanguage] ||
-      !concept.expressions[targetLanguage]
-    ) {
+    // 표현 확인 (더 유연한 조건)
+    const sourceExpression = concept.expressions?.[sourceLanguage];
+    const targetExpression = concept.expressions?.[targetLanguage];
+
+    // 적어도 하나의 언어에는 단어가 있어야 함 (두 언어 모두 필수는 아님)
+    const hasAnyExpression = Object.values(concept.expressions || {}).some(
+      (expr) => expr.word
+    );
+
+    if (!hasAnyExpression) {
+      console.log("표현이 없는 개념 필터링:", concept.id || concept._id);
       return false;
     }
 
+    // 현재 선택된 언어 조합에서 적어도 하나는 있어야 함
+    if (!sourceExpression?.word && !targetExpression?.word) {
+      console.log(
+        "선택된 언어 조합에 표현이 없는 개념:",
+        concept.id || concept._id
+      );
+      return false;
+    }
+
+    // concept_info 가져오기 (새 구조 우선, 기존 구조 fallback)
+    const conceptInfo = concept.concept_info || {
+      domain: concept.domain || "기타",
+      category: concept.category || "일반",
+    };
+
     // 카테고리 필터
-    if (
-      categoryFilter !== "all" &&
-      concept.concept_info.category !== categoryFilter
-    ) {
+    if (categoryFilter !== "all" && conceptInfo.category !== categoryFilter) {
       return false;
     }
 
     // 검색어 필터
     if (searchValue) {
-      const sourceWord = concept.expressions[sourceLanguage].word.toLowerCase();
-      const targetWord = concept.expressions[targetLanguage].word.toLowerCase();
-      const definition =
-        concept.expressions[sourceLanguage].definition?.toLowerCase() || "";
+      const sourceWord = sourceExpression?.word?.toLowerCase() || "";
+      const targetWord = targetExpression?.word?.toLowerCase() || "";
+      const sourceDefinition =
+        sourceExpression?.definition?.toLowerCase() || "";
+      const targetDefinition =
+        targetExpression?.definition?.toLowerCase() || "";
 
-      return (
+      // 태그도 검색에 포함 (새 구조)
+      const tags = conceptInfo.tags
+        ? conceptInfo.tags.join(" ").toLowerCase()
+        : "";
+
+      // 도메인과 카테고리도 검색에 포함
+      const domain = conceptInfo.domain?.toLowerCase() || "";
+      const category = conceptInfo.category?.toLowerCase() || "";
+
+      const matchesSearch =
         sourceWord.includes(searchValue) ||
         targetWord.includes(searchValue) ||
-        definition.includes(searchValue)
-      );
+        sourceDefinition.includes(searchValue) ||
+        targetDefinition.includes(searchValue) ||
+        tags.includes(searchValue) ||
+        domain.includes(searchValue) ||
+        category.includes(searchValue);
+
+      if (!matchesSearch) {
+        return false;
+      }
     }
 
     return true;
   });
+
+  console.log(`필터링 결과: ${filteredConcepts.length}개 개념`);
 
   // 정렬
   sortFilteredConcepts(sortOption);
@@ -365,7 +476,7 @@ function handleSearch(elements) {
   displayConceptList();
 }
 
-// 정렬 함수
+// 정렬 함수 (확장된 구조 지원)
 function sortFilteredConcepts(sortOption) {
   switch (sortOption) {
     case "latest":
@@ -373,11 +484,19 @@ function sortFilteredConcepts(sortOption) {
         const dateA =
           a.created_at instanceof Timestamp
             ? a.created_at.toMillis()
-            : new Date(a.created_at).getTime();
+            : a.created_at
+            ? new Date(a.created_at).getTime()
+            : a.timestamp instanceof Timestamp
+            ? a.timestamp.toMillis()
+            : new Date(a.timestamp || 0).getTime();
         const dateB =
           b.created_at instanceof Timestamp
             ? b.created_at.toMillis()
-            : new Date(b.created_at).getTime();
+            : b.created_at
+            ? new Date(b.created_at).getTime()
+            : b.timestamp instanceof Timestamp
+            ? b.timestamp.toMillis()
+            : new Date(b.timestamp || 0).getTime();
         return dateB - dateA;
       });
       break;
@@ -386,50 +505,86 @@ function sortFilteredConcepts(sortOption) {
         const dateA =
           a.created_at instanceof Timestamp
             ? a.created_at.toMillis()
-            : new Date(a.created_at).getTime();
+            : a.created_at
+            ? new Date(a.created_at).getTime()
+            : a.timestamp instanceof Timestamp
+            ? a.timestamp.toMillis()
+            : new Date(a.timestamp || 0).getTime();
         const dateB =
           b.created_at instanceof Timestamp
             ? b.created_at.toMillis()
-            : new Date(b.created_at).getTime();
+            : b.created_at
+            ? new Date(b.created_at).getTime()
+            : b.timestamp instanceof Timestamp
+            ? b.timestamp.toMillis()
+            : new Date(b.timestamp || 0).getTime();
         return dateA - dateB;
       });
       break;
     case "a-z":
       filteredConcepts.sort((a, b) => {
         const sourceLanguage = document.getElementById("source-language").value;
-        const wordA = a.expressions[sourceLanguage]?.word.toLowerCase() || "";
-        const wordB = b.expressions[sourceLanguage]?.word.toLowerCase() || "";
+        const wordA =
+          a.expressions?.[sourceLanguage]?.word?.toLowerCase() || "";
+        const wordB =
+          b.expressions?.[sourceLanguage]?.word?.toLowerCase() || "";
         return wordA.localeCompare(wordB);
       });
       break;
     case "z-a":
       filteredConcepts.sort((a, b) => {
         const sourceLanguage = document.getElementById("source-language").value;
-        const wordA = a.expressions[sourceLanguage]?.word.toLowerCase() || "";
-        const wordB = b.expressions[sourceLanguage]?.word.toLowerCase() || "";
+        const wordA =
+          a.expressions?.[sourceLanguage]?.word?.toLowerCase() || "";
+        const wordB =
+          b.expressions?.[sourceLanguage]?.word?.toLowerCase() || "";
         return wordB.localeCompare(wordA);
       });
       break;
   }
 }
 
-// 개념 목록 표시 함수
+// 개념 목록 표시 함수 (디버깅 개선)
 function displayConceptList() {
   const conceptList = document.getElementById("concept-list");
   const loadMoreBtn = document.getElementById("load-more");
   const conceptCount = document.getElementById("concept-count");
 
-  if (!conceptList) return;
+  console.log("displayConceptList 호출됨");
+  console.log("concept-list 요소:", conceptList);
+
+  if (!conceptList) {
+    console.error("concept-list 요소를 찾을 수 없습니다!");
+    return;
+  }
+
+  console.log("개념 목록 표시 시작:", {
+    totalFiltered: filteredConcepts.length,
+    displayCount: displayCount,
+  });
 
   // 표시할 개념 선택
   const conceptsToShow = filteredConcepts.slice(0, displayCount);
 
+  console.log(
+    "표시할 개념들:",
+    conceptsToShow.map((c) => ({
+      id: c.id || c._id,
+      sourceWord:
+        c.expressions?.[document.getElementById("source-language").value]?.word,
+      targetWord:
+        c.expressions?.[document.getElementById("target-language").value]?.word,
+    }))
+  );
+
   // 개념 수 업데이트
   if (conceptCount) {
     conceptCount.textContent = filteredConcepts.length;
+    console.log("개념 수 업데이트:", filteredConcepts.length);
   }
 
   if (conceptsToShow.length === 0) {
+    console.log("표시할 개념이 없음");
     conceptList.innerHTML = `
       <div class="col-span-full text-center py-8 text-gray-500">
         표시할 개념이 없습니다. 다른 언어 조합이나 필터를 시도해보세요.
@@ -440,14 +595,80 @@ function displayConceptList() {
   }
 
   // 개념 카드 생성 및 표시
-  conceptList.innerHTML = conceptsToShow.map(createConceptCard).join("");
+  const cardHTMLs = conceptsToShow
+    .map((concept, index) => {
+      const cardHTML = createConceptCard(concept);
+      if (!cardHTML) {
+        console.log(`카드 ${index} 생성 실패:`, concept.id || concept._id);
+      }
+      return cardHTML;
+    })
+    .filter((html) => html); // 빈 HTML 제거
+
+  console.log(`${cardHTMLs.length}개의 카드 HTML 생성됨`);
+  console.log(
+    "첫 번째 카드 HTML 샘플:",
+    cardHTMLs[0]?.substring(0, 200) + "..."
+  );
+
+  // DOM에 HTML 삽입 전 현재 상태 확인
+  console.log(
+    "DOM 삽입 전 conceptList.innerHTML:",
+    conceptList.innerHTML.length > 0 ? "내용 있음" : "비어있음"
+  );
+
+  // HTML 삽입
+  conceptList.innerHTML = cardHTMLs.join("");
+
+  // DOM 삽입 후 확인
+  console.log(
+    "DOM 삽입 후 conceptList.innerHTML:",
+    conceptList.innerHTML.length > 0
+      ? `${conceptList.innerHTML.length}자`
+      : "비어있음"
+  );
+  console.log(
+    "DOM 삽입 후 conceptList.children.length:",
+    conceptList.children.length
+  );
+
+  // 강제 테스트 요소 추가 (디버깅용)
+  if (conceptList.children.length === 0) {
+    console.log("카드가 삽입되지 않았습니다. 테스트 요소를 추가합니다.");
+    conceptList.innerHTML =
+      '<div style="padding: 20px; background: red; color: white; text-align: center;">테스트 요소 - 이게 보이면 DOM 조작은 정상입니다</div>';
+    setTimeout(() => {
+      console.log("3초 후 다시 시도합니다.");
+      conceptList.innerHTML = cardHTMLs.join("");
+      console.log(
+        "재시도 후 conceptList.children.length:",
+        conceptList.children.length
+      );
+    }, 3000);
+  }
+
+  // 실제 DOM 요소들 확인
+  const insertedCards = conceptList.querySelectorAll(".concept-card");
+  console.log("삽입된 concept-card 요소 수:", insertedCards.length);
+
+  // 첫 번째 카드 요소 확인
+  if (insertedCards.length > 0) {
+    console.log("첫 번째 카드 요소:", insertedCards[0]);
+    console.log("첫 번째 카드 스타일:", getComputedStyle(insertedCards[0]));
+  }
 
   // 더 보기 버튼 표시/숨김
-  if (filteredConcepts.length > displayCount) {
-    loadMoreBtn.classList.remove("hidden");
-  } else {
-    loadMoreBtn.classList.add("hidden");
+  if (loadMoreBtn) {
+    if (filteredConcepts.length > displayCount) {
+      loadMoreBtn.classList.remove("hidden");
+      console.log("더 보기 버튼 표시");
+    } else {
+      loadMoreBtn.classList.add("hidden");
+      console.log("더 보기 버튼 숨김");
+    }
   }
+
+  console.log("개념 목록 표시 완료");
 }
 
 // 더 보기 버튼 처리
@@ -500,21 +721,87 @@ async function updateUsageUI() {
   }
 }
 
-// 개념 데이터 가져오기
+// 개념 데이터 가져오기 (ID 포함 및 디버깅 개선)
 async function fetchAndDisplayConcepts() {
   try {
     if (!currentUser) return;
 
-    // concepts 컬렉션에서 데이터 가져오기
+    console.log("개념 데이터 가져오기 시작...");
+
+    // concepts 컬렉션에서 모든 데이터 가져오기 (orderBy 없이)
     const conceptsRef = collection(db, "concepts");
-    const q = query(conceptsRef, orderBy("created_at", "desc"));
-    const querySnapshot = await getDocs(q);
+    // created_at 필드가 없는 문서도 포함하기 위해 orderBy 제거
+    const querySnapshot = await getDocs(conceptsRef);
 
     allConcepts = [];
     querySnapshot.forEach((doc) => {
       const data = doc.data();
+      // 문서 ID 추가
+      data.id = doc.id;
+      // 기존 _id 필드가 없으면 doc.id로 설정
+      if (!data._id) {
+        data._id = doc.id;
+      }
       allConcepts.push(data);
+
+      // 생성 시간 정보도 로그에 포함
+      const createdAt = data.created_at
+        ? data.created_at.toDate
+          ? data.created_at.toDate()
+          : new Date(data.created_at)
+        : data.timestamp
+        ? data.timestamp.toDate
+          ? data.timestamp.toDate()
+          : new Date(data.timestamp)
+        : null;
+
+      console.log("가져온 개념:", {
+        id: data.id,
+        domain: data.concept_info?.domain || data.domain,
+        category: data.concept_info?.category || data.category,
+        expressions: Object.keys(data.expressions || {}),
+        structure: data.concept_info ? "new" : "legacy",
+        createdAt: createdAt
+          ? createdAt.toLocaleString("ko-KR")
+          : "시간 정보 없음",
+        koreanWord: data.expressions?.korean?.word,
+        englishWord: data.expressions?.english?.word,
+        hasCreatedAt: !!data.created_at,
+        hasTimestamp: !!data.timestamp,
+      });
     });
+
+    console.log(`총 ${allConcepts.length}개의 개념을 가져왔습니다.`);
+
+    // JavaScript에서 직접 정렬 (created_at이 없는 경우 최신으로 간주)
+    allConcepts.sort((a, b) => {
+      const getTime = (concept) => {
+        if (concept.created_at) {
+          return concept.created_at.toDate
+            ? concept.created_at.toDate().getTime()
+            : new Date(concept.created_at).getTime();
+        }
+        if (concept.timestamp) {
+          return concept.timestamp.toDate
+            ? concept.timestamp.toDate().getTime()
+            : new Date(concept.timestamp).getTime();
+        }
+        // 시간 정보가 없으면 현재 시간으로 간주 (최신으로 표시)
+        return Date.now();
+      };
+
+      return getTime(b) - getTime(a); // 내림차순 정렬
+    });
+
+    // 즉시 DOM 상태 확인 (디버깅용)
+    console.log("=== DOM 상태 확인 ===");
+    const conceptListElement = document.getElementById("concept-list");
+    console.log("concept-list 요소:", conceptListElement);
+    console.log("concept-list 부모:", conceptListElement?.parentElement);
+    console.log(
+      "concept-list 스타일:",
+      conceptListElement ? getComputedStyle(conceptListElement) : "요소 없음"
+    );
 
     // 현재 필터로 검색 및 표시
     const elements = {
@@ -524,6 +811,8 @@ async function fetchAndDisplayConcepts() {
       categoryFilter: document.getElementById("category-filter"),
       sortOption: document.getElementById("sort-option"),
     };
+
+    console.log("검색 요소들:", elements);
 
     handleSearch(elements);
   } catch (error) {
@@ -549,7 +838,7 @@ async function loadModals(modalPaths) {
   }
 }
 
-// 개념 상세 보기 모달 열기 함수 (전역 함수)
+// 개념 상세 보기 모달 열기 함수 (전역 함수, ID 조회 개선)
 window.openConceptViewModal = async function (conceptId) {
   try {
     console.log("모달 열기 시도, conceptId:", conceptId);
@@ -565,12 +854,52 @@ window.openConceptViewModal = async function (conceptId) {
 
     console.log("현재 언어 설정:", { sourceLanguage, targetLanguage });
 
-    console.log("conceptUtils.getConcept 호출 중...");
-    const conceptData = await conceptUtils.getConcept(conceptId);
+    // 먼저 메모리에서 개념 찾기 (빠른 검색)
+    let conceptData = allConcepts.find(
+      (concept) =>
+        concept.id === conceptId ||
+        concept._id === conceptId ||
+        `${concept.expressions?.[sourceLanguage]?.word}_${concept.expressions?.[targetLanguage]?.word}` ===
+          conceptId
+    );
 
-    console.log("개념 데이터 조회 결과:", conceptData);
+    console.log("메모리에서 개념 찾기 결과:", conceptData ? "발견" : "없음");
+
+    // 메모리에서 찾지 못했으면 Firebase에서 조회
+    if (!conceptData) {
+      console.log("Firebase에서 개념 조회 시도...");
+      try {
+        conceptData = await conceptUtils.getConcept(conceptId);
+        console.log("Firebase 조회 결과:", conceptData);
+      } catch (error) {
+        console.error("Firebase 조회 실패:", error);
+
+        // ID가 word 조합 형태인 경우 메모리에서 다시 검색
+        if (conceptId.includes("_")) {
+          const [sourceWord, targetWord] = conceptId.split("_");
+          conceptData = allConcepts.find((concept) => {
+            const srcExpr = concept.expressions?.[sourceLanguage];
+            const tgtExpr = concept.expressions?.[targetLanguage];
+            return srcExpr?.word === sourceWord && tgtExpr?.word === targetWord;
+          });
+          console.log(
+            "단어 조합으로 재검색 결과:",
+            conceptData ? "발견" : "없음"
+          );
+        }
+      }
+    }
 
     if (!conceptData) {
+      console.error("개념을 찾을 수 없습니다. conceptId:", conceptId);
+      console.log(
+        "사용 가능한 개념들:",
+        allConcepts.map((c) => ({
+          id: c.id || c._id,
+          sourceWord: c.expressions?.[sourceLanguage]?.word,
+          targetWord: c.expressions?.[targetLanguage]?.word,
+        }))
+      );
       alert("개념 정보를 찾을 수 없습니다.");
       return;
     }
@@ -592,11 +921,11 @@ window.openConceptViewModal = async function (conceptId) {
   } catch (error) {
     console.error("개념 상세 보기 모달 열기 중 오류 발생:", error);
     console.error("Error stack:", error.stack);
-    alert("개념 정보를 불러올 수 없습니다.");
+    alert("개념 정보를 불러올 수 없습니다: " + error.message);
   }
 };
 
-// 개념 상세 보기 모달 내용 채우기
+// 개념 상세 보기 모달 내용 채우기 (확장된 구조 지원)
 function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
   const modal = document.getElementById("concept-view-modal");
   if (!modal) return;
@@ -604,11 +933,29 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
   console.log("모달 요소 구조 확인:", modal);
   console.log("사용할 언어 설정:", { sourceLanguage, targetLanguage });
 
-  console.log("개념 데이터의 이모지:", conceptData.concept_info.emoji);
+  // concept_info 가져오기 (새 구조 우선, 기존 구조 fallback)
+  const conceptInfo = conceptData.concept_info || {
+    domain: conceptData.domain || "기타",
+    category: conceptData.category || "일반",
+    unicode_emoji: conceptData.emoji || "📝",
+    color_theme: conceptData.color_theme || "#4B63AC",
+  };
+
+  console.log("개념 정보:", conceptInfo);
+  console.log("개념 데이터의 이모지:", conceptInfo.unicode_emoji);
   console.log("개념 데이터 전체:", conceptData);
 
-  // 이모지 가져오기
-  const emoji = conceptData.concept_info.emoji || "📝";
+  // 색상 테마 가져오기 (안전한 fallback)
+  const colorTheme =
+    conceptInfo.color_theme || conceptData.color_theme || "#4B63AC";
+
+  // 이모지 가져오기 (실제 데이터 구조에 맞게 우선순위 조정)
+  const emoji =
+    conceptInfo.unicode_emoji ||
+    conceptInfo.emoji ||
+    conceptData.emoji ||
+    conceptData.unicode_emoji ||
+    "📝";
 
   // 기본 정보 설정 (선택된 언어에 맞게)
   const conceptEmoji = document.getElementById("concept-view-emoji");
@@ -619,9 +966,9 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
   const conceptCategory = document.getElementById("concept-category");
   const conceptDomain = document.getElementById("concept-domain");
 
-  // 원본 언어의 표현 가져오기
-  const sourceExpression = conceptData.expressions[sourceLanguage];
-  const targetExpression = conceptData.expressions[targetLanguage];
+  // 원본 언어의 표현 가져오기 (새 구조와 기존 구조 모두 지원)
+  const sourceExpression = conceptData.expressions?.[sourceLanguage] || {};
+  const targetExpression = conceptData.expressions?.[targetLanguage] || {};
 
   // 간단하게 innerHTML로 상단 영역 구성 (언어탭 방식과 동일) - 대상언어 우선
   if (conceptEmoji) {
@@ -641,7 +988,7 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
   }
 
   if (conceptPrimaryWord) {
-    if (targetExpression) {
+    if (targetExpression.word) {
       conceptPrimaryWord.textContent = targetExpression.word;
     } else {
       conceptPrimaryWord.textContent = "N/A";
@@ -649,20 +996,24 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
   }
 
   if (conceptPrimaryPronunciation) {
-    if (targetExpression) {
-      conceptPrimaryPronunciation.textContent =
-        targetExpression.pronunciation || "";
-    } else {
-      conceptPrimaryPronunciation.textContent = "";
-    }
+    conceptPrimaryPronunciation.textContent =
+      targetExpression.pronunciation || targetExpression.romanization || "";
   }
 
-  if (conceptCategory)
-    conceptCategory.textContent = conceptData.concept_info?.category || "기타";
-  if (conceptDomain)
-    conceptDomain.textContent = conceptData.concept_info?.domain || "일반";
+  if (conceptCategory) {
+    conceptCategory.textContent = conceptInfo.category;
+  }
 
-  // 언어 표현 탭 생성
+  if (conceptDomain) {
+    conceptDomain.textContent = conceptInfo.domain;
+  }
+
+  // 언어별 표현 정보 채우기
+  fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage);
+}
+
+// 언어별 표현 정보 채우기 함수 (확장된 구조 지원)
+function fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage) {
   const tabContainer = document.getElementById("concept-view-tabs");
   const contentContainer = document.getElementById("concept-view-content");
 
@@ -681,26 +1032,29 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
   const orderedLanguages = [];
 
   // 1. 원본 언어가 있으면 먼저 추가
-  if (conceptData.expressions[sourceLanguage]) {
+  if (conceptData.expressions?.[sourceLanguage]?.word) {
     orderedLanguages.push(sourceLanguage);
   }
 
   // 2. 대상 언어가 있고 원본 언어와 다르면 추가
   if (
-    conceptData.expressions[targetLanguage] &&
+    conceptData.expressions?.[targetLanguage]?.word &&
     sourceLanguage !== targetLanguage
   ) {
     orderedLanguages.push(targetLanguage);
   }
 
   // 3. 나머지 언어들 추가
-  Object.keys(conceptData.expressions).forEach((langCode) => {
-    if (!orderedLanguages.includes(langCode)) {
+  Object.keys(conceptData.expressions || {}).forEach((langCode) => {
+    if (
+      !orderedLanguages.includes(langCode) &&
+      conceptData.expressions[langCode]?.word
+    ) {
       orderedLanguages.push(langCode);
     }
   });
 
-  // 각 언어별 탭과 컨텐츠 생성 (순서 변경됨)
+  // 각 언어별 탭과 컨텐츠 생성
   orderedLanguages.forEach((langCode, index) => {
     const expression = conceptData.expressions[langCode];
     const langInfo = supportedLanguages[langCode] || {
@@ -726,12 +1080,23 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
     panel.id = `view-${langCode}-content`;
     panel.className = `${index === 0 ? "" : "hidden"} p-4`;
 
-    // 언어에 따른 레이블 설정
-    let definitionLabel = "의미/정의:";
-    let partOfSpeechLabel = "품사:";
-    let levelLabel = "난이도:";
+    // 새로운 구조의 추가 정보 포함
+    const synonyms = expression.synonyms ? expression.synonyms.join(", ") : "";
+    const antonyms = expression.antonyms ? expression.antonyms.join(", ") : "";
+    const wordFamily = expression.word_family
+      ? expression.word_family.join(", ")
+      : "";
 
-    // 이모지 제거된 패널 내용
+    // 연어 정보 처리
+    let collocationsText = "";
+    if (expression.collocations && Array.isArray(expression.collocations)) {
+      collocationsText = expression.collocations
+        .map((col) =>
+          typeof col === "object" ? `${col.phrase} (${col.frequency})` : col
+        )
+        .join(", ");
+    }
+
     panel.innerHTML = `
       <div class="mb-4">
         <div class="flex items-center gap-2 mb-1">
@@ -740,69 +1105,81 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
             expression.part_of_speech || "정보 없음"
           }</span>
         </div>
-        <p class="text-gray-500">${expression.pronunciation || ""}</p>
+        <p class="text-gray-500">${
+          expression.pronunciation || expression.romanization || ""
+        }</p>
+        ${
+          langCode === "japanese" && expression.hiragana
+            ? `<p class="text-sm text-gray-600">히라가나: ${expression.hiragana}</p>`
+            : ""
+        }
+        ${
+          langCode === "japanese" && expression.katakana
+            ? `<p class="text-sm text-gray-600">가타카나: ${expression.katakana}</p>`
+            : ""
+        }
+        ${
+          langCode === "japanese" && expression.kanji
+            ? `<p class="text-sm text-gray-600">한자: ${expression.kanji}</p>`
+            : ""
+        }
       </div>
       <div class="mb-4">
-        <p class="text-sm text-gray-700 mb-1">${definitionLabel}</p>
+        <p class="text-sm text-gray-700 mb-1">의미/정의:</p>
         <p>${expression.definition || "정의 없음"}</p>
       </div>
       <div class="grid grid-cols-1 gap-4 mb-4">
         <div>
-          <p class="text-sm text-gray-700 mb-1">${levelLabel}</p>
+          <p class="text-sm text-gray-700 mb-1">난이도:</p>
           <p>${expression.level || "정보 없음"}</p>
         </div>
+        ${
+          synonyms
+            ? `
+        <div>
+          <p class="text-sm text-gray-700 mb-1">동의어:</p>
+          <p>${synonyms}</p>
+        </div>
+        `
+            : ""
+        }
+        ${
+          antonyms
+            ? `
+        <div>
+          <p class="text-sm text-gray-700 mb-1">반의어:</p>
+          <p>${antonyms}</p>
+        </div>
+        `
+            : ""
+        }
+        ${
+          wordFamily
+            ? `
+        <div>
+          <p class="text-sm text-gray-700 mb-1">어족:</p>
+          <p>${wordFamily}</p>
+        </div>
+        `
+            : ""
+        }
+        ${
+          collocationsText
+            ? `
+        <div>
+          <p class="text-sm text-gray-700 mb-1">연어:</p>
+          <p>${collocationsText}</p>
+        </div>
+        `
+            : ""
+        }
       </div>
     `;
 
     contentContainer.appendChild(panel);
   });
 
-  // 예문 표시는 탭 전환 시 동적으로 처리
-
-  // 편집 버튼 이벤트
-  const editButton = document.getElementById("edit-concept-button");
-  if (editButton) {
-    editButton.onclick = () => {
-      // 개념 수정 모달 열기
-      const viewModal = document.getElementById("concept-view-modal");
-      if (viewModal) viewModal.classList.add("hidden");
-
-      window.openConceptModal(conceptData._id);
-    };
-  }
-
-  // 삭제 버튼 이벤트
-  const deleteButton = document.getElementById("delete-concept-button");
-  if (deleteButton) {
-    deleteButton.onclick = async () => {
-      if (confirm("정말로 이 개념을 삭제하시겠습니까?")) {
-        try {
-          await conceptUtils.deleteConcept(conceptData._id);
-          alert("개념이 성공적으로 삭제되었습니다.");
-
-          // 모달 닫기
-          const viewModal = document.getElementById("concept-view-modal");
-          if (viewModal) viewModal.classList.add("hidden");
-
-          // 목록 새로고침
-          window.dispatchEvent(new CustomEvent("concept-saved"));
-        } catch (error) {
-          console.error("개념 삭제 중 오류 발생:", error);
-          alert("개념 삭제 중 오류가 발생했습니다: " + error.message);
-        }
-      }
-    };
-  }
-
-  // 모달 닫기 버튼 이벤트
-  const closeButton = document.getElementById("close-concept-view-modal");
-  if (closeButton) {
-    closeButton.onclick = () => {
-      modal.classList.add("hidden");
-    };
-  }
-
-  // 탭 전환 함수 정의 (예문 필터링 포함)
+  // 탭 전환 함수 정의
   window.switchViewTab = (langCode) => {
     // 모든 탭 비활성화
     document.querySelectorAll("[id^='view-'][id$='-tab']").forEach((tab) => {
@@ -834,48 +1211,148 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
     updateExamples(langCode, conceptData);
   };
 
+  // 모달 버튼 이벤트 설정
+  setupModalButtons(conceptData);
+
   // 초기 예문 표시 (첫 번째 탭 언어)
   if (orderedLanguages.length > 0) {
     updateExamples(orderedLanguages[0], conceptData);
   }
 }
 
-// 특정 언어의 예문만 표시하는 함수
+// 모달 버튼 이벤트 설정
+function setupModalButtons(conceptData) {
+  // 편집 버튼 이벤트
+  const editButton = document.getElementById("edit-concept-button");
+  if (editButton) {
+    editButton.onclick = () => {
+      // 개념 수정 모달 열기
+      const viewModal = document.getElementById("concept-view-modal");
+      if (viewModal) viewModal.classList.add("hidden");
+
+      window.openConceptModal(conceptData.id || conceptData._id);
+    };
+  }
+
+  // 삭제 버튼 이벤트
+  const deleteButton = document.getElementById("delete-concept-button");
+  if (deleteButton) {
+    deleteButton.onclick = async () => {
+      if (confirm("정말로 이 개념을 삭제하시겠습니까?")) {
+        try {
+          await conceptUtils.deleteConcept(conceptData.id || conceptData._id);
+          alert("개념이 성공적으로 삭제되었습니다.");
+
+          // 모달 닫기
+          const viewModal = document.getElementById("concept-view-modal");
+          if (viewModal) viewModal.classList.add("hidden");
+
+          // 목록 새로고침
+          window.dispatchEvent(new CustomEvent("concept-saved"));
+        } catch (error) {
+          console.error("개념 삭제 중 오류 발생:", error);
+          alert("개념 삭제 중 오류가 발생했습니다: " + error.message);
+        }
+      }
+    };
+  }
+
+  // 모달 닫기 버튼 이벤트
+  const closeButton = document.getElementById("close-concept-view-modal");
+  if (closeButton) {
+    closeButton.onclick = () => {
+      const modal = document.getElementById("concept-view-modal");
+      if (modal) modal.classList.add("hidden");
+    };
+  }
+}
+
+// 특정 언어의 예문만 표시하는 함수 (확장된 구조 지원)
 function updateExamples(langCode, conceptData) {
   const examplesContainer = document.getElementById("concept-view-examples");
 
   console.log("예문 업데이트 - 언어:", langCode);
-  console.log("전체 예문 데이터:", conceptData.examples);
+  console.log(
+    "전체 예문 데이터:",
+    conceptData.featured_examples || conceptData.examples
+  );
 
   if (!examplesContainer) return;
 
   examplesContainer.innerHTML = "";
 
-  if (conceptData.examples && conceptData.examples.length > 0) {
-    console.log("예문 개수:", conceptData.examples.length);
+  // 새로운 구조의 featured_examples 우선 사용, 없으면 기존 examples 사용
+  const examples = conceptData.featured_examples || conceptData.examples || [];
 
-    const filteredExamples = conceptData.examples.filter(
-      (example) => example[langCode]
-    );
-    console.log("필터링된 예문:", filteredExamples);
+  if (examples.length > 0) {
+    console.log("예문 개수:", examples.length);
 
-    if (filteredExamples.length > 0) {
-      filteredExamples.forEach((example, index) => {
-        console.log(`예문 ${index + 1}:`, example);
+    examples.forEach((example, index) => {
+      console.log(`예문 ${index + 1}:`, example);
 
-        const exampleDiv = document.createElement("div");
-        exampleDiv.className = "border p-4 rounded mb-4 bg-gray-50";
+      const exampleDiv = document.createElement("div");
+      exampleDiv.className = "border p-4 rounded mb-4 bg-gray-50";
 
-        // 현재 탭 언어, 원본 언어, 대상 언어의 예문을 모두 표시
-        const sourceLanguage = document.getElementById("source-language").value;
-        const targetLanguage = document.getElementById("target-language").value;
+      const sourceLanguage = document.getElementById("source-language").value;
+      const targetLanguage = document.getElementById("target-language").value;
 
-        let exampleContent = "";
+      let exampleContent = "";
+      const languagesToShow = [];
 
-        // 대상언어 → 원본언어 순서로 표시 (현재 탭 언어와 관계없이)
-        const languagesToShow = [];
+      // 새로운 구조 처리 (featured_examples)
+      if (example.translations) {
+        // 1. 대상언어 먼저 추가
+        if (targetLanguage && example.translations[targetLanguage]) {
+          const targetLangInfo = supportedLanguages[targetLanguage] || {
+            nameKo: targetLanguage,
+          };
+          languagesToShow.push({
+            code: targetLanguage,
+            name: targetLangInfo.nameKo,
+            text: example.translations[targetLanguage].text,
+            label: "(대상)",
+            grammar: example.translations[targetLanguage].grammar_notes,
+          });
+        }
 
-        // 1. 대상언어 먼저 추가 (있는 경우)
+        // 2. 원본언어 추가
+        if (
+          sourceLanguage &&
+          example.translations[sourceLanguage] &&
+          sourceLanguage !== targetLanguage
+        ) {
+          const sourceLangInfo = supportedLanguages[sourceLanguage] || {
+            nameKo: sourceLanguage,
+          };
+          languagesToShow.push({
+            code: sourceLanguage,
+            name: sourceLangInfo.nameKo,
+            text: example.translations[sourceLanguage].text,
+            label: "(원본)",
+            grammar: example.translations[sourceLanguage].grammar_notes,
+          });
+        }
+
+        // 3. 현재 탭 언어 추가
+        if (
+          example.translations[langCode] &&
+          !languagesToShow.find((lang) => lang.code === langCode)
+        ) {
+          const currentLangInfo = supportedLanguages[langCode] || {
+            nameKo: langCode,
+          };
+          languagesToShow.push({
+            code: langCode,
+            name: currentLangInfo.nameKo,
+            text: example.translations[langCode].text,
+            label: "(현재)",
+            grammar: example.translations[langCode].grammar_notes,
+          });
+        }
+      }
+      // 기존 구조 처리 (examples)
+      else {
+        // 1. 대상언어 먼저 추가
         if (targetLanguage && example[targetLanguage]) {
           const targetLangInfo = supportedLanguages[targetLanguage] || {
             nameKo: targetLanguage,
@@ -888,7 +1365,7 @@ function updateExamples(langCode, conceptData) {
           });
         }
 
-        // 2. 원본언어 추가 (있고, 대상언어와 다른 경우)
+        // 2. 원본언어 추가
         if (
           sourceLanguage &&
           example[sourceLanguage] &&
@@ -905,7 +1382,7 @@ function updateExamples(langCode, conceptData) {
           });
         }
 
-        // 3. 현재 탭 언어 추가 (위에 추가되지 않은 경우만)
+        // 3. 현재 탭 언어 추가
         if (
           example[langCode] &&
           !languagesToShow.find((lang) => lang.code === langCode)
@@ -917,36 +1394,52 @@ function updateExamples(langCode, conceptData) {
             code: langCode,
             name: currentLangInfo.nameKo,
             text: example[langCode],
-            label: "",
+            label: "(현재)",
           });
         }
+      }
 
-        // 언어들을 순서대로 표시
-        languagesToShow.forEach((lang, index) => {
-          const isFirst = index === 0;
-          exampleContent += `
-            <div class="${
-              isFirst ? "mb-3" : "mb-2 pl-4 border-l-2 border-gray-300"
-            }">
-              <span class="text-sm ${
-                isFirst ? "font-medium text-blue-600" : "text-gray-600"
-              }">${lang.name}${lang.label}:</span>
-              <p class="ml-2 ${
-                isFirst ? "font-medium text-gray-800" : "text-gray-700"
-              }">${lang.text}</p>
-            </div>
-          `;
-        });
-
-        exampleDiv.innerHTML = exampleContent;
-        examplesContainer.appendChild(exampleDiv);
+      // 예문 컨텐츠 생성
+      languagesToShow.forEach((lang) => {
+        exampleContent += `
+          <div class="mb-3">
+            <p class="text-sm font-medium text-gray-700 mb-1">
+              ${lang.name} ${lang.label}
+            </p>
+            <p class="text-gray-900">${lang.text}</p>
+            ${
+              lang.grammar
+                ? `<p class="text-xs text-gray-500 mt-1">문법: ${lang.grammar}</p>`
+                : ""
+            }
+          </div>
+        `;
       });
-    } else {
-      console.log(`${langCode} 언어의 예문이 없음`);
-      examplesContainer.innerHTML = `<p class="text-gray-500">이 언어의 예문이 없습니다.</p>`;
-    }
+
+      // 추가 정보 표시 (새로운 구조에서만)
+      if (example.context || example.priority || example.unicode_emoji) {
+        exampleContent += `
+          <div class="border-t pt-3 mt-3 text-xs text-gray-500">
+            ${
+              example.unicode_emoji
+                ? `<span class="mr-2">${example.unicode_emoji}</span>`
+                : ""
+            }
+            ${example.context ? `맥락: ${example.context}` : ""}
+            ${example.priority ? ` | 우선순위: ${example.priority}` : ""}
+          </div>
+        `;
+      }
+
+      exampleDiv.innerHTML = exampleContent;
+      examplesContainer.appendChild(exampleDiv);
+    });
   } else {
-    console.log("전체 예문이 없음");
-    examplesContainer.innerHTML = `<p class="text-gray-500">등록된 예문이 없습니다.</p>`;
+    console.log("해당 언어의 예문이 없습니다.");
+    examplesContainer.innerHTML = `
+      <div class="text-center py-8 text-gray-500">
+        <p>해당 언어의 예문이 없습니다.</p>
+      </div>
+    `;
   }
 }

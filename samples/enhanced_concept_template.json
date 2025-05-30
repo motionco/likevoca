@@ -1,0 +1,316 @@
+[
+  {
+    "concept_info": {
+      "domain": "food",
+      "category": "fruit",
+      "difficulty": "basic",
+      "tags": ["everyday", "healthy", "common"],
+      "unicode_emoji": "🍎",
+      "color_theme": "#FF6B6B",
+      "quiz_frequency": "high",
+      "game_types": ["matching", "pronunciation", "spelling"]
+    },
+    "media": {
+      "images": {
+        "primary": "https://source.unsplash.com/400x300/?apple,red",
+        "secondary": "https://source.unsplash.com/400x300/?apple,green",
+        "illustration": "https://api.iconify.design/noto:red-apple.svg?width=400",
+        "emoji_style": "https://api.iconify.design/twemoji:red-apple.svg?width=200",
+        "line_art": "https://api.iconify.design/carbon:fruit-bowl.svg?width=300"
+      },
+      "videos": {
+        "intro": null,
+        "pronunciation": null
+      },
+      "audio": {
+        "pronunciation_slow": null,
+        "pronunciation_normal": null,
+        "word_in_sentence": null
+      }
+    },
+    "expressions": {
+      "korean": {
+        "word": "사과",
+        "pronunciation": "sa-gwa",
+        "romanization": "sagwa",
+        "definition": "둥글고 단맛이 나는 열매",
+        "part_of_speech": "명사",
+        "level": "초급",
+        "unicode_emoji": "🍎",
+        "synonyms": [],
+        "antonyms": [],
+        "word_family": ["사과나무", "사과즙", "사과파이"],
+        "conjugations": null,
+        "collocations": [
+          {"phrase": "사과를 먹다", "frequency": "high"},
+          {"phrase": "빨간 사과", "frequency": "high"},
+          {"phrase": "사과 한 개", "frequency": "medium"}
+        ]
+      },
+      "english": {
+        "word": "apple",
+        "pronunciation": "ˈæpl",
+        "phonetic": "/ˈæpəl/",
+        "definition": "a round fruit with firm, white flesh and a green, red, or yellow skin",
+        "part_of_speech": "noun",
+        "level": "beginner",
+        "unicode_emoji": "🍎",
+        "synonyms": [],
+        "antonyms": [],
+        "word_family": ["apple tree", "apple juice", "apple pie"],
+        "conjugations": {
+          "plural": "apples"
+        },
+        "collocations": [
+          {"phrase": "eat an apple", "frequency": "high"},
+          {"phrase": "red apple", "frequency": "high"},
+          {"phrase": "green apple", "frequency": "medium"}
+        ]
+      },
+      "japanese": {
+        "word": "りんご",
+        "hiragana": "りんご",
+        "katakana": "リンゴ",
+        "kanji": null,
+        "pronunciation": "ringo",
+        "romanization": "ringo",
+        "definition": "赤や緑の皮をもつ、甘くて丸い果物",
+        "part_of_speech": "名詞",
+        "level": "初級",
+        "unicode_emoji": "🍎",
+        "synonyms": ["アップル"],
+        "antonyms": [],
+        "word_family": ["りんごの木", "りんごジュース"],
+        "conjugations": null,
+        "collocations": [
+          {"phrase": "りんごを食べる", "frequency": "high"},
+          {"phrase": "赤いりんご", "frequency": "high"}
+        ]
+      }
+    },
+    "featured_examples": [
+      {
+        "example_id": "example_apple_1",
+        "level": "beginner",
+        "context": "daily_routine",
+        "priority": "high",
+        "unicode_emoji": "🌅",
+        "quiz_weight": 10,
+        "translations": {
+          "korean": {
+            "text": "아침에 사과를 먹어요.",
+            "grammar_notes": "현재 시제, 존댓말"
+          },
+          "english": {
+            "text": "I eat an apple in the morning.",
+            "grammar_notes": "Simple present tense"
+          },
+          "japanese": {
+            "text": "朝にりんごを食べます。",
+            "grammar_notes": "丁寧語、現在形"
+          }
+        }
+      },
+      {
+        "example_id": "example_apple_2",
+        "level": "beginner", 
+        "context": "shopping",
+        "priority": "high",
+        "unicode_emoji": "🛒",
+        "quiz_weight": 8,
+        "translations": {
+          "korean": {
+            "text": "사과 두 개 주세요.",
+            "grammar_notes": "요청 표현, 수량 표현"
+          },
+          "english": {
+            "text": "Please give me two apples.",
+            "grammar_notes": "Polite request, plural form"
+          },
+          "japanese": {
+            "text": "りんごを二つください。",
+            "grammar_notes": "依頼表現、数量詞"
+          }
+        }
+      }
+    ],
+    "quiz_data": {
+      "question_types": ["translation", "pronunciation", "matching", "fill_blank", "multiple_choice"],
+      "difficulty_multiplier": 1.0,
+      "common_mistakes": [
+        {"mistake": "apple pie", "correction": "apple", "type": "word_confusion"},
+        {"mistake": "aple", "correction": "apple", "type": "spelling"}
+      ],
+      "hint_text": {
+        "korean": "빨간색 또는 초록색 과일",
+        "english": "Red or green fruit that grows on trees",
+        "japanese": "木になる赤や緑の果物"
+      }
+    },
+    "game_data": {
+      "memory_card": {
+        "front_image": "https://api.iconify.design/noto:red-apple.svg",
+        "back_text": "apple / 사과 / りんご"
+      },
+      "word_puzzle": {
+        "scrambled": ["a", "p", "p", "l", "e"],
+        "hints": ["It's a fruit", "Red or green", "Grows on trees"]
+      },
+      "pronunciation_game": {
+        "target_phoneme": "/æ/",
+        "similar_sounds": ["/ʌ/", "/e/"],
+        "practice_words": ["apple", "cat", "hat"]
+      }
+    },
+    "related_concepts": [],
+    "learning_metadata": {
+      "memorization_difficulty": 2,
+      "pronunciation_difficulty": 1,
+      "usage_frequency": "very_high",
+      "cultural_importance": "medium"
+    }
+  },
+  {
+    "concept_info": {
+      "domain": "daily",
+      "category": "greeting",
+      "difficulty": "basic",
+      "tags": ["polite", "common", "essential"],
+      "unicode_emoji": "👋",
+      "color_theme": "#4CAF50",
+      "quiz_frequency": "very_high",
+      "game_types": ["matching", "pronunciation"]
+    },
+    "media": {
+      "images": {
+        "primary": "https://source.unsplash.com/400x300/?greeting,hello",
+        "secondary": null,
+        "illustration": "https://api.iconify.design/noto:waving-hand.svg?width=400",
+        "emoji_style": "https://api.iconify.design/twemoji:waving-hand.svg?width=200",
+        "line_art": null
+      },
+      "videos": {
+        "intro": null,
+        "pronunciation": null
+      },
+      "audio": {
+        "pronunciation_slow": null,
+        "pronunciation_normal": null,
+        "word_in_sentence": null
+      }
+    },
+    "expressions": {
+      "korean": {
+        "word": "안녕하세요",
+        "pronunciation": "an-nyeong-ha-se-yo",
+        "romanization": "annyeonghaseyo",
+        "definition": "정중한 인사말",
+        "part_of_speech": "감탄사",
+        "level": "초급",
+        "unicode_emoji": "👋",
+        "synonyms": ["안녕", "반갑습니다"],
+        "antonyms": ["안녕히 가세요"],
+        "word_family": ["안녕", "안녕히", "안녕하다"],
+        "conjugations": null,
+        "collocations": [
+          {"phrase": "안녕하세요, 만나서 반갑습니다", "frequency": "high"}
+        ]
+      },
+      "english": {
+        "word": "hello",
+        "pronunciation": "həˈloʊ",
+        "phonetic": "/həˈloʊ/",
+        "definition": "used as a greeting or to begin a phone conversation",
+        "part_of_speech": "exclamation",
+        "level": "beginner",
+        "unicode_emoji": "👋",
+        "synonyms": ["hi", "hey", "greetings"],
+        "antonyms": ["goodbye", "bye"],
+        "word_family": ["hello", "hi", "hey"],
+        "conjugations": null,
+        "collocations": [
+          {"phrase": "say hello", "frequency": "high"},
+          {"phrase": "hello there", "frequency": "medium"}
+        ]
+      },
+      "japanese": {
+        "word": "こんにちは",
+        "hiragana": "こんにちは",
+        "katakana": null,
+        "kanji": "今日は",
+        "pronunciation": "konnichiwa",
+        "romanization": "konnichiwa",
+        "definition": "昼間の挨拶",
+        "part_of_speech": "感動詞",
+        "level": "初級",
+        "unicode_emoji": "👋",
+        "synonyms": ["おはよう", "こんばんは"],
+        "antonyms": ["さようなら"],
+        "word_family": ["こんにちは", "おはよう", "こんばんは"],
+        "conjugations": null,
+        "collocations": [
+          {"phrase": "こんにちは、元気ですか", "frequency": "high"}
+        ]
+      }
+    },
+    "featured_examples": [
+      {
+        "example_id": "example_hello_1",
+        "level": "beginner",
+        "context": "meeting",
+        "priority": "very_high",
+        "unicode_emoji": "🤝",
+        "quiz_weight": 15,
+        "translations": {
+          "korean": {
+            "text": "안녕하세요, 만나서 반갑습니다.",
+            "grammar_notes": "정중한 인사, 존댓말"
+          },
+          "english": {
+            "text": "Hello, nice to meet you.",
+            "grammar_notes": "Formal greeting"
+          },
+          "japanese": {
+            "text": "こんにちは、はじめまして。",
+            "grammar_notes": "丁寧な挨拶"
+          }
+        }
+      }
+    ],
+    "quiz_data": {
+      "question_types": ["translation", "pronunciation", "matching"],
+      "difficulty_multiplier": 0.8,
+      "common_mistakes": [
+        {"mistake": "helo", "correction": "hello", "type": "spelling"},
+        {"mistake": "hallo", "correction": "hello", "type": "spelling"}
+      ],
+      "hint_text": {
+        "korean": "만날 때 하는 인사",
+        "english": "A greeting when you meet someone",
+        "japanese": "人に会った時の挨拶"
+      }
+    },
+    "game_data": {
+      "memory_card": {
+        "front_image": "https://api.iconify.design/noto:waving-hand.svg",
+        "back_text": "hello / 안녕하세요 / こんにちは"
+      },
+      "word_puzzle": {
+        "scrambled": ["h", "e", "l", "l", "o"],
+        "hints": ["A greeting", "First word you learn", "👋"]
+      },
+      "pronunciation_game": {
+        "target_phoneme": "/həˈloʊ/",
+        "similar_sounds": ["/hɛˈloʊ/", "/həˈlɑ/"],
+        "practice_words": ["hello", "help", "held"]
+      }
+    },
+    "related_concepts": [],
+    "learning_metadata": {
+      "memorization_difficulty": 1,
+      "pronunciation_difficulty": 2,
+      "usage_frequency": "very_high",
+      "cultural_importance": "very_high"
+    }
+  }
+] 

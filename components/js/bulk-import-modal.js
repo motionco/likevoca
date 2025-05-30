@@ -142,96 +142,264 @@ function downloadTemplate() {
 
 // CSV 템플릿 다운로드
 function downloadCSVTemplate() {
-  // CSV 헤더
+  // 새로운 확장된 CSV 헤더
   const headers = [
     "domain",
     "category",
-    "emoji",
+    "difficulty",
+    "tags",
+    "unicode_emoji",
+    "color_theme",
+    "quiz_frequency",
+    "game_types",
     "korean_word",
     "korean_pronunciation",
+    "korean_romanization",
     "korean_definition",
     "korean_part_of_speech",
     "korean_level",
+    "korean_synonyms",
+    "korean_antonyms",
+    "korean_word_family",
+    "korean_collocations",
+    "korean_audio",
     "english_word",
     "english_pronunciation",
+    "english_phonetic",
     "english_definition",
     "english_part_of_speech",
     "english_level",
+    "english_synonyms",
+    "english_antonyms",
+    "english_word_family",
+    "english_collocations",
+    "english_audio",
     "japanese_word",
+    "japanese_hiragana",
+    "japanese_katakana",
+    "japanese_kanji",
     "japanese_pronunciation",
+    "japanese_romanization",
     "japanese_definition",
     "japanese_part_of_speech",
     "japanese_level",
+    "japanese_synonyms",
+    "japanese_antonyms",
+    "japanese_word_family",
+    "japanese_collocations",
+    "japanese_audio",
     "chinese_word",
     "chinese_pronunciation",
     "chinese_definition",
     "chinese_part_of_speech",
     "chinese_level",
-    "example_korean",
-    "example_english",
-    "example_japanese",
-    "example_chinese",
+    "chinese_synonyms",
+    "chinese_antonyms",
+    "chinese_word_family",
+    "chinese_collocations",
+    "chinese_audio",
+    "primary_image",
+    "secondary_image",
+    "illustration_image",
+    "intro_video",
+    "pronunciation_video",
+    "example_1_korean",
+    "example_1_english",
+    "example_1_japanese",
+    "example_1_chinese",
+    "example_1_context",
+    "example_1_priority",
+    "example_1_emoji",
+    "example_2_korean",
+    "example_2_english",
+    "example_2_japanese",
+    "example_2_chinese",
+    "example_2_context",
+    "example_2_priority",
+    "example_2_emoji",
+    "quiz_question_types",
+    "quiz_difficulty_multiplier",
+    "quiz_hint_korean",
+    "quiz_hint_english",
+    "quiz_hint_japanese",
+    "quiz_hint_chinese",
+    "memorization_difficulty",
+    "pronunciation_difficulty",
+    "usage_frequency",
+    "cultural_importance",
   ];
 
-  // 샘플 데이터
+  // 새로운 확장된 샘플 데이터
   const sampleRows = [
-    [
-      "daily",
-      "greeting",
-      "👋",
-      "안녕하세요",
-      "annyeonghaseyo",
-      "인사말",
-      "interjection",
-      "beginner",
-      "hello",
-      "həˈloʊ",
-      "greeting",
-      "interjection",
-      "beginner",
-      "こんにちは",
-      "konnichiwa",
-      "挨拶",
-      "interjection",
-      "beginner",
-      "你好",
-      "nǐ hǎo",
-      "问候语",
-      "interjection",
-      "beginner",
-      "안녕하세요, 만나서 반갑습니다.",
-      "Hello, nice to meet you.",
-      "はじめまして、よろしくお願いします。",
-      "很高兴见到你。",
-    ],
     [
       "food",
       "fruit",
+      "basic",
+      "everyday,healthy,common",
       "🍎",
+      "#FF6B6B",
+      "high",
+      "matching,pronunciation,spelling",
       "사과",
+      "sa-gwa",
       "sagwa",
-      "과일의 일종",
-      "noun",
-      "beginner",
+      "둥글고 단맛이 나는 열매",
+      "명사",
+      "초급",
+      "",
+      "",
+      "사과나무|사과즙|사과파이",
+      "사과를 먹다:high|빨간 사과:high|사과 한 개:medium",
+      "",
       "apple",
       "ˈæpl",
-      "a round fruit with red, yellow, or green skin",
+      "/ˈæpəl/",
+      "a round fruit with firm, white flesh and a green, red, or yellow skin",
       "noun",
       "beginner",
+      "",
+      "",
+      "apple tree|apple juice|apple pie",
+      "eat an apple:high|red apple:high|green apple:medium",
+      "",
       "りんご",
+      "りんご",
+      "リンゴ",
+      "",
       "ringo",
-      "果物の一種",
-      "noun",
-      "beginner",
+      "ringo",
+      "赤や緑の皮をもつ、甘くて丸い果物",
+      "名詞",
+      "初級",
+      "アップル",
+      "",
+      "りんごの木|りんごジュース",
+      "りんごを食べる:high|赤いりんご:high",
+      "",
       "苹果",
       "píng guǒ",
-      "一种水果",
-      "noun",
+      "红色或绿色皮的甜美水果",
+      "名词",
+      "初级",
+      "",
+      "",
+      "苹果树|苹果汁",
+      "吃苹果:high|红苹果:high",
+      "",
+      "https://source.unsplash.com/400x300/?apple",
+      "https://source.unsplash.com/400x300/?apple_green",
+      "https://api.iconify.design/noto:red-apple.svg",
+      "",
+      "",
+      "아침에 사과를 먹어요.",
+      "I eat an apple in the morning.",
+      "朝にりんごを食べます。",
+      "我早上吃苹果。",
+      "daily_routine",
+      "high",
+      "🌅",
+      "사과 두 개 주세요.",
+      "Please give me two apples.",
+      "りんごを二つください。",
+      "请给我两个苹果。",
+      "shopping",
+      "high",
+      "🛒",
+      "translation,pronunciation,matching,fill_blank,multiple_choice",
+      "1.0",
+      "빨간색 또는 초록색 과일",
+      "Red or green fruit that grows on trees",
+      "木になる赤や緑の果物",
+      "长在树上的红色或绿色水果",
+      "2",
+      "1",
+      "very_high",
+      "medium",
+    ],
+    [
+      "daily",
+      "greeting",
+      "basic",
+      "polite,common,essential",
+      "👋",
+      "#4CAF50",
+      "very_high",
+      "matching,pronunciation",
+      "안녕하세요",
+      "an-nyeong-ha-se-yo",
+      "annyeonghaseyo",
+      "정중한 인사말",
+      "감탄사",
+      "초급",
+      "안녕|반갑습니다",
+      "안녕히 가세요",
+      "안녕|안녕히|안녕하다",
+      "안녕하세요, 만나서 반갑습니다:high",
+      "",
+      "hello",
+      "həˈloʊ",
+      "/həˈloʊ/",
+      "used as a greeting or to begin a phone conversation",
+      "exclamation",
       "beginner",
-      "나는 사과를 좋아합니다.",
-      "I like apples.",
-      "私はりんごが好きです。",
-      "我喜欢苹果。",
+      "hi,hey,greetings",
+      "goodbye,bye",
+      "hello,hi,hey",
+      "say hello:high|hello there:medium",
+      "",
+      "こんにちは",
+      "こんにちは",
+      "",
+      "今日は",
+      "konnichiwa",
+      "konnichiwa",
+      "昼間の挨拶",
+      "感動詞",
+      "初級",
+      "おはよう,こんばんは",
+      "さようなら",
+      "こんにちは,おはよう,こんばんは",
+      "こんにちは、元気ですか:high",
+      "",
+      "你好",
+      "nǐ hǎo",
+      "用作问候语或开始电话对话",
+      "感叹词",
+      "初级",
+      "您好,嗨",
+      "再见,拜拜",
+      "你好,您好,嗨",
+      "说你好:high|你好吗:medium",
+      "",
+      "https://source.unsplash.com/400x300/?greeting",
+      "",
+      "https://api.iconify.design/noto:waving-hand.svg",
+      "",
+      "",
+      "안녕하세요. 만나서 반갑습니다.",
+      "Hello, nice to meet you.",
+      "こんにちは。はじめまして。",
+      "你好，很高兴见到你。",
+      "meeting",
+      "very_high",
+      "🤝",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "translation,pronunciation,matching",
+      "0.8",
+      "만날 때 하는 인사",
+      "A greeting when you meet someone",
+      "人に会った時の挨拶",
+      "遇到某人时的问候语",
+      "1",
+      "2",
+      "very_high",
+      "very_high",
     ],
   ];
 
@@ -267,101 +435,350 @@ function downloadCSVTemplate() {
 
 // JSON 템플릿 다운로드
 function downloadJSONTemplate() {
-  // JSON 템플릿 데이터
+  // 새로운 확장된 JSON 템플릿 데이터
   const jsonTemplate = [
     {
-      domain: "daily",
-      category: "greeting",
-      concept_info: {
-        domain: "daily",
-        category: "greeting",
-        emoji: "👋",
-      },
-      expressions: {
-        korean: {
-          word: "안녕하세요",
-          pronunciation: "annyeonghaseyo",
-          definition: "인사말",
-          part_of_speech: "interjection",
-          level: "beginner",
-        },
-        english: {
-          word: "hello",
-          pronunciation: "həˈloʊ",
-          definition: "greeting",
-          part_of_speech: "interjection",
-          level: "beginner",
-        },
-        japanese: {
-          word: "こんにちは",
-          pronunciation: "konnichiwa",
-          definition: "挨拶",
-          part_of_speech: "interjection",
-          level: "beginner",
-        },
-        chinese: {
-          word: "你好",
-          pronunciation: "nǐ hǎo",
-          definition: "问候语",
-          part_of_speech: "interjection",
-          level: "beginner",
-        },
-      },
-      examples: [
-        {
-          korean: "안녕하세요, 만나서 반갑습니다.",
-          english: "Hello, nice to meet you.",
-          japanese: "はじめまして、よろしくお願いします。",
-          chinese: "很高兴见到你。",
-        },
-      ],
-    },
-    {
-      domain: "food",
-      category: "fruit",
       concept_info: {
         domain: "food",
         category: "fruit",
-        emoji: "🍎",
+        difficulty: "basic",
+        tags: ["everyday", "healthy", "common"],
+        unicode_emoji: "🍎",
+        color_theme: "#FF6B6B",
+        quiz_frequency: "high",
+        game_types: ["matching", "pronunciation", "spelling"],
+      },
+      media: {
+        images: {
+          primary: "https://source.unsplash.com/400x300/?apple",
+          secondary: "https://source.unsplash.com/400x300/?apple_green",
+          illustration:
+            "https://api.iconify.design/noto:red-apple.svg?width=400",
+          emoji_style:
+            "https://api.iconify.design/twemoji:red-apple.svg?width=200",
+          line_art: null,
+        },
+        videos: {
+          intro: null,
+          pronunciation: null,
+        },
+        audio: {
+          pronunciation_slow: null,
+          pronunciation_normal: null,
+          word_in_sentence: null,
+        },
       },
       expressions: {
         korean: {
           word: "사과",
-          pronunciation: "sagwa",
-          definition: "과일의 일종",
-          part_of_speech: "noun",
-          level: "beginner",
+          pronunciation: "sa-gwa",
+          romanization: "sagwa",
+          definition: "둥글고 단맛이 나는 열매",
+          part_of_speech: "명사",
+          level: "초급",
+          unicode_emoji: "🍎",
+          synonyms: [],
+          antonyms: [],
+          word_family: ["사과나무", "사과즙", "사과파이"],
+          conjugations: null,
+          collocations: [
+            { phrase: "사과를 먹다", frequency: "high" },
+            { phrase: "빨간 사과", frequency: "high" },
+            { phrase: "사과 한 개", frequency: "medium" },
+          ],
         },
         english: {
           word: "apple",
           pronunciation: "ˈæpl",
-          definition: "a round fruit with red, yellow, or green skin",
+          phonetic: "/ˈæpəl/",
+          definition:
+            "a round fruit with firm, white flesh and a green, red, or yellow skin",
           part_of_speech: "noun",
           level: "beginner",
+          unicode_emoji: "🍎",
+          synonyms: [],
+          antonyms: [],
+          word_family: ["apple tree", "apple juice", "apple pie"],
+          conjugations: { plural: "apples" },
+          collocations: [
+            { phrase: "eat an apple", frequency: "high" },
+            { phrase: "red apple", frequency: "high" },
+            { phrase: "green apple", frequency: "medium" },
+          ],
         },
         japanese: {
           word: "りんご",
+          hiragana: "りんご",
+          katakana: "リンゴ",
+          kanji: "",
           pronunciation: "ringo",
-          definition: "果物の一種",
-          part_of_speech: "noun",
-          level: "beginner",
+          romanization: "ringo",
+          definition: "赤や緑の皮をもつ、甘くて丸い果物",
+          part_of_speech: "名詞",
+          level: "初級",
+          unicode_emoji: "🍎",
+          synonyms: ["アップル"],
+          antonyms: [],
+          word_family: ["りんごの木", "りんごジュース"],
+          conjugations: null,
+          collocations: [
+            { phrase: "りんごを食べる", frequency: "high" },
+            { phrase: "赤いりんご", frequency: "high" },
+          ],
         },
         chinese: {
           word: "苹果",
           pronunciation: "píng guǒ",
-          definition: "一种水果",
-          part_of_speech: "noun",
-          level: "beginner",
+          definition: "红色或绿色皮的甜美水果",
+          part_of_speech: "名词",
+          level: "初级",
+          unicode_emoji: "🍎",
+          synonyms: [],
+          antonyms: [],
+          word_family: ["苹果树", "苹果汁"],
+          conjugations: null,
+          collocations: [
+            { phrase: "吃苹果", frequency: "high" },
+            { phrase: "红苹果", frequency: "high" },
+          ],
         },
       },
-      examples: [
+      featured_examples: [
         {
-          korean: "나는 사과를 좋아합니다.",
-          english: "I like apples.",
-          japanese: "私はりんごが好きです。",
-          chinese: "我喜欢苹果。",
+          example_id: "example_apple_1",
+          level: "beginner",
+          context: "daily_routine",
+          priority: "high",
+          unicode_emoji: "🌅",
+          quiz_weight: 10,
+          translations: {
+            korean: {
+              text: "아침에 사과를 먹어요.",
+              grammar_notes: "현재 시제, 목적어 활용",
+            },
+            english: {
+              text: "I eat an apple in the morning.",
+              grammar_notes: "Simple present tense, article usage",
+            },
+            japanese: {
+              text: "朝にりんごを食べます。",
+              grammar_notes: "現在形、助詞の使い方",
+            },
+            chinese: {
+              text: "我早上吃苹果。",
+              grammar_notes: "现在时态，时间表达",
+            },
+          },
         },
       ],
+      quiz_data: {
+        question_types: [
+          "translation",
+          "pronunciation",
+          "matching",
+          "fill_blank",
+          "multiple_choice",
+        ],
+        difficulty_multiplier: 1.0,
+        common_mistakes: [
+          { mistake: "aple", correction: "apple", type: "spelling" },
+          { mistake: "apel", correction: "apple", type: "spelling" },
+        ],
+        hint_text: {
+          korean: "빨간색 또는 초록색 과일",
+          english: "Red or green fruit that grows on trees",
+          japanese: "木になる赤や緑の果物",
+          chinese: "长在树上的红色或绿色水果",
+        },
+      },
+      game_data: {
+        memory_card: {
+          front_image: "https://api.iconify.design/noto:red-apple.svg",
+          back_text: "apple / 사과 / りんご / 苹果",
+        },
+        word_puzzle: {
+          scrambled: ["a", "p", "p", "l", "e"],
+          hints: ["Red or green fruit", "Grows on trees", "🍎"],
+        },
+        pronunciation_game: {
+          target_phoneme: "/ˈæpəl/",
+          similar_sounds: ["/ˈæpəl/", "/ˈæpəl/"],
+          practice_words: ["apple", "ample", "chapel"],
+        },
+      },
+      related_concepts: [],
+      learning_metadata: {
+        memorization_difficulty: 2,
+        pronunciation_difficulty: 1,
+        usage_frequency: "very_high",
+        cultural_importance: "medium",
+      },
+    },
+    {
+      concept_info: {
+        domain: "daily",
+        category: "greeting",
+        difficulty: "basic",
+        tags: ["polite", "common", "essential"],
+        unicode_emoji: "👋",
+        color_theme: "#4CAF50",
+        quiz_frequency: "very_high",
+        game_types: ["matching", "pronunciation"],
+      },
+      media: {
+        images: {
+          primary: "https://source.unsplash.com/400x300/?greeting",
+          secondary: null,
+          illustration:
+            "https://api.iconify.design/noto:waving-hand.svg?width=400",
+          emoji_style:
+            "https://api.iconify.design/twemoji:waving-hand.svg?width=200",
+          line_art: null,
+        },
+        videos: {
+          intro: null,
+          pronunciation: null,
+        },
+        audio: {
+          pronunciation_slow: null,
+          pronunciation_normal: null,
+          word_in_sentence: null,
+        },
+      },
+      expressions: {
+        korean: {
+          word: "안녕하세요",
+          pronunciation: "an-nyeong-ha-se-yo",
+          romanization: "annyeonghaseyo",
+          definition: "정중한 인사말",
+          part_of_speech: "감탄사",
+          level: "초급",
+          unicode_emoji: "👋",
+          synonyms: ["안녕", "반갑습니다"],
+          antonyms: ["안녕히 가세요"],
+          word_family: ["안녕", "안녕히", "안녕하다"],
+          conjugations: null,
+          collocations: [
+            { phrase: "안녕하세요, 만나서 반갑습니다", frequency: "high" },
+          ],
+        },
+        english: {
+          word: "hello",
+          pronunciation: "həˈloʊ",
+          phonetic: "/həˈloʊ/",
+          definition: "used as a greeting or to begin a phone conversation",
+          part_of_speech: "exclamation",
+          level: "beginner",
+          unicode_emoji: "👋",
+          synonyms: ["hi", "hey", "greetings"],
+          antonyms: ["goodbye", "bye"],
+          word_family: ["hello", "hi", "hey"],
+          conjugations: null,
+          collocations: [
+            { phrase: "say hello", frequency: "high" },
+            { phrase: "hello there", frequency: "medium" },
+          ],
+        },
+        japanese: {
+          word: "こんにちは",
+          hiragana: "こんにちは",
+          katakana: "",
+          kanji: "今日は",
+          pronunciation: "konnichiwa",
+          romanization: "konnichiwa",
+          definition: "昼間の挨拶",
+          part_of_speech: "感動詞",
+          level: "初級",
+          unicode_emoji: "👋",
+          synonyms: ["おはよう", "こんばんは"],
+          antonyms: ["さようなら"],
+          word_family: ["こんにちは", "おはよう", "こんばんは"],
+          conjugations: null,
+          collocations: [
+            { phrase: "こんにちは、元気ですか", frequency: "high" },
+          ],
+        },
+        chinese: {
+          word: "你好",
+          pronunciation: "nǐ hǎo",
+          definition: "用作问候语或开始电话对话",
+          part_of_speech: "感叹词",
+          level: "初级",
+          unicode_emoji: "👋",
+          synonyms: ["您好", "嗨"],
+          antonyms: ["再见", "拜拜"],
+          word_family: ["你好", "您好", "嗨"],
+          conjugations: null,
+          collocations: [
+            { phrase: "说你好", frequency: "high" },
+            { phrase: "你好吗", frequency: "medium" },
+          ],
+        },
+      },
+      featured_examples: [
+        {
+          example_id: "example_hello_1",
+          level: "beginner",
+          context: "meeting",
+          priority: "very_high",
+          unicode_emoji: "🤝",
+          quiz_weight: 15,
+          translations: {
+            korean: {
+              text: "안녕하세요. 만나서 반갑습니다.",
+              grammar_notes: "정중한 인사, 존댓말",
+            },
+            english: {
+              text: "Hello, nice to meet you.",
+              grammar_notes: "Formal greeting, politeness",
+            },
+            japanese: {
+              text: "こんにちは。はじめまして。",
+              grammar_notes: "丁寧な挨拶、初対面",
+            },
+            chinese: {
+              text: "你好，很高兴见到你。",
+              grammar_notes: "礼貌问候，初次见面",
+            },
+          },
+        },
+      ],
+      quiz_data: {
+        question_types: ["translation", "pronunciation", "matching"],
+        difficulty_multiplier: 0.8,
+        common_mistakes: [
+          { mistake: "helo", correction: "hello", type: "spelling" },
+          { mistake: "hallo", correction: "hello", type: "spelling" },
+        ],
+        hint_text: {
+          korean: "만날 때 하는 인사",
+          english: "A greeting when you meet someone",
+          japanese: "人に会った時の挨拶",
+          chinese: "遇到某人时的问候语",
+        },
+      },
+      game_data: {
+        memory_card: {
+          front_image: "https://api.iconify.design/noto:waving-hand.svg",
+          back_text: "hello / 안녕하세요 / こんにちは / 你好",
+        },
+        word_puzzle: {
+          scrambled: ["h", "e", "l", "l", "o"],
+          hints: ["Greeting word", "First thing you say", "👋"],
+        },
+        pronunciation_game: {
+          target_phoneme: "/həˈloʊ/",
+          similar_sounds: ["/həˈloʊ/", "/hæˈloʊ/"],
+          practice_words: ["hello", "below", "yellow"],
+        },
+      },
+      related_concepts: [],
+      learning_metadata: {
+        memorization_difficulty: 1,
+        pronunciation_difficulty: 2,
+        usage_frequency: "very_high",
+        cultural_importance: "very_high",
+      },
     },
   ];
 
@@ -467,6 +884,17 @@ async function startImport() {
 
     // 이벤트 발생 (목록 새로고침)
     window.dispatchEvent(new CustomEvent("concept-saved"));
+
+    // 대량 개념 추가 완료 이벤트 발생
+    window.dispatchEvent(
+      new CustomEvent("bulk-import-completed", {
+        detail: {
+          total: importedData.length,
+          success: successCount,
+          failed: errorCount,
+        },
+      })
+    );
   } catch (error) {
     console.error("가져오기 오류:", error);
     importResult.innerHTML = `
@@ -751,15 +1179,14 @@ function parseJSONFile(file, defaultDomain, defaultCategory) {
   });
 }
 
-// JSON 데이터에서 개념 객체 생성
+// JSON 데이터에서 개념 객체 생성 (확장된 구조 지원)
 function createConceptFromJSON(item, defaultDomain, defaultCategory) {
   if (!item) return null;
 
-  // 기본 정보 검증
-  const domain = item.domain || defaultDomain;
-  const category = item.category || defaultCategory;
-  const conceptInfo = item.concept_info || {};
-  const emoji = conceptInfo.emoji || "";
+  // 기본 정보 검증 및 설정
+  const domain = item.concept_info?.domain || item.domain || defaultDomain;
+  const category =
+    item.concept_info?.category || item.category || defaultCategory;
 
   if (!domain || !category) {
     console.warn("도메인 또는 카테고리가 없는 개념:", item);
@@ -772,7 +1199,7 @@ function createConceptFromJSON(item, defaultDomain, defaultCategory) {
     return null;
   }
 
-  // 유효한 표현 필터링
+  // 유효한 표현 필터링 및 확장 정보 포함
   const expressions = {};
 
   for (const [lang, expr] of Object.entries(item.expressions)) {
@@ -780,9 +1207,23 @@ function createConceptFromJSON(item, defaultDomain, defaultCategory) {
       expressions[lang] = {
         word: expr.word,
         pronunciation: expr.pronunciation || "",
+        romanization: expr.romanization || "",
+        phonetic: expr.phonetic || "",
         definition: expr.definition || "",
         part_of_speech: expr.part_of_speech || "noun",
         level: expr.level || "beginner",
+        unicode_emoji: expr.unicode_emoji || "",
+        synonyms: expr.synonyms || [],
+        antonyms: expr.antonyms || [],
+        word_family: expr.word_family || [],
+        conjugations: expr.conjugations || null,
+        collocations: expr.collocations || [],
+        // 일본어 특수 필드
+        hiragana: expr.hiragana || "",
+        katakana: expr.katakana || "",
+        kanji: expr.kanji || "",
+        // 오디오 정보
+        audio: expr.audio || "",
       };
     }
   }
@@ -792,9 +1233,46 @@ function createConceptFromJSON(item, defaultDomain, defaultCategory) {
     return null;
   }
 
-  // 예제 검증
-  const examples = [];
+  // 개념 정보 구성 (확장된 구조)
+  const conceptInfo = {
+    domain: domain,
+    category: category,
+    difficulty: item.concept_info?.difficulty || "basic",
+    tags: item.concept_info?.tags || [],
+    unicode_emoji:
+      item.concept_info?.unicode_emoji || item.concept_info?.emoji || "",
+    color_theme: item.concept_info?.color_theme || "#9C27B0",
+    created_at: new Date(),
+    updated_at: new Date(),
+    total_examples_count: 0, // 나중에 계산
+    quiz_frequency: item.concept_info?.quiz_frequency || "medium",
+    game_types: item.concept_info?.game_types || ["matching", "pronunciation"],
+  };
 
+  // 미디어 정보 처리
+  const media = {
+    images: {
+      primary: item.media?.images?.primary || "",
+      secondary: item.media?.images?.secondary || "",
+      illustration: item.media?.images?.illustration || "",
+      emoji_style: item.media?.images?.emoji_style || "",
+      line_art: item.media?.images?.line_art || "",
+    },
+    videos: {
+      intro: item.media?.videos?.intro || "",
+      pronunciation: item.media?.videos?.pronunciation || "",
+    },
+    audio: {
+      pronunciation_slow: item.media?.audio?.pronunciation_slow || "",
+      pronunciation_normal: item.media?.audio?.pronunciation_normal || "",
+      word_in_sentence: item.media?.audio?.word_in_sentence || "",
+    },
+  };
+
+  // 예제 처리 (기존 형식과 새 형식 모두 지원)
+  let examples = [];
+
+  // 기존 형식 (item.examples)
   if (Array.isArray(item.examples)) {
     for (const ex of item.examples) {
       if (ex && Object.keys(ex).length > 0) {
@@ -803,17 +1281,90 @@ function createConceptFromJSON(item, defaultDomain, defaultCategory) {
     }
   }
 
-  // 개념 객체 반환
-  return {
-    concept_info: {
-      domain: domain,
-      category: category,
-      emoji: emoji,
-      images: [],
-    },
-    expressions: expressions,
-    examples: examples,
+  // 새로운 형식 (item.featured_examples)
+  const featuredExamples = [];
+  if (Array.isArray(item.featured_examples)) {
+    for (const ex of item.featured_examples) {
+      if (ex && ex.translations) {
+        featuredExamples.push({
+          example_id:
+            ex.example_id ||
+            `example_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          level: ex.level || "beginner",
+          context: ex.context || "general",
+          priority: ex.priority || "medium",
+          unicode_emoji: ex.unicode_emoji || "",
+          quiz_weight: ex.quiz_weight || 5,
+          translations: ex.translations || {},
+        });
+      }
+    }
+  }
+
+  // 예제 수 업데이트
+  conceptInfo.total_examples_count = examples.length + featuredExamples.length;
+
+  // 퀴즈 데이터 처리
+  const quizData = {
+    question_types: item.quiz_data?.question_types || [
+      "translation",
+      "multiple_choice",
+    ],
+    difficulty_multiplier: item.quiz_data?.difficulty_multiplier || 1.0,
+    common_mistakes: item.quiz_data?.common_mistakes || [],
+    hint_text: item.quiz_data?.hint_text || {},
   };
+
+  // 게임 데이터 처리
+  const gameData = {
+    memory_card: {
+      front_image: item.game_data?.memory_card?.front_image || "",
+      back_text: item.game_data?.memory_card?.back_text || "",
+    },
+    word_puzzle: {
+      scrambled: item.game_data?.word_puzzle?.scrambled || [],
+      hints: item.game_data?.word_puzzle?.hints || [],
+    },
+    pronunciation_game: {
+      target_phoneme: item.game_data?.pronunciation_game?.target_phoneme || "",
+      similar_sounds: item.game_data?.pronunciation_game?.similar_sounds || [],
+      practice_words: item.game_data?.pronunciation_game?.practice_words || [],
+    },
+  };
+
+  // 학습 메타데이터 처리
+  const learningMetadata = {
+    memorization_difficulty:
+      item.learning_metadata?.memorization_difficulty || 3,
+    pronunciation_difficulty:
+      item.learning_metadata?.pronunciation_difficulty || 3,
+    usage_frequency: item.learning_metadata?.usage_frequency || "medium",
+    cultural_importance:
+      item.learning_metadata?.cultural_importance || "medium",
+  };
+
+  // 관련 개념 처리
+  const relatedConcepts = item.related_concepts || [];
+
+  // 완전한 개념 객체 반환
+  const conceptObject = {
+    concept_info: conceptInfo,
+    media: media,
+    expressions: expressions,
+    featured_examples: featuredExamples,
+    quiz_data: quizData,
+    game_data: gameData,
+    related_concepts: relatedConcepts,
+    learning_metadata: learningMetadata,
+  };
+
+  // 기존 형식의 예제가 있으면 추가
+  if (examples.length > 0) {
+    conceptObject.examples = examples;
+  }
+
+  console.log("생성된 개념 객체:", conceptObject);
+  return conceptObject;
 }
 
 // 모달 닫기

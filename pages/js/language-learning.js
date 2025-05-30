@@ -252,6 +252,16 @@ function displayFlashcard(concept) {
   const sourceExpression = concept.fromExpression;
   const targetExpression = concept.toExpression;
 
+  // 이모지 표시 (새 구조에 맞게 수정)
+  const emoji =
+    concept.conceptInfo.emoji || concept.conceptInfo.unicode_emoji || "📚";
+
+  // 이모지 요소 찾기 및 표시
+  const emojiElement = document.getElementById("card-emoji");
+  if (emojiElement) {
+    emojiElement.textContent = emoji;
+  }
+
   // 카테고리 표시
   document.getElementById("card-category").textContent =
     concept.conceptInfo.domain + " / " + concept.conceptInfo.category;
