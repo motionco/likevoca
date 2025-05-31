@@ -767,6 +767,10 @@ const translations = {
   },
 };
 
+// 언어 캐싱을 위한 변수
+let cachedLanguage = null;
+let languageDetectionInProgress = false;
+
 // 브라우저 기본 언어 감지
 function detectBrowserLanguage() {
   const language = navigator.language || navigator.userLanguage;
@@ -804,14 +808,75 @@ function getCurrentLanguage() {
   return localStorage.getItem("userLanguage") || "auto";
 }
 
+// 현재 활성화된 언어 코드 가져오기 (캐싱 및 중복 호출 방지)
+async function getActiveLanguage() {
+  // 이미 감지 중이면 대기
+  if (languageDetectionInProgress) {
+    return new Promise((resolve) => {
+      const checkInterval = setInterval(() => {
+        if (!languageDetectionInProgress && cachedLanguage) {
+          clearInterval(checkInterval);
+          resolve(cachedLanguage);
+        }
+      }, 100);
+    });
+  }
+
+  // 캐시된 언어가 있으면 반환
+  if (cachedLanguage) {
+    console.log("캐시된 언어 사용:", cachedLanguage);
+    return cachedLanguage;
+  }
+
+  languageDetectionInProgress = true;
+
+  try {
+    // 1. 먼저 localStorage에서 사용자가 직접 설정한 언어 확인
+    const savedLang = localStorage.getItem("userLanguage");
+
+    if (savedLang && savedLang !== "auto" && SUPPORTED_LANGUAGES[savedLang]) {
+      console.log("저장된 언어 사용:", savedLang);
+      cachedLanguage = savedLang;
+      return savedLang;
+    }
+
+    // 2. 자동 설정이거나 저장된 언어가 없는 경우
+    console.log("자동 언어 감지 시도...");
+
+    // 먼저 브라우저 언어 시도
+    const browserLang = detectBrowserLanguage();
+    if (SUPPORTED_LANGUAGES[browserLang]) {
+      console.log("브라우저 언어 사용:", browserLang);
+      cachedLanguage = browserLang;
+      return browserLang;
+    }
+
+    // 브라우저 언어가 지원되지 않으면 위치 기반 감지
+    try {
+      const locationLang = await detectLanguageFromLocation();
+      console.log("위치 기반 언어 사용:", locationLang);
+      cachedLanguage = locationLang;
+      return locationLang;
+    } catch (error) {
+      console.error("위치 기반 언어 감지 실패, 기본 언어 사용");
+      cachedLanguage = "ko"; // 최종 기본값: 한국어
+      return "ko";
+    }
+  } finally {
+    languageDetectionInProgress = false;
+  }
+}
+
 // 언어 설정 저장 및 적용
 function setLanguage(langCode) {
   console.log("언어 설정 변경:", langCode);
 
   if (langCode === "auto") {
     localStorage.removeItem("userLanguage");
+    cachedLanguage = null; // 캐시 초기화
   } else {
     localStorage.setItem("userLanguage", langCode);
+    cachedLanguage = langCode; // 캐시 업데이트
   }
 
   // 언어 적용 및 메타데이터 업데이트
@@ -846,68 +911,41 @@ function setLanguage(langCode) {
   updateMetadata(pageType);
 }
 
-// 현재 활성화된 언어 코드 가져오기 (우선순위 수정)
-async function getActiveLanguage() {
-  // 1. 먼저 localStorage에서 사용자가 직접 설정한 언어 확인
-  const savedLang = localStorage.getItem("userLanguage");
-
-  if (savedLang && savedLang !== "auto" && SUPPORTED_LANGUAGES[savedLang]) {
-    console.log("저장된 언어 사용:", savedLang);
-    return savedLang;
-  }
-
-  // 2. 자동 설정이거나 저장된 언어가 없는 경우
-  console.log("자동 언어 감지 시도...");
-
-  // 먼저 브라우저 언어 시도
-  const browserLang = detectBrowserLanguage();
-  if (SUPPORTED_LANGUAGES[browserLang]) {
-    console.log("브라우저 언어 사용:", browserLang);
-    return browserLang;
-  }
-
-  // 브라우저 언어가 지원되지 않으면 위치 기반 감지
-  try {
-    const locationLang = await detectLanguageFromLocation();
-    console.log("위치 기반 언어 사용:", locationLang);
-    return locationLang;
-  } catch (error) {
-    console.error("위치 기반 언어 감지 실패, 기본 언어 사용");
-    return "ko"; // 최종 기본값: 한국어
-  }
-}
-
-// 언어 변경 적용
+// 언어 변경 적용 (무한루프 방지)
 async function applyLanguage() {
-  const langCode = await getActiveLanguage();
+  try {
+    const langCode = await getActiveLanguage();
 
-  if (!translations[langCode]) {
-    console.error(`번역 데이터가 없는 언어입니다: ${langCode}`);
-    return;
+    if (!translations[langCode]) {
+      console.error(`번역 데이터가 없는 언어입니다: ${langCode}`);
+      return;
+    }
+
+    document.querySelectorAll("[data-i18n]").forEach((element) => {
+      const key = element.getAttribute("data-i18n");
+      if (translations[langCode][key]) {
+        element.textContent = translations[langCode][key];
+      }
+    });
+
+    // placeholder 속성이 있는 입력 필드에 대해 번역 적용
+    document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
+      const key = element.getAttribute("data-i18n-placeholder");
+      if (translations[langCode][key]) {
+        element.placeholder = translations[langCode][key];
+      }
+    });
+
+    // HTML lang 속성 변경
+    document.documentElement.lang = langCode;
+
+    // 이벤트 발생 - 언어 변경을 알림
+    document.dispatchEvent(
+      new CustomEvent("languageChanged", { detail: { language: langCode } })
+    );
+  } catch (error) {
+    console.error("언어 적용 중 오류:", error);
   }
-
-  document.querySelectorAll("[data-i18n]").forEach((element) => {
-    const key = element.getAttribute("data-i18n");
-    if (translations[langCode][key]) {
-      element.textContent = translations[langCode][key];
-    }
-  });
-
-  // placeholder 속성이 있는 입력 필드에 대해 번역 적용
-  document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
-    const key = element.getAttribute("data-i18n-placeholder");
-    if (translations[langCode][key]) {
-      element.placeholder = translations[langCode][key];
-    }
-  });
-
-  // HTML lang 속성 변경
-  document.documentElement.lang = langCode;
-
-  // 이벤트 발생 - 언어 변경을 알림
-  document.dispatchEvent(
-    new CustomEvent("languageChanged", { detail: { language: langCode } })
-  );
 }
 
 // 언어 설정 모달 표시
@@ -992,10 +1030,14 @@ function showLanguageSettingsModal() {
   });
 }
 
-// 메타데이터 업데이트 함수
+// 메타데이터 업데이트 함수 (캐시된 언어 사용)
 async function updateMetadata(pageType = "home") {
   try {
-    const langCode = await getActiveLanguage();
+    // 캐시된 언어를 먼저 확인, 없으면 감지
+    let langCode = cachedLanguage;
+    if (!langCode) {
+      langCode = await getActiveLanguage();
+    }
 
     if (!seoMetadata[pageType] || !seoMetadata[pageType][langCode]) {
       console.error(`메타데이터가 없습니다: ${pageType}, ${langCode}`);

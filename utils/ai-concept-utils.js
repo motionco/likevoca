@@ -725,19 +725,17 @@ async function generateConceptWithGemini(topic, category, languages) {
       : "english";
     const prompt = PROMPTS[userLang];
 
+    // Gemini API에 맞는 올바른 형식으로 요청 구성
     const requestBody = {
       contents: [
         {
+          role: "user",
           parts: [
             {
-              text: prompt.system,
-            },
-          ],
-        },
-        {
-          parts: [
-            {
-              text: prompt.user(topic, category, languages),
+              text:
+                prompt.system +
+                "\n\n" +
+                prompt.user(topic, category, languages),
             },
           ],
         },
@@ -749,6 +747,8 @@ async function generateConceptWithGemini(topic, category, languages) {
         maxOutputTokens: 2048,
       },
     };
+
+    console.log("API 요청 데이터:", JSON.stringify(requestBody, null, 2));
 
     // 배포 환경에서는 서버 API 엔드포인트 사용
     const response = await fetch("/api/gemini", {
@@ -766,6 +766,7 @@ async function generateConceptWithGemini(topic, category, languages) {
     }
 
     const data = await response.json();
+    console.log("API 응답 데이터:", data);
 
     // 응답 구조 확인
     if (
@@ -778,6 +779,7 @@ async function generateConceptWithGemini(topic, category, languages) {
     }
 
     const generatedText = data.candidates[0].content.parts[0].text;
+    console.log("생성된 텍스트:", generatedText);
 
     // JSON 파싱
     const jsonMatch = generatedText.match(/\{[\s\S]*\}/);
