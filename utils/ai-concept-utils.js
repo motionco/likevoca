@@ -8,9 +8,9 @@ const isLocalEnvironment =
   window.location.hostname === "localhost" ||
   window.location.hostname === "127.0.0.1";
 
-// Gemini API 설정 (실제 환경에서만 사용)
-const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY"; // 실제 배포시 환경변수로 설정
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
+// Gemini API 설정 제거 - 이제 서버 엔드포인트를 사용
+// const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY"; // 실제 배포시 환경변수로 설정
+// const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
 
 // 다국어 프롬프트 템플릿
 const PROMPTS = {
@@ -750,7 +750,8 @@ async function generateConceptWithGemini(topic, category, languages) {
       },
     };
 
-    const response = await fetch(GEMINI_API_URL, {
+    // 배포 환경에서는 서버 API 엔드포인트 사용
+    const response = await fetch("/api/gemini", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -759,10 +760,23 @@ async function generateConceptWithGemini(topic, category, languages) {
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`API 오류 응답:`, response.status, errorText);
       throw new Error(`Gemini API 오류: ${response.status}`);
     }
 
     const data = await response.json();
+
+    // 응답 구조 확인
+    if (
+      !data.candidates ||
+      !data.candidates[0] ||
+      !data.candidates[0].content
+    ) {
+      console.error("유효하지 않은 API 응답 구조:", data);
+      throw new Error("유효하지 않은 API 응답 구조");
+    }
+
     const generatedText = data.candidates[0].content.parts[0].text;
 
     // JSON 파싱
