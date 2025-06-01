@@ -2,6 +2,7 @@ import {
   auth,
   db,
   supportedLanguages,
+  conceptUtils,
 } from "../../js/firebase/firebase-init.js";
 import { getActiveLanguage } from "../../utils/language-utils.js";
 import {
@@ -469,17 +470,43 @@ async function deleteConcept() {
   }
 
   try {
-    const conceptRef = doc(db, "concepts", currentConcept.id);
-    await deleteDoc(conceptRef);
+    console.log("삭제할 개념:", currentConcept);
 
-    alert("개념이 성공적으로 삭제되었습니다.");
+    // AI 개념인지 일반 개념인지 판단
+    const isAIConcept =
+      currentConcept.isAIGenerated ||
+      currentConcept._id?.startsWith("ai_") ||
+      window.location.pathname.includes("ai-vocabulary");
+
+    if (isAIConcept) {
+      console.log("AI 개념 삭제 시도...");
+      // AI 개념 삭제
+      const success = await conceptUtils.deleteAIConcept(
+        auth.currentUser.email,
+        currentConcept._id || currentConcept.id
+      );
+
+      if (success) {
+        console.log("AI 개념 삭제 성공");
+        alert("개념이 성공적으로 삭제되었습니다.");
+      } else {
+        throw new Error("AI 개념 삭제에 실패했습니다.");
+      }
+    } else {
+      console.log("일반 개념 삭제 시도...");
+      // 일반 개념 삭제
+      await conceptUtils.deleteConcept(currentConcept.id || currentConcept._id);
+      console.log("일반 개념 삭제 성공");
+      alert("개념이 성공적으로 삭제되었습니다.");
+    }
+
     closeModal();
 
     // 페이지 새로고침
     window.location.reload();
   } catch (error) {
     console.error("개념 삭제 중 오류:", error);
-    alert("개념 삭제 중 오류가 발생했습니다.");
+    alert("개념 삭제 중 오류가 발생했습니다: " + error.message);
   }
 }
 
@@ -536,7 +563,125 @@ function displayExamples(
 
   examplesContainer.innerHTML = "";
 
-  if (concept.examples && concept.examples.length > 0) {
+  let hasExamples = false;
+
+  // 새로운 구조 (featured_examples) 확인 - AI 개념용
+  if (concept.featured_examples && concept.featured_examples.length > 0) {
+    console.log("AI 개념의 featured_examples 발견:", concept.featured_examples);
+
+    concept.featured_examples.forEach((example, index) => {
+      if (example.translations) {
+        const exampleDiv = document.createElement("div");
+        exampleDiv.className = "border p-4 rounded mb-4 bg-gray-50";
+
+        let exampleContent = "";
+        const languagesToShow = [];
+
+        // 1. 대상언어 먼저 추가 (있는 경우)
+        if (targetLanguage && example.translations[targetLanguage]) {
+          languagesToShow.push({
+            code: targetLanguage,
+            name: getLanguageName(targetLanguage),
+            text: example.translations[targetLanguage].text,
+            grammarNotes: example.translations[targetLanguage].grammar_notes,
+            label: "(대상)",
+          });
+        }
+
+        // 2. 원본언어 추가 (있고, 대상언어와 다른 경우)
+        if (
+          sourceLanguage &&
+          example.translations[sourceLanguage] &&
+          sourceLanguage !== targetLanguage
+        ) {
+          languagesToShow.push({
+            code: sourceLanguage,
+            name: getLanguageName(sourceLanguage),
+            text: example.translations[sourceLanguage].text,
+            grammarNotes: example.translations[sourceLanguage].grammar_notes,
+            label: "(원본)",
+          });
+        }
+
+        // 3. 현재 탭 언어 추가 (위에 추가되지 않은 경우만)
+        if (
+          example.translations[currentLang] &&
+          !languagesToShow.find((lang) => lang.code === currentLang)
+        ) {
+          languagesToShow.push({
+            code: currentLang,
+            name: getLanguageName(currentLang),
+            text: example.translations[currentLang].text,
+            grammarNotes: example.translations[currentLang].grammar_notes,
+            label: "",
+          });
+        }
+
+        // 추가 언어들도 표시 (모든 언어 포함)
+        Object.keys(example.translations).forEach((langCode) => {
+          if (!languagesToShow.find((lang) => lang.code === langCode)) {
+            languagesToShow.push({
+              code: langCode,
+              name: getLanguageName(langCode),
+              text: example.translations[langCode].text,
+              grammarNotes: example.translations[langCode].grammar_notes,
+              label: "",
+            });
+          }
+        });
+
+        // 언어들을 순서대로 표시
+        languagesToShow.forEach((lang, index) => {
+          const isFirst = index === 0;
+          exampleContent += `
+            <div class="${
+              isFirst ? "mb-3" : "mb-2 pl-4 border-l-2 border-gray-300"
+            }">
+              <span class="text-sm ${
+                isFirst ? "font-medium text-blue-600" : "text-gray-600"
+              }">${lang.name}${lang.label}:</span>
+              <p class="ml-2 ${
+                isFirst ? "font-medium text-gray-800" : "text-gray-700"
+              }">${lang.text}</p>
+              ${
+                lang.grammarNotes
+                  ? `<p class="ml-2 text-xs text-gray-500 italic">${lang.grammarNotes}</p>`
+                  : ""
+              }
+            </div>
+          `;
+        });
+
+        // 예문 컨텍스트와 이모지 표시
+        if (example.context || example.unicode_emoji) {
+          exampleContent =
+            `
+            <div class="mb-2 text-sm text-gray-600">
+              ${
+                example.unicode_emoji
+                  ? `<span class="mr-2">${example.unicode_emoji}</span>`
+                  : ""
+              }
+              ${
+                example.context
+                  ? `<span class="italic">컨텍스트: ${example.context}</span>`
+                  : ""
+              }
+            </div>
+          ` + exampleContent;
+        }
+
+        exampleDiv.innerHTML = exampleContent;
+        examplesContainer.appendChild(exampleDiv);
+        hasExamples = true;
+      }
+    });
+  }
+
+  // 기존 구조 (examples) 확인 - 일반 개념용
+  else if (concept.examples && concept.examples.length > 0) {
+    console.log("일반 개념의 examples 발견:", concept.examples);
+
     const filteredExamples = concept.examples.filter(
       (example) => example[currentLang]
     );
@@ -607,11 +752,13 @@ function displayExamples(
 
         exampleDiv.innerHTML = exampleContent;
         examplesContainer.appendChild(exampleDiv);
+        hasExamples = true;
       });
-    } else {
-      examplesContainer.innerHTML = `<p class="text-gray-500">이 언어의 예문이 없습니다.</p>`;
     }
-  } else {
+  }
+
+  // 예문이 없는 경우
+  if (!hasExamples) {
     examplesContainer.innerHTML = `<p class="text-gray-500 text-sm">${getTranslatedText(
       "no_examples"
     )}</p>`;

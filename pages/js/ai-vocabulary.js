@@ -463,6 +463,36 @@ function createConceptCard(concept, sourceLanguage, targetLanguage) {
     };
   }
 
+  // 날짜 포맷팅 개선
+  let formattedDate = "";
+  try {
+    const dateValue = concept.created_at || concept.createdAt;
+    if (dateValue) {
+      let date;
+      if (dateValue.toDate && typeof dateValue.toDate === "function") {
+        // Firestore Timestamp 객체인 경우
+        date = dateValue.toDate();
+      } else if (dateValue.seconds) {
+        // Firestore Timestamp 형태의 객체인 경우
+        date = new Date(dateValue.seconds * 1000);
+      } else {
+        // 일반 Date 객체나 문자열인 경우
+        date = new Date(dateValue);
+      }
+
+      if (!isNaN(date.getTime())) {
+        formattedDate = date.toLocaleDateString("ko-KR", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        });
+      }
+    }
+  } catch (error) {
+    console.error("날짜 포맷팅 오류:", error);
+    formattedDate = "";
+  }
+
   card.innerHTML = `
     <div class="mb-4 flex justify-between items-start" style="border-left: 4px solid ${colorTheme}; padding-left: 12px;">
       <div>
@@ -489,12 +519,16 @@ function createConceptCard(concept, sourceLanguage, targetLanguage) {
     </div>
     
     ${
-      example && example.source && example.target
+      example && (example.source || example.target)
         ? `
     <div class="border-t border-gray-200 pt-3 mt-3">
       <p class="text-xs text-gray-500 mb-1">${getTranslatedText("examples")}</p>
-      <p class="text-sm mb-1">${example.target}</p>
-      <p class="text-sm text-gray-600">${example.source}</p>
+      ${example.target ? `<p class="text-sm mb-1">${example.target}</p>` : ""}
+      ${
+        example.source
+          ? `<p class="text-sm text-gray-600">${example.source}</p>`
+          : ""
+      }
     </div>
     `
         : ""
@@ -506,19 +540,15 @@ function createConceptCard(concept, sourceLanguage, targetLanguage) {
           "ai_generated"
         )}
       </span>
+      ${
+        formattedDate
+          ? `
       <span class="flex items-center">
-        <i class="fas fa-clock mr-1"></i> ${
-          concept.created_at || concept.createdAt
-            ? new Date(
-                concept.created_at || concept.createdAt
-              ).toLocaleDateString("ko-KR", {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-              })
-            : ""
-        }
+        <i class="fas fa-clock mr-1"></i> ${formattedDate}
       </span>
+      `
+          : ""
+      }
     </div>
   `;
 
