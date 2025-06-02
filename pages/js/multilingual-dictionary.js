@@ -1435,101 +1435,72 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
 
     if (!rawPartOfSpeech) return "정보 없음";
 
-    // 확장된 품사 매핑 (모든 언어의 품사를 영어로 정규화한 후 번역)
-    const partOfSpeechNormalization = {
-      // 한국어 → 영어 정규화
-      명사: "noun",
-      동사: "verb",
-      형용사: "adjective",
-      부사: "adverb",
-      대명사: "pronoun",
-      전치사: "preposition",
-      접속사: "conjunction",
-      감탄사: "interjection",
+    // 직접 매핑 테이블 (모든 언어의 품사를 서로 매핑)
+    const partOfSpeechMappings = {
+      // 한국어 품사들
+      명사: { ko: "명사", en: "noun", ja: "名詞", zh: "名词" },
+      동사: { ko: "동사", en: "verb", ja: "動詞", zh: "动词" },
+      형용사: { ko: "형용사", en: "adjective", ja: "形容詞", zh: "形容词" },
+      부사: { ko: "부사", en: "adverb", ja: "副詞", zh: "副词" },
+      대명사: { ko: "대명사", en: "pronoun", ja: "代名詞", zh: "代词" },
+      전치사: { ko: "전치사", en: "preposition", ja: "前置詞", zh: "介词" },
+      접속사: { ko: "접속사", en: "conjunction", ja: "接続詞", zh: "连词" },
+      감탄사: { ko: "감탄사", en: "interjection", ja: "感嘆詞", zh: "感叹词" },
 
-      // 영어는 그대로
-      noun: "noun",
-      verb: "verb",
-      adjective: "adjective",
-      adverb: "adverb",
-      pronoun: "pronoun",
-      preposition: "preposition",
-      conjunction: "conjunction",
-      interjection: "interjection",
+      // 영어 품사들
+      noun: { ko: "명사", en: "noun", ja: "名詞", zh: "名词" },
+      verb: { ko: "동사", en: "verb", ja: "動詞", zh: "动词" },
+      adjective: { ko: "형용사", en: "adjective", ja: "形容詞", zh: "形容词" },
+      adverb: { ko: "부사", en: "adverb", ja: "副詞", zh: "副词" },
+      pronoun: { ko: "대명사", en: "pronoun", ja: "代名詞", zh: "代词" },
+      preposition: {
+        ko: "전치사",
+        en: "preposition",
+        ja: "前置詞",
+        zh: "介词",
+      },
+      conjunction: {
+        ko: "접속사",
+        en: "conjunction",
+        ja: "接続詞",
+        zh: "连词",
+      },
+      interjection: {
+        ko: "감탄사",
+        en: "interjection",
+        ja: "感嘆詞",
+        zh: "感叹词",
+      },
 
-      // 일본어 → 영어 정규화
-      名詞: "noun",
-      動詞: "verb",
-      形容詞: "adjective",
-      副詞: "adverb",
-      代名詞: "pronoun",
-      前置詞: "preposition",
-      接続詞: "conjunction",
-      感嘆詞: "interjection",
+      // 일본어 품사들
+      名詞: { ko: "명사", en: "noun", ja: "名詞", zh: "名词" },
+      動詞: { ko: "동사", en: "verb", ja: "動詞", zh: "动词" },
+      形容詞: { ko: "형용사", en: "adjective", ja: "形容詞", zh: "形容词" },
+      副詞: { ko: "부사", en: "adverb", ja: "副詞", zh: "副词" },
+      代名詞: { ko: "대명사", en: "pronoun", ja: "代名詞", zh: "代词" },
+      前置詞: { ko: "전치사", en: "preposition", ja: "前置詞", zh: "介词" },
+      接続詞: { ko: "접속사", en: "conjunction", ja: "接続詞", zh: "连词" },
+      感嘆詞: { ko: "감탄사", en: "interjection", ja: "感嘆詞", zh: "感叹词" },
 
-      // 중국어 → 영어 정규화
-      名词: "noun",
-      动词: "verb",
-      形容词: "adjective",
-      副词: "adverb",
-      代词: "pronoun",
-      介词: "preposition",
-      连词: "conjunction",
-      感叹词: "interjection",
+      // 중국어 품사들
+      名词: { ko: "명사", en: "noun", ja: "名詞", zh: "名词" },
+      动词: { ko: "동사", en: "verb", ja: "動詞", zh: "动词" },
+      形容词: { ko: "형용사", en: "adjective", ja: "形容詞", zh: "形容词" },
+      副词: { ko: "부사", en: "adverb", ja: "副詞", zh: "副词" },
+      代词: { ko: "대명사", en: "pronoun", ja: "代名詞", zh: "代词" },
+      介词: { ko: "전치사", en: "preposition", ja: "前置詞", zh: "介词" },
+      连词: { ko: "접속사", en: "conjunction", ja: "接続詞", zh: "连词" },
+      感叹词: { ko: "감탄사", en: "interjection", ja: "感嘆詞", zh: "感叹词" },
     };
 
-    const partOfSpeechTranslations = {
-      ko: {
-        noun: "명사",
-        verb: "동사",
-        adjective: "형용사",
-        adverb: "부사",
-        pronoun: "대명사",
-        preposition: "전치사",
-        conjunction: "접속사",
-        interjection: "감탄사",
-      },
-      en: {
-        noun: "noun",
-        verb: "verb",
-        adjective: "adjective",
-        adverb: "adverb",
-        pronoun: "pronoun",
-        preposition: "preposition",
-        conjunction: "conjunction",
-        interjection: "interjection",
-      },
-      ja: {
-        noun: "名詞",
-        verb: "動詞",
-        adjective: "形容詞",
-        adverb: "副詞",
-        pronoun: "代名詞",
-        preposition: "前置詞",
-        conjunction: "接続詞",
-        interjection: "感嘆詞",
-      },
-      zh: {
-        noun: "名词",
-        verb: "动词",
-        adjective: "形容词",
-        adverb: "副词",
-        pronoun: "代词",
-        preposition: "介词",
-        conjunction: "连词",
-        interjection: "感叹词",
-      },
-    };
+    // DB에서 가져온 품사를 현재 언어 설정에 맞게 직접 변환
+    const mapping = partOfSpeechMappings[rawPartOfSpeech];
+    if (mapping && mapping[userLanguage]) {
+      return mapping[userLanguage];
+    }
 
-    // 1단계: 원본 품사를 영어로 정규화
-    const normalizedPartOfSpeech =
-      partOfSpeechNormalization[rawPartOfSpeech] || rawPartOfSpeech;
-
-    // 2단계: 정규화된 품사를 현재 언어로 번역
-    const currentTranslations =
-      partOfSpeechTranslations[userLanguage] || partOfSpeechTranslations.ko;
-
-    return currentTranslations[normalizedPartOfSpeech] || rawPartOfSpeech;
+    // 매핑이 없으면 원본 그대로 반환
+    return rawPartOfSpeech;
   };
 
   // 현재 언어 설정에 맞는 레이블 번역
@@ -1661,101 +1632,92 @@ function fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage) {
 
       if (!rawPartOfSpeech) return "정보 없음";
 
-      // 확장된 품사 매핑 (모든 언어의 품사를 영어로 정규화한 후 번역)
-      const partOfSpeechNormalization = {
-        // 한국어 → 영어 정규화
-        명사: "noun",
-        동사: "verb",
-        형용사: "adjective",
-        부사: "adverb",
-        대명사: "pronoun",
-        전치사: "preposition",
-        접속사: "conjunction",
-        감탄사: "interjection",
-
-        // 영어는 그대로
-        noun: "noun",
-        verb: "verb",
-        adjective: "adjective",
-        adverb: "adverb",
-        pronoun: "pronoun",
-        preposition: "preposition",
-        conjunction: "conjunction",
-        interjection: "interjection",
-
-        // 일본어 → 영어 정규화
-        名詞: "noun",
-        動詞: "verb",
-        形容詞: "adjective",
-        副詞: "adverb",
-        代名詞: "pronoun",
-        前置詞: "preposition",
-        接続詞: "conjunction",
-        感嘆詞: "interjection",
-
-        // 중국어 → 영어 정규화
-        名词: "noun",
-        动词: "verb",
-        形容词: "adjective",
-        副词: "adverb",
-        代词: "pronoun",
-        介词: "preposition",
-        连词: "conjunction",
-        感叹词: "interjection",
-      };
-
-      const partOfSpeechTranslations = {
-        ko: {
-          noun: "명사",
-          verb: "동사",
-          adjective: "형용사",
-          adverb: "부사",
-          pronoun: "대명사",
-          preposition: "전치사",
-          conjunction: "접속사",
-          interjection: "감탄사",
+      // 직접 매핑 테이블 (모든 언어의 품사를 서로 매핑)
+      const partOfSpeechMappings = {
+        // 한국어 품사들
+        명사: { ko: "명사", en: "noun", ja: "名詞", zh: "名词" },
+        동사: { ko: "동사", en: "verb", ja: "動詞", zh: "动词" },
+        형용사: { ko: "형용사", en: "adjective", ja: "形容詞", zh: "形容词" },
+        부사: { ko: "부사", en: "adverb", ja: "副詞", zh: "副词" },
+        대명사: { ko: "대명사", en: "pronoun", ja: "代名詞", zh: "代词" },
+        전치사: { ko: "전치사", en: "preposition", ja: "前置詞", zh: "介词" },
+        접속사: { ko: "접속사", en: "conjunction", ja: "接続詞", zh: "连词" },
+        감탄사: {
+          ko: "감탄사",
+          en: "interjection",
+          ja: "感嘆詞",
+          zh: "感叹词",
         },
-        en: {
-          noun: "noun",
-          verb: "verb",
-          adjective: "adjective",
-          adverb: "adverb",
-          pronoun: "pronoun",
-          preposition: "preposition",
-          conjunction: "conjunction",
-          interjection: "interjection",
+
+        // 영어 품사들
+        noun: { ko: "명사", en: "noun", ja: "名詞", zh: "名词" },
+        verb: { ko: "동사", en: "verb", ja: "動詞", zh: "动词" },
+        adjective: {
+          ko: "형용사",
+          en: "adjective",
+          ja: "形容詞",
+          zh: "形容词",
         },
-        ja: {
-          noun: "名詞",
-          verb: "動詞",
-          adjective: "形容詞",
-          adverb: "副詞",
-          pronoun: "代名詞",
-          preposition: "前置詞",
-          conjunction: "接続詞",
-          interjection: "感嘆詞",
+        adverb: { ko: "부사", en: "adverb", ja: "副詞", zh: "副词" },
+        pronoun: { ko: "대명사", en: "pronoun", ja: "代名詞", zh: "代词" },
+        preposition: {
+          ko: "전치사",
+          en: "preposition",
+          ja: "前置詞",
+          zh: "介词",
         },
-        zh: {
-          noun: "名词",
-          verb: "动词",
-          adjective: "形容词",
-          adverb: "副词",
-          pronoun: "代词",
-          preposition: "介词",
-          conjunction: "连词",
-          interjection: "感叹词",
+        conjunction: {
+          ko: "접속사",
+          en: "conjunction",
+          ja: "接続詞",
+          zh: "连词",
+        },
+        interjection: {
+          ko: "감탄사",
+          en: "interjection",
+          ja: "感嘆詞",
+          zh: "感叹词",
+        },
+
+        // 일본어 품사들
+        名詞: { ko: "명사", en: "noun", ja: "名詞", zh: "名词" },
+        動詞: { ko: "동사", en: "verb", ja: "動詞", zh: "动词" },
+        形容詞: { ko: "형용사", en: "adjective", ja: "形容詞", zh: "形容词" },
+        副詞: { ko: "부사", en: "adverb", ja: "副詞", zh: "副词" },
+        代名詞: { ko: "대명사", en: "pronoun", ja: "代名詞", zh: "代词" },
+        前置詞: { ko: "전치사", en: "preposition", ja: "前置詞", zh: "介词" },
+        接続詞: { ko: "접속사", en: "conjunction", ja: "接続詞", zh: "连词" },
+        感嘆詞: {
+          ko: "감탄사",
+          en: "interjection",
+          ja: "感嘆詞",
+          zh: "感叹词",
+        },
+
+        // 중국어 품사들
+        名词: { ko: "명사", en: "noun", ja: "名詞", zh: "名词" },
+        动词: { ko: "동사", en: "verb", ja: "動詞", zh: "动词" },
+        形容词: { ko: "형용사", en: "adjective", ja: "形容詞", zh: "形容词" },
+        副词: { ko: "부사", en: "adverb", ja: "副詞", zh: "副词" },
+        代词: { ko: "대명사", en: "pronoun", ja: "代名詞", zh: "代词" },
+        介词: { ko: "전치사", en: "preposition", ja: "前置詞", zh: "介词" },
+        连词: { ko: "접속사", en: "conjunction", ja: "接続詞", zh: "连词" },
+        感叹词: {
+          ko: "감탄사",
+          en: "interjection",
+          ja: "感嘆詞",
+          zh: "感叹词",
         },
       };
 
-      // 1단계: 원본 품사를 영어로 정규화
-      const normalizedPartOfSpeech =
-        partOfSpeechNormalization[rawPartOfSpeech] || rawPartOfSpeech;
+      // DB에서 가져온 품사를 현재 언어 설정에 맞게 직접 변환
+      const mapping = partOfSpeechMappings[rawPartOfSpeech];
+      if (mapping && mapping[userLanguage]) {
+        return mapping[userLanguage];
+      }
 
-      // 2단계: 정규화된 품사를 현재 언어로 번역
-      const currentTranslations =
-        partOfSpeechTranslations[userLanguage] || partOfSpeechTranslations.ko;
-
-      return currentTranslations[normalizedPartOfSpeech] || rawPartOfSpeech;
+      // 매핑이 없으면 원본 그대로 반환
+      return rawPartOfSpeech;
     };
 
     // 현재 언어 설정에 맞는 레이블 번역
