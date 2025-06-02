@@ -1050,12 +1050,7 @@ function displayExamples(
 
           exampleContent += `
             <div class="mt-2 pt-2 border-t border-gray-200">
-              <p class="text-xs text-gray-500">
-                <span class="font-medium">${getTranslatedText(
-                  "grammar"
-                )}:</span>
-                <span class="italic">${translatedGrammarNote}</span>
-              </p>
+              <p class="text-xs text-gray-500 italic">${translatedGrammarNote}</p>
             </div>
           `;
         }

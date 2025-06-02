@@ -130,9 +130,274 @@ const pageTranslations = {
   },
 };
 
+// 문법 용어 번역 테이블
+const grammarTranslations = {
+  ko: {
+    // 영어 문법 용어
+    "simple present tense": "현재 시제",
+    "present tense": "현재 시제",
+    "simple past tense": "과거 시제",
+    "past tense": "과거 시제",
+    "simple future tense": "미래 시제",
+    "future tense": "미래 시제",
+    "present continuous": "현재 진행형",
+    "past continuous": "과거 진행형",
+    "future continuous": "미래 진행형",
+    "present perfect": "현재 완료형",
+    "past perfect": "과거 완료형",
+    "future perfect": "미래 완료형",
+    "present perfect continuous": "현재 완료 진행형",
+    "past perfect continuous": "과거 완료 진행형",
+    "future perfect continuous": "미래 완료 진행형",
+    "modal verb": "조동사",
+    "auxiliary verb": "조동사",
+    "passive voice": "수동태",
+    "active voice": "능동태",
+    conditional: "조건문",
+    subjunctive: "가정법",
+    imperative: "명령문",
+    gerund: "동명사",
+    infinitive: "부정사",
+    participle: "분사",
+    "present participle": "현재분사",
+    "past participle": "과거분사",
+    comparative: "비교급",
+    superlative: "최상급",
+    "countable noun": "가산명사",
+    "uncountable noun": "불가산명사",
+    plural: "복수형",
+    singular: "단수형",
+    article: "관사",
+    "definite article": "정관사",
+    "indefinite article": "부정관사",
+    preposition: "전치사",
+    conjunction: "접속사",
+    adverb: "부사",
+    adjective: "형용사",
+    pronoun: "대명사",
+    "relative clause": "관계절",
+    "subordinate clause": "종속절",
+    "main clause": "주절",
+
+    // 일본어 문법 용어
+    hiragana: "히라가나",
+    katakana: "가타카나",
+    kanji: "한자",
+    keigo: "경어",
+    sonkeigo: "존경어",
+    kenjougo: "겸양어",
+    teineigo: "정중어",
+    "masu form": "마스형",
+    "te form": "테형",
+    "potential form": "가능형",
+    "causative form": "사역형",
+    "passive form": "수동형",
+    "volitional form": "의지형",
+    "conditional form": "조건형",
+    "imperative form": "명령형",
+    "negative form": "부정형",
+    "past tense": "과거형",
+    "present tense": "현재형",
+    particle: "조사",
+    "wa particle": "는/은 조사",
+    "ga particle": "가/이 조사",
+    "wo particle": "를/을 조사",
+    "ni particle": "에 조사",
+    "de particle": "에서 조사",
+    "to particle": "와/과 조사",
+
+    // 중국어 문법 용어
+    pinyin: "병음",
+    tone: "성조",
+    "first tone": "1성",
+    "second tone": "2성",
+    "third tone": "3성",
+    "fourth tone": "4성",
+    "neutral tone": "경성",
+    "measure word": "양사",
+    classifier: "양사",
+    "sentence final particle": "문말사",
+    "aspect marker": "상 표지",
+    "perfective aspect": "완료상",
+    "progressive aspect": "진행상",
+    "experiential aspect": "경험상",
+  },
+  en: {
+    // 기본적으로 영어는 그대로 유지
+    "simple present tense": "simple present tense",
+    "present tense": "present tense",
+    "simple past tense": "simple past tense",
+    "past tense": "past tense",
+    // ... 나머지도 그대로
+  },
+  ja: {
+    // 영어 문법 용어를 일본어로
+    "simple present tense": "現在時制",
+    "present tense": "現在時制",
+    "simple past tense": "過去時制",
+    "past tense": "過去時制",
+    "simple future tense": "未来時制",
+    "future tense": "未来時制",
+    "present continuous": "現在進行形",
+    "past continuous": "過去進行形",
+    "future continuous": "未来進行形",
+    "present perfect": "現在完了形",
+    "past perfect": "過去完了形",
+    "future perfect": "未来完了形",
+    "modal verb": "助動詞",
+    "auxiliary verb": "助動詞",
+    "passive voice": "受動態",
+    "active voice": "能動態",
+    conditional: "条件文",
+    subjunctive: "仮定法",
+    imperative: "命令文",
+    gerund: "動名詞",
+    infinitive: "不定詞",
+    participle: "分詞",
+    "present participle": "現在分詞",
+    "past participle": "過去分詞",
+    comparative: "比較級",
+    superlative: "最上級",
+    "countable noun": "可算名詞",
+    "uncountable noun": "不可算名詞",
+    plural: "複数形",
+    singular: "単数形",
+    article: "冠詞",
+    "definite article": "定冠詞",
+    "indefinite article": "不定冠詞",
+    preposition: "前置詞",
+    conjunction: "接続詞",
+    adverb: "副詞",
+    adjective: "形容詞",
+    pronoun: "代名詞",
+
+    // 일본어 문법 용어는 그대로
+    hiragana: "ひらがな",
+    katakana: "カタカナ",
+    kanji: "漢字",
+    keigo: "敬語",
+    "masu form": "ます形",
+    "te form": "て形",
+    particle: "助詞",
+  },
+  zh: {
+    // 영어 문법 용어를 중국어로
+    "simple present tense": "一般现在时",
+    "present tense": "现在时",
+    "simple past tense": "一般过去时",
+    "past tense": "过去时",
+    "simple future tense": "一般将来时",
+    "future tense": "将来时",
+    "present continuous": "现在进行时",
+    "past continuous": "过去进行时",
+    "future continuous": "将来进行时",
+    "present perfect": "现在完成时",
+    "past perfect": "过去完成时",
+    "future perfect": "将来完成时",
+    "modal verb": "情态动词",
+    "auxiliary verb": "助动词",
+    "passive voice": "被动语态",
+    "active voice": "主动语态",
+    conditional: "条件句",
+    subjunctive: "虚拟语气",
+    imperative: "祈使句",
+    gerund: "动名词",
+    infinitive: "不定式",
+    participle: "分词",
+    "present participle": "现在分词",
+    "past participle": "过去分词",
+    comparative: "比较级",
+    superlative: "最高级",
+    "countable noun": "可数名词",
+    "uncountable noun": "不可数名词",
+    plural: "复数",
+    singular: "单数",
+    article: "冠词",
+    "definite article": "定冠词",
+    "indefinite article": "不定冠词",
+    preposition: "介词",
+    conjunction: "连词",
+    adverb: "副词",
+    adjective: "形容词",
+    pronoun: "代词",
+
+    // 중국어 문법 용어는 그대로
+    pinyin: "拼音",
+    tone: "声调",
+    "measure word": "量词",
+    classifier: "量词",
+  },
+};
+
 // 다국어 번역 텍스트 가져오기 함수
 function getTranslatedText(key) {
   return pageTranslations[userLanguage][key] || pageTranslations.en[key] || key;
+}
+
+// 문법 설명을 환경 언어로 번역하는 함수
+function translateGrammarNote(grammarNote) {
+  if (!grammarNote || !userLanguage) return grammarNote;
+
+  const translations = grammarTranslations[userLanguage];
+  if (!translations) return grammarNote;
+
+  // 소문자로 변환해서 매칭 시도
+  const lowerNote = grammarNote.toLowerCase();
+
+  // 정확히 일치하는 번역이 있는지 확인
+  if (translations[lowerNote]) {
+    return translations[lowerNote];
+  }
+
+  // 부분 일치 시도 (더 긴 용어부터 확인)
+  const sortedKeys = Object.keys(translations).sort(
+    (a, b) => b.length - a.length
+  );
+
+  for (const key of sortedKeys) {
+    if (lowerNote.includes(key)) {
+      return grammarNote.replace(new RegExp(key, "gi"), translations[key]);
+    }
+  }
+
+  // 번역이 없으면 원본 반환
+  return grammarNote;
+}
+
+// 언어 이름 가져오기 (환경 설정 언어에 맞게)
+function getLanguageName(langCode) {
+  const languageNames = {
+    ko: {
+      korean: "한국어",
+      english: "영어",
+      japanese: "일본어",
+      chinese: "중국어",
+    },
+    en: {
+      korean: "Korean",
+      english: "English",
+      japanese: "Japanese",
+      chinese: "Chinese",
+    },
+    ja: {
+      korean: "韓国語",
+      english: "英語",
+      japanese: "日本語",
+      chinese: "中国語",
+    },
+    zh: {
+      korean: "韩语",
+      english: "英语",
+      japanese: "日语",
+      chinese: "中文",
+    },
+  };
+
+  return (
+    languageNames[userLanguage]?.[langCode] ||
+    languageNames.en[langCode] ||
+    langCode
+  );
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -1088,12 +1353,58 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
       targetExpression.pronunciation || targetExpression.romanization || "";
   }
 
-  if (conceptCategory) {
-    conceptCategory.textContent = conceptInfo.category;
+  // 카테고리와 도메인을 통합해서 번역하여 표시
+  const categoryDomainElement = document.getElementById(
+    "concept-category-domain"
+  );
+  if (categoryDomainElement) {
+    const categoryKey = conceptInfo.category || "general";
+    const domainKey = conceptInfo.domain || "general";
+
+    const translatedCategory = getTranslatedText(categoryKey);
+    const translatedDomain = getTranslatedText(domainKey);
+
+    // 도메인/카테고리 형태로 결합
+    categoryDomainElement.textContent = `${translatedDomain}/${translatedCategory}`;
   }
 
-  if (conceptDomain) {
-    conceptDomain.textContent = conceptInfo.domain;
+  // 마지막 업데이트 날짜 설정
+  const updatedAtElement = document.getElementById("concept-updated-at");
+  if (updatedAtElement) {
+    const updatedAt =
+      conceptData.updatedAt || conceptData.createdAt || conceptData.created_at;
+    if (updatedAt) {
+      // 날짜 포맷팅 (concept-modal.js와 동일한 로직)
+      let formattedDate = "";
+      try {
+        let date;
+        if (updatedAt.toDate && typeof updatedAt.toDate === "function") {
+          // Firestore Timestamp 객체인 경우
+          date = updatedAt.toDate();
+        } else if (updatedAt.seconds) {
+          // Firestore Timestamp 형태의 객체인 경우
+          date = new Date(updatedAt.seconds * 1000);
+        } else {
+          // 일반 Date 객체나 문자열인 경우
+          date = new Date(updatedAt);
+        }
+
+        if (!isNaN(date.getTime())) {
+          formattedDate = date.toLocaleDateString("ko-KR", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          });
+        }
+      } catch (error) {
+        console.error("날짜 포맷팅 오류:", error);
+        formattedDate = "";
+      }
+
+      updatedAtElement.textContent = formattedDate || "날짜 정보 없음";
+    } else {
+      updatedAtElement.textContent = "날짜 정보 없음";
+    }
   }
 
   // 언어별 표현 정보 채우기
@@ -1158,7 +1469,7 @@ function fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage) {
         ? "border-blue-500 text-blue-600"
         : "border-transparent text-gray-500 hover:text-gray-700"
     }`;
-    tab.textContent = langInfo.nameKo;
+    tab.textContent = getLanguageName(langCode);
     tab.onclick = () => switchViewTab(langCode);
 
     tabContainer.appendChild(tab);
@@ -1220,10 +1531,6 @@ function fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage) {
         <p>${expression.definition || "정의 없음"}</p>
       </div>
       <div class="grid grid-cols-1 gap-4 mb-4">
-        <div>
-          <p class="text-sm text-gray-700 mb-1">난이도:</p>
-          <p>${expression.level || "정보 없음"}</p>
-        </div>
         ${
           synonyms
             ? `
@@ -1501,36 +1808,50 @@ function updateExamples(langCode, conceptData) {
       }
 
       // 예문 컨텐츠 생성
-      languagesToShow.forEach((lang) => {
+      languagesToShow.forEach((lang, index) => {
+        const isFirst = index === 0;
         exampleContent += `
-          <div class="mb-3">
-            <p class="text-sm font-medium text-gray-700 mb-1">
-              ${lang.name} ${lang.label}
-            </p>
-            <p class="text-gray-900">${lang.text}</p>
-            ${
-              lang.grammar
-                ? `<p class="text-xs text-gray-500 mt-1">문법: ${lang.grammar}</p>`
-                : ""
-            }
+          <div class="${
+            isFirst ? "mb-3" : "mb-2 pl-4 border-l-2 border-gray-300"
+          }">
+            <span class="text-sm ${
+              isFirst ? "font-medium text-blue-600" : "text-gray-600"
+            }">${lang.name}${lang.label}:</span>
+            <p class="ml-2 ${
+              isFirst ? "font-medium text-gray-800" : "text-gray-700"
+            }">${lang.text}</p>
           </div>
         `;
       });
 
-      // 추가 정보 표시 (새로운 구조에서만)
-      if (example.context || example.priority || example.unicode_emoji) {
+      // 대상 언어로 문법 설명 하나만 추가 (가장 아래)
+      let grammarNote = null;
+
+      // 대상 언어에 맞는 문법 설명 찾기
+      if (
+        targetLanguage &&
+        example.translations?.[targetLanguage]?.grammar_notes
+      ) {
+        grammarNote = example.translations[targetLanguage].grammar_notes;
+      }
+      // 대상 언어가 없거나 문법 설명이 없으면 첫 번째 언어의 문법 설명 사용
+      else if (languagesToShow.length > 0 && languagesToShow[0].grammar) {
+        grammarNote = languagesToShow[0].grammar;
+      }
+
+      // 문법 설명이 있으면 추가
+      if (grammarNote) {
+        // 문법 설명을 환경 언어로 번역
+        const translatedGrammarNote = translateGrammarNote(grammarNote);
+
         exampleContent += `
-          <div class="border-t pt-3 mt-3 text-xs text-gray-500">
-            ${
-              example.unicode_emoji
-                ? `<span class="mr-2">${example.unicode_emoji}</span>`
-                : ""
-            }
-            ${example.context ? `맥락: ${example.context}` : ""}
-            ${example.priority ? ` | 우선순위: ${example.priority}` : ""}
+          <div class="mt-2 pt-2 border-t border-gray-200">
+            <p class="text-xs text-gray-500 italic">${translatedGrammarNote}</p>
           </div>
         `;
       }
+
+      // 추가 정보 표시는 제거 (맥락, 우선순위, 이모지 등 숨김)
 
       exampleDiv.innerHTML = exampleContent;
       examplesContainer.appendChild(exampleDiv);
