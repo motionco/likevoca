@@ -30,6 +30,26 @@ const pageTranslations = {
     no_examples: "예문이 없습니다.",
     category: "카테고리",
     domain: "도메인",
+    grammar: "문법",
+    // 카테고리 번역
+    fruit: "과일",
+    food: "음식",
+    animal: "동물",
+    daily: "일상",
+    travel: "여행",
+    business: "비즈니스",
+    transportation: "교통",
+    greeting: "인사",
+    emotion: "감정",
+    education: "교육",
+    nature: "자연",
+    // 도메인 번역
+    general: "일반",
+    // 수준 번역
+    beginner: "초급",
+    intermediate: "중급",
+    advanced: "고급",
+    basic: "기초",
   },
   en: {
     concept_detail_view: "Concept Detail View",
@@ -44,6 +64,26 @@ const pageTranslations = {
     no_examples: "No examples available.",
     category: "Category",
     domain: "Domain",
+    grammar: "Grammar",
+    // 카테고리 번역
+    fruit: "Fruit",
+    food: "Food",
+    animal: "Animal",
+    daily: "Daily Life",
+    travel: "Travel",
+    business: "Business",
+    transportation: "Transportation",
+    greeting: "Greeting",
+    emotion: "Emotion",
+    education: "Education",
+    nature: "Nature",
+    // 도메인 번역
+    general: "General",
+    // 수준 번역
+    beginner: "Beginner",
+    intermediate: "Intermediate",
+    advanced: "Advanced",
+    basic: "Basic",
   },
   ja: {
     concept_detail_view: "概念詳細表示",
@@ -58,6 +98,26 @@ const pageTranslations = {
     no_examples: "例文がありません。",
     category: "カテゴリ",
     domain: "ドメイン",
+    grammar: "文法",
+    // 카테고리 번역
+    fruit: "果物",
+    food: "食べ物",
+    animal: "動物",
+    daily: "日常",
+    travel: "旅行",
+    business: "ビジネス",
+    transportation: "交通",
+    greeting: "挨拶",
+    emotion: "感情",
+    education: "教育",
+    nature: "自然",
+    // 도메인 번역
+    general: "一般",
+    // 수준 번역
+    beginner: "初級",
+    intermediate: "中級",
+    advanced: "上級",
+    basic: "基礎",
   },
   zh: {
     concept_detail_view: "概念详细视图",
@@ -72,12 +132,231 @@ const pageTranslations = {
     no_examples: "没有例句。",
     category: "类别",
     domain: "领域",
+    grammar: "语法",
+    // 카테고리 번역
+    fruit: "水果",
+    food: "食物",
+    animal: "动物",
+    daily: "日常",
+    travel: "旅行",
+    business: "商务",
+    transportation: "交通",
+    greeting: "问候",
+    emotion: "情绪",
+    education: "教育",
+    nature: "自然",
+    // 도메인 번역
+    general: "一般",
+    // 수준 번역
+    beginner: "初级",
+    intermediate: "中级",
+    advanced: "高级",
+    basic: "基础",
+  },
+};
+
+// 문법 용어 번역 테이블
+const grammarTranslations = {
+  ko: {
+    // 영어 문법 용어
+    "simple present tense": "현재 시제",
+    "present tense": "현재 시제",
+    "simple past tense": "과거 시제",
+    "past tense": "과거 시제",
+    "simple future tense": "미래 시제",
+    "future tense": "미래 시제",
+    "present continuous": "현재 진행형",
+    "past continuous": "과거 진행형",
+    "future continuous": "미래 진행형",
+    "present perfect": "현재 완료형",
+    "past perfect": "과거 완료형",
+    "future perfect": "미래 완료형",
+    "present perfect continuous": "현재 완료 진행형",
+    "past perfect continuous": "과거 완료 진행형",
+    "future perfect continuous": "미래 완료 진행형",
+    "modal verb": "조동사",
+    "auxiliary verb": "조동사",
+    "passive voice": "수동태",
+    "active voice": "능동태",
+    conditional: "조건문",
+    subjunctive: "가정법",
+    imperative: "명령문",
+    gerund: "동명사",
+    infinitive: "부정사",
+    participle: "분사",
+    "present participle": "현재분사",
+    "past participle": "과거분사",
+    comparative: "비교급",
+    superlative: "최상급",
+    "countable noun": "가산명사",
+    "uncountable noun": "불가산명사",
+    plural: "복수형",
+    singular: "단수형",
+    article: "관사",
+    "definite article": "정관사",
+    "indefinite article": "부정관사",
+    preposition: "전치사",
+    conjunction: "접속사",
+    adverb: "부사",
+    adjective: "형용사",
+    pronoun: "대명사",
+    "relative clause": "관계절",
+    "subordinate clause": "종속절",
+    "main clause": "주절",
+
+    // 일본어 문법 용어
+    hiragana: "히라가나",
+    katakana: "가타카나",
+    kanji: "한자",
+    keigo: "경어",
+    sonkeigo: "존경어",
+    kenjougo: "겸양어",
+    teineigo: "정중어",
+    "masu form": "마스형",
+    "te form": "테형",
+    "potential form": "가능형",
+    "causative form": "사역형",
+    "passive form": "수동형",
+    "volitional form": "의지형",
+    "conditional form": "조건형",
+    "imperative form": "명령형",
+    "negative form": "부정형",
+    "past tense": "과거형",
+    "present tense": "현재형",
+    particle: "조사",
+    "wa particle": "는/은 조사",
+    "ga particle": "가/이 조사",
+    "wo particle": "를/을 조사",
+    "ni particle": "에 조사",
+    "de particle": "에서 조사",
+    "to particle": "와/과 조사",
+
+    // 중국어 문법 용어
+    pinyin: "병음",
+    tone: "성조",
+    "first tone": "1성",
+    "second tone": "2성",
+    "third tone": "3성",
+    "fourth tone": "4성",
+    "neutral tone": "경성",
+    "measure word": "양사",
+    classifier: "양사",
+    "sentence final particle": "문말사",
+    "aspect marker": "상 표지",
+    "perfective aspect": "완료상",
+    "progressive aspect": "진행상",
+    "experiential aspect": "경험상",
+  },
+  en: {
+    // 기본적으로 영어는 그대로 유지
+    "simple present tense": "simple present tense",
+    "present tense": "present tense",
+    "simple past tense": "simple past tense",
+    "past tense": "past tense",
+    // ... 나머지도 그대로
+  },
+  ja: {
+    // 영어 문법 용어를 일본어로
+    "simple present tense": "現在時制",
+    "present tense": "現在時制",
+    "simple past tense": "過去時制",
+    "past tense": "過去時制",
+    "simple future tense": "未来時制",
+    "future tense": "未来時制",
+    "present continuous": "現在進行形",
+    "past continuous": "過去進行形",
+    "future continuous": "未来進行形",
+    "present perfect": "現在完了形",
+    "past perfect": "過去完了形",
+    "future perfect": "未来完了形",
+    "modal verb": "助動詞",
+    "auxiliary verb": "助動詞",
+    "passive voice": "受動態",
+    "active voice": "能動態",
+    conditional: "条件文",
+    subjunctive: "仮定法",
+    imperative: "命令文",
+    gerund: "動名詞",
+    infinitive: "不定詞",
+    participle: "分詞",
+    "present participle": "現在分詞",
+    "past participle": "過去分詞",
+    comparative: "比較級",
+    superlative: "最上級",
+    "countable noun": "可算名詞",
+    "uncountable noun": "不可算名詞",
+    plural: "複数形",
+    singular: "単数形",
+    article: "冠詞",
+    "definite article": "定冠詞",
+    "indefinite article": "不定冠詞",
+    preposition: "前置詞",
+    conjunction: "接続詞",
+    adverb: "副詞",
+    adjective: "形容詞",
+    pronoun: "代名詞",
+
+    // 일본어 문법 용어는 그대로
+    hiragana: "ひらがな",
+    katakana: "カタカナ",
+    kanji: "漢字",
+    keigo: "敬語",
+    "masu form": "ます形",
+    "te form": "て形",
+    particle: "助詞",
+  },
+  zh: {
+    // 영어 문법 용어를 중국어로
+    "simple present tense": "一般现在时",
+    "present tense": "现在时",
+    "simple past tense": "一般过去时",
+    "past tense": "过去时",
+    "simple future tense": "一般将来时",
+    "future tense": "将来时",
+    "present continuous": "现在进行时",
+    "past continuous": "过去进行时",
+    "future continuous": "将来进行时",
+    "present perfect": "现在完成时",
+    "past perfect": "过去完成时",
+    "future perfect": "将来完成时",
+    "modal verb": "情态动词",
+    "auxiliary verb": "助动词",
+    "passive voice": "被动语态",
+    "active voice": "主动语态",
+    conditional: "条件句",
+    subjunctive: "虚拟语气",
+    imperative: "祈使句",
+    gerund: "动名词",
+    infinitive: "不定式",
+    participle: "分词",
+    "present participle": "现在分词",
+    "past participle": "过去分词",
+    comparative: "比较级",
+    superlative: "最高级",
+    "countable noun": "可数名词",
+    "uncountable noun": "不可数名词",
+    plural: "复数",
+    singular: "单数",
+    article: "冠词",
+    "definite article": "定冠词",
+    "indefinite article": "不定冠词",
+    preposition: "介词",
+    conjunction: "连词",
+    adverb: "副词",
+    adjective: "形容词",
+    pronoun: "代词",
+
+    // 중국어 문법 용어는 그대로
+    pinyin: "拼音",
+    tone: "声调",
+    "measure word": "量词",
+    classifier: "量词",
   },
 };
 
 // 다국어 번역 텍스트 가져오기 함수
 function getTranslatedText(key) {
-  return pageTranslations[userLanguage][key] || pageTranslations.en[key];
+  return pageTranslations[userLanguage][key] || pageTranslations.en[key] || key;
 }
 
 // 사용자 언어 초기화
@@ -243,16 +522,31 @@ export async function showConceptModal(
 
   console.log("기본 언어 설정:", primaryLang, "표현:", primaryExpr);
 
-  document.getElementById("concept-view-emoji").textContent =
-    concept.concept_info?.emoji || "📝";
+  // 이모지 설정 개선
+  const emoji =
+    concept.concept_info?.emoji ||
+    concept.unicode_emoji ||
+    concept.concept_info?.unicode_emoji ||
+    "📝";
+  document.getElementById("concept-view-emoji").textContent = emoji;
+  console.log("이모지 설정:", emoji, "원본 데이터:", concept.concept_info);
+
   document.getElementById("concept-primary-word").textContent =
     primaryExpr?.word || "N/A";
   document.getElementById("concept-primary-pronunciation").textContent =
     primaryExpr?.pronunciation || "";
-  document.getElementById("concept-category").textContent =
-    concept.concept_info?.category || getTranslatedText("category");
-  document.getElementById("concept-domain").textContent =
-    concept.concept_info?.domain || getTranslatedText("domain");
+
+  // 카테고리와 도메인을 사용자 언어에 맞게 번역
+  const categoryKey =
+    concept.concept_info?.category || concept.category || "general";
+  const domainKey = concept.concept_info?.domain || concept.domain || "general";
+
+  const translatedCategory = getTranslatedText(categoryKey);
+  const translatedDomain = getTranslatedText(domainKey);
+
+  document.getElementById(
+    "concept-category-domain"
+  ).textContent = `${translatedDomain}/${translatedCategory}`;
 
   // 업데이트 날짜 설정
   const updatedAt =
@@ -338,15 +632,40 @@ export async function showConceptModal(
   setupModalEventListeners();
 }
 
-// 언어 이름 가져오기
+// 언어 이름 가져오기 (환경설정 언어에 맞게)
 function getLanguageName(langCode) {
   const languageNames = {
-    korean: "한국어",
-    english: "English",
-    japanese: "日本語",
-    chinese: "中文",
+    ko: {
+      korean: "한국어",
+      english: "영어",
+      japanese: "일본어",
+      chinese: "중국어",
+    },
+    en: {
+      korean: "Korean",
+      english: "English",
+      japanese: "Japanese",
+      chinese: "Chinese",
+    },
+    ja: {
+      korean: "韓国語",
+      english: "英語",
+      japanese: "日本語",
+      chinese: "中国語",
+    },
+    zh: {
+      korean: "韩语",
+      english: "英语",
+      japanese: "日语",
+      chinese: "中文",
+    },
   };
-  return languageNames[langCode] || langCode;
+
+  return (
+    languageNames[userLanguage]?.[langCode] ||
+    languageNames.en[langCode] ||
+    langCode
+  );
 }
 
 // 언어별 내용 표시
@@ -373,9 +692,6 @@ function showLanguageContent(lang, concept) {
   contentContainer.innerHTML = `
     <div class="space-y-4">
       <div>
-        <h4 class="font-medium text-gray-700 mb-2">${getTranslatedText(
-          "meaning"
-        )}</h4>
         <div class="bg-gray-50 p-3 rounded">
           <div class="flex items-center gap-2 mb-1">
             <p class="text-lg font-medium">${expression.word || "N/A"}</p>
@@ -389,22 +705,43 @@ function showLanguageContent(lang, concept) {
           <p class="text-gray-700 mt-2">${expression.definition || "N/A"}</p>
         </div>
       </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
-        <div>
-          <h4 class="font-medium text-gray-700 mb-2">${getTranslatedText(
-            "level"
-          )}</h4>
-          <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-sm">${
-            expression.level || "N/A"
-          }</span>
-        </div>
-      </div>
     </div>
   `;
 }
 
-// 기본 정보 업데이트 함수 추가
+// 수준을 해당 언어에 맞게 번역하는 함수
+function getLocalizedLevel(level, targetLang) {
+  const levelTranslations = {
+    korean: {
+      beginner: "초급",
+      intermediate: "중급",
+      advanced: "고급",
+      basic: "기초",
+    },
+    english: {
+      beginner: "Beginner",
+      intermediate: "Intermediate",
+      advanced: "Advanced",
+      basic: "Basic",
+    },
+    japanese: {
+      beginner: "初級",
+      intermediate: "中級",
+      advanced: "上級",
+      basic: "基礎",
+    },
+    chinese: {
+      beginner: "初级",
+      intermediate: "中级",
+      advanced: "高级",
+      basic: "基础",
+    },
+  };
+
+  return levelTranslations[targetLang]?.[level] || level || "N/A";
+}
+
+// 기본 정보 업데이트 함수 수정
 function updateBasicInfo(lang, concept) {
   // 대상언어 정보로 고정 (전달받은 언어가 아닌 targetLanguage 사용)
   const targetLanguage = window.currentTargetLanguage;
@@ -422,9 +759,19 @@ function updateBasicInfo(lang, concept) {
   const pronunciationElement = document.getElementById(
     "concept-primary-pronunciation"
   );
+  const categoryDomainElement = document.getElementById(
+    "concept-category-domain"
+  );
 
   if (emojiElement) {
-    emojiElement.textContent = concept.concept_info?.emoji || "📝";
+    // 이모지 수정: concept_info 또는 unicode_emoji에서 가져오기
+    const emoji =
+      concept.concept_info?.emoji ||
+      concept.unicode_emoji ||
+      concept.concept_info?.unicode_emoji ||
+      "📝";
+    emojiElement.textContent = emoji;
+    console.log("이모지 설정:", emoji, "원본 데이터:", concept.concept_info);
   }
 
   if (wordElement) {
@@ -433,6 +780,20 @@ function updateBasicInfo(lang, concept) {
 
   if (pronunciationElement) {
     pronunciationElement.textContent = expression.pronunciation || "";
+  }
+
+  // 카테고리와 도메인을 하나로 합쳐서 표시
+  if (categoryDomainElement) {
+    const categoryKey =
+      concept.concept_info?.category || concept.category || "general";
+    const domainKey =
+      concept.concept_info?.domain || concept.domain || "general";
+
+    const translatedCategory = getTranslatedText(categoryKey);
+    const translatedDomain = getTranslatedText(domainKey);
+
+    // 도메인/카테고리 형태로 결합 (순서 변경)
+    categoryDomainElement.textContent = `${translatedDomain}/${translatedCategory}`;
   }
 }
 
@@ -605,7 +966,7 @@ function displayExamples(
         let exampleContent = "";
         const languagesToShow = [];
 
-        // 원본 언어와 대상 언어만 표시
+        // 예문 순서: 대상언어 → 원본언어 → 현재언어
         // 1. 대상언어 먼저 추가 (있는 경우)
         if (targetLanguage && example.translations[targetLanguage]) {
           languagesToShow.push({
@@ -617,7 +978,7 @@ function displayExamples(
           });
         }
 
-        // 2. 원본언어 추가 (있고, 대상언어와 다른 경우)
+        // 2. 원본언어 추가 (대상언어와 다르고 있는 경우)
         if (
           sourceLanguage &&
           example.translations[sourceLanguage] &&
@@ -632,7 +993,22 @@ function displayExamples(
           });
         }
 
-        // 언어들을 순서대로 표시
+        // 3. 현재 탭 언어 추가 (대상언어 및 원본언어와 다르고 있는 경우)
+        if (
+          example.translations[currentLang] &&
+          currentLang !== targetLanguage &&
+          currentLang !== sourceLanguage
+        ) {
+          languagesToShow.push({
+            code: currentLang,
+            name: getLanguageName(currentLang),
+            text: example.translations[currentLang].text,
+            grammarNotes: example.translations[currentLang].grammar_notes,
+            label: "(현재)",
+          });
+        }
+
+        // 언어들을 순서대로 표시 (문법 노트는 제외)
         languagesToShow.forEach((lang, index) => {
           const isFirst = index === 0;
           exampleContent += `
@@ -645,32 +1021,43 @@ function displayExamples(
               <p class="ml-2 ${
                 isFirst ? "font-medium text-gray-800" : "text-gray-700"
               }">${lang.text}</p>
-              ${
-                lang.grammarNotes
-                  ? `<p class="ml-2 text-xs text-gray-500 italic">${lang.grammarNotes}</p>`
-                  : ""
-              }
             </div>
           `;
         });
 
-        // 예문 컨텍스트와 이모지 표시
-        if (example.context || example.unicode_emoji) {
-          exampleContent =
-            `
-            <div class="mb-2 text-sm text-gray-600">
-              ${
-                example.unicode_emoji
-                  ? `<span class="mr-2">${example.unicode_emoji}</span>`
-                  : ""
-              }
-              ${
-                example.context
-                  ? `<span class="italic">컨텍스트: ${example.context}</span>`
-                  : ""
-              }
+        // 대상 언어로 문법 설명 하나만 추가 (가장 아래)
+        let grammarNote = null;
+
+        // 대상 언어에 맞는 문법 설명 찾기
+        if (
+          targetLanguage &&
+          example.translations[targetLanguage]?.grammar_notes
+        ) {
+          grammarNote = example.translations[targetLanguage].grammar_notes;
+        }
+        // 대상 언어가 없거나 문법 설명이 없으면 첫 번째 언어의 문법 설명 사용
+        else if (
+          languagesToShow.length > 0 &&
+          languagesToShow[0].grammarNotes
+        ) {
+          grammarNote = languagesToShow[0].grammarNotes;
+        }
+
+        // 문법 설명이 있으면 추가
+        if (grammarNote) {
+          // 문법 설명을 환경 언어로 번역
+          const translatedGrammarNote = translateGrammarNote(grammarNote);
+
+          exampleContent += `
+            <div class="mt-2 pt-2 border-t border-gray-200">
+              <p class="text-xs text-gray-500">
+                <span class="font-medium">${getTranslatedText(
+                  "grammar"
+                )}:</span>
+                <span class="italic">${translatedGrammarNote}</span>
+              </p>
             </div>
-          ` + exampleContent;
+          `;
         }
 
         exampleDiv.innerHTML = exampleContent;
@@ -698,7 +1085,7 @@ function displayExamples(
 
         let exampleContent = "";
 
-        // 원본 언어와 대상 언어만 표시
+        // 예문 순서: 대상언어 → 원본언어 → 현재언어
         const languagesToShow = [];
 
         // 1. 대상언어 먼저 추가 (있는 경우)
@@ -711,7 +1098,7 @@ function displayExamples(
           });
         }
 
-        // 2. 원본언어 추가 (있고, 대상언어와 다른 경우)
+        // 2. 원본언어 추가 (대상언어와 다르고 있는 경우)
         if (
           sourceLanguage &&
           example[sourceLanguage] &&
@@ -722,6 +1109,20 @@ function displayExamples(
             name: getLanguageName(sourceLanguage),
             text: example[sourceLanguage],
             label: "(원본)",
+          });
+        }
+
+        // 3. 현재 탭 언어 추가 (대상언어 및 원본언어와 다르고 있는 경우)
+        if (
+          example[currentLang] &&
+          currentLang !== targetLanguage &&
+          currentLang !== sourceLanguage
+        ) {
+          languagesToShow.push({
+            code: currentLang,
+            name: getLanguageName(currentLang),
+            text: example[currentLang],
+            label: "(현재)",
           });
         }
 
@@ -755,4 +1156,34 @@ function displayExamples(
       "no_examples"
     )}</p>`;
   }
+}
+
+// 문법 설명을 환경 언어로 번역하는 함수
+function translateGrammarNote(grammarNote) {
+  if (!grammarNote || !userLanguage) return grammarNote;
+
+  const translations = grammarTranslations[userLanguage];
+  if (!translations) return grammarNote;
+
+  // 소문자로 변환해서 매칭 시도
+  const lowerNote = grammarNote.toLowerCase();
+
+  // 정확히 일치하는 번역이 있는지 확인
+  if (translations[lowerNote]) {
+    return translations[lowerNote];
+  }
+
+  // 부분 일치 시도 (더 긴 용어부터 확인)
+  const sortedKeys = Object.keys(translations).sort(
+    (a, b) => b.length - a.length
+  );
+
+  for (const key of sortedKeys) {
+    if (lowerNote.includes(key)) {
+      return grammarNote.replace(new RegExp(key, "gi"), translations[key]);
+    }
+  }
+
+  // 번역이 없으면 원본 반환
+  return grammarNote;
 }

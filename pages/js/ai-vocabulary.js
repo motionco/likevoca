@@ -29,27 +29,87 @@ const pageTranslations = {
     meaning: "의미",
     examples: "예문",
     ai_generated: "AI 생성",
+    // 카테고리 번역
+    fruit: "과일",
+    food: "음식",
+    animal: "동물",
+    daily: "일상",
+    travel: "여행",
+    business: "비즈니스",
+    transportation: "교통",
+    greeting: "인사",
+    emotion: "감정",
+    education: "교육",
+    nature: "자연",
+    subject: "과목",
+    // 도메인 번역
+    general: "일반",
   },
   en: {
     meaning: "Meaning",
     examples: "Examples",
     ai_generated: "AI Generated",
+    // 카테고리 번역
+    fruit: "Fruit",
+    food: "Food",
+    animal: "Animal",
+    daily: "Daily Life",
+    travel: "Travel",
+    business: "Business",
+    transportation: "Transportation",
+    greeting: "Greeting",
+    emotion: "Emotion",
+    education: "Education",
+    nature: "Nature",
+    subject: "Subject",
+    // 도메인 번역
+    general: "General",
   },
   ja: {
     meaning: "意味",
     examples: "例文",
     ai_generated: "AI生成",
+    // 카테고리 번역
+    fruit: "果物",
+    food: "食べ物",
+    animal: "動物",
+    daily: "日常",
+    travel: "旅行",
+    business: "ビジネス",
+    transportation: "交通",
+    greeting: "挨拶",
+    emotion: "感情",
+    education: "教育",
+    nature: "自然",
+    subject: "科目",
+    // 도메인 번역
+    general: "一般",
   },
   zh: {
     meaning: "意思",
     examples: "例句",
     ai_generated: "AI生成",
+    // 카테고리 번역
+    fruit: "水果",
+    food: "食物",
+    animal: "动物",
+    daily: "日常",
+    travel: "旅行",
+    business: "商务",
+    transportation: "交通",
+    greeting: "问候",
+    emotion: "情绪",
+    education: "教育",
+    nature: "自然",
+    subject: "学科",
+    // 도메인 번역
+    general: "一般",
   },
 };
 
 // 다국어 번역 텍스트 가져오기 함수
 function getTranslatedText(key) {
-  return pageTranslations[userLanguage][key] || pageTranslations.en[key];
+  return pageTranslations[userLanguage][key] || pageTranslations.en[key] || key;
 }
 
 // 사용자 언어 초기화
@@ -502,15 +562,14 @@ function createConceptCard(concept, sourceLanguage, targetLanguage) {
         }</p>
       </div>
       <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-        ${domain}${domain && category ? "/" : ""}${category}
+        ${getTranslatedText(domain)}${
+    domain && category ? "/" : ""
+  }${getTranslatedText(category)}
       </span>
     </div>
     
     <div class="border-t border-gray-200 pt-3 mt-3">
       <div class="flex items-center">
-        <span class="text-gray-500 text-sm mr-2">${getTranslatedText(
-          "meaning"
-        )}</span>
         <span class="font-medium">${sourceExpr.word || ""}</span>
       </div>
       <p class="text-sm text-gray-600 mt-1">${
@@ -522,7 +581,6 @@ function createConceptCard(concept, sourceLanguage, targetLanguage) {
       example && (example.source || example.target)
         ? `
     <div class="border-t border-gray-200 pt-3 mt-3">
-      <p class="text-xs text-gray-500 mb-1">${getTranslatedText("examples")}</p>
       ${example.target ? `<p class="text-sm mb-1">${example.target}</p>` : ""}
       ${
         example.source
