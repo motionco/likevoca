@@ -258,9 +258,37 @@ export async function showConceptModal(
   const updatedAt =
     concept.updatedAt || concept.createdAt || concept.created_at;
   if (updatedAt) {
-    document.getElementById("concept-updated-at").textContent = new Date(
-      updatedAt
-    ).toLocaleDateString();
+    // 날짜 포맷팅 개선 (ai-vocabulary.js와 동일한 로직 사용)
+    let formattedDate = "";
+    try {
+      let date;
+      if (updatedAt.toDate && typeof updatedAt.toDate === "function") {
+        // Firestore Timestamp 객체인 경우
+        date = updatedAt.toDate();
+      } else if (updatedAt.seconds) {
+        // Firestore Timestamp 형태의 객체인 경우
+        date = new Date(updatedAt.seconds * 1000);
+      } else {
+        // 일반 Date 객체나 문자열인 경우
+        date = new Date(updatedAt);
+      }
+
+      if (!isNaN(date.getTime())) {
+        formattedDate = date.toLocaleDateString("ko-KR", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        });
+      }
+    } catch (error) {
+      console.error("날짜 포맷팅 오류:", error);
+      formattedDate = "";
+    }
+
+    const updatedAtElement = document.getElementById("concept-updated-at");
+    if (updatedAtElement) {
+      updatedAtElement.textContent = formattedDate || "날짜 정보 없음";
+    }
   }
 
   // 탭 생성
@@ -577,6 +605,7 @@ function displayExamples(
         let exampleContent = "";
         const languagesToShow = [];
 
+        // 원본 언어와 대상 언어만 표시
         // 1. 대상언어 먼저 추가 (있는 경우)
         if (targetLanguage && example.translations[targetLanguage]) {
           languagesToShow.push({
@@ -602,33 +631,6 @@ function displayExamples(
             label: "(원본)",
           });
         }
-
-        // 3. 현재 탭 언어 추가 (위에 추가되지 않은 경우만)
-        if (
-          example.translations[currentLang] &&
-          !languagesToShow.find((lang) => lang.code === currentLang)
-        ) {
-          languagesToShow.push({
-            code: currentLang,
-            name: getLanguageName(currentLang),
-            text: example.translations[currentLang].text,
-            grammarNotes: example.translations[currentLang].grammar_notes,
-            label: "",
-          });
-        }
-
-        // 추가 언어들도 표시 (모든 언어 포함)
-        Object.keys(example.translations).forEach((langCode) => {
-          if (!languagesToShow.find((lang) => lang.code === langCode)) {
-            languagesToShow.push({
-              code: langCode,
-              name: getLanguageName(langCode),
-              text: example.translations[langCode].text,
-              grammarNotes: example.translations[langCode].grammar_notes,
-              label: "",
-            });
-          }
-        });
 
         // 언어들을 순서대로 표시
         languagesToShow.forEach((lang, index) => {
@@ -683,7 +685,10 @@ function displayExamples(
     console.log("일반 개념의 examples 발견:", concept.examples);
 
     const filteredExamples = concept.examples.filter(
-      (example) => example[currentLang]
+      (example) =>
+        example[currentLang] ||
+        example[sourceLanguage] ||
+        example[targetLanguage]
     );
 
     if (filteredExamples.length > 0) {
@@ -693,7 +698,7 @@ function displayExamples(
 
         let exampleContent = "";
 
-        // 대상언어 → 원본언어 순서로 표시 (현재 탭 언어와 관계없이)
+        // 원본 언어와 대상 언어만 표시
         const languagesToShow = [];
 
         // 1. 대상언어 먼저 추가 (있는 경우)
@@ -717,19 +722,6 @@ function displayExamples(
             name: getLanguageName(sourceLanguage),
             text: example[sourceLanguage],
             label: "(원본)",
-          });
-        }
-
-        // 3. 현재 탭 언어 추가 (위에 추가되지 않은 경우만)
-        if (
-          example[currentLang] &&
-          !languagesToShow.find((lang) => lang.code === currentLang)
-        ) {
-          languagesToShow.push({
-            code: currentLang,
-            name: getLanguageName(currentLang),
-            text: example[currentLang],
-            label: "",
           });
         }
 
