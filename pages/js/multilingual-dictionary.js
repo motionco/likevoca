@@ -1527,16 +1527,20 @@ function fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage) {
         }
       </div>
       <div class="mb-4">
-        <p class="text-sm text-gray-700 mb-1">의미/정의:</p>
-        <p>${expression.definition || "정의 없음"}</p>
+        <p class="text-lg font-medium text-gray-800">${
+          expression.definition || "정의 없음"
+        }</p>
       </div>
-      <div class="grid grid-cols-1 gap-4 mb-4">
+      ${
+        synonyms || antonyms || wordFamily || compoundWords || collocationsText
+          ? `
+      <div class="grid grid-cols-2 gap-3 mb-4">
         ${
           synonyms
             ? `
-        <div>
-          <p class="text-sm text-gray-700 mb-1">동의어:</p>
-          <p>${synonyms}</p>
+        <div class="bg-gray-50 p-3 rounded-lg">
+          <p class="text-sm font-medium text-gray-700 mb-1">동의어</p>
+          <p class="text-sm text-gray-600">${synonyms}</p>
         </div>
         `
             : ""
@@ -1544,9 +1548,9 @@ function fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage) {
         ${
           antonyms
             ? `
-        <div>
-          <p class="text-sm text-gray-700 mb-1">반의어:</p>
-          <p>${antonyms}</p>
+        <div class="bg-gray-50 p-3 rounded-lg">
+          <p class="text-sm font-medium text-gray-700 mb-1">반의어</p>
+          <p class="text-sm text-gray-600">${antonyms}</p>
         </div>
         `
             : ""
@@ -1554,9 +1558,9 @@ function fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage) {
         ${
           wordFamily
             ? `
-        <div>
-          <p class="text-sm text-gray-700 mb-1">어족:</p>
-          <p>${wordFamily}</p>
+        <div class="bg-gray-50 p-3 rounded-lg">
+          <p class="text-sm font-medium text-gray-700 mb-1">어족</p>
+          <p class="text-sm text-gray-600">${wordFamily}</p>
         </div>
         `
             : ""
@@ -1564,9 +1568,9 @@ function fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage) {
         ${
           compoundWords
             ? `
-        <div>
-          <p class="text-sm text-gray-700 mb-1">복합어:</p>
-          <p>${compoundWords}</p>
+        <div class="bg-gray-50 p-3 rounded-lg">
+          <p class="text-sm font-medium text-gray-700 mb-1">복합어</p>
+          <p class="text-sm text-gray-600">${compoundWords}</p>
         </div>
         `
             : ""
@@ -1574,14 +1578,17 @@ function fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage) {
         ${
           collocationsText
             ? `
-        <div>
-          <p class="text-sm text-gray-700 mb-1">연어:</p>
-          <p>${collocationsText}</p>
+        <div class="bg-gray-50 p-3 rounded-lg col-span-2">
+          <p class="text-sm font-medium text-gray-700 mb-1">연어</p>
+          <p class="text-sm text-gray-600">${collocationsText}</p>
         </div>
         `
             : ""
         }
       </div>
+      `
+          : ""
+      }
     `;
 
     contentContainer.appendChild(panel);
@@ -1824,25 +1831,39 @@ function updateExamples(langCode, conceptData) {
         `;
       });
 
-      // 대상 언어로 문법 설명 하나만 추가 (가장 아래)
+      // 현재 탭 언어에 맞는 문법 설명 찾기
       let grammarNote = null;
 
-      // 대상 언어에 맞는 문법 설명 찾기
-      if (
+      // 현재 탭 언어의 문법 설명 우선 사용
+      if (langCode && example.translations?.[langCode]?.grammar_notes) {
+        grammarNote = example.translations[langCode].grammar_notes;
+      }
+      // 현재 탭 언어에 문법 설명이 없으면 대상 언어의 문법 설명 사용
+      else if (
         targetLanguage &&
         example.translations?.[targetLanguage]?.grammar_notes
       ) {
         grammarNote = example.translations[targetLanguage].grammar_notes;
       }
-      // 대상 언어가 없거나 문법 설명이 없으면 첫 번째 언어의 문법 설명 사용
+      // 첫 번째 언어의 문법 설명 사용
       else if (languagesToShow.length > 0 && languagesToShow[0].grammar) {
         grammarNote = languagesToShow[0].grammar;
       }
 
-      // 문법 설명이 있으면 추가
+      // 문법 설명이 있으면 추가 (현재 탭 언어로 번역)
       if (grammarNote) {
-        // 문법 설명을 환경 언어로 번역
-        const translatedGrammarNote = translateGrammarNote(grammarNote);
+        // 현재 표시 중인 탭 언어에 맞게 문법 설명 번역
+        let translatedGrammarNote = grammarNote;
+
+        // 현재 탭 언어에 따라 번역 (langCode 사용)
+        const tabLanguageInfo = supportedLanguages[langCode];
+        if (tabLanguageInfo && tabLanguageInfo.code) {
+          // 임시로 userLanguage를 현재 탭 언어로 변경해서 번역
+          const originalUserLanguage = userLanguage;
+          userLanguage = tabLanguageInfo.code;
+          translatedGrammarNote = translateGrammarNote(grammarNote);
+          userLanguage = originalUserLanguage; // 원래 언어로 복원
+        }
 
         exampleContent += `
           <div class="mt-2 pt-2 border-t border-gray-200">
