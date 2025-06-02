@@ -657,7 +657,7 @@ function createConceptCard(concept) {
           <span class="font-medium">${sourceExpression.word || "N/A"}</span>
         </div>
         <p class="text-sm text-gray-600 mt-1">${
-          sourceExpression.definition || ""
+          targetExpression.definition || ""
         }</p>
       </div>
       
@@ -1310,7 +1310,7 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
     conceptData.unicode_emoji ||
     "📝";
 
-  // 기본 정보 설정 (선택된 언어에 맞게)
+  // 기본 정보 설정 (대상언어 우선)
   const conceptEmoji = document.getElementById("concept-view-emoji");
   const conceptPrimaryWord = document.getElementById("concept-primary-word");
   const conceptPrimaryPronunciation = document.getElementById(
@@ -1319,8 +1319,7 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
   const conceptCategory = document.getElementById("concept-category");
   const conceptDomain = document.getElementById("concept-domain");
 
-  // 원본 언어의 표현 가져오기 (새 구조와 기존 구조 모두 지원)
-  const sourceExpression = conceptData.expressions?.[sourceLanguage] || {};
+  // 대상 언어의 표현 가져오기 (초기 표시용)
   const targetExpression = conceptData.expressions?.[targetLanguage] || {};
 
   // 간단하게 innerHTML로 상단 영역 구성 (언어탭 방식과 동일) - 대상언어 우선
@@ -1409,6 +1408,24 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
 
   // 언어별 표현 정보 채우기
   fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage);
+
+  // 탭 전환 시 상단 제목도 함께 업데이트하는 함수 추가
+  window.updateModalHeaderForTab = (langCode) => {
+    const expression = conceptData.expressions?.[langCode] || {};
+    const conceptPrimaryWord = document.getElementById("concept-primary-word");
+    const conceptPrimaryPronunciation = document.getElementById(
+      "concept-primary-pronunciation"
+    );
+
+    if (conceptPrimaryWord && expression.word) {
+      conceptPrimaryWord.textContent = expression.word;
+    }
+
+    if (conceptPrimaryPronunciation) {
+      conceptPrimaryPronunciation.textContent =
+        expression.pronunciation || expression.romanization || "";
+    }
+  };
 }
 
 // 언어별 표현 정보 채우기 함수 (확장된 구조 지원)
@@ -1427,23 +1444,15 @@ function fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage) {
   tabContainer.innerHTML = "";
   contentContainer.innerHTML = "";
 
-  // 언어탭 순서: 원본 언어, 대상 언어, 나머지 언어들
+  // 언어탭 순서: 대상 언어, 나머지 언어들
   const orderedLanguages = [];
 
-  // 1. 원본 언어가 있으면 먼저 추가
-  if (conceptData.expressions?.[sourceLanguage]?.word) {
-    orderedLanguages.push(sourceLanguage);
-  }
-
-  // 2. 대상 언어가 있고 원본 언어와 다르면 추가
-  if (
-    conceptData.expressions?.[targetLanguage]?.word &&
-    sourceLanguage !== targetLanguage
-  ) {
+  // 1. 대상 언어가 있으면 먼저 추가
+  if (conceptData.expressions?.[targetLanguage]?.word) {
     orderedLanguages.push(targetLanguage);
   }
 
-  // 3. 나머지 언어들 추가
+  // 2. 나머지 언어들 추가 (대상 언어 제외)
   Object.keys(conceptData.expressions || {}).forEach((langCode) => {
     if (
       !orderedLanguages.includes(langCode) &&
@@ -1453,9 +1462,15 @@ function fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage) {
     }
   });
 
+  if (orderedLanguages.length === 0) {
+    console.error("표시할 언어가 없습니다.");
+    return;
+  }
+
   // 각 언어별 탭과 컨텐츠 생성
   orderedLanguages.forEach((langCode, index) => {
     const expression = conceptData.expressions[langCode];
+    const sourceExpression = conceptData.expressions?.[sourceLanguage] || {};
     const langInfo = supportedLanguages[langCode] || {
       nameKo: langCode,
       code: langCode,
@@ -1479,7 +1494,28 @@ function fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage) {
     panel.id = `view-${langCode}-content`;
     panel.className = `${index === 0 ? "" : "hidden"} p-4`;
 
-    // 새로운 구조의 추가 정보 포함
+    // 원본 언어 품사 번역 (항상 원본언어인 한국어로 표시)
+    const getSourcePartOfSpeech = () => {
+      // 항상 한국어로 품사 표시 (원본 언어)
+      const partOfSpeechMap = {
+        noun: "명사",
+        verb: "동사",
+        adjective: "형용사",
+        adverb: "부사",
+        pronoun: "대명사",
+        preposition: "전치사",
+        conjunction: "접속사",
+        interjection: "감탄사",
+      };
+
+      return (
+        partOfSpeechMap[expression.part_of_speech] ||
+        expression.part_of_speech ||
+        "정보 없음"
+      );
+    };
+
+    // 현재 탭 언어의 추가 정보 포함
     const synonyms = expression.synonyms ? expression.synonyms.join(", ") : "";
     const antonyms = expression.antonyms ? expression.antonyms.join(", ") : "";
     const wordFamily = expression.word_family
@@ -1489,7 +1525,7 @@ function fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage) {
       ? expression.compound_words.join(", ")
       : "";
 
-    // 연어 정보 처리
+    // 현재 탭 언어의 연어 정보 처리
     let collocationsText = "";
     if (expression.collocations && Array.isArray(expression.collocations)) {
       collocationsText = expression.collocations
@@ -1499,17 +1535,167 @@ function fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage) {
         .join(", ");
     }
 
+    // 개별 번역 함수 (DB의 같은 개념 데이터에서만 찾기)
+    const getIndividualTranslation = (targetWords) => {
+      if (!targetWords) return "";
+
+      // 같은 개념의 다른 언어 표현에서 찾기
+      const findInConceptData = (phrase) => {
+        // 현재 탭 언어의 속성에서 해당 phrase의 인덱스를 찾기
+        const currentExpression = conceptData.expressions?.[langCode] || {};
+
+        // 원본 언어(한국어) 표현 가져오기
+        const sourceExpression =
+          conceptData.expressions?.[sourceLanguage] || {};
+
+        // 복합어 매칭
+        if (
+          currentExpression.compound_words &&
+          sourceExpression.compound_words
+        ) {
+          const currentCompounds = Array.isArray(
+            currentExpression.compound_words
+          )
+            ? currentExpression.compound_words
+            : [];
+          const sourceCompounds = Array.isArray(sourceExpression.compound_words)
+            ? sourceExpression.compound_words
+            : [];
+
+          const index = currentCompounds.findIndex(
+            (compound) =>
+              compound && compound.toLowerCase().includes(phrase.toLowerCase())
+          );
+
+          if (index !== -1 && sourceCompounds[index]) {
+            return sourceCompounds[index];
+          }
+        }
+
+        // 연어 매칭
+        if (currentExpression.collocations && sourceExpression.collocations) {
+          const currentCollocations = Array.isArray(
+            currentExpression.collocations
+          )
+            ? currentExpression.collocations
+            : [];
+          const sourceCollocations = Array.isArray(
+            sourceExpression.collocations
+          )
+            ? sourceExpression.collocations
+            : [];
+
+          const index = currentCollocations.findIndex((collocation) => {
+            const colText =
+              typeof collocation === "object"
+                ? collocation.phrase
+                : collocation;
+            return (
+              colText && colText.toLowerCase().includes(phrase.toLowerCase())
+            );
+          });
+
+          if (index !== -1 && sourceCollocations[index]) {
+            const sourceCol = sourceCollocations[index];
+            return typeof sourceCol === "object" ? sourceCol.phrase : sourceCol;
+          }
+        }
+
+        // 동의어 매칭
+        if (currentExpression.synonyms && sourceExpression.synonyms) {
+          const currentSynonyms = Array.isArray(currentExpression.synonyms)
+            ? currentExpression.synonyms
+            : [];
+          const sourceSynonyms = Array.isArray(sourceExpression.synonyms)
+            ? sourceExpression.synonyms
+            : [];
+
+          const index = currentSynonyms.findIndex(
+            (synonym) =>
+              synonym && synonym.toLowerCase().includes(phrase.toLowerCase())
+          );
+
+          if (index !== -1 && sourceSynonyms[index]) {
+            return sourceSynonyms[index];
+          }
+        }
+
+        // 반의어 매칭
+        if (currentExpression.antonyms && sourceExpression.antonyms) {
+          const currentAntonyms = Array.isArray(currentExpression.antonyms)
+            ? currentExpression.antonyms
+            : [];
+          const sourceAntonyms = Array.isArray(sourceExpression.antonyms)
+            ? sourceExpression.antonyms
+            : [];
+
+          const index = currentAntonyms.findIndex(
+            (antonym) =>
+              antonym && antonym.toLowerCase().includes(phrase.toLowerCase())
+          );
+
+          if (index !== -1 && sourceAntonyms[index]) {
+            return sourceAntonyms[index];
+          }
+        }
+
+        // 어족 매칭
+        if (currentExpression.word_family && sourceExpression.word_family) {
+          const currentWordFamily = Array.isArray(currentExpression.word_family)
+            ? currentExpression.word_family
+            : [];
+          const sourceWordFamily = Array.isArray(sourceExpression.word_family)
+            ? sourceExpression.word_family
+            : [];
+
+          const index = currentWordFamily.findIndex(
+            (familyWord) =>
+              familyWord &&
+              familyWord.toLowerCase().includes(phrase.toLowerCase())
+          );
+
+          if (index !== -1 && sourceWordFamily[index]) {
+            return sourceWordFamily[index];
+          }
+        }
+
+        return null;
+      };
+
+      // 쉼표로 분리 (복합어 단위 유지)
+      const phrases = targetWords
+        .split(",")
+        .map((phrase) => phrase.trim())
+        .filter((phrase) => phrase);
+
+      const translatedPhrases = phrases.map((phrase) => {
+        // 괄호 내용 제거 (빈도 정보 등)
+        const cleanPhrase = phrase.replace(/\([^)]*\)/g, "").trim();
+
+        // DB의 같은 개념 데이터에서만 찾기
+        const conceptTranslation = findInConceptData(cleanPhrase);
+        if (conceptTranslation) {
+          return conceptTranslation;
+        }
+
+        // 매칭이 없으면 빈 문자열 반환
+        return "";
+      });
+
+      // 빈 번역 제거 후 중복 제거하여 결합
+      const validTranslations = translatedPhrases.filter((trans) =>
+        trans.trim()
+      );
+      const uniqueTranslations = [...new Set(validTranslations)];
+      return uniqueTranslations.join(", ");
+    };
+
     panel.innerHTML = `
       <div class="mb-4">
         <div class="flex items-center gap-2 mb-1">
-          <h3 class="text-xl font-bold">${expression.word}</h3>
-          <span class="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">${
-            expression.part_of_speech || "정보 없음"
-          }</span>
+          <h3 class="text-xl font-bold">${sourceExpression.word || "N/A"}</h3>
+          <span class="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">${getSourcePartOfSpeech()}</span>
         </div>
-        <p class="text-gray-500">${
-          expression.pronunciation || expression.romanization || ""
-        }</p>
         ${
           langCode === "japanese" && expression.hiragana
             ? `<p class="text-sm text-gray-600">히라가나: ${expression.hiragana}</p>`
@@ -1534,53 +1720,68 @@ function fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage) {
       ${
         synonyms || antonyms || wordFamily || compoundWords || collocationsText
           ? `
-      <div class="grid grid-cols-2 gap-3 mb-4">
+      <div class="space-y-2 mb-4">
         ${
-          synonyms
+          synonyms && getIndividualTranslation(synonyms)
             ? `
-        <div class="bg-gray-50 p-3 rounded-lg">
-          <p class="text-sm font-medium text-gray-700 mb-1">동의어</p>
-          <p class="text-sm text-gray-600">${synonyms}</p>
+        <div class="flex flex-wrap items-start gap-2">
+          <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm font-medium">동의어</span>
+          <span class="text-sm text-gray-700 flex-1">${synonyms}</span>
+          <span class="text-sm text-gray-500">${getIndividualTranslation(
+            synonyms
+          )}</span>
         </div>
         `
             : ""
         }
         ${
-          antonyms
+          antonyms && getIndividualTranslation(antonyms)
             ? `
-        <div class="bg-gray-50 p-3 rounded-lg">
-          <p class="text-sm font-medium text-gray-700 mb-1">반의어</p>
-          <p class="text-sm text-gray-600">${antonyms}</p>
+        <div class="flex flex-wrap items-start gap-2">
+          <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm font-medium">반의어</span>
+          <span class="text-sm text-gray-700 flex-1">${antonyms}</span>
+          <span class="text-sm text-gray-500">${getIndividualTranslation(
+            antonyms
+          )}</span>
+      </div>
+        `
+            : ""
+        }
+        ${
+          wordFamily && getIndividualTranslation(wordFamily)
+            ? `
+        <div class="flex flex-wrap items-start gap-2">
+          <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm font-medium">어족</span>
+          <span class="text-sm text-gray-700 flex-1">${wordFamily}</span>
+          <span class="text-sm text-gray-500">${getIndividualTranslation(
+            wordFamily
+          )}</span>
         </div>
         `
             : ""
         }
         ${
-          wordFamily
+          compoundWords && getIndividualTranslation(compoundWords)
             ? `
-        <div class="bg-gray-50 p-3 rounded-lg">
-          <p class="text-sm font-medium text-gray-700 mb-1">어족</p>
-          <p class="text-sm text-gray-600">${wordFamily}</p>
+        <div class="flex flex-wrap items-start gap-2">
+          <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm font-medium">복합어</span>
+          <span class="text-sm text-gray-700 flex-1">${compoundWords}</span>
+          <span class="text-sm text-gray-500">${getIndividualTranslation(
+            compoundWords
+          )}</span>
         </div>
         `
             : ""
         }
         ${
-          compoundWords
+          collocationsText && getIndividualTranslation(collocationsText)
             ? `
-        <div class="bg-gray-50 p-3 rounded-lg">
-          <p class="text-sm font-medium text-gray-700 mb-1">복합어</p>
-          <p class="text-sm text-gray-600">${compoundWords}</p>
-        </div>
-        `
-            : ""
-        }
-        ${
-          collocationsText
-            ? `
-        <div class="bg-gray-50 p-3 rounded-lg col-span-2">
-          <p class="text-sm font-medium text-gray-700 mb-1">연어</p>
-          <p class="text-sm text-gray-600">${collocationsText}</p>
+        <div class="flex flex-wrap items-start gap-2">
+          <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm font-medium">연어</span>
+          <span class="text-sm text-gray-700 flex-1">${collocationsText}</span>
+          <span class="text-sm text-gray-500">${getIndividualTranslation(
+            collocationsText
+          )}</span>
         </div>
         `
             : ""
@@ -1620,6 +1821,11 @@ function fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage) {
     const selectedContent = document.getElementById(`view-${langCode}-content`);
     if (selectedContent) {
       selectedContent.classList.remove("hidden");
+    }
+
+    // 모달 상단 제목 업데이트
+    if (window.updateModalHeaderForTab) {
+      window.updateModalHeaderForTab(langCode);
     }
 
     // 해당 언어의 예문만 표시
@@ -1712,167 +1918,69 @@ function updateExamples(langCode, conceptData) {
       const targetLanguage = document.getElementById("target-language").value;
 
       let exampleContent = "";
-      const languagesToShow = [];
 
       // 새로운 구조 처리 (featured_examples)
       if (example.translations) {
-        // 1. 대상언어 먼저 추가
-        if (targetLanguage && example.translations[targetLanguage]) {
-          const targetLangInfo = supportedLanguages[targetLanguage] || {
-            nameKo: targetLanguage,
-          };
-          languagesToShow.push({
-            code: targetLanguage,
-            name: targetLangInfo.nameKo,
-            text: example.translations[targetLanguage].text,
-            label: "(대상)",
-            grammar: example.translations[targetLanguage].grammar_notes,
-          });
+        // 대상 언어 예문
+        const targetExample = example.translations[targetLanguage];
+        // 원본 언어 예문
+        const sourceExample = example.translations[sourceLanguage];
+
+        if (targetExample?.text) {
+          exampleContent += `
+            <div class="mb-2">
+              <p class="font-medium text-gray-800">${targetExample.text}</p>
+            </div>
+          `;
         }
 
-        // 2. 원본언어 추가
-        if (
-          sourceLanguage &&
-          example.translations[sourceLanguage] &&
-          sourceLanguage !== targetLanguage
-        ) {
-          const sourceLangInfo = supportedLanguages[sourceLanguage] || {
-            nameKo: sourceLanguage,
-          };
-          languagesToShow.push({
-            code: sourceLanguage,
-            name: sourceLangInfo.nameKo,
-            text: example.translations[sourceLanguage].text,
-            label: "(원본)",
-            grammar: example.translations[sourceLanguage].grammar_notes,
-          });
+        if (sourceExample?.text) {
+          exampleContent += `
+            <div class="mb-2 pl-4 border-l-2 border-gray-300">
+              <p class="text-gray-700">${sourceExample.text}</p>
+            </div>
+          `;
         }
 
-        // 3. 현재 탭 언어 추가
-        if (
-          example.translations[langCode] &&
-          !languagesToShow.find((lang) => lang.code === langCode)
-        ) {
-          const currentLangInfo = supportedLanguages[langCode] || {
-            nameKo: langCode,
-          };
-          languagesToShow.push({
-            code: langCode,
-            name: currentLangInfo.nameKo,
-            text: example.translations[langCode].text,
-            label: "(현재)",
-            grammar: example.translations[langCode].grammar_notes,
-          });
+        // 문법 해석 추가 (대상언어에 대한 내용을 원본 언어로 표시)
+        const grammarNote = targetExample?.grammar_notes;
+        if (grammarNote) {
+          // 원본 언어로 문법 설명 번역
+          const originalUserLanguage = userLanguage;
+          const sourceLangInfo = supportedLanguages[sourceLanguage];
+          if (sourceLangInfo?.code) {
+            userLanguage = sourceLangInfo.code;
+          }
+          const translatedGrammarNote = translateGrammarNote(grammarNote);
+          userLanguage = originalUserLanguage; // 원래 언어로 복원
+
+          exampleContent += `
+            <div class="mt-2 pt-2 border-t border-gray-200">
+              <p class="text-xs text-gray-500 italic">${translatedGrammarNote}</p>
+            </div>
+          `;
         }
       }
       // 기존 구조 처리 (examples)
       else {
-        // 1. 대상언어 먼저 추가
-        if (targetLanguage && example[targetLanguage]) {
-          const targetLangInfo = supportedLanguages[targetLanguage] || {
-            nameKo: targetLanguage,
-          };
-          languagesToShow.push({
-            code: targetLanguage,
-            name: targetLangInfo.nameKo,
-            text: example[targetLanguage],
-            label: "(대상)",
-          });
+        // 대상 언어 예문
+        if (example[targetLanguage]) {
+          exampleContent += `
+            <div class="mb-2">
+              <p class="font-medium text-gray-800">${example[targetLanguage]}</p>
+            </div>
+          `;
         }
 
-        // 2. 원본언어 추가
-        if (
-          sourceLanguage &&
-          example[sourceLanguage] &&
-          sourceLanguage !== targetLanguage
-        ) {
-          const sourceLangInfo = supportedLanguages[sourceLanguage] || {
-            nameKo: sourceLanguage,
-          };
-          languagesToShow.push({
-            code: sourceLanguage,
-            name: sourceLangInfo.nameKo,
-            text: example[sourceLanguage],
-            label: "(원본)",
-          });
-        }
-
-        // 3. 현재 탭 언어 추가
-        if (
-          example[langCode] &&
-          !languagesToShow.find((lang) => lang.code === langCode)
-        ) {
-          const currentLangInfo = supportedLanguages[langCode] || {
-            nameKo: langCode,
-          };
-          languagesToShow.push({
-            code: langCode,
-            name: currentLangInfo.nameKo,
-            text: example[langCode],
-            label: "(현재)",
-          });
+        // 원본 언어 예문
+        if (example[sourceLanguage]) {
+          exampleContent += `
+            <div class="mb-2 pl-4 border-l-2 border-gray-300">
+              <p class="text-gray-700">${example[sourceLanguage]}</p>
+            </div>
+          `;
         }
       }
-
-      // 예문 컨텐츠 생성
-      languagesToShow.forEach((lang, index) => {
-        const isFirst = index === 0;
-        exampleContent += `
-          <div class="${
-            isFirst ? "mb-3" : "mb-2 pl-4 border-l-2 border-gray-300"
-          }">
-            <span class="text-sm ${
-              isFirst ? "font-medium text-blue-600" : "text-gray-600"
-            }">${lang.name}${lang.label}:</span>
-            <p class="ml-2 ${
-              isFirst ? "font-medium text-gray-800" : "text-gray-700"
-            }">${lang.text}</p>
-          </div>
-        `;
-      });
-
-      // 현재 탭 언어에 맞는 문법 설명 찾기
-      let grammarNote = null;
-
-      // 현재 탭 언어의 문법 설명 우선 사용
-      if (langCode && example.translations?.[langCode]?.grammar_notes) {
-        grammarNote = example.translations[langCode].grammar_notes;
-      }
-      // 현재 탭 언어에 문법 설명이 없으면 대상 언어의 문법 설명 사용
-      else if (
-        targetLanguage &&
-        example.translations?.[targetLanguage]?.grammar_notes
-      ) {
-        grammarNote = example.translations[targetLanguage].grammar_notes;
-      }
-      // 첫 번째 언어의 문법 설명 사용
-      else if (languagesToShow.length > 0 && languagesToShow[0].grammar) {
-        grammarNote = languagesToShow[0].grammar;
-      }
-
-      // 문법 설명이 있으면 추가 (현재 탭 언어로 번역)
-      if (grammarNote) {
-        // 현재 표시 중인 탭 언어에 맞게 문법 설명 번역
-        let translatedGrammarNote = grammarNote;
-
-        // 현재 탭 언어에 따라 번역 (langCode 사용)
-        const tabLanguageInfo = supportedLanguages[langCode];
-        if (tabLanguageInfo && tabLanguageInfo.code) {
-          // 임시로 userLanguage를 현재 탭 언어로 변경해서 번역
-          const originalUserLanguage = userLanguage;
-          userLanguage = tabLanguageInfo.code;
-          translatedGrammarNote = translateGrammarNote(grammarNote);
-          userLanguage = originalUserLanguage; // 원래 언어로 복원
-        }
-
-        exampleContent += `
-          <div class="mt-2 pt-2 border-t border-gray-200">
-            <p class="text-xs text-gray-500 italic">${translatedGrammarNote}</p>
-          </div>
-        `;
-      }
-
-      // 추가 정보 표시는 제거 (맥락, 우선순위, 이모지 등 숨김)
 
       exampleDiv.innerHTML = exampleContent;
       examplesContainer.appendChild(exampleDiv);
@@ -1881,7 +1989,7 @@ function updateExamples(langCode, conceptData) {
     console.log("해당 언어의 예문이 없습니다.");
     examplesContainer.innerHTML = `
       <div class="text-center py-8 text-gray-500">
-        <p>해당 언어의 예문이 없습니다.</p>
+        <p>예문이 없습니다.</p>
       </div>
     `;
   }
