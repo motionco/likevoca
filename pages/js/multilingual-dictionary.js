@@ -1426,6 +1426,165 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
         expression.pronunciation || expression.romanization || "";
     }
   };
+
+  // 현재 언어 설정에 맞는 품사 번역
+  const getSourcePartOfSpeech = () => {
+    // 원본 언어(한국어)의 표현에서 품사 가져오기
+    const sourceExpression = conceptData.expressions?.[sourceLanguage] || {};
+    const rawPartOfSpeech = sourceExpression.part_of_speech;
+
+    if (!rawPartOfSpeech) return "정보 없음";
+
+    // 확장된 품사 매핑 (모든 언어의 품사를 영어로 정규화한 후 번역)
+    const partOfSpeechNormalization = {
+      // 한국어 → 영어 정규화
+      명사: "noun",
+      동사: "verb",
+      형용사: "adjective",
+      부사: "adverb",
+      대명사: "pronoun",
+      전치사: "preposition",
+      접속사: "conjunction",
+      감탄사: "interjection",
+
+      // 영어는 그대로
+      noun: "noun",
+      verb: "verb",
+      adjective: "adjective",
+      adverb: "adverb",
+      pronoun: "pronoun",
+      preposition: "preposition",
+      conjunction: "conjunction",
+      interjection: "interjection",
+
+      // 일본어 → 영어 정규화
+      名詞: "noun",
+      動詞: "verb",
+      形容詞: "adjective",
+      副詞: "adverb",
+      代名詞: "pronoun",
+      前置詞: "preposition",
+      接続詞: "conjunction",
+      感嘆詞: "interjection",
+
+      // 중국어 → 영어 정규화
+      名词: "noun",
+      动词: "verb",
+      形容词: "adjective",
+      副词: "adverb",
+      代词: "pronoun",
+      介词: "preposition",
+      连词: "conjunction",
+      感叹词: "interjection",
+    };
+
+    const partOfSpeechTranslations = {
+      ko: {
+        noun: "명사",
+        verb: "동사",
+        adjective: "형용사",
+        adverb: "부사",
+        pronoun: "대명사",
+        preposition: "전치사",
+        conjunction: "접속사",
+        interjection: "감탄사",
+      },
+      en: {
+        noun: "noun",
+        verb: "verb",
+        adjective: "adjective",
+        adverb: "adverb",
+        pronoun: "pronoun",
+        preposition: "preposition",
+        conjunction: "conjunction",
+        interjection: "interjection",
+      },
+      ja: {
+        noun: "名詞",
+        verb: "動詞",
+        adjective: "形容詞",
+        adverb: "副詞",
+        pronoun: "代名詞",
+        preposition: "前置詞",
+        conjunction: "接続詞",
+        interjection: "感嘆詞",
+      },
+      zh: {
+        noun: "名词",
+        verb: "动词",
+        adjective: "形容词",
+        adverb: "副词",
+        pronoun: "代词",
+        preposition: "介词",
+        conjunction: "连词",
+        interjection: "感叹词",
+      },
+    };
+
+    // 1단계: 원본 품사를 영어로 정규화
+    const normalizedPartOfSpeech =
+      partOfSpeechNormalization[rawPartOfSpeech] || rawPartOfSpeech;
+
+    // 2단계: 정규화된 품사를 현재 언어로 번역
+    const currentTranslations =
+      partOfSpeechTranslations[userLanguage] || partOfSpeechTranslations.ko;
+
+    return currentTranslations[normalizedPartOfSpeech] || rawPartOfSpeech;
+  };
+
+  // 현재 언어 설정에 맞는 레이블 번역
+  const getLabels = () => {
+    const labelMaps = {
+      ko: {
+        synonyms: "동의어",
+        antonyms: "반의어",
+        wordFamily: "어족",
+        compoundWords: "복합어",
+        collocations: "연어",
+        hiragana: "히라가나",
+        katakana: "가타카나",
+        kanji: "한자",
+        definition: "정의 없음",
+      },
+      en: {
+        synonyms: "Synonyms",
+        antonyms: "Antonyms",
+        wordFamily: "Word Family",
+        compoundWords: "Compound Words",
+        collocations: "Collocations",
+        hiragana: "Hiragana",
+        katakana: "Katakana",
+        kanji: "Kanji",
+        definition: "No definition",
+      },
+      ja: {
+        synonyms: "類義語",
+        antonyms: "反義語",
+        wordFamily: "語族",
+        compoundWords: "複合語",
+        collocations: "連語",
+        hiragana: "ひらがな",
+        katakana: "カタカナ",
+        kanji: "漢字",
+        definition: "定義なし",
+      },
+      zh: {
+        synonyms: "同义词",
+        antonyms: "反义词",
+        wordFamily: "词族",
+        compoundWords: "复合词",
+        collocations: "搭配",
+        hiragana: "平假名",
+        katakana: "片假名",
+        kanji: "汉字",
+        definition: "无定义",
+      },
+    };
+
+    return labelMaps[userLanguage] || labelMaps.ko;
+  };
+
+  const labels = getLabels();
 }
 
 // 언어별 표현 정보 채우기 함수 (확장된 구조 지원)
@@ -1496,24 +1655,162 @@ function fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage) {
 
     // 원본 언어 품사 번역 (항상 원본언어인 한국어로 표시)
     const getSourcePartOfSpeech = () => {
-      // 항상 한국어로 품사 표시 (원본 언어)
-      const partOfSpeechMap = {
-        noun: "명사",
-        verb: "동사",
-        adjective: "형용사",
-        adverb: "부사",
-        pronoun: "대명사",
-        preposition: "전치사",
-        conjunction: "접속사",
-        interjection: "감탄사",
+      // 원본 언어(한국어)의 표현에서 품사 가져오기
+      const sourceExpression = conceptData.expressions?.[sourceLanguage] || {};
+      const rawPartOfSpeech = sourceExpression.part_of_speech;
+
+      if (!rawPartOfSpeech) return "정보 없음";
+
+      // 확장된 품사 매핑 (모든 언어의 품사를 영어로 정규화한 후 번역)
+      const partOfSpeechNormalization = {
+        // 한국어 → 영어 정규화
+        명사: "noun",
+        동사: "verb",
+        형용사: "adjective",
+        부사: "adverb",
+        대명사: "pronoun",
+        전치사: "preposition",
+        접속사: "conjunction",
+        감탄사: "interjection",
+
+        // 영어는 그대로
+        noun: "noun",
+        verb: "verb",
+        adjective: "adjective",
+        adverb: "adverb",
+        pronoun: "pronoun",
+        preposition: "preposition",
+        conjunction: "conjunction",
+        interjection: "interjection",
+
+        // 일본어 → 영어 정규화
+        名詞: "noun",
+        動詞: "verb",
+        形容詞: "adjective",
+        副詞: "adverb",
+        代名詞: "pronoun",
+        前置詞: "preposition",
+        接続詞: "conjunction",
+        感嘆詞: "interjection",
+
+        // 중국어 → 영어 정규화
+        名词: "noun",
+        动词: "verb",
+        形容词: "adjective",
+        副词: "adverb",
+        代词: "pronoun",
+        介词: "preposition",
+        连词: "conjunction",
+        感叹词: "interjection",
       };
 
-      return (
-        partOfSpeechMap[expression.part_of_speech] ||
-        expression.part_of_speech ||
-        "정보 없음"
-      );
+      const partOfSpeechTranslations = {
+        ko: {
+          noun: "명사",
+          verb: "동사",
+          adjective: "형용사",
+          adverb: "부사",
+          pronoun: "대명사",
+          preposition: "전치사",
+          conjunction: "접속사",
+          interjection: "감탄사",
+        },
+        en: {
+          noun: "noun",
+          verb: "verb",
+          adjective: "adjective",
+          adverb: "adverb",
+          pronoun: "pronoun",
+          preposition: "preposition",
+          conjunction: "conjunction",
+          interjection: "interjection",
+        },
+        ja: {
+          noun: "名詞",
+          verb: "動詞",
+          adjective: "形容詞",
+          adverb: "副詞",
+          pronoun: "代名詞",
+          preposition: "前置詞",
+          conjunction: "接続詞",
+          interjection: "感嘆詞",
+        },
+        zh: {
+          noun: "名词",
+          verb: "动词",
+          adjective: "形容词",
+          adverb: "副词",
+          pronoun: "代词",
+          preposition: "介词",
+          conjunction: "连词",
+          interjection: "感叹词",
+        },
+      };
+
+      // 1단계: 원본 품사를 영어로 정규화
+      const normalizedPartOfSpeech =
+        partOfSpeechNormalization[rawPartOfSpeech] || rawPartOfSpeech;
+
+      // 2단계: 정규화된 품사를 현재 언어로 번역
+      const currentTranslations =
+        partOfSpeechTranslations[userLanguage] || partOfSpeechTranslations.ko;
+
+      return currentTranslations[normalizedPartOfSpeech] || rawPartOfSpeech;
     };
+
+    // 현재 언어 설정에 맞는 레이블 번역
+    const getLabels = () => {
+      const labelMaps = {
+        ko: {
+          synonyms: "동의어",
+          antonyms: "반의어",
+          wordFamily: "어족",
+          compoundWords: "복합어",
+          collocations: "연어",
+          hiragana: "히라가나",
+          katakana: "가타카나",
+          kanji: "한자",
+          definition: "정의 없음",
+        },
+        en: {
+          synonyms: "Synonyms",
+          antonyms: "Antonyms",
+          wordFamily: "Word Family",
+          compoundWords: "Compound Words",
+          collocations: "Collocations",
+          hiragana: "Hiragana",
+          katakana: "Katakana",
+          kanji: "Kanji",
+          definition: "No definition",
+        },
+        ja: {
+          synonyms: "類義語",
+          antonyms: "反義語",
+          wordFamily: "語族",
+          compoundWords: "複合語",
+          collocations: "連語",
+          hiragana: "ひらがな",
+          katakana: "カタカナ",
+          kanji: "漢字",
+          definition: "定義なし",
+        },
+        zh: {
+          synonyms: "同义词",
+          antonyms: "反义词",
+          wordFamily: "词族",
+          compoundWords: "复合词",
+          collocations: "搭配",
+          hiragana: "平假名",
+          katakana: "片假名",
+          kanji: "汉字",
+          definition: "无定义",
+        },
+      };
+
+      return labelMaps[userLanguage] || labelMaps.ko;
+    };
+
+    const labels = getLabels();
 
     // 현재 탭 언어의 추가 정보 포함
     const synonyms = expression.synonyms ? expression.synonyms.join(", ") : "";
@@ -1525,13 +1822,17 @@ function fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage) {
       ? expression.compound_words.join(", ")
       : "";
 
-    // 현재 탭 언어의 연어 정보 처리
+    // 현재 탭 언어의 연어 정보 처리 (빈도 정보 제거)
     let collocationsText = "";
     if (expression.collocations && Array.isArray(expression.collocations)) {
       collocationsText = expression.collocations
-        .map((col) =>
-          typeof col === "object" ? `${col.phrase} (${col.frequency})` : col
-        )
+        .map((col) => {
+          // 빈도 정보 제거하고 구문만 반환
+          if (typeof col === "object" && col.phrase) {
+            return col.phrase;
+          }
+          return col;
+        })
         .join(", ");
     }
 
@@ -1698,23 +1999,23 @@ function fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage) {
         </div>
         ${
           langCode === "japanese" && expression.hiragana
-            ? `<p class="text-sm text-gray-600">히라가나: ${expression.hiragana}</p>`
+            ? `<p class="text-sm text-gray-600">${labels.hiragana}: ${expression.hiragana}</p>`
             : ""
         }
         ${
           langCode === "japanese" && expression.katakana
-            ? `<p class="text-sm text-gray-600">가타카나: ${expression.katakana}</p>`
+            ? `<p class="text-sm text-gray-600">${labels.katakana}: ${expression.katakana}</p>`
             : ""
         }
         ${
           langCode === "japanese" && expression.kanji
-            ? `<p class="text-sm text-gray-600">한자: ${expression.kanji}</p>`
+            ? `<p class="text-sm text-gray-600">${labels.kanji}: ${expression.kanji}</p>`
             : ""
         }
       </div>
       <div class="mb-4">
         <p class="text-lg font-medium text-gray-800">${
-          expression.definition || "정의 없음"
+          expression.definition || labels.definition
         }</p>
       </div>
       ${
@@ -1725,7 +2026,9 @@ function fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage) {
           synonyms && getIndividualTranslation(synonyms)
             ? `
         <div class="flex flex-wrap items-start gap-2">
-          <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm font-medium">동의어</span>
+          <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm font-medium">${
+            labels.synonyms
+          }</span>
           <span class="text-sm text-gray-700 flex-1">${synonyms}</span>
           <span class="text-sm text-gray-500">${getIndividualTranslation(
             synonyms
@@ -1738,7 +2041,9 @@ function fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage) {
           antonyms && getIndividualTranslation(antonyms)
             ? `
         <div class="flex flex-wrap items-start gap-2">
-          <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm font-medium">반의어</span>
+          <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm font-medium">${
+            labels.antonyms
+          }</span>
           <span class="text-sm text-gray-700 flex-1">${antonyms}</span>
           <span class="text-sm text-gray-500">${getIndividualTranslation(
             antonyms
@@ -1751,7 +2056,9 @@ function fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage) {
           wordFamily && getIndividualTranslation(wordFamily)
             ? `
         <div class="flex flex-wrap items-start gap-2">
-          <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm font-medium">어족</span>
+          <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm font-medium">${
+            labels.wordFamily
+          }</span>
           <span class="text-sm text-gray-700 flex-1">${wordFamily}</span>
           <span class="text-sm text-gray-500">${getIndividualTranslation(
             wordFamily
@@ -1764,7 +2071,9 @@ function fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage) {
           compoundWords && getIndividualTranslation(compoundWords)
             ? `
         <div class="flex flex-wrap items-start gap-2">
-          <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm font-medium">복합어</span>
+          <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm font-medium">${
+            labels.compoundWords
+          }</span>
           <span class="text-sm text-gray-700 flex-1">${compoundWords}</span>
           <span class="text-sm text-gray-500">${getIndividualTranslation(
             compoundWords
@@ -1777,7 +2086,9 @@ function fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage) {
           collocationsText && getIndividualTranslation(collocationsText)
             ? `
         <div class="flex flex-wrap items-start gap-2">
-          <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm font-medium">연어</span>
+          <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm font-medium">${
+            labels.collocations
+          }</span>
           <span class="text-sm text-gray-700 flex-1">${collocationsText}</span>
           <span class="text-sm text-gray-500">${getIndividualTranslation(
             collocationsText
@@ -1914,14 +2225,15 @@ function updateExamples(langCode, conceptData) {
       const exampleDiv = document.createElement("div");
       exampleDiv.className = "border p-4 rounded mb-4 bg-gray-50";
 
-      const sourceLanguage = document.getElementById("source-language").value;
-      const targetLanguage = document.getElementById("target-language").value;
+      // 동적 언어 설정: 현재 탭 언어를 대상언어로, 원본언어를 소스언어로
+      const targetLanguage = langCode; // 현재 탭 언어
+      const sourceLanguage = document.getElementById("source-language").value; // 원본언어
 
       let exampleContent = "";
 
       // 새로운 구조 처리 (featured_examples)
       if (example.translations) {
-        // 대상 언어 예문
+        // 대상 언어 예문 (현재 탭 언어)
         const targetExample = example.translations[targetLanguage];
         // 원본 언어 예문
         const sourceExample = example.translations[sourceLanguage];
@@ -1942,17 +2254,11 @@ function updateExamples(langCode, conceptData) {
           `;
         }
 
-        // 문법 해석 추가 (대상언어에 대한 내용을 원본 언어로 표시)
+        // 문법 해석 추가 (대상언어에 대한 내용을 현재 환경 언어로 표시)
         const grammarNote = targetExample?.grammar_notes;
         if (grammarNote) {
-          // 원본 언어로 문법 설명 번역
-          const originalUserLanguage = userLanguage;
-          const sourceLangInfo = supportedLanguages[sourceLanguage];
-          if (sourceLangInfo?.code) {
-            userLanguage = sourceLangInfo.code;
-          }
+          // 현재 환경 언어로 문법 설명 번역
           const translatedGrammarNote = translateGrammarNote(grammarNote);
-          userLanguage = originalUserLanguage; // 원래 언어로 복원
 
           exampleContent += `
             <div class="mt-2 pt-2 border-t border-gray-200">
@@ -1963,7 +2269,7 @@ function updateExamples(langCode, conceptData) {
       }
       // 기존 구조 처리 (examples)
       else {
-        // 대상 언어 예문
+        // 대상 언어 예문 (현재 탭 언어)
         if (example[targetLanguage]) {
           exampleContent += `
             <div class="mb-2">
