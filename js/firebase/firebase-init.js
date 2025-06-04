@@ -118,7 +118,7 @@ export const conceptUtils = {
             conceptData.concept_info?.emoji ||
             "📚",
           color_theme: conceptData.concept_info?.color_theme || "#9C27B0",
-          updated_at: new Date(),
+        updated_at: new Date(),
           total_examples_count: conceptData.featured_examples?.length || 0,
           quiz_frequency: conceptData.concept_info?.quiz_frequency || "medium",
           game_types: conceptData.concept_info?.game_types || [
@@ -182,13 +182,13 @@ export const conceptUtils = {
         conceptData.expressions || {}
       )) {
         if (expression?.word) {
-          await this.updateLanguageIndex(
-            lang,
-            expression.word,
-            conceptRef.id,
+        await this.updateLanguageIndex(
+          lang,
+          expression.word,
+          conceptRef.id,
             enhancedConceptData.concept_info.category,
             enhancedConceptData.concept_info.difficulty
-          );
+        );
         }
       }
 
@@ -221,7 +221,7 @@ export const conceptUtils = {
     try {
       const conceptDoc = await getDoc(doc(db, "concepts", conceptId));
       if (!conceptDoc.exists()) {
-        return null;
+      return null;
       }
 
       const conceptData = conceptDoc.data();
@@ -374,14 +374,14 @@ export const conceptUtils = {
 
         if (!oldExpression || oldExpression.word !== expression.word) {
           if (expression.word) {
-            await this.updateLanguageIndex(
-              lang,
-              expression.word,
-              conceptId,
+          await this.updateLanguageIndex(
+            lang,
+            expression.word,
+            conceptId,
               newData.concept_info?.category || oldData.concept_info?.category,
               newData.concept_info?.difficulty ||
                 oldData.concept_info?.difficulty
-            );
+          );
           }
 
           if (oldExpression?.word) {
@@ -400,7 +400,7 @@ export const conceptUtils = {
         concept_info: {
           ...oldData.concept_info,
           ...newData.concept_info,
-          updated_at: new Date(),
+        updated_at: new Date(),
         },
       };
 

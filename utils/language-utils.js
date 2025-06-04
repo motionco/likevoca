@@ -914,35 +914,35 @@ function setLanguage(langCode) {
 // 언어 변경 적용 (무한루프 방지)
 async function applyLanguage() {
   try {
-    const langCode = await getActiveLanguage();
+  const langCode = await getActiveLanguage();
 
-    if (!translations[langCode]) {
-      console.error(`번역 데이터가 없는 언어입니다: ${langCode}`);
-      return;
+  if (!translations[langCode]) {
+    console.error(`번역 데이터가 없는 언어입니다: ${langCode}`);
+    return;
+  }
+
+  document.querySelectorAll("[data-i18n]").forEach((element) => {
+    const key = element.getAttribute("data-i18n");
+    if (translations[langCode][key]) {
+      element.textContent = translations[langCode][key];
     }
+  });
 
-    document.querySelectorAll("[data-i18n]").forEach((element) => {
-      const key = element.getAttribute("data-i18n");
-      if (translations[langCode][key]) {
-        element.textContent = translations[langCode][key];
-      }
-    });
+  // placeholder 속성이 있는 입력 필드에 대해 번역 적용
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
+    const key = element.getAttribute("data-i18n-placeholder");
+    if (translations[langCode][key]) {
+      element.placeholder = translations[langCode][key];
+    }
+  });
 
-    // placeholder 속성이 있는 입력 필드에 대해 번역 적용
-    document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
-      const key = element.getAttribute("data-i18n-placeholder");
-      if (translations[langCode][key]) {
-        element.placeholder = translations[langCode][key];
-      }
-    });
+  // HTML lang 속성 변경
+  document.documentElement.lang = langCode;
 
-    // HTML lang 속성 변경
-    document.documentElement.lang = langCode;
-
-    // 이벤트 발생 - 언어 변경을 알림
-    document.dispatchEvent(
-      new CustomEvent("languageChanged", { detail: { language: langCode } })
-    );
+  // 이벤트 발생 - 언어 변경을 알림
+  document.dispatchEvent(
+    new CustomEvent("languageChanged", { detail: { language: langCode } })
+  );
   } catch (error) {
     console.error("언어 적용 중 오류:", error);
   }

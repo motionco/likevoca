@@ -1,0 +1,385 @@
+{
+  "concepts": [
+    {
+      "concept_info": {
+        "domain": "food",
+        "category": "fruit",
+        "difficulty": "basic",
+        "tags": ["everyday", "healthy", "common"],
+        "unicode_emoji": "🍎",
+        "color_theme": "#FF6B6B",
+        "quiz_frequency": "high",
+        "game_types": ["matching", "pronunciation", "spelling"]
+      },
+      "expressions": {
+        "korean": {
+          "word": "사과",
+          "pronunciation": "sa-gwa",
+          "romanization": "sagwa",
+          "definition": "둥글고 단맛이 나는 열매",
+          "part_of_speech": "명사",
+          "level": "초급",
+          "grammar_tags": ["noun", "noun_type:구체명사"],
+          "unicode_emoji": "🍎",
+          "synonyms": [],
+          "antonyms": [],
+          "word_family": ["과일", "과실", "열매"],
+          "compound_words": ["사과나무", "사과즙", "사과파이", "사과가게", "사과상자"],
+          "collocations": [
+            { "phrase": "사과를 먹다", "frequency": "high" },
+            { "phrase": "빨간 사과", "frequency": "high" },
+            { "phrase": "사과 한 개", "frequency": "medium" }
+          ],
+          "audio": ""
+        },
+        "english": {
+          "word": "apple",
+          "pronunciation": "ˈæpl",
+          "phonetic": "/ˈæpəl/",
+          "definition": "a round fruit with firm, white flesh and a green, red, or yellow skin",
+          "part_of_speech": "noun",
+          "level": "beginner",
+          "grammar_tags": ["noun", "noun_type:countable", "number:singular"],
+          "unicode_emoji": "🍎",
+          "synonyms": [],
+          "antonyms": [],
+          "word_family": ["fruit", "produce", "orchard fruit"],
+          "compound_words": ["apple tree", "apple juice", "apple pie", "appleshop", "applesauce"],
+          "conjugations": { "plural": "apples" },
+          "collocations": [
+            { "phrase": "eat an apple", "frequency": "high" },
+            { "phrase": "red apple", "frequency": "high" },
+            { "phrase": "green apple", "frequency": "medium" }
+          ],
+          "audio": ""
+        },
+        "japanese": {
+          "word": "りんご",
+          "hiragana": "りんご",
+          "katakana": "リンゴ",
+          "kanji": "",
+          "pronunciation": "ringo",
+          "romanization": "ringo",
+          "definition": "赤や緑の皮をもつ、甘くて丸い果物",
+          "part_of_speech": "名詞",
+          "level": "初級",
+          "grammar_tags": ["noun", "writing_system:ひらがな"],
+          "unicode_emoji": "🍎",
+          "synonyms": ["アップル"],
+          "antonyms": [],
+          "word_family": ["果物", "果実", "青果"],
+          "compound_words": ["りんごの木", "りんごジュース", "りんご屋", "りんご箱"],
+          "collocations": [
+            { "phrase": "りんごを食べる", "frequency": "high" },
+            { "phrase": "赤いりんご", "frequency": "high" }
+          ],
+          "audio": ""
+        },
+        "chinese": {
+          "word": "苹果",
+          "pronunciation": "píng guǒ",
+          "definition": "红色或绿色皮的甜美水果",
+          "part_of_speech": "名词",
+          "level": "初级",
+          "grammar_tags": ["noun", "tone:二声三声", "classifier_type:个体量词"],
+          "unicode_emoji": "🍎",
+          "synonyms": [],
+          "antonyms": [],
+          "word_family": ["水果", "果实", "鲜果"],
+          "compound_words": ["苹果树", "苹果汁", "苹果派", "苹果店"],
+          "collocations": [
+            { "phrase": "吃苹果", "frequency": "high" },
+            { "phrase": "红苹果", "frequency": "high" }
+          ],
+          "audio": ""
+        }
+      },
+      "media": {
+        "images": {
+          "primary_image": "",
+          "secondary_image": "",
+          "illustration_image": ""
+        },
+        "videos": {
+          "intro_video": "",
+          "pronunciation_video": ""
+        }
+      },
+      "featured_examples": [
+        {
+          "example_id": "apple_preference",
+          "level": "beginner",
+          "context": "preference",
+          "priority": 1,
+          "unicode_emoji": "🍎",
+          "quiz_weight": 10,
+          "translations": {
+            "korean": {
+              "text": "나는 사과를 좋아해요.",
+              "grammar_notes": "현재 시제, 존댓말, 목적격 조사 '을/를'"
+            },
+            "english": {
+              "text": "I like apples.",
+              "grammar_notes": "Simple present tense, countable noun plural"
+            },
+            "japanese": {
+              "text": "私はりんごが好きです。",
+              "grammar_notes": "現在形、丁寧語、主格助詞「が」"
+            },
+            "chinese": {
+              "text": "我喜欢苹果。",
+              "grammar_notes": "现在时态，及物动词"
+            }
+          }
+        },
+        {
+          "example_id": "apple_health",
+          "level": "beginner",
+          "context": "health",
+          "priority": 1,
+          "unicode_emoji": "🍎",
+          "quiz_weight": 8,
+          "translations": {
+            "korean": {
+              "text": "사과는 건강에 좋아요.",
+              "grammar_notes": "주격 조사 '은/는', 존댓말, 형용사 서술"
+            },
+            "english": {
+              "text": "Apples are good for health.",
+              "grammar_notes": "Simple present, plural subject, prepositional phrase"
+            },
+            "japanese": {
+              "text": "りんごは健康に良いです。",
+              "grammar_notes": "主題助詞「は」、形容詞述語、丁寧語"
+            },
+            "chinese": {
+              "text": "苹果对健康有好处。",
+              "grammar_notes": "介词结构，存现句"
+            }
+          }
+        }
+      ],
+      "quiz_data": {
+        "question_types": ["translation", "pronunciation", "matching"],
+        "difficulty_multiplier": 0.8,
+        "common_mistakes": ["apple vs. banana confusion"],
+        "hint": {
+          "korean": "빨간색 또는 초록색 과일",
+          "english": "Red or green fruit that grows on trees",
+          "japanese": "木になる赤や緑の果物",
+          "chinese": "长在树上的红色或绿色水果"
+        }
+      },
+      "game_data": {
+        "memory_cards": {
+          "front_type": "word",
+          "back_type": "definition",
+          "difficulty_theme": "fruit_colors"
+        },
+        "word_puzzle": {
+          "scramble_difficulty": 1,
+          "hint_level": 2
+        },
+        "pronunciation_game": {
+          "phonetic_focus": true,
+          "accent_training": false
+        }
+      },
+      "learning_metadata": {
+        "memorization_difficulty": 1,
+        "pronunciation_difficulty": 2,
+        "usage_frequency": "very_high",
+        "cultural_importance": "very_high"
+      }
+    },
+    {
+      "concept_info": {
+        "domain": "daily",
+        "category": "greeting",
+        "difficulty": "basic",
+        "tags": ["polite", "formal", "common"],
+        "unicode_emoji": "👋",
+        "color_theme": "#4A90E2",
+        "quiz_frequency": "very_high",
+        "game_types": ["pronunciation", "conversation", "matching"]
+      },
+      "expressions": {
+        "korean": {
+          "word": "안녕하세요",
+          "pronunciation": "an-nyeong-ha-se-yo",
+          "romanization": "annyeonghaseyo",
+          "definition": "정중한 인사말",
+          "part_of_speech": "감탄사",
+          "level": "초급",
+          "grammar_tags": ["interjection", "honorific:존댓말", "speech_level:해요체"],
+          "unicode_emoji": "👋",
+          "synonyms": ["안녕히 계세요", "안녕히 가세요"],
+          "antonyms": [],
+          "word_family": ["인사", "예의", "정중함"],
+          "compound_words": ["안녕하세요만", "첫인사", "정중한인사"],
+          "collocations": [
+            { "phrase": "안녕하세요 하다", "frequency": "very_high" },
+            { "phrase": "정중한 인사", "frequency": "high" }
+          ],
+          "audio": ""
+        },
+        "english": {
+          "word": "hello",
+          "pronunciation": "həˈloʊ",
+          "phonetic": "/həˈloʊ/",
+          "definition": "used as a greeting or to begin a phone conversation",
+          "part_of_speech": "interjection",
+          "level": "beginner",
+          "grammar_tags": ["interjection", "sentence_type:declarative"],
+          "unicode_emoji": "👋",
+          "synonyms": ["hi", "greetings", "good morning"],
+          "antonyms": ["goodbye"],
+          "word_family": ["greeting", "salutation", "welcome"],
+          "compound_words": ["hello world", "say hello", "hello there"],
+          "collocations": [
+            { "phrase": "say hello", "frequency": "very_high" },
+            { "phrase": "hello everyone", "frequency": "high" }
+          ],
+          "audio": ""
+        },
+        "japanese": {
+          "word": "こんにちは",
+          "hiragana": "こんにちは",
+          "katakana": "コンニチハ",
+          "kanji": "今日は",
+          "pronunciation": "konnichiwa",
+          "romanization": "konnichiwa",
+          "definition": "昼間に使う丁寧な挨拶",
+          "part_of_speech": "感動詞",
+          "level": "初級",
+          "grammar_tags": ["interjection", "form:丁寧語", "sentence_type:平叙文"],
+          "unicode_emoji": "👋",
+          "synonyms": ["こんばんは", "おはようございます"],
+          "antonyms": ["さようなら"],
+          "word_family": ["挨拶", "礼儀", "敬語"],
+          "compound_words": ["挨拶言葉", "昼間挨拶", "丁寧挨拶"],
+          "collocations": [
+            { "phrase": "こんにちはと言う", "frequency": "very_high" },
+            { "phrase": "丁寧な挨拶", "frequency": "high" }
+          ],
+          "audio": ""
+        },
+        "chinese": {
+          "word": "你好",
+          "pronunciation": "nǐ hǎo",
+          "definition": "常用的问候语",
+          "part_of_speech": "叹词",
+          "level": "初级",
+          "grammar_tags": ["interjection", "tone:三声二声", "sentence_type:陈述句"],
+          "unicode_emoji": "👋",
+          "synonyms": ["您好", "大家好"],
+          "antonyms": ["再见"],
+          "word_family": ["问候", "礼貌", "社交"],
+          "compound_words": ["问候语", "打招呼", "礼貌用语"],
+          "collocations": [
+            { "phrase": "说你好", "frequency": "very_high" },
+            { "phrase": "礼貌问候", "frequency": "high" }
+          ],
+          "audio": ""
+        }
+      },
+      "media": {
+        "images": {
+          "primary_image": "",
+          "secondary_image": "",
+          "illustration_image": ""
+        },
+        "videos": {
+          "intro_video": "",
+          "pronunciation_video": ""
+        }
+      },
+      "featured_examples": [
+        {
+          "example_id": "greeting_meeting",
+          "level": "beginner",
+          "context": "first_meeting",
+          "priority": 1,
+          "unicode_emoji": "👋",
+          "quiz_weight": 15,
+          "translations": {
+            "korean": {
+              "text": "안녕하세요, 만나서 반갑습니다.",
+              "grammar_notes": "존댓말, 연결어미 '-어서', 감정 표현"
+            },
+            "english": {
+              "text": "Hello, nice to meet you.",
+              "grammar_notes": "Formal greeting, adjective phrase"
+            },
+            "japanese": {
+              "text": "こんにちは、お会いできて嬉しいです。",
+              "grammar_notes": "丁寧語、可能表現、感情の形容詞"
+            },
+            "chinese": {
+              "text": "你好，很高兴见到你。",
+              "grammar_notes": "程度副词，感情形容词，补语结构"
+            }
+          }
+        },
+        {
+          "example_id": "greeting_casual",
+          "level": "beginner",
+          "context": "daily_conversation",
+          "priority": 1,
+          "unicode_emoji": "😊",
+          "quiz_weight": 12,
+          "translations": {
+            "korean": {
+              "text": "안녕하세요, 어떻게 지내세요?",
+              "grammar_notes": "의문사 '어떻게', 존댓말, 현재 진행 표현"
+            },
+            "english": {
+              "text": "Hello, how are you doing?",
+              "grammar_notes": "Present continuous question, informal inquiry"
+            },
+            "japanese": {
+              "text": "こんにちは、お元気ですか？",
+              "grammar_notes": "疑問文、敬語表現、健康状態の質問"
+            },
+            "chinese": {
+              "text": "你好，你怎么样？",
+              "grammar_notes": "疑问代词，状态询问"
+            }
+          }
+        }
+      ],
+      "quiz_data": {
+        "question_types": ["pronunciation", "conversation", "matching"],
+        "difficulty_multiplier": 0.5,
+        "common_mistakes": ["formality level confusion"],
+        "hint": {
+          "korean": "사람을 만날 때 하는 말",
+          "english": "What you say when meeting someone",
+          "japanese": "人に会った時に言う言葉",
+          "chinese": "见到某人时说的话"
+        }
+      },
+      "game_data": {
+        "memory_cards": {
+          "front_type": "word",
+          "back_type": "situation",
+          "difficulty_theme": "social_interaction"
+        },
+        "word_puzzle": {
+          "scramble_difficulty": 1,
+          "hint_level": 1
+        },
+        "pronunciation_game": {
+          "phonetic_focus": true,
+          "accent_training": true
+        }
+      },
+      "learning_metadata": {
+        "memorization_difficulty": 1,
+        "pronunciation_difficulty": 1,
+        "usage_frequency": "very_high",
+        "cultural_importance": "very_high"
+      }
+    }
+  ]
+} 

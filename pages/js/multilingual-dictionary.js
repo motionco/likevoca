@@ -634,15 +634,15 @@ function createConceptCard(concept) {
       <div class="flex items-start justify-between mb-4">
         <div class="flex items-center space-x-3">
           <span class="text-3xl">${emoji}</span>
-          <div>
+        <div>
             <h3 class="text-lg font-semibold text-gray-800 mb-1">
               ${targetExpression.word || "N/A"}
             </h3>
-            <p class="text-sm text-gray-500">${
+          <p class="text-sm text-gray-500">${
               targetExpression.pronunciation ||
               targetExpression.romanization ||
               ""
-            }</p>
+          }</p>
           </div>
         </div>
         <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
@@ -977,13 +977,13 @@ function displayConceptList() {
 
   // 더 보기 버튼 표시/숨김
   if (loadMoreBtn) {
-    if (filteredConcepts.length > displayCount) {
-      loadMoreBtn.classList.remove("hidden");
+  if (filteredConcepts.length > displayCount) {
+    loadMoreBtn.classList.remove("hidden");
       console.log("더 보기 버튼 표시");
-    } else {
-      loadMoreBtn.classList.add("hidden");
+  } else {
+    loadMoreBtn.classList.add("hidden");
       console.log("더 보기 버튼 숨김");
-    }
+  }
   }
 
   console.log("개념 목록 표시 완료");
@@ -1054,9 +1054,9 @@ async function fetchAndDisplayConcepts() {
       const queryWithOrder = query(conceptsRef, orderBy("created_at", "desc"));
       const querySnapshot = await getDocs(queryWithOrder);
 
-      allConcepts = [];
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
+    allConcepts = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
         data.id = doc.id;
         if (!data._id) {
           data._id = doc.id;
@@ -1064,7 +1064,7 @@ async function fetchAndDisplayConcepts() {
 
         // AI 생성 개념 제외 (다국어 단어장에서는 수동 생성 개념만 표시)
         if (!data.isAIGenerated) {
-          allConcepts.push(data);
+      allConcepts.push(data);
         }
       });
 
@@ -1348,7 +1348,7 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
   }
 
   if (conceptPrimaryPronunciation) {
-    conceptPrimaryPronunciation.textContent =
+      conceptPrimaryPronunciation.textContent =
       targetExpression.pronunciation || targetExpression.romanization || "";
   }
 
@@ -1383,7 +1383,7 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
         } else if (updatedAt.seconds) {
           // Firestore Timestamp 형태의 객체인 경우
           date = new Date(updatedAt.seconds * 1000);
-        } else {
+    } else {
           // 일반 Date 객체나 문자열인 경우
           date = new Date(updatedAt);
         }
@@ -2182,16 +2182,16 @@ function updateExamples(langCode, conceptData) {
     console.log("예문 개수:", examples.length);
 
     examples.forEach((example, index) => {
-      console.log(`예문 ${index + 1}:`, example);
+        console.log(`예문 ${index + 1}:`, example);
 
-      const exampleDiv = document.createElement("div");
-      exampleDiv.className = "border p-4 rounded mb-4 bg-gray-50";
+        const exampleDiv = document.createElement("div");
+        exampleDiv.className = "border p-4 rounded mb-4 bg-gray-50";
 
       // 동적 언어 설정: 현재 탭 언어를 대상언어로, 원본언어를 소스언어로
       const targetLanguage = langCode; // 현재 탭 언어
       const sourceLanguage = document.getElementById("source-language").value; // 원본언어
 
-      let exampleContent = "";
+        let exampleContent = "";
 
       // 새로운 구조 처리 (featured_examples)
       if (example.translations) {
@@ -2250,10 +2250,10 @@ function updateExamples(langCode, conceptData) {
         }
       }
 
-      exampleDiv.innerHTML = exampleContent;
-      examplesContainer.appendChild(exampleDiv);
-    });
-  } else {
+        exampleDiv.innerHTML = exampleContent;
+        examplesContainer.appendChild(exampleDiv);
+      });
+    } else {
     console.log("해당 언어의 예문이 없습니다.");
     examplesContainer.innerHTML = `
       <div class="text-center py-8 text-gray-500">

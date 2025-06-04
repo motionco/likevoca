@@ -1,0 +1,301 @@
+{
+  "concept_info": {
+    "domain": "daily", 
+    "category": "greeting",
+    "difficulty": "beginner",
+    "tags": ["common", "polite", "essential"],
+    "unicode_emoji": "👋",
+    "color_theme": "#4CAF50",
+    "quiz_frequency": "very_high",
+    "game_types": ["pronunciation", "matching", "context"],
+    "learning_priority": 1
+  },
+  "expressions": {
+    "korean": {
+      "word": "안녕하세요",
+      "pronunciation": "an-nyeong-ha-se-yo",
+      "romanization": "annyeonghaseyo", 
+      "definition": "상대방에게 인사할 때 쓰는 정중한 표현",
+      "part_of_speech": "감탄사",
+      "level": "beginner",
+      
+      "grammar_system": {
+        "structured_tags": [
+          "interjection",
+          "honorific:존댓말", 
+          "speech_level:해요체",
+          "formality:정중함",
+          "usage_context:일상인사"
+        ],
+        
+        "natural_descriptions": {
+          "basic": "정중한 인사말입니다.",
+          "detailed": "상대방에게 예의를 갖춘 인사를 할 때 사용하는 존댓말 표현입니다. 해요체로 되어 있어 일상적이면서도 정중합니다.",
+          "contextual": {
+            "quiz": "정중한 표현이며, 일상에서 가장 많이 사용되는 인사말입니다",
+            "game": "기본 인사 표현 - 높임말",
+            "example": "만남의 첫 인사에 사용되는 기본 표현"
+          }
+        },
+        
+        "learning_metadata": {
+          "difficulty_score": 10,
+          "quiz_suitability": 95,
+          "game_difficulty": 15,
+          "practice_points": ["발음", "상황별 사용법", "높임 표현"],
+          "common_mistakes": ["발음 생략", "상황에 맞지 않는 사용"]
+        }
+      },
+      
+      "synonyms": ["안녕히 계세요", "좋은 하루 되세요"],
+      "antonyms": ["안녕히 가세요", "안녕"],
+      "word_family": ["인사", "예의", "높임말"],
+      "compound_words": [],
+      "collocations": [
+        { "phrase": "안녕하세요, 만나서 반갑습니다", "frequency": "high" },
+        { "phrase": "안녕하세요, 어떻게 지내세요?", "frequency": "medium" }
+      ]
+    },
+    
+    "english": {
+      "word": "hello",
+      "pronunciation": "həˈloʊ",
+      "phonetic": "/həˈloʊ/",
+      "definition": "a greeting used when meeting someone",
+      "part_of_speech": "interjection",
+      "level": "beginner",
+      
+      "grammar_system": {
+        "structured_tags": [
+          "interjection",
+          "formality:neutral",
+          "usage_context:greeting",
+          "register:informal_formal"
+        ],
+        
+        "natural_descriptions": {
+          "basic": "It is a common greeting.",
+          "detailed": "A versatile greeting used in both formal and informal situations when meeting someone or starting a conversation.",
+          "contextual": {
+            "quiz": "Most common English greeting, suitable for any situation",
+            "game": "Basic greeting - universally used",
+            "example": "Standard greeting for meeting people"
+          }
+        },
+        
+        "learning_metadata": {
+          "difficulty_score": 5,
+          "quiz_suitability": 90,
+          "game_difficulty": 10,
+          "practice_points": ["pronunciation", "usage contexts", "response patterns"],
+          "common_mistakes": ["overuse in writing", "pronunciation stress"]
+        },
+        "grammar_notes": "Simple present tense, article usage"
+      },
+      
+      "synonyms": ["hi", "hey", "greetings"],
+      "antonyms": ["goodbye", "farewell"],
+      "word_family": ["greeting", "salutation", "welcome"],
+      "compound_words": ["hello there", "hello world"],
+      "collocations": [
+        { "phrase": "say hello", "frequency": "very_high" },
+        { "phrase": "hello everyone", "frequency": "high" }
+      ]
+    },
+    
+    "japanese": {
+      "word": "こんにちは",
+      "hiragana": "こんにちは",
+      "katakana": null,
+      "kanji": "今日は",
+      "pronunciation": "konnichiwa",
+      "romanization": "konnichiwa",
+      "definition": "昼間の挨拶として使用される一般的な表現",
+      "part_of_speech": "感動詞",
+      "level": "初級",
+      
+      "grammar_system": {
+        "structured_tags": [
+          "interjection",
+          "time_context:昼間",
+          "formality:丁寧",
+          "writing_system:ひらがな",
+          "usage_context:日常挨拶"
+        ],
+        
+        "natural_descriptions": {
+          "basic": "一般的な挨拶です。",
+          "detailed": "昼間に使用される最も一般的な挨拶表現で、丁寧で親しみやすい印象を与えます。",
+          "contextual": {
+            "quiz": "日本語の基本的な挨拶、昼間に使用",
+            "game": "基本挨拶 - 昼間用",
+            "example": "日中の出会いで使う標準的な挨拶"
+          }
+        },
+        
+        "learning_metadata": {
+          "difficulty_score": 15,
+          "quiz_suitability": 90,
+          "game_difficulty": 20,
+          "practice_points": ["発音", "使用時間帯", "書字システム"],
+          "common_mistakes": ["時間帯の混同", "カナ表記の誤り"]
+        }
+      },
+      
+      "synonyms": ["こんにちわ"],
+      "antonyms": ["さようなら", "おやすみ"],
+      "word_family": ["挨拶", "日常表現", "丁寧語"],
+      "compound_words": ["こんにちは世界"],
+      "collocations": [
+        { "phrase": "こんにちは、元気ですか", "frequency": "high" },
+        { "phrase": "こんにちは、はじめまして", "frequency": "medium" }
+      ]
+    },
+    
+    "chinese": {
+      "word": "你好",
+      "pronunciation": "nǐ hǎo",
+      "pinyin": "nǐ hǎo",
+      "definition": "日常见面时使用的问候语",
+      "part_of_speech": "叹词",
+      "level": "初级",
+      "traditional": "你好",
+      "simplified": "你好",
+      
+      "grammar_system": {
+        "structured_tags": [
+          "interjection",
+          "tone:三声二声",
+          "formality:中性",
+          "usage_context:日常问候",
+          "register:通用"
+        ],
+        
+        "natural_descriptions": {
+          "basic": "这是常用的问候语。",
+          "detailed": "最基本和常用的中文问候语，适用于各种场合，表达友好和礼貌。",
+          "contextual": {
+            "quiz": "中文最基本的问候语，声调很重要",
+            "game": "基础问候 - 注意声调",
+            "example": "见面时的标准问候语"
+          }
+        },
+        
+        "learning_metadata": {
+          "difficulty_score": 25,
+          "quiz_suitability": 95,
+          "game_difficulty": 30,
+          "practice_points": ["声调", "发音", "使用场合"],
+          "common_mistakes": ["声调错误", "过度使用"]
+        }
+      },
+      
+      "synonyms": ["您好", "大家好"],
+      "antonyms": ["再见", "拜拜"],
+      "word_family": ["问候", "礼貌用语", "日常用语"],
+      "compound_words": ["你好世界", "你好吗"],
+      "collocations": [
+        { "phrase": "你好，很高兴见到你", "frequency": "high" },
+        { "phrase": "你好，请问", "frequency": "medium" }
+      ]
+    }
+  },
+  
+  "featured_examples": [
+    {
+      "id": "greeting_example_1",
+      "context": "첫 만남",
+      "difficulty": "beginner",
+      
+      "unified_grammar": {
+        "structural_pattern": "greeting_sequence",
+        "grammar_tags": [
+          "interjection:greeting",
+          "conjunction:sequence",
+          "emotion_expression:positive", 
+          "formality:polite",
+          "context:first_meeting"
+        ],
+        "complexity_level": "basic_compound",
+        "learning_focus": ["greeting_patterns", "polite_expressions", "social_context"]
+      },
+      
+      "translations": {
+        "korean": {
+          "text": "안녕하세요, 만나서 반갑습니다.",
+          "romanization": "annyeonghaseyo, mannaseo bangapseumnida"
+        },
+        "english": {
+          "text": "Hello, nice to meet you.",
+          "phonetic": "/həˈloʊ, naɪs tə mit ju/"
+        },
+        "japanese": {
+          "text": "こんにちは、はじめまして。",
+          "romanization": "konnichiwa, hajimemashite"
+        },
+        "chinese": {
+          "text": "你好，很高兴见到你。",
+          "pinyin": "nǐ hǎo, hěn gāoxìng jiàndào nǐ"
+        }
+      },
+      
+      "grammar_explanation": {
+        "pattern_analysis": "기본 인사 + 감정 표현의 연결 구조",
+        "usage_notes": "정중한 첫 만남 상황에서 사용하는 완전한 인사 표현",
+        "cultural_context": "모든 언어에서 공통적으로 사용되는 예의 바른 첫 인사 패턴"
+      }
+    }
+  ],
+  
+  "quiz_data": {
+    "difficulty_levels": {
+      "beginner": {
+        "translation": {
+          "korean_to_english": {
+            "question": "다음 한국어를 영어로 번역하세요: '안녕하세요'",
+            "correct_answer": "hello",
+            "grammar_hint": "정중한 인사말입니다",
+            "alternatives": ["hi", "hey", "greetings"]
+          }
+        },
+        "pronunciation": {
+          "korean": {
+            "question": "'안녕하세요'의 정확한 발음은?",
+            "correct_answer": "an-nyeong-ha-se-yo",
+            "grammar_hint": "각 음절을 명확히 발음하세요"
+          }
+        }
+      }
+    }
+  },
+  
+  "game_data": {
+    "memory_game": {
+      "difficulty_score": 15,
+      "pair_type": "word_translation",
+      "hint_system": {
+        "grammar_hint": "기본 인사말",
+        "context_hint": "만날 때 사용",
+        "difficulty_hint": "초급 수준"
+      }
+    },
+    "pronunciation_game": {
+      "target_sounds": ["안녕", "하세요"],
+      "common_mistakes": ["하새요", "안녕해세요"],
+      "practice_focus": ["연음", "경음"]
+    }
+  },
+  
+  "learning_progress": {
+    "vocabulary_mastery": {
+      "recognition": 0,
+      "production": 0,
+      "fluency": 0
+    },
+    "grammar_understanding": {
+      "structured_tags": 0,
+      "natural_usage": 0,
+      "contextual_application": 0
+    }
+  }
+} 

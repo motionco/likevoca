@@ -6,6 +6,11 @@ import {
 } from "../../js/firebase/firebase-init.js";
 import { getActiveLanguage } from "../../utils/language-utils.js";
 import {
+  formatGrammarTags,
+  getPOSList,
+  getGrammarFeatures,
+} from "../../js/grammar-tags-system.js";
+import {
   deleteDoc,
   doc,
   updateDoc,
@@ -31,6 +36,7 @@ const pageTranslations = {
     category: "카테고리",
     domain: "도메인",
     grammar: "문법",
+    grammar_info: "문법 정보",
     // 카테고리 번역
     fruit: "과일",
     food: "음식",
@@ -65,6 +71,7 @@ const pageTranslations = {
     category: "Category",
     domain: "Domain",
     grammar: "Grammar",
+    grammar_info: "Grammar Info",
     // 카테고리 번역
     fruit: "Fruit",
     food: "Food",
@@ -99,6 +106,7 @@ const pageTranslations = {
     category: "カテゴリ",
     domain: "ドメイン",
     grammar: "文法",
+    grammar_info: "文法情報",
     // 카테고리 번역
     fruit: "果物",
     food: "食べ物",
@@ -133,6 +141,7 @@ const pageTranslations = {
     category: "类别",
     domain: "领域",
     grammar: "语法",
+    grammar_info: "语法信息",
     // 카테고리 번역
     fruit: "水果",
     food: "食物",
@@ -155,208 +164,20 @@ const pageTranslations = {
   },
 };
 
-// 문법 용어 번역 테이블
-const grammarTranslations = {
-  ko: {
-    // 영어 문법 용어
-    "simple present tense": "현재 시제",
-    "present tense": "현재 시제",
-    "simple past tense": "과거 시제",
-    "past tense": "과거 시제",
-    "simple future tense": "미래 시제",
-    "future tense": "미래 시제",
-    "present continuous": "현재 진행형",
-    "past continuous": "과거 진행형",
-    "future continuous": "미래 진행형",
-    "present perfect": "현재 완료형",
-    "past perfect": "과거 완료형",
-    "future perfect": "미래 완료형",
-    "present perfect continuous": "현재 완료 진행형",
-    "past perfect continuous": "과거 완료 진행형",
-    "future perfect continuous": "미래 완료 진행형",
-    "modal verb": "조동사",
-    "auxiliary verb": "조동사",
-    "passive voice": "수동태",
-    "active voice": "능동태",
-    conditional: "조건문",
-    subjunctive: "가정법",
-    imperative: "명령문",
-    gerund: "동명사",
-    infinitive: "부정사",
-    participle: "분사",
-    "present participle": "현재분사",
-    "past participle": "과거분사",
-    comparative: "비교급",
-    superlative: "최상급",
-    "countable noun": "가산명사",
-    "uncountable noun": "불가산명사",
-    plural: "복수형",
-    singular: "단수형",
-    article: "관사",
-    "definite article": "정관사",
-    "indefinite article": "부정관사",
-    preposition: "전치사",
-    conjunction: "접속사",
-    adverb: "부사",
-    adjective: "형용사",
-    pronoun: "대명사",
-    "relative clause": "관계절",
-    "subordinate clause": "종속절",
-    "main clause": "주절",
-
-    // 일본어 문법 용어
-    hiragana: "히라가나",
-    katakana: "가타카나",
-    kanji: "한자",
-    keigo: "경어",
-    sonkeigo: "존경어",
-    kenjougo: "겸양어",
-    teineigo: "정중어",
-    "masu form": "마스형",
-    "te form": "테형",
-    "potential form": "가능형",
-    "causative form": "사역형",
-    "passive form": "수동형",
-    "volitional form": "의지형",
-    "conditional form": "조건형",
-    "imperative form": "명령형",
-    "negative form": "부정형",
-    "past tense": "과거형",
-    "present tense": "현재형",
-    particle: "조사",
-    "wa particle": "는/은 조사",
-    "ga particle": "가/이 조사",
-    "wo particle": "를/을 조사",
-    "ni particle": "에 조사",
-    "de particle": "에서 조사",
-    "to particle": "와/과 조사",
-
-    // 중국어 문법 용어
-    pinyin: "병음",
-    tone: "성조",
-    "first tone": "1성",
-    "second tone": "2성",
-    "third tone": "3성",
-    "fourth tone": "4성",
-    "neutral tone": "경성",
-    "measure word": "양사",
-    classifier: "양사",
-    "sentence final particle": "문말사",
-    "aspect marker": "상 표지",
-    "perfective aspect": "완료상",
-    "progressive aspect": "진행상",
-    "experiential aspect": "경험상",
-  },
-  en: {
-    // 기본적으로 영어는 그대로 유지
-    "simple present tense": "simple present tense",
-    "present tense": "present tense",
-    "simple past tense": "simple past tense",
-    "past tense": "past tense",
-    // ... 나머지도 그대로
-  },
-  ja: {
-    // 영어 문법 용어를 일본어로
-    "simple present tense": "現在時制",
-    "present tense": "現在時制",
-    "simple past tense": "過去時制",
-    "past tense": "過去時制",
-    "simple future tense": "未来時制",
-    "future tense": "未来時制",
-    "present continuous": "現在進行形",
-    "past continuous": "過去進行形",
-    "future continuous": "未来進行形",
-    "present perfect": "現在完了形",
-    "past perfect": "過去完了形",
-    "future perfect": "未来完了形",
-    "modal verb": "助動詞",
-    "auxiliary verb": "助動詞",
-    "passive voice": "受動態",
-    "active voice": "能動態",
-    conditional: "条件文",
-    subjunctive: "仮定法",
-    imperative: "命令文",
-    gerund: "動名詞",
-    infinitive: "不定詞",
-    participle: "分詞",
-    "present participle": "現在分詞",
-    "past participle": "過去分詞",
-    comparative: "比較級",
-    superlative: "最上級",
-    "countable noun": "可算名詞",
-    "uncountable noun": "不可算名詞",
-    plural: "複数形",
-    singular: "単数形",
-    article: "冠詞",
-    "definite article": "定冠詞",
-    "indefinite article": "不定冠詞",
-    preposition: "前置詞",
-    conjunction: "接続詞",
-    adverb: "副詞",
-    adjective: "形容詞",
-    pronoun: "代名詞",
-
-    // 일본어 문법 용어는 그대로
-    hiragana: "ひらがな",
-    katakana: "カタカナ",
-    kanji: "漢字",
-    keigo: "敬語",
-    "masu form": "ます形",
-    "te form": "て形",
-    particle: "助詞",
-  },
-  zh: {
-    // 영어 문법 용어를 중국어로
-    "simple present tense": "一般现在时",
-    "present tense": "现在时",
-    "simple past tense": "一般过去时",
-    "past tense": "过去时",
-    "simple future tense": "一般将来时",
-    "future tense": "将来时",
-    "present continuous": "现在进行时",
-    "past continuous": "过去进行时",
-    "future continuous": "将来进行时",
-    "present perfect": "现在完成时",
-    "past perfect": "过去完成时",
-    "future perfect": "将来完成时",
-    "modal verb": "情态动词",
-    "auxiliary verb": "助动词",
-    "passive voice": "被动语态",
-    "active voice": "主动语态",
-    conditional: "条件句",
-    subjunctive: "虚拟语气",
-    imperative: "祈使句",
-    gerund: "动名词",
-    infinitive: "不定式",
-    participle: "分词",
-    "present participle": "现在分词",
-    "past participle": "过去分词",
-    comparative: "比较级",
-    superlative: "最高级",
-    "countable noun": "可数名词",
-    "uncountable noun": "不可数名词",
-    plural: "复数",
-    singular: "单数",
-    article: "冠词",
-    "definite article": "定冠词",
-    "indefinite article": "不定冠词",
-    preposition: "介词",
-    conjunction: "连词",
-    adverb: "副词",
-    adjective: "形容词",
-    pronoun: "代词",
-
-    // 중국어 문법 용어는 그대로
-    pinyin: "拼音",
-    tone: "声调",
-    "measure word": "量词",
-    classifier: "量词",
-  },
-};
-
 // 다국어 번역 텍스트 가져오기 함수
 function getTranslatedText(key) {
   return pageTranslations[userLanguage][key] || pageTranslations.en[key] || key;
+}
+
+// 웹사이트 언어를 DB 언어 코드로 변환하는 함수
+function getUserLanguageCode() {
+  const languageCodeMap = {
+    ko: "korean",
+    en: "english",
+    ja: "japanese",
+    zh: "chinese",
+  };
+  return languageCodeMap[userLanguage] || "korean";
 }
 
 // 사용자 언어 초기화
@@ -636,28 +457,28 @@ export async function showConceptModal(
 function getLanguageName(langCode) {
   const languageNames = {
     ko: {
-      korean: "한국어",
+    korean: "한국어",
       english: "영어",
       japanese: "일본어",
       chinese: "중국어",
     },
     en: {
       korean: "Korean",
-      english: "English",
+    english: "English",
       japanese: "Japanese",
       chinese: "Chinese",
     },
     ja: {
       korean: "韓国語",
       english: "英語",
-      japanese: "日本語",
+    japanese: "日本語",
       chinese: "中国語",
     },
     zh: {
       korean: "韩语",
       english: "英语",
       japanese: "日语",
-      chinese: "中文",
+    chinese: "中文",
     },
   };
 
@@ -689,6 +510,36 @@ function showLanguageContent(lang, concept) {
   // 상단 기본 정보도 함께 업데이트
   updateBasicInfo(lang, concept);
 
+  // 문법 태그 포맷팅
+  let grammarTagsHtml = "";
+  if (expression.grammar_tags && expression.grammar_tags.length > 0) {
+    const pos = expression.grammar_tags.find((tag) => !tag.includes(":"));
+    const features = expression.grammar_tags.filter((tag) => tag.includes(":"));
+    const formatted = formatGrammarTags(lang, pos, features);
+
+    grammarTagsHtml = `
+      <div class="mt-3 p-2 bg-blue-50 rounded">
+        <div class="text-xs font-medium text-blue-700 mb-1">${getTranslatedText(
+          "grammar_info"
+        )}</div>
+        <div class="flex flex-wrap gap-1">
+          <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded font-medium">
+            ${formatted.pos}
+          </span>
+          ${formatted.features
+            .map(
+              (feature) => `
+            <span class="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">
+              ${feature}
+            </span>
+          `
+            )
+            .join("")}
+        </div>
+      </div>
+    `;
+  }
+
   contentContainer.innerHTML = `
     <div class="space-y-4">
       <div>
@@ -703,6 +554,7 @@ function showLanguageContent(lang, concept) {
             expression.pronunciation || ""
           }</p>
           <p class="text-gray-700 mt-2">${expression.definition || "N/A"}</p>
+          ${grammarTagsHtml}
         </div>
       </div>
     </div>
@@ -886,7 +738,7 @@ async function deleteConcept() {
       // 일반 개념 삭제
       await conceptUtils.deleteConcept(currentConcept.id || currentConcept._id);
       console.log("일반 개념 삭제 성공");
-      alert("개념이 성공적으로 삭제되었습니다.");
+    alert("개념이 성공적으로 삭제되었습니다.");
     }
 
     closeModal();
@@ -1028,14 +880,22 @@ function displayExamples(
         // 대상 언어로 문법 설명 하나만 추가 (가장 아래)
         let grammarNote = null;
 
-        // 대상 언어에 맞는 문법 설명 찾기
+        // 웹사이트 환경 언어에 맞는 문법 설명 우선 찾기
+        const websiteLanguageCode = getUserLanguageCode(); // 현재 웹사이트 언어 코드 가져오기
         if (
+          websiteLanguageCode &&
+          example.translations[websiteLanguageCode]?.grammar_notes
+        ) {
+          grammarNote = example.translations[websiteLanguageCode].grammar_notes;
+        }
+        // 웹사이트 언어가 없으면 대상 언어의 문법 설명 사용
+        else if (
           targetLanguage &&
           example.translations[targetLanguage]?.grammar_notes
         ) {
           grammarNote = example.translations[targetLanguage].grammar_notes;
         }
-        // 대상 언어가 없거나 문법 설명이 없으면 첫 번째 언어의 문법 설명 사용
+        // 그것도 없으면 첫 번째 언어의 문법 설명 사용
         else if (
           languagesToShow.length > 0 &&
           languagesToShow[0].grammarNotes
@@ -1045,12 +905,12 @@ function displayExamples(
 
         // 문법 설명이 있으면 추가
         if (grammarNote) {
-          // 문법 설명을 환경 언어로 번역
-          const translatedGrammarNote = translateGrammarNote(grammarNote);
-
           exampleContent += `
             <div class="mt-2 pt-2 border-t border-gray-200">
-              <p class="text-xs text-gray-500 italic">${translatedGrammarNote}</p>
+              <span class="text-xs text-gray-600 font-medium">${getTranslatedText(
+                "grammar"
+              )}:</span>
+              <p class="text-xs text-gray-500 italic ml-2">${grammarNote}</p>
             </div>
           `;
         }
@@ -1151,34 +1011,4 @@ function displayExamples(
       "no_examples"
     )}</p>`;
   }
-}
-
-// 문법 설명을 환경 언어로 번역하는 함수
-function translateGrammarNote(grammarNote) {
-  if (!grammarNote || !userLanguage) return grammarNote;
-
-  const translations = grammarTranslations[userLanguage];
-  if (!translations) return grammarNote;
-
-  // 소문자로 변환해서 매칭 시도
-  const lowerNote = grammarNote.toLowerCase();
-
-  // 정확히 일치하는 번역이 있는지 확인
-  if (translations[lowerNote]) {
-    return translations[lowerNote];
-  }
-
-  // 부분 일치 시도 (더 긴 용어부터 확인)
-  const sortedKeys = Object.keys(translations).sort(
-    (a, b) => b.length - a.length
-  );
-
-  for (const key of sortedKeys) {
-    if (lowerNote.includes(key)) {
-      return grammarNote.replace(new RegExp(key, "gi"), translations[key]);
-    }
-  }
-
-  // 번역이 없으면 원본 반환
-  return grammarNote;
 }
