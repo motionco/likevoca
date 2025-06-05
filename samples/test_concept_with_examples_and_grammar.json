@@ -1,0 +1,426 @@
+[
+  {
+    "concept_info": {
+      "domain": "greeting",
+      "category": "daily",
+      "difficulty": "beginner",
+      "unicode_emoji": "👋",
+      "color_theme": "#4CAF50",
+      "tags": ["basic", "conversation", "polite"],
+      "created_at": "2025-01-01T00:00:00Z"
+    },
+    "expressions": {
+      "korean": {
+        "word": "안녕하세요",
+        "pronunciation": "an-nyeong-ha-se-yo",
+        "definition": "정중한 인사말",
+        "part_of_speech": "감탄사",
+        "synonyms": ["안녕히 계세요", "안녕히 가세요"],
+        "antonyms": ["안녕히 가세요"],
+        "word_family": ["안녕", "안녕히"],
+        "compound_words": ["안녕인사", "인사말"],
+        "collocations": ["안녕하세요 하고 인사하다", "정중하게 안녕하세요"]
+      },
+      "english": {
+        "word": "hello",
+        "pronunciation": "həˈloʊ",
+        "definition": "used as a greeting or to begin a phone conversation",
+        "part_of_speech": "interjection",
+        "synonyms": ["hi", "greetings", "good day"],
+        "antonyms": ["goodbye", "farewell"],
+        "word_family": ["hello", "helloer"],
+        "compound_words": ["hello world", "hello there"],
+        "collocations": ["say hello", "hello everyone"]
+      },
+      "japanese": {
+        "word": "こんにちは",
+        "pronunciation": "kon-ni-chi-wa",
+        "hiragana": "こんにちは",
+        "katakana": "",
+        "kanji": "",
+        "definition": "昼間の挨拶",
+        "part_of_speech": "感嘆詞",
+        "synonyms": ["おはようございます", "こんばんは"],
+        "antonyms": ["さようなら"],
+        "word_family": ["こんにち", "今日"],
+        "compound_words": ["こんにちは挨拶", "昼間挨拶"]
+      },
+      "chinese": {
+        "word": "你好",
+        "pronunciation": "nǐ hǎo",
+        "pinyin": "nǐ hǎo",
+        "definition": "常用的问候语",
+        "part_of_speech": "感叹词",
+        "synonyms": ["您好", "早上好"],
+        "antonyms": ["再见", "拜拜"],
+        "word_family": ["你", "好"],
+        "compound_words": ["你好世界", "问候你好"]
+      }
+    },
+    "representative_example": {
+      "context": "daily_greeting",
+      "difficulty": "beginner",
+      "priority": 10,
+      "translations": {
+        "korean": {
+          "text": "안녕하세요, 만나서 반갑습니다.",
+          "grammar_notes": "정중한 인사 표현"
+        },
+        "english": {
+          "text": "Hello, nice to meet you.",
+          "grammar_notes": "formal greeting expression"
+        },
+        "japanese": {
+          "text": "こんにちは、はじめまして。",
+          "grammar_notes": "丁寧な挨拶表現"
+        },
+        "chinese": {
+          "text": "你好，很高兴见到你。",
+          "grammar_notes": "正式问候表达"
+        }
+      }
+    },
+    "additional_examples": [
+      {
+        "example_id": "greeting_phone_001",
+        "context": "phone_conversation",
+        "difficulty": "beginner",
+        "priority": 8,
+        "grammar_pattern_id": "greeting_basic",
+        "translations": {
+          "korean": {
+            "text": "여보세요, 안녕하세요.",
+            "grammar_notes": "전화 인사 표현"
+          },
+          "english": {
+            "text": "Hello, this is speaking.",
+            "grammar_notes": "phone greeting"
+          },
+          "japanese": {
+            "text": "もしもし、こんにちは。",
+            "grammar_notes": "電話での挨拶"
+          },
+          "chinese": {
+            "text": "喂，你好。",
+            "grammar_notes": "电话问候"
+          }
+        },
+        "metadata": {
+          "quiz_eligible": true,
+          "game_eligible": true,
+          "learning_weight": 10
+        }
+      },
+      {
+        "example_id": "greeting_formal_001",
+        "context": "formal_meeting",
+        "difficulty": "intermediate",
+        "priority": 7,
+        "grammar_pattern_id": "greeting_with_response",
+        "translations": {
+          "korean": {
+            "text": "안녕하세요, 오늘 회의에 참석해 주셔서 감사합니다.",
+            "grammar_notes": "공식적인 인사 및 감사 표현"
+          },
+          "english": {
+            "text": "Hello everyone, thank you for attending today's meeting.",
+            "grammar_notes": "formal greeting with appreciation"
+          },
+          "japanese": {
+            "text": "こんにちは皆様、本日は会議にご参加いただきありがとうございます。",
+            "grammar_notes": "正式な挨拶と感謝の表現"
+          },
+          "chinese": {
+            "text": "大家好，感谢您参加今天的会议。",
+            "grammar_notes": "正式问候与感谢表达"
+          }
+        },
+        "metadata": {
+          "quiz_eligible": true,
+          "game_eligible": false,
+          "learning_weight": 15
+        }
+      },
+      {
+        "example_id": "greeting_casual_001",
+        "context": "casual_friend",
+        "difficulty": "beginner",
+        "priority": 6,
+        "grammar_pattern_id": "greeting_basic",
+        "translations": {
+          "korean": {
+            "text": "안녕! 오늘 어때?",
+            "grammar_notes": "친구 사이의 캐주얼한 인사"
+          },
+          "english": {
+            "text": "Hi! How are you today?",
+            "grammar_notes": "casual greeting between friends"
+          },
+          "japanese": {
+            "text": "こんにちは！今日はどう？",
+            "grammar_notes": "友達同士のカジュアルな挨拶"
+          },
+          "chinese": {
+            "text": "你好！今天怎么样？",
+            "grammar_notes": "朋友间的随意问候"
+          }
+        },
+        "metadata": {
+          "quiz_eligible": true,
+          "game_eligible": true,
+          "learning_weight": 8
+        }
+      }
+    ],
+    "grammar_patterns": [
+      {
+        "pattern_id": "greeting_basic",
+        "pattern_type": "greeting_expression",
+        "difficulty": "beginner",
+        "priority": 10,
+        "related_languages": ["korean", "english", "japanese", "chinese"],
+        "description": {
+          "korean": "기본 인사 표현 패턴",
+          "english": "Basic greeting expression pattern",
+          "japanese": "基本的な挨拶表現パターン",
+          "chinese": "基本问候表达模式"
+        },
+        "structure": {
+          "korean": "[인사말] + [존댓말 어미]",
+          "english": "[Greeting] + [Polite ending]",
+          "japanese": "[挨拶] + [丁寧語]",
+          "chinese": "[问候语] + [礼貌用语]"
+        },
+        "examples": [
+          {
+            "korean": "안녕하세요",
+            "english": "Hello",
+            "japanese": "こんにちは",
+            "chinese": "你好"
+          },
+          {
+            "korean": "안녕히 계세요",
+            "english": "Goodbye (to someone staying)",
+            "japanese": "さようなら",
+            "chinese": "再见"
+          }
+        ],
+        "usage_notes": {
+          "korean": "상대방에게 정중하게 인사할 때 사용",
+          "english": "Used for polite greetings",
+          "japanese": "相手に丁寧に挨拶する時に使用",
+          "chinese": "用于礼貌地向对方问候"
+        }
+      },
+      {
+        "pattern_id": "greeting_with_response",
+        "pattern_type": "conversation_pattern",
+        "difficulty": "intermediate",
+        "priority": 8,
+        "related_languages": ["korean", "english", "japanese", "chinese"],
+        "description": {
+          "korean": "인사와 응답 패턴",
+          "english": "Greeting and response pattern",
+          "japanese": "挨拶と応答パターン",
+          "chinese": "问候与回应模式"
+        },
+        "structure": {
+          "korean": "[인사말] + [응답] + [추가 질문/대화]",
+          "english": "[Greeting] + [Response] + [Follow-up]",
+          "japanese": "[挨拶] + [応答] + [続きの会話]",
+          "chinese": "[问候] + [回应] + [后续对话]"
+        },
+        "examples": [
+          {
+            "korean": "안녕하세요! - 안녕하세요, 잘 지내세요?",
+            "english": "Hello! - Hello, how are you?",
+            "japanese": "こんにちは！ - こんにちは、元気ですか？",
+            "chinese": "你好！ - 你好，你好吗？"
+          }
+        ],
+        "usage_notes": {
+          "korean": "대화를 시작하고 지속하는 패턴",
+          "english": "Pattern for starting and continuing conversation",
+          "japanese": "会話を始めて続けるパターン",
+          "chinese": "开始和继续对话的模式"
+        }
+      }
+    ],
+    "media": {
+      "images": {
+        "primary": null,
+        "examples": []
+      },
+      "audio": {
+        "pronunciations": {},
+        "examples": []
+      }
+    },
+    "learning_activities": {
+      "flashcard": {
+        "front_template": "{target_word}",
+        "back_template": "{source_word}\n{definition}",
+        "difficulty": "beginner"
+      },
+      "typing": {
+        "prompt_template": "다음 단어를 입력하세요: {source_word}",
+        "answer": "{target_word}",
+        "difficulty": "beginner"
+      },
+      "pronunciation": {
+        "target": "{target_word}",
+        "phonetic": "{pronunciation}",
+        "difficulty": "intermediate"
+      },
+      "reading_comprehension": {
+        "passage": "인사는 사람들 사이의 기본적인 소통 방법입니다. '안녕하세요'는 한국어에서 가장 일반적인 정중한 인사말입니다.",
+        "questions": [
+          {
+            "type": "multiple_choice",
+            "question": "한국어에서 가장 일반적인 정중한 인사말은 무엇입니까?",
+            "options": ["안녕", "안녕하세요", "좋은 아침", "반갑습니다"],
+            "correct_answer": "안녕하세요"
+          }
+        ],
+        "difficulty": "intermediate"
+      }
+    },
+    "metadata": {
+      "created_at": "2025-01-01T00:00:00Z",
+      "created_by": "system",
+      "source": "manual_input",
+      "version": "4.0_with_grammar_and_activities"
+    }
+  },
+  {
+    "concept_info": {
+      "domain": "food",
+      "category": "daily",
+      "difficulty": "beginner",
+      "unicode_emoji": "🍎",
+      "color_theme": "#FF5722",
+      "tags": ["food", "fruit", "basic"],
+      "created_at": "2025-01-01T00:00:00Z"
+    },
+    "expressions": {
+      "korean": {
+        "word": "사과",
+        "pronunciation": "sa-gwa",
+        "definition": "둥글고 빨간 과일",
+        "part_of_speech": "명사",
+        "synonyms": ["능금"],
+        "antonyms": [],
+        "word_family": ["사과나무", "사과주스"]
+      },
+      "english": {
+        "word": "apple",
+        "pronunciation": "ˈæpəl",
+        "definition": "a round fruit with firm white flesh and a green red or yellow skin",
+        "part_of_speech": "noun",
+        "synonyms": [],
+        "antonyms": []
+      },
+      "japanese": {
+        "word": "りんご",
+        "pronunciation": "rin-go",
+        "hiragana": "りんご",
+        "katakana": "リンゴ",
+        "kanji": "林檎",
+        "definition": "赤い丸い果物",
+        "part_of_speech": "名詞"
+      },
+      "chinese": {
+        "word": "苹果",
+        "pronunciation": "píng guǒ",
+        "pinyin": "píng guǒ",
+        "definition": "红色圆形水果",
+        "part_of_speech": "名词"
+      }
+    },
+    "representative_example": {
+      "context": "daily_conversation",
+      "difficulty": "beginner",
+      "priority": 10,
+      "translations": {
+        "korean": {
+          "text": "사과를 하나 주세요.",
+          "grammar_notes": "물건 요청 표현"
+        },
+        "english": {
+          "text": "I would like an apple please.",
+          "grammar_notes": "polite request"
+        },
+        "japanese": {
+          "text": "りんごを一つください。",
+          "grammar_notes": "丁寧な依頼表現"
+        },
+        "chinese": {
+          "text": "请给我一个苹果。",
+          "grammar_notes": "礼貌请求表达"
+        }
+      }
+    },
+    "additional_examples": [
+      {
+        "example_id": "apple_market_001",
+        "context": "market_shopping",
+        "difficulty": "beginner",
+        "priority": 8,
+        "grammar_pattern_id": "counting_objects",
+        "translations": {
+          "korean": {
+            "text": "사과 다섯 개가 얼마예요?",
+            "grammar_notes": "수량과 가격 문의"
+          },
+          "english": {
+            "text": "How much are five apples?",
+            "grammar_notes": "price inquiry with quantity"
+          },
+          "japanese": {
+            "text": "りんご五つはいくらですか？",
+            "grammar_notes": "数量と価格の質問"
+          },
+          "chinese": {
+            "text": "五个苹果多少钱？",
+            "grammar_notes": "询问数量和价格"
+          }
+        }
+      }
+    ],
+    "grammar_patterns": [
+      {
+        "pattern_id": "counting_objects",
+        "pattern_type": "counting_expression",
+        "difficulty": "beginner",
+        "priority": 9,
+        "related_languages": ["korean", "english", "japanese", "chinese"],
+        "description": {
+          "korean": "물건 세기 표현",
+          "english": "Object counting expressions",
+          "japanese": "物の数え方表現",
+          "chinese": "物品计数表达"
+        },
+        "structure": {
+          "korean": "[명사] + [수량사] + [개/명/마리 등]",
+          "english": "[Number] + [Noun]",
+          "japanese": "[名詞] + [数] + [つ/個/匹 etc]",
+          "chinese": "[数字] + [量词] + [名词]"
+        },
+        "examples": [
+          {
+            "korean": "사과 세 개",
+            "english": "three apples",
+            "japanese": "りんご三つ",
+            "chinese": "三个苹果"
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "created_at": "2025-01-01T00:00:00Z",
+      "created_by": "system",
+      "source": "manual_input",
+      "version": "4.0_with_grammar_and_activities"
+    }
+  }
+] 

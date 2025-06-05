@@ -1,142 +1,132 @@
 [
   {
-    "domain": "daily",
-    "category": "greeting",
+    "concept_info": {
+      "category": "fruit",
+      "domain": "food",
+      "difficulty": "beginner",
+      "tags": ["과일", "음식", "건강"],
+      "unicode_emoji": "🍎",
+      "color_theme": "#FF6B6B"
+    },
+    "expressions": {
+      "korean": {
+        "word": "사과",
+        "pronunciation": "sa-gwa",
+        "definition": "빨갛거나 녹색인 둥근 과일",
+        "part_of_speech": "명사"
+      },
+      "english": {
+        "word": "apple",
+        "pronunciation": "ˈæpəl",
+        "definition": "A round fruit that is typically red or green",
+        "part_of_speech": "noun"
+      },
+      "japanese": {
+        "word": "りんご",
+        "hiragana": "りんご",
+        "kanji": "林檎",
+        "pronunciation": "ringo",
+        "definition": "赤いまたは緑色の丸い果物",
+        "part_of_speech": "名詞"
+      },
+      "chinese": {
+        "word": "苹果",
+        "pinyin": "píngguǒ",
+        "definition": "红色或绿色的圆形水果",
+        "part_of_speech": "名词"
+      }
+    },
+    "examples": [
+      {
+        "korean": "나는 사과를 좋아한다",
+        "english": "I like apples",
+        "japanese": "私はりんごが好きです",
+        "chinese": "我喜欢苹果"
+      }
+    ],
+    "grammar_patterns": [
+      {
+        "korean": {
+          "pattern": "명사 - 가산명사",
+          "explanation": "셀 수 있는 명사"
+        },
+        "english": {
+          "pattern": "noun - countable",
+          "explanation": "A noun that can be counted"
+        },
+        "japanese": {
+          "pattern": "名詞 - 可算名詞",
+          "explanation": "数えることができる名詞"
+        },
+        "chinese": {
+          "pattern": "名词 - 可数名词",
+          "explanation": "可以计数的名词"
+        }
+      }
+    ]
+  },
+  {
+    "concept_info": {
+      "category": "greeting",
+      "domain": "daily",
+      "difficulty": "beginner",
+      "tags": ["인사", "일상", "기본"],
+      "unicode_emoji": "👋",
+      "color_theme": "#4CAF50"
+    },
     "expressions": {
       "korean": {
         "word": "안녕하세요",
-        "pronunciation": "annyeonghaseyo",
-        "definition": "인사말",
-        "part_of_speech": "interjection",
-        "level": "beginner"
+        "pronunciation": "an-nyeong-ha-se-yo",
+        "definition": "정중한 인사말",
+        "part_of_speech": "감탄사"
       },
       "english": {
         "word": "hello",
         "pronunciation": "həˈloʊ",
-        "definition": "greeting",
-        "part_of_speech": "interjection",
-        "level": "beginner"
+        "definition": "A greeting used when meeting someone",
+        "part_of_speech": "interjection"
       },
       "japanese": {
         "word": "こんにちは",
+        "hiragana": "こんにちは",
         "pronunciation": "konnichiwa",
-        "definition": "挨拶",
-        "part_of_speech": "interjection",
-        "level": "beginner"
+        "definition": "人に会った時の挨拶",
+        "part_of_speech": "感動詞"
       },
       "chinese": {
         "word": "你好",
-        "pronunciation": "nǐ hǎo",
-        "definition": "问候语",
-        "part_of_speech": "interjection",
-        "level": "beginner"
+        "pinyin": "nǐhǎo",
+        "definition": "见面时的问候语",
+        "part_of_speech": "感叹词"
       }
-    },
-    "concept_info": {
-      "domain": "daily",
-      "category": "greeting",
-      "emoji": "👋"
     },
     "examples": [
       {
-        "korean": "안녕하세요, 만나서 반갑습니다.",
-        "english": "Hello, nice to meet you.",
-        "japanese": "はじめまして、よろしくお願いします。",
-        "chinese": "你好，很高兴见到你。"
+        "korean": "안녕하세요! 만나서 반갑습니다",
+        "english": "Hello! Nice to meet you",
+        "japanese": "こんにちは！はじめまして",
+        "chinese": "你好！很高兴见到你"
       }
-    ]
-  },
-  {
-    "domain": "food",
-    "category": "fruit",
-    "expressions": {
-      "korean": {
-        "word": "사과",
-        "pronunciation": "sagwa",
-        "definition": "과일의 일종",
-        "part_of_speech": "noun",
-        "level": "beginner"
-      },
-      "english": {
-        "word": "apple",
-        "pronunciation": "ˈæpl",
-        "definition": "a round fruit with red or green skin",
-        "part_of_speech": "noun",
-        "level": "beginner"
-      },
-      "japanese": {
-        "word": "りんご",
-        "pronunciation": "ringo",
-        "definition": "果物の一種",
-        "part_of_speech": "noun",
-        "level": "beginner"
-      },
-      "chinese": {
-        "word": "苹果",
-        "pronunciation": "píng guǒ",
-        "definition": "一种水果",
-        "part_of_speech": "noun",
-        "level": "beginner"
-      }
-    },
-    "concept_info": {
-      "domain": "food",
-      "category": "fruit",
-      "emoji": "🍎"
-    },
-    "examples": [
+    ],
+    "grammar_patterns": [
       {
-        "korean": "나는 사과를 좋아합니다.",
-        "english": "I like apples.",
-        "japanese": "私はりんごが好きです。",
-        "chinese": "我喜欢苹果。"
-      }
-    ]
-  },
-  {
-    "domain": "daily",
-    "category": "weather",
-    "expressions": {
-      "korean": {
-        "word": "비",
-        "pronunciation": "bi",
-        "definition": "하늘에서 내리는 물",
-        "part_of_speech": "noun",
-        "level": "beginner"
-      },
-      "english": {
-        "word": "rain",
-        "pronunciation": "reɪn",
-        "definition": "water that falls from clouds",
-        "part_of_speech": "noun",
-        "level": "beginner"
-      },
-      "japanese": {
-        "word": "雨",
-        "pronunciation": "ame",
-        "definition": "空から降る水",
-        "part_of_speech": "noun",
-        "level": "beginner"
-      },
-      "chinese": {
-        "word": "雨",
-        "pronunciation": "yǔ",
-        "definition": "从云中落下的水",
-        "part_of_speech": "noun",
-        "level": "beginner"
-      }
-    },
-    "concept_info": {
-      "domain": "daily",
-      "category": "weather",
-      "emoji": "🌧️"
-    },
-    "examples": [
-      {
-        "korean": "오늘은 비가 많이 옵니다.",
-        "english": "It's raining a lot today.",
-        "japanese": "今日はたくさん雨が降っています。",
-        "chinese": "今天下了很多雨。"
+        "korean": {
+          "pattern": "정중한 존댓말",
+          "explanation": "상대방을 존중하는 표현"
+        },
+        "english": {
+          "pattern": "polite formal expression",
+          "explanation": "A respectful way of greeting"
+        },
+        "japanese": {
+          "pattern": "丁寧な敬語表現",
+          "explanation": "相手を尊重する表現"
+        },
+        "chinese": {
+          "pattern": "礼貌的正式表达",
+          "explanation": "尊重对方的表达方式"
+        }
       }
     ]
   },

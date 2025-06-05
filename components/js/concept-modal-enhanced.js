@@ -274,18 +274,34 @@ export class EnhancedConceptModal {
   }
 
   /**
-   * 예문에서 문법 시스템 찾기
+   * 예문에서 문법 시스템 찾기 - 참조 기반 구조 대응
    */
   findExampleGrammarSystem() {
-    const examples = this.currentConcept.featured_examples;
+    // 새로운 구조: core_examples
+    const examples =
+      this.currentConcept.core_examples ||
+      this.currentConcept.featured_examples || // 호환성
+      [];
+
     if (!examples || examples.length === 0) return null;
 
-    // 첫 번째 예문의 문법 시스템 사용
+    // 첫 번째 예문에서 문법 패턴 참조 찾기
     for (const example of examples) {
+      // 새로운 참조 기반 구조
+      if (example.grammar_pattern_id) {
+        return {
+          example: example,
+          grammar_pattern_id: example.grammar_pattern_id,
+          type: "reference_based", // 향후 grammar 컬렉션에서 조회
+        };
+      }
+
+      // 기존 구조 (호환성)
       if (example.grammar_system) {
         return {
           example: example,
           grammar_system: example.grammar_system,
+          type: "embedded",
         };
       }
     }
@@ -294,64 +310,93 @@ export class EnhancedConceptModal {
   }
 
   /**
-   * 예문 중심 문법 시스템 표시
+   * 개념 차원 문법 시스템 찾기 - 참조 기반 구조 대응
+   */
+  findConceptGrammarSystem() {
+    const conceptInfo = this.currentConcept.concept_info;
+    const references = this.currentConcept.references;
+
+    // 새로운 참조 기반: grammar_patterns 참조
+    if (
+      references?.grammar_patterns &&
+      references.grammar_patterns.length > 0
+    ) {
+      return {
+        type: "pattern_references",
+        pattern_ids: references.grammar_patterns,
+        // 향후: 실제 grammar 컬렉션에서 조회
+        // patterns: await grammarService.getPatterns(references.grammar_patterns)
+      };
+    }
+
+    // 기존 구조 (호환성)
+    if (conceptInfo?.unified_grammar) {
+      return {
+        type: "concept_level",
+        grammar_system: conceptInfo.unified_grammar,
+      };
+    }
+
+    // 레거시 구조
+    if (this.currentConcept.grammar_patterns) {
+      return {
+        type: "pattern_based",
+        patterns: this.currentConcept.grammar_patterns,
+      };
+    }
+
+    return null;
+  }
+
+  /**
+   * 예문 중심 문법 시스템 표시 - 참조 기반 구조 대응
    */
   async displayExampleGrammarSystem(exampleGrammar) {
-    const { example, grammar_system } = exampleGrammar;
+    const { example } = exampleGrammar;
+
+    if (exampleGrammar.type === "reference_based") {
+      // 새로운 참조 기반 구조
+      await this.displayReferencedGrammarPattern(
+        example,
+        exampleGrammar.grammar_pattern_id
+      );
+    } else if (exampleGrammar.type === "embedded") {
+      // 기존 임베디드 구조 (호환성)
+      await this.displayEmbeddedGrammarSystem(
+        example,
+        exampleGrammar.grammar_system
+      );
+    }
+  }
+
+  /**
+   * 참조된 문법 패턴 표시 (향후 확장)
+   */
+  async displayReferencedGrammarPattern(example, grammarPatternId) {
+    const basicDesc = document.getElementById("basic-grammar-desc");
+    const detailedDesc = document.getElementById("detailed-grammar-desc");
 
     // 예문 텍스트 표시
     const exampleText =
       example.translations?.[this.currentLanguage]?.text || "";
 
-    // 자연어 설명 표시
-    await this.displayExampleNaturalDescriptions(grammar_system, exampleText);
-
-    // 구조화된 문법 태그 표시
-    this.displayExampleGrammarTags(grammar_system.grammar_tags);
-
-    // 예문 기반 학습 메타데이터 표시
-    this.displayExampleLearningMetadata(grammar_system);
-  }
-
-  /**
-   * 예문 기반 자연어 설명 표시
-   */
-  async displayExampleNaturalDescriptions(grammarSystem, exampleText) {
-    const basicDesc = document.getElementById("basic-grammar-desc");
-    const detailedDesc = document.getElementById("detailed-grammar-desc");
-
-    // 패턴명과 구조 기반 설명 생성
-    const patternName = grammarSystem.pattern_name || "기본 패턴";
-    const structuralPattern = grammarSystem.structural_pattern || "기본 구조";
-    const learningFocus = grammarSystem.learning_focus || [];
+    // 현재는 패턴 ID 기반으로 기본 정보 생성
+    // 향후: grammarService.getPattern(grammarPatternId)로 조회
+    const patternInfo = this.inferPatternInfoFromId(grammarPatternId);
 
     // 기본 설명
-    let basicText = `${patternName} (${structuralPattern})`;
+    let basicText = `${patternInfo.name} 패턴`;
     if (exampleText) {
       basicText += ` - 예문: "${exampleText}"`;
     }
 
     // 상세 설명
-    let detailedText = "";
-    if (learningFocus.length > 0) {
-      detailedText = `학습 초점: ${learningFocus.join(", ")}`;
+    let detailedText = `문법 패턴 ID: ${grammarPatternId}`;
+    if (example.context !== "general") {
+      detailedText += ` | 맥락: ${example.context}`;
     }
-
-    // 언어별 문법적 특성 추가
-    const langFeatures =
-      grammarSystem.grammatical_features?.[this.currentLanguage];
-    if (langFeatures) {
-      if (langFeatures.sentence_type) {
-        detailedText += ` | 문장 유형: ${langFeatures.sentence_type}`;
-      }
-      if (
-        langFeatures.key_grammar_points &&
-        langFeatures.key_grammar_points.length > 0
-      ) {
-        detailedText += ` | 핵심 포인트: ${langFeatures.key_grammar_points.join(
-          ", "
-        )}`;
-      }
+    if (example.priority) {
+      detailedText += ` | 우선순위: ${example.priority}`;
     }
 
     // UI 언어에 맞게 번역
@@ -368,126 +413,128 @@ export class EnhancedConceptModal {
 
     basicDesc.textContent = translatedBasic;
     detailedDesc.textContent = translatedDetailed;
+
+    // 참조 기반 태그 표시
+    this.displayReferencedGrammarTags(grammarPatternId, example);
   }
 
   /**
-   * 예문 문법 태그 표시
+   * 임베디드 문법 시스템 표시 (기존 호환성)
    */
-  displayExampleGrammarTags(grammarTags) {
+  async displayEmbeddedGrammarSystem(example, grammarSystem) {
+    // 기존 로직 유지
+    const exampleText =
+      example.translations?.[this.currentLanguage]?.text || "";
+
+    await this.displayExampleNaturalDescriptions(grammarSystem, exampleText);
+    this.displayExampleGrammarTags(grammarSystem.grammar_tags);
+    this.displayExampleLearningMetadata(grammarSystem);
+  }
+
+  /**
+   * 패턴 ID에서 정보 추론 (향후 실제 조회로 대체)
+   */
+  inferPatternInfoFromId(patternId) {
+    // 패턴 ID 구조: pattern_{domain}_{category}_{pattern_name}
+    const parts = patternId.split("_");
+
+    if (parts.length >= 4) {
+      const domain = parts[1];
+      const category = parts[2];
+      const patternName = parts.slice(3).join(" ");
+
+      return {
+        name: patternName || "기본 패턴",
+        domain: domain,
+        category: category,
+        inferred: true,
+      };
+    }
+
+    return {
+      name: "알 수 없는 패턴",
+      domain: "unknown",
+      category: "unknown",
+      inferred: true,
+    };
+  }
+
+  /**
+   * 참조 기반 문법 태그 표시
+   */
+  displayReferencedGrammarTags(grammarPatternId, example) {
     const tagsContainer = document.getElementById("grammar-tags-display");
     tagsContainer.innerHTML = "";
 
-    if (!grammarTags || grammarTags.length === 0) {
-      tagsContainer.innerHTML =
-        '<span class="text-muted">태그 정보 없음</span>';
-      return;
+    // 패턴 정보 배지
+    const patternInfo = this.inferPatternInfoFromId(grammarPatternId);
+    const patternBadge = document.createElement("span");
+    patternBadge.className = "badge bg-primary me-1 mb-1";
+    patternBadge.textContent = patternInfo.name;
+    patternBadge.title = `문법 패턴: ${grammarPatternId}`;
+    tagsContainer.appendChild(patternBadge);
+
+    // 도메인/카테고리 배지
+    const domainBadge = document.createElement("span");
+    domainBadge.className = "badge bg-info me-1 mb-1";
+    domainBadge.textContent = `${patternInfo.domain}.${patternInfo.category}`;
+    tagsContainer.appendChild(domainBadge);
+
+    // 예문 메타데이터 배지
+    if (example.metadata?.has_detailed_grammar) {
+      const detailBadge = document.createElement("span");
+      detailBadge.className = "badge bg-success me-1 mb-1";
+      detailBadge.textContent = "상세 문법";
+      tagsContainer.appendChild(detailBadge);
     }
 
-    grammarTags.forEach((tag) => {
-      const badge = document.createElement("span");
-      badge.className = "badge bg-success me-1 mb-1"; // 예문 태그는 초록색
-      badge.textContent = this.translateGrammarTag(tag);
-      tagsContainer.appendChild(badge);
-    });
+    if (example.priority === 1) {
+      const priorityBadge = document.createElement("span");
+      priorityBadge.className = "badge bg-warning me-1 mb-1";
+      priorityBadge.textContent = "핵심 예문";
+      tagsContainer.appendChild(priorityBadge);
+    }
 
-    // 복잡도 수준 표시
-    const complexityBadge = document.createElement("span");
-    complexityBadge.className = "badge bg-warning ms-2";
-    complexityBadge.textContent = "예문 기반";
-    tagsContainer.appendChild(complexityBadge);
+    // 참조 기반 시스템 표시
+    const systemBadge = document.createElement("span");
+    systemBadge.className = "badge bg-secondary ms-2";
+    systemBadge.textContent = "참조 기반";
+    systemBadge.title = "향후 grammar 컬렉션에서 조회";
+    tagsContainer.appendChild(systemBadge);
   }
 
   /**
-   * 예문 기반 학습 메타데이터 표시
-   */
-  displayExampleLearningMetadata(grammarSystem) {
-    const difficultyFactors = grammarSystem.difficulty_factors || {};
-
-    // 종합 난이도 계산
-    const totalDifficulty = Math.round(
-      (difficultyFactors.vocabulary || 15) +
-        (difficultyFactors.grammar_complexity || 20) +
-        (difficultyFactors.cultural_context || 10) +
-        (difficultyFactors.pronunciation || 15)
-    );
-
-    // 난이도 프로그레스 바
-    const difficultyBar = document.querySelector(
-      "#difficulty-score .progress-bar"
-    );
-    difficultyBar.style.width = `${Math.min(totalDifficulty, 100)}%`;
-    difficultyBar.textContent = `${Math.min(totalDifficulty, 100)}%`;
-
-    // 퀴즈 적합도 (예문 기반이므로 높게 설정)
-    const quizBar = document.querySelector("#quiz-score .progress-bar");
-    quizBar.style.width = "85%";
-    quizBar.textContent = "85%";
-
-    // 학습 포인트 표시
-    const practiceList = document.getElementById("practice-list");
-    practiceList.innerHTML = "";
-
-    const teachingNotes = grammarSystem.teaching_notes;
-    if (teachingNotes && teachingNotes.practice_suggestions) {
-      teachingNotes.practice_suggestions.forEach((suggestion) => {
-        const span = document.createElement("span");
-        span.className = "badge bg-info me-1";
-        span.textContent = this.translatePracticePoint(suggestion);
-        practiceList.appendChild(span);
-      });
-    }
-
-    // 주요 학습 초점 추가
-    if (teachingNotes && teachingNotes.primary_focus) {
-      const focusSpan = document.createElement("span");
-      focusSpan.className = "badge bg-primary me-1";
-      focusSpan.textContent = `핵심: ${teachingNotes.primary_focus}`;
-      practiceList.appendChild(focusSpan);
-    }
-  }
-
-  /**
-   * 개념 차원 문법 시스템 찾기
-   */
-  findConceptGrammarSystem() {
-    const conceptInfo = this.currentConcept.concept_info;
-
-    // concept_info에 unified_grammar가 있는지 확인
-    if (conceptInfo?.unified_grammar) {
-      return {
-        type: "concept_level",
-        grammar_system: conceptInfo.unified_grammar,
-      };
-    }
-
-    // grammar_patterns가 있는지 확인
-    if (this.currentConcept.grammar_patterns) {
-      return {
-        type: "pattern_based",
-        patterns: this.currentConcept.grammar_patterns,
-      };
-    }
-
-    return null;
-  }
-
-  /**
-   * 개념 차원 문법 시스템 표시
+   * 개념 차원 문법 시스템 표시 - 참조 기반 구조 대응
    */
   async displayConceptGrammarSystem(conceptGrammar) {
     const basicDesc = document.getElementById("basic-grammar-desc");
     const detailedDesc = document.getElementById("detailed-grammar-desc");
 
-    if (conceptGrammar.type === "concept_level") {
-      const unified = conceptGrammar.grammar_system;
+    if (conceptGrammar.type === "pattern_references") {
+      // 새로운 참조 기반 구조
+      const patternIds = conceptGrammar.pattern_ids;
 
       // 기본 설명
+      const patternNames = patternIds
+        .map((id) => this.inferPatternInfoFromId(id).name)
+        .join(", ");
+
+      basicDesc.textContent = `문법 패턴: ${patternNames}`;
+
+      // 상세 설명
+      detailedDesc.textContent = `참조된 패턴 ${patternIds.length}개 (향후 grammar 컬렉션에서 조회)`;
+
+      // 참조 패턴 태그 표시
+      this.displayPatternReferenceTags(patternIds);
+    } else if (conceptGrammar.type === "concept_level") {
+      // 기존 구조 (호환성)
+      const unified = conceptGrammar.grammar_system;
+
       let basicText = "";
       if (unified.word_level) {
         basicText = `${unified.word_level.primary_pos} (${unified.word_level.semantic_field})`;
       }
 
-      // 상세 설명 - 사용 패턴들
       let detailedText = "";
       if (unified.usage_patterns && unified.usage_patterns.length > 0) {
         const patterns = unified.usage_patterns
@@ -499,63 +546,47 @@ export class EnhancedConceptModal {
       basicDesc.textContent = basicText;
       detailedDesc.textContent = detailedText;
 
-      // 통합 태그 표시
       this.displayConceptGrammarTags(unified);
     } else if (conceptGrammar.type === "pattern_based") {
-      // 패턴 기반 표시
+      // 레거시 구조
       this.displayPatternBasedGrammar(conceptGrammar.patterns);
     }
   }
 
   /**
-   * 개념 문법 태그 표시
+   * 패턴 참조 태그 표시
    */
-  displayConceptGrammarTags(unifiedGrammar) {
+  displayPatternReferenceTags(patternIds) {
     const tagsContainer = document.getElementById("grammar-tags-display");
     tagsContainer.innerHTML = "";
 
-    // 단어 레벨 태그
-    if (unifiedGrammar.word_level) {
-      const wordBadge = document.createElement("span");
-      wordBadge.className = "badge bg-primary me-1 mb-1";
-      wordBadge.textContent = this.translateGrammarTag(
-        unifiedGrammar.word_level.primary_pos
-      );
-      tagsContainer.appendChild(wordBadge);
+    patternIds.forEach((patternId) => {
+      const patternInfo = this.inferPatternInfoFromId(patternId);
 
-      const semanticBadge = document.createElement("span");
-      semanticBadge.className = "badge bg-info me-1 mb-1";
-      semanticBadge.textContent = unifiedGrammar.word_level.semantic_field;
-      tagsContainer.appendChild(semanticBadge);
-    }
+      const badge = document.createElement("span");
+      badge.className = "badge bg-primary me-1 mb-1";
+      badge.textContent = `${patternInfo.domain}.${patternInfo.category}`;
+      badge.title = `패턴: ${patternInfo.name} (ID: ${patternId})`;
+      tagsContainer.appendChild(badge);
+    });
 
-    // 사용 패턴 태그
-    if (unifiedGrammar.usage_patterns) {
-      unifiedGrammar.usage_patterns.forEach((pattern) => {
-        pattern.grammar_tags?.forEach((tag) => {
-          const badge = document.createElement("span");
-          badge.className = "badge bg-success me-1 mb-1";
-          badge.textContent = this.translateGrammarTag(tag);
-          tagsContainer.appendChild(badge);
-        });
-      });
-    }
-
-    // 레벨 표시
-    const levelBadge = document.createElement("span");
-    levelBadge.className = "badge bg-warning ms-2";
-    levelBadge.textContent = "개념 기반";
-    tagsContainer.appendChild(levelBadge);
+    // 참조 시스템 표시
+    const refBadge = document.createElement("span");
+    refBadge.className = "badge bg-info ms-2";
+    refBadge.textContent = "패턴 참조";
+    refBadge.title = "향후 분리된 grammar 컬렉션 참조";
+    tagsContainer.appendChild(refBadge);
   }
 
   /**
-   * 향상된 단어 문법 정보 생성
+   * 향상된 단어 문법 정보 생성 - 참조 정보 포함
    */
   generateEnhancedWordGrammar(expression) {
     const pos = expression.part_of_speech || "unknown";
     const level = expression.level || "beginner";
     const domain = this.currentConcept.concept_info?.domain || "";
     const category = this.currentConcept.concept_info?.category || "";
+    const conceptId = this.currentConcept.concept_info?.concept_id || "";
 
     // 의미 영역 분석
     const semanticField = this.analyzeSemanticField(
@@ -569,6 +600,9 @@ export class EnhancedConceptModal {
 
     // 사용 맥락 추론
     const usageContexts = this.inferUsageContexts(domain, category, expression);
+
+    // 참조 정보 포함
+    const references = this.currentConcept.references || {};
 
     return {
       basic_description: `${pos} (${level} 수준) - ${semanticField}`,
@@ -595,6 +629,15 @@ export class EnhancedConceptModal {
         domain,
         category
       ),
+
+      // 참조 정보 추가
+      references: {
+        concept_id: conceptId,
+        available_examples: references.core_examples?.length || 0,
+        grammar_patterns: references.grammar_patterns?.length || 0,
+        quiz_templates: references.quiz_templates?.length || 0,
+        game_types: references.game_types?.length || 0,
+      },
     };
   }
 

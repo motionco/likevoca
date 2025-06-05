@@ -11,6 +11,7 @@ import {
   grammarTagsFromCSV,
   grammarTagsToCSV,
 } from "../../js/grammar-tags-system.js";
+import { collectionManager } from "../../js/firebase/firebase-collection-manager.js";
 
 // 전역 변수
 let importedData = [];
@@ -404,7 +405,7 @@ function downloadCSVTemplate() {
 
   const link = document.createElement("a");
   link.setAttribute("href", url);
-  link.setAttribute("download", "concept_template_example_grammar.csv");
+  link.setAttribute("download", "concept_template.csv");
   link.style.display = "none";
 
   document.body.appendChild(link);
@@ -940,7 +941,7 @@ function downloadJSONTemplate() {
 
   const link = document.createElement("a");
   link.setAttribute("href", url);
-  link.setAttribute("download", "concept_template_example_grammar.json");
+  link.setAttribute("download", "concept_template.json");
   link.style.display = "none";
 
   document.body.appendChild(link);
@@ -950,7 +951,7 @@ function downloadJSONTemplate() {
   URL.revokeObjectURL(url);
 }
 
-// 가져오기 시작
+// 가져오기 시작 - 분리된 컬렉션 시스템 사용
 async function startImport() {
   if (!selectedFile || isImporting) return;
 
@@ -996,59 +997,144 @@ async function startImport() {
       await parseJSONFile(selectedFile, defaultDomain, defaultCategory);
     }
 
-    // 데이터 가져오기 시작
-    importResult.textContent = `${importedData.length}개의 개념을 가져오는 중...`;
+    // === 분리된 컬렉션 시스템 사용 ===
+    importResult.textContent = `${importedData.length}개의 개념을 분리된 컬렉션으로 저장 중...`;
 
-    let successCount = 0;
-    let errorCount = 0;
+    // 대량 처리 최적화
+    const batchResults = await collectionManager.bulkCreateSeparatedConcepts(
+      importedData
+    );
 
-    for (let i = 0; i < importedData.length; i++) {
-      try {
-        await conceptUtils.createConcept(importedData[i]);
-        successCount++;
-      } catch (error) {
-        console.error("개념 가져오기 오류:", error);
-        errorCount++;
-      }
+    const successCount = batchResults.results.length;
+    const errorCount = batchResults.errors.length;
 
-      // 진행률 업데이트
-      const progressPercent = Math.round(((i + 1) / importedData.length) * 100);
+    // 진행률 및 결과 업데이트
+    let processedCount = 0;
+    const totalCount = successCount + errorCount;
+
+    // 성공한 항목들에 대한 UI 업데이트
+    for (const result of batchResults.results) {
+      processedCount++;
+      const progressPercent = Math.round((processedCount / totalCount) * 100);
       importProgress.style.width = `${progressPercent}%`;
       importPercentage.textContent = `${progressPercent}%`;
 
-      // 결과 업데이트
-      importResult.textContent = `처리 중: ${i + 1}/${
-        importedData.length
-      } (성공: ${successCount}, 실패: ${errorCount})`;
+      importResult.innerHTML = `
+        <div class="text-blue-700 font-medium">분리된 컬렉션으로 저장 중...</div>
+        <div>처리됨: ${processedCount}/${totalCount} (성공: ${successCount}, 실패: ${errorCount})</div>
+        <div class="text-xs text-gray-600 mt-1">
+          개념: ${result.conceptId}<br/>
+          예문: ${result.exampleIds.length}개, 
+          문법패턴: ${result.grammarPatternIds.length}개, 
+          퀴즈템플릿: ${result.quizTemplateIds.length}개
+        </div>
+      `;
 
-      // 렌더링을 위한 지연
-      await new Promise((resolve) => setTimeout(resolve, 10));
+      // UI 반응성을 위한 지연
+      await new Promise((resolve) => setTimeout(resolve, 5));
+    }
+
+    // 사용자 개념 수 업데이트 (users 컬렉션)
+    if (auth.currentUser && successCount > 0) {
+      await conceptUtils.updateUsage(auth.currentUser.email, {
+        conceptCount:
+          (await conceptUtils.getUsage(auth.currentUser.email)).conceptCount +
+          successCount,
+      });
     }
 
     // 최종 결과 표시
     importResult.innerHTML = `
-      <div class="text-green-700 font-medium">가져오기 완료</div>
-      <div>전체: ${importedData.length}개, 성공: ${successCount}개, 실패: ${errorCount}개</div>
+      <div class="text-green-700 font-medium">분리된 컬렉션 저장 완료</div>
+      <div class="mb-2">
+        전체: ${
+          importedData.length
+        }개, 성공: ${successCount}개, 실패: ${errorCount}개
+      </div>
+      <div class="grid grid-cols-2 gap-2 text-xs">
+        <div class="bg-blue-50 p-2 rounded">
+          <div class="font-medium">생성된 컬렉션</div>
+          <div>• concepts: ${successCount}개</div>
+          <div>• examples: ${batchResults.results.reduce(
+            (sum, r) => sum + r.exampleIds.length,
+            0
+          )}개</div>
+          <div>• grammar_patterns: ${batchResults.results.reduce(
+            (sum, r) => sum + r.grammarPatternIds.length,
+            0
+          )}개</div>
+          <div>• quiz_templates: ${batchResults.results.reduce(
+            (sum, r) => sum + r.quizTemplateIds.length,
+            0
+          )}개</div>
+        </div>
+        <div class="bg-green-50 p-2 rounded">
+          <div class="font-medium">최적화 혜택</div>
+          <div>• 검색 속도 향상</div>
+          <div>• 게임 성능 개선</div>
+          <div>• 진도 추적 정확도</div>
+          <div>• 문법 분석 고도화</div>
+        </div>
+      </div>
     `;
 
-    // 이벤트 발생 (목록 새로고침)
-    window.dispatchEvent(new CustomEvent("concept-saved"));
+    // 오류가 있는 경우 세부 정보 표시
+    if (errorCount > 0) {
+      const errorDetails = document.createElement("div");
+      errorDetails.className = "mt-3 text-xs text-red-600";
+      errorDetails.innerHTML = `
+        <details>
+          <summary class="cursor-pointer font-medium">오류 상세 정보 (${errorCount}개)</summary>
+          <div class="mt-2 max-h-32 overflow-y-auto">
+            ${batchResults.errors
+              .map(
+                (error, index) => `
+              <div class="mb-1 p-1 bg-red-50 rounded">
+                ${index + 1}. ${error.error?.message || "알 수 없는 오류"}
+              </div>
+            `
+              )
+              .join("")}
+          </div>
+        </details>
+      `;
+      importResult.appendChild(errorDetails);
+    }
 
-    // 대량 개념 추가 완료 이벤트 발생
+    // 대량 개념 추가 완료 이벤트만 발생
     window.dispatchEvent(
       new CustomEvent("bulk-import-completed", {
         detail: {
           total: importedData.length,
           success: successCount,
           failed: errorCount,
+          collectionStats: {
+            concepts: successCount,
+            examples: batchResults.results.reduce(
+              (sum, r) => sum + r.exampleIds.length,
+              0
+            ),
+            grammarPatterns: batchResults.results.reduce(
+              (sum, r) => sum + r.grammarPatternIds.length,
+              0
+            ),
+            quizTemplates: batchResults.results.reduce(
+              (sum, r) => sum + r.quizTemplateIds.length,
+              0
+            ),
+          },
+          structure: "separated_collections",
         },
       })
     );
   } catch (error) {
-    console.error("가져오기 오류:", error);
+    console.error("분리된 컬렉션 가져오기 오류:", error);
     importResult.innerHTML = `
       <div class="text-red-700 font-medium">오류 발생</div>
       <div>${error.message}</div>
+      <div class="text-xs text-gray-600 mt-2">
+        기존 통합 방식으로 대체 실행을 시도할 수 있습니다.
+      </div>
     `;
   } finally {
     isImporting = false;
@@ -1144,7 +1230,7 @@ function parseCSVLine(line, delimiter) {
   return result;
 }
 
-// CSV 데이터에서 개념 객체 생성 - 예문 중심 문법 시스템 적용
+// CSV 데이터에서 개념 객체 생성 - 참조 기반 구조로 재설계
 function createConceptFromCSV(
   values,
   headerRow,
@@ -1154,7 +1240,7 @@ function createConceptFromCSV(
   // 헤더가 있는 경우와 없는 경우 처리
   let domain, category, emoji;
   let expressions = {};
-  let examples = [];
+  let coreExamples = []; // 핵심 예문만 포함
 
   if (headerRow) {
     // 헤더가 있는 경우 - 헤더 이름으로 매핑
@@ -1170,12 +1256,12 @@ function createConceptFromCSV(
     category = valueMap.category || defaultCategory;
     emoji = valueMap.emoji || valueMap.unicode_emoji || "";
 
-    // 언어별 표현 생성 (grammar_system 제거)
+    // 언어별 표현 생성 (단순화됨)
     for (const langCode of Object.keys(supportedLanguages)) {
       const word = valueMap[`${langCode}_word`];
 
       if (word) {
-        // 기본 표현 정보만 포함 (grammar_system 제거)
+        // 핵심 단어 정보만 포함
         const expression = {
           word: word,
           pronunciation: valueMap[`${langCode}_pronunciation`] || "",
@@ -1213,7 +1299,7 @@ function createConceptFromCSV(
       }
     }
 
-    // 예문 중심 문법 시스템 생성
+    // 핵심 예문 생성 (Firestore 자동 ID 사용)
     const exampleKorean = valueMap.example_1_korean;
     const exampleEnglish = valueMap.example_1_english;
     const exampleJapanese = valueMap.example_1_japanese;
@@ -1221,97 +1307,71 @@ function createConceptFromCSV(
     const exampleContext = valueMap.example_1_context || "general";
     const exampleGrammarPattern = valueMap.example_1_grammar_pattern || "";
     const exampleGrammarTags = parseArrayField(valueMap.example_1_grammar_tags);
-    const exampleGrammarFocus = parseArrayField(
-      valueMap.example_1_grammar_focus
-    );
     const exampleDifficulty = valueMap.example_1_difficulty || "beginner";
-    const examplePriority = valueMap.example_1_priority || "1";
 
     if (exampleKorean || exampleEnglish || exampleJapanese || exampleChinese) {
-      const example = {
-        id: `${domain}_${category}_example_1`,
+      // 예문 ID는 컬렉션 매니저에서 자동 생성됨
+      const exampleId = `example_${Date.now()}_${Math.random()
+        .toString(36)
+        .substr(2, 9)}`;
+
+      // 문법 패턴 ID 생성 (향후 grammar 컬렉션에서 사용)
+      const grammarPatternId = generateGrammarPatternId(
+        domain,
+        category,
+        exampleGrammarPattern,
+        exampleGrammarTags
+      );
+
+      const coreExample = {
+        example_id: exampleId,
+        grammar_pattern_id: grammarPatternId, // 향후 grammar 컬렉션 참조
         context: exampleContext,
         difficulty: exampleDifficulty,
+        priority: 1, // 핵심 예문
 
-        // 강화된 예문 중심 문법 시스템
-        grammar_system: {
-          pattern_name: exampleGrammarPattern || "기본 문장 패턴",
-          structural_pattern: exampleGrammarPattern || "기본 구조",
-          grammar_tags: exampleGrammarTags,
-          complexity_level:
-            exampleDifficulty === "advanced"
-              ? "complex"
-              : exampleDifficulty === "intermediate"
-              ? "moderate"
-              : "basic",
-          learning_focus:
-            exampleGrammarFocus.length > 0
-              ? exampleGrammarFocus
-              : [domain, category],
-
-          // 언어별 문법적 특성 자동 생성
-          grammatical_features: generateGrammaticalFeatures(
-            exampleGrammarTags,
-            exampleGrammarPattern,
-            expressions
-          ),
-
-          // 난이도 요소 자동 계산
-          difficulty_factors: {
-            vocabulary: calculateVocabularyDifficulty(expressions),
-            grammar_complexity: calculateGrammarComplexity(exampleGrammarTags),
-            cultural_context:
-              domain === "daily" || domain === "culture" ? 20 : 10,
-            pronunciation: calculatePronunciationDifficulty(expressions),
-          },
-
-          // 교육적 메모
-          teaching_notes: {
-            primary_focus:
-              exampleGrammarFocus.join(", ") ||
-              `${domain} 영역의 ${category} 학습`,
-            common_mistakes: [],
-            practice_suggestions: [
-              `${domain} 관련 어휘 확장`,
-              "다양한 상황 적용 연습",
-              "발음 및 억양 연습",
-            ],
-          },
-        },
-
+        // 단순한 번역 정보만
         translations: {},
+
+        // 향후 확장을 위한 메타데이터
+        metadata: {
+          created_from: "csv_import",
+          learning_weight: 10,
+          quiz_eligible: true,
+          game_eligible: true,
+        },
       };
 
       // 번역 추가
       if (exampleKorean) {
-        example.translations.korean = {
+        coreExample.translations.korean = {
           text: exampleKorean,
           romanization: "",
         };
       }
       if (exampleEnglish) {
-        example.translations.english = {
+        coreExample.translations.english = {
           text: exampleEnglish,
           phonetic: "",
         };
       }
       if (exampleJapanese) {
-        example.translations.japanese = {
+        coreExample.translations.japanese = {
           text: exampleJapanese,
           romanization: "",
         };
       }
       if (exampleChinese) {
-        example.translations.chinese = {
+        coreExample.translations.chinese = {
           text: exampleChinese,
           pinyin: "",
         };
       }
 
-      examples.push(example);
+      coreExamples.push(coreExample);
     }
   } else {
-    // 헤더가 없는 경우 - 기존 레거시 처리 방식
+    // 헤더가 없는 경우 - 기존 레거시 처리 방식 (단순화)
     domain = values[0] || defaultDomain;
     category = values[1] || defaultCategory;
     emoji = values[2] || "";
@@ -1342,7 +1402,7 @@ function createConceptFromCSV(
     return null;
   }
 
-  // concept_info 생성
+  // concept_info (단순화됨) - concept_id 제거
   const conceptInfo = {
     domain: domain,
     category: category,
@@ -1351,35 +1411,103 @@ function createConceptFromCSV(
     unicode_emoji: emoji,
     color_theme: "#9C27B0",
     updated_at: new Date(),
-    total_examples_count: examples.length,
-    quiz_frequency: "medium",
-    game_types: ["matching", "pronunciation"],
     learning_priority: 1,
   };
 
+  // 개념 ID 생성 (참조용으로만 사용)
+  const conceptId = generateConceptId(domain, category, expressions);
+
+  // 향후 컬렉션 분리를 위한 참조 시스템
+  const references = {
+    // 핵심 예문 참조 (examples 컬렉션)
+    core_examples: coreExamples.map((ex) => ex.example_id),
+
+    // 문법 패턴 참조 (grammar 컬렉션)
+    grammar_patterns: [
+      ...new Set(coreExamples.map((ex) => ex.grammar_pattern_id)),
+    ].filter(Boolean),
+
+    // 퀴즈 템플릿 참조 (quiz 컬렉션)
+    quiz_templates: generateQuizTemplateIds(conceptId, domain, category),
+
+    // 게임 타입 참조 (games 컬렉션)
+    game_types: generateGameTypeIds(conceptId, domain, category),
+
+    // 사용자 진도 참조 (user_progress 컬렉션)
+    progress_tracking: {
+      vocabulary_progress_id: `${conceptId}_vocab_progress`,
+      example_progress_id: `${conceptId}_example_progress`,
+    },
+  };
+
+  // 최종 개념 객체 (단순화됨)
   const concept = {
     concept_info: conceptInfo,
     expressions: expressions,
-    featured_examples: examples,
-    quiz_data: generateBasicQuizData(expressions),
-    game_data: generateBasicGameData(expressions),
-    learning_progress: {
-      vocabulary_mastery: {
-        recognition: 0,
-        production: 0,
-        fluency: 0,
-      },
-      grammar_understanding: {
-        pattern_recognition: 0,
-        production_accuracy: 0,
-        contextual_usage: 0,
-      },
+
+    // 핵심 예문들 (현재는 포함, 향후 분리)
+    core_examples: coreExamples,
+
+    // 참조 시스템 (향후 컬렉션 분리 대비)
+    references: references,
+
+    // 최소한의 메타데이터
+    metadata: {
+      created_at: new Date(),
+      created_from: "csv_import",
+      version: "1.0",
+      collection_structure: "integrated", // 향후 "separated"로 변경
     },
-    created_at: new Date(),
   };
 
-  console.log("CSV에서 생성된 개념 객체 (예문 중심):", concept);
+  console.log("참조 기반 개념 객체 생성:", concept);
   return concept;
+}
+
+// 개념 ID 생성 함수
+function generateConceptId(domain, category, expressions) {
+  // 주요 언어 단어 기반으로 ID 생성
+  const primaryWord =
+    expressions.korean?.word ||
+    expressions.english?.word ||
+    Object.values(expressions)[0]?.word ||
+    "unknown";
+
+  // 안전한 ID 생성 (특수문자 제거)
+  const safeWord = primaryWord.replace(/[^a-zA-Z0-9가-힣]/g, "_");
+  return `${domain}_${category}_${safeWord}_${Date.now().toString(36)}`;
+}
+
+// 문법 패턴 ID 생성 함수
+function generateGrammarPatternId(domain, category, pattern, tags) {
+  if (!pattern && (!tags || tags.length === 0)) {
+    return `pattern_${domain}_${category}_basic`;
+  }
+
+  // 패턴명 기반 또는 태그 기반으로 ID 생성
+  const basePattern = pattern || tags.join("_");
+  const safePattern = basePattern.replace(/[^a-zA-Z0-9]/g, "_");
+  return `pattern_${domain}_${category}_${safePattern}`;
+}
+
+// 퀴즈 템플릿 ID 생성 함수
+function generateQuizTemplateIds(conceptId, domain, category) {
+  return [
+    `quiz_${conceptId}_translation`,
+    `quiz_${conceptId}_pronunciation`,
+    `quiz_${conceptId}_matching`,
+    `quiz_${domain}_${category}_general`,
+  ];
+}
+
+// 게임 타입 ID 생성 함수
+function generateGameTypeIds(conceptId, domain, category) {
+  return [
+    `game_${conceptId}_memory_card`,
+    `game_${conceptId}_pronunciation`,
+    `game_${domain}_${category}_word_puzzle`,
+    `game_general_vocabulary_building`,
+  ];
 }
 
 // 언어별 문법적 특성 자동 생성 헬퍼 함수
@@ -1650,7 +1778,7 @@ function parseJSONFile(file, defaultDomain, defaultCategory) {
   });
 }
 
-// JSON 데이터에서 개념 객체 생성 - 예문 중심 문법 시스템 완전 지원
+// JSON 데이터에서 개념 객체 생성 - 참조 기반 구조로 재설계
 function createConceptFromJSON(item, defaultDomain, defaultCategory) {
   if (!item) return null;
 
@@ -1670,7 +1798,7 @@ function createConceptFromJSON(item, defaultDomain, defaultCategory) {
     return null;
   }
 
-  // 유효한 표현 필터링 (grammar_system 제거)
+  // 유효한 표현 필터링 (단순화됨)
   const expressions = {};
 
   for (const [lang, expr] of Object.entries(item.expressions)) {
@@ -1702,7 +1830,6 @@ function createConceptFromJSON(item, defaultDomain, defaultCategory) {
         audio: expr.audio || "",
       };
 
-      // grammar_system은 더 이상 개별 단어에 포함하지 않음
       expressions[lang] = expression;
     }
   }
@@ -1712,7 +1839,7 @@ function createConceptFromJSON(item, defaultDomain, defaultCategory) {
     return null;
   }
 
-  // 개념 정보 구성 (확장된 구조)
+  // 개념 정보 구성 (단순화됨) - concept_id 제거
   const conceptInfo = {
     domain: domain,
     category: category,
@@ -1722,160 +1849,94 @@ function createConceptFromJSON(item, defaultDomain, defaultCategory) {
       item.concept_info?.unicode_emoji || item.concept_info?.emoji || "",
     color_theme: item.concept_info?.color_theme || "#9C27B0",
     updated_at: new Date(),
-    total_examples_count: 0, // 나중에 계산
-    quiz_frequency: item.concept_info?.quiz_frequency || "medium",
-    game_types: item.concept_info?.game_types || ["matching", "pronunciation"],
     learning_priority: item.concept_info?.learning_priority || 1,
   };
 
-  // 미디어 정보 처리 (선택적)
+  // 미디어 정보 처리 (선택적, 단순화됨)
   const media = item.media
     ? {
-        images: {
-          primary: item.media?.images?.primary || "",
-          secondary: item.media?.images?.secondary || "",
-          illustration: item.media?.images?.illustration || "",
-          emoji_style: item.media?.images?.emoji_style || "",
-          line_art: item.media?.images?.line_art || "",
-        },
-        videos: {
-          intro: item.media?.videos?.intro || "",
-          pronunciation: item.media?.videos?.pronunciation || "",
-        },
-        audio: {
-          pronunciation_slow: item.media?.audio?.pronunciation_slow || "",
-          pronunciation_normal: item.media?.audio?.pronunciation_normal || "",
-          word_in_sentence: item.media?.audio?.word_in_sentence || "",
-        },
+        primary_image: item.media?.images?.primary || "",
+        secondary_image: item.media?.images?.secondary || "",
+        illustration_image: item.media?.images?.illustration || "",
+        audio_pronunciation: item.media?.audio?.pronunciation_normal || "",
       }
     : undefined;
 
-  // featured_examples 처리 - 예문 중심 문법 구조 지원
-  const featuredExamples = [];
+  // 핵심 예문 처리 (Firestore 자동 ID 사용)
+  const coreExamples = [];
   if (Array.isArray(item.featured_examples)) {
     for (const ex of item.featured_examples) {
       if (ex && ex.translations && Object.keys(ex.translations).length > 0) {
-        const processedExample = {
-          id:
-            ex.id ||
-            `${domain}_${category}_example_${featuredExamples.length + 1}`,
-          context: ex.context || "general",
-          difficulty: ex.difficulty || "beginner",
-          translations: ex.translations,
-        };
+        const exampleId = `example_${Date.now()}_${Math.random()
+          .toString(36)
+          .substr(2, 9)}`;
 
-        // 예문 중심 문법 시스템 처리 (새로운 구조)
-        if (ex.grammar_system) {
-          processedExample.grammar_system = {
-            pattern_name: ex.grammar_system.pattern_name || "기본 패턴",
-            structural_pattern:
-              ex.grammar_system.structural_pattern || "기본 구조",
-            grammar_tags: ex.grammar_system.grammar_tags || [],
-            complexity_level: ex.grammar_system.complexity_level || "basic",
-            learning_focus: ex.grammar_system.learning_focus || [
-              domain,
-              category,
-            ],
-            grammatical_features: ex.grammar_system.grammatical_features || {},
-            difficulty_factors: ex.grammar_system.difficulty_factors || {
-              vocabulary: 15,
-              grammar_complexity: 20,
-              cultural_context: 10,
-              pronunciation: 15,
-            },
-            teaching_notes: ex.grammar_system.teaching_notes || {
-              primary_focus: `${domain} 영역의 ${category} 학습`,
-              common_mistakes: [],
-              practice_suggestions: [],
-            },
-          };
-        } else if (ex.unified_grammar) {
-          // 기존 unified_grammar 형식을 새 형식으로 변환
-          processedExample.grammar_system = {
-            pattern_name: ex.unified_grammar.structural_pattern || "기본 패턴",
-            structural_pattern:
-              ex.unified_grammar.structural_pattern || "기본 구조",
-            grammar_tags: ex.unified_grammar.grammar_tags || [],
-            complexity_level: ex.unified_grammar.complexity_level || "basic",
-            learning_focus: ex.unified_grammar.learning_focus || [
-              domain,
-              category,
-            ],
-            grammatical_features: generateBasicGrammaticalFeatures(
-              ex.unified_grammar.grammar_tags,
-              expressions
-            ),
-            difficulty_factors: {
-              vocabulary: 15,
-              grammar_complexity: calculateGrammarComplexity(
-                ex.unified_grammar.grammar_tags || []
-              ),
-              cultural_context: 10,
-              pronunciation: 15,
-            },
-            teaching_notes: {
-              primary_focus:
-                ex.unified_grammar.learning_focus?.join(", ") ||
-                `${domain} 영역의 ${category} 학습`,
-              common_mistakes: [],
-              practice_suggestions: [],
-            },
-          };
+        // 문법 패턴 ID 추출 또는 생성
+        let grammarPatternId = null;
+        if (ex.grammar_system?.pattern_name) {
+          grammarPatternId = generateGrammarPatternId(
+            domain,
+            category,
+            ex.grammar_system.pattern_name,
+            ex.grammar_system.grammar_tags || []
+          );
+        } else if (ex.unified_grammar?.structural_pattern) {
+          grammarPatternId = generateGrammarPatternId(
+            domain,
+            category,
+            ex.unified_grammar.structural_pattern,
+            ex.unified_grammar.grammar_tags || []
+          );
         } else {
-          // 자동 생성
-          processedExample.grammar_system = {
-            pattern_name: "기본 문장 패턴",
-            structural_pattern: "기본 구조",
-            grammar_tags: [`domain:${domain}`, `category:${category}`],
-            complexity_level: "basic",
-            learning_focus: [domain, category, "basic_usage"],
-            grammatical_features: {},
-            difficulty_factors: {
-              vocabulary: 15,
-              grammar_complexity: 10,
-              cultural_context: 10,
-              pronunciation: 15,
-            },
-            teaching_notes: {
-              primary_focus: `${domain} 영역의 ${category} 학습`,
-              common_mistakes: [],
-              practice_suggestions: [],
-            },
-          };
+          grammarPatternId = `pattern_${domain}_${category}_basic`;
         }
 
-        featuredExamples.push(processedExample);
+        const coreExample = {
+          example_id: exampleId,
+          grammar_pattern_id: grammarPatternId, // 향후 grammar 컬렉션 참조
+          context: ex.context || "general",
+          difficulty: ex.difficulty || "beginner",
+          priority: 1, // 핵심 예문
+          translations: ex.translations,
+
+          // 향후 확장을 위한 메타데이터
+          metadata: {
+            created_from: "json_import",
+            learning_weight: 10,
+            quiz_eligible: true,
+            game_eligible: true,
+            has_detailed_grammar: !!(ex.grammar_system || ex.unified_grammar),
+          },
+        };
+
+        coreExamples.push(coreExample);
       }
     }
   }
 
-  // 기존 형식의 예제 처리 (호환성)
+  // 기존 형식의 예제 처리 (호환성, 단순화됨)
   if (Array.isArray(item.examples)) {
     for (const ex of item.examples) {
       if (ex && Object.keys(ex).length > 0) {
+        const exampleId = `example_legacy_${Date.now()}_${Math.random()
+          .toString(36)
+          .substr(2, 9)}`;
+        const grammarPatternId = `pattern_${domain}_${category}_legacy`;
+
         const convertedExample = {
-          id: `legacy_example_${featuredExamples.length + 1}`,
+          example_id: exampleId,
+          grammar_pattern_id: grammarPatternId,
           context: ex.context || "general",
           difficulty: "beginner",
+          priority: 2, // 일반 예문
           translations: {},
-          grammar_system: {
-            pattern_name: "기본 문장 패턴",
-            structural_pattern: "기본 구조",
-            grammar_tags: [`domain:${domain}`, `category:${category}`],
-            complexity_level: "basic",
-            learning_focus: [domain, category],
-            grammatical_features: {},
-            difficulty_factors: {
-              vocabulary: 15,
-              grammar_complexity: 10,
-              cultural_context: 10,
-              pronunciation: 15,
-            },
-            teaching_notes: {
-              primary_focus: "기존 형식에서 변환된 예제",
-              common_mistakes: [],
-              practice_suggestions: [],
-            },
+
+          metadata: {
+            created_from: "json_import_legacy",
+            learning_weight: 5,
+            quiz_eligible: true,
+            game_eligible: false,
+            has_detailed_grammar: false,
           },
         };
 
@@ -1891,56 +1952,112 @@ function createConceptFromJSON(item, defaultDomain, defaultCategory) {
           }
         });
 
-        featuredExamples.push(convertedExample);
+        coreExamples.push(convertedExample);
       }
     }
   }
 
-  // 총 예제 수 업데이트
-  conceptInfo.total_examples_count = featuredExamples.length;
+  // grammar_patterns 처리 (템플릿에서 직접 가져오기)
+  const grammarPatterns = [];
+  if (Array.isArray(item.grammar_patterns)) {
+    for (const grammarPattern of item.grammar_patterns) {
+      if (grammarPattern && Object.keys(grammarPattern).length > 0) {
+        const patternId = generateGrammarPatternId(
+          domain,
+          category,
+          "template_pattern",
+          Object.keys(grammarPattern)
+        );
 
-  // 퀴즈 데이터 처리
-  const quizData = item.quiz_data || generateBasicQuizData(expressions);
+        // 문법 패턴 객체 생성
+        const grammarPatternObj = {
+          pattern_id: patternId,
+          pattern_name: `${domain}_${category}_패턴`,
+          domain: domain,
+          category: category,
+          pattern_info: {
+            structural_pattern: "기본 문장 구조",
+            complexity_level: conceptInfo.difficulty || "beginner",
+            usage_frequency: "medium",
+          },
+          related_concepts: [conceptId],
+          example_references: [],
+          learning_metadata: {
+            difficulty_score: 15,
+            practice_priority: 1,
+            quiz_eligible: true,
+          },
+          pattern_data: grammarPattern, // 원본 문법 패턴 데이터
+          metadata: {
+            created_at: new Date(),
+            created_from: "json_import_grammar",
+            source: "bulk_import",
+          },
+        };
 
-  // 게임 데이터 처리
-  const gameData = item.game_data || generateBasicGameData(expressions);
+        grammarPatterns.push(grammarPatternObj);
 
-  // 학습 메타데이터 처리
-  const learningMetadata = item.learning_metadata || {
-    memorization_difficulty: 3,
-    pronunciation_difficulty: 3,
-    usage_frequency: "medium",
-    cultural_importance: "medium",
-  };
+        // 문법 패턴과 연결된 예문도 생성
+        const coreExample = {
+          example_id: `example_grammar_${Date.now()}_${Math.random()
+            .toString(36)
+            .substr(2, 9)}`,
+          grammar_pattern_id: patternId,
+          context: "grammar_template",
+          difficulty: conceptInfo.difficulty || "beginner",
+          priority: 1,
+          translations: {},
+          grammar_pattern_data: grammarPattern, // 문법 패턴 원본 데이터 포함
 
-  // 학습 진도 처리
-  const learningProgress = item.learning_progress || {
-    vocabulary_mastery: {
-      recognition: 0,
-      production: 0,
-      fluency: 0,
-    },
-    grammar_understanding: {
-      pattern_recognition: 0,
-      production_accuracy: 0,
-      contextual_usage: 0,
-    },
-  };
+          metadata: {
+            created_from: "json_import_grammar",
+            learning_weight: 15,
+            quiz_eligible: true,
+            game_eligible: true,
+            has_detailed_grammar: true,
+          },
+        };
 
-  // 관련 개념 처리
-  const relatedConcepts = item.related_concepts || [];
+        // 각 언어별로 문법 패턴 텍스트 추가
+        Object.keys(grammarPattern).forEach((lang) => {
+          if (grammarPattern[lang]) {
+            coreExample.translations[lang] = {
+              text: grammarPattern[lang].pattern || "",
+              grammar_explanation: grammarPattern[lang].explanation || "",
+            };
+          }
+        });
 
-  // 완전한 개념 객체 반환
+        coreExamples.push(coreExample);
+      }
+    }
+  }
+
+  // 완전한 개념 객체 반환 (featured_examples 보존)
   const conceptObject = {
     concept_info: conceptInfo,
     expressions: expressions,
-    featured_examples: featuredExamples,
-    quiz_data: quizData,
-    game_data: gameData,
-    related_concepts: relatedConcepts,
-    learning_metadata: learningMetadata,
-    learning_progress: learningProgress,
-    created_at: new Date(),
+
+    // 원본 featured_examples 보존 (Firebase Collection Manager가 처리)
+    featured_examples: item.featured_examples || [],
+
+    // 백업용으로만 core_examples 유지 (기존 시스템 호환성)
+    core_examples: coreExamples,
+
+    // 문법 패턴들 (분리된 컬렉션용)
+    grammar_patterns: grammarPatterns,
+
+    // 최소한의 메타데이터
+    metadata: {
+      created_at: new Date(),
+      created_from: "json_import",
+      version: "2.0",
+      collection_structure: "separated", // 분리된 컬렉션 사용
+      original_structure: item.concept_info ? "enhanced" : "basic",
+      has_featured_examples: !!(
+        item.featured_examples && item.featured_examples.length > 0
+      ),
+    },
   };
 
   // 미디어가 있으면 추가
@@ -1948,51 +2065,17 @@ function createConceptFromJSON(item, defaultDomain, defaultCategory) {
     conceptObject.media = media;
   }
 
-  console.log("JSON에서 생성된 개념 객체 (예문 중심):", conceptObject);
+  console.log("분리된 컬렉션용 JSON 개념 객체 생성:", {
+    concept_info: conceptObject.concept_info,
+    expressions: Object.keys(conceptObject.expressions),
+    featured_examples_count: conceptObject.featured_examples?.length || 0,
+    core_examples_count: conceptObject.core_examples?.length || 0,
+    grammar_patterns_count: conceptObject.grammar_patterns?.length || 0,
+    has_grammar_system: conceptObject.featured_examples?.[0]?.grammar_system
+      ? true
+      : false,
+  });
   return conceptObject;
-}
-
-// 기본 문법적 특성 생성 헬퍼 함수
-function generateBasicGrammaticalFeatures(grammarTags, expressions) {
-  const features = {};
-
-  for (const [lang, expr] of Object.entries(expressions)) {
-    if (!expr) continue;
-
-    features[lang] = {
-      sentence_type: detectSentenceType(grammarTags || [], lang),
-      key_grammar_points: extractKeyGrammarPoints(grammarTags || [], lang),
-    };
-  }
-
-  return features;
-}
-
-// 기본 퀴즈 데이터 생성
-function generateBasicQuizData(expressions) {
-  return {
-    difficulty_levels: {
-      beginner: {
-        translation: {},
-        pronunciation: {},
-      },
-    },
-  };
-}
-
-// 기본 게임 데이터 생성
-function generateBasicGameData(expressions) {
-  return {
-    memory_game: {
-      difficulty_score: 20,
-      pair_type: "word_translation",
-      hint_system: {
-        grammar_hint: "기본 단어",
-        context_hint: "일반 사용",
-        difficulty_hint: "초급 수준",
-      },
-    },
-  };
 }
 
 // 모달 닫기

@@ -307,22 +307,22 @@ const translations = {
     quiz: "퀴즈",
     quiz_desc: "객관식 문제로 학습",
     typing: "타이핑",
-    typing_desc: "직접 입력하며 학습",
+    typing_desc: "직접 입력하여 학습",
     previous: "이전",
     flip: "뒤집기",
     next: "다음",
     examples: "예문:",
-    card_progress: "진행 상황",
+    card_progress: "진행률",
     quiz_question: "문제",
     next_question: "다음 문제",
-    quiz_progress: "진행 상황",
-    typing_prompt: "정답을 입력하세요:",
-    typing_placeholder: "정답 입력...",
+    quiz_progress: "진행률",
+    typing_prompt: "답을 입력하세요:",
+    typing_placeholder: "답을 입력하세요...",
     check_answer: "정답 확인",
     next_word: "다음 단어",
-    typing_progress: "진행 상황",
-    correct_count: "맞춘 개수:",
-    wrong_count: "틀린 개수:",
+    typing_progress: "진행률",
+    correct_count: "정답:",
+    wrong_count: "오답:",
     // 단어장 상세보기 모달 번역
     concept_detail_view: "개념 상세 보기",
     expressions_by_language: "언어별 표현",
@@ -348,6 +348,30 @@ const translations = {
     // 다국어 게임 번역
     language_games: commonTexts.ko.language_games,
     language_games_desc: commonTexts.ko.language_games_desc,
+    // 문법 및 학습 진도 페이지 번역
+    grammar_progress: "문법 및 학습 진도",
+    grammar_progress_title: "문법 및 학습 진도",
+    grammar_progress_subtitle: "학습 성과와 문법 패턴 분석을 확인하세요",
+    total_concepts: "총 개념 수",
+    concepts_breakdown: "카테고리별 분포",
+    learning_progress: "학습 진도",
+    learning_progress_title: "학습 진도",
+    learning_progress_subtitle: "개인 학습 성과와 진도를 추적하고 분석하세요",
+    learning_streak: "학습 스트릭",
+    learning_goals: "학습 목표",
+    quiz_performance: "퀴즈 성과",
+    game_performance: "게임 성과",
+    language_progress: "언어별 학습 진도",
+    category_distribution: "카테고리별 분포",
+    grammar_patterns: "문법 패턴 분석",
+    recent_activity: "최근 학습 활동",
+    refresh: "새로고침",
+    export: "내보내기",
+    attempts: "시도",
+    correct: "정답",
+    games_played: "게임",
+    wins: "승리",
+    loading: "로딩 중...",
   },
   en: {
     home: "Home",
@@ -438,14 +462,14 @@ const translations = {
     japanese: "Japanese",
     chinese: "Chinese",
     // 다국어 학습 페이지 번역
-    language_learning_title: "Language Learning",
+    language_learning_title: "Multilingual Learning",
     select_source_language: "Select Source Language",
     select_target_language: "Select Target Language",
     learning_mode: "Learning Mode",
     flashcards: "Flashcards",
     flashcards_desc: "Learn with front/back word cards",
-    quiz: "Quiz",
-    quiz_desc: "Learn with multiple choice questions",
+    quiz: "Enhanced Quiz",
+    quiz_desc: "Test your knowledge with interactive quizzes",
     typing: "Typing",
     typing_desc: "Learn by typing answers",
     previous: "Previous",
@@ -488,6 +512,32 @@ const translations = {
     // 다국어 게임 번역
     language_games: commonTexts.en.language_games,
     language_games_desc: commonTexts.en.language_games_desc,
+    // 문법 및 학습 진도 페이지 번역
+    grammar_progress: "Grammar & Learning Progress",
+    grammar_progress_title: "Grammar & Learning Progress",
+    grammar_progress_subtitle:
+      "Track your learning achievements and grammar patterns",
+    total_concepts: "Total Concepts",
+    concepts_breakdown: "Category Breakdown",
+    learning_progress: "Learning Progress",
+    learning_progress_title: "Learning Progress",
+    learning_progress_subtitle:
+      "Track and analyze your personal learning achievements and progress",
+    learning_streak: "Learning Streak",
+    learning_goals: "Learning Goals",
+    quiz_performance: "Quiz Performance",
+    game_performance: "Game Performance",
+    language_progress: "Language Progress",
+    category_distribution: "Category Distribution",
+    grammar_patterns: "Grammar Patterns",
+    recent_activity: "Recent Activity",
+    refresh: "Refresh",
+    export: "Export",
+    attempts: "Attempts",
+    correct: "Correct",
+    games_played: "Games",
+    wins: "Wins",
+    loading: "Loading...",
   },
   ja: {
     home: "ホーム",
@@ -628,6 +678,30 @@ const translations = {
     // 다국어 게임 번역
     language_games: commonTexts.ja.language_games,
     language_games_desc: commonTexts.ja.language_games_desc,
+    // 문법 및 학습 진도 페이지 번역
+    grammar_progress: "文法と学習進捗",
+    grammar_progress_title: "文法と学習進捗",
+    grammar_progress_subtitle: "学習成果と文法パターンを確認する",
+    total_concepts: "総概念数",
+    concepts_breakdown: "カテゴリ別分布",
+    learning_progress: "学習進度",
+    learning_progress_title: "学習進度",
+    learning_progress_subtitle: "個人学習成果と進度を追跡し、分析する",
+    learning_streak: "学習ストリーク",
+    learning_goals: "学習目標",
+    quiz_performance: "クイズ成績",
+    game_performance: "ゲーム成績",
+    language_progress: "言語別学習進度",
+    category_distribution: "カテゴリ別分布",
+    grammar_patterns: "文法パターン分析",
+    recent_activity: "最近の学習活動",
+    refresh: "更新",
+    export: "エクスポート",
+    attempts: "試行",
+    correct: "正解",
+    games_played: "ゲーム",
+    wins: "勝利",
+    loading: "読み込み中...",
   },
   zh: {
     home: "首页",
@@ -764,6 +838,30 @@ const translations = {
     // 다국어 게임 번역
     language_games: commonTexts.zh.language_games,
     language_games_desc: commonTexts.zh.language_games_desc,
+    // 문법 및 학습 진도 페이지 번역
+    grammar_progress: "语法和学习进度",
+    grammar_progress_title: "语法和学习进度",
+    grammar_progress_subtitle: "查看学习成果和语法模式分析",
+    total_concepts: "总概念数",
+    concepts_breakdown: "类别分布",
+    learning_progress: "学习进度",
+    learning_progress_title: "学习进度",
+    learning_progress_subtitle: "跟踪个人学习成果和进度",
+    learning_streak: "学习 streak",
+    learning_goals: "学习目标",
+    quiz_performance: "测验成绩",
+    game_performance: "游戏成绩",
+    language_progress: "语言学习进度",
+    category_distribution: "类别分布",
+    grammar_patterns: "语法模式分析",
+    recent_activity: "最近学习活动",
+    refresh: "刷新",
+    export: "导出",
+    attempts: "尝试",
+    correct: "正确",
+    games_played: "游戏",
+    wins: "胜利",
+    loading: "加载中...",
   },
 };
 
@@ -914,35 +1012,35 @@ function setLanguage(langCode) {
 // 언어 변경 적용 (무한루프 방지)
 async function applyLanguage() {
   try {
-  const langCode = await getActiveLanguage();
+    const langCode = await getActiveLanguage();
 
-  if (!translations[langCode]) {
-    console.error(`번역 데이터가 없는 언어입니다: ${langCode}`);
-    return;
-  }
-
-  document.querySelectorAll("[data-i18n]").forEach((element) => {
-    const key = element.getAttribute("data-i18n");
-    if (translations[langCode][key]) {
-      element.textContent = translations[langCode][key];
+    if (!translations[langCode]) {
+      console.error(`번역 데이터가 없는 언어입니다: ${langCode}`);
+      return;
     }
-  });
 
-  // placeholder 속성이 있는 입력 필드에 대해 번역 적용
-  document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
-    const key = element.getAttribute("data-i18n-placeholder");
-    if (translations[langCode][key]) {
-      element.placeholder = translations[langCode][key];
-    }
-  });
+    document.querySelectorAll("[data-i18n]").forEach((element) => {
+      const key = element.getAttribute("data-i18n");
+      if (translations[langCode][key]) {
+        element.textContent = translations[langCode][key];
+      }
+    });
 
-  // HTML lang 속성 변경
-  document.documentElement.lang = langCode;
+    // placeholder 속성이 있는 입력 필드에 대해 번역 적용
+    document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
+      const key = element.getAttribute("data-i18n-placeholder");
+      if (translations[langCode][key]) {
+        element.placeholder = translations[langCode][key];
+      }
+    });
 
-  // 이벤트 발생 - 언어 변경을 알림
-  document.dispatchEvent(
-    new CustomEvent("languageChanged", { detail: { language: langCode } })
-  );
+    // HTML lang 속성 변경
+    document.documentElement.lang = langCode;
+
+    // 이벤트 발생 - 언어 변경을 알림
+    document.dispatchEvent(
+      new CustomEvent("languageChanged", { detail: { language: langCode } })
+    );
   } catch (error) {
     console.error("언어 적용 중 오류:", error);
   }
