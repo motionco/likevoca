@@ -817,10 +817,14 @@ export class EnhancedConceptModal {
     (expression.collocations || []).forEach((collocation) => {
       const div = document.createElement("div");
       div.className = "mb-1";
-      div.innerHTML = `
-        <span class="text-primary">${collocation.phrase}</span>
-        <small class="text-muted ms-2">(${collocation.frequency})</small>
-      `;
+      if (typeof collocation === "string") {
+        div.innerHTML = `<span class="text-primary">${collocation}</span>`;
+      } else if (collocation.phrase) {
+        div.innerHTML = `
+          <span class="text-primary">${collocation.phrase}</span>
+          <small class="text-muted ms-2">(${collocation.frequency})</small>
+        `;
+      }
       collocationsList.appendChild(div);
     });
   }

@@ -131,10 +131,10 @@ export const conceptUtils = {
 
   // 기존 통합 방식 개념 생성 (호환성 유지)
   async createLegacyConcept(conceptData) {
-    const conceptRef = doc(collection(db, "concepts"));
+      const conceptRef = doc(collection(db, "concepts"));
 
     const enhancedConceptData = {
-      _id: conceptRef.id,
+        _id: conceptRef.id,
       created_at: conceptData.created_at || new Date(),
       concept_info: {
         domain:
@@ -209,10 +209,10 @@ export const conceptUtils = {
 
     await setDoc(conceptRef, enhancedConceptData);
 
-    // 각 언어별 인덱스 생성/업데이트
-    for (const [lang, expression] of Object.entries(
+      // 각 언어별 인덱스 생성/업데이트
+      for (const [lang, expression] of Object.entries(
       conceptData.expressions || {}
-    )) {
+      )) {
       if (expression?.word) {
         await this.updateLanguageIndex(
           lang,
@@ -222,9 +222,9 @@ export const conceptUtils = {
           enhancedConceptData.concept_info.difficulty
         );
       }
-    }
+      }
 
-    return conceptRef.id;
+      return conceptRef.id;
   },
 
   // 통합 개념 조회 (분리된 컬렉션과 기존 시스템 모두 지원)
@@ -480,14 +480,14 @@ export const conceptUtils = {
 
         if (!oldExpression || oldExpression.word !== expression.word) {
           if (expression.word) {
-            await this.updateLanguageIndex(
-              lang,
-              expression.word,
-              conceptId,
+          await this.updateLanguageIndex(
+            lang,
+            expression.word,
+            conceptId,
               newData.concept_info?.category || oldData.concept_info?.category,
               newData.concept_info?.difficulty ||
                 oldData.concept_info?.difficulty
-            );
+          );
           }
 
           if (oldExpression?.word) {
@@ -506,7 +506,7 @@ export const conceptUtils = {
         concept_info: {
           ...oldData.concept_info,
           ...newData.concept_info,
-          updated_at: new Date(),
+        updated_at: new Date(),
         },
       };
 
@@ -611,9 +611,11 @@ export const conceptUtils = {
     }
   },
 
-  // 개념 삭제
+  // 개념 삭제 (관련 컬렉션 데이터도 함께 삭제)
   async deleteConcept(conceptId) {
     try {
+      console.log("개념 삭제 시작:", conceptId);
+
       // 먼저 개념 정보를 가져옵니다
       const conceptRef = doc(db, "concepts", conceptId);
       const conceptDoc = await getDoc(conceptRef);
@@ -623,18 +625,130 @@ export const conceptUtils = {
       }
 
       const conceptData = conceptDoc.data();
+      console.log("삭제할 개념 데이터:", conceptData);
 
-      // 각 언어 인덱스에서 개념을 제거합니다
-      for (const [lang, expression] of Object.entries(
-        conceptData.expressions
-      )) {
-        await this.removeFromLanguageIndex(lang, expression.word, conceptId);
+      // 1. 관련 예문 삭제 (examples 컬렉션)
+      try {
+        const examplesQuery = query(
+          collection(db, "examples"),
+          where("concept_id", "==", conceptId)
+        );
+        const exampleSnapshot = await getDocs(examplesQuery);
+
+        const exampleDeletePromises = exampleSnapshot.docs.map((doc) =>
+          deleteDoc(doc.ref)
+        );
+        await Promise.all(exampleDeletePromises);
+        console.log(`${exampleSnapshot.size}개의 관련 예문 삭제 완료`);
+      } catch (error) {
+        console.warn("예문 삭제 중 오류:", error);
       }
 
-      // 개념 문서 자체를 삭제합니다
-      await deleteDoc(conceptRef);
+      // 2. 관련 문법 패턴 삭제 (grammar_patterns 컬렉션)
+      try {
+        const grammarQuery = query(
+          collection(db, "grammar_patterns"),
+          where("related_concepts", "array-contains", conceptId)
+        );
+        const grammarSnapshot = await getDocs(grammarQuery);
 
-      // 사용자의 개념 수 업데이트
+        for (const grammarDoc of grammarSnapshot.docs) {
+          const grammarData = grammarDoc.data();
+          const updatedConcepts = grammarData.related_concepts.filter(
+            (id) => id !== conceptId
+          );
+
+          if (updatedConcepts.length === 0) {
+            // 관련 개념이 없으면 문법 패턴 삭제
+            await deleteDoc(grammarDoc.ref);
+          } else {
+            // 관련 개념 리스트에서만 제거
+            await updateDoc(grammarDoc.ref, {
+              related_concepts: updatedConcepts,
+            });
+          }
+        }
+        console.log(`${grammarSnapshot.size}개의 관련 문법 패턴 처리 완료`);
+      } catch (error) {
+        console.warn("문법 패턴 삭제 중 오류:", error);
+      }
+
+      // 3. 관련 퀴즈 템플릿 삭제 (quiz_templates 컬렉션)
+      try {
+        const quizQuery = query(
+          collection(db, "quiz_templates"),
+          where("source_concept_id", "==", conceptId)
+        );
+        const quizSnapshot = await getDocs(quizQuery);
+
+        const quizDeletePromises = quizSnapshot.docs.map((doc) =>
+          deleteDoc(doc.ref)
+        );
+        await Promise.all(quizDeletePromises);
+        console.log(`${quizSnapshot.size}개의 관련 퀴즈 템플릿 삭제 완료`);
+      } catch (error) {
+        console.warn("퀴즈 템플릿 삭제 중 오류:", error);
+      }
+
+      // 4. 관련 게임 데이터 삭제 (game_data 컬렉션)
+      try {
+        const gameQuery = query(
+          collection(db, "game_data"),
+          where("concept_id", "==", conceptId)
+        );
+        const gameSnapshot = await getDocs(gameQuery);
+
+        const gameDeletePromises = gameSnapshot.docs.map((doc) =>
+          deleteDoc(doc.ref)
+        );
+        await Promise.all(gameDeletePromises);
+        console.log(`${gameSnapshot.size}개의 관련 게임 데이터 삭제 완료`);
+      } catch (error) {
+        console.warn("게임 데이터 삭제 중 오류:", error);
+      }
+
+      // 5. 각 언어 인덱스에서 개념을 제거합니다
+      for (const [lang, expression] of Object.entries(
+        conceptData.expressions || {}
+      )) {
+        if (expression?.word) {
+        await this.removeFromLanguageIndex(lang, expression.word, conceptId);
+        }
+      }
+
+      // 6. 문법 인덱스에서도 제거 (추가적인 정리)
+      for (const lang of Object.keys(conceptData.expressions || {})) {
+        try {
+          const grammarIndexQuery = query(
+            collection(db, `${lang}_grammar_index`),
+            where("concept_ids", "array-contains", conceptId)
+          );
+          const grammarIndexSnapshot = await getDocs(grammarIndexQuery);
+
+          for (const indexDoc of grammarIndexSnapshot.docs) {
+            const indexData = indexDoc.data();
+            const updatedConceptIds = indexData.concept_ids.filter(
+              (id) => id !== conceptId
+            );
+
+            if (updatedConceptIds.length === 0) {
+              await deleteDoc(indexDoc.ref);
+            } else {
+              await updateDoc(indexDoc.ref, {
+                concept_ids: updatedConceptIds,
+              });
+            }
+          }
+        } catch (error) {
+          console.warn(`${lang} 문법 인덱스 정리 중 오류:`, error);
+        }
+      }
+
+      // 7. 개념 문서 자체를 삭제합니다
+      await deleteDoc(conceptRef);
+      console.log("개념 문서 삭제 완료");
+
+      // 8. 사용자의 개념 수 업데이트
       if (auth.currentUser) {
         const userRef = doc(db, "users", auth.currentUser.email);
         const userDoc = await getDoc(userRef);
@@ -651,6 +765,7 @@ export const conceptUtils = {
         }
       }
 
+      console.log("개념 및 관련 데이터 삭제 완료:", conceptId);
       return true;
     } catch (error) {
       console.error("개념 삭제 중 오류 발생:", error);
@@ -985,10 +1100,10 @@ export const userProgressUtils = {
   async getUserProgress(userEmail) {
     try {
       const userRef = doc(db, "users", userEmail);
-      const userDoc = await getDoc(userRef);
+        const userDoc = await getDoc(userRef);
 
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
 
         // 기존 구조와 새로운 구조 모두 지원
         return {
@@ -1150,7 +1265,7 @@ export const userProgressUtils = {
       languageProgress.last_updated = new Date();
       vocabularyProgress[language] = languageProgress;
 
-      await updateDoc(userRef, {
+          await updateDoc(userRef, {
         vocabulary_progress: vocabularyProgress,
         [`collection_metadata.last_sync`]: new Date(),
       });

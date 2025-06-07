@@ -397,34 +397,34 @@ async function loadGame(gameType) {
       endTime: null,
     };
 
-    // 모든 게임 컨테이너 숨기기
-    document.querySelectorAll(".game-container").forEach((container) => {
-      container.style.display = "none";
-    });
+  // 모든 게임 컨테이너 숨기기
+  document.querySelectorAll(".game-container").forEach((container) => {
+    container.style.display = "none";
+  });
 
     // 선택한 게임 컨테이너 표시
     const gameContainer = document.getElementById(`${gameType}-game`);
-    if (gameContainer) {
-      gameContainer.style.display = "block";
+  if (gameContainer) {
+    gameContainer.style.display = "block";
     }
 
     // 게임용 단어 로드
-    await loadGameWords();
+  await loadGameWords();
 
     // 게임별 초기화
-    switch (gameType) {
-      case "word-matching":
-        initWordMatchingGame();
-        break;
-      case "word-scramble":
-        initWordScrambleGame();
-        break;
-      case "memory-game":
-        initMemoryGame();
-        break;
-    }
+  switch (gameType) {
+    case "word-matching":
+      initWordMatchingGame();
+      break;
+    case "word-scramble":
+      initWordScrambleGame();
+      break;
+    case "memory-game":
+      initMemoryGame();
+      break;
+  }
 
-    console.log(`${gameType} 게임 초기화 완료`);
+  console.log(`${gameType} 게임 초기화 완료`);
   } catch (error) {
     console.error("게임 로드 중 오류:", error);
   }
@@ -475,7 +475,7 @@ async function loadGameWords() {
           gameWords = firebaseWords;
         }
 
-        console.log(
+    console.log(
           `게임 단어 로딩 완료: ${gameWords.length}개 (Firebase: ${firebaseWords.length}개)`
         );
         return;
@@ -512,7 +512,7 @@ async function loadGameWords() {
           gameWords = firebaseWords;
         }
 
-        console.log(
+      console.log(
           `게임 단어 로딩 완료: ${gameWords.length}개 (Firebase: ${firebaseWords.length}개)`
         );
         return;
@@ -533,13 +533,13 @@ async function loadGameWords() {
 
 // 기본 단어 세트 사용 함수
 function useDefaultWords() {
-  const defaultWordsMapped = defaultWords.map((word) => ({
-    id: word.id,
+      const defaultWordsMapped = defaultWords.map((word) => ({
+        id: word.id,
     source: word.languages[sourceLanguage]?.word || "",
     target: word.languages[targetLanguage]?.word || "",
-    domain: word.domain || "",
+        domain: word.domain || "",
     category: "",
-    emoji: word.emoji || "",
+        emoji: word.emoji || "",
     difficulty: "basic",
     media: { images: {}, audio: {} },
     pronunciation: { source: "", target: "" },
@@ -554,18 +554,18 @@ function useDefaultWords() {
 
   gameWords = shuffledWords.slice(0, gameWordCount[currentGameType] || 8);
   console.log("기본 단어 목록:", gameWords);
-  return gameWords;
+    return gameWords;
 }
 
 // 필요한 수만큼 기본 단어 가져오기 (Firebase 보완용)
 function getDefaultWordsForGame(neededCount) {
-  const defaultWordsMapped = defaultWords.map((word) => ({
-    id: word.id,
+    const defaultWordsMapped = defaultWords.map((word) => ({
+      id: word.id,
     source: word.languages[sourceLanguage]?.word || "",
     target: word.languages[targetLanguage]?.word || "",
-    domain: word.domain || "",
+      domain: word.domain || "",
     category: "",
-    emoji: word.emoji || "",
+      emoji: word.emoji || "",
     difficulty: "basic",
     media: { images: {}, audio: {} },
     pronunciation: { source: "", target: "" },
@@ -1657,7 +1657,7 @@ function flipCard(card, word) {
   }
 
   // 선택 금지 (애니메이션 중에는 다른 카드 클릭 방지)
-  canSelect = false;
+    canSelect = false;
 
   // 카드 뒤집기 애니메이션 - 3D 회전 효과
   card.classList.add("flipped");
@@ -1696,7 +1696,7 @@ function checkMemoryMatch() {
 
     if (word1Data === word2Data) {
       // 매치 성공
-      setTimeout(() => {
+    setTimeout(() => {
         card1.classList.add("matched");
         card2.classList.add("matched");
 
@@ -1708,7 +1708,7 @@ function checkMemoryMatch() {
           card.style.boxShadow = "0 0 20px rgba(46, 125, 50, 0.7)";
         });
 
-        memoryPairs++;
+      memoryPairs++;
 
         // 페어 카운터 업데이트
         const pairsCounter = document.getElementById("memory-pairs");
@@ -1730,9 +1730,9 @@ function checkMemoryMatch() {
         }
 
         // 선택 허용 복원
-        canSelect = true;
-      }, 500);
-    } else {
+      canSelect = true;
+    }, 500);
+  } else {
       // 매치 실패
       // 실패 피드백 표시
       [card1, card2].forEach((card) => {

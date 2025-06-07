@@ -30,7 +30,7 @@ import {
 
 export class CollectionManager {
   constructor() {
-    this.batchSize = 3; // 기존 10에서 3으로 줄임 (BloomFilter 에러 완화)
+    this.batchSize = 2; // BloomFilter 에러 완화를 위해 3에서 2로 더 축소
   }
 
   /**
@@ -44,6 +44,10 @@ export class CollectionManager {
 
     try {
       console.log(`분리된 컬렉션 개념 생성 시작: ${conceptId}`);
+
+      // BloomFilter 에러 방지를 위한 초기 지연
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
       console.log(`📊 입력 데이터 구조:`, {
         has_additional_examples: !!integratedConceptData.additional_examples,
         additional_examples_count:
@@ -150,6 +154,11 @@ export class CollectionManager {
             index + 1
           })`
         );
+
+        // BloomFilter 에러 방지를 위한 짧은 지연
+        if (index < allExamples.length - 1) {
+          await new Promise((resolve) => setTimeout(resolve, 50));
+        }
       }
 
       // 3. 문법 패턴 정보 저장 (grammar_patterns 컬렉션) - 개별 처리
@@ -190,6 +199,9 @@ export class CollectionManager {
               console.log(
                 `✓ grammar_patterns 컬렉션에 저장 완료: ${uniquePatternId}`
               );
+
+              // BloomFilter 에러 방지를 위한 짧은 지연
+              await new Promise((resolve) => setTimeout(resolve, 50));
             } catch (error) {
               console.warn(`문법 패턴 ${uniquePatternId} 처리 중 오류:`, error);
             }
@@ -230,6 +242,9 @@ export class CollectionManager {
               console.log(
                 `✓ grammar_patterns 컬렉션에 저장 완료: ${uniquePatternId} (예문에서 추출)`
               );
+
+              // BloomFilter 에러 방지를 위한 짧은 지연
+              await new Promise((resolve) => setTimeout(resolve, 50));
             } catch (error) {
               console.warn(`문법 패턴 ${uniquePatternId} 처리 중 오류:`, error);
             }
@@ -311,6 +326,12 @@ export class CollectionManager {
         await setDoc(templateRef, templateDoc);
         quizTemplateIds.push(templateId);
         console.log(`✓ quiz_templates 컬렉션에 저장 완료: ${templateId}`);
+
+        // BloomFilter 에러 방지를 위한 짧은 지연
+        if (quizType !== "fill_in_blank") {
+          // 마지막 템플릿이 아닌 경우에만
+          await new Promise((resolve) => setTimeout(resolve, 50));
+        }
       }
 
       // 5. 언어별 인덱스 업데이트 (기존 시스템 활용)
@@ -376,7 +397,7 @@ export class CollectionManager {
 
         // 배치 간 지연으로 Firestore 부하 방지
         if (i + this.batchSize < integratedConceptsArray.length) {
-          await new Promise((resolve) => setTimeout(resolve, 300));
+          await new Promise((resolve) => setTimeout(resolve, 600));
         }
       } catch (error) {
         console.error(
@@ -448,8 +469,7 @@ export class CollectionManager {
         languages: Object.keys(integratedData.expressions),
       },
 
-      // 미디어 정보 (용량이 작으므로 포함)
-      media: integratedData.media || null,
+      // 미디어 정보 제거 (템플릿에서 지원하지 않음)
 
       metadata: {
         created_at: serverTimestamp(),
@@ -1013,6 +1033,11 @@ export class CollectionManager {
   }
 
   extractAllWords(expressions) {
+    if (!expressions || typeof expressions !== "object") {
+      console.warn("expressions가 유효하지 않습니다:", expressions);
+      return [];
+    }
+
     return Object.values(expressions)
       .map((expr) => expr?.word)
       .filter(Boolean);
@@ -1248,11 +1273,26 @@ export class CollectionManager {
   }
 
   calculateDifficultyFromFactors(factors) {
+    // null, undefined 체크 추가
+    if (!factors || typeof factors !== "object") {
+      console.warn("difficulty_factors가 유효하지 않음:", factors);
+      return 15; // 기본 난이도 점수
+    }
+
+    const factorKeys = Object.keys(factors);
+    if (factorKeys.length === 0) {
+      console.warn("difficulty_factors가 비어있음:", factors);
+      return 15; // 기본 난이도 점수
+    }
+
     let difficultyScore = 0;
     for (const factor in factors) {
-      difficultyScore += factors[factor];
+      const value = factors[factor];
+      if (typeof value === "number" && !isNaN(value)) {
+        difficultyScore += value;
+      }
     }
-    return difficultyScore / Object.keys(factors).length;
+    return difficultyScore / factorKeys.length;
   }
 
   /**

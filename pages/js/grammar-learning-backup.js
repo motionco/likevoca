@@ -1,4 +1,4 @@
-﻿import { loadNavbar } from "../../components/js/navbar.js";
+import { loadNavbar } from "../../components/js/navbar.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
 import {
   auth,
@@ -153,137 +153,135 @@ async function loadGrammarPatterns() {
 
     console.log("문법 패턴 로딩 시작...");
 
-    // examples 컬렉션에서 문법 패턴 로드 시도
+    // 1. grammar_patterns 컬렉션에서 먼저 로드 시도 (하이브리드 구조)
     try {
-      console.log("examples 컬렉션에서 로딩 시도...");
-      const examplesRef = collection(db, "examples");
-      const examplesQuery = query(examplesRef, limit(100));
+      console.log("grammar_patterns 컬렉션에서 로딩 시도...");
+      const patternsRef = collection(db, "grammar_patterns");
+      const patternsQuery = query(patternsRef, limit(100));
 
-      const examplesSnapshot = await getDocs(examplesQuery);
-      console.log(`examples 컬렉션에서 ${examplesSnapshot.size}개 문서 발견`);
-
-      examplesSnapshot.forEach((doc) => {
-        const data = doc.data();
-        console.log("examples 문서 구조:", Object.keys(data));
-
-        // examples 컬렉션에서 문법 패턴 생성 (실제 DB 구조 반영)
-        const grammarPattern = {
-          id: `example_${doc.id}`,
-          concept_id: data.concept_id || doc.id,
-          source: "examples",
-          // learning_metadata나 context에서 패턴명 추출 시도
-          pattern_name:
-            data.learning_metadata?.pattern_name ||
-            data.context?.pattern_type ||
-            generateMeaningfulPatternName(data),
-          structural_pattern:
-            data.learning_metadata?.structural_pattern ||
-            data.context?.structure ||
-            extractStructureFromTranslations(data.translations) ||
-            "기본 구조",
-          grammar_tags:
-            data.learning_metadata?.grammar_tags ||
-            data.context?.tags ||
-            extractTagsFromPatternId(data.grammar_pattern_id) ||
-            [],
-          complexity_level: data.learning_metadata?.complexity || "basic",
-          learning_focus:
-            data.learning_metadata?.focus_areas ||
-            extractFocusFromContext(data.context) ||
-            [],
-          difficulty: data.difficulty || "beginner",
-          frequency: data.learning_metadata?.frequency || "medium",
-          domain: data.learning_metadata?.domain || "general",
-          category: "grammar",
-          example_translations: data.translations || {},
-          teaching_notes: data.learning_metadata?.notes || {},
-          concept_data: {
-            word: data.context?.source_word || "",
-            expressions: {},
-          },
-          // 추가 정보
-          grammar_pattern_id: data.grammar_pattern_id,
-          context: data.context,
-          order_index: data.order_index,
-          is_representative: data.is_representative,
-        };
-
-        allGrammarPatterns.push(grammarPattern);
-      });
-
+      const patternsSnapshot = await getDocs(patternsQuery);
       console.log(
-        `examples에서 ${allGrammarPatterns.length}개 문법 패턴 로드됨`
+        `grammar_patterns 컬렉션에서 ${patternsSnapshot.size}개 문서 발견`
       );
-    } catch (error) {
-      console.warn("examples 컬렉션 로드 실패:", error);
+
+      if (patternsSnapshot.size > 0) {
+        patternsSnapshot.forEach((doc) => {
+          const data = doc.data();
+          console.log("grammar_patterns 문서 구조:", Object.keys(data));
+
+          // 하이브리드 구조의 문법 패턴 데이터 처리
+          const grammarPattern = {
+            id: doc.id,
+            source: "grammar_patterns",
+            pattern_name: data.pattern_name || data.name || "문법 패턴",
+            structural_pattern:
+              data.structural_pattern || data.structure || "기본 구조",
+            grammar_tags: data.grammar_tags || data.tags || [],
+            complexity_level:
+              data.complexity_level || data.complexity || "basic",
+            learning_focus: data.learning_focus || data.focus_areas || [],
+            difficulty: data.difficulty || "beginner",
+            frequency: data.frequency || "medium",
+            domain: data.domain || "general",
+            category: data.category || "grammar",
+            featured_examples: data.featured_examples || [],
+            teaching_notes: data.teaching_notes || {},
+            created_at: data.created_at,
+            updated_at: data.updated_at,
+            ...data, // 나머지 모든 필드 포함
+          };
+
+          allGrammarPatterns.push(grammarPattern);
+        });
+
+        console.log(
+          `하이브리드 구조에서 ${allGrammarPatterns.length}개 문법 패턴 로드 완료`
+        );
+      }
+    } catch (patternsError) {
+      console.warn("grammar_patterns 컬렉션 조회 실패:", patternsError);
     }
 
-    // concepts 컬렉션에서 추가 패턴 생성 (백업)
-    try {
-      const conceptsRef = collection(db, "concepts");
-      const conceptsQuery = query(conceptsRef, limit(50));
+    // 2. grammar_patterns에서 데이터가 부족하면 examples 컬렉션에서 보완
+    if (allGrammarPatterns.length < 5) {
+      try {
+        console.log("examples 컬렉션에서 보완 로딩 시도...");
+        const examplesRef = collection(db, "examples");
+        const examplesQuery = query(examplesRef, limit(50));
 
-      const conceptsSnapshot = await getDocs(conceptsQuery);
+        const examplesSnapshot = await getDocs(examplesQuery);
+        console.log(`examples 컬렉션에서 ${examplesSnapshot.size}개 문서 발견`);
 
-      let conceptPatternsCount = 0;
+        examplesSnapshot.forEach((doc) => {
+          const data = doc.data();
 
-      conceptsSnapshot.forEach((doc) => {
-        const data = doc.data();
+          // examples 컬렉션에서 문법 패턴 생성 (실제 DB 구조 반영)
+          const grammarPattern = {
+            id: `example_${doc.id}`,
+            concept_id: data.concept_id || doc.id,
+            source: "examples",
+            // learning_metadata나 context에서 패턴명 추출 시도
+            pattern_name:
+              data.learning_metadata?.pattern_name ||
+              data.context?.pattern_type ||
+              generateMeaningfulPatternName(data),
+            structural_pattern:
+              data.learning_metadata?.structural_pattern ||
+              data.context?.structure ||
+              extractStructureFromTranslations(data.translations) ||
+              "기본 구조",
+            grammar_tags:
+              data.learning_metadata?.grammar_tags ||
+              data.context?.tags ||
+              extractTagsFromPatternId(data.grammar_pattern_id) ||
+              [],
+            complexity_level: data.learning_metadata?.complexity || "basic",
+            learning_focus:
+              data.learning_metadata?.focus_areas ||
+              extractFocusFromContext(data.context) ||
+              [],
+            difficulty: data.difficulty || "beginner",
+            frequency: data.learning_metadata?.frequency || "medium",
+            domain: data.learning_metadata?.domain || "general",
+            category: "grammar",
+            example_translations: data.translations || {},
+            teaching_notes: data.learning_metadata?.notes || {},
+            concept_data: {
+              id: data.concept_id,
+              translations: data.translations,
+            },
+            related_concepts: data.related_concepts || [],
+            usage_examples: [data], // 현재 예문을 usage_examples에 포함
+            created_at: data.created_at,
+            updated_at: data.updated_at,
+          };
 
-        // featured_examples에서 간단한 문법 패턴 생성
-        if (data.featured_examples && Array.isArray(data.featured_examples)) {
-          data.featured_examples.forEach((example, index) => {
-            if (example.grammar_system) {
-              const grammarPattern = {
-                id: `${doc.id}_example_${index}`,
-                concept_id: doc.id,
-                source: "concepts",
-                pattern_name:
-                  example.grammar_system.pattern_name || "기본 문법 패턴",
-                structural_pattern:
-                  example.grammar_system.structural_pattern || "기본 문장 구조",
-                grammar_tags: example.grammar_system.grammar_tags || [],
-                complexity_level:
-                  example.grammar_system.complexity_level || "basic",
-                learning_focus: example.grammar_system.learning_focus || [],
-                difficulty:
-                  example.difficulty ||
-                  data.concept_info?.difficulty ||
-                  "beginner",
-                frequency: "medium",
-                domain: data.concept_info?.domain || "general",
-                category: data.concept_info?.category || "general",
-                example_translations: example.translations || {},
-                teaching_notes: example.grammar_system.teaching_notes || {},
-                concept_data: {
-                  word: data.expressions?.korean?.word || "",
-                  expressions: data.expressions || {},
-                },
-              };
+          allGrammarPatterns.push(grammarPattern);
+        });
 
-              allGrammarPatterns.push(grammarPattern);
-              conceptPatternsCount++;
-            }
-          });
-        }
-      });
-
-      console.log(`concepts에서 ${conceptPatternsCount}개 추가 패턴 생성`);
-    } catch (error) {
-      console.warn("concepts 로드 실패:", error);
+        console.log(
+          `examples에서 보완하여 총 ${allGrammarPatterns.length}개 문법 패턴 로드`
+        );
+      } catch (examplesError) {
+        console.error("examples 컬렉션 조회도 실패:", examplesError);
+      }
     }
 
-    // 데이터가 부족하면 샘플 추가
-    if (allGrammarPatterns.length < 3) {
-      console.log("DB 데이터가 부족하여 샘플 데이터 추가");
+    // 3. 데이터가 여전히 부족하면 샘플 데이터 추가
+    if (allGrammarPatterns.length === 0) {
+      console.log("실제 데이터가 없어 샘플 데이터 추가...");
       addSampleGrammarPatterns();
     }
 
-    console.log(`총 ${allGrammarPatterns.length}개 문법 패턴 로드 완료`);
+    console.log(`📚 총 ${allGrammarPatterns.length}개 문법 패턴 로드 완료`);
+
+    // 필터링 및 표시
     filterAndDisplayPatterns();
   } catch (error) {
-    console.error("문법 패턴 로드 오류:", error);
-    showError("문법 패턴을 불러오는 중 오류가 발생했습니다.");
+    console.error("❌ 문법 패턴 로드 중 오류:", error);
+    showError("문법 패턴을 불러오는데 실패했습니다: " + error.message);
+
+    // 오류 발생 시에도 샘플 데이터라도 표시
     addSampleGrammarPatterns();
     filterAndDisplayPatterns();
   } finally {
@@ -371,10 +369,28 @@ function filterAndDisplayPatterns() {
   const domain = document.getElementById("domain-filter").value;
   const sortOption = document.getElementById("sort-patterns").value;
 
+  console.log("필터링 시작:", {
+    totalPatterns: allGrammarPatterns.length,
+    targetLanguage,
+    difficulty,
+    patternType,
+    domain,
+  });
+
   // 필터링
   filteredPatterns = allGrammarPatterns.filter((pattern) => {
+    console.log("패턴 필터링 확인:", {
+      id: pattern.id,
+      difficulty: pattern.difficulty,
+      domain: pattern.domain,
+      hasExampleTranslations: !!pattern.example_translations,
+      hasFeaturedExamples: !!pattern.featured_examples?.length,
+      hasUsageExamples: !!pattern.usage_examples?.length,
+    });
+
     // 난이도 필터
     if (difficulty !== "all" && pattern.difficulty !== difficulty) {
+      console.log("난이도 필터링됨:", pattern.id, pattern.difficulty);
       return false;
     }
 
@@ -383,21 +399,35 @@ function filterAndDisplayPatterns() {
       const hasPatternType = pattern.grammar_tags?.some(
         (tag) => tag.includes(patternType) || pattern.category === patternType
       );
-      if (!hasPatternType) return false;
+      if (!hasPatternType) {
+        console.log("패턴 유형 필터링됨:", pattern.id);
+        return false;
+      }
     }
 
     // 도메인 필터
     if (domain !== "all" && pattern.domain !== domain) {
+      console.log("도메인 필터링됨:", pattern.id, pattern.domain);
       return false;
     }
 
-    // 대상 언어에 예문이 있는지 확인
-    if (!pattern.example_translations?.[targetLanguage]) {
+    // 하이브리드 구조 지원: 다양한 방식으로 예문 확인
+    const hasExample =
+      pattern.example_translations?.[targetLanguage] ||
+      pattern.featured_examples?.length > 0 ||
+      pattern.usage_examples?.length > 0 ||
+      pattern.pattern_name; // 최소한 패턴 이름이라도 있으면 표시
+
+    if (!hasExample) {
+      console.log("예문 없어서 필터링됨:", pattern.id);
       return false;
     }
 
+    console.log("✅ 필터링 통과:", pattern.id);
     return true;
   });
+
+  console.log(`필터링 결과: ${filteredPatterns.length}개 패턴`);
 
   // 정렬
   sortPatterns(sortOption);
@@ -528,6 +558,20 @@ function createPatternCard(pattern, targetLanguage) {
     </div>
   `;
 }
+
+// 전역 함수: 패턴 ID로 모달 열기
+window.openPatternModal = function (patternId) {
+  console.log("모달 열기 시도:", patternId);
+  const pattern = allGrammarPatterns.find((p) => p.id === patternId);
+  if (pattern) {
+    showPatternDetail(pattern);
+  } else {
+    console.error("패턴을 찾을 수 없습니다:", patternId);
+  }
+};
+
+// 전역 함수: showPatternDetail을 전역에서 접근 가능하게 만들기
+window.showPatternDetail = showPatternDetail;
 
 // 패턴 모달 표시 (복원된 이전 UI)
 function showPatternDetail(pattern) {
@@ -838,13 +882,6 @@ function closePatternModal() {
   }
 }
 
-// 패턴 모달 열기 (이전 방식과 호환)
-window.openPatternModal = function (patternId) {
-  const pattern = allGrammarPatterns.find((p) => p.id === patternId);
-  if (!pattern) return;
-  showPatternDetail(pattern);
-};
-
 // 필터 초기화
 window.resetFilters = function () {
   document.getElementById("difficulty-filter").value = "all";
@@ -881,10 +918,6 @@ function showError(message) {
     `;
   }
 }
-
-// 전역 함수로 설정
-window.showPatternDetail = showPatternDetail;
-window.closePatternModal = closePatternModal;
 
 // DB 데이터에서 문법 정보 추출을 위한 헬퍼 함수들
 function extractStructureFromTranslations(translations) {
@@ -1046,3 +1079,6 @@ function generateMeaningfulPatternName(data) {
   // 기본값
   return `대화 패턴 (${patternId.split("_").pop() || "basic"})`;
 }
+
+// 전역 함수 설정
+window.showPatternDetail = showPatternDetail;

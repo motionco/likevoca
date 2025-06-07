@@ -130,7 +130,12 @@
 
       <!-- 영역별 학습 선택 -->
       <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-        <h2 class="text-xl font-bold mb-4" data-i18n="learning_areas">학습 영역</h2>
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold" data-i18n="learning_areas">학습 영역</h2>
+          <a href="enhanced-quiz.html" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+            <i class="fas fa-brain mr-2"></i>퀴즈 테스트
+          </a>
+        </div>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
           <button id="vocabulary-area" class="skill-button bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300">
             <i class="fas fa-book text-3xl mb-3"></i>
@@ -531,14 +536,7 @@
       </div>
     </main>
 
-    <!-- Firebase -->
-    <script type="module" src="../js/firebase/firebase-init.js"></script>
+    <!-- Firebase 및 스크립트 -->
     <script type="module" src="./js/language-learning.js"></script>
-    <script type="module">
-      // 페이지별 메타데이터 업데이트
-      document.addEventListener('DOMContentLoaded', function() {
-        // 동적 메타 태그 업데이트 로직
-      });
-    </script>
   </body>
 </html> 

@@ -148,806 +148,483 @@ function downloadTemplate() {
   }
 }
 
-// CSV 템플릿 다운로드 - 예문 중심 문법 시스템 적용
+// CSV 템플릿 다운로드 - 방식 1 기반 핵심 속성 유지
 function downloadCSVTemplate() {
-  // 예문 중심 문법 시스템을 포함한 간소화된 CSV 헤더
+  // CSV 헤더 생성 (핵심 속성은 concepts에 유지, 예문/문법만 분리)
   const headers = [
     "domain",
     "category",
-    "difficulty",
-    "tags",
-    "unicode_emoji",
-    "color_theme",
-    "quiz_frequency",
-    "game_types",
-    // 한국어 (grammar_system 제거)
+    "emoji",
+    // 한국어 필드 (핵심 속성 유지)
     "korean_word",
     "korean_pronunciation",
-    "korean_romanization",
     "korean_definition",
     "korean_part_of_speech",
     "korean_level",
+    "korean_romanization",
     "korean_synonyms",
     "korean_antonyms",
     "korean_word_family",
     "korean_compound_words",
     "korean_collocations",
-    // 영어
+    // 영어 필드 (핵심 속성 유지)
     "english_word",
     "english_pronunciation",
-    "english_phonetic",
     "english_definition",
     "english_part_of_speech",
     "english_level",
+    "english_phonetic",
     "english_synonyms",
     "english_antonyms",
     "english_word_family",
     "english_compound_words",
     "english_collocations",
-    // 일본어
+    // 일본어 필드 (핵심 속성 유지)
     "japanese_word",
-    "japanese_hiragana",
-    "japanese_katakana",
-    "japanese_kanji",
     "japanese_pronunciation",
-    "japanese_romanization",
     "japanese_definition",
     "japanese_part_of_speech",
     "japanese_level",
+    "japanese_hiragana",
+    "japanese_katakana",
+    "japanese_kanji",
+    "japanese_romanization",
     "japanese_synonyms",
     "japanese_antonyms",
     "japanese_word_family",
     "japanese_compound_words",
     "japanese_collocations",
-    // 중국어
+    // 중국어 필드 (핵심 속성 유지)
     "chinese_word",
     "chinese_pronunciation",
     "chinese_definition",
     "chinese_part_of_speech",
     "chinese_level",
+    "chinese_traditional",
+    "chinese_simplified",
     "chinese_synonyms",
     "chinese_antonyms",
     "chinese_word_family",
     "chinese_compound_words",
     "chinese_collocations",
-    // 미디어
-    "primary_image",
-    "secondary_image",
-    "illustration_image",
-    // 예문 중심 문법 시스템 (강화됨)
-    "example_1_korean",
-    "example_1_english",
-    "example_1_japanese",
-    "example_1_chinese",
-    "example_1_context",
-    "example_1_grammar_pattern",
-    "example_1_grammar_tags",
-    "example_1_grammar_focus",
-    "example_1_difficulty",
-    "example_1_priority",
+    // 대표 예문 (concepts에 포함)
+    "representative_example_korean",
+    "representative_example_english",
+    "representative_example_japanese",
+    "representative_example_chinese",
+    "representative_example_context",
+    "representative_example_difficulty",
+    // 추가 예문 (examples 컬렉션으로 분리)
+    "additional_examples_korean",
+    "additional_examples_english",
+    "additional_examples_japanese",
+    "additional_examples_chinese",
+    "additional_examples_context",
+    "additional_examples_difficulty",
+    // 문법 정보 (grammar_patterns 컬렉션으로 분리)
+    "grammar_pattern_name",
+    "grammar_pattern_korean",
+    "grammar_pattern_english",
+    "grammar_pattern_japanese",
+    "grammar_pattern_chinese",
+    "grammar_tags",
+    "learning_focus",
   ];
 
-  // 예문 중심 문법 시스템을 사용한 샘플 데이터
-  const sampleRows = [
+  // 샘플 데이터 생성 (방식 1 기반)
+  const sampleData = [
     [
-      // 사과 개념
-      "food",
+      "daily",
       "fruit",
-      "beginner",
-      "everyday|healthy|common",
       "🍎",
-      "#FF6B6B",
-      "high",
-      "matching|pronunciation|spelling",
-      // 한국어 (단순화)
+      // 한국어 (핵심 속성)
       "사과",
       "sa-gwa",
-      "sagwa",
-      "둥글고 단맛이 나는 열매",
+      "빨간 과일",
       "명사",
       "초급",
-      "",
-      "",
-      "과일|과실|열매",
-      "사과나무|사과즙|사과파이",
-      "사과를 먹다:high|빨간 사과:high",
-      // 영어
+      "sagwa",
+      "능금",
+      "오렌지",
+      "과일|음식",
+      "사과나무|사과즙",
+      "빨간 사과|맛있는 사과",
+      // 영어 (핵심 속성)
       "apple",
-      "ˈæpl",
       "/ˈæpəl/",
-      "a round fruit with firm white flesh and a green red or yellow skin",
+      "a round fruit with red or green skin",
       "noun",
       "beginner",
+      "/ˈæpəl/",
       "",
       "",
-      "fruit|produce|orchard fruit",
-      "apple tree|apple juice|apple pie",
-      "eat an apple:high|red apple:high",
-      // 일본어
+      "fruit|food",
+      "apple tree|apple juice",
+      "red apple|sweet apple",
+      // 일본어 (핵심 속성)
       "りんご",
-      "りんご",
-      "リンゴ",
-      "",
       "ringo",
-      "ringo",
-      "赤や緑の皮をもつ、甘くて丸い果物",
+      "赤い果物",
       "名詞",
       "初級",
-      "アップル",
-      "",
-      "果物|果実|青果",
+      "りんご",
+      "リンゴ",
+      "林檎",
+      "ringo",
+      "果物",
+      "オレンジ",
+      "果物|食べ物",
       "りんごの木|りんごジュース",
-      "りんごを食べる:high|赤いりんご:high",
-      // 중국어
+      "赤いりんご|甘いりんご",
+      // 중국어 (핵심 속성)
       "苹果",
-      "píng guǒ",
-      "红色或绿色皮的甜美水果",
+      "píngguǒ",
+      "红色或绿色的圆形水果",
       "名词",
       "初级",
+      "蘋果",
+      "苹果",
       "",
       "",
-      "水果|果实|鲜果",
-      "苹果树|苹果汁|苹果派",
-      "吃苹果:high|红苹果:high",
-      // 미디어
-      "https://source.unsplash.com/400x300/?apple",
-      "https://source.unsplash.com/400x300/?apple_green",
-      "https://api.iconify.design/noto:red-apple.svg?width=400",
-      // 예문 + 상세 문법 정보
+      "水果|食物",
+      "苹果树|苹果汁",
+      "红苹果|甜苹果",
+      // 대표 예문 (concepts에 포함)
       "아침에 사과를 먹어요.",
       "I eat an apple in the morning.",
       "朝にりんごを食べます。",
       "我早上吃苹果。",
       "daily_routine",
-      "S + 시간부사 + O + V",
-      "present_tense|time_adverb:morning|object_marking|polite_ending:haeyo|daily_routine|food_consumption",
-      "시간표현|목적어|현재시제|정중함",
       "beginner",
-      "1",
+      // 추가 예문 (examples 컬렉션)
+      "이 사과는 달콤해요.|사과 한 개 주세요.",
+      "This apple is sweet.|Can I have one apple please?",
+      "このりんごは甘いです。|りんごを一つください。",
+      "这个苹果很甜。|请给我一个苹果。",
+      "taste_description|shopping",
+      "beginner|beginner",
+      // 문법 정보 (grammar_patterns 컬렉션)
+      "목적어 표시 패턴",
+      "명사 + 을/를 + 동사",
+      "Object + Verb pattern",
+      "名詞 + を + 動詞",
+      "名词 + 宾语标记",
+      "present_tense|declarative|daily_activity|object_marking",
+      "시간 표현|목적어 표시|현재 시제|일상 활동",
     ],
     [
-      // 인사 개념
       "daily",
       "greeting",
-      "beginner",
-      "polite|common|essential",
       "👋",
-      "#4CAF50",
-      "very_high",
-      "matching|pronunciation",
-      // 한국어 (단순화)
+      // 한국어 (핵심 속성)
       "안녕하세요",
       "an-nyeong-ha-se-yo",
-      "annyeonghaseyo",
       "정중한 인사말",
       "감탄사",
       "초급",
+      "annyeonghaseyo",
       "안녕|반갑습니다",
       "안녕히 가세요",
-      "인사|인사말|예의",
-      "안녕인사|안녕메시지",
-      "안녕하세요, 만나서 반갑습니다:high",
-      // 영어
+      "인사|예의",
+      "인사말|첫인사",
+      "정중한 안녕하세요|첫 안녕하세요",
+      // 영어 (핵심 속성)
       "hello",
-      "həˈloʊ",
       "/həˈloʊ/",
-      "used as a greeting or to begin a phone conversation",
+      "a polite greeting expression used during the day",
       "exclamation",
       "beginner",
-      "hi|hey|greetings",
-      "goodbye|bye",
-      "greeting|salutation|welcome",
-      "hello-world|hello-sign",
-      "say hello:high|hello there:medium",
-      // 일본어
+      "/həˈloʊ/",
+      "hi|good morning|good afternoon",
+      "goodbye|farewell",
+      "greeting|salutation",
+      "hello greeting|hello message",
+      "say hello|warm hello",
+      // 일본어 (핵심 속성)
       "こんにちは",
-      "こんにちは",
-      "",
-      "今日は",
-      "konnichiwa",
       "konnichiwa",
       "昼間の挨拶",
       "感動詞",
       "初級",
+      "こんにちは",
+      "",
+      "今日は",
+      "konnichiwa",
       "おはよう|こんばんは",
       "さようなら",
-      "挨拶|礼儀|言葉",
-      "こんにちは挨拶",
-      "こんにちは、元気ですか:high",
-      // 중국어
+      "挨拶|礼儀",
+      "挨拶言葉|初対面挨拶",
+      "丁寧なこんにちは|初めてのこんにちは",
+      // 중국어 (핵심 속성)
       "你好",
       "nǐ hǎo",
-      "见面时的礼貌问候语",
+      "白天使用的礼貌问候语",
       "感叹词",
       "初级",
-      "您好|你们好",
-      "再见|拜拜",
-      "问候|礼貌|招呼",
-      "你好问候|你好信息",
-      "你好，很高兴见到你:high",
-      // 미디어
-      "https://source.unsplash.com/400x300/?greeting",
-      "",
-      "https://api.iconify.design/noto:waving-hand.svg?width=400",
-      // 예문 + 상세 문법 정보
-      "안녕하세요. 만나서 반갑습니다.",
+      "你好",
+      "你好",
+      "您好|大家好",
+      "再见|告别",
+      "问候|礼貌",
+      "问候语|初次见面",
+      "礼貌的你好|热情的你好",
+      // 대표 예문 (concepts에 포함)
+      "안녕하세요, 만나서 반갑습니다.",
       "Hello, nice to meet you.",
-      "こんにちは。はじめまして。",
+      "こんにちは、はじめまして。",
       "你好，很高兴见到你。",
       "first_meeting",
-      "인사 + 감정표현",
-      "greeting_formula|polite_level:formal|first_meeting|emotion_expression:positive|social_protocol|sequential_greetings",
-      "첫만남|정중함|감정표현|사회적예의",
       "beginner",
-      "1",
+      // 추가 예문 (examples 컬렉션)
+      "안녕하세요, 오늘 날씨가 좋네요.|안녕하세요, 어떻게 지내세요?",
+      "Hello, the weather is nice today.|Hello, how are you doing?",
+      "こんにちは、今日はいい天気ですね。|こんにちは、元気ですか？",
+      "你好，今天天气真好。|你好，你好吗？",
+      "weather_talk|wellbeing_check",
+      "beginner|beginner",
+      // 문법 정보 (grammar_patterns 컬렉션)
+      "정중한 인사 표현",
+      "안녕하세요 + 연결어미",
+      "Polite greeting formula",
+      "こんにちは + 連結表現",
+      "你好 + 连接表达",
+      "greeting_formula|polite_level:formal|first_meeting|emotion_expression",
+      "첫만남 인사|정중함 표현|감정 표현|사회적 예의",
     ],
   ];
 
   // CSV 문자열 생성
-  let csvContent = headers.join(",") + "\n";
-
-  sampleRows.forEach((row) => {
-    csvContent +=
+  const csvContent = [headers, ...sampleData]
+    .map((row) =>
       row
         .map((cell) => {
-          // 쉼표나 쌍따옴표가 있으면 쌍따옴표로 감싸고 내부 쌍따옴표는 두 번 표시
-          if (cell && (cell.includes(",") || cell.includes('"'))) {
-            return `"${cell.replace(/"/g, '""')}"`;
+          // 문자열 내 따옴표와 쉼표 처리
+          const cellStr = String(cell || "");
+          if (
+            cellStr.includes(",") ||
+            cellStr.includes('"') ||
+            cellStr.includes("\n")
+          ) {
+            return `"${cellStr.replace(/"/g, '""')}"`;
           }
-          return cell || "";
+          return cellStr;
         })
-        .join(",") + "\n";
+        .join(",")
+    )
+    .join("\n");
+
+  // 파일 다운로드
+  const blob = new Blob(["\uFEFF" + csvContent], {
+    type: "text/csv;charset=utf-8;",
   });
-
-  // Blob 생성 및 다운로드
-  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-
   const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
   link.setAttribute("href", url);
-  link.setAttribute("download", "concept_template.csv");
-  link.style.display = "none";
-
+  link.setAttribute("download", "concept_template_improved.csv");
+  link.style.visibility = "hidden";
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-
   URL.revokeObjectURL(url);
 }
 
-// JSON 템플릿 다운로드 - 예문 중심 문법 시스템 적용
+// JSON 템플릿 다운로드 - 방식 1 기반 핵심 속성 유지
 function downloadJSONTemplate() {
-  // 예문 중심 문법 시스템을 사용한 확장된 JSON 템플릿 데이터
-  const jsonTemplate = [
+  // 방식 1 기반 JSON 템플릿 (핵심 속성 유지, 예문/문법 분리)
+  const template = [
     {
-      concept_info: {
-        domain: "food",
-        category: "fruit",
-        difficulty: "beginner",
-        tags: ["everyday", "healthy", "common"],
-        unicode_emoji: "🍎",
-        color_theme: "#FF6B6B",
-        quiz_frequency: "high",
-        game_types: ["matching", "pronunciation", "spelling"],
-        learning_priority: 1,
-      },
-      expressions: {
-        korean: {
-          word: "사과",
-          pronunciation: "sa-gwa",
-          romanization: "sagwa",
-          definition: "둥글고 단맛이 나는 열매",
-          part_of_speech: "명사",
-          level: "초급",
-          synonyms: [],
-          antonyms: [],
-          word_family: ["과일", "과실", "열매"],
-          compound_words: ["사과나무", "사과즙", "사과파이"],
-          collocations: [
-            { phrase: "사과를 먹다", frequency: "high" },
-            { phrase: "빨간 사과", frequency: "high" },
-          ],
-        },
+      // 기본 정보
+      domain: "daily",
+      category: "fruit",
+      emoji: "🍎",
 
-        english: {
-          word: "apple",
-          pronunciation: "ˈæpl",
-          phonetic: "/ˈæpəl/",
-          definition:
-            "a round fruit with firm white flesh and a green red or yellow skin",
-          part_of_speech: "noun",
-          level: "beginner",
-          synonyms: [],
-          antonyms: [],
-          word_family: ["fruit", "produce", "orchard fruit"],
-          compound_words: ["apple tree", "apple juice", "apple pie"],
-          collocations: [
-            { phrase: "eat an apple", frequency: "high" },
-            { phrase: "red apple", frequency: "high" },
-          ],
-        },
+      // 한국어 정보 (핵심 속성 유지)
+      korean_word: "사과",
+      korean_pronunciation: "sa-gwa", // 한국어 발음 표기
+      korean_definition: "빨간색이나 녹색인 둥근 과일",
+      korean_part_of_speech: "명사",
+      korean_level: "초급",
+      korean_romanization: "sagwa", // 로마자 표기 (한국어 특화)
+      korean_synonyms: "", // 동의어 없음 (빈 문자열)
+      korean_antonyms: "", // 반의어 없음 (빈 문자열)
+      korean_word_family: "과일|음식",
+      korean_compound_words: "사과나무|사과즙",
+      korean_collocations: "빨간 사과|맛있는 사과", // frequency 제거
 
-        japanese: {
-          word: "りんご",
-          hiragana: "りんご",
-          katakana: "リンゴ",
-          kanji: "",
-          pronunciation: "ringo",
-          romanization: "ringo",
-          definition: "赤や緑の皮をもつ、甘くて丸い果物",
-          part_of_speech: "名詞",
-          level: "初級",
-          synonyms: ["アップル"],
-          antonyms: [],
-          word_family: ["果物", "果実", "青果"],
-          compound_words: ["りんごの木", "りんごジュース"],
-          collocations: [
-            { phrase: "りんごを食べる", frequency: "high" },
-            { phrase: "赤いりんご", frequency: "high" },
-          ],
-        },
+      // 영어 정보 (핵심 속성 유지)
+      english_word: "apple",
+      english_pronunciation: "/ˈæpəl/", // IPA 표기 (영어 특화)
+      english_definition: "a round fruit with red or green skin",
+      english_part_of_speech: "noun",
+      english_level: "beginner",
+      english_phonetic: "/ˈæpəl/", // IPA 음성 표기 (영어 특화)
+      english_synonyms: "", // 동의어 없음
+      english_antonyms: "", // 반의어 없음
+      english_word_family: "fruit|food",
+      english_compound_words: "apple tree|apple juice",
+      english_collocations: "red apple|sweet apple",
 
-        chinese: {
-          word: "苹果",
-          pronunciation: "píng guǒ",
-          pinyin: "píng guǒ",
-          definition: "红色或绿色皮的甜美水果",
-          part_of_speech: "名词",
-          level: "初级",
-          traditional: "蘋果",
-          simplified: "苹果",
-          synonyms: [],
-          antonyms: [],
-          word_family: ["水果", "果实", "鲜果"],
-          compound_words: ["苹果树", "苹果汁", "苹果派"],
-          collocations: [
-            { phrase: "吃苹果", frequency: "high" },
-            { phrase: "红苹果", frequency: "high" },
-          ],
-        },
-      },
+      // 일본어 정보 (핵심 속성 유지)
+      japanese_word: "りんご",
+      japanese_pronunciation: "ringo", // 일본어 발음 표기
+      japanese_definition: "赤色または緑色の丸い果物",
+      japanese_part_of_speech: "名詞",
+      japanese_level: "初級",
+      japanese_hiragana: "りんご", // 히라가나 (일본어 특화)
+      japanese_katakana: "リンゴ", // 가타카나 (일본어 특화)
+      japanese_kanji: "林檎", // 한자 (일본어 특화)
+      japanese_romanization: "ringo", // 로마자 표기 (일본어 특화)
+      japanese_synonyms: "",
+      japanese_antonyms: "",
+      japanese_word_family: "果物|食べ物",
+      japanese_compound_words: "りんごの木|りんごジュース",
+      japanese_collocations: "赤いりんご|甘いりんご",
 
-      featured_examples: [
-        {
-          id: "apple_example_1",
-          context: "daily_routine",
-          difficulty: "beginner",
+      // 중국어 정보 (핵심 속성 유지)
+      chinese_word: "苹果",
+      chinese_pronunciation: "píngguǒ", // 병음 표기 (중국어 특화)
+      chinese_definition: "红色或绿色的圆形水果",
+      chinese_part_of_speech: "名词",
+      chinese_level: "初级",
+      chinese_traditional: "蘋果", // 번체 (중국어 특화)
+      chinese_simplified: "苹果", // 간체 (중국어 특화)
+      chinese_synonyms: "",
+      chinese_antonyms: "",
+      chinese_word_family: "水果|食物",
+      chinese_compound_words: "苹果树|苹果汁",
+      chinese_collocations: "红苹果|甜苹果",
 
-          // 강화된 문법 시스템 (예문 중심)
-          grammar_system: {
-            pattern_name: "시간부사 + 목적어 + 동사",
-            structural_pattern: "S + 시간부사 + O + V",
-            grammar_tags: [
-              "present_tense",
-              "time_adverb:morning",
-              "object_marking:을/를",
-              "polite_ending:haeyo",
-              "daily_routine",
-              "food_consumption",
-              "declarative_mood",
-            ],
-            complexity_level: "basic_sentence",
-            learning_focus: [
-              "시간표현",
-              "목적어 조사",
-              "현재시제",
-              "정중함 표현",
-              "일상 루틴",
-            ],
-            grammatical_features: {
-              korean: {
-                sentence_type: "서술문",
-                speech_level: "해요체",
-                tense: "현재",
-                mood: "평서법",
-                honorific_level: "일반 정중",
-                key_grammar_points: [
-                  "시간부사 위치",
-                  "목적어 조사 '을'",
-                  "해요체 어미",
-                  "어순 구조",
-                ],
-              },
-              english: {
-                sentence_type: "declarative",
-                tense: "simple_present",
-                voice: "active",
-                mood: "indicative",
-                key_grammar_points: [
-                  "time_adverbial_placement",
-                  "article_usage",
-                  "subject_verb_agreement",
-                  "sentence_structure",
-                ],
-              },
-              japanese: {
-                sentence_type: "平叙文",
-                speech_level: "丁寧語",
-                tense: "現在",
-                key_grammar_points: [
-                  "時間詞の位置",
-                  "助詞「に」「を」",
-                  "ます形活用",
-                  "語順構造",
-                ],
-              },
-              chinese: {
-                sentence_type: "陈述句",
-                tense: "一般现在时",
-                key_grammar_points: [
-                  "时间状语位置",
-                  "宾语结构",
-                  "动词时态",
-                  "语序特点",
-                ],
-              },
-            },
-            difficulty_factors: {
-              vocabulary: 15,
-              grammar_complexity: 20,
-              cultural_context: 10,
-              pronunciation: 15,
-            },
-            teaching_notes: {
-              primary_focus: "시간표현과 목적어 활용",
-              common_mistakes: [
-                "목적어 조사 생략",
-                "시간부사 위치 오류",
-                "해요체 활용 실수",
-              ],
-              practice_suggestions: [
-                "다른 시간부사로 치환 연습",
-                "다른 음식 단어로 대체 연습",
-                "질문-답변 패턴 연습",
-              ],
-            },
-          },
+      // 대표 예문 (concepts에 포함)
+      representative_example_korean: "아침에 사과를 먹어요.",
+      representative_example_english: "I eat an apple in the morning.",
+      representative_example_japanese: "朝にりんごを食べます。",
+      representative_example_chinese: "我早上吃苹果。",
+      representative_example_context: "daily_routine",
+      representative_example_difficulty: "beginner",
 
-          translations: {
-            korean: {
-              text: "아침에 사과를 먹어요.",
-              romanization: "achime sagwareul meogeoyo",
-            },
-            english: {
-              text: "I eat an apple in the morning.",
-              phonetic: "/aɪ iːt æn ˈæpəl ɪn ðə ˈmɔrnɪŋ/",
-            },
-            japanese: {
-              text: "朝にりんごを食べます。",
-              romanization: "asa ni ringo wo tabemasu",
-            },
-            chinese: {
-              text: "我早上吃苹果。",
-              pinyin: "wǒ zǎoshang chī píngguǒ",
-            },
-          },
-        },
-      ],
+      // 추가 예문 (examples 컬렉션으로 분리)
+      additional_examples_korean: "이 사과는 달콤해요.|사과 한 개 주세요.",
+      additional_examples_english:
+        "This apple is sweet.|Can I have one apple please?",
+      additional_examples_japanese:
+        "このりんごは甘いです。|りんごを一つください。",
+      additional_examples_chinese: "这个苹果很甜。|请给我一个苹果。",
+      additional_examples_context: "taste_description|shopping",
+      additional_examples_difficulty: "beginner|beginner",
 
-      quiz_data: {
-        difficulty_levels: {
-          beginner: {
-            translation: {
-              korean_to_english: {
-                question: "다음 한국어를 영어로 번역하세요: '사과'",
-                correct_answer: "apple",
-                grammar_hint: "과일 명사입니다",
-                alternatives: ["fruit", "red apple"],
-              },
-            },
-            pronunciation: {
-              korean: {
-                question: "'사과'의 정확한 발음은?",
-                correct_answer: "sa-gwa",
-                grammar_hint: "각 음절을 명확히 발음하세요",
-              },
-            },
-          },
-        },
-      },
-
-      game_data: {
-        memory_game: {
-          difficulty_score: 15,
-          pair_type: "word_translation",
-          hint_system: {
-            grammar_hint: "과일 명사",
-            context_hint: "건강한 간식",
-            difficulty_hint: "초급 수준",
-          },
-        },
-        pronunciation_game: {
-          target_sounds: ["사", "과"],
-          common_mistakes: ["싸과", "사까"],
-          practice_focus: ["자음", "모음"],
-        },
-      },
-
-      learning_progress: {
-        vocabulary_mastery: {
-          recognition: 0,
-          production: 0,
-          fluency: 0,
-        },
-        grammar_understanding: {
-          pattern_recognition: 0,
-          production_accuracy: 0,
-          contextual_usage: 0,
-        },
-      },
+      // 문법 정보 (grammar_patterns 컬렉션으로 분리)
+      grammar_pattern_name: "목적어 표시 패턴",
+      grammar_pattern_korean: "명사 + 을/를 + 동사",
+      grammar_pattern_english: "Object + Verb pattern",
+      grammar_pattern_japanese: "名詞 + を + 動詞",
+      grammar_pattern_chinese: "名词 + 宾语标记",
+      grammar_tags: "present_tense|declarative|daily_activity|object_marking",
+      learning_focus: "시간 표현|목적어 표시|현재 시제|일상 활동",
     },
-
     {
-      concept_info: {
-        domain: "daily",
-        category: "greeting",
-        difficulty: "beginner",
-        tags: ["polite", "common", "essential"],
-        unicode_emoji: "👋",
-        color_theme: "#4CAF50",
-        quiz_frequency: "very_high",
-        game_types: ["matching", "pronunciation"],
-        learning_priority: 1,
-      },
-      expressions: {
-        korean: {
-          word: "안녕하세요",
-          pronunciation: "an-nyeong-ha-se-yo",
-          romanization: "annyeonghaseyo",
-          definition: "정중한 인사말",
-          part_of_speech: "감탄사",
-          level: "초급",
-          synonyms: ["안녕", "반갑습니다"],
-          antonyms: ["안녕히 가세요"],
-          word_family: ["인사", "인사말", "예의"],
-          compound_words: ["안녕인사", "안녕메시지"],
-          collocations: [
-            { phrase: "안녕하세요, 만나서 반갑습니다", frequency: "high" },
-          ],
-        },
+      // 기본 정보
+      domain: "daily",
+      category: "greeting",
+      emoji: "👋",
 
-        english: {
-          word: "hello",
-          pronunciation: "həˈloʊ",
-          phonetic: "/həˈloʊ/",
-          definition: "used as a greeting or to begin a phone conversation",
-          part_of_speech: "exclamation",
-          level: "beginner",
-          synonyms: ["hi", "hey", "greetings"],
-          antonyms: ["goodbye", "bye"],
-          word_family: ["greeting", "salutation", "welcome"],
-          compound_words: ["hello-world", "hello-sign"],
-          collocations: [
-            { phrase: "say hello", frequency: "high" },
-            { phrase: "hello there", frequency: "medium" },
-          ],
-        },
+      // 한국어 정보 (핵심 속성 유지)
+      korean_word: "안녕하세요",
+      korean_pronunciation: "an-nyeong-ha-se-yo",
+      korean_definition: "정중한 인사말로 낮에 사용하는 표현",
+      korean_part_of_speech: "감탄사",
+      korean_level: "초급",
+      korean_romanization: "annyeonghaseyo",
+      korean_synonyms: "안녕|반갑습니다", // 실제 동의어
+      korean_antonyms: "안녕히 가세요", // 실제 반대 개념 (인사 vs 이별)
+      korean_word_family: "인사|예의",
+      korean_compound_words: "인사말|첫인사",
+      korean_collocations: "정중한 안녕하세요|첫 안녕하세요",
 
-        japanese: {
-          word: "こんにちは",
-          hiragana: "こんにちは",
-          katakana: "",
-          kanji: "今日は",
-          pronunciation: "konnichiwa",
-          romanization: "konnichiwa",
-          definition: "昼間の挨拶",
-          part_of_speech: "感動詞",
-          level: "初級",
-          synonyms: ["おはよう", "こんばんは"],
-          antonyms: ["さようなら"],
-          word_family: ["挨拶", "礼儀", "言葉"],
-          compound_words: ["こんにちは挨拶"],
-          collocations: [
-            { phrase: "こんにちは、元気ですか", frequency: "high" },
-          ],
-        },
+      // 영어 정보 (핵심 속성 유지)
+      english_word: "hello",
+      english_pronunciation: "/həˈloʊ/",
+      english_definition: "a polite greeting expression used during the day",
+      english_part_of_speech: "exclamation",
+      english_level: "beginner",
+      english_phonetic: "/həˈloʊ/",
+      english_synonyms: "hi|good morning|good afternoon", // 실제 동의어
+      english_antonyms: "goodbye|farewell", // 실제 반대 개념
+      english_word_family: "greeting|salutation",
+      english_compound_words: "hello greeting|hello message",
+      english_collocations: "say hello|warm hello",
 
-        chinese: {
-          word: "你好",
-          pronunciation: "nǐ hǎo",
-          pinyin: "nǐ hǎo",
-          definition: "见面时的礼貌问候语",
-          part_of_speech: "感叹词",
-          level: "初级",
-          traditional: "你好",
-          simplified: "你好",
-          synonyms: ["您好", "你们好"],
-          antonyms: ["再见", "拜拜"],
-          word_family: ["问候", "礼貌", "招呼"],
-          compound_words: ["你好问候", "你好信息"],
-          collocations: [{ phrase: "你好，很高兴见到你", frequency: "high" }],
-        },
-      },
+      // 일본어 정보 (핵심 속성 유지)
+      japanese_word: "こんにちは",
+      japanese_pronunciation: "konnichiwa",
+      japanese_definition: "昼間に使う丁寧な挨拶表現",
+      japanese_part_of_speech: "感動詞",
+      japanese_level: "初級",
+      japanese_hiragana: "こんにちは",
+      japanese_katakana: "", // 가타카나 표기 없음
+      japanese_kanji: "今日は", // 한자 표기
+      japanese_romanization: "konnichiwa",
+      japanese_synonyms: "おはようございます|こんばんは", // 실제 동의어
+      japanese_antonyms: "さようなら|また明日", // 실제 반대 개념
+      japanese_word_family: "挨拶|礼儀",
+      japanese_compound_words: "挨拶言葉|初対面挨拶",
+      japanese_collocations: "丁寧なこんにちは|初めてのこんにちは",
 
-      featured_examples: [
-        {
-          id: "greeting_example_1",
-          context: "first_meeting",
-          difficulty: "beginner",
+      // 중국어 정보 (핵심 속성 유지)
+      chinese_word: "你好",
+      chinese_pronunciation: "nǐ hǎo",
+      chinese_definition: "白天使用的礼貌问候语",
+      chinese_part_of_speech: "感叹词",
+      chinese_level: "初级",
+      chinese_traditional: "你好",
+      chinese_simplified: "你好",
+      chinese_synonyms: "您好|大家好", // 실제 동의어
+      chinese_antonyms: "再见|告别", // 실제 반대 개념
+      chinese_word_family: "问候|礼貌",
+      chinese_compound_words: "问候语|初次见面",
+      chinese_collocations: "礼貌的你好|热情的你好",
 
-          // 강화된 문법 시스템 (예문 중심)
-          grammar_system: {
-            pattern_name: "연속 인사 표현",
-            structural_pattern: "인사 + 감정표현",
-            grammar_tags: [
-              "greeting_formula",
-              "polite_level:formal",
-              "first_meeting",
-              "emotion_expression:positive",
-              "social_protocol",
-              "sequential_greetings",
-              "conjunction:period",
-            ],
-            complexity_level: "basic_compound",
-            learning_focus: [
-              "첫만남 인사",
-              "정중함 표현",
-              "감정 표현",
-              "사회적 예의",
-              "문장 연결",
-            ],
-            grammatical_features: {
-              korean: {
-                sentence_type: "감탄문 + 서술문",
-                speech_level: "해요체 + 합니다체",
-                formality: "정중함",
-                social_context: "첫 만남",
-                key_grammar_points: [
-                  "인사 감탄사",
-                  "연결어미 없는 문장 연결",
-                  "높임 표현",
-                  "감정 표현 동사",
-                ],
-              },
-              english: {
-                sentence_type: "exclamation + declarative",
-                formality: "neutral_polite",
-                social_context: "introduction",
-                key_grammar_points: [
-                  "greeting_interjection",
-                  "comma_conjunction",
-                  "adjective_phrase",
-                  "infinitive_purpose",
-                ],
-              },
-              japanese: {
-                sentence_type: "挨拶 + 定型表現",
-                speech_level: "丁寧語",
-                formality: "正式",
-                social_context: "初対面",
-                key_grammar_points: [
-                  "挨拶の感動詞",
-                  "初対面の決まり文句",
-                  "丁寧語の活用",
-                  "文の区切り",
-                ],
-              },
-              chinese: {
-                sentence_type: "问候语 + 感情表达",
-                formality: "礼貌",
-                social_context: "初次见面",
-                key_grammar_points: [
-                  "问候语使用",
-                  "逗号连接",
-                  "感情形容词",
-                  "见面表达",
-                ],
-              },
-            },
-            difficulty_factors: {
-              vocabulary: 20,
-              grammar_complexity: 25,
-              cultural_context: 30,
-              pronunciation: 20,
-            },
-            teaching_notes: {
-              primary_focus: "첫 만남 상황의 정중한 인사 패턴",
-              common_mistakes: [
-                "높임 표현 혼동",
-                "문장 연결 오류",
-                "상황별 인사 구분 실패",
-              ],
-              practice_suggestions: [
-                "다양한 만남 상황 시뮬레이션",
-                "높임 표현 단계별 연습",
-                "감정 표현 어휘 확장 연습",
-              ],
-            },
-          },
+      // 대표 예문 (concepts에 포함)
+      representative_example_korean: "안녕하세요, 만나서 반갑습니다.",
+      representative_example_english: "Hello, nice to meet you.",
+      representative_example_japanese: "こんにちは、はじめまして。",
+      representative_example_chinese: "你好，很高兴见到你。",
+      representative_example_context: "first_meeting",
+      representative_example_difficulty: "beginner",
 
-          translations: {
-            korean: {
-              text: "안녕하세요. 만나서 반갑습니다.",
-              romanization: "annyeonghaseyo. mannaseo bangapseumnida",
-            },
-            english: {
-              text: "Hello, nice to meet you.",
-              phonetic: "/həˈloʊ, naɪs tə mit ju/",
-            },
-            japanese: {
-              text: "こんにちは。はじめまして。",
-              romanization: "konnichiwa. hajimemashite",
-            },
-            chinese: {
-              text: "你好，很高兴见到你。",
-              pinyin: "nǐ hǎo, hěn gāoxìng jiàndào nǐ",
-            },
-          },
-        },
-      ],
+      // 추가 예문 (examples 컬렉션으로 분리)
+      additional_examples_korean:
+        "안녕하세요, 오늘 날씨가 좋네요.|안녕하세요, 어떻게 지내세요?",
+      additional_examples_english:
+        "Hello, the weather is nice today.|Hello, how are you doing?",
+      additional_examples_japanese:
+        "こんにちは、今日はいい天気ですね。|こんにちは、元気ですか？",
+      additional_examples_chinese: "你好，今天天气真好。|你好，你好吗？",
+      additional_examples_context: "weather_talk|wellbeing_check",
+      additional_examples_difficulty: "beginner|beginner",
 
-      quiz_data: {
-        difficulty_levels: {
-          beginner: {
-            translation: {
-              korean_to_english: {
-                question: "다음 한국어를 영어로 번역하세요: '안녕하세요'",
-                correct_answer: "hello",
-                grammar_hint: "정중한 인사말입니다",
-                alternatives: ["hi", "hey", "greetings"],
-              },
-            },
-            pronunciation: {
-              korean: {
-                question: "'안녕하세요'의 정확한 발음은?",
-                correct_answer: "an-nyeong-ha-se-yo",
-                grammar_hint: "각 음절을 명확히 발음하세요",
-              },
-            },
-          },
-        },
-      },
-
-      game_data: {
-        memory_game: {
-          difficulty_score: 15,
-          pair_type: "word_translation",
-          hint_system: {
-            grammar_hint: "기본 인사말",
-            context_hint: "만날 때 사용",
-            difficulty_hint: "초급 수준",
-          },
-        },
-        pronunciation_game: {
-          target_sounds: ["안녕", "하세요"],
-          common_mistakes: ["하새요", "안녕해세요"],
-          practice_focus: ["연음", "경음"],
-        },
-      },
-
-      learning_progress: {
-        vocabulary_mastery: {
-          recognition: 0,
-          production: 0,
-          fluency: 0,
-        },
-        grammar_understanding: {
-          pattern_recognition: 0,
-          production_accuracy: 0,
-          contextual_usage: 0,
-        },
-      },
+      // 문법 정보 (grammar_patterns 컬렉션으로 분리)
+      grammar_pattern_name: "정중한 인사 표현",
+      grammar_pattern_korean: "안녕하세요 + 연결어미",
+      grammar_pattern_english: "Polite greeting formula",
+      grammar_pattern_japanese: "こんにちは + 連結表現",
+      grammar_pattern_chinese: "你好 + 连接表达",
+      grammar_tags:
+        "greeting_formula|polite_level:formal|first_meeting|emotion_expression",
+      learning_focus: "첫만남 인사|정중함 표현|감정 표현|사회적 예의",
     },
   ];
 
-  // JSON 문자열로 변환 (들여쓰기 포함)
-  const jsonContent = JSON.stringify(jsonTemplate, null, 2);
-
-  // Blob 생성 및 다운로드
-  const blob = new Blob([jsonContent], {
-    type: "application/json;charset=utf-8;",
-  });
-  const url = URL.createObjectURL(blob);
-
+  // JSON 파일 다운로드
+  const jsonString = JSON.stringify(template, null, 2);
+  const blob = new Blob([jsonString], { type: "application/json" });
   const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
   link.setAttribute("href", url);
-  link.setAttribute("download", "concept_template.json");
-  link.style.display = "none";
-
+  link.setAttribute("download", "concept_template_improved.json");
+  link.style.visibility = "hidden";
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-
   URL.revokeObjectURL(url);
 }
 
@@ -1000,9 +677,25 @@ async function startImport() {
     // === 분리된 컬렉션 시스템 사용 ===
     importResult.textContent = `${importedData.length}개의 개념을 분리된 컬렉션으로 저장 중...`;
 
+    // JSON 데이터 형식 변환 (방식 1에서 integratedData 형식으로)
+    const convertedData = importedData.map((item) => {
+      if (item.concept) {
+        // 방식 1 형태를 integratedData 형태로 변환
+        return {
+          concept_info: item.concept.concept_info,
+          expressions: item.concept.expressions,
+          representative_example: item.concept.representative_example,
+          core_examples: item.examples || [],
+          grammar_patterns: item.grammar_pattern ? [item.grammar_pattern] : [],
+          metadata: item.concept.learning_metadata || {},
+        };
+      }
+      return item; // 이미 올바른 형식인 경우
+    });
+
     // 대량 처리 최적화
     const batchResults = await collectionManager.bulkCreateSeparatedConcepts(
-      importedData
+      convertedData
     );
 
     const successCount = batchResults.results.length;
@@ -1230,238 +923,288 @@ function parseCSVLine(line, delimiter) {
   return result;
 }
 
-// CSV 데이터에서 개념 객체 생성 - 참조 기반 구조로 재설계
+// CSV 데이터에서 개념 객체 생성 - 방식 1 기반 분리된 컬렉션 구조
 function createConceptFromCSV(
   values,
   headerRow,
   defaultDomain,
   defaultCategory
 ) {
-  // 헤더가 있는 경우와 없는 경우 처리
-  let domain, category, emoji;
-  let expressions = {};
-  let coreExamples = []; // 핵심 예문만 포함
+  if (!values || values.length === 0) return null;
 
-  if (headerRow) {
-    // 헤더가 있는 경우 - 헤더 이름으로 매핑
-    const valueMap = {};
+  // 헤더와 값 매핑
+  const valueMap = {};
+  headerRow.forEach((header, index) => {
+    valueMap[header] = values[index] || "";
+  });
 
-    headerRow.forEach((header, index) => {
-      if (index < values.length) {
-        valueMap[header.trim()] = values[index];
-      }
-    });
+  const domain = valueMap.domain || defaultDomain;
+  const category = valueMap.category || defaultCategory;
+  const emoji = valueMap.emoji || "";
 
-    domain = valueMap.domain || defaultDomain;
-    category = valueMap.category || defaultCategory;
-    emoji = valueMap.emoji || valueMap.unicode_emoji || "";
-
-    // 언어별 표현 생성 (단순화됨)
-    for (const langCode of Object.keys(supportedLanguages)) {
-      const word = valueMap[`${langCode}_word`];
-
-      if (word) {
-        // 핵심 단어 정보만 포함
-        const expression = {
-          word: word,
-          pronunciation: valueMap[`${langCode}_pronunciation`] || "",
-          definition: valueMap[`${langCode}_definition`] || "",
-          part_of_speech: valueMap[`${langCode}_part_of_speech`] || "noun",
-          level: valueMap[`${langCode}_level`] || "beginner",
-          synonyms: parseArrayField(valueMap[`${langCode}_synonyms`]),
-          antonyms: parseArrayField(valueMap[`${langCode}_antonyms`]),
-          word_family: parseArrayField(valueMap[`${langCode}_word_family`]),
-          compound_words: parseArrayField(
-            valueMap[`${langCode}_compound_words`]
-          ),
-          collocations: parseCollocationsField(
-            valueMap[`${langCode}_collocations`]
-          ),
-        };
-
-        // 언어별 특수 필드 추가
-        if (langCode === "korean") {
-          expression.romanization = valueMap.korean_romanization || "";
-        } else if (langCode === "english") {
-          expression.phonetic = valueMap.english_phonetic || "";
-        } else if (langCode === "japanese") {
-          expression.hiragana = valueMap.japanese_hiragana || "";
-          expression.katakana = valueMap.japanese_katakana || "";
-          expression.kanji = valueMap.japanese_kanji || "";
-          expression.romanization = valueMap.japanese_romanization || "";
-        } else if (langCode === "chinese") {
-          expression.pinyin = valueMap.chinese_pronunciation || "";
-          expression.traditional = valueMap.chinese_traditional || word;
-          expression.simplified = valueMap.chinese_simplified || word;
-        }
-
-        expressions[langCode] = expression;
-      }
-    }
-
-    // 핵심 예문 생성 (Firestore 자동 ID 사용)
-    const exampleKorean = valueMap.example_1_korean;
-    const exampleEnglish = valueMap.example_1_english;
-    const exampleJapanese = valueMap.example_1_japanese;
-    const exampleChinese = valueMap.example_1_chinese;
-    const exampleContext = valueMap.example_1_context || "general";
-    const exampleGrammarPattern = valueMap.example_1_grammar_pattern || "";
-    const exampleGrammarTags = parseArrayField(valueMap.example_1_grammar_tags);
-    const exampleDifficulty = valueMap.example_1_difficulty || "beginner";
-
-    if (exampleKorean || exampleEnglish || exampleJapanese || exampleChinese) {
-      // 예문 ID는 컬렉션 매니저에서 자동 생성됨
-      const exampleId = `example_${Date.now()}_${Math.random()
-        .toString(36)
-        .substr(2, 9)}`;
-
-      // 문법 패턴 ID 생성 (향후 grammar 컬렉션에서 사용)
-      const grammarPatternId = generateGrammarPatternId(
-        domain,
-        category,
-        exampleGrammarPattern,
-        exampleGrammarTags
-      );
-
-      const coreExample = {
-        example_id: exampleId,
-        grammar_pattern_id: grammarPatternId, // 향후 grammar 컬렉션 참조
-        context: exampleContext,
-        difficulty: exampleDifficulty,
-        priority: 1, // 핵심 예문
-
-        // 단순한 번역 정보만
-        translations: {},
-
-        // 향후 확장을 위한 메타데이터
-        metadata: {
-          created_from: "csv_import",
-          learning_weight: 10,
-          quiz_eligible: true,
-          game_eligible: true,
-        },
-      };
-
-      // 번역 추가
-      if (exampleKorean) {
-        coreExample.translations.korean = {
-          text: exampleKorean,
-          romanization: "",
-        };
-      }
-      if (exampleEnglish) {
-        coreExample.translations.english = {
-          text: exampleEnglish,
-          phonetic: "",
-        };
-      }
-      if (exampleJapanese) {
-        coreExample.translations.japanese = {
-          text: exampleJapanese,
-          romanization: "",
-        };
-      }
-      if (exampleChinese) {
-        coreExample.translations.chinese = {
-          text: exampleChinese,
-          pinyin: "",
-        };
-      }
-
-      coreExamples.push(coreExample);
-    }
-  } else {
-    // 헤더가 없는 경우 - 기존 레거시 처리 방식 (단순화)
-    domain = values[0] || defaultDomain;
-    category = values[1] || defaultCategory;
-    emoji = values[2] || "";
-
-    let wordIndex = 3;
-    for (const langCode of Object.keys(supportedLanguages)) {
-      const word = values[wordIndex];
-      if (word) {
-        expressions[langCode] = {
-          word: word,
-          pronunciation: values[wordIndex + 1] || "",
-          definition: values[wordIndex + 2] || "",
-          part_of_speech: "noun",
-          level: "beginner",
-          synonyms: [],
-          antonyms: [],
-          word_family: [],
-          compound_words: [],
-          collocations: [],
-        };
-      }
-      wordIndex += 3;
-    }
-  }
-
-  if (Object.keys(expressions).length === 0) {
-    console.warn("유효한 단어가 없는 행:", values);
+  if (!domain || !category) {
+    console.warn("도메인 또는 카테고리가 없는 개념:", valueMap);
     return null;
   }
 
-  // concept_info (단순화됨) - concept_id 제거
+  // 1. 언어별 표현 생성 (핵심 속성 유지)
+  let expressions = {};
+  const supportedLanguages = {
+    korean: "한국어",
+    english: "영어",
+    japanese: "일본어",
+    chinese: "중국어",
+  };
+
+  for (const langCode of Object.keys(supportedLanguages)) {
+    const word = valueMap[`${langCode}_word`];
+
+    if (word) {
+      // 핵심 단어 정보 (concepts 컬렉션에 포함)
+      const expression = {
+        word: word,
+        pronunciation: valueMap[`${langCode}_pronunciation`] || "",
+        definition: valueMap[`${langCode}_definition`] || "",
+        part_of_speech: valueMap[`${langCode}_part_of_speech`] || "noun",
+        level: valueMap[`${langCode}_level`] || "beginner",
+        synonyms: parseArrayField(valueMap[`${langCode}_synonyms`]),
+        antonyms: parseArrayField(valueMap[`${langCode}_antonyms`]),
+        word_family: parseArrayField(valueMap[`${langCode}_word_family`]),
+        compound_words: parseArrayField(valueMap[`${langCode}_compound_words`]),
+        collocations: parseCollocationsField(
+          valueMap[`${langCode}_collocations`]
+        ),
+      };
+
+      // 언어별 특수 필드 추가
+      if (langCode === "korean") {
+        expression.romanization = valueMap.korean_romanization || "";
+      } else if (langCode === "english") {
+        expression.phonetic = valueMap.english_phonetic || "";
+      } else if (langCode === "japanese") {
+        expression.hiragana = valueMap.japanese_hiragana || "";
+        expression.katakana = valueMap.japanese_katakana || "";
+        expression.kanji = valueMap.japanese_kanji || "";
+        expression.romanization = valueMap.japanese_romanization || "";
+      } else if (langCode === "chinese") {
+        expression.pinyin = valueMap.chinese_pronunciation || "";
+        expression.traditional = valueMap.chinese_traditional || word;
+        expression.simplified = valueMap.chinese_simplified || word;
+      }
+
+      expressions[langCode] = expression;
+    }
+  }
+
+  // 개념 ID 생성
+  const conceptId = generateConceptId(domain, category, expressions);
+
+  // 2. 대표 예문 생성 (concepts 컬렉션에 포함)
+  let representativeExample = null;
+  const repExampleKorean = valueMap.representative_example_korean;
+  const repExampleEnglish = valueMap.representative_example_english;
+  const repExampleJapanese = valueMap.representative_example_japanese;
+  const repExampleChinese = valueMap.representative_example_chinese;
+
+  if (
+    repExampleKorean ||
+    repExampleEnglish ||
+    repExampleJapanese ||
+    repExampleChinese
+  ) {
+    representativeExample = {
+      example_id: `${conceptId}_rep_example`,
+      context: valueMap.representative_example_context || "general",
+      difficulty: valueMap.representative_example_difficulty || "beginner",
+      translations: {},
+    };
+
+    // 각 언어별 번역 추가
+    if (repExampleKorean) {
+      representativeExample.translations.korean = {
+        text: repExampleKorean,
+        romanization: "",
+      };
+    }
+    if (repExampleEnglish) {
+      representativeExample.translations.english = {
+        text: repExampleEnglish,
+        phonetic: "",
+      };
+    }
+    if (repExampleJapanese) {
+      representativeExample.translations.japanese = {
+        text: repExampleJapanese,
+        romanization: "",
+      };
+    }
+    if (repExampleChinese) {
+      representativeExample.translations.chinese = {
+        text: repExampleChinese,
+        pinyin: "",
+      };
+    }
+  }
+
+  // 3. concept_info 생성 (불필요한 속성 제거)
   const conceptInfo = {
     domain: domain,
     category: category,
     difficulty: "beginner",
-    tags: [],
     unicode_emoji: emoji,
     color_theme: "#9C27B0",
     updated_at: new Date(),
-    learning_priority: 1,
   };
 
-  // 개념 ID 생성 (참조용으로만 사용)
-  const conceptId = generateConceptId(domain, category, expressions);
+  // 4. 추가 예문 생성 (examples 컬렉션으로 분리)
+  const additionalExamples = [];
+  const addExamplesKorean = valueMap.additional_examples_korean;
+  const addExamplesEnglish = valueMap.additional_examples_english;
+  const addExamplesJapanese = valueMap.additional_examples_japanese;
+  const addExamplesChinese = valueMap.additional_examples_chinese;
 
-  // 향후 컬렉션 분리를 위한 참조 시스템
-  const references = {
-    // 핵심 예문 참조 (examples 컬렉션)
-    core_examples: coreExamples.map((ex) => ex.example_id),
+  if (
+    addExamplesKorean ||
+    addExamplesEnglish ||
+    addExamplesJapanese ||
+    addExamplesChinese
+  ) {
+    // 파이프로 구분된 여러 예문 처리
+    const koreanExamples = addExamplesKorean
+      ? addExamplesKorean.split("|")
+      : [];
+    const englishExamples = addExamplesEnglish
+      ? addExamplesEnglish.split("|")
+      : [];
+    const japaneseExamples = addExamplesJapanese
+      ? addExamplesJapanese.split("|")
+      : [];
+    const chineseExamples = addExamplesChinese
+      ? addExamplesChinese.split("|")
+      : [];
+    const contexts = valueMap.additional_examples_context
+      ? valueMap.additional_examples_context.split("|")
+      : [];
+    const difficulties = valueMap.additional_examples_difficulty
+      ? valueMap.additional_examples_difficulty.split("|")
+      : [];
 
-    // 문법 패턴 참조 (grammar 컬렉션)
-    grammar_patterns: [
-      ...new Set(coreExamples.map((ex) => ex.grammar_pattern_id)),
-    ].filter(Boolean),
+    const maxExamples = Math.max(
+      koreanExamples.length,
+      englishExamples.length,
+      japaneseExamples.length,
+      chineseExamples.length
+    );
 
-    // 퀴즈 템플릿 참조 (quiz 컬렉션)
-    quiz_templates: generateQuizTemplateIds(conceptId, domain, category),
+    for (let i = 0; i < maxExamples; i++) {
+      const example = {
+        example_id: `${conceptId}_add_example_${i + 1}`,
+        concept_id: conceptId,
+        context: contexts[i] || "general",
+        difficulty: difficulties[i] || "beginner",
+        translations: {},
+      };
 
-    // 게임 타입 참조 (games 컬렉션)
-    game_types: generateGameTypeIds(conceptId, domain, category),
+      if (koreanExamples[i]) {
+        example.translations.korean = {
+          text: koreanExamples[i].trim(),
+          romanization: "",
+        };
+      }
+      if (englishExamples[i]) {
+        example.translations.english = {
+          text: englishExamples[i].trim(),
+          phonetic: "",
+        };
+      }
+      if (japaneseExamples[i]) {
+        example.translations.japanese = {
+          text: japaneseExamples[i].trim(),
+          romanization: "",
+        };
+      }
+      if (chineseExamples[i]) {
+        example.translations.chinese = {
+          text: chineseExamples[i].trim(),
+          pinyin: "",
+        };
+      }
 
-    // 사용자 진도 참조 (user_progress 컬렉션)
-    progress_tracking: {
-      vocabulary_progress_id: `${conceptId}_vocab_progress`,
-      example_progress_id: `${conceptId}_example_progress`,
+      additionalExamples.push(example);
+    }
+  }
+
+  // 5. 문법 패턴 생성 (grammar_patterns 컬렉션으로 분리)
+  let grammarPattern = null;
+  const grammarPatternName = valueMap.grammar_pattern_name;
+  const grammarTags = valueMap.grammar_tags;
+
+  if (grammarPatternName || grammarTags) {
+    grammarPattern = {
+      pattern_id: `${conceptId}_grammar_pattern`,
+      concept_id: conceptId,
+      pattern_name: grammarPatternName || "기본 패턴",
+      pattern_type: "basic",
+      difficulty: "beginner",
+      tags: grammarTags ? grammarTags.split("|") : [],
+      learning_focus: valueMap.learning_focus
+        ? valueMap.learning_focus.split("|")
+        : [],
+      explanations: {},
+    };
+
+    // 각 언어별 문법 설명 추가
+    if (valueMap.grammar_pattern_korean) {
+      grammarPattern.explanations.korean = {
+        pattern: valueMap.grammar_pattern_korean,
+        explanation: `${grammarPatternName} - 한국어 문법 패턴`,
+      };
+    }
+    if (valueMap.grammar_pattern_english) {
+      grammarPattern.explanations.english = {
+        pattern: valueMap.grammar_pattern_english,
+        explanation: `${grammarPatternName} - English grammar pattern`,
+      };
+    }
+    if (valueMap.grammar_pattern_japanese) {
+      grammarPattern.explanations.japanese = {
+        pattern: valueMap.grammar_pattern_japanese,
+        explanation: `${grammarPatternName} - 日本語文法パターン`,
+      };
+    }
+    if (valueMap.grammar_pattern_chinese) {
+      grammarPattern.explanations.chinese = {
+        pattern: valueMap.grammar_pattern_chinese,
+        explanation: `${grammarPatternName} - 中文语法模式`,
+      };
+    }
+  }
+
+  // 6. 최종 구조 반환 (방식 1)
+  const result = {
+    // concepts 컬렉션에 저장될 데이터
+    concept: {
+      concept_info: conceptInfo,
+      expressions: expressions,
+      representative_example: representativeExample,
+      learning_metadata: {
+        created_from: "csv_import",
+        import_date: new Date(),
+        version: "2.0",
+        structure_type: "method1_separated",
+      },
     },
   };
 
-  // 최종 개념 객체 (단순화됨)
-  const concept = {
-    concept_info: conceptInfo,
-    expressions: expressions,
+  // 분리된 컬렉션 데이터 추가
+  if (additionalExamples.length > 0) {
+    result.examples = additionalExamples;
+  }
+  if (grammarPattern) {
+    result.grammar_pattern = grammarPattern;
+  }
 
-    // 핵심 예문들 (현재는 포함, 향후 분리)
-    core_examples: coreExamples,
-
-    // 참조 시스템 (향후 컬렉션 분리 대비)
-    references: references,
-
-    // 최소한의 메타데이터
-    metadata: {
-      created_at: new Date(),
-      created_from: "csv_import",
-      version: "1.0",
-      collection_structure: "integrated", // 향후 "separated"로 변경
-    },
-  };
-
-  console.log("참조 기반 개념 객체 생성:", concept);
-  return concept;
+  return result;
 }
 
 // 개념 ID 생성 함수
@@ -1726,16 +1469,13 @@ function parseCollocationsField(value) {
   return value
     .split("|")
     .map((item) => {
-      const parts = item.split(":");
-      if (parts.length === 2) {
-        return {
-          phrase: parts[0].trim(),
-          frequency: parts[1].trim(),
-        };
-      }
-      return { phrase: item.trim(), frequency: "medium" };
+      // frequency 지원 제거, 단순한 문구만 처리
+      const phrase = item.includes(":")
+        ? item.split(":")[0].trim()
+        : item.trim();
+      return phrase; // frequency 속성 완전 제거
     })
-    .filter((item) => item.phrase);
+    .filter((phrase) => phrase); // 빈 문구 제거
 }
 
 // JSON 파일 파싱
@@ -1778,304 +1518,278 @@ function parseJSONFile(file, defaultDomain, defaultCategory) {
   });
 }
 
-// JSON 데이터에서 개념 객체 생성 - 참조 기반 구조로 재설계
+// JSON 데이터에서 개념 객체 생성 - 방식 1 기반 분리된 컬렉션 구조
 function createConceptFromJSON(item, defaultDomain, defaultCategory) {
   if (!item) return null;
 
-  // 기본 정보 검증 및 설정
-  const domain = item.concept_info?.domain || item.domain || defaultDomain;
-  const category =
-    item.concept_info?.category || item.category || defaultCategory;
+  const domain = item.domain || defaultDomain;
+  const category = item.category || defaultCategory;
+  const emoji = item.emoji || "";
 
   if (!domain || !category) {
     console.warn("도메인 또는 카테고리가 없는 개념:", item);
     return null;
   }
 
-  // 표현 정보 검증
-  if (!item.expressions || Object.keys(item.expressions).length === 0) {
-    console.warn("유효한 표현이 없는 개념:", item);
-    return null;
-  }
+  // 1. 언어별 표현 생성 (핵심 속성 유지)
+  let expressions = {};
+  const supportedLanguages = {
+    korean: "한국어",
+    english: "영어",
+    japanese: "일본어",
+    chinese: "중국어",
+  };
 
-  // 유효한 표현 필터링 (단순화됨)
-  const expressions = {};
+  for (const langCode of Object.keys(supportedLanguages)) {
+    const word = item[`${langCode}_word`];
 
-  for (const [lang, expr] of Object.entries(item.expressions)) {
-    if (expr && expr.word) {
+    if (word) {
+      // 핵심 단어 정보 (concepts 컬렉션에 포함)
       const expression = {
-        word: expr.word,
-        pronunciation: expr.pronunciation || "",
-        romanization: expr.romanization || "",
-        phonetic: expr.phonetic || "",
-        definition: expr.definition || "",
-        part_of_speech: expr.part_of_speech || "noun",
-        level: expr.level || "beginner",
-        unicode_emoji: expr.unicode_emoji || "",
-        synonyms: expr.synonyms || [],
-        antonyms: expr.antonyms || [],
-        word_family: expr.word_family || [],
-        compound_words: expr.compound_words || [],
-        conjugations: expr.conjugations || null,
-        collocations: expr.collocations || [],
-        // 일본어 특수 필드
-        hiragana: expr.hiragana || "",
-        katakana: expr.katakana || "",
-        kanji: expr.kanji || "",
-        // 중국어 특수 필드
-        pinyin: expr.pinyin || "",
-        traditional: expr.traditional || "",
-        simplified: expr.simplified || "",
-        // 오디오 정보
-        audio: expr.audio || "",
+        word: word,
+        pronunciation: item[`${langCode}_pronunciation`] || "",
+        definition: item[`${langCode}_definition`] || "",
+        part_of_speech: item[`${langCode}_part_of_speech`] || "noun",
+        level: item[`${langCode}_level`] || "beginner",
+        synonyms: parseArrayField(item[`${langCode}_synonyms`]),
+        antonyms: parseArrayField(item[`${langCode}_antonyms`]),
+        word_family: parseArrayField(item[`${langCode}_word_family`]),
+        compound_words: parseArrayField(item[`${langCode}_compound_words`]),
+        collocations: parseCollocationsField(item[`${langCode}_collocations`]),
       };
 
-      expressions[lang] = expression;
+      // 언어별 특수 필드 추가
+      if (langCode === "korean") {
+        expression.romanization = item.korean_romanization || "";
+      } else if (langCode === "english") {
+        expression.phonetic = item.english_phonetic || "";
+      } else if (langCode === "japanese") {
+        expression.hiragana = item.japanese_hiragana || "";
+        expression.katakana = item.japanese_katakana || "";
+        expression.kanji = item.japanese_kanji || "";
+        expression.romanization = item.japanese_romanization || "";
+      } else if (langCode === "chinese") {
+        expression.pinyin = item.chinese_pronunciation || "";
+        expression.traditional = item.chinese_traditional || word;
+        expression.simplified = item.chinese_simplified || word;
+      }
+
+      expressions[langCode] = expression;
     }
   }
 
   if (Object.keys(expressions).length === 0) {
-    console.warn("유효한 단어가 없는 개념:", item);
+    console.warn("유효한 단어가 없는 JSON 항목:", item);
     return null;
   }
 
-  // 개념 정보 구성 (단순화됨) - concept_id 제거
+  // 개념 ID 생성
+  const conceptId = generateConceptId(domain, category, expressions);
+
+  // 2. 대표 예문 생성 (concepts 컬렉션에 포함)
+  let representativeExample = null;
+  const repExampleKorean = item.representative_example_korean;
+  const repExampleEnglish = item.representative_example_english;
+  const repExampleJapanese = item.representative_example_japanese;
+  const repExampleChinese = item.representative_example_chinese;
+
+  if (
+    repExampleKorean ||
+    repExampleEnglish ||
+    repExampleJapanese ||
+    repExampleChinese
+  ) {
+    representativeExample = {
+      example_id: `${conceptId}_rep_example`,
+      context: item.representative_example_context || "general",
+      difficulty: item.representative_example_difficulty || "beginner",
+      translations: {},
+    };
+
+    // 각 언어별 번역 추가
+    if (repExampleKorean) {
+      representativeExample.translations.korean = {
+        text: repExampleKorean,
+        romanization: "",
+      };
+    }
+    if (repExampleEnglish) {
+      representativeExample.translations.english = {
+        text: repExampleEnglish,
+        phonetic: "",
+      };
+    }
+    if (repExampleJapanese) {
+      representativeExample.translations.japanese = {
+        text: repExampleJapanese,
+        romanization: "",
+      };
+    }
+    if (repExampleChinese) {
+      representativeExample.translations.chinese = {
+        text: repExampleChinese,
+        pinyin: "",
+      };
+    }
+  }
+
+  // 3. concept_info 생성 (불필요한 속성 제거)
   const conceptInfo = {
     domain: domain,
     category: category,
-    difficulty: item.concept_info?.difficulty || "beginner",
-    tags: item.concept_info?.tags || [],
-    unicode_emoji:
-      item.concept_info?.unicode_emoji || item.concept_info?.emoji || "",
-    color_theme: item.concept_info?.color_theme || "#9C27B0",
+    difficulty: "beginner",
+    unicode_emoji: emoji,
+    color_theme: "#9C27B0",
     updated_at: new Date(),
-    learning_priority: item.concept_info?.learning_priority || 1,
   };
 
-  // 미디어 정보 처리 (선택적, 단순화됨)
-  const media = item.media
-    ? {
-        primary_image: item.media?.images?.primary || "",
-        secondary_image: item.media?.images?.secondary || "",
-        illustration_image: item.media?.images?.illustration || "",
-        audio_pronunciation: item.media?.audio?.pronunciation_normal || "",
-      }
-    : undefined;
+  // 4. 추가 예문 생성 (examples 컬렉션으로 분리)
+  const additionalExamples = [];
+  const addExamplesKorean = item.additional_examples_korean;
+  const addExamplesEnglish = item.additional_examples_english;
+  const addExamplesJapanese = item.additional_examples_japanese;
+  const addExamplesChinese = item.additional_examples_chinese;
 
-  // 핵심 예문 처리 (Firestore 자동 ID 사용)
-  const coreExamples = [];
-  if (Array.isArray(item.featured_examples)) {
-    for (const ex of item.featured_examples) {
-      if (ex && ex.translations && Object.keys(ex.translations).length > 0) {
-        const exampleId = `example_${Date.now()}_${Math.random()
-          .toString(36)
-          .substr(2, 9)}`;
+  if (
+    addExamplesKorean ||
+    addExamplesEnglish ||
+    addExamplesJapanese ||
+    addExamplesChinese
+  ) {
+    // 파이프로 구분된 여러 예문 처리
+    const koreanExamples = addExamplesKorean
+      ? addExamplesKorean.split("|")
+      : [];
+    const englishExamples = addExamplesEnglish
+      ? addExamplesEnglish.split("|")
+      : [];
+    const japaneseExamples = addExamplesJapanese
+      ? addExamplesJapanese.split("|")
+      : [];
+    const chineseExamples = addExamplesChinese
+      ? addExamplesChinese.split("|")
+      : [];
+    const contexts = item.additional_examples_context
+      ? item.additional_examples_context.split("|")
+      : [];
+    const difficulties = item.additional_examples_difficulty
+      ? item.additional_examples_difficulty.split("|")
+      : [];
 
-        // 문법 패턴 ID 추출 또는 생성
-        let grammarPatternId = null;
-        if (ex.grammar_system?.pattern_name) {
-          grammarPatternId = generateGrammarPatternId(
-            domain,
-            category,
-            ex.grammar_system.pattern_name,
-            ex.grammar_system.grammar_tags || []
-          );
-        } else if (ex.unified_grammar?.structural_pattern) {
-          grammarPatternId = generateGrammarPatternId(
-            domain,
-            category,
-            ex.unified_grammar.structural_pattern,
-            ex.unified_grammar.grammar_tags || []
-          );
-        } else {
-          grammarPatternId = `pattern_${domain}_${category}_basic`;
-        }
+    const maxExamples = Math.max(
+      koreanExamples.length,
+      englishExamples.length,
+      japaneseExamples.length,
+      chineseExamples.length
+    );
 
-        const coreExample = {
-          example_id: exampleId,
-          grammar_pattern_id: grammarPatternId, // 향후 grammar 컬렉션 참조
-          context: ex.context || "general",
-          difficulty: ex.difficulty || "beginner",
-          priority: 1, // 핵심 예문
-          translations: ex.translations,
+    for (let i = 0; i < maxExamples; i++) {
+      const example = {
+        example_id: `${conceptId}_add_example_${i + 1}`,
+        concept_id: conceptId,
+        context: contexts[i] || "general",
+        difficulty: difficulties[i] || "beginner",
+        translations: {},
+      };
 
-          // 향후 확장을 위한 메타데이터
-          metadata: {
-            created_from: "json_import",
-            learning_weight: 10,
-            quiz_eligible: true,
-            game_eligible: true,
-            has_detailed_grammar: !!(ex.grammar_system || ex.unified_grammar),
-          },
+      if (koreanExamples[i]) {
+        example.translations.korean = {
+          text: koreanExamples[i].trim(),
+          romanization: "",
         };
-
-        coreExamples.push(coreExample);
       }
+      if (englishExamples[i]) {
+        example.translations.english = {
+          text: englishExamples[i].trim(),
+          phonetic: "",
+        };
+      }
+      if (japaneseExamples[i]) {
+        example.translations.japanese = {
+          text: japaneseExamples[i].trim(),
+          romanization: "",
+        };
+      }
+      if (chineseExamples[i]) {
+        example.translations.chinese = {
+          text: chineseExamples[i].trim(),
+          pinyin: "",
+        };
+      }
+
+      additionalExamples.push(example);
     }
   }
 
-  // 기존 형식의 예제 처리 (호환성, 단순화됨)
-  if (Array.isArray(item.examples)) {
-    for (const ex of item.examples) {
-      if (ex && Object.keys(ex).length > 0) {
-        const exampleId = `example_legacy_${Date.now()}_${Math.random()
-          .toString(36)
-          .substr(2, 9)}`;
-        const grammarPatternId = `pattern_${domain}_${category}_legacy`;
+  // 5. 문법 패턴 생성 (grammar_patterns 컬렉션으로 분리)
+  let grammarPattern = null;
+  const grammarPatternName = item.grammar_pattern_name;
+  const grammarTags = item.grammar_tags;
 
-        const convertedExample = {
-          example_id: exampleId,
-          grammar_pattern_id: grammarPatternId,
-          context: ex.context || "general",
-          difficulty: "beginner",
-          priority: 2, // 일반 예문
-          translations: {},
+  if (grammarPatternName || grammarTags) {
+    grammarPattern = {
+      pattern_id: `${conceptId}_grammar_pattern`,
+      concept_id: conceptId,
+      pattern_name: grammarPatternName || "기본 패턴",
+      pattern_type: "basic",
+      difficulty: "beginner",
+      tags: grammarTags ? grammarTags.split("|") : [],
+      learning_focus: item.learning_focus ? item.learning_focus.split("|") : [],
+      explanations: {},
+    };
 
-          metadata: {
-            created_from: "json_import_legacy",
-            learning_weight: 5,
-            quiz_eligible: true,
-            game_eligible: false,
-            has_detailed_grammar: false,
-          },
-        };
-
-        // 기존 형식을 새 형식으로 변환
-        ["korean", "english", "japanese", "chinese"].forEach((lang) => {
-          if (ex[lang]) {
-            convertedExample.translations[lang] = {
-              text: ex[lang],
-              romanization: "",
-              phonetic: "",
-              pinyin: "",
-            };
-          }
-        });
-
-        coreExamples.push(convertedExample);
-      }
+    // 각 언어별 문법 설명 추가
+    if (item.grammar_pattern_korean) {
+      grammarPattern.explanations.korean = {
+        pattern: item.grammar_pattern_korean,
+        explanation: `${grammarPatternName} - 한국어 문법 패턴`,
+      };
+    }
+    if (item.grammar_pattern_english) {
+      grammarPattern.explanations.english = {
+        pattern: item.grammar_pattern_english,
+        explanation: `${grammarPatternName} - English grammar pattern`,
+      };
+    }
+    if (item.grammar_pattern_japanese) {
+      grammarPattern.explanations.japanese = {
+        pattern: item.grammar_pattern_japanese,
+        explanation: `${grammarPatternName} - 日本語文法パターン`,
+      };
+    }
+    if (item.grammar_pattern_chinese) {
+      grammarPattern.explanations.chinese = {
+        pattern: item.grammar_pattern_chinese,
+        explanation: `${grammarPatternName} - 中文语法模式`,
+      };
     }
   }
 
-  // grammar_patterns 처리 (템플릿에서 직접 가져오기)
-  const grammarPatterns = [];
-  if (Array.isArray(item.grammar_patterns)) {
-    for (const grammarPattern of item.grammar_patterns) {
-      if (grammarPattern && Object.keys(grammarPattern).length > 0) {
-        const patternId = generateGrammarPatternId(
-          domain,
-          category,
-          "template_pattern",
-          Object.keys(grammarPattern)
-        );
-
-        // 문법 패턴 객체 생성
-        const grammarPatternObj = {
-          pattern_id: patternId,
-          pattern_name: `${domain}_${category}_패턴`,
-          domain: domain,
-          category: category,
-          pattern_info: {
-            structural_pattern: "기본 문장 구조",
-            complexity_level: conceptInfo.difficulty || "beginner",
-            usage_frequency: "medium",
-          },
-          related_concepts: [conceptId],
-          example_references: [],
-          learning_metadata: {
-            difficulty_score: 15,
-            practice_priority: 1,
-            quiz_eligible: true,
-          },
-          pattern_data: grammarPattern, // 원본 문법 패턴 데이터
-          metadata: {
-            created_at: new Date(),
-            created_from: "json_import_grammar",
-            source: "bulk_import",
-          },
-        };
-
-        grammarPatterns.push(grammarPatternObj);
-
-        // 문법 패턴과 연결된 예문도 생성
-        const coreExample = {
-          example_id: `example_grammar_${Date.now()}_${Math.random()
-            .toString(36)
-            .substr(2, 9)}`,
-          grammar_pattern_id: patternId,
-          context: "grammar_template",
-          difficulty: conceptInfo.difficulty || "beginner",
-          priority: 1,
-          translations: {},
-          grammar_pattern_data: grammarPattern, // 문법 패턴 원본 데이터 포함
-
-          metadata: {
-            created_from: "json_import_grammar",
-            learning_weight: 15,
-            quiz_eligible: true,
-            game_eligible: true,
-            has_detailed_grammar: true,
-          },
-        };
-
-        // 각 언어별로 문법 패턴 텍스트 추가
-        Object.keys(grammarPattern).forEach((lang) => {
-          if (grammarPattern[lang]) {
-            coreExample.translations[lang] = {
-              text: grammarPattern[lang].pattern || "",
-              grammar_explanation: grammarPattern[lang].explanation || "",
-            };
-          }
-        });
-
-        coreExamples.push(coreExample);
-      }
-    }
-  }
-
-  // 완전한 개념 객체 반환 (featured_examples 보존)
-  const conceptObject = {
-    concept_info: conceptInfo,
-    expressions: expressions,
-
-    // 원본 featured_examples 보존 (Firebase Collection Manager가 처리)
-    featured_examples: item.featured_examples || [],
-
-    // 백업용으로만 core_examples 유지 (기존 시스템 호환성)
-    core_examples: coreExamples,
-
-    // 문법 패턴들 (분리된 컬렉션용)
-    grammar_patterns: grammarPatterns,
-
-    // 최소한의 메타데이터
-    metadata: {
-      created_at: new Date(),
-      created_from: "json_import",
-      version: "2.0",
-      collection_structure: "separated", // 분리된 컬렉션 사용
-      original_structure: item.concept_info ? "enhanced" : "basic",
-      has_featured_examples: !!(
-        item.featured_examples && item.featured_examples.length > 0
-      ),
+  // 6. 최종 구조 반환 (방식 1)
+  const result = {
+    // concepts 컬렉션에 저장될 데이터
+    concept: {
+      concept_info: conceptInfo,
+      expressions: expressions,
+      representative_example: representativeExample,
+      learning_metadata: {
+        created_from: "json_import",
+        import_date: new Date(),
+        version: "2.0",
+        structure_type: "method1_separated",
+      },
     },
   };
 
-  // 미디어가 있으면 추가
-  if (media) {
-    conceptObject.media = media;
+  // 분리된 컬렉션 데이터 추가
+  if (additionalExamples.length > 0) {
+    result.examples = additionalExamples;
+  }
+  if (grammarPattern) {
+    result.grammar_pattern = grammarPattern;
   }
 
-  console.log("분리된 컬렉션용 JSON 개념 객체 생성:", {
-    concept_info: conceptObject.concept_info,
-    expressions: Object.keys(conceptObject.expressions),
-    featured_examples_count: conceptObject.featured_examples?.length || 0,
-    core_examples_count: conceptObject.core_examples?.length || 0,
-    grammar_patterns_count: conceptObject.grammar_patterns?.length || 0,
-    has_grammar_system: conceptObject.featured_examples?.[0]?.grammar_system
-      ? true
-      : false,
-  });
-  return conceptObject;
+  return result;
 }
 
 // 모달 닫기

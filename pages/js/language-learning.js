@@ -1,12 +1,32 @@
-import { loadNavbar } from "../../components/js/navbar.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import {
-  auth,
-  db,
-  conceptUtils,
-  supportedLanguages,
-} from "../../js/firebase/firebase-init.js";
-import { collectionManager } from "../../js/firebase/firebase-collection-manager.js";
+  getFirestore,
+  collection,
+  query,
+  where,
+  limit,
+  getDocs,
+  orderBy,
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+// 기타 유틸리티는 필요시 동적으로 로드
+
+// Firebase 설정 및 초기화
+const firebaseConfig = {
+  apiKey: "AIzaSyC7Zb2gZpG8yRGKVx1l8xIxKJ9N0k2o5A4",
+  authDomain: "likevoca-f9906.firebaseapp.com",
+  projectId: "likevoca-f9906",
+  storageBucket: "likevoca-f9906.appspot.com",
+  messagingSenderId: "644834612157",
+  appId: "1:644834612157:web:8b5c5b5f5e4c4d8a5f5e5f",
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
 // 현재 사용자
 let currentUser = null;
@@ -49,28 +69,10 @@ const learningAreas = {
         desc: "단어 앞면/뒷면으로 학습",
       },
       {
-        id: "typing",
-        name: "타이핑",
-        icon: "fas fa-keyboard",
-        desc: "직접 입력하며 학습",
-      },
-      {
         id: "pronunciation",
         name: "발음 연습",
         icon: "fas fa-microphone",
         desc: "발음을 듣고 따라하기",
-      },
-      {
-        id: "multiple-choice",
-        name: "객관식",
-        icon: "fas fa-list",
-        desc: "선택지에서 정답 고르기",
-      },
-      {
-        id: "sentence-completion",
-        name: "문장 완성",
-        icon: "fas fa-puzzle-piece",
-        desc: "문장 빈칸 채우기",
       },
     ],
   },
@@ -97,12 +99,6 @@ const learningAreas = {
     icon: "fas fa-file-text",
     modes: [
       {
-        id: "reading-comprehension",
-        name: "독해 이해",
-        icon: "fas fa-search",
-        desc: "지문 읽고 문제 풀기",
-      },
-      {
         id: "vocabulary-in-context",
         name: "문맥 속 어휘",
         icon: "fas fa-highlighter",
@@ -114,12 +110,6 @@ const learningAreas = {
     name: "듣기 학습",
     icon: "fas fa-headphones",
     modes: [
-      {
-        id: "listening-comprehension",
-        name: "듣기 이해",
-        icon: "fas fa-volume-up",
-        desc: "오디오 듣고 문제 풀기",
-      },
       {
         id: "dictation",
         name: "받아쓰기",
@@ -136,39 +126,74 @@ let typingStats = {
   wrong: 0,
 };
 
-document.addEventListener("DOMContentLoaded", async () => {
-  try {
+document.addEventListener("DOMContentLoaded", async function () {
+  console.log("다국어 학습 페이지 로딩 시작...");
+
     // 네비게이션바 로드
-    loadNavbar();
+  await loadNavbar();
 
-    // 이벤트 리스너 등록
-    setupEventListeners();
-
-    // 사용자 인증 상태 관찰
+  // 사용자 인증 상태 확인
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUser = user;
-        learningStats.startTime = Date.now();
+      console.log("사용자 로그인됨:", user.email);
+      console.log("다국어 학습 페이지에서 로그인 상태 확인됨");
 
+      // 로그인된 상태에서 바로 초기화
+      initializePage();
+    } else {
+      console.log("로그인되지 않음, 게스트 모드로 실행");
+      // 로그인하지 않은 상태에서도 기본 기능 사용 가능 (샘플 데이터)
+      currentUser = null;
+      initializePage();
+    }
+  });
+});
+
+// 네비게이션바 로드 함수
+async function loadNavbar() {
+  try {
+    const response = await fetch("../components/navbar.html");
+    const navbarHtml = await response.text();
+    document.getElementById("navbar-container").innerHTML = navbarHtml;
+
+    // 네비게이션바 스크립트 로드
+    const script = document.createElement("script");
+    script.type = "module";
+    script.src = "../components/js/navbar.js";
+    document.head.appendChild(script);
+
+    console.log("네비게이션바 로드 완료");
+  } catch (error) {
+    console.error("네비게이션바 로드 실패:", error);
+  }
+}
+
+// 언어 설정 함수
+function setupLanguageSettings() {
         // 언어 설정 로드
         sourceLanguage = document.getElementById("source-language").value;
         targetLanguage = document.getElementById("target-language").value;
-        difficultyLevel = document.getElementById("difficulty-level").value;
+  difficultyLevel = document.getElementById("difficulty-level").value;
 
-        // 학습 통계 초기화
-        updateLearningStats();
+  // 언어 변경 이벤트 리스너
+  document
+    .getElementById("source-language")
+    .addEventListener("change", handleSettingsChange);
+  document
+    .getElementById("target-language")
+    .addEventListener("change", handleSettingsChange);
+  document
+    .getElementById("difficulty-level")
+    .addEventListener("change", handleSettingsChange);
+}
 
-        console.log("다국어 학습 페이지 초기화 완료");
-      } else {
-        alert("로그인이 필요합니다.");
-        window.location.href = "../login.html";
-      }
-    });
-  } catch (error) {
-    console.error("페이지 초기화 중 오류 발생:", error);
-    showError("페이지를 불러오는 중 문제가 발생했습니다: " + error.message);
-  }
-});
+// 페이지 초기화
+function initializePage() {
+  setupEventListeners();
+  setupLanguageSettings();
+  console.log("다국어 학습 페이지 초기화 완료");
+}
 
 // 이벤트 리스너 설정
 function setupEventListeners() {
@@ -360,88 +385,249 @@ function hideAllLearningContainers() {
   });
 }
 
-// 학습 데이터 로드
+// 학습 데이터 로드 (개선된 버전)
 async function loadLearningData(areaId) {
   try {
-    if (!currentUser) return;
+    console.log(`${areaId} 영역 데이터 로딩 시작...`);
 
-    console.log(`${areaId} 영역 데이터 로딩 중...`);
+    currentLearningData = {
+      concepts: [],
+      grammarPatterns: [],
+      readingPassages: [],
+      listeningContent: [],
+    };
 
+    // Firebase에서 개념 데이터 로드 시도
+    let concepts = [];
+
+    try {
+      // Firebase 연결 상태 확인
+      const auth = getAuth();
+
+      const conceptsRef = collection(db, "concepts");
+      let conceptsQuery;
+
+      // 언어 및 난이도 필터링
+      if (difficultyLevel === "all") {
+        conceptsQuery = query(conceptsRef, limit(50));
+      } else {
+        conceptsQuery = query(
+          conceptsRef,
+          where("concept_info.difficulty", "==", difficultyLevel),
+          limit(50)
+        );
+      }
+
+      // 타임아웃과 함께 데이터 로드 시도
+      const snapshotPromise = getDocs(conceptsQuery);
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Firebase 연결 타임아웃")), 15000)
+      );
+
+      const snapshot = await Promise.race([snapshotPromise, timeoutPromise]);
+
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        data.id = doc.id;
+        concepts.push(data);
+      });
+
+      console.log(`Firebase에서 로드된 개념 수: ${concepts.length}`);
+
+      // 데이터가 없으면 샘플 데이터 추가
+      if (concepts.length === 0) {
+        console.log("Firebase 데이터가 비어있음, 샘플 데이터 추가");
+        concepts = generateSampleConcepts();
+      }
+    } catch (error) {
+      console.warn("Firebase 데이터 로딩 실패, 샘플 데이터 사용:", error);
+
+      // 샘플 데이터 생성
+      concepts = generateSampleConcepts();
+      console.log(`샘플 데이터 생성됨: ${concepts.length}개`);
+    }
+
+    // 학습 영역별 데이터 구성
     switch (areaId) {
       case "vocabulary":
-        // 분리된 컬렉션에서 개념 로드
-        const concepts = await collectionManager.getConceptsForLearning(
-          sourceLanguage,
-          targetLanguage,
-          20
-        );
-
-        // 기존 conceptUtils 형식으로 변환
-        currentLearningData.concepts = concepts.map((concept) => ({
-          id: concept.id,
-          concept_info: concept.conceptInfo,
-          expressions: {
-            [sourceLanguage]:
-              concept.fromExpression || concept.expressions?.[sourceLanguage],
-            [targetLanguage]:
-              concept.toExpression || concept.expressions?.[targetLanguage],
-          },
-          representative_example: concept.representativeExample,
-          media: concept.media,
-        }));
-
-        console.log(
-          `✅ 어휘 학습용 개념 ${currentLearningData.concepts.length}개 로드 완료`
-        );
+        currentLearningData.concepts = concepts;
         break;
 
       case "grammar":
-        currentLearningData.grammarPatterns =
-          await collectionManager.getGrammarPatternsForLearning(
-            targetLanguage,
-            difficultyLevel === "all" ? null : difficultyLevel
-          );
+        // 개념에서 문법 정보 추출
+        currentLearningData.grammarPatterns = [];
+
+        concepts.forEach((concept, index) => {
+          // featured_examples에서 문법 정보 추출
+          if (
+            concept.featured_examples &&
+            Array.isArray(concept.featured_examples)
+          ) {
+            concept.featured_examples.forEach((example, exampleIndex) => {
+              if (example.grammar_system) {
+                const grammarPattern = {
+                  id: `${concept.id}_example_${exampleIndex}`,
+                  concept_id: concept.id,
+                  pattern_name:
+                    example.grammar_system.pattern_name || "문법 패턴",
+                  structural_pattern:
+                    example.grammar_system.structural_pattern || "",
+                  difficulty:
+                    example.difficulty ||
+                    concept.concept_info?.difficulty ||
+                    "beginner",
+                  domain: concept.concept_info?.domain || "general",
+                  category: concept.concept_info?.category || "general",
+                  grammar_tags: example.grammar_system.grammar_tags || [],
+                  learning_focus: example.grammar_system.learning_focus || [],
+                  example_translations: example.translations || {},
+                  concept_data: {
+                    word: concept.expressions?.[sourceLanguage]?.word || "",
+                    expressions: concept.expressions,
+                  },
+                  source: "concepts",
+                };
+                currentLearningData.grammarPatterns.push(grammarPattern);
+              }
+            });
+          }
+
+          // expressions에서 문법 정보 추출
+          if (concept.expressions) {
+            Object.entries(concept.expressions).forEach(([lang, expr]) => {
+              if (expr.grammar_system) {
+                const grammarPattern = {
+                  id: `${concept.id}_expr_${lang}`,
+                  concept_id: concept.id,
+                  pattern_name:
+                    expr.grammar_system.pattern_name || `${lang} 문법`,
+                  structural_pattern:
+                    expr.grammar_system.structural_pattern || "",
+                  difficulty: concept.concept_info?.difficulty || "beginner",
+                  domain: concept.concept_info?.domain || "general",
+                  category: concept.concept_info?.category || "general",
+                  grammar_tags: expr.grammar_system.grammar_tags || [],
+                  learning_focus: expr.grammar_system.learning_focus || [],
+                  example_translations: {
+                    [lang]: {
+                      text: expr.word || "",
+                      grammar_notes: expr.grammar_system.notes || "",
+                    },
+                  },
+                  concept_data: {
+                    word: concept.expressions?.[sourceLanguage]?.word || "",
+                    expressions: concept.expressions,
+                  },
+                  source: "concepts",
+                };
+                currentLearningData.grammarPatterns.push(grammarPattern);
+              }
+            });
+          }
+        });
+
+        // 기본 문법 패턴 추가 (데이터가 부족한 경우)
+        if (currentLearningData.grammarPatterns.length === 0) {
+          currentLearningData.grammarPatterns = getDefaultGrammarPatterns();
+        }
+
         console.log(
-          `✅ 문법 패턴 ${currentLearningData.grammarPatterns.length}개 로드 완료`
+          `추출된 문법 패턴 수: ${currentLearningData.grammarPatterns.length}`
         );
         break;
 
       case "reading":
-        currentLearningData.readingPassages =
-          await collectionManager.getReadingPassagesForLearning(
-            targetLanguage,
-            difficultyLevel === "all" ? null : difficultyLevel
-          );
-        console.log(
-          `✅ 독해 지문 ${currentLearningData.readingPassages.length}개 로드 완료`
-        );
+        // 개념에서 독해 지문 생성
+        currentLearningData.readingPassages = concepts
+          .slice(0, 10)
+          .map((concept, index) => {
+            const primaryLang = sourceLanguage;
+            const secondaryLang = targetLanguage;
+
+            const word = concept.expressions?.[primaryLang]?.word || "단어";
+            const definition =
+              concept.expressions?.[secondaryLang]?.definition || "정의";
+
+            return {
+              id: `reading_${concept.id}`,
+              title: `${word}에 대하여`,
+              content: `${word}는 ${definition}입니다. 이 단어는 ${
+                concept.concept_info?.category || "일반"
+              } 분야에서 자주 사용됩니다.`,
+              difficulty: concept.concept_info?.difficulty || "beginner",
+              vocabulary: [
+                {
+                  word: word,
+                  meaning: definition,
+                  pronunciation:
+                    concept.expressions?.[primaryLang]?.pronunciation || "",
+                },
+              ],
+              questions: [
+                {
+                  question: `${word}의 의미는 무엇입니까?`,
+                  options: [
+                    definition,
+                    "다른 의미1",
+                    "다른 의미2",
+                    "다른 의미3",
+                  ],
+      correct: 0,
+                },
+              ],
+            };
+          });
         break;
 
       case "listening":
-        currentLearningData.listeningContent =
-          await collectionManager.getListeningContentForLearning(
-            targetLanguage,
-            difficultyLevel === "all" ? null : difficultyLevel
-          );
-        console.log(
-          `✅ 듣기 콘텐츠 ${currentLearningData.listeningContent.length}개 로드 완료`
-        );
+        // 개념에서 듣기 콘텐츠 생성
+        currentLearningData.listeningContent = concepts
+          .slice(0, 5)
+          .map((concept, index) => {
+            const word = concept.expressions?.[sourceLanguage]?.word || "단어";
+            const pronunciation =
+              concept.expressions?.[sourceLanguage]?.pronunciation || "";
+
+            return {
+              id: `listening_${concept.id}`,
+              title: `${word} 발음 연습`,
+              audioUrl: concept.expressions?.[sourceLanguage]?.audio || "",
+              transcript: `${word}의 올바른 발음은 ${pronunciation}입니다.`,
+              difficulty: concept.concept_info?.difficulty || "beginner",
+              questions: [
+                {
+                  question: "들은 단어는 무엇입니까?",
+                  options: [word, "다른단어1", "다른단어2", "다른단어3"],
+                  correct: 0,
+                },
+              ],
+            };
+          });
         break;
     }
 
-    // 인덱스 초기화
-    currentItemIndex = 0;
-
-    console.log(`${areaId} 데이터 로딩 완료:`, {
-      concepts: currentLearningData.concepts?.length || 0,
-      examples: currentLearningData.examples?.length || 0,
-      grammarPatterns: currentLearningData.grammarPatterns?.length || 0,
-      readingPassages: currentLearningData.readingPassages?.length || 0,
-      listeningContent: currentLearningData.listeningContent?.length || 0,
-    });
+    console.log(`${areaId} 영역 데이터 로딩 완료`);
+    return true;
   } catch (error) {
-    console.error("학습 데이터 로드 중 오류:", error);
-    showError("학습 데이터를 불러올 수 없습니다: " + error.message);
+    console.error(`${areaId} 데이터 로딩 중 오류:`, error);
+
+    // 오류 발생 시 기본 데이터 사용
+    switch (areaId) {
+      case "vocabulary":
+        currentLearningData.concepts = generateSampleConcepts();
+        break;
+      case "grammar":
+        currentLearningData.grammarPatterns = getDefaultGrammarPatterns();
+        break;
+      case "reading":
+        currentLearningData.readingPassages = getDefaultReadingPassages();
+        break;
+      case "listening":
+        currentLearningData.listeningContent = getDefaultListeningContent();
+        break;
+    }
+
+    return false;
   }
 }
 
@@ -1224,25 +1410,60 @@ function updateLearningStats() {
 function getDefaultGrammarPatterns() {
   return [
     {
-      pattern_id: "basic_greeting",
-      pattern_type: "greeting",
-      description: {
-        korean: "기본 인사 표현",
-        english: "Basic greeting expressions",
+      id: "default_present",
+      pattern_name: "현재 시제 기본형",
+      structural_pattern: "주어 + 동사 + 목적어",
+      grammar_tags: ["present_tense", "basic_sentence"],
+      difficulty: "beginner",
+      domain: "daily",
+      category: "grammar",
+      example_translations: {
+        korean: { text: "나는 사과를 먹어요." },
+        english: { text: "I eat an apple." },
+        japanese: { text: "私はりんごを食べます。" },
+        chinese: { text: "我吃苹果。" },
       },
-      structure: {
-        korean: "[인사말] + [존댓말 어미]",
-        english: "[Greeting] + [Polite form]",
+      teaching_notes: {
+        primary_focus: "현재 시제의 기본 구조",
+        practice_tips: ["단순 문장 연습", "시제 변환 연습"],
       },
-      examples: [
-        {
-          korean: "안녕하세요",
-          english: "Hello",
-        },
-      ],
-      usage_notes: {
-        korean: "일반적인 정중한 인사말",
-        english: "Common polite greeting",
+    },
+    {
+      id: "default_past",
+      pattern_name: "과거 시제",
+      structural_pattern: "주어 + 과거동사 + 목적어",
+      grammar_tags: ["past_tense", "completed_action"],
+      difficulty: "beginner",
+      domain: "daily",
+      category: "grammar",
+      example_translations: {
+        korean: { text: "어제 영화를 봤어요." },
+        english: { text: "I watched a movie yesterday." },
+        japanese: { text: "昨日映画を見ました。" },
+        chinese: { text: "昨天我看了电影。" },
+      },
+      teaching_notes: {
+        primary_focus: "과거 시제 표현",
+        practice_tips: ["일기 쓰기", "과거 경험 말하기"],
+      },
+    },
+    {
+      id: "default_question",
+      pattern_name: "의문문",
+      structural_pattern: "의문사 + 주어 + 동사?",
+      grammar_tags: ["question", "interrogative"],
+      difficulty: "beginner",
+      domain: "daily",
+      category: "grammar",
+      example_translations: {
+        korean: { text: "무엇을 하고 있어요?" },
+        english: { text: "What are you doing?" },
+        japanese: { text: "何をしていますか？" },
+        chinese: { text: "你在做什么？" },
+      },
+      teaching_notes: {
+        primary_focus: "질문 형태의 문장 구조",
+        practice_tips: ["질문 만들기 연습", "대화 연습"],
       },
     },
   ];
@@ -1251,11 +1472,45 @@ function getDefaultGrammarPatterns() {
 function getDefaultReadingPassages() {
   return [
     {
-      category: "일상 대화",
-      text: "안녕하세요. 저는 한국어를 배우고 있는 학생입니다. 매일 새로운 단어를 공부하고 있어요.",
+      id: "default_reading_1",
+      title: "자기소개",
+      content:
+        "안녕하세요. 저는 김민수입니다. 한국에서 왔습니다. 저는 학생입니다. 한국어를 공부하고 있습니다.",
+      difficulty: "beginner",
       vocabulary: [
-        { word: "학생", meaning: "student" },
-        { word: "공부", meaning: "study" },
+        {
+          word: "안녕하세요",
+          meaning: "hello",
+          pronunciation: "an-nyeong-ha-se-yo",
+        },
+        { word: "학생", meaning: "student", pronunciation: "hak-saeng" },
+        { word: "공부", meaning: "study", pronunciation: "gong-bu" },
+      ],
+      questions: [
+        {
+          question: "민수는 어디에서 왔습니까?",
+          options: ["한국", "일본", "중국", "미국"],
+          correct: 0,
+        },
+      ],
+    },
+    {
+      id: "default_reading_2",
+      title: "취미 이야기",
+      content:
+        "저의 취미는 음악을 듣는 것입니다. 특히 클래식 음악을 좋아합니다. 주말에는 친구들과 영화를 봅니다.",
+      difficulty: "beginner",
+      vocabulary: [
+        { word: "취미", meaning: "hobby", pronunciation: "chwi-mi" },
+        { word: "음악", meaning: "music", pronunciation: "eum-ak" },
+        { word: "영화", meaning: "movie", pronunciation: "yeong-hwa" },
+      ],
+      questions: [
+        {
+          question: "어떤 음악을 좋아합니까?",
+          options: ["팝", "클래식", "재즈", "록"],
+          correct: 1,
+        },
       ],
     },
   ];
@@ -1264,9 +1519,32 @@ function getDefaultReadingPassages() {
 function getDefaultListeningContent() {
   return [
     {
-      category: "기본 대화",
-      question: "화자가 무엇에 대해 이야기하고 있나요?",
-      transcript: "안녕하세요. 오늘 날씨가 좋네요.",
+      id: "default_listening_1",
+      title: "기본 인사",
+      audioUrl: "",
+      transcript: "안녕하세요. 만나서 반갑습니다.",
+      difficulty: "beginner",
+      questions: [
+        {
+          question: "들린 인사말은 무엇입니까?",
+          options: ["안녕하세요", "안녕히 가세요", "고맙습니다", "죄송합니다"],
+          correct: 0,
+        },
+      ],
+    },
+    {
+      id: "default_listening_2",
+      title: "숫자 듣기",
+      audioUrl: "",
+      transcript: "하나, 둘, 셋, 넷, 다섯",
+      difficulty: "beginner",
+      questions: [
+        {
+          question: "몇 개의 숫자를 들었습니까?",
+          options: ["3개", "4개", "5개", "6개"],
+          correct: 2,
+        },
+      ],
     },
   ];
 }
@@ -1401,7 +1679,7 @@ function setupLegacyEventListeners() {
       if (currentItemIndex > 0) {
         currentItemIndex--;
         displayFlashcard(currentLearningData.concepts[currentItemIndex]);
-        updateProgress(
+      updateProgress(
           "flashcard",
           currentItemIndex + 1,
           currentLearningData.concepts.length
@@ -1415,7 +1693,7 @@ function setupLegacyEventListeners() {
       if (currentItemIndex < currentLearningData.concepts.length - 1) {
         currentItemIndex++;
         displayFlashcard(currentLearningData.concepts[currentItemIndex]);
-        updateProgress(
+      updateProgress(
           "flashcard",
           currentItemIndex + 1,
           currentLearningData.concepts.length
@@ -1450,8 +1728,8 @@ function setupLegacyEventListeners() {
       if (currentItemIndex < currentLearningData.concepts.length - 1) {
         currentItemIndex++;
         displayTypingQuestion(currentLearningData.concepts[currentItemIndex]);
-        updateProgress(
-          "typing",
+      updateProgress(
+        "typing",
           currentItemIndex + 1,
           currentLearningData.concepts.length
         );
@@ -1511,29 +1789,110 @@ function checkTypingAnswer() {
   }
 }
 
-// ============ 기존 학습 데이터 로딩 (업데이트) ============
-
-async function loadLearningConcepts() {
-  try {
-    if (!currentUser) return;
-
-    console.log("학습용 개념 로딩 중...");
-
-    currentLearningData.concepts = await conceptUtils.getConceptsForLearning(
-      sourceLanguage,
-      targetLanguage,
-      difficultyLevel === "all" ? null : difficultyLevel
-    );
-
-    console.log(`로딩된 개념 수: ${currentLearningData.concepts.length}`);
-
-    // 현재 모드가 있다면 다시 초기화
-    if (currentMode && currentArea === "vocabulary") {
-      currentItemIndex = 0;
-      await initializeLearningMode(currentMode);
-    }
-  } catch (error) {
-    console.error("학습용 개념 로딩 오류:", error);
-    showError("학습 데이터를 불러올 수 없습니다: " + error.message);
-  }
+// 샘플 개념 데이터 생성 함수
+function generateSampleConcepts() {
+  return [
+    {
+      id: "sample_1",
+      concept_info: {
+        domain: "daily",
+        category: "fruit",
+        difficulty: "beginner",
+      },
+      expressions: {
+        korean: {
+          word: "사과",
+          pronunciation: "sa-gwa",
+          definition: "빨간 과일",
+          part_of_speech: "명사",
+        },
+        english: {
+          word: "apple",
+          pronunciation: "/ˈæpəl/",
+          definition: "a round fruit",
+          part_of_speech: "noun",
+        },
+        japanese: {
+          word: "りんご",
+          pronunciation: "ringo",
+          definition: "赤い果物",
+          part_of_speech: "名詞",
+        },
+        chinese: {
+          word: "苹果",
+          pronunciation: "píngguǒ",
+          definition: "红色水果",
+          part_of_speech: "名词",
+        },
+      },
+    },
+    {
+      id: "sample_2",
+      concept_info: {
+        domain: "daily",
+        category: "greeting",
+        difficulty: "beginner",
+      },
+      expressions: {
+        korean: {
+          word: "안녕하세요",
+          pronunciation: "an-nyeong-ha-se-yo",
+          definition: "정중한 인사말",
+          part_of_speech: "감탄사",
+        },
+        english: {
+          word: "hello",
+          pronunciation: "/həˈloʊ/",
+          definition: "a greeting",
+          part_of_speech: "exclamation",
+        },
+        japanese: {
+          word: "こんにちは",
+          pronunciation: "konnichiwa",
+          definition: "昼間の挨拶",
+          part_of_speech: "感動詞",
+        },
+        chinese: {
+          word: "你好",
+          pronunciation: "nǐ hǎo",
+          definition: "问候语",
+          part_of_speech: "感叹词",
+        },
+      },
+    },
+    {
+      id: "sample_3",
+      concept_info: {
+        domain: "daily",
+        category: "food",
+        difficulty: "beginner",
+      },
+      expressions: {
+        korean: {
+          word: "물",
+          pronunciation: "mul",
+          definition: "마시는 액체",
+          part_of_speech: "명사",
+        },
+        english: {
+          word: "water",
+          pronunciation: "/ˈwɔːtər/",
+          definition: "clear liquid",
+          part_of_speech: "noun",
+        },
+        japanese: {
+          word: "水",
+          pronunciation: "mizu",
+          definition: "透明な液体",
+          part_of_speech: "名詞",
+        },
+        chinese: {
+          word: "水",
+          pronunciation: "shuǐ",
+          definition: "透明液体",
+          part_of_speech: "名词",
+        },
+      },
+    },
+  ];
 }
