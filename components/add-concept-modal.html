@@ -1,0 +1,124 @@
+<!-- 개념 추가 모달 -->
+<div id="concept-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
+  <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-4xl max-h-[90vh] overflow-y-auto">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-bold text-gray-800" data-i18n="add_concept">개념 추가</h2>
+      <button id="close-concept-modal" class="text-gray-500 hover:text-gray-700">
+        <i class="fas fa-times text-xl"></i>
+      </button>
+    </div>
+
+    <form id="concept-form">
+      <!-- 기본 정보 -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">도메인</label>
+          <select id="concept-domain" class="w-full p-2 border rounded">
+            <option value="daily">일상</option>
+            <option value="business">비즈니스</option>
+            <option value="academic">학술</option>
+            <option value="travel">여행</option>
+            <option value="food">음식</option>
+            <option value="nature">자연</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">카테고리</label>
+          <input type="text" id="concept-category" class="w-full p-2 border rounded" placeholder="예: fruit, animal">
+        </div>
+      </div>
+
+      <!-- 언어별 표현 -->
+      <div class="mb-6">
+        <h3 class="text-lg font-semibold mb-3">언어별 표현</h3>
+        
+        <!-- 한국어 -->
+        <div class="border rounded-lg p-4 mb-4">
+          <h4 class="font-medium text-blue-600 mb-2">한국어</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-sm text-gray-600">단어</label>
+              <input type="text" id="korean-word" class="w-full p-2 border rounded" placeholder="사과">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-600">발음</label>
+              <input type="text" id="korean-pronunciation" class="w-full p-2 border rounded" placeholder="sa-gwa">
+            </div>
+            <div class="md:col-span-2">
+              <label class="block text-sm text-gray-600">정의</label>
+              <input type="text" id="korean-definition" class="w-full p-2 border rounded" placeholder="둥글고 빨간 과일">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-600">품사</label>
+              <select id="korean-pos" class="w-full p-2 border rounded">
+                <option value="명사">명사</option>
+                <option value="동사">동사</option>
+                <option value="형용사">형용사</option>
+                <option value="부사">부사</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 영어 -->
+        <div class="border rounded-lg p-4 mb-4">
+          <h4 class="font-medium text-green-600 mb-2">영어</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-sm text-gray-600">단어</label>
+              <input type="text" id="english-word" class="w-full p-2 border rounded" placeholder="apple">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-600">발음</label>
+              <input type="text" id="english-pronunciation" class="w-full p-2 border rounded" placeholder="/ˈæpəl/">
+            </div>
+            <div class="md:col-span-2">
+              <label class="block text-sm text-gray-600">정의</label>
+              <input type="text" id="english-definition" class="w-full p-2 border rounded" placeholder="a round fruit with red or green skin">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-600">품사</label>
+              <select id="english-pos" class="w-full p-2 border rounded">
+                <option value="noun">noun</option>
+                <option value="verb">verb</option>
+                <option value="adjective">adjective</option>
+                <option value="adverb">adverb</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 대표 예문 -->
+      <div class="mb-6">
+        <h3 class="text-lg font-semibold mb-3">대표 예문</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm text-gray-600">한국어 예문</label>
+            <textarea id="example-korean" class="w-full p-2 border rounded h-20" placeholder="나는 빨간 사과를 좋아한다."></textarea>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-600">영어 예문</label>
+            <textarea id="example-english" class="w-full p-2 border rounded h-20" placeholder="I like red apples."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- 태그 -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-1">태그 (쉼표로 구분)</label>
+        <input type="text" id="concept-tags" class="w-full p-2 border rounded" placeholder="food, healthy, common">
+      </div>
+
+      <!-- 버튼 -->
+      <div class="flex justify-end space-x-4">
+        <button type="button" id="cancel-concept" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded">
+          취소
+        </button>
+        <button type="submit" id="save-concept" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded">
+          저장
+        </button>
+      </div>
+    </form>
+  </div>
+</div> 

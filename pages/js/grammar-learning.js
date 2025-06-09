@@ -1,1048 +1,1820 @@
-﻿import { loadNavbar } from "../../components/js/navbar.js";
+import { loadNavbar } from "../../components/js/navbar.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
 import {
-  auth,
-  db,
-  supportedLanguages,
-} from "../../js/firebase/firebase-init.js";
-import {
-  collection,
-  query,
   getDocs,
-  orderBy,
+  query,
+  collection,
   where,
   limit,
 } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
-import { getActiveLanguage } from "../../utils/language-utils.js";
+import {
+  auth,
+  db,
+  conceptUtils,
+  exampleUtils,
+  grammarPatternUtils,
+} from "../../js/firebase/firebase-init.js";
 
 let currentUser = null;
-let allGrammarPatterns = [];
-let filteredPatterns = [];
-let userLanguage = "ko";
+let currentLearningArea = null;
+let currentLearningMode = null;
+let currentData = [];
+let currentIndex = 0;
 
-// 페이지별 번역 키
-const grammarTranslations = {
-  ko: {
-    loading: "로딩 중...",
-    no_patterns: "문법 패턴이 없습니다",
-    filter_reset: "필터 초기화",
-    pattern_details: "패턴 상세",
-    examples: "예문",
-    usage_notes: "사용법",
-    difficulty: "난이도",
-    frequency: "빈도",
-    all: "전체",
-    beginner: "초급",
-    intermediate: "중급",
-    advanced: "고급",
-    tense: "시제",
-    grammar: "문법",
-    expression: "표현",
-    conversation: "회화",
-    daily: "일상",
-    business: "비즈니스",
-    academic: "학술",
-    travel: "여행",
-  },
-  en: {
-    loading: "Loading...",
-    no_patterns: "No grammar patterns found",
-    filter_reset: "Reset Filters",
-    pattern_details: "Pattern Details",
-    examples: "Examples",
-    usage_notes: "Usage Notes",
-    difficulty: "Difficulty",
-    frequency: "Frequency",
-    all: "All",
-    beginner: "Beginner",
-    intermediate: "Intermediate",
-    advanced: "Advanced",
-    tense: "Tense",
-    grammar: "Grammar",
-    expression: "Expression",
-    conversation: "Conversation",
-    daily: "Daily",
-    business: "Business",
-    academic: "Academic",
-    travel: "Travel",
-  },
-};
-
-// 번역 텍스트 가져오기
-function getTranslatedText(key) {
-  return (
-    grammarTranslations[userLanguage]?.[key] ||
-    grammarTranslations.en[key] ||
-    key
-  );
-}
-
+// 페이지 초기화
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    // 현재 활성화된 언어 코드 가져오기
-    userLanguage = await getActiveLanguage();
-
     // 네비게이션바 로드
     await loadNavbar();
 
-    // 이벤트 리스너 등록
+    // 이벤트 리스너 설정
     setupEventListeners();
 
     // 사용자 인증 상태 관찰
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUser = user;
-        await loadGrammarPatterns();
+        showAreaSelection();
       } else {
         alert("로그인이 필요합니다.");
         window.location.href = "../login.html";
       }
     });
   } catch (error) {
-    console.error("문법 학습 페이지 초기화 중 오류 발생:", error);
-    showError("페이지를 불러오는 중 문제가 발생했습니다.");
+    console.error("학습 페이지 초기화 중 오류 발생:", error);
+    alert("페이지를 불러오는 중 문제가 발생했습니다.");
   }
 });
 
 // 이벤트 리스너 설정
 function setupEventListeners() {
-  const elements = {
-    targetLanguage: document.getElementById("target-language"),
-    refreshBtn: document.getElementById("refresh-patterns"),
-    difficultyFilter: document.getElementById("difficulty-filter"),
-    patternTypeFilter: document.getElementById("pattern-type-filter"),
-    domainFilter: document.getElementById("domain-filter"),
-    sortPatterns: document.getElementById("sort-patterns"),
+  console.log("🔧 이벤트 리스너 설정 시작");
+
+  // 영역 선택 카드 클릭 이벤트
+  const vocabularyArea = document.getElementById("vocabulary-area");
+  const grammarArea = document.getElementById("grammar-area");
+  const readingArea = document.getElementById("reading-area");
+
+  console.log("🔍 카드 요소들:", {
+    vocabularyArea: !!vocabularyArea,
+    grammarArea: !!grammarArea,
+    readingArea: !!readingArea,
+  });
+
+  if (vocabularyArea) {
+    vocabularyArea.addEventListener("click", (e) => {
+      console.log("🖱️ 단어 학습 카드 클릭됨");
+      if (!e.target.closest("button")) {
+        showLearningModes("vocabulary");
+      }
+    });
+  } else {
+    console.error("❌ vocabulary-area 요소를 찾을 수 없습니다");
+  }
+
+  if (grammarArea) {
+    grammarArea.addEventListener("click", (e) => {
+      console.log("🖱️ 문법 학습 카드 클릭됨");
+      if (!e.target.closest("button")) {
+        showLearningModes("grammar");
+      }
+    });
+  } else {
+    console.error("❌ grammar-area 요소를 찾을 수 없습니다");
+  }
+
+  if (readingArea) {
+    readingArea.addEventListener("click", (e) => {
+      console.log("🖱️ 독해 학습 카드 클릭됨");
+      if (!e.target.closest("button")) {
+        showLearningModes("reading");
+      }
+    });
+  } else {
+    console.error("❌ reading-area 요소를 찾을 수 없습니다");
+  }
+
+  // 업로드 버튼 이벤트
+  const addVocabularyBtn = document.getElementById("add-vocabulary-wordbook");
+  const addGrammarBtn = document.getElementById("add-grammar-patterns");
+  const addReadingBtn = document.getElementById("add-reading-examples");
+
+  if (addVocabularyBtn) {
+    addVocabularyBtn.addEventListener("click", (e) => {
+      console.log("📦 개념 업로드 버튼 클릭됨");
+      e.stopPropagation();
+      showUploadModal("concept");
+    });
+  }
+
+  if (addGrammarBtn) {
+    addGrammarBtn.addEventListener("click", (e) => {
+      console.log("📦 문법 업로드 버튼 클릭됨");
+      e.stopPropagation();
+      showUploadModal("grammar");
+    });
+  }
+
+  if (addReadingBtn) {
+    addReadingBtn.addEventListener("click", (e) => {
+      console.log("📦 예문 업로드 버튼 클릭됨");
+      e.stopPropagation();
+      showUploadModal("example");
+    });
+  }
+
+  // 모달 닫기 이벤트
+  const closeConceptModal = document.getElementById(
+    "close-concept-upload-modal"
+  );
+  const closeGrammarModal = document.getElementById(
+    "close-grammar-upload-modal"
+  );
+  const closeExampleModal = document.getElementById(
+    "close-example-upload-modal"
+  );
+
+  if (closeConceptModal) {
+    closeConceptModal.addEventListener("click", () => {
+      hideUploadModal("concept");
+    });
+  }
+
+  if (closeGrammarModal) {
+    closeGrammarModal.addEventListener("click", () => {
+      hideUploadModal("grammar");
+    });
+  }
+
+  if (closeExampleModal) {
+    closeExampleModal.addEventListener("click", () => {
+      hideUploadModal("example");
+    });
+  }
+
+  // 업로드 버튼 이벤트
+  const uploadConceptBtn = document.getElementById("upload-concept-file");
+  const uploadGrammarBtn = document.getElementById("upload-grammar-file");
+  const uploadExampleBtn = document.getElementById("upload-example-file");
+
+  if (uploadConceptBtn) {
+    uploadConceptBtn.addEventListener("click", () => {
+      handleFileUpload("concept");
+    });
+  }
+
+  if (uploadGrammarBtn) {
+    uploadGrammarBtn.addEventListener("click", () => {
+      handleFileUpload("grammar");
+    });
+  }
+
+  if (uploadExampleBtn) {
+    uploadExampleBtn.addEventListener("click", () => {
+      handleFileUpload("example");
+    });
+  }
+
+  // 템플릿 다운로드 이벤트
+  const downloadConceptTemplate = document.getElementById(
+    "download-concept-template"
+  );
+  const downloadGrammarTemplate = document.getElementById(
+    "download-grammar-template"
+  );
+  const downloadExampleTemplate = document.getElementById(
+    "download-example-template"
+  );
+
+  if (downloadConceptTemplate) {
+    downloadConceptTemplate.addEventListener("click", () => {
+      downloadTemplate("concept");
+    });
+  }
+
+  if (downloadGrammarTemplate) {
+    downloadGrammarTemplate.addEventListener("click", () => {
+      downloadTemplate("grammar");
+    });
+  }
+
+  if (downloadExampleTemplate) {
+    downloadExampleTemplate.addEventListener("click", () => {
+      downloadTemplate("example");
+    });
+  }
+
+  // 돌아가기 버튼 이벤트
+  const backToAreasBtn = document.getElementById("back-to-areas");
+  if (backToAreasBtn) {
+    backToAreasBtn.addEventListener("click", showAreaSelection);
+  }
+
+  // 플래시카드 이벤트
+  const flipCardBtn = document.getElementById("flip-card");
+  const prevCardBtn = document.getElementById("prev-card");
+  const nextCardBtn = document.getElementById("next-card");
+  const flipCardElement = document.querySelector(".flip-card");
+
+  if (flipCardBtn) {
+    flipCardBtn.addEventListener("click", flipCard);
+  }
+  if (prevCardBtn) {
+    prevCardBtn.addEventListener("click", () => navigateCard(-1));
+  }
+  if (nextCardBtn) {
+    nextCardBtn.addEventListener("click", () => navigateCard(1));
+  }
+
+  // 플래시카드 자체 클릭 이벤트 추가 (클릭으로도 뒤집기)
+  if (flipCardElement) {
+    flipCardElement.addEventListener("click", (e) => {
+      // 버튼 클릭이 아닌 경우에만 뒤집기
+      if (!e.target.closest("button")) {
+        flipCard();
+      }
+    });
+  }
+
+  // 타이핑 이벤트
+  const checkAnswerBtn = document.getElementById("check-answer");
+  const nextTypingBtn = document.getElementById("next-typing");
+
+  if (checkAnswerBtn) {
+    checkAnswerBtn.addEventListener("click", checkTypingAnswer);
+  }
+  if (nextTypingBtn) {
+    nextTypingBtn.addEventListener("click", nextTypingQuestion);
+  }
+
+  // 독해 네비게이션 이벤트
+  const prevReadingBtn = document.getElementById("prev-reading");
+  const nextReadingBtn = document.getElementById("next-reading");
+
+  if (prevReadingBtn) {
+    prevReadingBtn.addEventListener("click", () => navigateReading(-1));
+  }
+  if (nextReadingBtn) {
+    nextReadingBtn.addEventListener("click", () => navigateReading(1));
+  }
+
+  // 백 버튼 이벤트
+  const backFromFlashcard = document.getElementById("back-from-flashcard");
+  const backFromTyping = document.getElementById("back-from-typing");
+  const backFromGrammar = document.getElementById("back-from-grammar");
+  const backFromReading = document.getElementById("back-from-reading");
+
+  if (backFromFlashcard) {
+    backFromFlashcard.addEventListener("click", () =>
+      showLearningModes(currentLearningArea)
+    );
+  }
+  if (backFromTyping) {
+    backFromTyping.addEventListener("click", () =>
+      showLearningModes(currentLearningArea)
+    );
+  }
+  if (backFromGrammar) {
+    backFromGrammar.addEventListener("click", () =>
+      showLearningModes(currentLearningArea)
+    );
+  }
+  if (backFromReading) {
+    backFromReading.addEventListener("click", () =>
+      showLearningModes(currentLearningArea)
+    );
+  }
+
+  // 학습 모드 선택에서 업로드 버튼 이벤트
+  const uploadForModeBtn = document.getElementById("upload-for-mode");
+  if (uploadForModeBtn) {
+    uploadForModeBtn.addEventListener("click", () => {
+      toggleInlineUpload("mode");
+    });
+  }
+
+  // 학습 모드 업로드 파일 버튼들
+  const uploadModeFileBtn = document.getElementById("upload-mode-file");
+  const downloadModeTemplateBtn = document.getElementById(
+    "download-mode-template"
+  );
+
+  if (uploadModeFileBtn) {
+    uploadModeFileBtn.addEventListener("click", () => {
+      handleModeFileUpload();
+    });
+  }
+
+  if (downloadModeTemplateBtn) {
+    downloadModeTemplateBtn.addEventListener("click", () => {
+      console.log("📥 템플릿 다운로드 요청:", currentLearningArea);
+      let templateType;
+      switch (currentLearningArea) {
+        case "vocabulary":
+          templateType = "concept";
+          break;
+        case "grammar":
+          templateType = "grammar";
+          break;
+        case "reading":
+          templateType = "example";
+          break;
+        default:
+          templateType = currentLearningArea;
+      }
+      console.log("📥 템플릿 타입:", templateType);
+      downloadTemplate(templateType);
+    });
+  }
+
+  // 인라인 업로드 버튼들 이벤트
+  const uploadVocabularyBtn = document.getElementById("upload-vocabulary-btn");
+  const uploadTypingBtn = document.getElementById("upload-typing-btn");
+
+  if (uploadVocabularyBtn) {
+    uploadVocabularyBtn.addEventListener("click", () => {
+      toggleInlineUpload("vocabulary");
+    });
+  }
+
+  if (uploadTypingBtn) {
+    uploadTypingBtn.addEventListener("click", () => {
+      toggleInlineUpload("typing");
+    });
+  }
+
+  // 인라인 업로드 파일 버튼들
+  const uploadVocabularyFileBtn = document.getElementById(
+    "upload-vocabulary-file"
+  );
+  const uploadTypingFileBtn = document.getElementById("upload-typing-file");
+
+  if (uploadVocabularyFileBtn) {
+    uploadVocabularyFileBtn.addEventListener("click", () => {
+      handleInlineFileUpload("vocabulary");
+    });
+  }
+
+  if (uploadTypingFileBtn) {
+    uploadTypingFileBtn.addEventListener("click", () => {
+      handleInlineFileUpload("typing");
+    });
+  }
+
+  // 템플릿 다운로드 버튼들
+  const downloadVocabularyTemplateBtn = document.getElementById(
+    "download-vocabulary-template"
+  );
+  const downloadTypingTemplateBtn = document.getElementById(
+    "download-typing-template"
+  );
+
+  if (downloadVocabularyTemplateBtn) {
+    downloadVocabularyTemplateBtn.addEventListener("click", () => {
+      downloadTemplate("concept");
+    });
+  }
+
+  if (downloadTypingTemplateBtn) {
+    downloadTypingTemplateBtn.addEventListener("click", () => {
+      downloadTemplate("concept");
+    });
+  }
+
+  console.log("✅ 이벤트 리스너 설정 완료");
+}
+
+// 영역 선택 화면 표시
+function showAreaSelection() {
+  hideAllSections();
+  document
+    .querySelector(".bg-white.rounded-lg.shadow-md")
+    .classList.remove("hidden");
+}
+
+// 학습 모드 선택 화면 표시
+function showLearningModes(area) {
+  currentLearningArea = area;
+  hideAllSections();
+
+  const modeSection = document.getElementById("learning-mode-section");
+  const modeTitle = document.getElementById("learning-mode-title");
+  const modeContainer = document.getElementById("mode-buttons-container");
+  const uploadBtn = document.getElementById("upload-for-mode");
+  const uploadTitle = document.getElementById("mode-upload-title");
+
+  let title = "";
+  let modes = [];
+
+  switch (area) {
+    case "vocabulary":
+      title = "단어 학습 모드";
+      uploadBtn.classList.remove("hidden");
+      uploadTitle.textContent = "단어 데이터 업로드";
+      modes = [
+        {
+          id: "flashcard",
+          name: "플래시카드",
+          icon: "fas fa-clone",
+          color: "blue",
+        },
+        {
+          id: "typing",
+          name: "타이핑",
+          icon: "fas fa-keyboard",
+          color: "green",
+        },
+        {
+          id: "pronunciation",
+          name: "발음 연습",
+          icon: "fas fa-microphone",
+          color: "purple",
+        },
+      ];
+      break;
+    case "grammar":
+      title = "문법 학습 모드";
+      uploadBtn.classList.remove("hidden");
+      uploadTitle.textContent = "문법 패턴 데이터 업로드";
+      modes = [
+        {
+          id: "pattern",
+          name: "패턴 학습",
+          icon: "fas fa-brain",
+          color: "green",
+        },
+        {
+          id: "exercise",
+          name: "실습 문제",
+          icon: "fas fa-edit",
+          color: "blue",
+        },
+      ];
+      break;
+    case "reading":
+      title = "독해 학습 모드";
+      uploadBtn.classList.remove("hidden");
+      uploadTitle.textContent = "예문 데이터 업로드";
+      modes = [
+        {
+          id: "comprehension",
+          name: "예문 이해",
+          icon: "fas fa-book-open",
+          color: "purple",
+        },
+        {
+          id: "context",
+          name: "맥락 학습",
+          icon: "fas fa-lightbulb",
+          color: "yellow",
+        },
+        {
+          id: "practice",
+          name: "독해 연습",
+          icon: "fas fa-pencil-alt",
+          color: "green",
+        },
+      ];
+      break;
+  }
+
+  modeTitle.textContent = title;
+  modeContainer.innerHTML = modes
+    .map(
+      (mode) => `
+    <div class="bg-gradient-to-br from-${mode.color}-500 to-${mode.color}-600 text-white p-6 rounded-lg cursor-pointer hover:from-${mode.color}-600 hover:to-${mode.color}-700 transition-all duration-300"
+         onclick="startLearningMode('${area}', '${mode.id}')">
+      <div class="flex items-center justify-between mb-4">
+        <i class="${mode.icon} text-3xl"></i>
+      </div>
+      <div class="font-bold text-xl mb-2">${mode.name}</div>
+    </div>
+  `
+    )
+    .join("");
+
+  modeSection.classList.remove("hidden");
+}
+
+// 학습 모드 시작
+async function startLearningMode(area, mode) {
+  console.log(`🎯 학습 모드 시작: ${area} - ${mode}`);
+
+  currentLearningArea = area;
+  currentLearningMode = mode;
+
+  try {
+    await loadLearningData(area);
+
+    if (currentData.length === 0) {
+      console.log("📭 학습할 데이터가 없어서 학습 모드를 시작할 수 없습니다.");
+      return;
+    }
+
+    console.log(`📚 ${currentData.length}개의 데이터로 학습 시작`);
+
+    hideAllSections();
+    currentIndex = 0;
+
+    switch (area) {
+      case "vocabulary":
+        if (mode === "flashcard") {
+          console.log("🃏 플래시카드 모드 시작");
+          showFlashcardMode();
+        } else if (mode === "typing") {
+          console.log("⌨️ 타이핑 모드 시작");
+          showTypingMode();
+        }
+        break;
+      case "grammar":
+        console.log("📝 문법 모드 시작");
+        if (mode === "pattern") {
+          showGrammarPatternMode();
+        } else if (mode === "exercise") {
+          showGrammarExerciseMode();
+        }
+        break;
+      case "reading":
+        console.log("📖 독해 모드 시작");
+        showReadingMode();
+        break;
+    }
+  } catch (error) {
+    console.error("❌ 학습 모드 시작 중 오류:", error);
+    alert("학습 모드를 시작하는 중 오류가 발생했습니다.");
+  }
+}
+
+// 학습 데이터 로드
+async function loadLearningData(area) {
+  try {
+    console.log(`📊 ${area} 데이터 로드 시작`);
+    console.log(`👤 현재 사용자:`, currentUser);
+
+    switch (area) {
+      case "vocabulary":
+        // 사용자 개념 가져오기 (실제 Firebase 쿼리 사용)
+        if (currentUser && currentUser.email) {
+          console.log(`🔍 이메일로 사용자 개념 조회: ${currentUser.email}`);
+          currentData = await conceptUtils.getUserConcepts(currentUser.email);
+          console.log(`🔍 이메일로 조회된 개념: ${currentData.length}개`);
+          console.log(`📋 조회된 개념 데이터 샘플:`, currentData.slice(0, 2));
+
+          // 이메일 기반으로 개념이 없으면 전체 concepts 컬렉션에서 조회 (테스트용)
+          if (currentData.length === 0) {
+            console.log("📚 전체 concepts 컬렉션에서 조회 시도");
+            try {
+              const allConceptsSnapshot = await getDocs(
+                query(collection(db, "concepts"), limit(50))
+              );
+              currentData = allConceptsSnapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+              }));
+              console.log(
+                `📖 전체 컬렉션에서 발견된 개념: ${currentData.length}개`
+              );
+              console.log(
+                `📋 전체 컬렉션 데이터 샘플:`,
+                currentData.slice(0, 2)
+              );
+            } catch (error) {
+              console.error("전체 컬렉션 조회 실패:", error);
+            }
+          }
+        } else {
+          console.error("❌ 사용자 정보 없음, 전체 컬렉션에서 조회");
+          console.log("🔄 Firebase 인증 상태 재확인");
+          const authUser = firebase.auth().currentUser;
+          console.log("🔄 Firebase Auth 현재 사용자:", authUser);
+
+          try {
+            const allConceptsSnapshot = await getDocs(
+              query(collection(db, "concepts"), limit(50))
+            );
+            currentData = allConceptsSnapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }));
+            console.log(
+              `📖 전체 컬렉션에서 발견된 개념: ${currentData.length}개`
+            );
+            console.log(`📋 전체 컬렉션 데이터 샘플:`, currentData.slice(0, 2));
+          } catch (error) {
+            console.error("전체 컬렉션 조회 실패:", error);
+            currentData = [];
+          }
+        }
+        break;
+      case "grammar":
+        // 문법 패턴 가져오기
+        if (currentUser && currentUser.email) {
+          console.log(`🔍 이메일로 문법 패턴 조회: ${currentUser.email}`);
+          try {
+            const grammarSnapshot = await getDocs(
+              query(
+                collection(db, "grammar_patterns"),
+                where("userId", "==", currentUser.email),
+                limit(50)
+              )
+            );
+            currentData = grammarSnapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }));
+            console.log(
+              `🔍 이메일로 조회된 문법 패턴: ${currentData.length}개`
+            );
+
+            if (currentData.length === 0) {
+              console.log("📚 전체 grammar_patterns 컬렉션에서 조회 시도");
+              const allGrammarSnapshot = await getDocs(
+                query(collection(db, "grammar_patterns"), limit(50))
+              );
+              currentData = allGrammarSnapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+              }));
+              console.log(
+                `📖 전체 문법 패턴 컬렉션에서 발견: ${currentData.length}개`
+              );
+            }
+          } catch (error) {
+            console.error("문법 패턴 조회 실패:", error);
+            currentData = [];
+          }
+        } else {
+          try {
+            const allGrammarSnapshot = await getDocs(
+              query(collection(db, "grammar_patterns"), limit(50))
+            );
+            currentData = allGrammarSnapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }));
+            console.log(
+              `📖 전체 문법 패턴 컬렉션에서 발견: ${currentData.length}개`
+            );
+          } catch (error) {
+            console.error("전체 문법 패턴 컬렉션 조회 실패:", error);
+            currentData = [];
+          }
+        }
+        break;
+      case "reading":
+        // 예문 가져오기
+        if (currentUser && currentUser.email) {
+          console.log(`🔍 이메일로 예문 조회: ${currentUser.email}`);
+          try {
+            const exampleSnapshot = await getDocs(
+              query(
+                collection(db, "examples"),
+                where("userId", "==", currentUser.email),
+                limit(50)
+              )
+            );
+            currentData = exampleSnapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }));
+            console.log(`🔍 이메일로 조회된 예문: ${currentData.length}개`);
+
+            if (currentData.length === 0) {
+              console.log("📚 전체 examples 컬렉션에서 조회 시도");
+              const allExampleSnapshot = await getDocs(
+                query(collection(db, "examples"), limit(50))
+              );
+              currentData = allExampleSnapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+              }));
+              console.log(
+                `📖 전체 예문 컬렉션에서 발견: ${currentData.length}개`
+              );
+            }
+          } catch (error) {
+            console.error("예문 조회 실패:", error);
+            currentData = [];
+          }
+        } else {
+          try {
+            const allExampleSnapshot = await getDocs(
+              query(collection(db, "examples"), limit(50))
+            );
+            currentData = allExampleSnapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }));
+            console.log(
+              `📖 전체 예문 컬렉션에서 발견: ${currentData.length}개`
+            );
+          } catch (error) {
+            console.error("전체 예문 컬렉션 조회 실패:", error);
+            currentData = [];
+          }
+        }
+        break;
+    }
+
+    console.log(`✅ ${area} 데이터 로드 완료: ${currentData.length}개`);
+
+    if (currentData.length === 0) {
+      console.log(
+        `📝 ${area} 학습 데이터가 없습니다. 업로드 안내를 표시합니다.`
+      );
+      showNoDataMessage(area);
+    }
+  } catch (error) {
+    console.error("❌ 데이터 로드 중 오류:", error);
+    currentData = [];
+    showNoDataMessage(area);
+  }
+}
+
+// 데이터가 없을 때 안내 메시지 표시
+function showNoDataMessage(area) {
+  const areaNames = {
+    vocabulary: "단어",
+    grammar: "문법 패턴",
+    reading: "예문",
   };
 
-  // 언어 변경
-  if (elements.targetLanguage) {
-    elements.targetLanguage.addEventListener("change", () => {
-      filterAndDisplayPatterns();
-    });
-  }
+  const message = `${areaNames[area]} 학습 데이터가 없습니다.\n\n학습 모드 선택 화면의 '데이터 업로드' 버튼을 사용하여 CSV/JSON 파일을 업로드하거나,\n다국어 단어장 페이지에서 개념을 추가해보세요.`;
 
-  // 새로고침
-  if (elements.refreshBtn) {
-    elements.refreshBtn.addEventListener("click", () => {
-      loadGrammarPatterns();
-    });
-  }
+  alert(message);
 
-  // 필터링
-  [
-    "difficultyFilter",
-    "patternTypeFilter",
-    "domainFilter",
-    "sortPatterns",
-  ].forEach((filterId) => {
-    const element = elements[filterId];
-    if (element) {
-      element.addEventListener("change", () => {
-        filterAndDisplayPatterns();
-      });
-    }
-  });
+  // 학습 모드 선택 화면으로 돌아가기
+  showLearningModes(area);
 }
 
-// 문법 패턴 로드 (간소화)
-async function loadGrammarPatterns() {
-  try {
-    showLoading();
-    allGrammarPatterns = [];
-
-    console.log("문법 패턴 로딩 시작...");
-
-    // examples 컬렉션에서 문법 패턴 로드 시도
-    try {
-      console.log("examples 컬렉션에서 로딩 시도...");
-      const examplesRef = collection(db, "examples");
-      const examplesQuery = query(examplesRef, limit(100));
-
-      const examplesSnapshot = await getDocs(examplesQuery);
-      console.log(`examples 컬렉션에서 ${examplesSnapshot.size}개 문서 발견`);
-
-      examplesSnapshot.forEach((doc) => {
-        const data = doc.data();
-        console.log("examples 문서 구조:", Object.keys(data));
-
-        // examples 컬렉션에서 문법 패턴 생성 (실제 DB 구조 반영)
-        const grammarPattern = {
-          id: `example_${doc.id}`,
-          concept_id: data.concept_id || doc.id,
-          source: "examples",
-          // learning_metadata나 context에서 패턴명 추출 시도
-          pattern_name:
-            data.learning_metadata?.pattern_name ||
-            data.context?.pattern_type ||
-            generateMeaningfulPatternName(data),
-          structural_pattern:
-            data.learning_metadata?.structural_pattern ||
-            data.context?.structure ||
-            extractStructureFromTranslations(data.translations) ||
-            "기본 구조",
-          grammar_tags:
-            data.learning_metadata?.grammar_tags ||
-            data.context?.tags ||
-            extractTagsFromPatternId(data.grammar_pattern_id) ||
-            [],
-          complexity_level: data.learning_metadata?.complexity || "basic",
-          learning_focus:
-            data.learning_metadata?.focus_areas ||
-            extractFocusFromContext(data.context) ||
-            [],
-          difficulty: data.difficulty || "beginner",
-          frequency: data.learning_metadata?.frequency || "medium",
-          domain: data.learning_metadata?.domain || "general",
-          category: "grammar",
-          example_translations: data.translations || {},
-          teaching_notes: data.learning_metadata?.notes || {},
-          concept_data: {
-            word: data.context?.source_word || "",
-            expressions: {},
-          },
-          // 추가 정보
-          grammar_pattern_id: data.grammar_pattern_id,
-          context: data.context,
-          order_index: data.order_index,
-          is_representative: data.is_representative,
-        };
-
-        allGrammarPatterns.push(grammarPattern);
-      });
-
-      console.log(
-        `examples에서 ${allGrammarPatterns.length}개 문법 패턴 로드됨`
-      );
-    } catch (error) {
-      console.warn("examples 컬렉션 로드 실패:", error);
-    }
-
-    // concepts 컬렉션에서 추가 패턴 생성 (백업)
-    try {
-      const conceptsRef = collection(db, "concepts");
-      const conceptsQuery = query(conceptsRef, limit(50));
-
-      const conceptsSnapshot = await getDocs(conceptsQuery);
-
-      let conceptPatternsCount = 0;
-
-      conceptsSnapshot.forEach((doc) => {
-        const data = doc.data();
-
-        // featured_examples에서 간단한 문법 패턴 생성
-        if (data.featured_examples && Array.isArray(data.featured_examples)) {
-          data.featured_examples.forEach((example, index) => {
-            if (example.grammar_system) {
-              const grammarPattern = {
-                id: `${doc.id}_example_${index}`,
-                concept_id: doc.id,
-                source: "concepts",
-                pattern_name:
-                  example.grammar_system.pattern_name || "기본 문법 패턴",
-                structural_pattern:
-                  example.grammar_system.structural_pattern || "기본 문장 구조",
-                grammar_tags: example.grammar_system.grammar_tags || [],
-                complexity_level:
-                  example.grammar_system.complexity_level || "basic",
-                learning_focus: example.grammar_system.learning_focus || [],
-                difficulty:
-                  example.difficulty ||
-                  data.concept_info?.difficulty ||
-                  "beginner",
-                frequency: "medium",
-                domain: data.concept_info?.domain || "general",
-                category: data.concept_info?.category || "general",
-                example_translations: example.translations || {},
-                teaching_notes: example.grammar_system.teaching_notes || {},
-                concept_data: {
-                  word: data.expressions?.korean?.word || "",
-                  expressions: data.expressions || {},
-                },
-              };
-
-              allGrammarPatterns.push(grammarPattern);
-              conceptPatternsCount++;
-            }
-          });
-        }
-      });
-
-      console.log(`concepts에서 ${conceptPatternsCount}개 추가 패턴 생성`);
-    } catch (error) {
-      console.warn("concepts 로드 실패:", error);
-    }
-
-    // 데이터가 부족하면 샘플 추가
-    if (allGrammarPatterns.length < 3) {
-      console.log("DB 데이터가 부족하여 샘플 데이터 추가");
-      addSampleGrammarPatterns();
-    }
-
-    console.log(`총 ${allGrammarPatterns.length}개 문법 패턴 로드 완료`);
-    filterAndDisplayPatterns();
-  } catch (error) {
-    console.error("문법 패턴 로드 오류:", error);
-    showError("문법 패턴을 불러오는 중 오류가 발생했습니다.");
-    addSampleGrammarPatterns();
-    filterAndDisplayPatterns();
-  } finally {
-    hideLoading();
-  }
-}
-
-// 기본 샘플 문법 패턴 추가
-function addSampleGrammarPatterns() {
-  const samplePatterns = [
-    {
-      id: "sample_present_tense",
-      source: "sample",
-      pattern_name: "현재 시제 기본형",
-      structural_pattern: "주어 + 동사 + 목적어",
-      grammar_tags: ["present_tense", "basic_sentence"],
-      complexity_level: "basic",
-      learning_focus: ["현재시제", "기본문장구조"],
-      difficulty: "beginner",
-      frequency: "high",
-      domain: "daily",
-      category: "grammar",
-      example_translations: {
-        korean: { text: "나는 사과를 먹어요." },
-        english: { text: "I eat an apple." },
-      },
-      teaching_notes: {
-        primary_focus: "현재 시제의 기본 구조",
-        practice_suggestions: ["단순 문장 연습"],
-      },
-    },
-    {
-      id: "sample_past_tense",
-      source: "sample",
-      pattern_name: "과거 시제",
-      structural_pattern: "주어 + 과거동사 + 목적어",
-      grammar_tags: ["past_tense"],
-      complexity_level: "basic",
-      learning_focus: ["과거시제"],
-      difficulty: "beginner",
-      frequency: "high",
-      domain: "daily",
-      category: "grammar",
-      example_translations: {
-        korean: { text: "어제 영화를 봤어요." },
-        english: { text: "I watched a movie yesterday." },
-      },
-      teaching_notes: {
-        primary_focus: "과거 시제 표현",
-        practice_suggestions: ["일기 쓰기"],
-      },
-    },
-    {
-      id: "sample_question_form",
-      source: "sample",
-      pattern_name: "의문문 만들기",
-      structural_pattern: "의문사 + 주어 + 동사?",
-      grammar_tags: ["interrogative"],
-      complexity_level: "intermediate",
-      learning_focus: ["의문문"],
-      difficulty: "intermediate",
-      frequency: "high",
-      domain: "conversation",
-      category: "expression",
-      example_translations: {
-        korean: { text: "뭐 하고 있어요?" },
-        english: { text: "What are you doing?" },
-      },
-      teaching_notes: {
-        primary_focus: "의문문 구조",
-        practice_suggestions: ["질문-답변 연습"],
-      },
-    },
+// 모든 섹션 숨기기
+function hideAllSections() {
+  const sections = [
+    "learning-mode-section",
+    "flashcard-container",
+    "typing-container",
+    "grammar-container",
+    "reading-container",
   ];
 
-  allGrammarPatterns.push(...samplePatterns);
-  console.log(`${samplePatterns.length}개 샘플 문법 패턴 추가됨`);
-}
-
-// 필터링 및 표시
-function filterAndDisplayPatterns() {
-  const targetLanguage = document.getElementById("target-language").value;
-  const difficulty = document.getElementById("difficulty-filter").value;
-  const patternType = document.getElementById("pattern-type-filter").value;
-  const domain = document.getElementById("domain-filter").value;
-  const sortOption = document.getElementById("sort-patterns").value;
-
-  // 필터링
-  filteredPatterns = allGrammarPatterns.filter((pattern) => {
-    // 난이도 필터
-    if (difficulty !== "all" && pattern.difficulty !== difficulty) {
-      return false;
-    }
-
-    // 패턴 유형 필터
-    if (patternType !== "all") {
-      const hasPatternType = pattern.grammar_tags?.some(
-        (tag) => tag.includes(patternType) || pattern.category === patternType
-      );
-      if (!hasPatternType) return false;
-    }
-
-    // 도메인 필터
-    if (domain !== "all" && pattern.domain !== domain) {
-      return false;
-    }
-
-    // 대상 언어에 예문이 있는지 확인
-    if (!pattern.example_translations?.[targetLanguage]) {
-      return false;
-    }
-
-    return true;
+  sections.forEach((id) => {
+    document.getElementById(id).classList.add("hidden");
   });
 
-  // 정렬
-  sortPatterns(sortOption);
+  // 업로드 버튼 숨기기
+  const uploadBtn = document.getElementById("upload-for-mode");
+  if (uploadBtn) {
+    uploadBtn.classList.add("hidden");
+  }
 
-  // 표시
-  displayGrammarPatterns();
-}
-
-// 정렬
-function sortPatterns(sortOption) {
-  switch (sortOption) {
-    case "frequency":
-      filteredPatterns.sort((a, b) => {
-        const freqOrder = { high: 3, medium: 2, low: 1 };
-        return (freqOrder[b.frequency] || 0) - (freqOrder[a.frequency] || 0);
-      });
-      break;
-    case "difficulty":
-      filteredPatterns.sort((a, b) => {
-        const diffOrder = { beginner: 1, intermediate: 2, advanced: 3 };
-        return (diffOrder[a.difficulty] || 0) - (diffOrder[b.difficulty] || 0);
-      });
-      break;
-    case "alphabetical":
-      filteredPatterns.sort((a, b) =>
-        (a.pattern_name || "").localeCompare(b.pattern_name || "")
-      );
-      break;
-    case "recent":
-      // 최근 추가된 순 (ID 기준)
-      filteredPatterns.sort((a, b) => (b.id || "").localeCompare(a.id || ""));
-      break;
+  // 인라인 업로드 섹션 숨기기
+  const uploadSection = document.getElementById("mode-upload-section");
+  if (uploadSection) {
+    uploadSection.classList.add("hidden");
   }
 }
 
-// 문법 패턴 표시
-function displayGrammarPatterns() {
-  const container = document.getElementById("grammar-patterns-container");
-  const emptyState = document.getElementById("empty-state");
+// 업로드 모달 표시
+function showUploadModal(type) {
+  document.getElementById(`${type}-upload-modal`).classList.remove("hidden");
+}
 
-  if (!container) return;
+// 업로드 모달 숨기기
+function hideUploadModal(type) {
+  document.getElementById(`${type}-upload-modal`).classList.add("hidden");
+}
 
-  if (filteredPatterns.length === 0) {
-    container.innerHTML = "";
-    if (emptyState) {
-      emptyState.classList.remove("hidden");
+// 인라인 업로드 UI 토글
+function toggleInlineUpload(type) {
+  const sectionId = `${type}-upload-section`;
+  const section = document.getElementById(sectionId);
+
+  if (section) {
+    if (section.classList.contains("hidden")) {
+      section.classList.remove("hidden");
+      console.log(`📂 ${type} 업로드 섹션 표시`);
+    } else {
+      section.classList.add("hidden");
+      console.log(`📂 ${type} 업로드 섹션 숨김`);
     }
+  }
+}
+
+// 학습 모드 선택에서 파일 업로드 처리
+async function handleModeFileUpload() {
+  const fileInput = document.getElementById("mode-file-input");
+  console.log("📁 파일 입력 요소:", fileInput);
+  console.log("📁 선택된 파일들:", fileInput?.files);
+  console.log("📁 파일 개수:", fileInput?.files?.length);
+
+  const file = fileInput.files[0];
+  console.log("📁 첫 번째 파일:", file);
+
+  if (!file) {
+    console.log("❌ 파일이 선택되지 않았습니다");
+    alert("파일을 선택해주세요.");
     return;
   }
 
-  if (emptyState) {
-    emptyState.classList.add("hidden");
+  try {
+    console.log("📁 파일 상세 정보:", {
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      lastModified: new Date(file.lastModified),
+    });
+
+    console.log(
+      `📁 ${currentLearningArea} 모드 파일 업로드 시작: ${file.name}`
+    );
+
+    const text = await file.text();
+    let data;
+
+    if (file.name.endsWith(".json")) {
+      data = JSON.parse(text);
+    } else if (file.name.endsWith(".csv")) {
+      data = parseCSV(text);
+    } else {
+      throw new Error("지원하지 않는 파일 형식입니다.");
+    }
+
+    console.log(`📊 파싱된 데이터: ${data.length}개 항목`);
+
+    // 데이터 업로드
+    let uploadedCount = 0;
+    let failedCount = 0;
+
+    console.log(
+      `📤 ${currentLearningArea} 업로드 시작 - 총 ${data.length}개 항목`
+    );
+    console.log(`📋 업로드할 데이터 샘플:`, data.slice(0, 2));
+
+    for (let i = 0; i < data.length; i++) {
+      const item = data[i];
+      try {
+        console.log(`📤 ${i + 1}/${data.length} 항목 업로드 중:`, item);
+
+        let result;
+        let transformedItem;
+
+        switch (currentLearningArea) {
+          case "vocabulary":
+            // CSV에서 받은 데이터를 concepts 형식으로 변환
+            transformedItem = {
+              concept_info: {
+                domain: item.domain || "daily",
+                category: item.category || "uncategorized",
+                difficulty: item.difficulty || "beginner",
+                unicode_emoji: item.unicode_emoji || "📝",
+                color_theme: item.color_theme || "#9C27B0",
+                tags: item.tags
+                  ? typeof item.tags === "string"
+                    ? item.tags.split(",").map((t) => t.trim())
+                    : item.tags
+                  : [],
+                updated_at: new Date(),
+              },
+              expressions: {
+                korean: {
+                  word: item.korean_word || "",
+                  pronunciation: item.korean_pronunciation || "",
+                  definition: item.korean_definition || "",
+                  part_of_speech: item.korean_part_of_speech || "명사",
+                  level: item.korean_level || "beginner",
+                  synonyms: item.korean_synonyms
+                    ? typeof item.korean_synonyms === "string"
+                      ? item.korean_synonyms.split(",").map((s) => s.trim())
+                      : item.korean_synonyms
+                    : [],
+                  antonyms: [],
+                  word_family: item.korean_word_family
+                    ? typeof item.korean_word_family === "string"
+                      ? item.korean_word_family.split(",").map((w) => w.trim())
+                      : item.korean_word_family
+                    : [],
+                  compound_words: item.korean_compound_words
+                    ? typeof item.korean_compound_words === "string"
+                      ? item.korean_compound_words
+                          .split(",")
+                          .map((c) => c.trim())
+                      : item.korean_compound_words
+                    : [],
+                  collocations: item.korean_collocations
+                    ? typeof item.korean_collocations === "string"
+                      ? item.korean_collocations.split(",").map((c) => c.trim())
+                      : item.korean_collocations
+                    : [],
+                },
+                english: {
+                  word: item.english_word || "",
+                  pronunciation: item.english_pronunciation || "",
+                  definition: item.english_definition || "",
+                  part_of_speech: item.english_part_of_speech || "noun",
+                  level: item.english_level || "beginner",
+                  synonyms: item.english_synonyms
+                    ? typeof item.english_synonyms === "string"
+                      ? item.english_synonyms.split(",").map((s) => s.trim())
+                      : item.english_synonyms
+                    : [],
+                  antonyms: [],
+                  word_family: item.english_word_family
+                    ? typeof item.english_word_family === "string"
+                      ? item.english_word_family.split(",").map((w) => w.trim())
+                      : item.english_word_family
+                    : [],
+                  compound_words: item.english_compound_words
+                    ? typeof item.english_compound_words === "string"
+                      ? item.english_compound_words
+                          .split(",")
+                          .map((c) => c.trim())
+                      : item.english_compound_words
+                    : [],
+                  collocations: item.english_collocations
+                    ? typeof item.english_collocations === "string"
+                      ? item.english_collocations
+                          .split(",")
+                          .map((c) => c.trim())
+                      : item.english_collocations
+                    : [],
+                },
+                chinese: {
+                  word: item.chinese_word || "",
+                  pronunciation: item.chinese_pronunciation || "",
+                  definition: item.chinese_definition || "",
+                  part_of_speech: item.chinese_part_of_speech || "名词",
+                  level: item.chinese_level || "beginner",
+                  synonyms: item.chinese_synonyms
+                    ? typeof item.chinese_synonyms === "string"
+                      ? item.chinese_synonyms.split(",").map((s) => s.trim())
+                      : item.chinese_synonyms
+                    : [],
+                  antonyms: [],
+                  word_family: item.chinese_word_family
+                    ? typeof item.chinese_word_family === "string"
+                      ? item.chinese_word_family.split(",").map((w) => w.trim())
+                      : item.chinese_word_family
+                    : [],
+                  compound_words: item.chinese_compound_words
+                    ? typeof item.chinese_compound_words === "string"
+                      ? item.chinese_compound_words
+                          .split(",")
+                          .map((c) => c.trim())
+                      : item.chinese_compound_words
+                    : [],
+                  collocations: item.chinese_collocations
+                    ? typeof item.chinese_collocations === "string"
+                      ? item.chinese_collocations
+                          .split(",")
+                          .map((c) => c.trim())
+                      : item.chinese_collocations
+                    : [],
+                },
+                japanese: {
+                  word: item.japanese_word || "",
+                  pronunciation: item.japanese_pronunciation || "",
+                  definition: item.japanese_definition || "",
+                  part_of_speech: item.japanese_part_of_speech || "名詞",
+                  level: item.japanese_level || "beginner",
+                  synonyms: item.japanese_synonyms
+                    ? typeof item.japanese_synonyms === "string"
+                      ? item.japanese_synonyms.split(",").map((s) => s.trim())
+                      : item.japanese_synonyms
+                    : [],
+                  antonyms: [],
+                  word_family: item.japanese_word_family
+                    ? typeof item.japanese_word_family === "string"
+                      ? item.japanese_word_family
+                          .split(",")
+                          .map((w) => w.trim())
+                      : item.japanese_word_family
+                    : [],
+                  compound_words: item.japanese_compound_words
+                    ? typeof item.japanese_compound_words === "string"
+                      ? item.japanese_compound_words
+                          .split(",")
+                          .map((c) => c.trim())
+                      : item.japanese_compound_words
+                    : [],
+                  collocations: item.japanese_collocations
+                    ? typeof item.japanese_collocations === "string"
+                      ? item.japanese_collocations
+                          .split(",")
+                          .map((c) => c.trim())
+                      : item.japanese_collocations
+                    : [],
+                },
+              },
+              representative_example:
+                item.example_korean && item.example_english
+                  ? {
+                      translations: {
+                        korean: item.example_korean,
+                        english: item.example_english,
+                        chinese: item.example_chinese || "",
+                        japanese: item.example_japanese || "",
+                      },
+                      context: item.example_context || "daily_conversation",
+                      difficulty: item.example_difficulty || "beginner",
+                    }
+                  : null,
+              userId: currentUser.email,
+            };
+            result = await conceptUtils.createConcept(transformedItem);
+            console.log(`✅ vocabulary 업로드 성공:`, result);
+            break;
+
+          case "grammar":
+            // CSV에서 받은 데이터를 grammar_patterns 형식으로 변환
+            transformedItem = {
+              pattern: item.pattern || "",
+              description: item.description || "",
+              example: item.example || "",
+              translation: item.translation || "",
+              level: item.level || "beginner",
+              tags: item.tags
+                ? typeof item.tags === "string"
+                  ? item.tags.split(",").map((t) => t.trim())
+                  : item.tags
+                : [],
+              userId: currentUser.email,
+            };
+            result = await grammarPatternUtils.createGrammarPattern(
+              transformedItem
+            );
+            console.log(`✅ grammar 업로드 성공:`, result);
+            break;
+
+          case "reading":
+            // CSV에서 받은 데이터를 examples 형식으로 변환
+            transformedItem = {
+              original: item.original || "",
+              translation: item.translation || "",
+              explanation: item.explanation || "",
+              level: item.level || "beginner",
+              tags: item.tags
+                ? typeof item.tags === "string"
+                  ? item.tags.split(",").map((t) => t.trim())
+                  : item.tags
+                : [],
+              userId: currentUser.email,
+            };
+            result = await exampleUtils.createExample(transformedItem);
+            console.log(`✅ reading 업로드 성공:`, result);
+            break;
+        }
+        uploadedCount++;
+      } catch (error) {
+        console.error(`❌ ${i + 1}/${data.length} 항목 업로드 실패:`, error);
+        console.error("실패한 항목:", item);
+        failedCount++;
+      }
+    }
+
+    console.log(
+      `📊 업로드 완료 - 성공: ${uploadedCount}, 실패: ${failedCount}`
+    );
+
+    alert(`업로드가 완료되었습니다. (${uploadedCount}/${data.length}개 성공)`);
+
+    // 업로드 섹션 숨기기
+    toggleInlineUpload("mode");
+    fileInput.value = "";
+
+    // 데이터 새로고침
+    console.log("🔄 데이터 새로고침 시작");
+    await loadLearningData(currentLearningArea);
+
+    // 데이터가 있으면 업로드 안내 메시지 표시
+    if (currentData.length > 0) {
+      alert(
+        `${currentData.length}개의 데이터가 로드되었습니다. 이제 학습 모드를 선택해주세요.`
+      );
+    }
+  } catch (error) {
+    console.error("❌ 업로드 중 오류:", error);
+    alert("업로드 중 오류가 발생했습니다: " + error.message);
   }
-
-  const targetLanguage = document.getElementById("target-language").value;
-
-  container.innerHTML = filteredPatterns
-    .map((pattern) => createPatternCard(pattern, targetLanguage))
-    .join("");
 }
 
-// 패턴 카드 생성
-function createPatternCard(pattern, targetLanguage) {
-  const example =
-    pattern.example_translations?.[targetLanguage] ||
-    pattern.example_translations?.korean ||
-    {};
-  const difficultyColors = {
-    beginner: "bg-green-100 text-green-800",
-    intermediate: "bg-yellow-100 text-yellow-800",
-    advanced: "bg-red-100 text-red-800",
-  };
+// 인라인 파일 업로드 처리
+async function handleInlineFileUpload(type) {
+  const fileInputId = `${type}-file-input`;
+  const fileInput = document.getElementById(fileInputId);
+  const file = fileInput.files[0];
 
-  const frequencyColors = {
-    high: "bg-blue-100 text-blue-800",
-    medium: "bg-gray-100 text-gray-800",
-    low: "bg-gray-100 text-gray-600",
-  };
+  if (!file) {
+    alert("파일을 선택해주세요.");
+    return;
+  }
 
-  return `
-    <div class="grammar-card bg-white rounded-lg shadow-md p-6 cursor-pointer" 
-         onclick="openPatternModal('${pattern.id}')">
-      <div class="flex items-start justify-between mb-4">
+  try {
+    console.log(`📁 ${type} 파일 업로드 시작: ${file.name}`);
+
+    const text = await file.text();
+    let data;
+
+    if (file.name.endsWith(".json")) {
+      data = JSON.parse(text);
+    } else if (file.name.endsWith(".csv")) {
+      data = parseCSV(text);
+    } else {
+      throw new Error("지원하지 않는 파일 형식입니다.");
+    }
+
+    console.log(`📊 파싱된 데이터: ${data.length}개 항목`);
+
+    // 데이터 업로드
+    let uploadedCount = 0;
+    for (const item of data) {
+      try {
+        await conceptUtils.createConcept(item);
+        uploadedCount++;
+      } catch (error) {
+        console.error("개별 항목 업로드 오류:", error);
+      }
+    }
+
+    alert(`업로드가 완료되었습니다. (${uploadedCount}/${data.length}개 성공)`);
+
+    // 업로드 섹션 숨기기
+    toggleInlineUpload(type);
+    fileInput.value = "";
+
+    // 데이터 새로고침
+    console.log("🔄 데이터 새로고침 시작");
+    await loadLearningData(currentLearningArea);
+
+    // 데이터가 있으면 학습 모드 다시 시작
+    if (currentData.length > 0) {
+      console.log("✅ 새 데이터로 학습 모드 재시작");
+      hideAllSections();
+      currentIndex = 0;
+
+      if (currentLearningMode === "flashcard") {
+        showFlashcardMode();
+      } else if (currentLearningMode === "typing") {
+        showTypingMode();
+      }
+    }
+  } catch (error) {
+    console.error("❌ 업로드 중 오류:", error);
+    alert("업로드 중 오류가 발생했습니다: " + error.message);
+  }
+}
+
+// 파일 업로드 처리 (기존 모달용)
+async function handleFileUpload(type) {
+  const fileInput = document.getElementById(`${type}-file-input`);
+  const file = fileInput.files[0];
+
+  if (!file) {
+    alert("파일을 선택해주세요.");
+    return;
+  }
+
+  try {
+    const text = await file.text();
+    let data;
+
+    if (file.name.endsWith(".json")) {
+      data = JSON.parse(text);
+    } else if (file.name.endsWith(".csv")) {
+      data = parseCSV(text);
+    } else {
+      throw new Error("지원하지 않는 파일 형식입니다.");
+    }
+
+    // 데이터 업로드
+    for (const item of data) {
+      switch (type) {
+        case "concept":
+          await conceptUtils.createConcept(item);
+          break;
+        case "grammar":
+          await grammarPatternUtils.createGrammarPattern(item);
+          break;
+        case "example":
+          await exampleUtils.createExample(item);
+          break;
+      }
+    }
+
+    alert("업로드가 완료되었습니다.");
+    hideUploadModal(type);
+    fileInput.value = "";
+  } catch (error) {
+    console.error("업로드 중 오류:", error);
+    alert("업로드 중 오류가 발생했습니다: " + error.message);
+  }
+}
+
+// CSV 파싱 (따옴표 안의 쉼표 처리)
+function parseCSV(text) {
+  console.log("📊 CSV 파싱 시작, 텍스트 길이:", text.length);
+  console.log("📊 텍스트 샘플:", text.substring(0, 200));
+
+  const lines = text.trim().split("\n");
+  console.log("📊 라인 수:", lines.length);
+
+  if (lines.length < 2) {
+    console.log("❌ CSV 데이터가 충분하지 않습니다");
+    return [];
+  }
+
+  const headers = parseCSVLine(lines[0]);
+  console.log("📊 헤더:", headers);
+
+  const data = [];
+
+  for (let i = 1; i < lines.length; i++) {
+    if (lines[i].trim() === "") continue;
+
+    const values = parseCSVLine(lines[i]);
+    console.log(`📊 라인 ${i} 파싱 결과:`, values);
+
+    const item = {};
+    headers.forEach((header, index) => {
+      item[header.trim()] = values[index]?.trim() || "";
+    });
+
+    console.log(`📊 생성된 항목 ${i}:`, item);
+    data.push(item);
+  }
+
+  console.log("📊 최종 파싱 결과:", data);
+  return data;
+}
+
+// CSV 라인 파싱 (따옴표 안의 쉼표 처리)
+function parseCSVLine(line) {
+  const result = [];
+  let current = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+
+    if (char === '"') {
+      inQuotes = !inQuotes;
+    } else if (char === "," && !inQuotes) {
+      result.push(current);
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+
+  result.push(current);
+  return result;
+}
+
+// 템플릿 다운로드
+function downloadTemplate(type) {
+  let template;
+  let filename;
+
+  switch (type) {
+    case "concept":
+      template = `domain,category,difficulty,unicode_emoji,color_theme,tags,korean_word,korean_pronunciation,korean_definition,korean_part_of_speech,korean_level,korean_synonyms,korean_word_family,korean_compound_words,korean_collocations,english_word,english_pronunciation,english_definition,english_part_of_speech,english_level,english_synonyms,english_word_family,english_compound_words,english_collocations,chinese_word,chinese_pronunciation,chinese_definition,chinese_part_of_speech,chinese_level,chinese_synonyms,chinese_word_family,chinese_compound_words,chinese_collocations,japanese_word,japanese_pronunciation,japanese_definition,japanese_part_of_speech,japanese_level,japanese_synonyms,japanese_word_family,japanese_compound_words,japanese_collocations,example_korean,example_english,example_chinese,example_japanese,example_context,example_difficulty
+daily,fruit,beginner,🍎,#FF6B6B,"food,healthy,common",사과,sa-gwa,둥글고 빨간 과일,명사,beginner,능금,"과일,음식","사과나무,사과즙","빨간 사과,맛있는 사과",apple,/ˈæpəl/,a round fruit with red or green skin,noun,beginner,,"fruit,food","apple tree,apple juice","red apple,fresh apple",苹果,píng guǒ,圆形的红色或绿色水果,名词,beginner,苹子,"水果,食物","苹果树,苹果汁","红苹果,新鲜苹果",りんご,ringo,赤いまたは緑色の丸い果物,名詞,beginner,アップル,"果物,食べ物","りんごの木,りんごジュース","赤いりんご,新鮮なりんご",나는 빨간 사과를 좋아한다.,I like red apples.,我喜欢红苹果。,私は赤いりんごが好きです。,daily_conversation,beginner`;
+      filename = "concept_template.csv";
+      break;
+    case "grammar":
+      template = `pattern,description,example,translation,level,tags
+-고 있다,현재 진행형 표현,나는 공부하고 있다,I am studying,beginner,grammar,present`;
+      filename = "grammar_template.csv";
+      break;
+    case "example":
+      template = `original,translation,explanation,level,tags
+안녕하세요,Hello,기본적인 인사 표현,beginner,"greeting,basic"
+오늘 날씨가 좋네요,The weather is nice today,날씨에 관한 일상 표현,beginner,"weather,conversation"`;
+      filename = "example_template.csv";
+      break;
+  }
+
+  const blob = new Blob([template], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// 플래시카드 기능들
+function showFlashcardMode() {
+  document.getElementById("flashcard-container").classList.remove("hidden");
+  updateFlashcard();
+}
+
+function updateFlashcard() {
+  if (currentData.length === 0) return;
+
+  const concept = currentData[currentIndex];
+  const sourceLanguage = document.getElementById("source-language").value;
+  const targetLanguage = document.getElementById("target-language").value;
+
+  console.log("🃏 플래시카드 업데이트:", {
+    concept,
+    sourceLanguage,
+    targetLanguage,
+    index: currentIndex,
+  });
+
+  document.getElementById("card-category").textContent =
+    concept.concept_info?.category || concept.category || "일반";
+  document.getElementById("front-word").textContent =
+    concept.expressions?.[sourceLanguage]?.word || "";
+  document.getElementById("front-pronunciation").textContent =
+    concept.expressions?.[sourceLanguage]?.pronunciation || "";
+
+  document.getElementById("back-word").textContent =
+    concept.expressions?.[targetLanguage]?.word || "";
+  document.getElementById("back-pronunciation").textContent =
+    concept.expressions?.[targetLanguage]?.pronunciation || "";
+  document.getElementById("back-definition").textContent =
+    concept.expressions?.[targetLanguage]?.definition || "";
+
+  document.getElementById("card-progress").textContent = `${currentIndex + 1}/${
+    currentData.length
+  }`;
+}
+
+function flipCard() {
+  const card = document.querySelector(".flip-card");
+  card.classList.toggle("flipped");
+}
+
+function navigateCard(direction) {
+  currentIndex += direction;
+  if (currentIndex < 0) currentIndex = currentData.length - 1;
+  if (currentIndex >= currentData.length) currentIndex = 0;
+
+  const card = document.querySelector(".flip-card");
+  card.classList.remove("flipped");
+
+  updateFlashcard();
+}
+
+// 타이핑 기능들
+function showTypingMode() {
+  document.getElementById("typing-container").classList.remove("hidden");
+  updateTyping();
+}
+
+function updateTyping() {
+  if (currentData.length === 0) return;
+
+  const concept = currentData[currentIndex];
+  const sourceLanguage = document.getElementById("source-language").value;
+
+  console.log("⌨️ 타이핑 업데이트:", {
+    concept,
+    sourceLanguage,
+    index: currentIndex,
+  });
+
+  document.getElementById("typing-category").textContent =
+    concept.concept_info?.category || concept.category || "일반";
+  document.getElementById("typing-word").textContent =
+    concept.expressions?.[sourceLanguage]?.word || "";
+  document.getElementById("typing-pronunciation").textContent =
+    concept.expressions?.[sourceLanguage]?.pronunciation || "";
+
+  document.getElementById("typing-answer").value = "";
+  document.getElementById("typing-result").classList.add("hidden");
+  document.getElementById("next-typing").classList.add("hidden");
+
+  document.getElementById("typing-progress").textContent = `${
+    currentIndex + 1
+  }/${currentData.length}`;
+}
+
+function checkTypingAnswer() {
+  const userAnswer = document.getElementById("typing-answer").value.trim();
+  const concept = currentData[currentIndex];
+  const targetLanguage = document.getElementById("target-language").value;
+  const correctAnswer = concept.expressions?.[targetLanguage]?.word || "";
+
+  const resultDiv = document.getElementById("typing-result");
+
+  if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+    resultDiv.className = "mt-4 p-4 rounded bg-green-100 text-green-800";
+    resultDiv.textContent = "정답입니다!";
+  } else {
+    resultDiv.className = "mt-4 p-4 rounded bg-red-100 text-red-800";
+    resultDiv.textContent = `틀렸습니다. 정답: ${correctAnswer}`;
+  }
+
+  resultDiv.classList.remove("hidden");
+  document.getElementById("next-typing").classList.remove("hidden");
+}
+
+function nextTypingQuestion() {
+  currentIndex++;
+  if (currentIndex >= currentData.length) {
+    alert("모든 문제를 완료했습니다!");
+    showLearningModes(currentLearningArea);
+    return;
+  }
+
+  updateTyping();
+}
+
+// 문법 기능들
+function showGrammarPatternMode() {
+  document.getElementById("grammar-container").classList.remove("hidden");
+  updateGrammarPatterns();
+}
+
+function showGrammarExerciseMode() {
+  document.getElementById("grammar-container").classList.remove("hidden");
+  updateGrammarExercise();
+}
+
+function updateGrammarPatterns() {
+  if (currentData.length === 0) return;
+
+  const container = document.getElementById("grammar-pattern-container");
+
+  console.log("📝 문법 패턴들 업데이트:", {
+    patterns: currentData,
+    count: currentData.length,
+  });
+
+  // 모든 패턴을 작은 카드 그리드로 표시
+  const patternCards = currentData
+    .map(
+      (pattern, index) => `
+    <div class="p-4 border-l-4 border-green-500 hover:bg-gray-50 transition-all">
+      <div class="flex justify-between items-start mb-3">
         <div class="flex-1">
-          <h3 class="text-lg font-semibold text-gray-800 mb-2">
-            ${pattern.pattern_name || "패턴"}
-          </h3>
-          <p class="text-sm text-gray-600 mb-3">
-            ${pattern.structural_pattern || "구조 정보 없음"}
-          </p>
-        </div>
-        <div class="flex flex-col gap-1">
-          <span class="text-xs px-2 py-1 rounded-full ${
-            difficultyColors[pattern.difficulty] || difficultyColors.beginner
-          }">
-            ${getTranslatedText(pattern.difficulty)}
-          </span>
-          <span class="text-xs px-2 py-1 rounded-full ${
-            frequencyColors[pattern.frequency] || frequencyColors.medium
-          }">
-            ${pattern.frequency || "medium"}
-          </span>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+              ${pattern.level || "중급"}
+            </span>
+            <span class="text-xs text-gray-500">#${index + 1}</span>
+          </div>
+          <h3 class="text-lg font-bold text-gray-800 mb-2">${
+            pattern.pattern || "문법 패턴"
+          }</h3>
+          <p class="text-sm text-gray-600 line-clamp-2">${
+            pattern.description || ""
+          }</p>
         </div>
       </div>
-
+      
+      <div class="space-y-3">
+        <div class="bg-gray-50 rounded-lg p-3">
+          <h4 class="font-semibold text-gray-700 mb-1 text-sm flex items-center">
+            <i class="fas fa-quote-left mr-1 text-gray-500 text-xs"></i>예문
+          </h4>
+          <p class="text-sm text-gray-800 line-clamp-2">${
+            pattern.example || ""
+          }</p>
+        </div>
+        <div class="bg-blue-50 rounded-lg p-3">
+          <h4 class="font-semibold text-gray-700 mb-1 text-sm flex items-center">
+            <i class="fas fa-language mr-1 text-blue-500 text-xs"></i>번역
+          </h4>
+          <p class="text-sm text-gray-800 line-clamp-2">${
+            pattern.translation || ""
+          }</p>
+        </div>
+      </div>
+      
       ${
-        example.text
+        pattern.tags &&
+        (Array.isArray(pattern.tags)
+          ? pattern.tags.length > 0
+          : pattern.tags.trim().length > 0)
           ? `
-        <div class="bg-gray-50 p-3 rounded-lg mb-3">
-          <p class="text-gray-800 font-medium">${example.text}</p>
+        <div class="mt-3 pt-3 border-t border-gray-200">
+          <div class="flex flex-wrap gap-1">
+            ${(Array.isArray(pattern.tags)
+              ? pattern.tags
+              : pattern.tags.split(",").map((t) => t.trim())
+            )
+              .map(
+                (tag) => `
+              <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">${tag}</span>
+            `
+              )
+              .join("")}
+          </div>
         </div>
       `
           : ""
       }
+    </div>
+  `
+    )
+    .join("");
 
-      <div class="flex items-center justify-between text-xs text-gray-500">
-        <span class="flex items-center">
-          <i class="fas fa-tag mr-1"></i>
-          ${getTranslatedText(
-            pattern.domain || "general"
-          )} / ${getTranslatedText(pattern.category || "general")}
-        </span>
-        <span class="flex items-center">
-          <i class="fas fa-lightbulb mr-1"></i>
-          ${(pattern.learning_focus || []).length}개 학습 포인트
-        </span>
+  container.innerHTML = `
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">문법 패턴 학습</h2>
+        <p class="text-gray-600">총 ${currentData.length}개의 문법 패턴</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        ${patternCards}
       </div>
     </div>
   `;
+
+  document.getElementById(
+    "grammar-progress"
+  ).textContent = `${currentData.length}개 패턴 표시 중`;
 }
 
-// 패턴 모달 표시 (복원된 이전 UI)
-function showPatternDetail(pattern) {
-  console.log("선택된 패턴:", pattern);
+function updateGrammarExercise() {
+  if (currentData.length === 0) return;
 
-  // 모달 요소 가져오기 (HTML ID와 맞춤)
-  const modal = document.getElementById("pattern-detail-modal");
-  const modalTitle = document.getElementById("pattern-modal-title");
-  const modalBody = document.getElementById("pattern-modal-content");
+  const pattern = currentData[currentIndex];
+  const container = document.getElementById("grammar-pattern-container");
 
-  if (!modal || !modalTitle || !modalBody) {
-    console.error("모달 요소를 찾을 수 없습니다.");
-    return;
-  }
+  console.log("📝 문법 실습 업데이트:", {
+    pattern,
+    index: currentIndex,
+  });
 
-  // 모달 제목 설정
-  modalTitle.textContent = pattern.pattern_name || "문법 패턴";
-
-  // 모달 내용 생성 (학습 정보 중심)
-  const content = `
-    <div class="grammar-pattern-detail space-y-4">
-      <!-- 문법 구조 -->
-      <div class="pattern-structure-section bg-blue-50 p-4 rounded-lg">
-        <h3 class="font-bold text-lg mb-2">문법 구조</h3>
-        <p class="text-gray-800 font-medium">${
-          pattern.structural_pattern || "기본 문장 구조"
-        }</p>
-      </div>
-
-      <!-- 예문 -->
-      ${generateExamplesFromPattern(pattern)}
-
-      <!-- 문법 태그 및 학습 포인트 -->
-      <div class="learning-info-section bg-green-50 p-4 rounded-lg">
-        <h3 class="font-bold text-lg mb-3">학습 정보</h3>
+  container.innerHTML = `
+    <div class="max-w-2xl mx-auto">
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="text-center mb-4">
+          <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+            실습 문제 ${currentIndex + 1}/${currentData.length}
+          </span>
+        </div>
+        <div class="text-center mb-6">
+          <h3 class="text-2xl font-bold text-gray-800 mb-2">${
+            pattern.pattern || "문법 패턴"
+          }</h3>
+          <p class="text-gray-600">${pattern.description || ""}</p>
+        </div>
         
-        ${
-          pattern.grammar_tags && pattern.grammar_tags.length > 0
-            ? `
-          <div class="mb-3">
-            <span class="font-medium text-gray-700">문법 태그:</span>
-            <div class="flex flex-wrap gap-2 mt-2">
-              ${pattern.grammar_tags
-                .map(
-                  (tag) =>
-                    `<span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">${tag}</span>`
-                )
-                .join("")}
-            </div>
+        <div class="space-y-4">
+          <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <h4 class="font-semibold text-gray-700 mb-2">📝 문제</h4>
+            <p class="text-lg">다음 패턴을 사용하여 문장을 완성하세요:</p>
+            <p class="text-xl font-bold text-blue-600 mt-2">${
+              pattern.pattern || ""
+            }</p>
           </div>
-        `
-            : ""
-        }
-
-        ${
-          pattern.learning_focus && pattern.learning_focus.length > 0
-            ? `
-          <div class="mb-3">
-            <span class="font-medium text-gray-700">학습 포인트:</span>
-            <ul class="mt-2 space-y-1">
-              ${pattern.learning_focus
-                .map((focus) => `<li class="text-gray-800">• ${focus}</li>`)
-                .join("")}
-            </ul>
+          
+          <div class="bg-gray-50 rounded-lg p-4">
+            <h4 class="font-semibold text-gray-700 mb-2">💡 힌트</h4>
+            <p class="text-gray-700">${pattern.example || ""}</p>
           </div>
-        `
-            : ""
-        }
-
-        <div class="grid grid-cols-2 gap-4 text-sm mt-3">
-          <div>
-            <span class="font-medium text-gray-700">난이도:</span>
-            <span class="ml-2 px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800">${getDifficultyText(
-              pattern.difficulty
-            )}</span>
-          </div>
-          <div>
-            <span class="font-medium text-gray-700">복잡도:</span>
-            <span class="ml-2">${getComplexityText(
-              pattern.complexity_level
-            )}</span>
+          
+          <div class="bg-green-50 rounded-lg p-4">
+            <h4 class="font-semibold text-gray-700 mb-2">🌐 참고 번역</h4>
+            <p class="text-gray-700">${pattern.translation || ""}</p>
           </div>
         </div>
+        
+        <div class="flex justify-center space-x-4 mt-8">
+          <button onclick="navigateGrammarExercise(-1)" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-lg">
+            <i class="fas fa-arrow-left mr-2"></i>이전
+          </button>
+          <button onclick="navigateGrammarExercise(1)" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg">
+            다음<i class="fas fa-arrow-right ml-2"></i>
+          </button>
+        </div>
       </div>
-
-      <!-- 학습 노트 -->
-      ${
-        pattern.teaching_notes
-          ? generateTeachingNotes(pattern.teaching_notes)
-          : ""
-      }
     </div>
   `;
 
-  modalBody.innerHTML = content;
-  modal.classList.remove("hidden");
+  document.getElementById("grammar-progress").textContent = `${
+    currentIndex + 1
+  }/${currentData.length}`;
 }
 
-// DB 예문을 활용한 예문 생성
-function generateExamplesFromPattern(pattern) {
-  let examplesHtml = "";
+function navigateGrammarExercise(direction) {
+  currentIndex += direction;
+  if (currentIndex < 0) currentIndex = currentData.length - 1;
+  if (currentIndex >= currentData.length) currentIndex = 0;
 
-  // example_translations에서 예문 추출
-  if (pattern.example_translations) {
-    const korean = pattern.example_translations.korean?.text;
-    const english = pattern.example_translations.english?.text;
+  updateGrammarExercise();
+}
 
-    if (korean || english) {
-      examplesHtml = `
-        <div class="examples-section bg-gray-50 p-4 rounded-lg">
-          <h3 class="font-bold text-lg mb-3">예문</h3>
-          <div class="space-y-2">
-            ${
-              korean ? `<p class="text-gray-800 font-medium">${korean}</p>` : ""
-            }
-            ${english ? `<p class="text-gray-600">${english}</p>` : ""}
+// 독해 기능들
+function showReadingMode() {
+  document.getElementById("reading-container").classList.remove("hidden");
+  updateReading();
+}
+
+function updateReading() {
+  if (currentData.length === 0) return;
+
+  const example = currentData[currentIndex];
+  const container = document.getElementById("reading-example-container");
+
+  console.log("📖 독해 업데이트:", {
+    example,
+    index: currentIndex,
+    mode: currentLearningMode,
+  });
+
+  let content = "";
+
+  switch (currentLearningMode) {
+    case "comprehension":
+      // 예문 이해 - 원문과 번역 모두 표시
+      content = `
+        <div class="text-center mb-6">
+          <h3 class="text-xl font-bold mb-4">📚 예문 이해</h3>
+          <p class="text-gray-600">원문과 번역을 함께 보며 이해하세요</p>
+        </div>
+        <div class="space-y-6">
+          <div class="border-l-4 border-blue-500 bg-blue-50 rounded-lg p-6">
+            <h4 class="font-semibold mb-3 text-blue-800 flex items-center">
+              <i class="fas fa-quote-left mr-2"></i>원문
+            </h4>
+            <p class="text-lg leading-relaxed text-gray-800">${
+              example.original || ""
+            }</p>
+          </div>
+          <div class="border-l-4 border-green-500 bg-green-50 rounded-lg p-6">
+            <h4 class="font-semibold mb-3 text-green-800 flex items-center">
+              <i class="fas fa-language mr-2"></i>번역
+            </h4>
+            <p class="text-lg leading-relaxed text-gray-800">${
+              example.translation || ""
+            }</p>
+          </div>
+          <div class="border-l-4 border-purple-500 bg-purple-50 rounded-lg p-6">
+            <h4 class="font-semibold mb-3 text-purple-800 flex items-center">
+              <i class="fas fa-lightbulb mr-2"></i>설명
+            </h4>
+            <p class="text-md leading-relaxed text-gray-700">${
+              example.explanation || "문장의 구조와 의미를 파악해보세요."
+            }</p>
           </div>
         </div>
       `;
-    }
-  }
+      break;
 
-  // 대체 예문 (이전 버전 호환)
-  if (!examplesHtml && pattern.example_korean && pattern.example_english) {
-    examplesHtml = `
-      <div class="examples-section bg-gray-50 p-4 rounded-lg">
-        <h3 class="font-bold text-lg mb-3">예문</h3>
-        <div class="space-y-2">
-          <p class="text-gray-800 font-medium">${pattern.example_korean}</p>
-          <p class="text-gray-600">${pattern.example_english}</p>
+    case "context":
+      // 맥락 학습 - 설명과 원문 중심
+      content = `
+        <div class="text-center mb-6">
+          <h3 class="text-xl font-bold mb-4">🔍 맥락 학습</h3>
+          <p class="text-gray-600">문맥과 상황을 이해하며 학습하세요</p>
         </div>
-      </div>
-    `;
+        <div class="space-y-6">
+          <div class="border-l-4 border-yellow-500 bg-yellow-50 rounded-lg p-6">
+            <h4 class="font-semibold mb-3 text-yellow-800 flex items-center">
+              <i class="fas fa-info-circle mr-2"></i>상황 설명
+            </h4>
+            <p class="text-md leading-relaxed text-gray-700">${
+              example.explanation || "이 표현이 사용되는 상황을 생각해보세요."
+            }</p>
+          </div>
+          <div class="border-l-4 border-blue-500 bg-blue-50 rounded-lg p-6">
+            <h4 class="font-semibold mb-3 text-blue-800 flex items-center">
+              <i class="fas fa-quote-left mr-2"></i>예문
+            </h4>
+            <p class="text-lg leading-relaxed text-gray-800">${
+              example.original || ""
+            }</p>
+          </div>
+          <div class="border-l-4 border-gray-500 bg-gray-50 rounded-lg p-6">
+            <h4 class="font-semibold mb-3 text-gray-800 flex items-center">
+              <i class="fas fa-level-up-alt mr-2"></i>레벨
+            </h4>
+            <p class="text-sm text-gray-600">난이도: ${
+              example.level || "초급"
+            }</p>
+            ${
+              example.tags && example.tags.length > 0
+                ? `
+              <div class="flex flex-wrap gap-2 mt-2">
+                ${(Array.isArray(example.tags)
+                  ? example.tags
+                  : example.tags.split(",").map((t) => t.trim())
+                )
+                  .map(
+                    (tag) => `
+                  <span class="bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs">${tag}</span>
+                `
+                  )
+                  .join("")}
+              </div>
+            `
+                : ""
+            }
+          </div>
+        </div>
+      `;
+      break;
+
+    case "practice":
+      // 독해 연습 - 단계적 노출
+      content = `
+        <div class="text-center mb-6">
+          <h3 class="text-xl font-bold mb-4">💪 독해 연습</h3>
+          <p class="text-gray-600">단계별로 해석해보며 실력을 키워보세요</p>
+        </div>
+        <div class="space-y-6">
+          <div class="border-l-4 border-red-500 bg-red-50 rounded-lg p-6">
+            <h4 class="font-semibold mb-3 text-red-800 flex items-center">
+              <i class="fas fa-eye mr-2"></i>1단계: 원문 읽기
+            </h4>
+            <p class="text-lg leading-relaxed text-gray-800 mb-4">${
+              example.original || ""
+            }</p>
+            <details class="mt-4">
+              <summary class="cursor-pointer text-sm text-red-600 hover:text-red-800 font-medium">💡 힌트 보기</summary>
+              <p class="mt-2 text-sm text-gray-600">${
+                example.explanation || "문장의 핵심 의미를 찾아보세요."
+              }</p>
+            </details>
+          </div>
+          <div class="border-l-4 border-orange-500 bg-orange-50 rounded-lg p-6">
+            <h4 class="font-semibold mb-3 text-orange-800 flex items-center">
+              <i class="fas fa-brain mr-2"></i>2단계: 해석 생각하기
+            </h4>
+            <p class="text-md text-gray-600 mb-3">위 문장의 의미를 스스로 생각해보세요.</p>
+            <details>
+              <summary class="cursor-pointer text-sm text-orange-600 hover:text-orange-800 font-medium">✅ 정답 확인</summary>
+              <div class="mt-3 p-3 bg-white rounded border">
+                <p class="text-lg text-gray-800">${
+                  example.translation || ""
+                }</p>
+              </div>
+            </details>
+          </div>
+          <div class="border-l-4 border-green-500 bg-green-50 rounded-lg p-6">
+            <h4 class="font-semibold mb-3 text-green-800 flex items-center">
+              <i class="fas fa-check-circle mr-2"></i>3단계: 완전 이해
+            </h4>
+            <p class="text-md text-gray-600">이제 전체 문장을 완전히 이해했는지 확인해보세요.</p>
+            <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="bg-white p-3 rounded border">
+                <h5 class="font-medium text-sm text-gray-700 mb-1">원문</h5>
+                <p class="text-gray-800">${example.original || ""}</p>
+              </div>
+              <div class="bg-white p-3 rounded border">
+                <h5 class="font-medium text-sm text-gray-700 mb-1">의미</h5>
+                <p class="text-gray-800">${example.translation || ""}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      break;
+
+    default:
+      // 기본 모드
+      content = `
+        <div class="text-center mb-6">
+          <h3 class="text-xl font-bold mb-4">예문 독해</h3>
+        </div>
+        <div class="space-y-6">
+          <div class="border rounded-lg p-6">
+            <h4 class="font-semibold mb-3">원문</h4>
+            <p class="text-lg leading-relaxed">${example.original || ""}</p>
+          </div>
+          <div class="border rounded-lg p-6">
+            <h4 class="font-semibold mb-3">번역</h4>
+            <p class="text-lg leading-relaxed">${example.translation || ""}</p>
+          </div>
+          ${
+            example.explanation
+              ? `
+            <div class="border rounded-lg p-6 bg-blue-50">
+              <h4 class="font-semibold mb-3">해설</h4>
+              <p class="text-gray-700">${example.explanation}</p>
+            </div>
+          `
+              : ""
+          }
+        </div>
+      `;
+      break;
   }
 
-  return examplesHtml || "";
+  container.innerHTML = `
+    <div class="max-w-4xl mx-auto">
+      ${content}
+    </div>
+  `;
+
+  document.getElementById("reading-progress").textContent = `${
+    currentIndex + 1
+  }/${currentData.length}`;
 }
 
-// 예문 내용 생성 (간소화)
-function generateExamplesContent(pattern) {
-  return generateExamplesFromPattern(pattern);
+function navigateReading(direction) {
+  currentIndex += direction;
+  if (currentIndex < 0) currentIndex = currentData.length - 1;
+  if (currentIndex >= currentData.length) currentIndex = 0;
+
+  updateReading();
 }
 
-// 단어 표현 생성
-function generateWordExpressions(expressions) {
-  if (!expressions || Object.keys(expressions).length === 0) {
-    return '<p class="text-gray-600">관련 단어 정보가 없습니다.</p>';
-  }
-
-  let content = "";
-
-  // 한국어와 영어만 표시
-  const koreanExpr = expressions.korean;
-  const englishExpr = expressions.english;
-
-  if (koreanExpr?.word) {
-    content += `
-      <div class="word-expression mb-2 flex items-center">
-        <span class="font-medium text-gray-700 w-16">한국어:</span>
-        <span class="ml-2">${koreanExpr.word}</span>
-        ${
-          koreanExpr.pronunciation
-            ? `<span class="text-gray-500 ml-2">[${koreanExpr.pronunciation}]</span>`
-            : ""
-        }
-      </div>
-    `;
-  }
-
-  if (englishExpr?.word) {
-    content += `
-      <div class="word-expression mb-2 flex items-center">
-        <span class="font-medium text-gray-700 w-16">영어:</span>
-        <span class="ml-2">${englishExpr.word}</span>
-        ${
-          englishExpr.definition
-            ? `<span class="text-gray-600 ml-2">- ${englishExpr.definition}</span>`
-            : ""
-        }
-      </div>
-    `;
-  }
-
-  return content || '<p class="text-gray-600">관련 단어 정보가 없습니다.</p>';
-}
-
-// 학습 노트 생성
-function generateTeachingNotes(notes) {
-  let content = "";
-
-  if (notes.primary_focus || notes.usage_context) {
-    content += `
-      <div class="note-item p-3 bg-yellow-50 rounded-lg">
-        <div class="text-sm font-medium text-gray-700">핵심 포인트</div>
-        <div class="text-gray-800">${
-          notes.primary_focus || notes.usage_context || "기본 문법 학습"
-        }</div>
-      </div>
-    `;
-  }
-
-  if (notes.common_mistakes && Array.isArray(notes.common_mistakes)) {
-    content += `
-      <div class="note-item p-3 bg-yellow-50 rounded-lg">
-        <div class="text-sm font-medium text-gray-700">주의사항</div>
-        <div class="text-gray-800">${notes.common_mistakes.join(", ")}</div>
-      </div>
-    `;
-  }
-
-  if (notes.practice_suggestions && Array.isArray(notes.practice_suggestions)) {
-    content += `
-      <div class="note-item p-3 bg-yellow-50 rounded-lg">
-        <div class="text-sm font-medium text-gray-700">연습 방법</div>
-        <div class="text-gray-800">${notes.practice_suggestions.join(
-          ", "
-        )}</div>
-      </div>
-    `;
-  }
-
-  if (notes.practice_tips && Array.isArray(notes.practice_tips)) {
-    content += `
-      <div class="note-item p-3 bg-yellow-50 rounded-lg">
-        <div class="text-sm font-medium text-gray-700">학습 팁</div>
-        <div class="text-gray-800">${notes.practice_tips.join(", ")}</div>
-      </div>
-    `;
-  }
-
-  if (notes.difficulty_explanation) {
-    content += `
-      <div class="note-item p-3 bg-yellow-50 rounded-lg">
-        <div class="text-sm font-medium text-gray-700">난이도 설명</div>
-        <div class="text-gray-800">${notes.difficulty_explanation}</div>
-      </div>
-    `;
-  }
-
-  return content || '<p class="text-gray-600">학습 가이드가 없습니다.</p>';
-}
-
-// 언어 이름 변환
-function getLanguageName(langCode) {
-  const langNames = {
-    korean: "한국어",
-    english: "영어",
-    japanese: "일본어",
-    chinese: "중국어",
-  };
-  return langNames[langCode] || langCode;
-}
-
-// 난이도 텍스트 변환
-function getDifficultyText(difficulty) {
-  const difficultyMap = {
-    beginner: "초급",
-    intermediate: "중급",
-    advanced: "고급",
-    basic: "기초",
-  };
-  return difficultyMap[difficulty] || difficulty;
-}
-
-// 복잡도 텍스트 변환
-function getComplexityText(complexity) {
-  const complexityMap = {
-    basic: "기초",
-    intermediate: "중간",
-    advanced: "고급",
-    expert: "전문가",
-  };
-  return complexityMap[complexity] || complexity;
-}
-
-// 도메인 텍스트 변환
-function getDomainText(domain) {
-  const domainMap = {
-    daily: "일상",
-    business: "비즈니스",
-    academic: "학술",
-    travel: "여행",
-    food: "음식",
-    general: "일반",
-  };
-  return domainMap[domain] || domain;
-}
-
-// 카테고리 텍스트 변환
-function getCategoryText(category) {
-  const categoryMap = {
-    greeting: "인사",
-    fruit: "과일",
-    food: "음식",
-    grammar: "문법",
-    verb: "동사",
-    noun: "명사",
-    general: "일반",
-  };
-  return categoryMap[category] || category;
-}
-
-// 패턴 모달 닫기
-function closePatternModal() {
-  const modal = document.getElementById("pattern-detail-modal");
-  if (modal) {
-    modal.classList.add("hidden");
-  }
-}
-
-// 패턴 모달 열기 (이전 방식과 호환)
-window.openPatternModal = function (patternId) {
-  const pattern = allGrammarPatterns.find((p) => p.id === patternId);
-  if (!pattern) return;
-  showPatternDetail(pattern);
-};
-
-// 필터 초기화
-window.resetFilters = function () {
-  document.getElementById("difficulty-filter").value = "all";
-  document.getElementById("pattern-type-filter").value = "all";
-  document.getElementById("domain-filter").value = "all";
-  document.getElementById("sort-patterns").value = "frequency";
-  filterAndDisplayPatterns();
-};
-
-// 로딩 표시
-function showLoading() {
-  const spinner = document.getElementById("loading-spinner");
-  const container = document.getElementById("grammar-patterns-container");
-
-  if (spinner) spinner.classList.remove("hidden");
-  if (container) container.innerHTML = "";
-}
-
-// 로딩 숨김
-function hideLoading() {
-  const spinner = document.getElementById("loading-spinner");
-  if (spinner) spinner.classList.add("hidden");
-}
-
-// 오류 표시
-function showError(message) {
-  const container = document.getElementById("grammar-patterns-container");
-  if (container) {
-    container.innerHTML = `
-      <div class="col-span-full text-center py-8 text-red-500">
-        <i class="fas fa-exclamation-triangle text-2xl mb-2"></i>
-        <p>${message}</p>
-      </div>
-    `;
-  }
-}
-
-// 전역 함수로 설정
-window.showPatternDetail = showPatternDetail;
-window.closePatternModal = closePatternModal;
-
-// DB 데이터에서 문법 정보 추출을 위한 헬퍼 함수들
-function extractStructureFromTranslations(translations) {
-  if (!translations) return null;
-
-  // 한국어와 영어 예문에서 구조 패턴 추론
-  const korean = translations.korean?.text || "";
-  const english = translations.english?.text || "";
-  const combined = (korean + " " + english).toLowerCase();
-
-  if (korean && english) {
-    // 인사말 패턴
-    if (
-      combined.includes("hello") ||
-      combined.includes("hi") ||
-      combined.includes("안녕") ||
-      combined.includes("meet") ||
-      korean.includes("만나") ||
-      english.includes("nice to meet")
-    ) {
-      return "인사 + 응답 표현";
-    }
-
-    // 의문문 패턴
-    if (
-      korean.includes("?") ||
-      english.includes("?") ||
-      korean.includes("뭐") ||
-      korean.includes("어디") ||
-      korean.includes("언제") ||
-      english.includes("what") ||
-      english.includes("where") ||
-      english.includes("when")
-    ) {
-      return "의문사 + 주어 + 동사";
-    }
-
-    // 과거시제 패턴
-    if (
-      korean.includes("었") ||
-      korean.includes("았") ||
-      english.includes("ed") ||
-      english.includes("was") ||
-      english.includes("were")
-    ) {
-      return "주어 + 과거동사 + 목적어";
-    }
-
-    // 현재진행형
-    if (english.includes("ing") || korean.includes("고 있")) {
-      return "주어 + be동사 + 현재분사";
-    }
-
-    // 기본 현재시제
-    if (korean.includes("요") && !korean.includes("?")) {
-      return "주어 + 동사 + 목적어";
-    }
-  }
-
-  return "기본 대화 표현";
-}
-
-function extractTagsFromPatternId(patternId) {
-  if (!patternId) return [];
-
-  const tags = [];
-  const idLower = patternId.toLowerCase();
-
-  // 더 구체적인 패턴 매칭
-  if (
-    idLower.includes("greeting") ||
-    idLower.includes("hello") ||
-    idLower.includes("meet")
-  ) {
-    tags.push("greeting", "introduction");
-  }
-  if (idLower.includes("question") || idLower.includes("interrogative")) {
-    tags.push("interrogative", "question");
-  }
-  if (idLower.includes("past")) {
-    tags.push("past_tense");
-  }
-  if (idLower.includes("present")) {
-    tags.push("present_tense");
-  }
-  if (idLower.includes("daily")) {
-    tags.push("daily_conversation");
-  }
-  if (idLower.includes("basic")) {
-    tags.push("basic_sentence");
-  }
-
-  return tags;
-}
-
-function extractFocusFromContext(context) {
-  if (!context) return [];
-
-  const focus = [];
-  const contextStr = JSON.stringify(context).toLowerCase();
-
-  if (
-    contextStr.includes("greeting") ||
-    contextStr.includes("hello") ||
-    contextStr.includes("meet")
-  ) {
-    focus.push("인사표현");
-  }
-  if (contextStr.includes("tense")) {
-    focus.push("시제");
-  }
-  if (contextStr.includes("question") || contextStr.includes("interrogative")) {
-    focus.push("의문문");
-  }
-  if (contextStr.includes("daily") || contextStr.includes("conversation")) {
-    focus.push("일상대화");
-  }
-  if (contextStr.includes("basic") || contextStr.includes("fundamental")) {
-    focus.push("기본문법");
-  }
-
-  return focus;
-}
-
-// 패턴명을 더 의미있게 생성하는 함수
-function generateMeaningfulPatternName(data) {
-  const patternId = data.grammar_pattern_id || "";
-  const korean = data.translations?.korean?.text || "";
-  const english = data.translations?.english?.text || "";
-
-  // 패턴 ID에서 의미 추출
-  if (patternId.includes("greeting")) {
-    return "인사말 표현";
-  }
-  if (patternId.includes("question")) {
-    return "질문하기";
-  }
-  if (patternId.includes("introduction")) {
-    return "자기소개";
-  }
-  if (patternId.includes("daily")) {
-    return "일상 대화";
-  }
-
-  // 예문 내용에서 추론
-  const combined = (korean + " " + english).toLowerCase();
-  if (
-    combined.includes("hello") ||
-    combined.includes("meet") ||
-    korean.includes("안녕") ||
-    korean.includes("만나")
-  ) {
-    return "인사 및 만남 표현";
-  }
-  if (korean.includes("?") || english.includes("?")) {
-    return "의문문 만들기";
-  }
-
-  // 기본값
-  return `대화 패턴 (${patternId.split("_").pop() || "basic"})`;
-}
+// 전역 함수로 노출
+window.startLearningMode = startLearningMode;

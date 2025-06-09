@@ -129,13 +129,13 @@ let typingStats = {
 document.addEventListener("DOMContentLoaded", async function () {
   console.log("다국어 학습 페이지 로딩 시작...");
 
-    // 네비게이션바 로드
+  // 네비게이션바 로드
   await loadNavbar();
 
   // 사용자 인증 상태 확인
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        currentUser = user;
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      currentUser = user;
       console.log("사용자 로그인됨:", user.email);
       console.log("다국어 학습 페이지에서 로그인 상태 확인됨");
 
@@ -171,9 +171,9 @@ async function loadNavbar() {
 
 // 언어 설정 함수
 function setupLanguageSettings() {
-        // 언어 설정 로드
-        sourceLanguage = document.getElementById("source-language").value;
-        targetLanguage = document.getElementById("target-language").value;
+  // 언어 설정 로드
+  sourceLanguage = document.getElementById("source-language").value;
+  targetLanguage = document.getElementById("target-language").value;
   difficultyLevel = document.getElementById("difficulty-level").value;
 
   // 언어 변경 이벤트 리스너
@@ -189,9 +189,13 @@ function setupLanguageSettings() {
 }
 
 // 페이지 초기화
-function initializePage() {
+async function initializePage() {
   setupEventListeners();
   setupLanguageSettings();
+
+  // 분리된 업로드 모달 로드
+  await loadBulkImportModal();
+
   console.log("다국어 학습 페이지 초기화 완료");
 }
 
@@ -212,6 +216,15 @@ function setupEventListeners() {
       button.addEventListener("click", () => selectLearningArea(areaId));
     }
   });
+
+  // 학습 단어장 추가 버튼
+  const addVocabularyBtn = document.getElementById("add-vocabulary-wordbook");
+  if (addVocabularyBtn) {
+    addVocabularyBtn.addEventListener("click", (e) => {
+      e.stopPropagation(); // 부모 클릭 이벤트 방지
+      openBulkImportModal("concepts");
+    });
+  }
 
   // 언어 선택 변경 (기존 이벤트)
   const sourceLanguageSelect = document.getElementById("source-language");
@@ -572,7 +585,7 @@ async function loadLearningData(areaId) {
                     "다른 의미2",
                     "다른 의미3",
                   ],
-      correct: 0,
+                  correct: 0,
                 },
               ],
             };
@@ -1679,7 +1692,7 @@ function setupLegacyEventListeners() {
       if (currentItemIndex > 0) {
         currentItemIndex--;
         displayFlashcard(currentLearningData.concepts[currentItemIndex]);
-      updateProgress(
+        updateProgress(
           "flashcard",
           currentItemIndex + 1,
           currentLearningData.concepts.length
@@ -1693,7 +1706,7 @@ function setupLegacyEventListeners() {
       if (currentItemIndex < currentLearningData.concepts.length - 1) {
         currentItemIndex++;
         displayFlashcard(currentLearningData.concepts[currentItemIndex]);
-      updateProgress(
+        updateProgress(
           "flashcard",
           currentItemIndex + 1,
           currentLearningData.concepts.length
@@ -1728,8 +1741,8 @@ function setupLegacyEventListeners() {
       if (currentItemIndex < currentLearningData.concepts.length - 1) {
         currentItemIndex++;
         displayTypingQuestion(currentLearningData.concepts[currentItemIndex]);
-      updateProgress(
-        "typing",
+        updateProgress(
+          "typing",
           currentItemIndex + 1,
           currentLearningData.concepts.length
         );
@@ -1896,3 +1909,45 @@ function generateSampleConcepts() {
     },
   ];
 }
+
+// 분리된 업로드 모달 로드
+async function loadBulkImportModal() {
+  try {
+    const response = await fetch("../components/bulk-import-modal.html");
+    const modalHTML = await response.text();
+
+    const container = document.getElementById("bulk-import-modal-container");
+    if (container) {
+      container.innerHTML = modalHTML;
+    }
+
+    // 모달 JavaScript 초기화
+    const { initialize } = await import(
+      "../components/js/bulk-import-modal.js"
+    );
+    initialize();
+
+    console.log("분리된 업로드 모달 로드 완료");
+  } catch (error) {
+    console.error("업로드 모달 로드 실패:", error);
+  }
+}
+
+// 업로드 모달 열기 (특정 탭으로)
+function openBulkImportModal(tabName = "concepts") {
+  const modal = document.getElementById("bulk-import-modal");
+  if (modal) {
+    modal.classList.remove("hidden");
+
+    // 해당 탭 활성화
+    const tabButton = document.getElementById(`${tabName}-tab`);
+    if (tabButton) {
+      tabButton.click();
+    }
+  } else {
+    console.error("업로드 모달을 찾을 수 없습니다.");
+  }
+}
+
+// 전역 함수로 설정
+window.openBulkImportModal = openBulkImportModal;

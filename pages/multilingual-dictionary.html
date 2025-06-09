@@ -190,13 +190,6 @@
     <!-- Firebase -->
     <script type="module" src="../js/firebase/firebase-init.js"></script>
     <script type="module" src="./js/multilingual-dictionary.js"></script>
-    <script type="module">
-      import { updateMetadata } from '../utils/language-utils.js';
-      
-      // 페이지 로드 후 메타데이터 업데이트
-      document.addEventListener('DOMContentLoaded', async () => {
-        await updateMetadata('dictionary');
-      });
-    </script>
+
   </body>
 </html> 

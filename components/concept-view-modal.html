@@ -1,61 +1,42 @@
-<div id="concept-view-modal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center hidden z-50">
-  <div class="bg-white p-8 rounded-2xl shadow-2xl w-[800px] max-h-[90vh] overflow-y-auto transform transition-all">
-    <div class="space-y-6">
-      <!-- 기본 개념 정보 섹션 -->
-      <div class="border-b pb-6 concept-view-header">
-        <div class="flex items-start justify-between">
-          <div class="flex-1">
-            <div class="flex items-center mb-4">
-              <span id="concept-view-emoji" class="text-4xl mr-3">📝</span>
-              <div class="flex-1">
-                <div class="flex items-center gap-2">
-                  <h3 id="concept-view-title" class="text-2xl font-bold text-gray-800">개념</h3>
-                  <span id="concept-view-category" class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">기타/일반</span>
-                </div>
-                <p id="concept-view-pronunciation" class="text-gray-500 text-sm mt-1">발음</p>
-              </div>
-            </div>
-            <p id="concept-view-definition" class="text-gray-700 text-base">정의</p>
-          </div>
-          <div class="ml-4">
-            <button id="close-concept-view-modal" class="text-gray-500 hover:text-gray-700">
-              <i class="fas fa-times text-2xl"></i>
-            </button>
-          </div>
+<!-- 개념 보기 모달 -->
+<div id="concept-view-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
+  <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-4xl max-h-[90vh] overflow-y-auto">
+    <div class="flex justify-between items-center mb-4">
+      <div class="flex items-center">
+        <div id="concept-emoji" class="text-3xl mr-3">📚</div>
+        <div>
+          <h2 id="concept-view-title" class="text-2xl font-bold text-gray-800"></h2>
+          <p id="concept-view-pronunciation" class="text-gray-600"></p>
         </div>
       </div>
-
-      <!-- 언어별 표현 탭 -->
-      <div>
-        <div class="border-b flex overflow-x-auto" id="concept-view-tabs">
-          <!-- 탭은 JavaScript로 동적 생성됨 -->
-        </div>
-        
-        <div id="concept-view-content" class="py-4">
-          <!-- 내용은 JavaScript로 동적 생성됨 -->
-        </div>
+      <div class="flex items-center space-x-2">
+        <button id="edit-concept-button" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
+          <i class="fas fa-edit mr-1"></i>편집
+        </button>
+        <button id="delete-concept-button" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
+          <i class="fas fa-trash mr-1"></i>삭제
+        </button>
+        <button id="close-concept-view-modal" class="text-gray-500 hover:text-gray-700">
+          <i class="fas fa-times text-xl"></i>
+        </button>
       </div>
+    </div>
 
-      <!-- 예문 섹션 -->
-      <div class="border-t pt-4">
-        <h3 class="text-lg font-semibold mb-3">예문</h3>
-        <div id="concept-examples">
-          <!-- 예문은 JavaScript로 동적 생성됨 -->
-        </div>
-      </div>
+    <!-- 언어 탭 -->
+    <div id="language-tabs" class="border-b mb-4">
+      <!-- 동적으로 생성됨 -->
+    </div>
 
-      <div class="flex justify-between items-center">
-        <div class="text-sm text-gray-500">
-          <span data-i18n="last_updated">마지막 업데이트:</span> <span id="concept-updated-at">-</span>
-        </div>
-        <div class="flex space-x-2">
-          <button id="edit-concept-button" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center">
-            <i class="fas fa-edit mr-2"></i>수정
-          </button>
-          <button id="delete-concept-button" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 flex items-center">
-            <i class="fas fa-trash mr-2"></i>삭제
-          </button>
-        </div>
+    <!-- 언어별 콘텐츠 -->
+    <div id="language-content">
+      <!-- 동적으로 생성됨 -->
+    </div>
+
+    <!-- 예문 섹션 -->
+    <div class="mt-6">
+      <h3 class="text-lg font-semibold mb-3">예문</h3>
+      <div id="examples-container">
+        <!-- 동적으로 생성됨 -->
       </div>
     </div>
   </div>

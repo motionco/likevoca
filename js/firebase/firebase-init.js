@@ -131,10 +131,11 @@ export const conceptUtils = {
 
   // 기존 통합 방식 개념 생성 (호환성 유지)
   async createLegacyConcept(conceptData) {
-      const conceptRef = doc(collection(db, "concepts"));
+    const conceptRef = doc(collection(db, "concepts"));
 
     const enhancedConceptData = {
-        _id: conceptRef.id,
+      _id: conceptRef.id,
+      userId: auth.currentUser?.email || "anonymous",
       created_at: conceptData.created_at || new Date(),
       concept_info: {
         domain:
@@ -178,6 +179,7 @@ export const conceptUtils = {
         },
       },
       expressions: conceptData.expressions || {},
+      representative_example: conceptData.representative_example || null,
       featured_examples: conceptData.featured_examples || [],
       quiz_data: {
         question_types: conceptData.quiz_data?.question_types || [
@@ -209,10 +211,10 @@ export const conceptUtils = {
 
     await setDoc(conceptRef, enhancedConceptData);
 
-      // 각 언어별 인덱스 생성/업데이트
-      for (const [lang, expression] of Object.entries(
+    // 각 언어별 인덱스 생성/업데이트
+    for (const [lang, expression] of Object.entries(
       conceptData.expressions || {}
-      )) {
+    )) {
       if (expression?.word) {
         await this.updateLanguageIndex(
           lang,
@@ -222,9 +224,9 @@ export const conceptUtils = {
           enhancedConceptData.concept_info.difficulty
         );
       }
-      }
+    }
 
-      return conceptRef.id;
+    return conceptRef.id;
   },
 
   // 통합 개념 조회 (분리된 컬렉션과 기존 시스템 모두 지원)
@@ -480,14 +482,14 @@ export const conceptUtils = {
 
         if (!oldExpression || oldExpression.word !== expression.word) {
           if (expression.word) {
-          await this.updateLanguageIndex(
-            lang,
-            expression.word,
-            conceptId,
+            await this.updateLanguageIndex(
+              lang,
+              expression.word,
+              conceptId,
               newData.concept_info?.category || oldData.concept_info?.category,
               newData.concept_info?.difficulty ||
                 oldData.concept_info?.difficulty
-          );
+            );
           }
 
           if (oldExpression?.word) {
@@ -506,7 +508,7 @@ export const conceptUtils = {
         concept_info: {
           ...oldData.concept_info,
           ...newData.concept_info,
-        updated_at: new Date(),
+          updated_at: new Date(),
         },
       };
 
@@ -712,7 +714,7 @@ export const conceptUtils = {
         conceptData.expressions || {}
       )) {
         if (expression?.word) {
-        await this.removeFromLanguageIndex(lang, expression.word, conceptId);
+          await this.removeFromLanguageIndex(lang, expression.word, conceptId);
         }
       }
 
@@ -1100,10 +1102,10 @@ export const userProgressUtils = {
   async getUserProgress(userEmail) {
     try {
       const userRef = doc(db, "users", userEmail);
-        const userDoc = await getDoc(userRef);
+      const userDoc = await getDoc(userRef);
 
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
 
         // 기존 구조와 새로운 구조 모두 지원
         return {
@@ -1265,7 +1267,7 @@ export const userProgressUtils = {
       languageProgress.last_updated = new Date();
       vocabularyProgress[language] = languageProgress;
 
-          await updateDoc(userRef, {
+      await updateDoc(userRef, {
         vocabulary_progress: vocabularyProgress,
         [`collection_metadata.last_sync`]: new Date(),
       });
@@ -1991,6 +1993,112 @@ export const migrationUtils = {
       return migratedCount;
     } catch (error) {
       console.error("개념 마이그레이션 중 오류 발생:", error);
+      throw error;
+    }
+  },
+};
+
+// 예문 유틸리티 함수
+export const exampleUtils = {
+  async createExample(exampleData) {
+    try {
+      const exampleRef = doc(collection(db, "examples"));
+      await setDoc(exampleRef, {
+        ...exampleData,
+        userId: auth.currentUser?.email || "anonymous",
+        created_at: new Date(),
+        _id: exampleRef.id,
+      });
+      return exampleRef.id;
+    } catch (error) {
+      console.error("예문 생성 중 오류:", error);
+      throw error;
+    }
+  },
+
+  async getExample(exampleId) {
+    try {
+      const exampleDoc = await getDoc(doc(db, "examples", exampleId));
+      if (exampleDoc.exists()) {
+        return { id: exampleDoc.id, ...exampleDoc.data() };
+      }
+      return null;
+    } catch (error) {
+      console.error("예문 조회 중 오류:", error);
+      throw error;
+    }
+  },
+
+  async updateExample(exampleId, newData) {
+    try {
+      await updateDoc(doc(db, "examples", exampleId), {
+        ...newData,
+        updated_at: new Date(),
+      });
+    } catch (error) {
+      console.error("예문 업데이트 중 오류:", error);
+      throw error;
+    }
+  },
+
+  async deleteExample(exampleId) {
+    try {
+      await deleteDoc(doc(db, "examples", exampleId));
+    } catch (error) {
+      console.error("예문 삭제 중 오류:", error);
+      throw error;
+    }
+  },
+};
+
+// 문법 패턴 유틸리티 함수
+export const grammarPatternUtils = {
+  async createGrammarPattern(patternData) {
+    try {
+      const patternRef = doc(collection(db, "grammar_patterns"));
+      await setDoc(patternRef, {
+        ...patternData,
+        userId: auth.currentUser?.email || "anonymous",
+        created_at: new Date(),
+        _id: patternRef.id,
+      });
+      return patternRef.id;
+    } catch (error) {
+      console.error("문법 패턴 생성 중 오류:", error);
+      throw error;
+    }
+  },
+
+  async getGrammarPattern(patternId) {
+    try {
+      const patternDoc = await getDoc(doc(db, "grammar_patterns", patternId));
+      if (patternDoc.exists()) {
+        return { id: patternDoc.id, ...patternDoc.data() };
+      }
+      return null;
+    } catch (error) {
+      console.error("문법 패턴 조회 중 오류:", error);
+      throw error;
+    }
+  },
+
+  async updateGrammarPattern(patternId, newData) {
+    try {
+      await updateDoc(doc(db, "grammar_patterns", patternId), {
+        ...newData,
+        updated_at: new Date(),
+      });
+    } catch (error) {
+      console.error("문법 패턴 업데이트 중 오류:", error);
+      throw error;
+    }
+  },
+
+  async deleteGrammarPattern(patternId) {
+    try {
+      await deleteDoc(doc(db, "grammar_patterns", patternId));
+    } catch (error) {
+      console.error("문법 패턴 삭제 중 오류:", error);
       throw error;
     }
   },

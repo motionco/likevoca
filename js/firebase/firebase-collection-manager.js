@@ -1582,6 +1582,241 @@ export class CollectionManager {
       "오답 3",
     ].sort(() => Math.random() - 0.5);
   }
+
+  /**
+   * 개별 개념 생성 (분리된 업로드용)
+   */
+  async createConcept(conceptData) {
+    try {
+      const conceptRef = doc(collection(db, "concepts"));
+      const conceptId = conceptRef.id;
+
+      const conceptDoc = {
+        concept_id: conceptId,
+        concept_info: conceptData.concept_info || {
+          domain: conceptData.domain || "general",
+          category: conceptData.category || "uncategorized",
+          difficulty: conceptData.difficulty || "beginner",
+          tags: conceptData.tags || [],
+        },
+        expressions: conceptData.expressions || {},
+        representative_example: conceptData.representative_example || null,
+        metadata: {
+          created_at: serverTimestamp(),
+          created_from: "separated_import",
+          version: "3.0",
+        },
+      };
+
+      await setDoc(conceptRef, conceptDoc);
+      console.log(`✓ 개념 생성 완료: ${conceptId}`);
+      return conceptId;
+    } catch (error) {
+      console.error("개념 생성 오류:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * 개별 예문 생성 (분리된 업로드용)
+   */
+  async createExample(exampleData) {
+    try {
+      const exampleRef = doc(collection(db, "examples"));
+      const exampleId = exampleRef.id;
+
+      const exampleDoc = {
+        example_id: exampleData.example_id || exampleId,
+        concept_id: exampleData.concept_id || null,
+        context: exampleData.context || "general",
+        difficulty: exampleData.difficulty || "beginner",
+        tags: exampleData.tags || [],
+        translations: exampleData.translations || {},
+        learning_metadata: {
+          pattern_name: exampleData.learning_metadata?.pattern_name || null,
+          structural_pattern:
+            exampleData.learning_metadata?.structural_pattern || null,
+          learning_weight: exampleData.learning_metadata?.learning_weight || 5,
+          quiz_eligible: exampleData.learning_metadata?.quiz_eligible !== false,
+          game_eligible: exampleData.learning_metadata?.game_eligible !== false,
+        },
+        metadata: {
+          created_at: serverTimestamp(),
+          created_from: "separated_import",
+          version: "3.0",
+        },
+      };
+
+      await setDoc(exampleRef, exampleDoc);
+      console.log(`✓ 예문 생성 완료: ${exampleId}`);
+      return exampleId;
+    } catch (error) {
+      console.error("예문 생성 오류:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * 개별 문법 패턴 생성 (분리된 업로드용)
+   */
+  async createGrammarPattern(patternData) {
+    try {
+      const patternRef = doc(collection(db, "grammar_patterns"));
+      const patternId = patternRef.id;
+
+      const patternDoc = {
+        pattern_id: patternData.pattern_id || patternId,
+        pattern_name: patternData.pattern_name || "기본 패턴",
+        pattern_type: patternData.pattern_type || "basic",
+        difficulty: patternData.difficulty || "beginner",
+        tags: patternData.tags || [],
+        learning_focus: patternData.learning_focus || [],
+        structural_pattern: patternData.structural_pattern || "",
+        explanations: patternData.explanations || {},
+        usage_examples: patternData.usage_examples || [],
+        teaching_notes: patternData.teaching_notes || {},
+        related_concepts: patternData.related_concepts || [],
+        metadata: {
+          created_at: serverTimestamp(),
+          created_from: "separated_import",
+          version: "3.0",
+        },
+      };
+
+      await setDoc(patternRef, patternDoc);
+      console.log(`✓ 문법 패턴 생성 완료: ${patternId}`);
+      return patternId;
+    } catch (error) {
+      console.error("문법 패턴 생성 오류:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * 태그 기반 개념 검색
+   */
+  async getConceptsByTags(tags, limit = 20) {
+    try {
+      const conceptsRef = collection(db, "concepts");
+      const q = query(conceptsRef, limit(limit));
+      const snapshot = await getDocs(q);
+
+      const concepts = [];
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        const conceptTags = data.concept_info?.tags || [];
+
+        // 태그 매칭 확인
+        const hasMatchingTag = tags.some((tag) => conceptTags.includes(tag));
+        if (hasMatchingTag) {
+          concepts.push({ id: doc.id, ...data });
+        }
+      });
+
+      return concepts;
+    } catch (error) {
+      console.error("태그 기반 개념 검색 오류:", error);
+      return [];
+    }
+  }
+
+  /**
+   * 태그 기반 예문 검색
+   */
+  async getExamplesByTags(tags, limit = 20) {
+    try {
+      const examplesRef = collection(db, "examples");
+      const q = query(examplesRef, limit(limit));
+      const snapshot = await getDocs(q);
+
+      const examples = [];
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        const exampleTags = data.tags || [];
+
+        // 태그 매칭 확인
+        const hasMatchingTag = tags.some((tag) => exampleTags.includes(tag));
+        if (hasMatchingTag) {
+          examples.push({ id: doc.id, ...data });
+        }
+      });
+
+      return examples;
+    } catch (error) {
+      console.error("태그 기반 예문 검색 오류:", error);
+      return [];
+    }
+  }
+
+  /**
+   * 태그 기반 문법 패턴 검색
+   */
+  async getGrammarPatternsByTags(tags, limit = 20) {
+    try {
+      const patternsRef = collection(db, "grammar_patterns");
+      const q = query(patternsRef, limit(limit));
+      const snapshot = await getDocs(q);
+
+      const patterns = [];
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        const patternTags = data.tags || [];
+
+        // 태그 매칭 확인
+        const hasMatchingTag = tags.some((tag) => patternTags.includes(tag));
+        if (hasMatchingTag) {
+          patterns.push({ id: doc.id, ...data });
+        }
+      });
+
+      return patterns;
+    } catch (error) {
+      console.error("태그 기반 문법 패턴 검색 오류:", error);
+      return [];
+    }
+  }
+
+  /**
+   * 컬렉션별 데이터 조회 함수들
+   */
+  async getConceptsOnly(limit = 50) {
+    try {
+      const conceptsRef = collection(db, "concepts");
+      const q = query(conceptsRef, limit(limit));
+      const snapshot = await getDocs(q);
+
+      return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    } catch (error) {
+      console.error("개념 조회 오류:", error);
+      return [];
+    }
+  }
+
+  async getExamplesOnly(limit = 50) {
+    try {
+      const examplesRef = collection(db, "examples");
+      const q = query(examplesRef, limit(limit));
+      const snapshot = await getDocs(q);
+
+      return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    } catch (error) {
+      console.error("예문 조회 오류:", error);
+      return [];
+    }
+  }
+
+  async getGrammarPatternsOnly(limit = 50) {
+    try {
+      const patternsRef = collection(db, "grammar_patterns");
+      const q = query(patternsRef, limit(limit));
+      const snapshot = await getDocs(q);
+
+      return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    } catch (error) {
+      console.error("문법 패턴 조회 오류:", error);
+      return [];
+    }
+  }
 }
 
 // 싱글톤 인스턴스

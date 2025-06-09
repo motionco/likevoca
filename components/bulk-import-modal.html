@@ -1,99 +1,43 @@
 <div id="bulk-import-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
   <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-4xl max-h-[90vh] overflow-y-auto">
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-bold text-gray-800">대량 개념 추가</h2>
+      <h2 class="text-xl font-bold text-gray-800">분리된 컬렉션 업로드</h2>
       <button id="close-bulk-modal" class="text-gray-500 hover:text-gray-700">
         <i class="fas fa-times text-xl"></i>
       </button>
     </div>
 
-    <div class="mb-6">
+    <!-- 탭 네비게이션 -->
+    <div class="flex border-b mb-6">
+      <button id="concepts-tab" class="tab-button px-6 py-3 font-medium text-blue-600 border-b-2 border-blue-600 bg-white">
+        <i class="fas fa-book mr-2"></i>개념 업로드
+      </button>
+      <button id="examples-tab" class="tab-button px-6 py-3 font-medium text-gray-600 hover:text-blue-600 bg-white">
+        <i class="fas fa-file-text mr-2"></i>예문 업로드
+      </button>
+      <button id="grammar-tab" class="tab-button px-6 py-3 font-medium text-gray-600 hover:text-blue-600 bg-white">
+        <i class="fas fa-language mr-2"></i>문법 업로드
+      </button>
+    </div>
+
+    <!-- 개념 업로드 탭 -->
+    <div id="concepts-content" class="tab-content">
       <div class="bg-blue-50 text-blue-800 p-4 rounded-lg mb-4">
-        <h3 class="font-medium text-lg mb-2">파일 형식 안내</h3>
-        <p class="mb-2">다음 형식의 파일을 업로드할 수 있습니다:</p>
+        <h3 class="font-medium text-lg mb-2">개념 (Concepts) 컬렉션 업로드</h3>
+        <p class="mb-2">기본 단어 정보와 대표 예문이 포함된 개념 데이터를 업로드합니다.</p>
         <ul class="list-disc pl-5 mb-2">
-          <li><strong>CSV 파일</strong>: 다국어 개념 데이터가 포함된 CSV 파일</li>
-          <li><strong>JSON 파일</strong>: 다국어 개념 데이터가 포함된 JSON 파일</li>
+          <li>단어, 발음, 정의, 품사 등 기본 정보</li>
+          <li>대표 예문 (각 개념당 1개)</li>
+          <li>학습 메타데이터 및 태그</li>
         </ul>
-        <div class="mt-3">
-          <button id="download-template" class="text-blue-700 hover:underline flex items-center">
-            <i class="fas fa-download mr-1"></i> 템플릿 파일 다운로드
-          </button>
-        </div>
       </div>
 
       <div class="mb-4">
-        <label for="import-mode" class="block text-sm font-medium mb-1">파일 형식</label>
-        <select id="import-mode" class="w-full p-2 border rounded">
+        <label for="concepts-import-mode" class="block text-sm font-medium mb-1">파일 형식</label>
+        <select id="concepts-import-mode" class="w-full p-2 border rounded">
           <option value="csv">CSV 파일</option>
           <option value="json">JSON 파일</option>
         </select>
-      </div>
-
-      <div class="mb-4">
-        <label for="default-domain" class="block text-sm font-medium mb-1">기본 도메인 (선택사항)</label>
-        <input type="text" id="default-domain" class="w-full p-2 border rounded" placeholder="예: daily, food, business">
-        <p class="text-xs text-gray-500 mt-1">파일에 도메인이 지정되지 않은 경우 사용됩니다.</p>
-      </div>
-
-      <div class="mb-4">
-        <label for="default-category" class="block text-sm font-medium mb-1">기본 카테고리 (선택사항)</label>
-        <input type="text" id="default-category" class="w-full p-2 border rounded" placeholder="예: fruit, greeting, vehicle">
-        <p class="text-xs text-gray-500 mt-1">파일에 카테고리가 지정되지 않은 경우 사용됩니다.</p>
-      </div>
-
-      <div id="csv-settings" class="mb-4 border p-4 rounded">
-        <h3 class="font-medium mb-2">CSV 설정</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label for="csv-delimiter" class="block text-sm font-medium mb-1">구분자</label>
-            <select id="csv-delimiter" class="w-full p-2 border rounded">
-              <option value=",">쉼표 (,)</option>
-              <option value=";">세미콜론 (;)</option>
-              <option value="\t">탭 (Tab)</option>
-            </select>
-          </div>
-          <div>
-            <label for="csv-has-header" class="block text-sm font-medium mb-1">첫 행 처리</label>
-            <select id="csv-has-header" class="w-full p-2 border rounded">
-              <option value="true">첫 행은 헤더</option>
-              <option value="false">첫 행부터 데이터</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div id="json-settings" class="mb-4 border p-4 rounded hidden">
-        <h3 class="font-medium mb-2">JSON 설정</h3>
-        <p class="text-sm text-gray-600">
-          JSON 파일은 다음 형식을 따라야 합니다:
-        </p>
-        <pre class="bg-gray-100 p-2 rounded text-xs overflow-auto mt-2">
-[
-  {
-    "domain": "daily",
-    "category": "greeting",
-    "expressions": {
-      "korean": {
-        "word": "안녕하세요",
-        "pronunciation": "annyeonghaseyo",
-        "definition": "인사말",
-        "part_of_speech": "interjection",
-        "level": "beginner"
-      },
-      "english": {
-        "word": "hello",
-        "pronunciation": "həˈloʊ",
-        "definition": "greeting",
-        "part_of_speech": "interjection",
-        "level": "beginner"
-      }
-    },
-    "examples": [
-      { "korean": "안녕하세요, 만나서 반갑습니다.", "english": "Hello, nice to meet you." }
-    ]
-  }
-]</pre>
       </div>
 
       <div class="mb-6">
@@ -101,33 +45,168 @@
         <div class="flex items-center justify-center border-2 border-dashed border-gray-300 p-6 rounded-lg">
           <div class="space-y-2 text-center">
             <i class="fas fa-file-upload text-3xl text-gray-400"></i>
-            <div id="file-name" class="text-sm text-gray-500">파일을 선택하거나 여기에 끌어다 놓으세요.</div>
-            <input type="file" id="file-input" class="hidden" accept=".csv,.json">
-            <button type="button" id="browse-file" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
-              파일 찾기
-            </button>
+            <div id="concepts-file-name" class="text-sm text-gray-500">개념 파일을 선택하세요.</div>
+            <input type="file" id="concepts-file-input" class="hidden" accept=".csv,.json">
+            <div class="flex space-x-2">
+              <button type="button" id="browse-concepts-file" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                파일 찾기
+              </button>
+              <button type="button" id="download-concepts-template" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+                템플릿 다운로드
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      <div id="import-status" class="mb-4 hidden">
+      <div id="concepts-import-status" class="mb-4 hidden">
         <div class="flex items-center mt-2">
           <div class="w-full bg-gray-200 rounded-full h-2.5 mr-4">
-            <div id="import-progress" class="bg-[#4B63AC] h-2.5 rounded-full" style="width: 0%"></div>
+            <div id="concepts-import-progress" class="bg-blue-500 h-2.5 rounded-full" style="width: 0%"></div>
           </div>
-          <span id="import-percentage" class="text-sm font-medium text-gray-700">0%</span>
+          <span id="concepts-import-percentage" class="text-sm font-medium text-gray-700">0%</span>
         </div>
-        <div id="import-result" class="mt-2 text-sm"></div>
+        <div id="concepts-import-result" class="mt-2 text-sm"></div>
+      </div>
+
+      <div class="flex justify-end">
+        <button id="start-concepts-import" type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded disabled:bg-gray-400" disabled>
+          개념 업로드 시작
+        </button>
       </div>
     </div>
 
-    <div class="flex justify-end space-x-4 mt-6">
+    <!-- 예문 업로드 탭 -->
+    <div id="examples-content" class="tab-content hidden">
+      <div class="bg-green-50 text-green-800 p-4 rounded-lg mb-4">
+        <h3 class="font-medium text-lg mb-2">예문 (Examples) 컬렉션 업로드</h3>
+        <p class="mb-2">독해 학습용 예문 데이터를 업로드합니다. 태그 매칭을 통해 개념과 연결됩니다.</p>
+        <ul class="list-disc pl-5 mb-2">
+          <li>다양한 맥락의 예문</li>
+          <li>다국어 번역</li>
+          <li>난이도 및 태그 정보</li>
+        </ul>
+      </div>
+
+      <div class="mb-4">
+        <label for="examples-import-mode" class="block text-sm font-medium mb-1">파일 형식</label>
+        <select id="examples-import-mode" class="w-full p-2 border rounded">
+          <option value="csv">CSV 파일</option>
+          <option value="json">JSON 파일</option>
+        </select>
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-sm font-medium mb-2">파일 선택</label>
+        <div class="flex items-center justify-center border-2 border-dashed border-gray-300 p-6 rounded-lg">
+          <div class="space-y-2 text-center">
+            <i class="fas fa-file-upload text-3xl text-gray-400"></i>
+            <div id="examples-file-name" class="text-sm text-gray-500">예문 파일을 선택하세요.</div>
+            <input type="file" id="examples-file-input" class="hidden" accept=".csv,.json">
+            <div class="flex space-x-2">
+              <button type="button" id="browse-examples-file" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                파일 찾기
+              </button>
+              <button type="button" id="download-examples-template" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+                템플릿 다운로드
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="examples-import-status" class="mb-4 hidden">
+        <div class="flex items-center mt-2">
+          <div class="w-full bg-gray-200 rounded-full h-2.5 mr-4">
+            <div id="examples-import-progress" class="bg-green-500 h-2.5 rounded-full" style="width: 0%"></div>
+          </div>
+          <span id="examples-import-percentage" class="text-sm font-medium text-gray-700">0%</span>
+        </div>
+        <div id="examples-import-result" class="mt-2 text-sm"></div>
+      </div>
+
+      <div class="flex justify-end">
+        <button id="start-examples-import" type="button" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded disabled:bg-gray-400" disabled>
+          예문 업로드 시작
+        </button>
+      </div>
+    </div>
+
+    <!-- 문법 업로드 탭 -->
+    <div id="grammar-content" class="tab-content hidden">
+      <div class="bg-purple-50 text-purple-800 p-4 rounded-lg mb-4">
+        <h3 class="font-medium text-lg mb-2">문법 패턴 (Grammar Patterns) 컬렉션 업로드</h3>
+        <p class="mb-2">문법 학습용 패턴 데이터를 업로드합니다. 태그 매칭을 통해 개념과 연결됩니다.</p>
+        <ul class="list-disc pl-5 mb-2">
+          <li>문법 패턴 및 규칙</li>
+          <li>다국어 설명</li>
+          <li>학습 포커스 태그</li>
+        </ul>
+      </div>
+
+      <div class="mb-4">
+        <label for="grammar-import-mode" class="block text-sm font-medium mb-1">파일 형식</label>
+        <select id="grammar-import-mode" class="w-full p-2 border rounded">
+          <option value="csv">CSV 파일</option>
+          <option value="json">JSON 파일</option>
+        </select>
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-sm font-medium mb-2">파일 선택</label>
+        <div class="flex items-center justify-center border-2 border-dashed border-gray-300 p-6 rounded-lg">
+          <div class="space-y-2 text-center">
+            <i class="fas fa-file-upload text-3xl text-gray-400"></i>
+            <div id="grammar-file-name" class="text-sm text-gray-500">문법 패턴 파일을 선택하세요.</div>
+            <input type="file" id="grammar-file-input" class="hidden" accept=".csv,.json">
+            <div class="flex space-x-2">
+              <button type="button" id="browse-grammar-file" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                파일 찾기
+              </button>
+              <button type="button" id="download-grammar-template" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+                템플릿 다운로드
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="grammar-import-status" class="mb-4 hidden">
+        <div class="flex items-center mt-2">
+          <div class="w-full bg-gray-200 rounded-full h-2.5 mr-4">
+            <div id="grammar-import-progress" class="bg-purple-500 h-2.5 rounded-full" style="width: 0%"></div>
+          </div>
+          <span id="grammar-import-percentage" class="text-sm font-medium text-gray-700">0%</span>
+        </div>
+        <div id="grammar-import-result" class="mt-2 text-sm"></div>
+      </div>
+
+      <div class="flex justify-end">
+        <button id="start-grammar-import" type="button" class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded disabled:bg-gray-400" disabled>
+          문법 업로드 시작
+        </button>
+      </div>
+    </div>
+
+    <div class="flex justify-end space-x-4 mt-6 pt-4 border-t">
       <button id="cancel-import" type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded">
-        취소
-      </button>
-      <button id="start-import" type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-        가져오기 시작
+        닫기
       </button>
     </div>
   </div>
-</div> 
+</div>
+
+<style>
+.tab-button.active {
+  color: #2563eb !important;
+  border-bottom-color: #2563eb !important;
+}
+
+.tab-content {
+  display: block;
+}
+
+.tab-content.hidden {
+  display: none;
+}
+</style> 
