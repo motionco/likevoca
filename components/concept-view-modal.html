@@ -10,12 +10,6 @@
         </div>
       </div>
       <div class="flex items-center space-x-2">
-        <button id="edit-concept-button" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
-          <i class="fas fa-edit mr-1"></i>편집
-        </button>
-        <button id="delete-concept-button" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
-          <i class="fas fa-trash mr-1"></i>삭제
-        </button>
         <button id="close-concept-view-modal" class="text-gray-500 hover:text-gray-700">
           <i class="fas fa-times text-xl"></i>
         </button>
@@ -37,6 +31,22 @@
       <h3 class="text-lg font-semibold mb-3">예문</h3>
       <div id="examples-container">
         <!-- 동적으로 생성됨 -->
+      </div>
+    </div>
+
+    <!-- 모달 하단: 시간 표시와 버튼들 -->
+    <div class="flex justify-between items-center mt-6 pt-4 border-t border-gray-200">
+      <div class="text-sm text-gray-500">
+        <i class="fas fa-clock mr-1"></i>
+        <span id="concept-timestamp">등록 시간</span>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button id="edit-concept-button" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded text-sm">
+          <i class="fas fa-edit mr-1"></i>편집
+        </button>
+        <button id="delete-concept-button" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-sm">
+          <i class="fas fa-trash mr-1"></i>삭제
+        </button>
       </div>
     </div>
   </div>

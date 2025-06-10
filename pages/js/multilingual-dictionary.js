@@ -32,6 +32,9 @@ import {
 let currentUser = null;
 let allConcepts = [];
 let filteredConcepts = [];
+
+// 전역에서 접근 가능하도록 설정
+window.allConcepts = allConcepts;
 let displayCount = 12;
 let lastVisibleConcept = null;
 let firstVisibleConcept = null;
@@ -1023,6 +1026,24 @@ async function fetchAndDisplayConcepts() {
 
     console.log(`📚 총 ${allConcepts.length}개 개념 로딩 완료`);
 
+    // 전역 변수 업데이트 (편집 모달에서 접근 가능하도록)
+    window.allConcepts = allConcepts;
+    console.log(
+      "🌍 전역 allConcepts 업데이트 완료:",
+      window.allConcepts.length
+    );
+
+    // 학습 페이지에서 사용할 수 있도록 sessionStorage에도 저장
+    try {
+      sessionStorage.setItem(
+        "learningConcepts",
+        JSON.stringify(allConcepts.slice(0, 100))
+      ); // 성능을 위해 최대 100개
+      console.log("💾 학습용 개념 데이터 sessionStorage에 저장 완료");
+    } catch (error) {
+      console.warn("⚠️ sessionStorage 저장 실패:", error);
+    }
+
     // 현재 필터로 검색 및 표시
     const elements = {
       searchInput: document.getElementById("search-input"),
@@ -1115,8 +1136,22 @@ window.openConceptViewModal = async function (conceptId) {
     fillConceptViewModal(conceptData, sourceLanguage, targetLanguage);
 
     console.log("모달 표시...");
-    // 모달 표시
+    // 모달 표시 (CSS 우선순위 문제 해결)
     modal.classList.remove("hidden");
+    modal.style.display = "flex"; // 강제로 표시
+    console.log("🔍 모달 표시 후 상태:", {
+      classList: Array.from(modal.classList),
+      display: getComputedStyle(modal).display,
+      visibility: getComputedStyle(modal).visibility,
+    });
+
+    // 모달이 표시된 후에 예문 로드
+    console.log("📖 모달 표시 완료, 예문 로드 시작...");
+    await loadAndDisplayExamples(
+      conceptData.id,
+      sourceLanguage,
+      targetLanguage
+    );
 
     console.log("모달 열기 완료");
   } catch (error) {
@@ -1156,30 +1191,6 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
   // 개념 정보
   const conceptInfo = conceptData.concept_info || {};
   console.log("🏷️ 개념 정보:", conceptInfo);
-  console.log("🌍 도메인:", conceptInfo.domain);
-  console.log("📁 카테고리:", conceptInfo.category);
-
-  const categoryElement = document.getElementById("concept-view-category");
-  console.log("📋 카테고리 요소:", categoryElement);
-
-  if (categoryElement) {
-    const domain = conceptInfo.domain || "general";
-    const category = conceptInfo.category || "uncategorized";
-    const domainText = getTranslatedText(domain);
-    const categoryText = getTranslatedText(category);
-
-    console.log("🔄 번역된 텍스트:", {
-      domain,
-      category,
-      domainText,
-      categoryText,
-    });
-
-    categoryElement.textContent = `${domainText} / ${categoryText}`;
-    console.log("✅ 카테고리 설정 완료:", categoryElement.textContent);
-  } else {
-    console.error("❌ concept-view-category 요소를 찾을 수 없습니다");
-  }
 
   // 이모지와 색상
   const emoji = conceptInfo.unicode_emoji || conceptInfo.emoji || "📝";
@@ -1209,9 +1220,6 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
   // 언어별 표현 채우기
   fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage);
 
-  // 예문 업데이트 (분리된 컬렉션에서 실시간 로드)
-  loadAndDisplayExamples(conceptData.id, sourceLanguage, targetLanguage);
-
   // 모달 버튼 설정
   setupModalButtons(conceptData);
 }
@@ -1223,9 +1231,13 @@ async function loadAndDisplayExamples(
   targetLanguage
 ) {
   try {
-    const examplesContainer = document.getElementById("examples-container");
+    // 보기 모달 내부의 examples-container만 찾기
+    const viewModal = document.getElementById("concept-view-modal");
+    const examplesContainer = viewModal
+      ? viewModal.querySelector("#examples-container")
+      : null;
     if (!examplesContainer) {
-      console.error("❌ examples-container를 찾을 수 없습니다");
+      console.error("❌ 보기 모달 내 examples-container를 찾을 수 없습니다");
       return;
     }
 
@@ -1242,6 +1254,14 @@ async function loadAndDisplayExamples(
 
       const repExample = currentConcept.representative_example;
       if (repExample.translations) {
+        console.log("🔍 대표 예문 translations 구조:", repExample.translations);
+        console.log(
+          "🔍 sourceLanguage:",
+          sourceLanguage,
+          "targetLanguage:",
+          targetLanguage
+        );
+
         const sourceText =
           repExample.translations[sourceLanguage]?.text ||
           repExample.translations[sourceLanguage] ||
@@ -1251,6 +1271,8 @@ async function loadAndDisplayExamples(
           repExample.translations[targetLanguage] ||
           "";
 
+        console.log("📝 추출된 예문:", { sourceText, targetText });
+
         if (sourceText && targetText) {
           allExamples.push({
             sourceText,
@@ -1259,7 +1281,12 @@ async function loadAndDisplayExamples(
             context: repExample.context || "대표 예문",
             isRepresentative: true,
           });
+          console.log("✅ 대표 예문을 allExamples에 추가함");
+        } else {
+          console.log("⚠️ sourceText 또는 targetText가 비어있음");
         }
+      } else {
+        console.log("⚠️ repExample.translations가 없음");
       }
     }
 
@@ -1330,10 +1357,37 @@ async function loadAndDisplayExamples(
     console.log(
       `모달에 표시할 예문 수: ${allExamples.length} (concepts 컬렉션에서만)`
     );
+    console.log("🔍 생성된 examplesHTML:", examplesHTML);
+    console.log("📋 examplesContainer 요소:", examplesContainer);
 
     if (examplesHTML) {
+      console.log("✅ 예문 HTML을 컨테이너에 삽입 중...");
+      console.log("🔍 컨테이너 삽입 전 스타일:", {
+        display: getComputedStyle(examplesContainer).display,
+        visibility: getComputedStyle(examplesContainer).visibility,
+        opacity: getComputedStyle(examplesContainer).opacity,
+        height: getComputedStyle(examplesContainer).height,
+      });
       examplesContainer.innerHTML = examplesHTML;
+      console.log(
+        "✅ 예문 HTML 삽입 완료, 컨테이너 내용:",
+        examplesContainer.innerHTML
+      );
+      console.log("🔍 컨테이너 삽입 후 스타일:", {
+        display: getComputedStyle(examplesContainer).display,
+        visibility: getComputedStyle(examplesContainer).visibility,
+        opacity: getComputedStyle(examplesContainer).opacity,
+        height: getComputedStyle(examplesContainer).height,
+      });
+      console.log("🔍 컨테이너 부모 요소:", examplesContainer.parentElement);
+      console.log("🔍 모달 표시 상태:", {
+        modal: document.getElementById("concept-view-modal"),
+        modalDisplay: getComputedStyle(
+          document.getElementById("concept-view-modal")
+        ).display,
+      });
     } else {
+      console.log("⚠️ 예문 HTML이 비어있음, 기본 메시지 표시");
       examplesContainer.innerHTML = `
         <div class="text-center text-gray-500 py-4">
           <i class="fas fa-quote-left text-2xl mb-2"></i>
@@ -1343,13 +1397,16 @@ async function loadAndDisplayExamples(
     }
   } catch (error) {
     console.error("예문 로드 중 오류:", error);
-    const examplesContainer = document.getElementById("concept-examples");
+    console.error("오류 스택:", error.stack);
+    const examplesContainer = document.getElementById("examples-container");
     if (examplesContainer) {
       examplesContainer.innerHTML = `
         <div class="text-center text-red-500 py-4">
           <p>예문을 불러오는 중 오류가 발생했습니다.</p>
         </div>
       `;
+    } else {
+      console.error("❌ catch 블록에서도 examples-container를 찾을 수 없음");
     }
   }
 }
@@ -1477,9 +1534,15 @@ function fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage) {
     // 각 언어별 컨텐츠 패널 내용 다시 생성 (환경 언어 기준 뜻과 품사 유지)
     updateLanguageContent(langCode, conceptData, sourceLanguage);
 
-    // 예문도 해당 언어에 맞게 업데이트
+    // 언어탭 변경에 따라 예문의 대상 언어도 업데이트
+    console.log(
+      `🔄 언어탭 변경: ${sourceLanguage} → ${langCode}, 예문 업데이트 중...`
+    );
     loadAndDisplayExamples(conceptData.id, sourceLanguage, langCode);
   };
+
+  // 시간 표시 설정
+  setupConceptTimestamp(conceptData);
 
   // 모달 버튼 이벤트 설정
   setupModalButtons(conceptData);
@@ -1498,6 +1561,89 @@ function updateLanguageContent(langCode, conceptData, sourceLanguage) {
     conceptData.expressions?.korean ||
     {};
 
+  // 환경 설정 언어에 따른 레이블 가져오기
+  const getUILabels = (userLang) => {
+    const labels = {
+      ko: {
+        synonyms: "유의어",
+        antonyms: "반의어",
+        word_family: "어족",
+        compound_words: "복합어",
+        collocations: "연어",
+        partOfSpeech: {
+          noun: "명사",
+          verb: "동사",
+          adjective: "형용사",
+          adverb: "부사",
+          pronoun: "대명사",
+          preposition: "전치사",
+          conjunction: "접속사",
+          interjection: "감탄사",
+        },
+      },
+      en: {
+        synonyms: "Synonyms",
+        antonyms: "Antonyms",
+        word_family: "Word Family",
+        compound_words: "Compound Words",
+        collocations: "Collocations",
+        partOfSpeech: {
+          noun: "noun",
+          verb: "verb",
+          adjective: "adjective",
+          adverb: "adverb",
+          pronoun: "pronoun",
+          preposition: "preposition",
+          conjunction: "conjunction",
+          interjection: "interjection",
+        },
+      },
+      ja: {
+        synonyms: "類義語",
+        antonyms: "反意語",
+        word_family: "語族",
+        compound_words: "複合語",
+        collocations: "連語",
+        partOfSpeech: {
+          noun: "名詞",
+          verb: "動詞",
+          adjective: "形容詞",
+          adverb: "副詞",
+          pronoun: "代名詞",
+          preposition: "前置詞",
+          conjunction: "接続詞",
+          interjection: "感嘆詞",
+        },
+      },
+      zh: {
+        synonyms: "同义词",
+        antonyms: "反义词",
+        word_family: "词族",
+        compound_words: "复合词",
+        collocations: "搭配词",
+        partOfSpeech: {
+          noun: "名词",
+          verb: "动词",
+          adjective: "形容词",
+          adverb: "副词",
+          pronoun: "代词",
+          preposition: "介词",
+          conjunction: "连词",
+          interjection: "感叹词",
+        },
+      },
+    };
+    return labels[userLang] || labels.ko;
+  };
+
+  const uiLabels = getUILabels(userLanguage);
+
+  // 품사 번역
+  const translatePartOfSpeech = (pos) => {
+    if (!pos) return "";
+    return uiLabels.partOfSpeech[pos] || pos;
+  };
+
   console.log(`🔍 ${langCode} 언어 표현 데이터:`, expression);
 
   panel.innerHTML = `
@@ -1508,15 +1654,13 @@ function updateLanguageContent(langCode, conceptData, sourceLanguage) {
         }</h3>
         ${
           envExpression.part_of_speech
-            ? `<span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">${envExpression.part_of_speech}</span>`
+            ? `<span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">${translatePartOfSpeech(
+                envExpression.part_of_speech
+              )}</span>`
             : ""
         }
       </div>
-      ${
-        expression.pronunciation
-          ? `<p class="text-sm text-gray-500 mb-2">${expression.pronunciation}</p>`
-          : ""
-      }
+
     </div>
     ${
       expression.definition
@@ -1528,7 +1672,9 @@ function updateLanguageContent(langCode, conceptData, sourceLanguage) {
     ${
       expression.synonyms && expression.synonyms.length > 0
         ? `<div class="mb-3">
-        <h4 class="text-sm font-medium text-gray-700 mb-1">유의어</h4>
+        <h4 class="text-sm font-medium text-gray-700 mb-1">${
+          uiLabels.synonyms
+        }</h4>
         <div class="flex flex-wrap gap-1">
           ${expression.synonyms
             .map(
@@ -1543,7 +1689,9 @@ function updateLanguageContent(langCode, conceptData, sourceLanguage) {
     ${
       expression.antonyms && expression.antonyms.length > 0
         ? `<div class="mb-3">
-        <h4 class="text-sm font-medium text-gray-700 mb-1">반의어</h4>
+        <h4 class="text-sm font-medium text-gray-700 mb-1">${
+          uiLabels.antonyms
+        }</h4>
         <div class="flex flex-wrap gap-1">
           ${expression.antonyms
             .map(
@@ -1558,7 +1706,9 @@ function updateLanguageContent(langCode, conceptData, sourceLanguage) {
     ${
       expression.word_family && expression.word_family.length > 0
         ? `<div class="mb-3">
-        <h4 class="text-sm font-medium text-gray-700 mb-1">어족</h4>
+        <h4 class="text-sm font-medium text-gray-700 mb-1">${
+          uiLabels.word_family
+        }</h4>
         <div class="flex flex-wrap gap-1">
           ${expression.word_family
             .map(
@@ -1573,7 +1723,9 @@ function updateLanguageContent(langCode, conceptData, sourceLanguage) {
     ${
       expression.compound_words && expression.compound_words.length > 0
         ? `<div class="mb-3">
-        <h4 class="text-sm font-medium text-gray-700 mb-1">복합어</h4>
+        <h4 class="text-sm font-medium text-gray-700 mb-1">${
+          uiLabels.compound_words
+        }</h4>
         <div class="flex flex-wrap gap-1">
           ${expression.compound_words
             .map(
@@ -1588,7 +1740,9 @@ function updateLanguageContent(langCode, conceptData, sourceLanguage) {
     ${
       expression.collocations && expression.collocations.length > 0
         ? `<div class="mb-3">
-        <h4 class="text-sm font-medium text-gray-700 mb-1">연어</h4>
+        <h4 class="text-sm font-medium text-gray-700 mb-1">${
+          uiLabels.collocations
+        }</h4>
         <div class="flex flex-wrap gap-1">
           ${expression.collocations
             .map(
@@ -1603,6 +1757,59 @@ function updateLanguageContent(langCode, conceptData, sourceLanguage) {
   `;
 }
 
+// 개념 시간 표시 설정
+function setupConceptTimestamp(conceptData) {
+  const timestampElement = document.getElementById("concept-timestamp");
+  if (timestampElement && conceptData) {
+    let timeText = "등록 시간";
+
+    console.log("⏰ 시간 설정 시도:", conceptData);
+
+    // 여러 가능한 시간 필드 확인
+    let dateValue = null;
+
+    if (conceptData.metadata?.created_at) {
+      dateValue = conceptData.metadata.created_at;
+    } else if (conceptData.metadata?.timestamp) {
+      dateValue = conceptData.metadata.timestamp;
+    } else if (conceptData.createdAt) {
+      dateValue = conceptData.createdAt;
+    } else if (conceptData.timestamp) {
+      dateValue = conceptData.timestamp;
+    } else if (conceptData.created_at) {
+      dateValue = conceptData.created_at;
+    }
+
+    if (dateValue) {
+      try {
+        let date;
+        if (dateValue.toDate) {
+          // Firestore Timestamp
+          date = dateValue.toDate();
+        } else if (dateValue instanceof Date) {
+          date = dateValue;
+        } else if (
+          typeof dateValue === "string" ||
+          typeof dateValue === "number"
+        ) {
+          date = new Date(dateValue);
+        }
+
+        if (date && !isNaN(date.getTime())) {
+          timeText = formatDate(date);
+          console.log("✅ 시간 설정 성공:", timeText);
+        }
+      } catch (error) {
+        console.error("❌ 시간 파싱 오류:", error);
+      }
+    } else {
+      console.log("⚠️ 시간 정보 없음, 기본값 사용");
+    }
+
+    timestampElement.textContent = timeText;
+  }
+}
+
 // 모달 버튼 이벤트 설정
 function setupModalButtons(conceptData) {
   // 편집 버튼 이벤트
@@ -1611,9 +1818,19 @@ function setupModalButtons(conceptData) {
     editButton.onclick = () => {
       // 개념 수정 모달 열기
       const viewModal = document.getElementById("concept-view-modal");
-      if (viewModal) viewModal.classList.add("hidden");
+      if (viewModal) {
+        viewModal.classList.add("hidden");
+        viewModal.style.display = "none"; // 강제로 숨기기
+      }
 
-      window.openConceptModal(conceptData.id || conceptData._id);
+      const conceptId =
+        conceptData.concept_id || conceptData.id || conceptData._id;
+      console.log("🔧 편집 버튼 클릭, conceptId:", conceptId);
+
+      // 약간의 지연 후 편집 모달 열기 (DOM 업데이트 대기)
+      setTimeout(() => {
+        window.openConceptModal(conceptId);
+      }, 100);
     };
   }
 
@@ -1640,13 +1857,41 @@ function setupModalButtons(conceptData) {
     };
   }
 
-  // 모달 닫기 버튼 이벤트
+  // 모달 닫기 버튼 이벤트 (여러 방법으로 설정)
   const closeButton = document.getElementById("close-concept-view-modal");
   if (closeButton) {
-    closeButton.onclick = () => {
+    // 기존 이벤트 리스너 제거
+    closeButton.onclick = null;
+
+    // 새로운 이벤트 리스너 추가
+    const closeModal = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       const modal = document.getElementById("concept-view-modal");
-      if (modal) modal.classList.add("hidden");
+      if (modal) {
+        modal.classList.add("hidden");
+        modal.style.display = "none"; // 강제로 숨기기
+        console.log("✅ 모달 닫기 완료");
+      }
     };
+
+    closeButton.addEventListener("click", closeModal);
+    closeButton.onclick = closeModal; // 백업용
+    console.log("✅ 모달 닫기 버튼 이벤트 설정 완료");
+  } else {
+    console.error("❌ close-concept-view-modal 버튼을 찾을 수 없습니다");
+  }
+
+  // 모달 배경 클릭으로도 닫기
+  const modal = document.getElementById("concept-view-modal");
+  if (modal) {
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        modal.classList.add("hidden");
+        modal.style.display = "none";
+        console.log("✅ 모달 배경 클릭으로 닫기");
+      }
+    });
   }
 }
 
@@ -1692,7 +1937,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // 모달 컴포넌트 초기화
     console.log("⚙️ 모달 컴포넌트 초기화 시작");
-    initializeConceptModal();
+    await initializeConceptModal();
     initializeBulkImportModal();
     console.log("✅ 모달 컴포넌트 초기화 완료");
 

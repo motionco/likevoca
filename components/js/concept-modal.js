@@ -457,28 +457,28 @@ export async function showConceptModal(
 function getLanguageName(langCode) {
   const languageNames = {
     ko: {
-    korean: "한국어",
+      korean: "한국어",
       english: "영어",
       japanese: "일본어",
       chinese: "중국어",
     },
     en: {
       korean: "Korean",
-    english: "English",
+      english: "English",
       japanese: "Japanese",
       chinese: "Chinese",
     },
     ja: {
       korean: "韓国語",
       english: "英語",
-    japanese: "日本語",
+      japanese: "日本語",
       chinese: "中国語",
     },
     zh: {
       korean: "韩语",
       english: "英语",
       japanese: "日语",
-    chinese: "中文",
+      chinese: "中文",
     },
   };
 
@@ -738,7 +738,7 @@ async function deleteConcept() {
       // 일반 개념 삭제
       await conceptUtils.deleteConcept(currentConcept.id || currentConcept._id);
       console.log("일반 개념 삭제 성공");
-    alert("개념이 성공적으로 삭제되었습니다.");
+      alert("개념이 성공적으로 삭제되었습니다.");
     }
 
     closeModal();

@@ -1,5 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+} from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 import {
   doc,
@@ -12,6 +15,7 @@ import {
   getDocs,
   addDoc,
   deleteDoc,
+  limit,
 } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 import { collectionManager } from "./firebase-collection-manager.js";
 
@@ -2104,4 +2108,21 @@ export const grammarPatternUtils = {
   },
 };
 
-export { app, auth, db };
+export {
+  app,
+  auth,
+  db,
+  // Firestore 함수들도 export
+  collection,
+  getDocs,
+  query,
+  limit,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  addDoc,
+  where,
+  onAuthStateChanged,
+};
