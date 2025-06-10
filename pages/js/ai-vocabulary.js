@@ -148,9 +148,38 @@ async function loadConceptViewModal() {
     }
 
     modalContainer.innerHTML = html;
-    console.log("개념 모달 로드 완료");
+    console.log("개념 보기 모달 로드 완료");
   } catch (error) {
-    console.error("개념 모달 로드 실패:", error);
+    console.error("개념 보기 모달 로드 실패:", error);
+  }
+}
+
+// AI 개념 편집 모달 로드
+async function loadEditConceptModal() {
+  try {
+    const response = await fetch("../components/edit-concept-modal.html");
+    const html = await response.text();
+
+    // modal-container에 편집 모달 추가
+    let modalContainer = document.getElementById("modal-container");
+    if (!modalContainer) {
+      modalContainer = document.createElement("div");
+      modalContainer.id = "modal-container";
+      document.body.appendChild(modalContainer);
+    }
+
+    // 기존 내용에 편집 모달 추가
+    modalContainer.innerHTML += html;
+    console.log("AI 개념 편집 모달 로드 완료");
+
+    // 편집 모달 스크립트 로드
+    const editModalScript = document.createElement("script");
+    editModalScript.type = "module";
+    editModalScript.src = "../components/js/edit-concept-modal.js";
+    document.head.appendChild(editModalScript);
+    console.log("AI 개념 편집 모달 스크립트 로드 완료");
+  } catch (error) {
+    console.error("AI 개념 편집 모달 로드 실패:", error);
   }
 }
 
@@ -169,8 +198,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     await loadNavbar();
 
-    // 모달 직접 로드
+    // 모달들 직접 로드
     await loadConceptViewModal();
+    await loadEditConceptModal();
 
     // 로컬 환경인지 확인
     if (isLocalEnvironment) {
@@ -266,6 +296,20 @@ function initializeEventListeners() {
     }
     // 카드 재렌더링
     applyFiltersAndSort();
+  });
+
+  // AI 개념 수정 완료 이벤트 리스너 추가
+  document.addEventListener("concept-saved", async (event) => {
+    console.log("🔔 AI 개념 수정 완료 이벤트 감지");
+    try {
+      // AI 개념 목록 다시 로드
+      await loadConcepts();
+      // 필터 및 정렬 다시 적용
+      applyFiltersAndSort();
+      console.log("✅ AI 개념 목록 업데이트 완료");
+    } catch (error) {
+      console.error("❌ AI 개념 목록 업데이트 실패:", error);
+    }
   });
 }
 

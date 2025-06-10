@@ -102,33 +102,53 @@ export const conceptUtils = {
   // 새 개념 생성 (기존 호환성 유지하면서 분리된 컬렉션 우선 사용)
   async createConcept(conceptData) {
     try {
-      // 분리된 컬렉션 시스템 우선 사용
-      if (
-        conceptData.metadata?.collection_structure === "separated" ||
-        conceptData.core_examples ||
-        conceptData.references
-      ) {
-        console.log("분리된 컬렉션 시스템 사용");
-        const result = await collectionManager.createSeparatedConcept(
-          conceptData
-        );
+      // 항상 분리된 컬렉션 시스템 사용
+      console.log("🆕 분리된 컬렉션 시스템으로 개념 생성");
 
-        // 사용자 개념 수 업데이트
-        if (auth.currentUser) {
-          await this.updateUsage(auth.currentUser.email, {
-            conceptCount:
-              (await this.getUsage(auth.currentUser.email)).conceptCount + 1,
-          });
-        }
+      // 분리된 컬렉션 형식으로 데이터 변환
+      const separatedConceptData = {
+        concept_info: {
+          domain:
+            conceptData.concept_info?.domain || conceptData.domain || "general",
+          category:
+            conceptData.concept_info?.category ||
+            conceptData.category ||
+            "common",
+          difficulty: conceptData.concept_info?.difficulty || "beginner",
+          unicode_emoji:
+            conceptData.concept_info?.unicode_emoji ||
+            conceptData.concept_info?.emoji ||
+            "📚",
+          color_theme: conceptData.concept_info?.color_theme || "#9C27B0",
+          tags: conceptData.concept_info?.tags || [],
+          updated_at: new Date(),
+        },
+        expressions: conceptData.expressions || {},
+        representative_example: conceptData.representative_example || null,
+        learning_metadata: {
+          created_from: "individual_add",
+          import_date: new Date(),
+          version: "3.0",
+          structure_type: "separated_collections",
+        },
+      };
 
-        return result.conceptId;
-      } else {
-        // 기존 통합 방식 (호환성)
-        console.log("기존 통합 시스템 사용 (호환성)");
-        return await this.createLegacyConcept(conceptData);
+      const result = await collectionManager.createConcept(
+        separatedConceptData
+      );
+
+      // 사용자 개념 수 업데이트
+      if (auth.currentUser) {
+        await this.updateUsage(auth.currentUser.email, {
+          conceptCount:
+            (await this.getUsage(auth.currentUser.email)).conceptCount + 1,
+        });
       }
+
+      console.log("✅ 분리된 컬렉션으로 개념 생성 완료:", result);
+      return result;
     } catch (error) {
-      console.error("개념 생성 중 오류:", error);
+      console.error("❌ 개념 생성 중 오류:", error);
       throw error;
     }
   },
@@ -899,67 +919,86 @@ export const conceptUtils = {
     }
   },
 
-  // AI 개념을 ai-recommend 컬렉션에 저장
+  // AI 개념을 ai-recommend 컬렉션에 저장 (분리된 컬렉션 구조)
   async createAIConcept(userEmail, conceptData) {
     try {
-      // 사용자 이메일을 문서 ID로 사용
+      console.log("🤖 AI 개념 생성 시작 (분리된 컬렉션 구조)");
+      console.log("📋 입력 데이터:", conceptData);
+
+      // 고유 ID 생성
+      const conceptId = `ai_${Date.now()}_${Math.random()
+        .toString(36)
+        .substr(2, 9)}`;
+
+      // 분리된 컬렉션 구조로 데이터 준비 (다국어 단어장과 동일한 구조)
+      const aiConceptData = {
+        // 메타데이터 (시스템 정보)
+        metadata: {
+          created_at: new Date(),
+          updated_at: new Date(),
+          created_by: userEmail,
+          version: "2.0",
+          source: "ai_generated",
+          is_ai_generated: true,
+          ai_model: "gemini",
+          content_language: "multilingual",
+        },
+
+        // 개념 기본 정보
+        concept_info: {
+          domain:
+            conceptData.concept_info?.domain || conceptData.domain || "general",
+          category:
+            conceptData.concept_info?.category ||
+            conceptData.category ||
+            "common",
+          difficulty: conceptData.concept_info?.difficulty || "beginner",
+          tags: conceptData.concept_info?.tags || [],
+          unicode_emoji:
+            conceptData.concept_info?.unicode_emoji ||
+            conceptData.concept_info?.emoji ||
+            "🤖",
+          images: conceptData.concept_info?.images || [],
+        },
+
+        // 언어별 표현 (다국어 단어장과 동일한 구조)
+        expressions: conceptData.expressions || {},
+
+        // 대표 예문 (다국어 단어장과 동일한 구조)
+        representative_example: conceptData.representative_example || null,
+
+        // 추가 예문들
+        examples: conceptData.examples || [],
+
+        // AI 생성 특화 정보
+        ai_metadata: {
+          generation_prompt: conceptData.ai_metadata?.generation_prompt || "",
+          generation_timestamp: new Date(),
+          confidence_score: conceptData.ai_metadata?.confidence_score || 0.9,
+          generation_model: "gemini-pro",
+          user_context: conceptData.ai_metadata?.user_context || {},
+        },
+
+        // 개념 고유 ID
+        concept_id: conceptId,
+
+        // 호환성을 위한 추가 필드들
+        domain:
+          conceptData.concept_info?.domain || conceptData.domain || "general",
+        category:
+          conceptData.concept_info?.category ||
+          conceptData.category ||
+          "common",
+        featured_examples: conceptData.examples || [],
+        created_at: new Date(),
+        updated_at: new Date(),
+      };
+
+      console.log("🔧 변환된 AI 개념 데이터:", aiConceptData);
+
+      // 사용자별 ai-recommend 컬렉션에 저장
       const userAIRef = doc(db, "ai-recommend", userEmail);
       const userAIDoc = await getDoc(userAIRef);
-
-      // AI 개념 데이터 준비
-      const aiConceptData = {
-        _id: `ai_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        created_at: new Date(),
-        concept_info: {
-          domain: conceptData.concept_info?.domain || "general",
-          category: conceptData.concept_info?.category || "common",
-          difficulty: conceptData.concept_info?.difficulty || "basic",
-          tags: conceptData.concept_info?.tags || [],
-          unicode_emoji: conceptData.concept_info?.unicode_emoji || "📚",
-          color_theme: conceptData.concept_info?.color_theme || "#9C27B0",
-          quiz_frequency: conceptData.concept_info?.quiz_frequency || "medium",
-          game_types: conceptData.concept_info?.game_types || [
-            "matching",
-            "pronunciation",
-            "spelling",
-          ],
-        },
-        media: conceptData.media || {
-          images: {
-            primary: null,
-            secondary: null,
-            illustration: null,
-            emoji_style: null,
-            line_art: null,
-          },
-          videos: { intro: null, pronunciation: null },
-          audio: {
-            pronunciation_slow: null,
-            pronunciation_normal: null,
-            word_in_sentence: null,
-          },
-        },
-        expressions: conceptData.expressions || {},
-        featured_examples: conceptData.featured_examples || [],
-        quiz_data: conceptData.quiz_data || {
-          question_types: ["translation", "matching"],
-          difficulty_multiplier: 1.0,
-          common_mistakes: [],
-          hint_text: {},
-        },
-        game_data: conceptData.game_data || {
-          memory_card: {},
-          word_puzzle: {},
-          pronunciation_game: {},
-        },
-        related_concepts: conceptData.related_concepts || [],
-        learning_metadata: conceptData.learning_metadata || {
-          memorization_difficulty: 2,
-          pronunciation_difficulty: 2,
-          usage_frequency: "medium",
-          cultural_importance: "medium",
-        },
-      };
 
       if (userAIDoc.exists()) {
         // 기존 문서가 있으면 concepts 배열에 추가
@@ -971,6 +1010,7 @@ export const conceptUtils = {
           totalConcepts: existingConcepts.length + 1,
           lastUpdated: new Date(),
         });
+        console.log("✅ 기존 사용자 문서에 AI 개념 추가됨");
       } else {
         // 새 문서 생성
         await setDoc(userAIRef, {
@@ -980,18 +1020,22 @@ export const conceptUtils = {
           createdAt: new Date(),
           lastUpdated: new Date(),
         });
+        console.log("✅ 새 사용자 문서 생성 및 AI 개념 추가됨");
       }
 
-      return aiConceptData._id;
+      console.log("🎉 AI 개념 생성 완료:", conceptId);
+      return conceptId;
     } catch (error) {
-      console.error("AI 개념 생성 중 오류 발생:", error);
+      console.error("❌ AI 개념 생성 중 오류 발생:", error);
       throw error;
     }
   },
 
-  // 사용자의 AI 개념 목록 가져오기
+  // 사용자의 AI 개념 목록 가져오기 (분리된 컬렉션 구조)
   async getUserAIConcepts(userEmail) {
     try {
+      console.log("🔍 사용자 AI 개념 조회 시작:", userEmail);
+
       const userAIRef = doc(db, "ai-recommend", userEmail);
       const userAIDoc = await getDoc(userAIRef);
 
@@ -999,23 +1043,103 @@ export const conceptUtils = {
         const userData = userAIDoc.data();
         const concepts = userData.concepts || [];
 
-        // 각 개념에 id 필드 추가 (기존 _id를 id로 매핑)
-        return concepts.map((concept) => ({
-          ...concept,
-          id: concept._id || concept.id,
-        }));
+        console.log(`📚 AI 개념 ${concepts.length}개 발견`);
+
+        // 분리된 컬렉션 구조에 맞게 데이터 매핑
+        const mappedConcepts = concepts.map((concept) => {
+          // 기본 ID 설정
+          const conceptId =
+            concept.concept_id ||
+            concept._id ||
+            concept.id ||
+            `ai_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+          return {
+            // 기본 식별자들
+            concept_id: conceptId,
+            id: conceptId,
+            _id: conceptId,
+
+            // 메타데이터 (분리된 컬렉션 구조)
+            metadata: concept.metadata || {
+              created_at:
+                concept.created_at ||
+                concept.metadata?.created_at ||
+                new Date(),
+              updated_at:
+                concept.updated_at ||
+                concept.metadata?.updated_at ||
+                new Date(),
+              created_by: userEmail,
+              version: "2.0",
+              source: "ai_generated",
+              is_ai_generated: true,
+              ai_model: "gemini",
+              content_language: "multilingual",
+            },
+
+            // 개념 정보 (분리된 컬렉션 구조)
+            concept_info: concept.concept_info || {
+              domain: concept.domain || "general",
+              category: concept.category || "common",
+              difficulty: concept.difficulty || "beginner",
+              tags: concept.tags || [],
+              unicode_emoji: concept.unicode_emoji || concept.emoji || "🤖",
+              images: concept.images || [],
+            },
+
+            // 언어별 표현 (다국어 단어장과 동일)
+            expressions: concept.expressions || {},
+
+            // 대표 예문 (다국어 단어장과 동일)
+            representative_example: concept.representative_example || null,
+
+            // 추가 예문들
+            examples: concept.examples || concept.featured_examples || [],
+
+            // AI 특화 메타데이터
+            ai_metadata: concept.ai_metadata || {
+              generation_prompt: "",
+              generation_timestamp: concept.created_at || new Date(),
+              confidence_score: 0.9,
+              generation_model: "gemini-pro",
+              user_context: {},
+            },
+
+            // 호환성을 위한 필드들
+            domain: concept.concept_info?.domain || concept.domain || "general",
+            category:
+              concept.concept_info?.category || concept.category || "common",
+            featured_examples:
+              concept.examples || concept.featured_examples || [],
+            created_at:
+              concept.metadata?.created_at || concept.created_at || new Date(),
+            updated_at:
+              concept.metadata?.updated_at || concept.updated_at || new Date(),
+            createdAt:
+              concept.metadata?.created_at || concept.created_at || new Date(), // AI 단어장 호환성
+          };
+        });
+
+        console.log("✅ AI 개념 매핑 완료:", mappedConcepts.length);
+        console.log("📊 첫 번째 개념 샘플:", mappedConcepts[0]);
+
+        return mappedConcepts;
       } else {
+        console.log("📭 사용자 AI 개념 문서가 존재하지 않음");
         return [];
       }
     } catch (error) {
-      console.error("사용자 AI 개념 가져오기 중 오류 발생:", error);
+      console.error("❌ 사용자 AI 개념 가져오기 중 오류 발생:", error);
       return [];
     }
   },
 
-  // AI 개념 삭제
+  // AI 개념 삭제 (분리된 컬렉션 구조)
   async deleteAIConcept(userEmail, conceptId) {
     try {
+      console.log("🗑️ AI 개념 삭제 시작:", { userEmail, conceptId });
+
       const userAIRef = doc(db, "ai-recommend", userEmail);
       const userAIDoc = await getDoc(userAIRef);
 
@@ -1023,10 +1147,17 @@ export const conceptUtils = {
         const userData = userAIDoc.data();
         const concepts = userData.concepts || [];
 
-        // 해당 개념 제거
+        console.log(`📚 삭제 전 총 개념 수: ${concepts.length}`);
+
+        // 해당 개념 제거 (분리된 컬렉션 구조의 ID들로 검색)
         const updatedConcepts = concepts.filter(
-          (concept) => concept._id !== conceptId && concept.id !== conceptId
+          (concept) =>
+            concept.concept_id !== conceptId &&
+            concept._id !== conceptId &&
+            concept.id !== conceptId
         );
+
+        console.log(`📚 삭제 후 총 개념 수: ${updatedConcepts.length}`);
 
         await updateDoc(userAIRef, {
           concepts: updatedConcepts,
@@ -1034,12 +1165,70 @@ export const conceptUtils = {
           lastUpdated: new Date(),
         });
 
+        console.log("✅ AI 개념 삭제 완료");
         return true;
+      } else {
+        console.log("📭 사용자 AI 개념 문서가 존재하지 않음");
+        return false;
       }
-
-      return false;
     } catch (error) {
-      console.error("AI 개념 삭제 중 오류 발생:", error);
+      console.error("❌ AI 개념 삭제 중 오류 발생:", error);
+      throw error;
+    }
+  },
+
+  // AI 개념 수정 (분리된 컬렉션 구조)
+  async updateAIConcept(userEmail, conceptId, updatedData) {
+    try {
+      console.log("✏️ AI 개념 수정 시작:", { userEmail, conceptId });
+
+      const userAIRef = doc(db, "ai-recommend", userEmail);
+      const userAIDoc = await getDoc(userAIRef);
+
+      if (userAIDoc.exists()) {
+        const userData = userAIDoc.data();
+        const concepts = userData.concepts || [];
+
+        // 해당 개념 찾기
+        const conceptIndex = concepts.findIndex(
+          (concept) =>
+            concept.concept_id === conceptId ||
+            concept._id === conceptId ||
+            concept.id === conceptId
+        );
+
+        if (conceptIndex !== -1) {
+          // 기존 개념 업데이트
+          const updatedConcept = {
+            ...concepts[conceptIndex],
+            ...updatedData,
+            metadata: {
+              ...concepts[conceptIndex].metadata,
+              ...updatedData.metadata,
+              updated_at: new Date(),
+            },
+            updated_at: new Date(),
+          };
+
+          concepts[conceptIndex] = updatedConcept;
+
+          await updateDoc(userAIRef, {
+            concepts: concepts,
+            lastUpdated: new Date(),
+          });
+
+          console.log("✅ AI 개념 수정 완료");
+          return true;
+        } else {
+          console.log("❌ 수정할 AI 개념을 찾을 수 없음");
+          return false;
+        }
+      } else {
+        console.log("📭 사용자 AI 개념 문서가 존재하지 않음");
+        return false;
+      }
+    } catch (error) {
+      console.error("❌ AI 개념 수정 중 오류 발생:", error);
       throw error;
     }
   },

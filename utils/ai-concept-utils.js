@@ -250,18 +250,17 @@ Please provide accurate words and translations that are actually usable. Fill al
   },
 };
 
-// 테스트 데이터 (로컬 환경용)
+// 테스트 데이터 (로컬 환경용) - 분리된 컬렉션 구조
 const TEST_CONCEPTS = [
   {
+    // 개념 기본 정보 (분리된 컬렉션 구조)
     concept_info: {
       domain: "food",
       category: "fruit",
-      difficulty: "basic",
+      difficulty: "beginner",
       tags: ["everyday", "healthy", "common"],
       unicode_emoji: "🍎",
-      color_theme: "#FF6B6B",
-      quiz_frequency: "high",
-      game_types: ["matching", "pronunciation", "spelling"],
+      images: [],
     },
     media: {
       images: {
@@ -341,80 +340,44 @@ const TEST_CONCEPTS = [
         collocations: [{ phrase: "吃苹果", frequency: "high" }],
       },
     },
-    featured_examples: [
+    // 대표 예문 (분리된 컬렉션 구조)
+    representative_example: {
+      korean: "나는 매일 사과를 먹습니다.",
+      english: "I eat an apple every day.",
+      japanese: "私は毎日りんごを食べます。",
+      chinese: "我每天吃苹果。",
+    },
+
+    // 추가 예문들 (분리된 컬렉션 구조)
+    examples: [
       {
-        example_id: "example_apple_1",
-        level: "beginner",
-        context: "daily_routine",
-        priority: "high",
-        unicode_emoji: "🌅",
-        quiz_weight: 10,
-        translations: {
-          korean: {
-            text: "나는 매일 사과를 먹습니다.",
-            grammar_notes: "현재 시제, 존댓말",
-          },
-          english: {
-            text: "I eat an apple every day.",
-            grammar_notes: "Simple present tense",
-          },
-          japanese: {
-            text: "私は毎日りんごを食べます。",
-            grammar_notes: "現在形、丁寧語",
-          },
-          chinese: {
-            text: "我每天吃苹果。",
-            grammar_notes: "现在时态",
-          },
-        },
+        korean: "이 사과는 정말 달아요.",
+        english: "This apple is really sweet.",
+        japanese: "このりんごはとても甘いです。",
+        chinese: "这个苹果真甜。",
       },
     ],
-    quiz_data: {
-      question_types: ["translation", "pronunciation", "matching"],
-      difficulty_multiplier: 1.0,
-      common_mistakes: [
-        { mistake: "aple", correction: "apple", type: "spelling" },
-      ],
-      hint_text: {
-        korean: "빨간색 또는 초록색 과일",
-        english: "Red or green fruit that grows on trees",
-        japanese: "木になる赤や緑の果物",
-        chinese: "长在树上的红色或绿色水果",
+    // 호환성을 위한 추가 필드들
+    domain: "food",
+    category: "fruit",
+    featured_examples: [
+      {
+        korean: "이 사과는 정말 달아요.",
+        english: "This apple is really sweet.",
+        japanese: "このりんごはとても甘いです。",
+        chinese: "这个苹果真甜。",
       },
-    },
-    game_data: {
-      memory_card: {
-        front_image: "https://api.iconify.design/noto:red-apple.svg",
-        back_text: "apple / 사과 / りんご / 苹果",
-      },
-      word_puzzle: {
-        scrambled: ["a", "p", "p", "l", "e"],
-        hints: ["Red or green fruit", "Grows on trees", "🍎"],
-      },
-      pronunciation_game: {
-        target_phoneme: "/ˈæpəl/",
-        similar_sounds: ["/ˈæpəl/", "/ˈæmpəl/"],
-        practice_words: ["apple", "ample", "chapel"],
-      },
-    },
-    related_concepts: [],
-    learning_metadata: {
-      memorization_difficulty: 2,
-      pronunciation_difficulty: 1,
-      usage_frequency: "very_high",
-      cultural_importance: "medium",
-    },
+    ],
   },
   {
+    // 개념 기본 정보 (분리된 컬렉션 구조)
     concept_info: {
       domain: "animal",
       category: "pet",
-      difficulty: "basic",
+      difficulty: "beginner",
       tags: ["pet", "common", "domestic"],
       unicode_emoji: "🐱",
-      color_theme: "#4CAF50",
-      quiz_frequency: "high",
-      game_types: ["matching", "pronunciation"],
+      images: [],
     },
     media: {
       images: {
@@ -494,69 +457,34 @@ const TEST_CONCEPTS = [
         collocations: [{ phrase: "养猫", frequency: "high" }],
       },
     },
-    featured_examples: [
+    // 대표 예문 (분리된 컬렉션 구조)
+    representative_example: {
+      korean: "우리 집에는 귀여운 고양이가 있습니다.",
+      english: "We have a cute cat at home.",
+      japanese: "私たちの家にはかわいい猫がいます。",
+      chinese: "我们家有一只可爱的猫。",
+    },
+
+    // 추가 예문들 (분리된 컬렉션 구조)
+    examples: [
       {
-        example_id: "example_cat_1",
-        level: "beginner",
-        context: "daily_life",
-        priority: "high",
-        unicode_emoji: "🏠",
-        quiz_weight: 10,
-        translations: {
-          korean: {
-            text: "우리 집에는 귀여운 고양이가 있습니다.",
-            grammar_notes: "존재문, 존댓말",
-          },
-          english: {
-            text: "We have a cute cat at home.",
-            grammar_notes: "Present tense, possessive",
-          },
-          japanese: {
-            text: "私たちの家にはかわいい猫がいます。",
-            grammar_notes: "存在文、丁寧語",
-          },
-          chinese: {
-            text: "我们家有一只可爱的猫。",
-            grammar_notes: "存在句式",
-          },
-        },
+        korean: "고양이가 야옹하고 웁니다.",
+        english: "The cat meows.",
+        japanese: "猫がニャーと鳴きます。",
+        chinese: "猫在喵喵叫。",
       },
     ],
-    quiz_data: {
-      question_types: ["translation", "pronunciation", "matching"],
-      difficulty_multiplier: 1.0,
-      common_mistakes: [
-        { mistake: "kat", correction: "cat", type: "spelling" },
-      ],
-      hint_text: {
-        korean: "작고 털이 있는 애완동물",
-        english: "Small furry pet that says meow",
-        japanese: "ニャーと鳴く小さなペット",
-        chinese: "会喵喵叫的小宠物",
+    // 호환성을 위한 추가 필드들
+    domain: "animal",
+    category: "pet",
+    featured_examples: [
+      {
+        korean: "고양이가 야옹하고 웁니다.",
+        english: "The cat meows.",
+        japanese: "猫がニャーと鳴きます。",
+        chinese: "猫在喵喵叫。",
       },
-    },
-    game_data: {
-      memory_card: {
-        front_image: "https://api.iconify.design/noto:cat-face.svg",
-        back_text: "cat / 고양이 / 猫 / 猫",
-      },
-      word_puzzle: {
-        scrambled: ["c", "a", "t"],
-        hints: ["Pet animal", "Says meow", "🐱"],
-      },
-      pronunciation_game: {
-        target_phoneme: "/kæt/",
-        similar_sounds: ["/kæt/", "/kɑt/"],
-        practice_words: ["cat", "bat", "hat"],
-      },
-    },
-    related_concepts: [],
-    learning_metadata: {
-      memorization_difficulty: 1,
-      pronunciation_difficulty: 1,
-      usage_frequency: "high",
-      cultural_importance: "high",
-    },
+    ],
   },
 ];
 
@@ -683,13 +611,78 @@ export async function handleAIConceptRecommendation(currentUser, db) {
       return;
     }
 
-    // ai-recommend 컬렉션에 저장
-    console.log("ai-recommend 컬렉션에 개념 저장 중...");
+    // 분리된 컬렉션 구조에 맞게 데이터 변환
+    console.log("🔧 분리된 컬렉션 구조로 데이터 변환 중...");
+    const transformedConceptData = {
+      // 개념 기본 정보
+      concept_info: {
+        domain:
+          conceptData.concept_info?.domain || conceptData.domain || "general",
+        category:
+          conceptData.concept_info?.category ||
+          conceptData.category ||
+          category ||
+          "common",
+        difficulty: conceptData.concept_info?.difficulty || "beginner",
+        tags: conceptData.concept_info?.tags || [],
+        unicode_emoji:
+          conceptData.concept_info?.unicode_emoji ||
+          conceptData.concept_info?.emoji ||
+          "🤖",
+        images: conceptData.concept_info?.images || [],
+      },
+
+      // 언어별 표현 (다국어 단어장과 동일한 구조)
+      expressions: conceptData.expressions || {},
+
+      // 대표 예문 (다국어 단어장과 동일한 구조)
+      representative_example:
+        conceptData.representative_example ||
+        (conceptData.featured_examples &&
+        conceptData.featured_examples.length > 0
+          ? conceptData.featured_examples[0]
+          : null),
+
+      // 추가 예문들
+      examples: conceptData.examples || conceptData.featured_examples || [],
+
+      // AI 생성 특화 정보
+      ai_metadata: {
+        generation_prompt: `주제: ${topic}, 카테고리: ${category}, 언어: ${selectedLanguages.join(
+          ", "
+        )}`,
+        generation_timestamp: new Date(),
+        confidence_score: 0.9,
+        generation_model: isLocalEnvironment ? "test-data" : "gemini-pro",
+        user_context: {
+          topic: topic,
+          category: category,
+          selected_languages: selectedLanguages,
+          user_email: currentUser.email,
+        },
+      },
+
+      // 호환성을 위한 추가 필드들
+      domain:
+        conceptData.concept_info?.domain || conceptData.domain || "general",
+      category:
+        conceptData.concept_info?.category ||
+        conceptData.category ||
+        category ||
+        "common",
+      featured_examples:
+        conceptData.examples || conceptData.featured_examples || [],
+    };
+
+    console.log("🔧 변환된 개념 데이터:", transformedConceptData);
+
+    // ai-recommend 컬렉션에 저장 (분리된 컬렉션 구조)
+    console.log("💾 ai-recommend 컬렉션에 개념 저장 중...");
     const conceptId = await conceptUtils.createAIConcept(
       currentUser.email,
-      conceptData
+      transformedConceptData
     );
-    console.log("AI 개념 저장 완료, ID:", conceptId);
+    console.log("✅ AI 개념 저장 완료, ID:", conceptId);
 
     // AI 사용량 업데이트 (기존 users 컬렉션 사용)
     console.log("AI 사용량 업데이트 중...");

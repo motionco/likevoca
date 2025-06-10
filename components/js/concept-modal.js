@@ -757,9 +757,31 @@ function editConcept() {
     return;
   }
 
-  // 개념 편집 모달 열기 (구현 필요)
-  console.log("개념 편집 기능은 아직 구현되지 않았습니다.");
-  alert("개념 편집 기능은 곧 추가될 예정입니다.");
+  const conceptId =
+    currentConcept.concept_id || currentConcept.id || currentConcept._id;
+
+  if (!conceptId) {
+    console.error("개념 ID를 찾을 수 없습니다.");
+    alert("편집할 개념의 ID를 찾을 수 없습니다.");
+    return;
+  }
+
+  console.log("📝 개념 편집 모달 열기:", conceptId);
+
+  // 현재 보기 모달 닫기
+  closeModal();
+
+  // 편집 모달 열기 (edit-concept-modal.js의 전역 함수 호출)
+  if (window.openEditConceptModal) {
+    window.openEditConceptModal(conceptId);
+  } else {
+    console.error(
+      "❌ openEditConceptModal 함수를 찾을 수 없습니다. edit-concept-modal.js가 로드되었는지 확인하세요."
+    );
+    alert(
+      "편집 기능을 불러올 수 없습니다. 페이지를 새로고침 후 다시 시도해주세요."
+    );
+  }
 }
 
 // 언어 변경 이벤트 리스너 추가

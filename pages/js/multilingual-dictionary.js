@@ -914,12 +914,13 @@ async function fetchAndDisplayConcepts() {
 
     // 분리된 컬렉션과 통합 컬렉션 모두에서 개념 가져오기
     allConcepts = [];
-
-    // 1. concepts 컬렉션에서 개념 가져오기 (분리된 컬렉션 + 기존 통합 컬렉션)
     const conceptsRef = collection(db, "concepts");
 
+    // 분리된 컬렉션만 조회 (metadata.created_at 필드가 있는 개념들)
+    console.log("🔍 분리된 컬렉션에서 개념 조회 중...");
+
     try {
-      // metadata.created_at으로 정렬해서 가져오기 시도 (분리된 컬렉션)
+      // metadata.created_at으로 정렬하여 분리된 컬렉션 개념만 조회
       const queryWithMetadataOrder = query(
         conceptsRef,
         orderBy("metadata.created_at", "desc")
@@ -933,61 +934,41 @@ async function fetchAndDisplayConcepts() {
           data._id = doc.id;
         }
 
-        // AI 생성 개념 제외 (다국어 단어장에서는 수동 생성 개념만 표시)
-        if (!data.isAIGenerated) {
+        // AI 생성 개념 제외, 분리된 컬렉션 개념만 포함
+        if (!data.isAIGenerated && data.metadata?.created_at) {
           allConcepts.push(data);
+          console.log("📊 분리된 컬렉션 개념 로딩:", data.id, data.expressions);
         }
       });
 
-      console.log(`분리된 컬렉션 우선 조회: ${allConcepts.length}개 개념 로딩`);
-
-      // 개념에 대표 예문이 이미 포함되어 있으므로 별도 예문 조회 불필요
+      console.log(
+        `📚 분리된 컬렉션 조회 완료: ${allConcepts.length}개 개념 로딩`
+      );
     } catch (metadataOrderError) {
-      console.warn("metadata.created_at 정렬 실패, created_at으로 시도");
+      console.warn(
+        "metadata.created_at 정렬 실패, 전체 조회로 분리된 컬렉션 개념 필터링"
+      );
 
-      try {
-        // created_at으로 정렬해서 가져오기 시도 (기존 통합 컬렉션)
-        const queryWithOrder = query(
-          conceptsRef,
-          orderBy("created_at", "desc")
-        );
-        const querySnapshot = await getDocs(queryWithOrder);
+      // 정렬 실패 시 전체 조회 후 분리된 컬렉션 개념만 필터링
+      const querySnapshot = await getDocs(conceptsRef);
 
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          data.id = doc.id;
-          if (!data._id) {
-            data._id = doc.id;
-          }
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        data.id = doc.id;
+        if (!data._id) {
+          data._id = doc.id;
+        }
 
-          // AI 생성 개념 제외
-          if (!data.isAIGenerated) {
-            allConcepts.push(data);
-          }
-        });
+        // AI 생성 개념 제외, 분리된 컬렉션 개념만 포함 (metadata.created_at 필드로 구분)
+        if (!data.isAIGenerated && data.metadata?.created_at) {
+          allConcepts.push(data);
+          console.log("📊 분리된 컬렉션 개념 로딩:", data.id, data.expressions);
+        }
+      });
 
-        console.log(`통합 컬렉션 조회: ${allConcepts.length}개 개념 로딩`);
-      } catch (orderByError) {
-        console.warn("created_at 정렬 실패, 전체 조회로 대체");
-
-        // orderBy 실패 시 전체 조회 후 JavaScript 정렬
-        const querySnapshot = await getDocs(conceptsRef);
-
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          data.id = doc.id;
-          if (!data._id) {
-            data._id = doc.id;
-          }
-
-          // AI 생성 개념 제외, 분리된 컬렉션 버전 포함
-          if (!data.isAIGenerated) {
-            allConcepts.push(data);
-          }
-        });
-
-        console.log(`전체 조회: ${allConcepts.length}개 개념 로딩`);
-      }
+      console.log(
+        `📚 필터링 후 분리된 컬렉션 개념: ${allConcepts.length}개 로딩`
+      );
     }
 
     // JavaScript에서 정렬 (분리된 컬렉션과 통합 컬렉션 모두 지원)
@@ -1829,7 +1810,11 @@ function setupModalButtons(conceptData) {
 
       // 약간의 지연 후 편집 모달 열기 (DOM 업데이트 대기)
       setTimeout(() => {
-        window.openConceptModal(conceptId);
+        if (window.openEditConceptModal) {
+          window.openEditConceptModal(conceptId);
+        } else {
+          console.error("❌ openEditConceptModal 함수가 정의되지 않았습니다.");
+        }
       }, 100);
     };
   }
@@ -1914,7 +1899,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       throw new Error("navbar-container 요소가 없습니다.");
     }
 
-    await loadNavbar();
+    await loadNavbar(navbarContainer);
     console.log("✅ 네비게이션바 로드 완료");
 
     // 네비게이션바가 실제로 로드되었는지 확인
@@ -1930,6 +1915,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.log("🔧 모달 초기화 시작");
     await loadModals([
       "../components/add-concept-modal.html",
+      "../components/edit-concept-modal.html",
       "../components/concept-view-modal.html",
       "../components/bulk-import-modal.html",
     ]);
