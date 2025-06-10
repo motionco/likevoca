@@ -287,6 +287,12 @@ function fillFormWithConceptData(conceptData) {
   // 예제 채우기
   const examplesContainer = document.getElementById("edit-examples-container");
   if (examplesContainer) {
+    console.log("🔍 다국어 편집 모달 예문 채우기 시작:", {
+      representative_example: conceptData.representative_example,
+      examples: conceptData.examples,
+      examples_length: conceptData.examples?.length,
+    });
+
     examplesContainer.innerHTML = "";
 
     let hasExamples = false;
@@ -311,6 +317,7 @@ function fillFormWithConceptData(conceptData) {
           repExample.japanese ||
           repExample.chinese)
       ) {
+        console.log("✅ 다국어 대표 예문 추가:", repExample);
         addEditExampleFields(repExample, true);
         hasExamples = true;
       }
@@ -322,16 +329,30 @@ function fillFormWithConceptData(conceptData) {
       Array.isArray(conceptData.examples) &&
       conceptData.examples.length > 0
     ) {
+      console.log("🔍 다국어 추가 예문 처리:", conceptData.examples);
       for (const example of conceptData.examples) {
+        console.log("✅ 다국어 추가 예문 추가:", example);
         addEditExampleFields(example, false);
         hasExamples = true;
       }
+    } else {
+      console.log(
+        "⚠️ 다국어 추가 예문이 없거나 배열이 아닙니다:",
+        conceptData.examples
+      );
     }
 
     // 예문이 없으면 기본 대표 예문 필드 추가
     if (!hasExamples) {
+      console.log("⚠️ 다국어 예문이 없어서 기본 예문 필드 추가");
       addEditExampleFields(null, true);
     }
+
+    console.log(
+      "🔍 다국어 예문 채우기 완료. 컨테이너 내용:",
+      examplesContainer.children.length,
+      "개 예문"
+    );
   }
 
   console.log("✅ 폼 데이터 채우기 완료");

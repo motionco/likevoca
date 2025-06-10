@@ -400,11 +400,11 @@ export async function showConceptModal(
     concept.concept_info?.unicode_emoji ||
     "📝";
 
-  const emojiElement = document.getElementById("concept-emoji");
+  const emojiElement = document.getElementById("concept-view-emoji");
   if (emojiElement) {
     emojiElement.textContent = emoji;
   } else {
-    console.warn("concept-emoji 요소를 찾을 수 없습니다.");
+    console.warn("concept-view-emoji 요소를 찾을 수 없습니다.");
   }
   console.log("이모지 설정:", emoji, "원본 데이터:", concept.concept_info);
 
@@ -432,33 +432,36 @@ export async function showConceptModal(
   const translatedCategory = getTranslatedText(categoryKey);
   const translatedDomain = getTranslatedText(domainKey);
 
-  // 카테고리/도메인 정보를 제목 아래에 표시
+  // 카테고리/도메인 정보를 헤더에 표시 (발음기호 위치에 영향 주지 않도록)
   const titleElement = document.getElementById("concept-view-title");
   if (titleElement) {
     // 기존 카테고리 태그가 있다면 제거
-    const existingCategory =
-      titleElement.parentElement.querySelector(".category-tag");
+    const existingCategory = document.querySelector(".category-tag");
     if (existingCategory) {
       existingCategory.remove();
     }
 
-    // 제목을 flexbox 컨테이너로 변경하고 카테고리를 오른쪽에 추가
+    // 제목과 발음기호가 있는 div 컨테이너를 찾기
     const titleContainer = titleElement.parentElement;
-    if (!titleContainer.classList.contains("flex")) {
-      titleContainer.classList.add(
-        "flex",
-        "items-center",
-        "justify-between",
-        "gap-2"
-      );
-    }
+    const headerContainer = titleContainer.parentElement; // 이모지와 제목/발음기호가 있는 상위 컨테이너
 
-    // 새 카테고리 태그 추가 (제목 오른쪽)
+    // 새 카테고리 태그를 헤더 오른쪽에 추가 (제목 컨테이너 밖에)
     const categoryTag = document.createElement("div");
     categoryTag.className =
-      "category-tag text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full whitespace-nowrap";
+      "category-tag text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full whitespace-nowrap ml-auto self-start";
     categoryTag.textContent = `${translatedDomain}/${translatedCategory}`;
-    titleContainer.appendChild(categoryTag);
+
+    // 헤더 컨테이너를 flex로 만들고 카테고리 태그 추가
+    if (!headerContainer.classList.contains("flex")) {
+      headerContainer.classList.add(
+        "flex",
+        "items-start",
+        "justify-between",
+        "w-full"
+      );
+    }
+    headerContainer.appendChild(categoryTag);
+
     console.log(
       "카테고리/도메인 태그 추가됨:",
       `${translatedDomain}/${translatedCategory}`
@@ -942,7 +945,7 @@ function updateModalHeader(lang, concept) {
   if (!expression) return;
 
   // 상단 기본 정보 업데이트
-  const emojiElement = document.getElementById("concept-emoji");
+  const emojiElement = document.getElementById("concept-view-emoji");
   const wordElement = document.getElementById("concept-view-title");
   const pronunciationElement = document.getElementById(
     "concept-view-pronunciation"
@@ -1350,35 +1353,8 @@ function displayExamples(
     hasExamples = true;
   }
 
-  // 2. 추가 예문들 확인 (간소화된 표시)
-  if (concept.examples && concept.examples.length > 0) {
-    console.log("추가 examples 발견:", concept.examples);
-
-    concept.examples.forEach((example, index) => {
-      const exampleDiv = document.createElement("div");
-      exampleDiv.className = "border p-4 rounded mb-4 bg-gray-50";
-      exampleDiv.innerHTML = `<div class="mb-2 text-sm font-medium text-gray-700">💡 ${getTranslatedText(
-        "additional_examples"
-      )} ${index + 1}</div>`;
-
-      let exampleContent = "";
-
-      // 현재 언어 추가
-      if (example[currentLang]) {
-        exampleContent += `<p class="text-sm text-gray-700 font-medium mb-2">${example[currentLang]}</p>`;
-      }
-
-      // 원본 언어 추가 (현재 언어와 다른 경우)
-      const sourceLanguageCode = window.currentSourceLanguage; // 원본 언어로 변경
-      if (example[sourceLanguageCode] && sourceLanguageCode !== currentLang) {
-        exampleContent += `<p class="text-sm text-gray-500 italic">${example[sourceLanguageCode]}</p>`;
-      }
-
-      exampleDiv.innerHTML += exampleContent;
-      examplesContainer.appendChild(exampleDiv);
-      hasExamples = true;
-    });
-  }
+  // 2. 추가 예문들은 보기 모달에서 표시하지 않음 (편집 모달에서만 표시)
+  // AI 단어장과 다국어 단어장 모두 보기 모달에서는 대표 예문만 표시
 
   // 예문이 없는 경우
   if (!hasExamples) {

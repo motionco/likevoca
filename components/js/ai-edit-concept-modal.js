@@ -197,17 +197,19 @@ function fillFormWithAIConceptData(conceptData) {
 
   if (domainField) {
     domainField.value =
-      conceptData.concept_info?.domain || conceptData.domain || "general";
+      conceptData.concept_info?.domain || conceptData.domain || "daily";
   }
   if (categoryField) {
     categoryField.value =
       conceptData.concept_info?.category || conceptData.category || "common";
   }
   if (emojiField) {
+    // 실제 저장된 이모지를 사용, 기본값으로 🤖 사용
     emojiField.value =
-      conceptData.concept_info?.emoji ||
       conceptData.concept_info?.unicode_emoji ||
+      conceptData.concept_info?.emoji ||
       conceptData.unicode_emoji ||
+      conceptData.emoji ||
       "🤖";
   }
 
@@ -369,6 +371,12 @@ function fillExamples(conceptData) {
   const examplesContainer = document.getElementById("edit-examples-container");
   if (!examplesContainer) return;
 
+  console.log("🔍 예문 채우기 시작:", {
+    representative_example: conceptData.representative_example,
+    examples: conceptData.examples,
+    examples_length: conceptData.examples?.length,
+  });
+
   examplesContainer.innerHTML = "";
 
   // 대표 예문 추가
@@ -385,15 +393,20 @@ function fillExamples(conceptData) {
     }
 
     if (repExample) {
+      console.log("✅ 대표 예문 추가:", repExample);
       addExampleField(repExample, true);
     }
   }
 
   // 추가 예문들
   if (conceptData.examples && Array.isArray(conceptData.examples)) {
-    conceptData.examples.forEach((example) => {
+    console.log("🔍 추가 예문 처리:", conceptData.examples);
+    conceptData.examples.forEach((example, index) => {
+      console.log(`✅ 추가 예문 ${index + 1} 추가:`, example);
       addExampleField(example, false);
     });
+  } else {
+    console.log("⚠️ 추가 예문이 없거나 배열이 아닙니다:", conceptData.examples);
   }
 
   // 예문이 없으면 기본 예문 필드 하나 추가
@@ -401,8 +414,15 @@ function fillExamples(conceptData) {
     !conceptData.representative_example &&
     (!conceptData.examples || conceptData.examples.length === 0)
   ) {
+    console.log("⚠️ 예문이 없어서 기본 예문 필드 추가");
     addExampleField(null, true);
   }
+
+  console.log(
+    "🔍 예문 채우기 완료. 컨테이너 내용:",
+    examplesContainer.children.length,
+    "개 예문"
+  );
 }
 
 // 예문 필드 추가
@@ -473,6 +493,8 @@ async function saveConcept() {
 
     const conceptData = collectFormData();
 
+    console.log("🔍 수집된 원본 데이터:", conceptData);
+
     // AI 구조로 변환
     const transformedData = {
       metadata: {
@@ -482,15 +504,17 @@ async function saveConcept() {
         is_ai_generated: true,
       },
       concept_info: {
-        domain: conceptData.concept_info?.domain || "general",
-        category: conceptData.concept_info?.category || "common",
-        unicode_emoji: conceptData.concept_info?.emoji || "🤖",
+        domain: conceptData.concept_info.domain || "general",
+        category: conceptData.concept_info.category || "common",
+        unicode_emoji: conceptData.concept_info.emoji || "🤖",
       },
       expressions: conceptData.expressions || {},
       representative_example: conceptData.representative_example || null,
       examples: conceptData.examples || [],
       updated_at: new Date(),
     };
+
+    console.log("🔍 변환된 데이터:", transformedData);
 
     const success = await conceptUtils.updateAIConcept(
       auth.currentUser.email,
@@ -500,6 +524,28 @@ async function saveConcept() {
 
     if (!success) {
       throw new Error("AI 개념 수정에 실패했습니다.");
+    }
+
+    console.log("✅ 저장 성공! 저장된 데이터 검증을 위해 다시 조회합니다...");
+
+    // 저장된 데이터 검증
+    try {
+      const savedConcepts = await conceptUtils.getUserAIConcepts(
+        auth.currentUser.email
+      );
+      const savedConcept = savedConcepts.find(
+        (c) =>
+          c.concept_id === editConceptId ||
+          c.id === editConceptId ||
+          c._id === editConceptId
+      );
+      console.log("🔍 저장된 개념 검증:", savedConcept);
+      console.log("🔍 저장된 예문 검증:", {
+        representative_example: savedConcept?.representative_example,
+        examples: savedConcept?.examples,
+      });
+    } catch (verifyError) {
+      console.error("❌ 저장 검증 중 오류:", verifyError);
     }
 
     alert("AI 개념이 성공적으로 수정되었습니다.");
@@ -533,11 +579,12 @@ function validateForm() {
 function collectFormData() {
   const domainField = document.getElementById("edit-concept-domain");
   const categoryField = document.getElementById("edit-concept-category");
+  const emojiField = document.getElementById("edit-concept-emoji");
 
   const conceptInfo = {
     domain: domainField?.value.trim() || "",
     category: categoryField?.value.trim() || "",
-    emoji: "🤖", // AI 개념 기본 이모지
+    emoji: emojiField?.value.trim() || "🤖", // 폼에서 입력된 이모지 사용
   };
 
   // 언어별 표현 수집
@@ -605,6 +652,9 @@ function collectFormData() {
   const exampleDivs = document.querySelectorAll(
     "#edit-examples-container > div"
   );
+
+  console.log("🔍 예문 수집 시작:", exampleDivs.length, "개 예문 div 발견");
+
   exampleDivs.forEach((div, index) => {
     const isRepresentative = div
       .querySelector("h4")
@@ -617,6 +667,8 @@ function collectFormData() {
       chinese: div.querySelector(".chinese-example")?.value.trim() || "",
     };
 
+    console.log(`🔍 예문 ${index + 1} (대표: ${isRepresentative}):`, example);
+
     // 빈 예문은 제외
     if (
       example.korean ||
@@ -628,10 +680,20 @@ function collectFormData() {
         representativeExample = {
           translations: example,
         };
+        console.log("✅ 대표 예문 설정:", representativeExample);
       } else {
         examples.push(example);
+        console.log("✅ 일반 예문 추가:", example);
       }
+    } else {
+      console.log("⚠️ 빈 예문 건너뛰기");
     }
+  });
+
+  console.log("🔍 최종 예문 수집 결과:", {
+    representativeExample,
+    examples: examples.length,
+    allExamples: examples,
   });
 
   return {

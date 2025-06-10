@@ -181,7 +181,7 @@ async function loadConceptViewModal() {
 // AI 개념 편집 모달 로드 (AI 전용 JS 사용)
 async function loadEditConceptModal() {
   try {
-    const response = await fetch("../components/edit-concept-modal.html");
+    const response = await fetch("../components/ai-edit-concept-modal.html");
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }

@@ -1173,13 +1173,75 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
   const conceptInfo = conceptData.concept_info || {};
   console.log("🏷️ 개념 정보:", conceptInfo);
 
-  // 이모지와 색상
-  const emoji = conceptInfo.unicode_emoji || conceptInfo.emoji || "📝";
+  // 이모지와 색상 (개념 카드와 동일한 우선순위 적용)
+  const emoji =
+    conceptInfo.unicode_emoji ||
+    conceptInfo.emoji ||
+    conceptData.emoji ||
+    conceptData.unicode_emoji ||
+    "📝";
   const colorTheme = conceptInfo.color_theme || "#4B63AC";
 
+  console.log("🔍 이모지 선택 디버깅:", {
+    conceptInfo_unicode_emoji: conceptInfo.unicode_emoji,
+    conceptInfo_emoji: conceptInfo.emoji,
+    conceptData_emoji: conceptData.emoji,
+    conceptData_unicode_emoji: conceptData.unicode_emoji,
+    final_emoji: emoji,
+    concept_info: conceptInfo,
+    concept_data: conceptData,
+  });
+
   const emojiElement = document.getElementById("concept-view-emoji");
-  if (emojiElement) {
+  console.log("🔍 이모지 요소 검색:", {
+    emojiElement: emojiElement,
+    modal: document.getElementById("concept-view-modal"),
+    allEmojiElements: document.querySelectorAll("#concept-view-emoji"),
+    modalContent: document
+      .getElementById("concept-view-modal")
+      ?.innerHTML?.substring(0, 500),
+  });
+
+  // 요소를 찾을 수 없을 때 DOM 상태 상세 분석
+  if (!emojiElement) {
+    console.log("🔍 DOM 상세 분석:");
+    const modalExists = !!document.getElementById("concept-view-modal");
+    const modalVisible =
+      modalExists &&
+      window.getComputedStyle(document.getElementById("concept-view-modal"))
+        .display !== "none";
+    const allDivs = document.querySelectorAll("div[id*='concept']");
+    const allEmojis = document.querySelectorAll("div[id*='emoji']");
+
+    console.log({
+      modalExists,
+      modalVisible,
+      allConceptDivs: allDivs.length,
+      allEmojiDivs: allEmojis.length,
+      allConceptIds: Array.from(allDivs).map((d) => d.id),
+      allEmojiIds: Array.from(allEmojis).map((d) => d.id),
+    });
+
+    // 약간의 지연 후 재시도
+    setTimeout(() => {
+      const delayedEmojiElement = document.getElementById("concept-view-emoji");
+      console.log("🔄 지연 후 이모지 요소 재검색:", delayedEmojiElement);
+      if (delayedEmojiElement && emoji) {
+        delayedEmojiElement.textContent = emoji;
+        console.log("✅ 지연 후 보기 모달 이모지 설정 완료:", emoji);
+      }
+    }, 100);
+  }
+
+  if (emojiElement && emoji) {
     emojiElement.textContent = emoji;
+    console.log("✅ 보기 모달 이모지 설정 완료:", emoji);
+  } else if (!emojiElement) {
+    console.log(
+      "❌ concept-view-emoji 요소를 찾을 수 없습니다. 모달이 제대로 로드되지 않았을 수 있습니다."
+    );
+  } else if (!emoji) {
+    console.log("❌ emoji가 없습니다.");
   }
 
   const headerElement = document.querySelector(".concept-view-header");

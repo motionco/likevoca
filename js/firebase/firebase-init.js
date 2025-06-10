@@ -958,6 +958,9 @@ export const conceptUtils = {
         // 대표 예문 (다국어 단어장과 완전히 동일한 구조)
         representative_example: conceptData.representative_example || null,
 
+        // 추가 예문들 (다국어 단어장과 완전히 동일한 구조)
+        examples: conceptData.examples || [],
+
         // 시간 정보 (단일화)
         created_at: new Date(),
       };
@@ -1013,6 +1016,31 @@ export const conceptUtils = {
 
         console.log(`📚 AI 개념 ${concepts.length}개 발견`);
 
+        // 원본 데이터 구조 디버깅
+        if (concepts.length > 0) {
+          console.log("🔍 원본 AI 개념 데이터 구조 분석:");
+          const sampleConcept = concepts[0];
+          console.log("  - concept_id:", sampleConcept.concept_id);
+          console.log("  - concept_info:", sampleConcept.concept_info);
+          console.log(
+            "  - expressions keys:",
+            Object.keys(sampleConcept.expressions || {})
+          );
+          console.log(
+            "  - representative_example:",
+            sampleConcept.representative_example
+          );
+          console.log(
+            "  - examples:",
+            sampleConcept.examples,
+            "Type:",
+            typeof sampleConcept.examples,
+            "Length:",
+            sampleConcept.examples?.length
+          );
+          console.log("  - 전체 키들:", Object.keys(sampleConcept));
+        }
+
         // 분리된 컬렉션 구조에 맞게 데이터 매핑
         const mappedConcepts = concepts.map((concept) => {
           // 기본 ID 설정
@@ -1043,6 +1071,9 @@ export const conceptUtils = {
 
             // 대표 예문 (다국어 단어장과 완전히 동일)
             representative_example: concept.representative_example || null,
+
+            // 추가 예문들 (다국어 단어장과 완전히 동일)
+            examples: concept.examples || [],
 
             // 시간 정보 (단일화)
             created_at: concept.created_at || new Date(),
