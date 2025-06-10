@@ -941,7 +941,6 @@ export const conceptUtils = {
           source: "ai_generated",
           is_ai_generated: true,
           ai_model: "gemini",
-          content_language: "multilingual",
         },
 
         // 개념 기본 정보
@@ -958,7 +957,6 @@ export const conceptUtils = {
             conceptData.concept_info?.unicode_emoji ||
             conceptData.concept_info?.emoji ||
             "🤖",
-          images: conceptData.concept_info?.images || [],
         },
 
         // 언어별 표현 (다국어 단어장과 동일한 구조)
@@ -982,14 +980,7 @@ export const conceptUtils = {
         // 개념 고유 ID
         concept_id: conceptId,
 
-        // 호환성을 위한 추가 필드들
-        domain:
-          conceptData.concept_info?.domain || conceptData.domain || "general",
-        category:
-          conceptData.concept_info?.category ||
-          conceptData.category ||
-          "common",
-        featured_examples: conceptData.examples || [],
+        // 호환성을 위한 최소 필드들 (제거 예정)
         created_at: new Date(),
         updated_at: new Date(),
       };
@@ -1075,7 +1066,6 @@ export const conceptUtils = {
               source: "ai_generated",
               is_ai_generated: true,
               ai_model: "gemini",
-              content_language: "multilingual",
             },
 
             // 개념 정보 (분리된 컬렉션 구조)
@@ -1085,7 +1075,6 @@ export const conceptUtils = {
               difficulty: concept.difficulty || "beginner",
               tags: concept.tags || [],
               unicode_emoji: concept.unicode_emoji || concept.emoji || "🤖",
-              images: concept.images || [],
             },
 
             // 언어별 표현 (다국어 단어장과 동일)
@@ -1106,18 +1095,13 @@ export const conceptUtils = {
               user_context: {},
             },
 
-            // 호환성을 위한 필드들
-            domain: concept.concept_info?.domain || concept.domain || "general",
-            category:
-              concept.concept_info?.category || concept.category || "common",
-            featured_examples:
-              concept.examples || concept.featured_examples || [],
+            // 최소 호환성 필드들
             created_at:
               concept.metadata?.created_at || concept.created_at || new Date(),
             updated_at:
               concept.metadata?.updated_at || concept.updated_at || new Date(),
             createdAt:
-              concept.metadata?.created_at || concept.created_at || new Date(), // AI 단어장 호환성
+              concept.metadata?.created_at || concept.created_at || new Date(),
           };
         });
 

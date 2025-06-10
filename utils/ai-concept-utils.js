@@ -357,17 +357,9 @@ const TEST_CONCEPTS = [
         chinese: "这个苹果真甜。",
       },
     ],
-    // 호환성을 위한 추가 필드들
+    // 최소 호환성 필드들
     domain: "food",
     category: "fruit",
-    featured_examples: [
-      {
-        korean: "이 사과는 정말 달아요.",
-        english: "This apple is really sweet.",
-        japanese: "このりんごはとても甘いです。",
-        chinese: "这个苹果真甜。",
-      },
-    ],
   },
   {
     // 개념 기본 정보 (분리된 컬렉션 구조)
@@ -474,17 +466,9 @@ const TEST_CONCEPTS = [
         chinese: "猫在喵喵叫。",
       },
     ],
-    // 호환성을 위한 추가 필드들
+    // 최소 호환성 필드들
     domain: "animal",
     category: "pet",
-    featured_examples: [
-      {
-        korean: "고양이가 야옹하고 웁니다.",
-        english: "The cat meows.",
-        japanese: "猫がニャーと鳴きます。",
-        chinese: "猫在喵喵叫。",
-      },
-    ],
   },
 ];
 
@@ -576,20 +560,29 @@ export async function handleAIConceptRecommendation(currentUser, db) {
       });
       conceptData.expressions = filteredExpressions;
 
-      // 예제도 필터링 (새로운 구조)
-      if (
-        conceptData.featured_examples &&
-        conceptData.featured_examples.length > 0
-      ) {
-        const filteredExample = conceptData.featured_examples[0];
-        const filteredTranslations = {};
+      // 예제도 필터링 (분리된 컬렉션 구조)
+      if (conceptData.representative_example) {
+        const filteredRepExample = {};
         selectedLanguages.forEach((lang) => {
-          if (filteredExample.translations[lang]) {
-            filteredTranslations[lang] = filteredExample.translations[lang];
+          if (conceptData.representative_example[lang]) {
+            filteredRepExample[lang] = conceptData.representative_example[lang];
           }
         });
-        filteredExample.translations = filteredTranslations;
-        conceptData.featured_examples = [filteredExample];
+        conceptData.representative_example = filteredRepExample;
+      }
+
+      // 추가 예문들도 필터링
+      if (conceptData.examples && conceptData.examples.length > 0) {
+        const filteredExamples = conceptData.examples.map((example) => {
+          const filteredExample = {};
+          selectedLanguages.forEach((lang) => {
+            if (example[lang]) {
+              filteredExample[lang] = example[lang];
+            }
+          });
+          return filteredExample;
+        });
+        conceptData.examples = filteredExamples;
       }
       console.log("테스트 개념 데이터 생성 완료:", conceptData);
     } else {
@@ -662,7 +655,7 @@ export async function handleAIConceptRecommendation(currentUser, db) {
         },
       },
 
-      // 호환성을 위한 추가 필드들
+      // 최소 호환성 필드들
       domain:
         conceptData.concept_info?.domain || conceptData.domain || "general",
       category:
@@ -670,8 +663,6 @@ export async function handleAIConceptRecommendation(currentUser, db) {
         conceptData.category ||
         category ||
         "common",
-      featured_examples:
-        conceptData.examples || conceptData.featured_examples || [],
     };
 
     console.log("🔧 변환된 개념 데이터:", transformedConceptData);

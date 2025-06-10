@@ -137,6 +137,10 @@ window.showConceptModal = showConceptModal;
 async function loadConceptViewModal() {
   try {
     const response = await fetch("../components/concept-view-modal.html");
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
     const html = await response.text();
 
     // modal-container가 없으면 생성
@@ -149,6 +153,26 @@ async function loadConceptViewModal() {
 
     modalContainer.innerHTML = html;
     console.log("개념 보기 모달 로드 완료");
+
+    // 로드 후 필수 요소들이 존재하는지 확인
+    const requiredElements = [
+      "concept-view-modal",
+      "concept-emoji",
+      "concept-view-title",
+      "concept-view-pronunciation",
+      "language-tabs",
+      "language-content",
+      "examples-container",
+    ];
+
+    const missingElements = requiredElements.filter(
+      (id) => !document.getElementById(id)
+    );
+    if (missingElements.length > 0) {
+      console.warn("필수 모달 요소들이 누락됨:", missingElements);
+    } else {
+      console.log("✅ 모든 필수 모달 요소가 로드됨");
+    }
   } catch (error) {
     console.error("개념 보기 모달 로드 실패:", error);
   }
@@ -158,6 +182,10 @@ async function loadConceptViewModal() {
 async function loadEditConceptModal() {
   try {
     const response = await fetch("../components/edit-concept-modal.html");
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
     const html = await response.text();
 
     // modal-container에 편집 모달 추가
@@ -176,8 +204,13 @@ async function loadEditConceptModal() {
     const editModalScript = document.createElement("script");
     editModalScript.type = "module";
     editModalScript.src = "../components/js/edit-concept-modal.js";
+    editModalScript.onload = () => {
+      console.log("✅ AI 개념 편집 모달 스크립트 로드 완료");
+    };
+    editModalScript.onerror = (error) => {
+      console.error("❌ AI 개념 편집 모달 스크립트 로드 실패:", error);
+    };
     document.head.appendChild(editModalScript);
-    console.log("AI 개념 편집 모달 스크립트 로드 완료");
   } catch (error) {
     console.error("AI 개념 편집 모달 로드 실패:", error);
   }
@@ -325,15 +358,33 @@ async function initializePage() {
 
 async function loadConcepts() {
   try {
-    console.log("AI 개념 로드 시작");
-    // ai-recommend 컬렉션에서 사용자의 AI 개념 가져오기
+    console.log("🔄 AI 개념 로드 시작");
+    // ai-recommend 컬렉션에서 사용자의 AI 개념 가져오기 (분리된 컬렉션 구조)
     allConcepts = await conceptUtils.getUserAIConcepts(currentUser.email);
-    console.log("로드된 AI 개념 수:", allConcepts.length);
-    console.log("로드된 AI 개념 샘플:", allConcepts.slice(0, 2));
+    console.log("📊 로드된 AI 개념 수:", allConcepts.length);
+
+    if (allConcepts.length > 0) {
+      console.log("📋 첫 번째 AI 개념 샘플:", allConcepts[0]);
+      console.log("🏗️ 분리된 컬렉션 구조 확인:");
+      console.log("  - metadata:", allConcepts[0].metadata);
+      console.log("  - concept_info:", allConcepts[0].concept_info);
+      console.log(
+        "  - expressions:",
+        Object.keys(allConcepts[0].expressions || {})
+      );
+      console.log(
+        "  - representative_example:",
+        allConcepts[0].representative_example
+      );
+      console.log("  - examples:", allConcepts[0].examples);
+      console.log("  - ai_metadata:", allConcepts[0].ai_metadata);
+    } else {
+      console.log("📭 저장된 AI 개념이 없습니다");
+    }
 
     updateConceptCount();
   } catch (error) {
-    console.error("AI 개념 로드 중 오류:", error);
+    console.error("❌ AI 개념 로드 중 오류:", error);
     allConcepts = [];
   }
 }
@@ -547,24 +598,41 @@ function createConceptCard(concept, sourceLanguage, targetLanguage) {
   const domain = concept.concept_info?.domain || "";
   const colorTheme = concept.concept_info?.color_theme || "#9C27B0";
 
-  // 예문 찾기 (새로운 구조 우선, 기존 구조 fallback)
+  // 예문 찾기 (분리된 컬렉션 구조)
   let example = null;
-  if (concept.featured_examples && concept.featured_examples.length > 0) {
-    const firstExample = concept.featured_examples[0];
-    if (firstExample.translations) {
-      example = {
-        source: firstExample.translations[sourceLanguage]?.text || "",
-        target: firstExample.translations[targetLanguage]?.text || "",
-      };
-    }
+
+  // 1. 대표 예문 확인 (분리된 컬렉션 구조)
+  if (concept.representative_example) {
+    example = {
+      source: concept.representative_example[sourceLanguage] || "",
+      target: concept.representative_example[targetLanguage] || "",
+    };
+    console.log("대표 예문 사용:", example);
   }
-  // 기존 구조의 examples도 지원
+  // 2. 추가 예문들 확인 (분리된 컬렉션 구조)
   else if (concept.examples && concept.examples.length > 0) {
     const firstExample = concept.examples[0];
     example = {
       source: firstExample[sourceLanguage] || "",
       target: firstExample[targetLanguage] || "",
     };
+    console.log("추가 예문 사용:", example);
+  }
+  // 3. 호환성을 위한 기존 구조 확인
+  else if (concept.featured_examples && concept.featured_examples.length > 0) {
+    const firstExample = concept.featured_examples[0];
+    if (firstExample.translations) {
+      example = {
+        source: firstExample.translations[sourceLanguage]?.text || "",
+        target: firstExample.translations[targetLanguage]?.text || "",
+      };
+    } else {
+      example = {
+        source: firstExample[sourceLanguage] || "",
+        target: firstExample[targetLanguage] || "",
+      };
+    }
+    console.log("호환성 예문 사용:", example);
   }
 
   // 날짜 포맷팅 개선

@@ -343,19 +343,36 @@ export async function showConceptModal(
 
   console.log("기본 언어 설정:", primaryLang, "표현:", primaryExpr);
 
-  // 이모지 설정 개선
+  // 이모지 설정 개선 (안전한 접근)
   const emoji =
     concept.concept_info?.emoji ||
     concept.unicode_emoji ||
     concept.concept_info?.unicode_emoji ||
     "📝";
-  document.getElementById("concept-view-emoji").textContent = emoji;
+
+  const emojiElement = document.getElementById("concept-emoji");
+  if (emojiElement) {
+    emojiElement.textContent = emoji;
+  } else {
+    console.warn("concept-emoji 요소를 찾을 수 없습니다.");
+  }
   console.log("이모지 설정:", emoji, "원본 데이터:", concept.concept_info);
 
-  document.getElementById("concept-primary-word").textContent =
-    primaryExpr?.word || "N/A";
-  document.getElementById("concept-primary-pronunciation").textContent =
-    primaryExpr?.pronunciation || "";
+  const primaryWordElement = document.getElementById("concept-view-title");
+  if (primaryWordElement) {
+    primaryWordElement.textContent = primaryExpr?.word || "N/A";
+  } else {
+    console.warn("concept-view-title 요소를 찾을 수 없습니다.");
+  }
+
+  const primaryPronElement = document.getElementById(
+    "concept-view-pronunciation"
+  );
+  if (primaryPronElement) {
+    primaryPronElement.textContent = primaryExpr?.pronunciation || "";
+  } else {
+    console.warn("concept-view-pronunciation 요소를 찾을 수 없습니다.");
+  }
 
   // 카테고리와 도메인을 사용자 언어에 맞게 번역
   const categoryKey =
@@ -365,9 +382,31 @@ export async function showConceptModal(
   const translatedCategory = getTranslatedText(categoryKey);
   const translatedDomain = getTranslatedText(domainKey);
 
-  document.getElementById(
-    "concept-category-domain"
-  ).textContent = `${translatedDomain}/${translatedCategory}`;
+  // 카테고리/도메인 정보를 제목 아래에 표시
+  const titleElement = document.getElementById("concept-view-title");
+  if (titleElement) {
+    // 기존 카테고리 태그가 있다면 제거
+    const existingCategory =
+      titleElement.parentElement.querySelector(".category-tag");
+    if (existingCategory) {
+      existingCategory.remove();
+    }
+
+    // 새 카테고리 태그 추가
+    const categoryTag = document.createElement("div");
+    categoryTag.className =
+      "category-tag text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full inline-block mt-1";
+    categoryTag.textContent = `${translatedDomain}/${translatedCategory}`;
+    titleElement.parentElement.appendChild(categoryTag);
+    console.log(
+      "카테고리/도메인 태그 추가됨:",
+      `${translatedDomain}/${translatedCategory}`
+    );
+  } else {
+    console.warn(
+      "concept-view-title 요소를 찾을 수 없어서 카테고리를 표시할 수 없습니다."
+    );
+  }
 
   // 업데이트 날짜 설정
   const updatedAt =
@@ -407,8 +446,8 @@ export async function showConceptModal(
   }
 
   // 탭 생성
-  const tabsContainer = document.getElementById("concept-view-tabs");
-  const contentContainer = document.getElementById("concept-view-content");
+  const tabsContainer = document.getElementById("language-tabs");
+  const contentContainer = document.getElementById("language-content");
 
   if (tabsContainer && contentContainer) {
     console.log("탭 컨테이너 찾음, 탭 생성 중...");
@@ -493,9 +532,9 @@ function getLanguageName(langCode) {
 function showLanguageContent(lang, concept) {
   console.log("언어별 내용 표시:", lang, "개념:", concept);
 
-  const contentContainer = document.getElementById("concept-view-content");
+  const contentContainer = document.getElementById("language-content");
   if (!contentContainer) {
-    console.error("content container를 찾을 수 없습니다.");
+    console.error("language-content container를 찾을 수 없습니다.");
     return;
   }
 
@@ -820,16 +859,166 @@ function displayExamples(
   sourceLanguage = null,
   targetLanguage = null
 ) {
-  const examplesContainer = document.getElementById("concept-view-examples");
+  const examplesContainer = document.getElementById("examples-container");
 
-  if (!examplesContainer) return;
+  if (!examplesContainer) {
+    console.warn("examples-container를 찾을 수 없습니다.");
+    return;
+  }
 
   examplesContainer.innerHTML = "";
 
   let hasExamples = false;
 
-  // 새로운 구조 (featured_examples) 확인 - AI 개념용
-  if (concept.featured_examples && concept.featured_examples.length > 0) {
+  // 1. 대표 예문 확인 (분리된 컬렉션 구조)
+  if (concept.representative_example) {
+    console.log(
+      "분리된 컬렉션 구조의 representative_example 발견:",
+      concept.representative_example
+    );
+
+    const exampleDiv = document.createElement("div");
+    exampleDiv.className = "border p-4 rounded mb-4 bg-blue-50";
+    exampleDiv.innerHTML = `<div class="mb-2 text-sm font-medium text-blue-800">📌 대표 예문</div>`;
+
+    let exampleContent = "";
+    const languagesToShow = [];
+
+    // 대상언어 먼저 추가
+    if (targetLanguage && concept.representative_example[targetLanguage]) {
+      languagesToShow.push({
+        code: targetLanguage,
+        name: getLanguageName(targetLanguage),
+        text: concept.representative_example[targetLanguage],
+        label: "(대상)",
+      });
+    }
+
+    // 원본언어 추가 (다른 경우만)
+    if (
+      sourceLanguage &&
+      concept.representative_example[sourceLanguage] &&
+      sourceLanguage !== targetLanguage
+    ) {
+      languagesToShow.push({
+        code: sourceLanguage,
+        name: getLanguageName(sourceLanguage),
+        text: concept.representative_example[sourceLanguage],
+        label: "(원본)",
+      });
+    }
+
+    // 현재 탭 언어 추가 (다른 경우만)
+    if (
+      concept.representative_example[currentLang] &&
+      currentLang !== targetLanguage &&
+      currentLang !== sourceLanguage
+    ) {
+      languagesToShow.push({
+        code: currentLang,
+        name: getLanguageName(currentLang),
+        text: concept.representative_example[currentLang],
+        label: "(현재)",
+      });
+    }
+
+    languagesToShow.forEach((lang, index) => {
+      const isFirst = index === 0;
+      exampleContent += `
+        <div class="${
+          isFirst ? "mb-3" : "mb-2 pl-4 border-l-2 border-gray-300"
+        }">
+          <span class="text-sm ${
+            isFirst ? "font-medium text-blue-600" : "text-gray-600"
+          }">${lang.name}${lang.label}:</span>
+          <p class="ml-2 ${
+            isFirst ? "font-medium text-gray-800" : "text-gray-700"
+          }">${lang.text}</p>
+        </div>
+      `;
+    });
+
+    exampleDiv.innerHTML += exampleContent;
+    examplesContainer.appendChild(exampleDiv);
+    hasExamples = true;
+  }
+
+  // 2. 추가 예문들 확인 (분리된 컬렉션 구조)
+  if (concept.examples && concept.examples.length > 0) {
+    console.log("분리된 컬렉션 구조의 examples 발견:", concept.examples);
+
+    concept.examples.forEach((example, index) => {
+      const exampleDiv = document.createElement("div");
+      exampleDiv.className = "border p-4 rounded mb-4 bg-gray-50";
+      exampleDiv.innerHTML = `<div class="mb-2 text-sm font-medium text-gray-700">💡 추가 예문 ${
+        index + 1
+      }</div>`;
+
+      let exampleContent = "";
+      const languagesToShow = [];
+
+      // 대상언어 먼저 추가
+      if (targetLanguage && example[targetLanguage]) {
+        languagesToShow.push({
+          code: targetLanguage,
+          name: getLanguageName(targetLanguage),
+          text: example[targetLanguage],
+          label: "(대상)",
+        });
+      }
+
+      // 원본언어 추가 (다른 경우만)
+      if (
+        sourceLanguage &&
+        example[sourceLanguage] &&
+        sourceLanguage !== targetLanguage
+      ) {
+        languagesToShow.push({
+          code: sourceLanguage,
+          name: getLanguageName(sourceLanguage),
+          text: example[sourceLanguage],
+          label: "(원본)",
+        });
+      }
+
+      // 현재 탭 언어 추가 (다른 경우만)
+      if (
+        example[currentLang] &&
+        currentLang !== targetLanguage &&
+        currentLang !== sourceLanguage
+      ) {
+        languagesToShow.push({
+          code: currentLang,
+          name: getLanguageName(currentLang),
+          text: example[currentLang],
+          label: "(현재)",
+        });
+      }
+
+      languagesToShow.forEach((lang, index) => {
+        const isFirst = index === 0;
+        exampleContent += `
+          <div class="${
+            isFirst ? "mb-3" : "mb-2 pl-4 border-l-2 border-gray-300"
+          }">
+            <span class="text-sm ${
+              isFirst ? "font-medium text-blue-600" : "text-gray-600"
+            }">${lang.name}${lang.label}:</span>
+            <p class="ml-2 ${
+              isFirst ? "font-medium text-gray-800" : "text-gray-700"
+            }">${lang.text}</p>
+          </div>
+        `;
+      });
+
+      exampleDiv.innerHTML += exampleContent;
+      examplesContainer.appendChild(exampleDiv);
+      hasExamples = true;
+    });
+  }
+
+  // 3. 호환성을 위한 기존 구조 (featured_examples) 확인
+  else if (concept.featured_examples && concept.featured_examples.length > 0) {
     console.log("AI 개념의 featured_examples 발견:", concept.featured_examples);
 
     concept.featured_examples.forEach((example, index) => {
