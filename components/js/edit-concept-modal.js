@@ -393,7 +393,14 @@ async function saveConcept() {
 function setupEditLanguageTabs() {
   console.log("🔄 편집 모달 언어탭 설정");
 
-  const tabButtons = document.querySelectorAll(
+  // 편집 모달 컨텍스트 내에서만 요소 찾기
+  const editModal = document.getElementById("edit-concept-modal");
+  if (!editModal) {
+    console.error("❌ 편집 모달을 찾을 수 없음");
+    return;
+  }
+
+  const tabButtons = editModal.querySelectorAll(
     "#edit-language-tabs .edit-language-tab"
   );
 
@@ -405,7 +412,7 @@ function setupEditLanguageTabs() {
   });
 
   // 새로운 버튼들에 이벤트 리스너 추가
-  const newTabButtons = document.querySelectorAll(
+  const newTabButtons = editModal.querySelectorAll(
     "#edit-language-tabs .edit-language-tab"
   );
   newTabButtons.forEach((button) => {
@@ -434,38 +441,71 @@ function handleTabClick(e) {
 function switchEditLanguageTab(language) {
   console.log("🔄 편집 모달 언어 탭 전환:", language);
 
-  // 모든 탭 버튼 비활성화
-  document
-    .querySelectorAll("#edit-language-tabs .edit-language-tab")
-    .forEach((tab) => {
-      tab.classList.remove("border-blue-500", "text-blue-600");
-      tab.classList.add("border-transparent", "text-gray-500");
-    });
+  // 편집 모달 컨텍스트 내에서만 요소 찾기
+  const editModal = document.getElementById("edit-concept-modal");
+  if (!editModal) {
+    console.error("❌ 편집 모달을 찾을 수 없음");
+    return;
+  }
 
-  // 모든 콘텐츠 숨기기
-  document
-    .querySelectorAll("#edit-language-content .language-content")
-    .forEach((section) => {
-      section.classList.add("hidden");
-    });
+  // 모든 탭 버튼 비활성화 (편집 모달 내에서만)
+  const allTabs = editModal.querySelectorAll(
+    "#edit-language-tabs .edit-language-tab"
+  );
+  console.log("🔍 전체 탭 버튼 수:", allTabs.length);
+  allTabs.forEach((tab, index) => {
+    console.log(
+      `🔍 탭 ${index}: ${tab.dataset.language}, 클래스:`,
+      tab.className
+    );
+    tab.classList.remove("border-blue-500", "text-blue-600");
+    tab.classList.add("border-transparent", "text-gray-500");
+  });
 
-  // 선택된 탭 활성화
-  const selectedTab = document.querySelector(
+  // 모든 콘텐츠 숨기기 (편집 모달 내에서만)
+  const allContents = editModal.querySelectorAll(
+    "#edit-language-content .language-content"
+  );
+  console.log("🔍 전체 콘텐츠 섹션 수:", allContents.length);
+  allContents.forEach((section, index) => {
+    console.log(
+      `🔍 콘텐츠 ${index}: ID=${section.id}, 클래스:`,
+      section.className
+    );
+    section.classList.add("hidden");
+    section.style.display = "none"; // 추가 보장
+  });
+
+  // 선택된 탭 활성화 (편집 모달 내에서만)
+  const selectedTab = editModal.querySelector(
     `#edit-language-tabs .edit-language-tab[data-language="${language}"]`
   );
   if (selectedTab) {
     selectedTab.classList.remove("border-transparent", "text-gray-500");
     selectedTab.classList.add("border-blue-500", "text-blue-600");
-    console.log("✅ 편집 모달 탭 활성화됨:", language);
+    console.log(
+      "✅ 편집 모달 탭 활성화됨:",
+      language,
+      "클래스:",
+      selectedTab.className
+    );
   } else {
     console.error("❌ 편집 모달 탭을 찾을 수 없음:", language);
   }
 
-  // 선택된 콘텐츠 표시
-  const selectedContent = document.getElementById(`${language}-content`);
+  // 선택된 콘텐츠 표시 (편집 모달 내에서만)
+  const selectedContent = editModal.querySelector(`#${language}-content`);
   if (selectedContent) {
     selectedContent.classList.remove("hidden");
+    selectedContent.style.display = "block"; // 추가 보장
     console.log("✅ 편집 모달 콘텐츠 표시됨:", language);
+    console.log("🔍 콘텐츠 최종 클래스:", selectedContent.className);
+    console.log("🔍 콘텐츠 스타일:", {
+      display: selectedContent.style.display,
+      visibility: selectedContent.style.visibility,
+      height: selectedContent.offsetHeight,
+      width: selectedContent.offsetWidth,
+    });
   } else {
     console.error("❌ 편집 모달 콘텐츠를 찾을 수 없음:", `${language}-content`);
   }
