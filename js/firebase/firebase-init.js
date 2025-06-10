@@ -932,18 +932,10 @@ export const conceptUtils = {
 
       // 분리된 컬렉션 구조로 데이터 준비 (다국어 단어장과 동일한 구조)
       const aiConceptData = {
-        // 메타데이터 (시스템 정보)
-        metadata: {
-          created_at: new Date(),
-          updated_at: new Date(),
-          created_by: userEmail,
-          version: "2.0",
-          source: "ai_generated",
-          is_ai_generated: true,
-          ai_model: "gemini",
-        },
+        // 개념 고유 ID
+        concept_id: conceptId,
 
-        // 개념 기본 정보
+        // 개념 기본 정보 (다국어 단어장과 동일)
         concept_info: {
           domain:
             conceptData.concept_info?.domain || conceptData.domain || "general",
@@ -952,11 +944,13 @@ export const conceptUtils = {
             conceptData.category ||
             "common",
           difficulty: conceptData.concept_info?.difficulty || "beginner",
-          tags: conceptData.concept_info?.tags || [],
           unicode_emoji:
             conceptData.concept_info?.unicode_emoji ||
             conceptData.concept_info?.emoji ||
             "🤖",
+          color_theme: conceptData.concept_info?.color_theme || "#9C27B0",
+          tags: conceptData.concept_info?.tags || [],
+          updated_at: new Date(),
         },
 
         // 언어별 표현 (다국어 단어장과 동일한 구조)
@@ -965,24 +959,19 @@ export const conceptUtils = {
         // 대표 예문 (다국어 단어장과 동일한 구조)
         representative_example: conceptData.representative_example || null,
 
-        // 추가 예문들
-        examples: conceptData.examples || [],
-
-        // AI 생성 특화 정보
-        ai_metadata: {
+        // 학습 메타데이터 (AI 생성 특화)
+        learning_metadata: {
+          created_from: "ai_generated",
+          import_date: new Date(),
+          version: "3.0",
+          structure_type: "separated_collections",
+          ai_model: "gemini-pro",
           generation_prompt: conceptData.ai_metadata?.generation_prompt || "",
-          generation_timestamp: new Date(),
           confidence_score: conceptData.ai_metadata?.confidence_score || 0.9,
-          generation_model: "gemini-pro",
-          user_context: conceptData.ai_metadata?.user_context || {},
         },
 
-        // 개념 고유 ID
-        concept_id: conceptId,
-
-        // 호환성을 위한 최소 필드들 (제거 예정)
+        // 시간 정보 (단일화)
         created_at: new Date(),
-        updated_at: new Date(),
       };
 
       console.log("🔧 변환된 AI 개념 데이터:", aiConceptData);
@@ -1051,30 +1040,15 @@ export const conceptUtils = {
             id: conceptId,
             _id: conceptId,
 
-            // 메타데이터 (분리된 컬렉션 구조)
-            metadata: concept.metadata || {
-              created_at:
-                concept.created_at ||
-                concept.metadata?.created_at ||
-                new Date(),
-              updated_at:
-                concept.updated_at ||
-                concept.metadata?.updated_at ||
-                new Date(),
-              created_by: userEmail,
-              version: "2.0",
-              source: "ai_generated",
-              is_ai_generated: true,
-              ai_model: "gemini",
-            },
-
-            // 개념 정보 (분리된 컬렉션 구조)
+            // 개념 정보 (다국어 단어장과 동일)
             concept_info: concept.concept_info || {
               domain: concept.domain || "general",
               category: concept.category || "common",
               difficulty: concept.difficulty || "beginner",
-              tags: concept.tags || [],
               unicode_emoji: concept.unicode_emoji || concept.emoji || "🤖",
+              color_theme: concept.concept_info?.color_theme || "#9C27B0",
+              tags: concept.tags || [],
+              updated_at: concept.concept_info?.updated_at || new Date(),
             },
 
             // 언어별 표현 (다국어 단어장과 동일)
@@ -1083,25 +1057,20 @@ export const conceptUtils = {
             // 대표 예문 (다국어 단어장과 동일)
             representative_example: concept.representative_example || null,
 
-            // 추가 예문들
-            examples: concept.examples || concept.featured_examples || [],
-
-            // AI 특화 메타데이터
-            ai_metadata: concept.ai_metadata || {
-              generation_prompt: "",
-              generation_timestamp: concept.created_at || new Date(),
-              confidence_score: 0.9,
-              generation_model: "gemini-pro",
-              user_context: {},
+            // 학습 메타데이터 (AI 생성 특화)
+            learning_metadata: concept.learning_metadata || {
+              created_from: "ai_generated",
+              import_date: concept.created_at || new Date(),
+              version: "3.0",
+              structure_type: "separated_collections",
+              ai_model: "gemini-pro",
+              generation_prompt: concept.ai_metadata?.generation_prompt || "",
+              confidence_score: concept.ai_metadata?.confidence_score || 0.9,
             },
 
-            // 최소 호환성 필드들
-            created_at:
-              concept.metadata?.created_at || concept.created_at || new Date(),
-            updated_at:
-              concept.metadata?.updated_at || concept.updated_at || new Date(),
-            createdAt:
-              concept.metadata?.created_at || concept.created_at || new Date(),
+            // 시간 정보 (단일화)
+            created_at: concept.created_at || new Date(),
+            createdAt: concept.created_at || new Date(), // 호환성
           };
         });
 

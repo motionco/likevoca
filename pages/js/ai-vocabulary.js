@@ -666,12 +666,17 @@ function createConceptCard(concept, sourceLanguage, targetLanguage) {
   }
 
   card.innerHTML = `
-    <div class="mb-4 flex justify-between items-start" style="border-left: 4px solid ${colorTheme}; padding-left: 12px;">
-      <div>
-        <h2 class="text-xl font-bold">${emoji} ${targetExpr.word || "N/A"}</h2>
-        <p class="text-sm text-gray-500">${
-          targetExpr.pronunciation || targetExpr.romanization || ""
-        }</p>
+    <div class="flex items-start justify-between mb-4" style="border-left: 4px solid ${colorTheme}">
+      <div class="flex items-center space-x-3 pl-3">
+        <span class="text-3xl">${emoji}</span>
+        <div>
+          <h3 class="text-lg font-semibold text-gray-800 mb-1">
+            ${targetExpr.word || "N/A"}
+          </h3>
+          <p class="text-sm text-gray-500">${
+            targetExpr.pronunciation || targetExpr.romanization || ""
+          }</p>
+        </div>
       </div>
       <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
         ${getTranslatedText(domain)}${
@@ -682,23 +687,17 @@ function createConceptCard(concept, sourceLanguage, targetLanguage) {
     
     <div class="border-t border-gray-200 pt-3 mt-3">
       <div class="flex items-center">
-        <span class="font-medium">${sourceExpr.word || ""}</span>
+        <span class="font-medium">${sourceExpr.word || "N/A"}</span>
       </div>
-      <p class="text-sm text-gray-600 mt-1">${
-        sourceExpr.definition || targetExpr.definition || ""
-      }</p>
+      <p class="text-sm text-gray-600 mt-1">${targetExpr.definition || ""}</p>
     </div>
     
     ${
       example && (example.source || example.target)
         ? `
     <div class="border-t border-gray-200 pt-3 mt-3">
-      ${example.target ? `<p class="text-sm mb-1">${example.target}</p>` : ""}
-      ${
-        example.source
-          ? `<p class="text-sm text-gray-600">${example.source}</p>`
-          : ""
-      }
+      <p class="text-sm text-gray-700 font-medium">${example.target}</p>
+      <p class="text-sm text-gray-500 italic">${example.source}</p>
     </div>
     `
         : ""
@@ -710,15 +709,9 @@ function createConceptCard(concept, sourceLanguage, targetLanguage) {
           "ai_generated"
         )}
       </span>
-      ${
-        formattedDate
-          ? `
       <span class="flex items-center">
         <i class="fas fa-clock mr-1"></i> ${formattedDate}
       </span>
-      `
-          : ""
-      }
     </div>
   `;
 

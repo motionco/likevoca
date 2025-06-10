@@ -308,21 +308,40 @@ export async function showConceptModal(
     return;
   }
 
-  // 언어 탭 순서 재정렬
+  // 언어 탭 순서 재정렬 (AI 단어장과 다국어 단어장 구분)
   const orderedLanguages = [];
+  const isAIVocabulary = window.location.pathname.includes("ai-vocabulary");
 
-  // 1. 원본언어 먼저 추가 (있는 경우)
-  if (sourceLanguage && availableLanguages.includes(sourceLanguage)) {
-    orderedLanguages.push(sourceLanguage);
-  }
+  if (isAIVocabulary) {
+    // AI 단어장: 대상언어 → 원본언어 → 나머지 순서
+    // 1. 대상언어 먼저 추가
+    if (targetLanguage && availableLanguages.includes(targetLanguage)) {
+      orderedLanguages.push(targetLanguage);
+    }
 
-  // 2. 대상언어 추가 (있고, 원본언어와 다른 경우)
-  if (
-    targetLanguage &&
-    availableLanguages.includes(targetLanguage) &&
-    targetLanguage !== sourceLanguage
-  ) {
-    orderedLanguages.push(targetLanguage);
+    // 2. 원본언어 추가 (대상언어와 다른 경우)
+    if (
+      sourceLanguage &&
+      availableLanguages.includes(sourceLanguage) &&
+      sourceLanguage !== targetLanguage
+    ) {
+      orderedLanguages.push(sourceLanguage);
+    }
+  } else {
+    // 다국어 단어장: 원본언어 → 대상언어 → 나머지 순서
+    // 1. 원본언어 먼저 추가 (있는 경우)
+    if (sourceLanguage && availableLanguages.includes(sourceLanguage)) {
+      orderedLanguages.push(sourceLanguage);
+    }
+
+    // 2. 대상언어 추가 (있고, 원본언어와 다른 경우)
+    if (
+      targetLanguage &&
+      availableLanguages.includes(targetLanguage) &&
+      targetLanguage !== sourceLanguage
+    ) {
+      orderedLanguages.push(targetLanguage);
+    }
   }
 
   // 3. 나머지 언어들 추가
@@ -332,7 +351,10 @@ export async function showConceptModal(
     }
   });
 
-  console.log("재정렬된 언어 순서:", orderedLanguages);
+  console.log(
+    `재정렬된 언어 순서 (${isAIVocabulary ? "AI 단어장" : "다국어 단어장"}):`,
+    orderedLanguages
+  );
 
   // 기본 개념 정보 설정 - 대상언어 우선, 없으면 첫 번째 언어 사용
   const primaryLang =
@@ -486,6 +508,9 @@ export async function showConceptModal(
 
   // 예문 표시 (개선된 버전)
   displayExamples(concept, orderedLanguages[0], sourceLanguage, targetLanguage);
+
+  // 시간 표시 설정
+  setupConceptTimestamp(concept);
 
   // 모달 표시
   modal.classList.remove("hidden");
@@ -846,6 +871,64 @@ document.addEventListener("languageChanged", async (event) => {
     }
   }
 });
+
+// 시간 표시 설정 함수 (다국어 단어장과 동일한 로직)
+function setupConceptTimestamp(conceptData) {
+  const timestampElement = document.getElementById("concept-timestamp");
+  if (timestampElement && conceptData) {
+    let timeText = "등록 시간";
+
+    console.log("⏰ AI 개념 시간 설정 시도:", conceptData);
+
+    // 여러 가능한 시간 필드 확인 (분리된 컬렉션 구조 우선)
+    let dateValue = null;
+
+    if (conceptData.metadata?.created_at) {
+      dateValue = conceptData.metadata.created_at;
+    } else if (conceptData.created_at) {
+      dateValue = conceptData.created_at;
+    } else if (conceptData.createdAt) {
+      dateValue = conceptData.createdAt;
+    } else if (conceptData.ai_metadata?.generation_timestamp) {
+      dateValue = conceptData.ai_metadata.generation_timestamp;
+    }
+
+    if (dateValue) {
+      try {
+        let date;
+        if (dateValue.toDate && typeof dateValue.toDate === "function") {
+          // Firestore Timestamp
+          date = dateValue.toDate();
+        } else if (dateValue instanceof Date) {
+          date = dateValue;
+        } else if (dateValue.seconds) {
+          // Firestore Timestamp 형태의 객체
+          date = new Date(dateValue.seconds * 1000);
+        } else if (
+          typeof dateValue === "string" ||
+          typeof dateValue === "number"
+        ) {
+          date = new Date(dateValue);
+        }
+
+        if (date && !isNaN(date.getTime())) {
+          timeText = date.toLocaleDateString("ko-KR", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          });
+          console.log("✅ AI 개념 시간 설정 성공:", timeText);
+        }
+      } catch (error) {
+        console.error("❌ AI 개념 시간 파싱 오류:", error);
+      }
+    } else {
+      console.log("⚠️ AI 개념 시간 정보 없음, 기본값 사용");
+    }
+
+    timestampElement.textContent = timeText;
+  }
+}
 
 // 초기화
 document.addEventListener("DOMContentLoaded", () => {

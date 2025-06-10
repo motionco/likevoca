@@ -604,10 +604,10 @@ export async function handleAIConceptRecommendation(currentUser, db) {
       return;
     }
 
-    // 분리된 컬렉션 구조에 맞게 데이터 변환
+    // 분리된 컬렉션 구조에 맞게 데이터 변환 (다국어 단어장과 동일한 구조)
     console.log("🔧 분리된 컬렉션 구조로 데이터 변환 중...");
     const transformedConceptData = {
-      // 개념 기본 정보
+      // 개념 기본 정보 (다국어 단어장과 동일)
       concept_info: {
         domain:
           conceptData.concept_info?.domain || conceptData.domain || "general",
@@ -617,12 +617,13 @@ export async function handleAIConceptRecommendation(currentUser, db) {
           category ||
           "common",
         difficulty: conceptData.concept_info?.difficulty || "beginner",
-        tags: conceptData.concept_info?.tags || [],
         unicode_emoji:
           conceptData.concept_info?.unicode_emoji ||
           conceptData.concept_info?.emoji ||
           "🤖",
-        images: conceptData.concept_info?.images || [],
+        color_theme: conceptData.concept_info?.color_theme || "#9C27B0",
+        tags: conceptData.concept_info?.tags || [],
+        updated_at: new Date(),
       },
 
       // 언어별 표현 (다국어 단어장과 동일한 구조)
@@ -636,33 +637,18 @@ export async function handleAIConceptRecommendation(currentUser, db) {
           ? conceptData.featured_examples[0]
           : null),
 
-      // 추가 예문들
-      examples: conceptData.examples || conceptData.featured_examples || [],
-
-      // AI 생성 특화 정보
-      ai_metadata: {
+      // 학습 메타데이터 (AI 생성 특화)
+      learning_metadata: {
+        created_from: "ai_generated",
+        import_date: new Date(),
+        version: "3.0",
+        structure_type: "separated_collections",
+        ai_model: isLocalEnvironment ? "test-data" : "gemini-pro",
         generation_prompt: `주제: ${topic}, 카테고리: ${category}, 언어: ${selectedLanguages.join(
           ", "
         )}`,
-        generation_timestamp: new Date(),
         confidence_score: 0.9,
-        generation_model: isLocalEnvironment ? "test-data" : "gemini-pro",
-        user_context: {
-          topic: topic,
-          category: category,
-          selected_languages: selectedLanguages,
-          user_email: currentUser.email,
-        },
       },
-
-      // 최소 호환성 필드들
-      domain:
-        conceptData.concept_info?.domain || conceptData.domain || "general",
-      category:
-        conceptData.concept_info?.category ||
-        conceptData.category ||
-        category ||
-        "common",
     };
 
     console.log("🔧 변환된 개념 데이터:", transformedConceptData);
