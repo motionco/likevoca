@@ -178,7 +178,7 @@ async function loadConceptViewModal() {
   }
 }
 
-// AI 개념 편집 모달 로드
+// AI 개념 편집 모달 로드 (AI 전용 JS 사용)
 async function loadEditConceptModal() {
   try {
     const response = await fetch("../components/edit-concept-modal.html");
@@ -198,17 +198,17 @@ async function loadEditConceptModal() {
 
     // 기존 내용에 편집 모달 추가
     modalContainer.innerHTML += html;
-    console.log("AI 개념 편집 모달 로드 완료");
+    console.log("AI 개념 편집 모달 HTML 로드 완료");
 
-    // 편집 모달 스크립트 로드
+    // AI 전용 편집 모달 스크립트 로드
     const editModalScript = document.createElement("script");
     editModalScript.type = "module";
-    editModalScript.src = "../components/js/edit-concept-modal.js";
+    editModalScript.src = "../components/js/ai-edit-concept-modal.js";
     editModalScript.onload = () => {
-      console.log("✅ AI 개념 편집 모달 스크립트 로드 완료");
+      console.log("✅ AI 전용 개념 편집 모달 스크립트 로드 완료");
     };
     editModalScript.onerror = (error) => {
-      console.error("❌ AI 개념 편집 모달 스크립트 로드 실패:", error);
+      console.error("❌ AI 전용 개념 편집 모달 스크립트 로드 실패:", error);
     };
     document.head.appendChild(editModalScript);
   } catch (error) {
@@ -598,18 +598,26 @@ function createConceptCard(concept, sourceLanguage, targetLanguage) {
   const domain = concept.concept_info?.domain || "";
   const colorTheme = concept.concept_info?.color_theme || "#9C27B0";
 
-  // 예문 찾기 (분리된 컬렉션 구조)
+  // 예문 찾기 (다국어 단어장과 동일한 구조)
   let example = null;
 
-  // 1. 대표 예문 확인 (분리된 컬렉션 구조)
-  if (concept.representative_example) {
+  // 1. 대표 예문 확인 (다국어 단어장 구조)
+  if (concept.representative_example?.translations) {
+    example = {
+      source: concept.representative_example.translations[sourceLanguage] || "",
+      target: concept.representative_example.translations[targetLanguage] || "",
+    };
+    console.log("다국어 단어장 구조 대표 예문 사용:", example);
+  }
+  // 2. 기존 구조 호환성 (분리된 컬렉션 구조)
+  else if (concept.representative_example) {
     example = {
       source: concept.representative_example[sourceLanguage] || "",
       target: concept.representative_example[targetLanguage] || "",
     };
-    console.log("대표 예문 사용:", example);
+    console.log("기존 구조 대표 예문 사용:", example);
   }
-  // 2. 추가 예문들 확인 (분리된 컬렉션 구조)
+  // 3. 추가 예문들 확인
   else if (concept.examples && concept.examples.length > 0) {
     const firstExample = concept.examples[0];
     example = {
@@ -617,22 +625,6 @@ function createConceptCard(concept, sourceLanguage, targetLanguage) {
       target: firstExample[targetLanguage] || "",
     };
     console.log("추가 예문 사용:", example);
-  }
-  // 3. 호환성을 위한 기존 구조 확인
-  else if (concept.featured_examples && concept.featured_examples.length > 0) {
-    const firstExample = concept.featured_examples[0];
-    if (firstExample.translations) {
-      example = {
-        source: firstExample.translations[sourceLanguage]?.text || "",
-        target: firstExample.translations[targetLanguage]?.text || "",
-      };
-    } else {
-      example = {
-        source: firstExample[sourceLanguage] || "",
-        target: firstExample[targetLanguage] || "",
-      };
-    }
-    console.log("호환성 예문 사용:", example);
   }
 
   // 날짜 포맷팅 개선

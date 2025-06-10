@@ -930,7 +930,7 @@ export const conceptUtils = {
         .toString(36)
         .substr(2, 9)}`;
 
-      // 분리된 컬렉션 구조로 데이터 준비 (다국어 단어장과 동일한 구조)
+      // 분리된 컬렉션 구조로 데이터 준비 (다국어 단어장과 완전히 동일한 구조)
       const aiConceptData = {
         // 개념 고유 ID
         concept_id: conceptId,
@@ -950,25 +950,13 @@ export const conceptUtils = {
             "🤖",
           color_theme: conceptData.concept_info?.color_theme || "#9C27B0",
           tags: conceptData.concept_info?.tags || [],
-          updated_at: new Date(),
         },
 
-        // 언어별 표현 (다국어 단어장과 동일한 구조)
+        // 언어별 표현 (다국어 단어장과 완전히 동일한 구조)
         expressions: conceptData.expressions || {},
 
-        // 대표 예문 (다국어 단어장과 동일한 구조)
+        // 대표 예문 (다국어 단어장과 완전히 동일한 구조)
         representative_example: conceptData.representative_example || null,
-
-        // 학습 메타데이터 (AI 생성 특화)
-        learning_metadata: {
-          created_from: "ai_generated",
-          import_date: new Date(),
-          version: "3.0",
-          structure_type: "separated_collections",
-          ai_model: "gemini-pro",
-          generation_prompt: conceptData.ai_metadata?.generation_prompt || "",
-          confidence_score: conceptData.ai_metadata?.confidence_score || 0.9,
-        },
 
         // 시간 정보 (단일화)
         created_at: new Date(),
@@ -1040,7 +1028,7 @@ export const conceptUtils = {
             id: conceptId,
             _id: conceptId,
 
-            // 개념 정보 (다국어 단어장과 동일)
+            // 개념 정보 (다국어 단어장과 완전히 동일)
             concept_info: concept.concept_info || {
               domain: concept.domain || "general",
               category: concept.category || "common",
@@ -1048,25 +1036,13 @@ export const conceptUtils = {
               unicode_emoji: concept.unicode_emoji || concept.emoji || "🤖",
               color_theme: concept.concept_info?.color_theme || "#9C27B0",
               tags: concept.tags || [],
-              updated_at: concept.concept_info?.updated_at || new Date(),
             },
 
-            // 언어별 표현 (다국어 단어장과 동일)
+            // 언어별 표현 (다국어 단어장과 완전히 동일)
             expressions: concept.expressions || {},
 
-            // 대표 예문 (다국어 단어장과 동일)
+            // 대표 예문 (다국어 단어장과 완전히 동일)
             representative_example: concept.representative_example || null,
-
-            // 학습 메타데이터 (AI 생성 특화)
-            learning_metadata: concept.learning_metadata || {
-              created_from: "ai_generated",
-              import_date: concept.created_at || new Date(),
-              version: "3.0",
-              structure_type: "separated_collections",
-              ai_model: "gemini-pro",
-              generation_prompt: concept.ai_metadata?.generation_prompt || "",
-              confidence_score: concept.ai_metadata?.confidence_score || 0.9,
-            },
 
             // 시간 정보 (단일화)
             created_at: concept.created_at || new Date(),

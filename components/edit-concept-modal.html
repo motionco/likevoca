@@ -10,7 +10,7 @@
 
     <form id="edit-concept-form">
       <!-- 기본 정보 -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">도메인</label>
           <select id="edit-concept-domain" class="w-full p-2 border rounded">
@@ -25,6 +25,10 @@
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">카테고리</label>
           <input type="text" id="edit-concept-category" class="w-full p-2 border rounded" placeholder="예: fruit, animal">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">이모지</label>
+          <input type="text" id="edit-concept-emoji" class="w-full p-2 border rounded" placeholder="📝" maxlength="2">
         </div>
       </div>
 

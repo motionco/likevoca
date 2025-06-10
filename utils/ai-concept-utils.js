@@ -29,30 +29,10 @@ const PROMPTS = {
   "concept_info": {
     "domain": "${topic || "daily"}",
     "category": "${category || "daily"}",
-    "difficulty": "basic",
+    "difficulty": "beginner",
     "tags": ["태그1", "태그2", "태그3"],
     "unicode_emoji": "적절한 이모지 1개",
-    "color_theme": "#FF6B6B",
-    "quiz_frequency": "high",
-    "game_types": ["matching", "pronunciation", "spelling"]
-  },
-  "media": {
-    "images": {
-      "primary": null,
-      "secondary": null,
-      "illustration": null,
-      "emoji_style": null,
-      "line_art": null
-    },
-    "videos": {
-      "intro": null,
-      "pronunciation": null
-    },
-    "audio": {
-      "pronunciation_slow": null,
-      "pronunciation_normal": null,
-      "word_in_sentence": null
-    }
+    "color_theme": "#FF6B6B"
   },
   "expressions": {
     ${languages
@@ -60,76 +40,29 @@ const PROMPTS = {
         (lang) => `
     "${lang}": {
       "word": "${lang} 단어",
-      "pronunciation": "발음 표기",
-      "romanization": "로마자 표기 (해당되는 경우)",
-      "definition": "정의/뜻",
+      "pronunciation": "발음 표기 (IPA 또는 현지 표기법)",
+      "definition": "명확한 정의/뜻",
       "part_of_speech": "품사",
-      "level": "beginner",
+      "level": "beginner|intermediate|advanced",
       "synonyms": ["동의어1", "동의어2"],
       "antonyms": ["반의어1", "반의어2"],
-      "word_family": ["관련어1", "관련어2", "관련어3"],
-      "compound_words": ["복합어1", "복합어2", "복합어3"],
-      "collocations": [
-        {"phrase": "자주 쓰이는 연어 표현", "frequency": "high"}
-      ]
+      "word_family": ["관련어1", "관련어2"],
+      "compound_words": ["복합어1", "복합어2"],
+      "collocations": ["연어1", "연어2"]
     }`
       )
       .join(",")}
   },
-  "featured_examples": [
-    {
-      "example_id": "example_1",
-      "level": "beginner",
-      "context": "daily_routine",
-      "priority": "high",
-      "unicode_emoji": "🌅",
-      "quiz_weight": 10,
-      "translations": {
-        ${languages
-          .map(
-            (lang) => `
-        "${lang}": {
-          "text": "${lang} 예문",
-          "grammar_notes": "문법 설명"
-        }`
-          )
-          .join(",")}
-      }
-    }
-  ],
-  "quiz_data": {
-    "question_types": ["translation", "pronunciation", "matching"],
-    "difficulty_multiplier": 1.0,
-    "common_mistakes": [],
-    "hint_text": {
-      ${languages.map((lang) => `"${lang}": "${lang} 힌트 텍스트"`).join(",")}
-    }
-  },
-  "game_data": {
-    "memory_card": {
-      "front_image": "",
-      "back_text": ""
+  "representative_example": {
+    "translations": {
+      ${languages.map((lang) => `"${lang}": "${lang} 예문"`).join(",")}
     },
-    "word_puzzle": {
-      "scrambled": [],
-      "hints": []
-    },
-    "pronunciation_game": {
-      "target_phoneme": "",
-      "similar_sounds": [],
-      "practice_words": []
-    }
-  },
-  "related_concepts": [],
-  "learning_metadata": {
-    "memorization_difficulty": 2,
-    "pronunciation_difficulty": 1,
-    "usage_frequency": "high",
-    "cultural_importance": "medium"
+    "context": "daily_conversation|formal|informal|academic",
+    "difficulty": "beginner|intermediate|advanced"
   }
 }
 
-실제 사용 가능한 정확한 단어와 번역을 제공해주세요. 모든 배열과 객체는 적절한 값으로 채워주세요.`,
+실제 사용 가능한 정확한 단어와 번역을 제공해주세요. 모든 배열은 적절한 값으로 채워주세요. 예문은 주요 단어를 자연스럽게 사용해야 합니다.`,
   },
   english: {
     system:
@@ -146,30 +79,10 @@ Respond in the following JSON format:
   "concept_info": {
     "domain": "${topic || "daily"}",
     "category": "${category || "daily"}",
-    "difficulty": "basic",
+    "difficulty": "beginner",
     "tags": ["tag1", "tag2", "tag3"],
     "unicode_emoji": "appropriate emoji",
-    "color_theme": "#FF6B6B",
-    "quiz_frequency": "high",
-    "game_types": ["matching", "pronunciation", "spelling"]
-  },
-  "media": {
-    "images": {
-      "primary": null,
-      "secondary": null,
-      "illustration": null,
-      "emoji_style": null,
-      "line_art": null
-    },
-    "videos": {
-      "intro": null,
-      "pronunciation": null
-    },
-    "audio": {
-      "pronunciation_slow": null,
-      "pronunciation_normal": null,
-      "word_in_sentence": null
-    }
+    "color_theme": "#FF6B6B"
   },
   "expressions": {
     ${languages
@@ -177,175 +90,107 @@ Respond in the following JSON format:
         (lang) => `
     "${lang}": {
       "word": "${lang} word",
-      "pronunciation": "pronunciation notation",
-      "romanization": "romanization (if applicable)",
-      "definition": "definition/meaning",
+      "pronunciation": "pronunciation notation with IPA or local notation",
+      "definition": "clear definition/meaning",
       "part_of_speech": "part of speech",
-      "level": "beginner",
+      "level": "beginner|intermediate|advanced",
       "synonyms": ["synonym1", "synonym2"],
       "antonyms": ["antonym1", "antonym2"],
-      "word_family": ["related1", "related2", "related3"],
-      "compound_words": ["compound1", "compound2", "compound3"],
-      "collocations": [
-        {"phrase": "common collocation", "frequency": "high"}
-      ]
+      "word_family": ["related1", "related2"],
+      "compound_words": ["compound1", "compound2"],
+      "collocations": ["collocation1", "collocation2"]
     }`
       )
       .join(",")}
   },
-  "featured_examples": [
-    {
-      "example_id": "example_1",
-      "level": "beginner",
-      "context": "daily_routine",
-      "priority": "high",
-      "unicode_emoji": "🌅",
-      "quiz_weight": 10,
-      "translations": {
-        ${languages
-          .map(
-            (lang) => `
-        "${lang}": {
-          "text": "${lang} example sentence",
-          "grammar_notes": "grammar explanation"
-        }`
-          )
-          .join(",")}
-      }
-    }
-  ],
-  "quiz_data": {
-    "question_types": ["translation", "pronunciation", "matching"],
-    "difficulty_multiplier": 1.0,
-    "common_mistakes": [],
-    "hint_text": {
-      ${languages.map((lang) => `"${lang}": "${lang} hint text"`).join(",")}
-    }
-  },
-  "game_data": {
-    "memory_card": {
-      "front_image": "",
-      "back_text": ""
+  "representative_example": {
+    "translations": {
+      ${languages
+        .map((lang) => `"${lang}": "${lang} example sentence"`)
+        .join(",")}
     },
-    "word_puzzle": {
-      "scrambled": [],
-      "hints": []
-    },
-    "pronunciation_game": {
-      "target_phoneme": "",
-      "similar_sounds": [],
-      "practice_words": []
-    }
-  },
-  "related_concepts": [],
-  "learning_metadata": {
-    "memorization_difficulty": 2,
-    "pronunciation_difficulty": 1,
-    "usage_frequency": "high",
-    "cultural_importance": "medium"
+    "context": "daily_conversation|formal|informal|academic",
+    "difficulty": "beginner|intermediate|advanced"
   }
 }
 
-Please provide accurate words and translations that are actually usable. Fill all arrays and objects with appropriate values.`,
+Please provide accurate words and translations that are actually usable. Fill all arrays with appropriate values. Make sure the example sentence uses the main word naturally.`,
   },
 };
 
-// 테스트 데이터 (로컬 환경용) - 분리된 컬렉션 구조
+// 테스트 데이터 (로컬 환경용) - 다국어 단어장과 완전히 동일한 구조
 const TEST_CONCEPTS = [
   {
-    // 개념 기본 정보 (분리된 컬렉션 구조)
+    // 개념 기본 정보 (다국어 단어장과 동일)
     concept_info: {
       domain: "food",
       category: "fruit",
       difficulty: "beginner",
       tags: ["everyday", "healthy", "common"],
       unicode_emoji: "🍎",
-      images: [],
+      color_theme: "#FF6B6B",
     },
-    media: {
-      images: {
-        primary: "https://source.unsplash.com/400x300/?apple",
-        secondary: "https://source.unsplash.com/400x300/?apple_green",
-        illustration: "https://api.iconify.design/noto:red-apple.svg",
-        emoji_style: "https://api.iconify.design/twemoji:red-apple.svg",
-        line_art: null,
-      },
-      videos: {
-        intro: null,
-        pronunciation: null,
-      },
-      audio: {
-        pronunciation_slow: null,
-        pronunciation_normal: null,
-        word_in_sentence: null,
-      },
-    },
+
     expressions: {
       korean: {
         word: "사과",
         pronunciation: "sa-gwa",
-        romanization: "sagwa",
-        definition: "빨갛거나 초록색의 둥근 과일",
+        definition: "둥글고 빨간 과일",
         part_of_speech: "명사",
         level: "beginner",
-        synonyms: [],
+        synonyms: ["능금"],
         antonyms: [],
-        word_family: ["과일", "과실", "열매"],
-        compound_words: ["사과나무", "사과즙", "사과파이"],
-        collocations: [
-          { phrase: "사과를 먹다", frequency: "high" },
-          { phrase: "빨간 사과", frequency: "high" },
-        ],
+        word_family: ["과일", "음식"],
+        compound_words: ["사과나무", "사과즙"],
+        collocations: ["빨간 사과", "맛있는 사과"],
       },
       english: {
         word: "apple",
-        pronunciation: "ˈæpəl",
-        romanization: null,
+        pronunciation: "/ˈæpəl/",
         definition: "a round fruit with red or green skin",
         part_of_speech: "noun",
         level: "beginner",
         synonyms: [],
         antonyms: [],
-        word_family: ["fruit", "produce", "orchard fruit"],
-        compound_words: ["apple tree", "apple juice", "apple pie"],
-        collocations: [
-          { phrase: "eat an apple", frequency: "high" },
-          { phrase: "red apple", frequency: "high" },
-        ],
+        word_family: ["fruit", "food"],
+        compound_words: ["apple tree", "apple juice"],
+        collocations: ["red apple", "fresh apple"],
+      },
+      chinese: {
+        word: "苹果",
+        pronunciation: "píng guǒ",
+        definition: "圆形的红色或绿色水果",
+        part_of_speech: "名词",
+        level: "beginner",
+        synonyms: ["苹子"],
+        antonyms: [],
+        word_family: ["水果", "食物"],
+        compound_words: ["苹果树", "苹果汁"],
+        collocations: ["红苹果", "新鲜苹果"],
       },
       japanese: {
         word: "りんご",
         pronunciation: "ringo",
-        romanization: "ringo",
         definition: "赤いまたは緑色の丸い果物",
         part_of_speech: "名詞",
         level: "beginner",
         synonyms: ["アップル"],
         antonyms: [],
-        word_family: ["果物", "果実", "青果"],
+        word_family: ["果物", "食べ物"],
         compound_words: ["りんごの木", "りんごジュース"],
-        collocations: [{ phrase: "りんごを食べる", frequency: "high" }],
-      },
-      chinese: {
-        word: "苹果",
-        pronunciation: "píngguǒ",
-        romanization: null,
-        definition: "红色或绿色的圆形水果",
-        part_of_speech: "名词",
-        level: "beginner",
-        synonyms: [],
-        antonyms: [],
-        word_family: ["水果", "果实", "鲜果"],
-        compound_words: ["苹果树", "苹果汁", "苹果派"],
-        collocations: [{ phrase: "吃苹果", frequency: "high" }],
+        collocations: ["赤いりんご", "新鮮なりんご"],
       },
     },
-    // 대표 예문 (분리된 컬렉션 구조)
+    // 대표 예문 (다국어 단어장과 동일한 구조)
     representative_example: {
-      korean: "나는 매일 사과를 먹습니다.",
-      english: "I eat an apple every day.",
-      japanese: "私は毎日りんごを食べます。",
-      chinese: "我每天吃苹果。",
+      translations: {
+        korean: "나는 빨간 사과를 좋아한다.",
+        english: "I like red apples.",
+        chinese: "我喜欢红苹果。",
+        japanese: "私は赤いりんごが好きです。",
+      },
+      context: "daily_conversation",
+      difficulty: "beginner",
     },
 
     // 추가 예문들 (분리된 컬렉션 구조)
@@ -362,113 +207,77 @@ const TEST_CONCEPTS = [
     category: "fruit",
   },
   {
-    // 개념 기본 정보 (분리된 컬렉션 구조)
+    // 개념 기본 정보 (다국어 단어장과 동일)
     concept_info: {
       domain: "animal",
       category: "pet",
       difficulty: "beginner",
       tags: ["pet", "common", "domestic"],
       unicode_emoji: "🐱",
-      images: [],
+      color_theme: "#9C27B0",
     },
-    media: {
-      images: {
-        primary: "https://source.unsplash.com/400x300/?cat",
-        secondary: "https://source.unsplash.com/400x300/?kitten",
-        illustration: "https://api.iconify.design/noto:cat-face.svg",
-        emoji_style: "https://api.iconify.design/twemoji:cat-face.svg",
-        line_art: null,
-      },
-      videos: {
-        intro: null,
-        pronunciation: null,
-      },
-      audio: {
-        pronunciation_slow: null,
-        pronunciation_normal: null,
-        word_in_sentence: null,
-      },
-    },
+
     expressions: {
       korean: {
         word: "고양이",
         pronunciation: "go-yang-i",
-        romanization: "goyangi",
         definition: "작고 털이 있는 애완동물",
         part_of_speech: "명사",
         level: "beginner",
         synonyms: ["야옹이"],
         antonyms: ["개"],
-        word_family: ["동물", "애완동물", "포유류"],
-        compound_words: ["길고양이", "고양이털", "고양이밥"],
-        collocations: [
-          { phrase: "고양이를 키우다", frequency: "high" },
-          { phrase: "귀여운 고양이", frequency: "high" },
-        ],
+        word_family: ["동물", "애완동물"],
+        compound_words: ["길고양이", "고양이털"],
+        collocations: ["귀여운 고양이", "고양이를 키우다"],
       },
       english: {
         word: "cat",
-        pronunciation: "kæt",
-        romanization: null,
+        pronunciation: "/kæt/",
         definition: "a small furry pet animal",
         part_of_speech: "noun",
         level: "beginner",
         synonyms: ["feline", "kitty"],
         antonyms: ["dog"],
-        word_family: ["animal", "pet", "mammal"],
-        compound_words: ["housecat", "wildcat", "catfish"],
-        collocations: [
-          { phrase: "pet a cat", frequency: "high" },
-          { phrase: "cute cat", frequency: "high" },
-        ],
-      },
-      japanese: {
-        word: "猫",
-        pronunciation: "neko",
-        romanization: "neko",
-        definition: "小さくて毛のあるペット",
-        part_of_speech: "名詞",
-        level: "beginner",
-        synonyms: ["ネコ", "にゃんこ"],
-        antonyms: ["犬"],
-        word_family: ["動物", "ペット", "哺乳類"],
-        compound_words: ["野良猫", "子猫", "猫カフェ"],
-        collocations: [{ phrase: "猫を飼う", frequency: "high" }],
+        word_family: ["animal", "pet"],
+        compound_words: ["housecat", "wildcat"],
+        collocations: ["cute cat", "pet a cat"],
       },
       chinese: {
         word: "猫",
         pronunciation: "māo",
-        romanization: null,
         definition: "小而有毛的宠物",
         part_of_speech: "名词",
         level: "beginner",
         synonyms: ["猫咪"],
         antonyms: ["狗"],
-        word_family: ["动物", "宠物", "哺乳动物"],
-        compound_words: ["野猫", "小猫", "猫咖啡"],
-        collocations: [{ phrase: "养猫", frequency: "high" }],
+        word_family: ["动物", "宠物"],
+        compound_words: ["野猫", "小猫"],
+        collocations: ["可爱的猫", "养猫"],
+      },
+      japanese: {
+        word: "猫",
+        pronunciation: "neko",
+        definition: "小さくて毛のあるペット",
+        part_of_speech: "名詞",
+        level: "beginner",
+        synonyms: ["ネコ", "にゃんこ"],
+        antonyms: ["犬"],
+        word_family: ["動物", "ペット"],
+        compound_words: ["野良猫", "子猫"],
+        collocations: ["かわいい猫", "猫を飼う"],
       },
     },
-    // 대표 예문 (분리된 컬렉션 구조)
+    // 대표 예문 (다국어 단어장과 동일한 구조)
     representative_example: {
-      korean: "우리 집에는 귀여운 고양이가 있습니다.",
-      english: "We have a cute cat at home.",
-      japanese: "私たちの家にはかわいい猫がいます。",
-      chinese: "我们家有一只可爱的猫。",
-    },
-
-    // 추가 예문들 (분리된 컬렉션 구조)
-    examples: [
-      {
-        korean: "고양이가 야옹하고 웁니다.",
-        english: "The cat meows.",
-        japanese: "猫がニャーと鳴きます。",
-        chinese: "猫在喵喵叫。",
+      translations: {
+        korean: "우리 집에는 귀여운 고양이가 있습니다.",
+        english: "We have a cute cat at home.",
+        chinese: "我们家有一只可爱的猫。",
+        japanese: "私たちの家にはかわいい猫がいます。",
       },
-    ],
-    // 최소 호환성 필드들
-    domain: "animal",
-    category: "pet",
+      context: "daily_conversation",
+      difficulty: "beginner",
+    },
   },
 ];
 
@@ -560,15 +369,16 @@ export async function handleAIConceptRecommendation(currentUser, db) {
       });
       conceptData.expressions = filteredExpressions;
 
-      // 예제도 필터링 (분리된 컬렉션 구조)
-      if (conceptData.representative_example) {
-        const filteredRepExample = {};
+      // 예제도 필터링 (다국어 단어장 구조)
+      if (conceptData.representative_example?.translations) {
+        const filteredTranslations = {};
         selectedLanguages.forEach((lang) => {
-          if (conceptData.representative_example[lang]) {
-            filteredRepExample[lang] = conceptData.representative_example[lang];
+          if (conceptData.representative_example.translations[lang]) {
+            filteredTranslations[lang] =
+              conceptData.representative_example.translations[lang];
           }
         });
-        conceptData.representative_example = filteredRepExample;
+        conceptData.representative_example.translations = filteredTranslations;
       }
 
       // 추가 예문들도 필터링
@@ -604,10 +414,10 @@ export async function handleAIConceptRecommendation(currentUser, db) {
       return;
     }
 
-    // 분리된 컬렉션 구조에 맞게 데이터 변환 (다국어 단어장과 동일한 구조)
+    // 분리된 컬렉션 구조에 맞게 데이터 변환 (다국어 단어장과 완전히 동일한 구조)
     console.log("🔧 분리된 컬렉션 구조로 데이터 변환 중...");
     const transformedConceptData = {
-      // 개념 기본 정보 (다국어 단어장과 동일)
+      // 개념 기본 정보 (다국어 단어장과 완전히 동일)
       concept_info: {
         domain:
           conceptData.concept_info?.domain || conceptData.domain || "general",
@@ -623,32 +433,18 @@ export async function handleAIConceptRecommendation(currentUser, db) {
           "🤖",
         color_theme: conceptData.concept_info?.color_theme || "#9C27B0",
         tags: conceptData.concept_info?.tags || [],
-        updated_at: new Date(),
       },
 
-      // 언어별 표현 (다국어 단어장과 동일한 구조)
+      // 언어별 표현 (다국어 단어장과 완전히 동일한 구조)
       expressions: conceptData.expressions || {},
 
-      // 대표 예문 (다국어 단어장과 동일한 구조)
+      // 대표 예문 (다국어 단어장과 완전히 동일한 구조)
       representative_example:
         conceptData.representative_example ||
         (conceptData.featured_examples &&
         conceptData.featured_examples.length > 0
           ? conceptData.featured_examples[0]
           : null),
-
-      // 학습 메타데이터 (AI 생성 특화)
-      learning_metadata: {
-        created_from: "ai_generated",
-        import_date: new Date(),
-        version: "3.0",
-        structure_type: "separated_collections",
-        ai_model: isLocalEnvironment ? "test-data" : "gemini-pro",
-        generation_prompt: `주제: ${topic}, 카테고리: ${category}, 언어: ${selectedLanguages.join(
-          ", "
-        )}`,
-        confidence_score: 0.9,
-      },
     };
 
     console.log("🔧 변환된 개념 데이터:", transformedConceptData);

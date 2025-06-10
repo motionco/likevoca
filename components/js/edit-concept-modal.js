@@ -1,11 +1,11 @@
 /**
- * 개념 편집 모달 관리 스크립트
+ * 다국어 단어장 전용 개념 편집 모달 관리 스크립트
  *
- * 역할: 기존 개념 편집 전용
+ * 역할: 다국어 단어장 개념 편집 전용
  *
  * 구분:
- * - add-concept-modal.js: 개념 추가 전용
- * - edit-concept-modal.js: 개념 편집 전용 (이 파일)
+ * - ai-edit-concept-modal.js: AI 개념 편집 전용
+ * - edit-concept-modal.js: 다국어 단어장 편집 전용 (이 파일)
  * - concept-modal.js: 개념 보기 전용 (읽기 전용)
  */
 
@@ -65,6 +65,40 @@ export async function initialize() {
     });
   }
 
+  // 취소 버튼 이벤트 설정
+  const cancelBtn = document.getElementById("cancel-edit-concept");
+  if (cancelBtn) {
+    cancelBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      console.log("❌ 취소 버튼 클릭됨");
+
+      if (confirm("편집을 취소하시겠습니까? 변경사항이 저장되지 않습니다.")) {
+        resetEditForm();
+        closeEditModal();
+        sessionStorage.removeItem("editConceptId");
+        editConceptId = null;
+        console.log("✅ 편집 취소 완료");
+      }
+    });
+  }
+
+  // X 버튼 이벤트 설정
+  const closeBtn = document.getElementById("close-edit-concept-modal");
+  if (closeBtn) {
+    closeBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      console.log("❌ X 버튼 클릭됨");
+
+      if (confirm("편집을 취소하시겠습니까? 변경사항이 저장되지 않습니다.")) {
+        resetEditForm();
+        closeEditModal();
+        sessionStorage.removeItem("editConceptId");
+        editConceptId = null;
+        console.log("✅ 편집 취소 완료");
+      }
+    });
+  }
+
   // 환경 설정 언어 가져오기
   let userLanguage = "ko";
   try {
@@ -77,8 +111,18 @@ export async function initialize() {
   // HTML 정적 레이블들을 환경 설정 언어로 업데이트
   await updateStaticLabels(userLanguage);
 
-  // 지원 언어 탭 초기화
-  initLanguageTabEventListeners();
+  // 언어 탭 이벤트 리스너 설정 (커스텀 함수 사용)
+  setupEditLanguageTabs();
+
+  // 예문 추가 버튼 이벤트 설정
+  const addExampleBtn = document.getElementById("edit-add-example");
+  if (addExampleBtn) {
+    addExampleBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      console.log("➕ 예문 추가 버튼 클릭됨");
+      addEditExampleFields(null, false);
+    });
+  }
 
   // 개념 데이터 로드 및 폼 채우기
   await fetchConceptForEdit(editConceptId);
@@ -118,40 +162,11 @@ async function fetchConceptForEdit(conceptId) {
     if (!conceptData) {
       console.log("🔍 Firebase에서 개념 조회 시도...");
       try {
-        // AI 개념인지 일반 개념인지 판단
-        const isAIConcept =
-          conceptId?.startsWith("ai_") ||
-          window.location.pathname.includes("ai-vocabulary");
-
-        if (isAIConcept) {
-          console.log("🤖 AI 개념 조회 시도...");
-          // AI 개념은 사용자별 ai-recommend 컬렉션에서 조회
-          const allAIConcepts = await conceptUtils.getUserAIConcepts(
-            auth.currentUser.email
-          );
-          conceptData = allAIConcepts.find(
-            (concept) =>
-              concept.concept_id === conceptId ||
-              concept.id === conceptId ||
-              concept._id === conceptId
-          );
-
-          if (conceptData) {
-            console.log(
-              "🔥 AI 개념 조회 성공:",
-              conceptData.concept_id || conceptData.id
-            );
-          } else {
-            throw new Error("AI 개념을 찾을 수 없습니다.");
-          }
-        } else {
-          console.log("📝 일반 개념 조회 시도...");
-          conceptData = await conceptUtils.getConcept(conceptId);
-          console.log(
-            "🔥 일반 개념 조회 성공:",
-            conceptData.concept_id || conceptData.id
-          );
-        }
+        conceptData = await conceptUtils.getConcept(conceptId);
+        console.log(
+          "🔥 일반 개념 조회 성공:",
+          conceptData.concept_id || conceptData.id
+        );
       } catch (firebaseError) {
         console.error("❌ Firebase 조회 실패:", firebaseError);
         throw new Error(
@@ -182,16 +197,22 @@ function fillFormWithConceptData(conceptData) {
   const emojiField = document.getElementById("edit-concept-emoji");
 
   if (domainField) {
-    domainField.value = conceptData.concept_info?.domain || "";
+    domainField.value =
+      conceptData.concept_info?.domain ||
+      conceptData.domain ||
+      conceptData.concept_info?.category ||
+      "general";
   }
   if (categoryField) {
-    categoryField.value = conceptData.concept_info?.category || "";
+    categoryField.value =
+      conceptData.concept_info?.category || conceptData.category || "common";
   }
   if (emojiField) {
     emojiField.value =
       conceptData.concept_info?.emoji ||
       conceptData.concept_info?.unicode_emoji ||
-      "";
+      conceptData.unicode_emoji ||
+      "📝";
   }
 
   // 언어별 표현 채우기
@@ -331,84 +352,10 @@ async function saveConcept() {
     console.log("📋 수집된 데이터:", conceptData);
 
     try {
-      // AI 개념인지 일반 개념인지 판단
-      const isAIConcept =
-        editConceptId?.startsWith("ai_") ||
-        window.location.pathname.includes("ai-vocabulary");
-
-      if (isAIConcept) {
-        console.log("🤖 AI 개념 수정 시도...");
-
-        // 분리된 컬렉션 구조에 맞게 데이터 변환
-        const transformedData = {
-          // 메타데이터 업데이트
-          metadata: {
-            updated_at: new Date(),
-            version: "2.0",
-            source: "ai_generated",
-            is_ai_generated: true,
-            ai_model: "gemini",
-            content_language: "multilingual",
-          },
-
-          // 개념 정보 업데이트
-          concept_info: {
-            domain:
-              conceptData.concept_info?.domain ||
-              conceptData.domain ||
-              "general",
-            category:
-              conceptData.concept_info?.category ||
-              conceptData.category ||
-              "common",
-            difficulty: conceptData.concept_info?.difficulty || "beginner",
-            tags: conceptData.concept_info?.tags || [],
-            unicode_emoji:
-              conceptData.concept_info?.unicode_emoji ||
-              conceptData.concept_info?.emoji ||
-              "🤖",
-            images: conceptData.concept_info?.images || [],
-          },
-
-          // 언어별 표현 (다국어 단어장과 동일한 구조)
-          expressions: conceptData.expressions || {},
-
-          // 대표 예문 (다국어 단어장과 동일한 구조)
-          representative_example: conceptData.representative_example || null,
-
-          // 추가 예문들
-          examples: conceptData.examples || [],
-
-          // 호환성을 위한 추가 필드들
-          domain:
-            conceptData.concept_info?.domain || conceptData.domain || "general",
-          category:
-            conceptData.concept_info?.category ||
-            conceptData.category ||
-            "common",
-          featured_examples: conceptData.examples || [],
-          updated_at: new Date(),
-        };
-
-        console.log("🔧 변환된 AI 개념 데이터:", transformedData);
-
-        // AI 개념 수정
-        const success = await conceptUtils.updateAIConcept(
-          auth.currentUser.email,
-          editConceptId,
-          transformedData
-        );
-
-        if (!success) {
-          throw new Error("AI 개념 수정에 실패했습니다.");
-        }
-
-        console.log("✅ AI 개념 수정 성공");
-      } else {
-        console.log("📝 일반 개념 수정 시도...");
-        await conceptUtils.updateConcept(editConceptId, conceptData);
-        console.log("✅ 일반 개념 수정 성공");
-      }
+      // 다국어 단어장 개념 수정
+      console.log("📝 다국어 단어장 개념 수정 시도...");
+      await conceptUtils.updateConcept(editConceptId, conceptData);
+      console.log("✅ 다국어 단어장 개념 수정 성공");
 
       alert("개념이 성공적으로 수정되었습니다.");
 
@@ -425,6 +372,12 @@ async function saveConcept() {
       // 편집 상태 초기화
       sessionStorage.removeItem("editConceptId");
       editConceptId = null;
+
+      // 페이지 새로고침으로 즉각 반영
+      console.log("🔄 페이지 새로고침으로 변경사항 즉각 반영");
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
     } catch (updateError) {
       console.error("❌ 개념 수정 실패:", updateError);
       alert(`개념을 수정하는 중 오류가 발생했습니다:\n${updateError.message}`);
@@ -433,6 +386,88 @@ async function saveConcept() {
   } catch (error) {
     console.error("개념 수정 중 전체 오류 발생:", error);
     alert(`개념을 수정하는 중 오류가 발생했습니다:\n${error.message}`);
+  }
+}
+
+// 편집 모달용 언어탭 설정
+function setupEditLanguageTabs() {
+  console.log("🔄 편집 모달 언어탭 설정");
+
+  const tabButtons = document.querySelectorAll(
+    "#edit-language-tabs .edit-language-tab"
+  );
+
+  // 모든 기존 이벤트 리스너 완전 제거
+  tabButtons.forEach((button) => {
+    // 새로운 클론 생성으로 모든 이벤트 리스너 제거
+    const newButton = button.cloneNode(true);
+    button.parentNode.replaceChild(newButton, button);
+  });
+
+  // 새로운 버튼들에 이벤트 리스너 추가
+  const newTabButtons = document.querySelectorAll(
+    "#edit-language-tabs .edit-language-tab"
+  );
+  newTabButtons.forEach((button) => {
+    button.addEventListener("click", handleTabClick);
+  });
+
+  // 첫 번째 탭 자동 활성화
+  if (newTabButtons.length > 0) {
+    const firstTab = newTabButtons[0];
+    const firstLanguage = firstTab.dataset.language;
+    switchEditLanguageTab(firstLanguage);
+  }
+
+  console.log("✅ 편집 모달 언어탭 설정 완료");
+}
+
+// 탭 클릭 핸들러
+function handleTabClick(e) {
+  e.preventDefault();
+  const language = e.currentTarget.dataset.language;
+  console.log("🖱️ 편집 모달 언어 탭 클릭:", language);
+  switchEditLanguageTab(language);
+}
+
+// 편집 모달용 언어탭 전환
+function switchEditLanguageTab(language) {
+  console.log("🔄 편집 모달 언어 탭 전환:", language);
+
+  // 모든 탭 버튼 비활성화
+  document
+    .querySelectorAll("#edit-language-tabs .edit-language-tab")
+    .forEach((tab) => {
+      tab.classList.remove("border-blue-500", "text-blue-600");
+      tab.classList.add("border-transparent", "text-gray-500");
+    });
+
+  // 모든 콘텐츠 숨기기
+  document
+    .querySelectorAll("#edit-language-content .language-content")
+    .forEach((section) => {
+      section.classList.add("hidden");
+    });
+
+  // 선택된 탭 활성화
+  const selectedTab = document.querySelector(
+    `#edit-language-tabs .edit-language-tab[data-language="${language}"]`
+  );
+  if (selectedTab) {
+    selectedTab.classList.remove("border-transparent", "text-gray-500");
+    selectedTab.classList.add("border-blue-500", "text-blue-600");
+    console.log("✅ 편집 모달 탭 활성화됨:", language);
+  } else {
+    console.error("❌ 편집 모달 탭을 찾을 수 없음:", language);
+  }
+
+  // 선택된 콘텐츠 표시
+  const selectedContent = document.getElementById(`${language}-content`);
+  if (selectedContent) {
+    selectedContent.classList.remove("hidden");
+    console.log("✅ 편집 모달 콘텐츠 표시됨:", language);
+  } else {
+    console.error("❌ 편집 모달 콘텐츠를 찾을 수 없음:", `${language}-content`);
   }
 }
 

@@ -37,6 +37,13 @@ const pageTranslations = {
     domain: "도메인",
     grammar: "문법",
     grammar_info: "문법 정보",
+    synonyms: "동의어",
+    antonyms: "반의어",
+    collocations: "연어",
+    compound_words: "합성어",
+    word_family: "어족",
+    representative_example: "대표 예문",
+    additional_examples: "추가 예문",
     // 카테고리 번역
     fruit: "과일",
     food: "음식",
@@ -72,6 +79,13 @@ const pageTranslations = {
     domain: "Domain",
     grammar: "Grammar",
     grammar_info: "Grammar Info",
+    synonyms: "Synonyms",
+    antonyms: "Antonyms",
+    collocations: "Collocations",
+    compound_words: "Compound Words",
+    word_family: "Word Family",
+    representative_example: "Representative Example",
+    additional_examples: "Additional Examples",
     // 카테고리 번역
     fruit: "Fruit",
     food: "Food",
@@ -107,6 +121,13 @@ const pageTranslations = {
     domain: "ドメイン",
     grammar: "文法",
     grammar_info: "文法情報",
+    synonyms: "類義語",
+    antonyms: "反義語",
+    collocations: "連語",
+    compound_words: "複合語",
+    word_family: "語族",
+    representative_example: "代表例文",
+    additional_examples: "追加例文",
     // 카테고리 번역
     fruit: "果物",
     food: "食べ物",
@@ -142,6 +163,13 @@ const pageTranslations = {
     domain: "领域",
     grammar: "语法",
     grammar_info: "语法信息",
+    synonyms: "同义词",
+    antonyms: "反义词",
+    collocations: "搭配",
+    compound_words: "复合词",
+    word_family: "词族",
+    representative_example: "代表例句",
+    additional_examples: "补充例句",
     // 카테고리 번역
     fruit: "水果",
     food: "食物",
@@ -414,12 +442,23 @@ export async function showConceptModal(
       existingCategory.remove();
     }
 
-    // 새 카테고리 태그 추가
+    // 제목을 flexbox 컨테이너로 변경하고 카테고리를 오른쪽에 추가
+    const titleContainer = titleElement.parentElement;
+    if (!titleContainer.classList.contains("flex")) {
+      titleContainer.classList.add(
+        "flex",
+        "items-center",
+        "justify-between",
+        "gap-2"
+      );
+    }
+
+    // 새 카테고리 태그 추가 (제목 오른쪽)
     const categoryTag = document.createElement("div");
     categoryTag.className =
-      "category-tag text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full inline-block mt-1";
+      "category-tag text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full whitespace-nowrap";
     categoryTag.textContent = `${translatedDomain}/${translatedCategory}`;
-    titleElement.parentElement.appendChild(categoryTag);
+    titleContainer.appendChild(categoryTag);
     console.log(
       "카테고리/도메인 태그 추가됨:",
       `${translatedDomain}/${translatedCategory}`
@@ -571,8 +610,8 @@ function showLanguageContent(lang, concept) {
 
   console.log(`${lang} 표현:`, expression);
 
-  // 상단 기본 정보도 함께 업데이트
-  updateBasicInfo(lang, concept);
+  // 상단 기본 정보를 현재 언어 탭에 맞게 업데이트
+  updateModalHeader(lang, concept);
 
   // 문법 태그 포맷팅
   let grammarTagsHtml = "";
@@ -604,21 +643,150 @@ function showLanguageContent(lang, concept) {
     `;
   }
 
+  // 동의어 HTML 생성
+  let synonymsHtml = "";
+  if (expression.synonyms && expression.synonyms.length > 0) {
+    synonymsHtml = `
+      <div class="mt-3">
+        <div class="text-xs font-medium text-gray-600 mb-1">${getTranslatedText(
+          "synonyms"
+        )}</div>
+        <div class="flex flex-wrap gap-1">
+          ${expression.synonyms
+            .map(
+              (synonym) => `
+            <span class="inline-block bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded">
+              ${synonym}
+            </span>
+          `
+            )
+            .join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  // 반의어 HTML 생성
+  let antonymsHtml = "";
+  if (expression.antonyms && expression.antonyms.length > 0) {
+    antonymsHtml = `
+      <div class="mt-3">
+        <div class="text-xs font-medium text-gray-600 mb-1">${getTranslatedText(
+          "antonyms"
+        )}</div>
+        <div class="flex flex-wrap gap-1">
+          ${expression.antonyms
+            .map(
+              (antonym) => `
+            <span class="inline-block bg-red-50 text-red-700 text-xs px-2 py-1 rounded">
+              ${antonym}
+            </span>
+          `
+            )
+            .join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  // 연어 HTML 생성
+  let collocationsHtml = "";
+  if (expression.collocations && expression.collocations.length > 0) {
+    collocationsHtml = `
+      <div class="mt-3">
+        <div class="text-xs font-medium text-gray-600 mb-1">${getTranslatedText(
+          "collocations"
+        )}</div>
+        <div class="flex flex-wrap gap-1">
+          ${expression.collocations
+            .map(
+              (collocation) => `
+            <span class="inline-block bg-green-50 text-green-700 text-xs px-2 py-1 rounded">
+              ${collocation}
+            </span>
+          `
+            )
+            .join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  // 합성어 HTML 생성
+  let compoundWordsHtml = "";
+  if (expression.compound_words && expression.compound_words.length > 0) {
+    compoundWordsHtml = `
+      <div class="mt-3">
+        <div class="text-xs font-medium text-gray-600 mb-1">${getTranslatedText(
+          "compound_words"
+        )}</div>
+        <div class="flex flex-wrap gap-1">
+          ${expression.compound_words
+            .map(
+              (compound) => `
+            <span class="inline-block bg-purple-50 text-purple-700 text-xs px-2 py-1 rounded">
+              ${compound}
+            </span>
+          `
+            )
+            .join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  // 어족 HTML 생성
+  let wordFamilyHtml = "";
+  if (expression.word_family && expression.word_family.length > 0) {
+    wordFamilyHtml = `
+      <div class="mt-3">
+        <div class="text-xs font-medium text-gray-600 mb-1">${getTranslatedText(
+          "word_family"
+        )}</div>
+        <div class="flex flex-wrap gap-1">
+          ${expression.word_family
+            .map(
+              (family) => `
+            <span class="inline-block bg-yellow-50 text-yellow-700 text-xs px-2 py-1 rounded">
+              ${family}
+            </span>
+          `
+            )
+            .join("")}
+        </div>
+      </div>
+    `;
+  }
+
   contentContainer.innerHTML = `
     <div class="space-y-4">
       <div>
         <div class="bg-gray-50 p-3 rounded">
           <div class="flex items-center gap-2 mb-1">
-            <p class="text-lg font-medium">${expression.word || "N/A"}</p>
-            <span class="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">${
-              expression.part_of_speech || "N/A"
-            }</span>
+            <p class="text-lg font-medium">${(() => {
+              // 품사 옆 단어는 원본 언어로 고정
+              const sourceLanguage = window.currentSourceLanguage;
+              const sourceExpression = sourceLanguage
+                ? concept.expressions[sourceLanguage]
+                : null;
+              return sourceExpression
+                ? sourceExpression.word
+                : expression.word || "N/A";
+            })()}</p>
+            <span class="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">${getLocalizedPartOfSpeech(
+              expression.part_of_speech
+            )}</span>
           </div>
-          <p class="text-sm text-gray-500 mt-1">${
-            expression.pronunciation || ""
-          }</p>
-          <p class="text-gray-700 mt-2">${expression.definition || "N/A"}</p>
+
+                    <p class="text-gray-700 mt-2">${
+                      expression.definition || "N/A"
+                    }</p>
           ${grammarTagsHtml}
+          ${synonymsHtml}
+          ${antonymsHtml}
+          ${collocationsHtml}
+          ${compoundWordsHtml}
+          ${wordFamilyHtml}
         </div>
       </div>
     </div>
@@ -657,19 +825,158 @@ function getLocalizedLevel(level, targetLang) {
   return levelTranslations[targetLang]?.[level] || level || "N/A";
 }
 
-// 기본 정보 업데이트 함수 수정
-function updateBasicInfo(lang, concept) {
-  // 대상언어 정보로 고정 (전달받은 언어가 아닌 targetLanguage 사용)
-  const targetLanguage = window.currentTargetLanguage;
-  const fixedLang =
-    targetLanguage && concept.expressions[targetLanguage]
-      ? targetLanguage
-      : lang; // 대상언어가 없으면 현재 언어 사용
+// 품사를 사용자 언어로 번역하는 함수
+function getLocalizedPartOfSpeech(pos) {
+  if (!pos) return "N/A";
 
-  const expression = concept.expressions[fixedLang];
+  // 1단계: 각 언어의 품사를 영어로 정규화
+  const posNormalization = {
+    // 일본어 품사 → 영어
+    名詞: "noun",
+    動詞: "verb",
+    形容詞: "adjective",
+    副詞: "adverb",
+    代名詞: "pronoun",
+    前置詞: "preposition",
+    接続詞: "conjunction",
+    感嘆詞: "interjection",
+    限定詞: "determiner",
+    助詞: "particle",
+
+    // 중국어 품사 → 영어
+    名词: "noun",
+    动词: "verb",
+    形容词: "adjective",
+    副词: "adverb",
+    代词: "pronoun",
+    介词: "preposition",
+    连词: "conjunction",
+    感叹词: "interjection",
+    限定词: "determiner",
+    助词: "particle",
+
+    // 한국어 품사 → 영어
+    명사: "noun",
+    동사: "verb",
+    형용사: "adjective",
+    부사: "adverb",
+    대명사: "pronoun",
+    전치사: "preposition",
+    접속사: "conjunction",
+    감탄사: "interjection",
+    한정사: "determiner",
+    조사: "particle",
+  };
+
+  // 정규화된 영어 품사 얻기
+  const normalizedPos = posNormalization[pos] || pos.toLowerCase();
+
+  // 2단계: 환경설정 언어로 번역
+  const posTranslations = {
+    korean: {
+      noun: "명사",
+      verb: "동사",
+      adjective: "형용사",
+      adverb: "부사",
+      pronoun: "대명사",
+      preposition: "전치사",
+      conjunction: "접속사",
+      interjection: "감탄사",
+      determiner: "한정사",
+      particle: "조사",
+    },
+    english: {
+      noun: "Noun",
+      verb: "Verb",
+      adjective: "Adjective",
+      adverb: "Adverb",
+      pronoun: "Pronoun",
+      preposition: "Preposition",
+      conjunction: "Conjunction",
+      interjection: "Interjection",
+      determiner: "Determiner",
+      particle: "Particle",
+    },
+  };
+
+  // 환경설정 언어 확인 (기본값은 한국어)
+  let userLangCode = "korean";
+  try {
+    if (typeof getUserLanguageCode === "function") {
+      userLangCode = getUserLanguageCode();
+    } else if (typeof userLanguage !== "undefined" && userLanguage) {
+      const languageCodeMap = {
+        ko: "korean",
+        en: "english",
+        ja: "korean", // 일본어도 한국어 품사로 표시
+        zh: "korean", // 중국어도 한국어 품사로 표시
+      };
+      userLangCode = languageCodeMap[userLanguage] || "korean";
+    }
+  } catch (error) {
+    console.warn("환경설정 언어 확인 실패, 기본값 사용:", error);
+    userLangCode = "korean";
+  }
+
+  const result =
+    posTranslations[userLangCode]?.[normalizedPos] ||
+    posTranslations.korean[normalizedPos] ||
+    pos;
+  console.log(
+    "품사 번역 - 원본:",
+    pos,
+    "정규화:",
+    normalizedPos,
+    "사용자 언어:",
+    userLangCode,
+    "결과:",
+    result
+  );
+  return result;
+}
+
+// 해석을 사용자 언어로 가져오는 함수 (환경설정 언어로 고정)
+// 모달 헤더 업데이트 함수 (언어 탭 변경시 상단 정보 업데이트)
+function updateModalHeader(lang, concept) {
+  const expression = concept.expressions[lang];
   if (!expression) return;
 
-  // 상단 기본 정보 업데이트 (항상 대상언어로)
+  // 상단 기본 정보 업데이트
+  const emojiElement = document.getElementById("concept-emoji");
+  const wordElement = document.getElementById("concept-view-title");
+  const pronunciationElement = document.getElementById(
+    "concept-view-pronunciation"
+  );
+
+  if (emojiElement) {
+    // 이모지는 언어와 무관하게 개념 자체의 정보 사용
+    const emoji =
+      concept.concept_info?.emoji ||
+      concept.unicode_emoji ||
+      concept.concept_info?.unicode_emoji ||
+      "📝";
+    emojiElement.textContent = emoji;
+  }
+
+  if (wordElement) {
+    wordElement.textContent = expression.word || "N/A";
+  }
+
+  if (pronunciationElement) {
+    pronunciationElement.textContent = expression.pronunciation || "";
+  }
+
+  console.log(
+    `모달 헤더 업데이트 완료 - 언어: ${lang}, 단어: ${expression.word}, 발음: ${expression.pronunciation}`
+  );
+}
+
+// 기본 정보 업데이트 함수 수정 (품사는 사용자 언어로 고정)
+function updateBasicInfo(lang, concept) {
+  const expression = concept.expressions[lang];
+  if (!expression) return;
+
+  // 상단 기본 정보 업데이트
   const emojiElement = document.getElementById("concept-view-emoji");
   const wordElement = document.getElementById("concept-primary-word");
   const pronunciationElement = document.getElementById(
@@ -730,7 +1037,7 @@ window.showLanguageTab = function (lang, button) {
   console.log(`${lang} 언어로 전환 중...`);
 
   // 모든 탭 버튼 스타일 리셋
-  const allTabs = document.querySelectorAll("#concept-view-tabs button");
+  const allTabs = document.querySelectorAll("#language-tabs button");
   allTabs.forEach((tab) => {
     tab.className = "py-2 px-4 text-gray-500 hover:text-gray-700";
   });
@@ -835,12 +1142,17 @@ function editConcept() {
   // 현재 보기 모달 닫기
   closeModal();
 
-  // 편집 모달 열기 (edit-concept-modal.js의 전역 함수 호출)
-  if (window.openEditConceptModal) {
+  // 편집 모달 열기 (AI 단어장인지 확인하여 적절한 모달 사용)
+  if (
+    window.openAIEditConceptModal &&
+    window.location.pathname.includes("ai-vocabulary")
+  ) {
+    window.openAIEditConceptModal(conceptId);
+  } else if (window.openEditConceptModal) {
     window.openEditConceptModal(conceptId);
   } else {
     console.error(
-      "❌ openEditConceptModal 함수를 찾을 수 없습니다. edit-concept-modal.js가 로드되었는지 확인하세요."
+      "❌ 편집 모달 함수를 찾을 수 없습니다. 해당 모달 스크립트가 로드되었는지 확인하세요."
     );
     alert(
       "편집 기능을 불러올 수 없습니다. 페이지를 새로고침 후 다시 시도해주세요."
@@ -863,7 +1175,7 @@ document.addEventListener("languageChanged", async (event) => {
     !document.getElementById("concept-view-modal").classList.contains("hidden")
   ) {
     const currentTab = document.querySelector(
-      "#concept-view-tabs button.text-blue-600"
+      "#language-tabs button.text-blue-600"
     );
     if (currentTab) {
       const lang = currentTab.getAttribute("onclick").match(/'([^']+)'/)[1];
@@ -953,72 +1265,84 @@ function displayExamples(
 
   let hasExamples = false;
 
-  // 1. 대표 예문 확인 (분리된 컬렉션 구조)
+  // 1. 대표 예문 확인 (다국어 단어장 구조)
   if (concept.representative_example) {
-    console.log(
-      "분리된 컬렉션 구조의 representative_example 발견:",
-      concept.representative_example
-    );
+    console.log("대표 예문 발견:", concept.representative_example);
 
     const exampleDiv = document.createElement("div");
     exampleDiv.className = "border p-4 rounded mb-4 bg-blue-50";
-    exampleDiv.innerHTML = `<div class="mb-2 text-sm font-medium text-blue-800">📌 대표 예문</div>`;
+    exampleDiv.innerHTML = ``;
 
     let exampleContent = "";
     const languagesToShow = [];
 
-    // 대상언어 먼저 추가
-    if (targetLanguage && concept.representative_example[targetLanguage]) {
-      languagesToShow.push({
-        code: targetLanguage,
-        name: getLanguageName(targetLanguage),
-        text: concept.representative_example[targetLanguage],
-        label: "(대상)",
-      });
-    }
+    // 다국어 단어장 구조 (translations 객체)
+    if (concept.representative_example.translations) {
+      const translations = concept.representative_example.translations;
 
-    // 원본언어 추가 (다른 경우만)
-    if (
-      sourceLanguage &&
-      concept.representative_example[sourceLanguage] &&
-      sourceLanguage !== targetLanguage
-    ) {
-      languagesToShow.push({
-        code: sourceLanguage,
-        name: getLanguageName(sourceLanguage),
-        text: concept.representative_example[sourceLanguage],
-        label: "(원본)",
-      });
-    }
+      // 현재 선택된 언어탭의 언어 먼저 추가
+      if (translations[currentLang]) {
+        languagesToShow.push({
+          code: currentLang,
+          name: getLanguageName(currentLang),
+          text: translations[currentLang],
+          isFirst: true,
+        });
+      }
 
-    // 현재 탭 언어 추가 (다른 경우만)
-    if (
-      concept.representative_example[currentLang] &&
-      currentLang !== targetLanguage &&
-      currentLang !== sourceLanguage
-    ) {
-      languagesToShow.push({
-        code: currentLang,
-        name: getLanguageName(currentLang),
-        text: concept.representative_example[currentLang],
-        label: "(현재)",
-      });
+      // 원본언어 추가 (현재 언어와 다른 경우에만)
+      const sourceLanguageCode = window.currentSourceLanguage; // 원본 언어로 변경
+      if (
+        translations[sourceLanguageCode] &&
+        sourceLanguageCode !== currentLang
+      ) {
+        languagesToShow.push({
+          code: sourceLanguageCode,
+          name: getLanguageName(sourceLanguageCode),
+          text: translations[sourceLanguageCode],
+          isFirst: false,
+        });
+      }
+    }
+    // 기존 구조 (언어 직접 접근)
+    else {
+      // 현재 선택된 언어탭의 언어 먼저 추가
+      if (concept.representative_example[currentLang]) {
+        languagesToShow.push({
+          code: currentLang,
+          name: getLanguageName(currentLang),
+          text: concept.representative_example[currentLang],
+          isFirst: true,
+        });
+      }
+
+      // 원본언어 추가 (현재 언어와 다른 경우에만)
+      const sourceLanguageCode = window.currentSourceLanguage; // 원본 언어로 변경
+      if (
+        concept.representative_example[sourceLanguageCode] &&
+        sourceLanguageCode !== currentLang
+      ) {
+        languagesToShow.push({
+          code: sourceLanguageCode,
+          name: getLanguageName(sourceLanguageCode),
+          text: concept.representative_example[sourceLanguageCode],
+          isFirst: false,
+        });
+      }
     }
 
     languagesToShow.forEach((lang, index) => {
-      const isFirst = index === 0;
-      exampleContent += `
-        <div class="${
-          isFirst ? "mb-3" : "mb-2 pl-4 border-l-2 border-gray-300"
-        }">
-          <span class="text-sm ${
-            isFirst ? "font-medium text-blue-600" : "text-gray-600"
-          }">${lang.name}${lang.label}:</span>
-          <p class="ml-2 ${
-            isFirst ? "font-medium text-gray-800" : "text-gray-700"
-          }">${lang.text}</p>
-        </div>
-      `;
+      if (lang.isFirst) {
+        // 첫 번째(현재 선택된 언어) - 강조 표시
+        exampleContent += `
+          <p class="text-sm text-gray-700 font-medium mb-2">${lang.text}</p>
+        `;
+      } else {
+        // 두 번째(원본 언어) - 이탤릭 표시
+        exampleContent += `
+          <p class="text-sm text-gray-500 italic">${lang.text}</p>
+        `;
+      }
     });
 
     exampleDiv.innerHTML += exampleContent;
@@ -1026,277 +1350,34 @@ function displayExamples(
     hasExamples = true;
   }
 
-  // 2. 추가 예문들 확인 (분리된 컬렉션 구조)
+  // 2. 추가 예문들 확인 (간소화된 표시)
   if (concept.examples && concept.examples.length > 0) {
-    console.log("분리된 컬렉션 구조의 examples 발견:", concept.examples);
+    console.log("추가 examples 발견:", concept.examples);
 
     concept.examples.forEach((example, index) => {
       const exampleDiv = document.createElement("div");
       exampleDiv.className = "border p-4 rounded mb-4 bg-gray-50";
-      exampleDiv.innerHTML = `<div class="mb-2 text-sm font-medium text-gray-700">💡 추가 예문 ${
-        index + 1
-      }</div>`;
+      exampleDiv.innerHTML = `<div class="mb-2 text-sm font-medium text-gray-700">💡 ${getTranslatedText(
+        "additional_examples"
+      )} ${index + 1}</div>`;
 
       let exampleContent = "";
-      const languagesToShow = [];
 
-      // 대상언어 먼저 추가
-      if (targetLanguage && example[targetLanguage]) {
-        languagesToShow.push({
-          code: targetLanguage,
-          name: getLanguageName(targetLanguage),
-          text: example[targetLanguage],
-          label: "(대상)",
-        });
+      // 현재 언어 추가
+      if (example[currentLang]) {
+        exampleContent += `<p class="text-sm text-gray-700 font-medium mb-2">${example[currentLang]}</p>`;
       }
 
-      // 원본언어 추가 (다른 경우만)
-      if (
-        sourceLanguage &&
-        example[sourceLanguage] &&
-        sourceLanguage !== targetLanguage
-      ) {
-        languagesToShow.push({
-          code: sourceLanguage,
-          name: getLanguageName(sourceLanguage),
-          text: example[sourceLanguage],
-          label: "(원본)",
-        });
+      // 원본 언어 추가 (현재 언어와 다른 경우)
+      const sourceLanguageCode = window.currentSourceLanguage; // 원본 언어로 변경
+      if (example[sourceLanguageCode] && sourceLanguageCode !== currentLang) {
+        exampleContent += `<p class="text-sm text-gray-500 italic">${example[sourceLanguageCode]}</p>`;
       }
-
-      // 현재 탭 언어 추가 (다른 경우만)
-      if (
-        example[currentLang] &&
-        currentLang !== targetLanguage &&
-        currentLang !== sourceLanguage
-      ) {
-        languagesToShow.push({
-          code: currentLang,
-          name: getLanguageName(currentLang),
-          text: example[currentLang],
-          label: "(현재)",
-        });
-      }
-
-      languagesToShow.forEach((lang, index) => {
-        const isFirst = index === 0;
-        exampleContent += `
-          <div class="${
-            isFirst ? "mb-3" : "mb-2 pl-4 border-l-2 border-gray-300"
-          }">
-            <span class="text-sm ${
-              isFirst ? "font-medium text-blue-600" : "text-gray-600"
-            }">${lang.name}${lang.label}:</span>
-            <p class="ml-2 ${
-              isFirst ? "font-medium text-gray-800" : "text-gray-700"
-            }">${lang.text}</p>
-          </div>
-        `;
-      });
 
       exampleDiv.innerHTML += exampleContent;
       examplesContainer.appendChild(exampleDiv);
       hasExamples = true;
     });
-  }
-
-  // 3. 호환성을 위한 기존 구조 (featured_examples) 확인
-  else if (concept.featured_examples && concept.featured_examples.length > 0) {
-    console.log("AI 개념의 featured_examples 발견:", concept.featured_examples);
-
-    concept.featured_examples.forEach((example, index) => {
-      if (example.translations) {
-        const exampleDiv = document.createElement("div");
-        exampleDiv.className = "border p-4 rounded mb-4 bg-gray-50";
-
-        let exampleContent = "";
-        const languagesToShow = [];
-
-        // 예문 순서: 대상언어 → 원본언어 → 현재언어
-        // 1. 대상언어 먼저 추가 (있는 경우)
-        if (targetLanguage && example.translations[targetLanguage]) {
-          languagesToShow.push({
-            code: targetLanguage,
-            name: getLanguageName(targetLanguage),
-            text: example.translations[targetLanguage].text,
-            grammarNotes: example.translations[targetLanguage].grammar_notes,
-            label: "(대상)",
-          });
-        }
-
-        // 2. 원본언어 추가 (대상언어와 다르고 있는 경우)
-        if (
-          sourceLanguage &&
-          example.translations[sourceLanguage] &&
-          sourceLanguage !== targetLanguage
-        ) {
-          languagesToShow.push({
-            code: sourceLanguage,
-            name: getLanguageName(sourceLanguage),
-            text: example.translations[sourceLanguage].text,
-            grammarNotes: example.translations[sourceLanguage].grammar_notes,
-            label: "(원본)",
-          });
-        }
-
-        // 3. 현재 탭 언어 추가 (대상언어 및 원본언어와 다르고 있는 경우)
-        if (
-          example.translations[currentLang] &&
-          currentLang !== targetLanguage &&
-          currentLang !== sourceLanguage
-        ) {
-          languagesToShow.push({
-            code: currentLang,
-            name: getLanguageName(currentLang),
-            text: example.translations[currentLang].text,
-            grammarNotes: example.translations[currentLang].grammar_notes,
-            label: "(현재)",
-          });
-        }
-
-        // 언어들을 순서대로 표시 (문법 노트는 제외)
-        languagesToShow.forEach((lang, index) => {
-          const isFirst = index === 0;
-          exampleContent += `
-            <div class="${
-              isFirst ? "mb-3" : "mb-2 pl-4 border-l-2 border-gray-300"
-            }">
-              <span class="text-sm ${
-                isFirst ? "font-medium text-blue-600" : "text-gray-600"
-              }">${lang.name}${lang.label}:</span>
-              <p class="ml-2 ${
-                isFirst ? "font-medium text-gray-800" : "text-gray-700"
-              }">${lang.text}</p>
-            </div>
-          `;
-        });
-
-        // 대상 언어로 문법 설명 하나만 추가 (가장 아래)
-        let grammarNote = null;
-
-        // 웹사이트 환경 언어에 맞는 문법 설명 우선 찾기
-        const websiteLanguageCode = getUserLanguageCode(); // 현재 웹사이트 언어 코드 가져오기
-        if (
-          websiteLanguageCode &&
-          example.translations[websiteLanguageCode]?.grammar_notes
-        ) {
-          grammarNote = example.translations[websiteLanguageCode].grammar_notes;
-        }
-        // 웹사이트 언어가 없으면 대상 언어의 문법 설명 사용
-        else if (
-          targetLanguage &&
-          example.translations[targetLanguage]?.grammar_notes
-        ) {
-          grammarNote = example.translations[targetLanguage].grammar_notes;
-        }
-        // 그것도 없으면 첫 번째 언어의 문법 설명 사용
-        else if (
-          languagesToShow.length > 0 &&
-          languagesToShow[0].grammarNotes
-        ) {
-          grammarNote = languagesToShow[0].grammarNotes;
-        }
-
-        // 문법 설명이 있으면 추가
-        if (grammarNote) {
-          exampleContent += `
-            <div class="mt-2 pt-2 border-t border-gray-200">
-              <span class="text-xs text-gray-600 font-medium">${getTranslatedText(
-                "grammar"
-              )}:</span>
-              <p class="text-xs text-gray-500 italic ml-2">${grammarNote}</p>
-            </div>
-          `;
-        }
-
-        exampleDiv.innerHTML = exampleContent;
-        examplesContainer.appendChild(exampleDiv);
-        hasExamples = true;
-      }
-    });
-  }
-
-  // 기존 구조 (examples) 확인 - 일반 개념용
-  else if (concept.examples && concept.examples.length > 0) {
-    console.log("일반 개념의 examples 발견:", concept.examples);
-
-    const filteredExamples = concept.examples.filter(
-      (example) =>
-        example[currentLang] ||
-        example[sourceLanguage] ||
-        example[targetLanguage]
-    );
-
-    if (filteredExamples.length > 0) {
-      filteredExamples.forEach((example, index) => {
-        const exampleDiv = document.createElement("div");
-        exampleDiv.className = "border p-4 rounded mb-4 bg-gray-50";
-
-        let exampleContent = "";
-
-        // 예문 순서: 대상언어 → 원본언어 → 현재언어
-        const languagesToShow = [];
-
-        // 1. 대상언어 먼저 추가 (있는 경우)
-        if (targetLanguage && example[targetLanguage]) {
-          languagesToShow.push({
-            code: targetLanguage,
-            name: getLanguageName(targetLanguage),
-            text: example[targetLanguage],
-            label: "(대상)",
-          });
-        }
-
-        // 2. 원본언어 추가 (대상언어와 다르고 있는 경우)
-        if (
-          sourceLanguage &&
-          example[sourceLanguage] &&
-          sourceLanguage !== targetLanguage
-        ) {
-          languagesToShow.push({
-            code: sourceLanguage,
-            name: getLanguageName(sourceLanguage),
-            text: example[sourceLanguage],
-            label: "(원본)",
-          });
-        }
-
-        // 3. 현재 탭 언어 추가 (대상언어 및 원본언어와 다르고 있는 경우)
-        if (
-          example[currentLang] &&
-          currentLang !== targetLanguage &&
-          currentLang !== sourceLanguage
-        ) {
-          languagesToShow.push({
-            code: currentLang,
-            name: getLanguageName(currentLang),
-            text: example[currentLang],
-            label: "(현재)",
-          });
-        }
-
-        // 언어들을 순서대로 표시
-        languagesToShow.forEach((lang, index) => {
-          const isFirst = index === 0;
-          exampleContent += `
-            <div class="${
-              isFirst ? "mb-3" : "mb-2 pl-4 border-l-2 border-gray-300"
-            }">
-              <span class="text-sm ${
-                isFirst ? "font-medium text-blue-600" : "text-gray-600"
-              }">${lang.name}${lang.label}:</span>
-              <p class="ml-2 ${
-                isFirst ? "font-medium text-gray-800" : "text-gray-700"
-              }">${lang.text}</p>
-            </div>
-          `;
-        });
-
-        exampleDiv.innerHTML = exampleContent;
-        examplesContainer.appendChild(exampleDiv);
-        hasExamples = true;
-      });
-    }
   }
 
   // 예문이 없는 경우
