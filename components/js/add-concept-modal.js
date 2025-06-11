@@ -25,6 +25,7 @@ import {
   switchLanguageTab,
   addExampleFields,
   updateStaticLabels,
+  applyModalTranslations,
 } from "./concept-modal-utils.js";
 
 // 전역 변수 (추가 모드 전용)
@@ -157,7 +158,7 @@ async function saveConcept() {
 // closeModal 함수는 concept-modal-utils.js로 이동됨
 
 // 개념 추가 모달 열기 (전역 함수)
-window.openConceptModal = function () {
+window.openConceptModal = async function () {
   console.log("➕ 새 개념 추가 모달 열기");
 
   resetForm();
@@ -165,6 +166,9 @@ window.openConceptModal = function () {
   const modal = document.getElementById("concept-modal");
   if (modal) {
     modal.classList.remove("hidden");
+
+    // 모달이 열린 후 번역 적용
+    await applyModalTranslations();
   } else {
     console.error("❌ concept-modal 요소를 찾을 수 없습니다");
   }

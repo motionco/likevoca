@@ -27,6 +27,8 @@ import {
   updateStaticLabels,
   getDefaultPartOfSpeech,
   translatePartOfSpeech,
+  applyModalTranslations,
+  setEditModalCategoryAndEmoji,
 } from "./concept-modal-utils.js";
 
 // 전역 변수 (편집 모드 전용)
@@ -355,6 +357,9 @@ function fillFormWithConceptData(conceptData) {
     );
   }
 
+  // 카테고리와 이모지 옵션 설정 (도메인 기반 캐스케이딩)
+  setEditModalCategoryAndEmoji(conceptData);
+
   console.log("✅ 폼 데이터 채우기 완료");
 }
 
@@ -533,7 +538,7 @@ function switchEditLanguageTab(language) {
 }
 
 // 편집 모달 열기 (전역 함수)
-window.openEditConceptModal = function (conceptId) {
+window.openEditConceptModal = async function (conceptId) {
   console.log("🔄 개념 편집 모달 열기:", conceptId);
 
   // 편집 상태 설정
@@ -545,6 +550,9 @@ window.openEditConceptModal = function (conceptId) {
   if (modal) {
     modal.classList.remove("hidden");
     initialize(); // 편집 모드로 초기화
+
+    // 모달이 열린 후 번역 적용
+    await applyModalTranslations();
   } else {
     console.error("❌ edit-concept-modal 요소를 찾을 수 없습니다");
   }

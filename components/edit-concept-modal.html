@@ -12,29 +12,39 @@
       <!-- 기본 정보 -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">도메인</label>
-          <select id="edit-concept-domain" class="w-full p-2 border rounded">
-            <option value="daily">일상</option>
-            <option value="business">비즈니스</option>
-            <option value="academic">학술</option>
-            <option value="travel">여행</option>
-            <option value="food">음식</option>
-            <option value="nature">자연</option>
+          <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="domain">도메인</label>
+          <select id="edit-concept-domain" class="w-full p-2 border rounded bg-white" onchange="updateEditCategoryOptions()">
+            <option value="" style="display: none;" data-i18n="select_domain">도메인 선택</option>
+            <option value="daily" data-i18n="daily">일상</option>
+            <option value="business" data-i18n="business">비즈니스</option>
+            <option value="academic" data-i18n="academic">학술</option>
+            <option value="travel" data-i18n="travel">여행</option>
+            <option value="food" data-i18n="food">음식</option>
+            <option value="nature" data-i18n="nature">자연</option>
+            <option value="technology" data-i18n="technology">기술</option>
+            <option value="health" data-i18n="health">건강</option>
+            <option value="sports" data-i18n="sports">스포츠</option>
+            <option value="entertainment" data-i18n="entertainment">엔터테인먼트</option>
+            <option value="other" data-i18n="other">기타</option>
           </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">카테고리</label>
-          <input type="text" id="edit-concept-category" class="w-full p-2 border rounded" placeholder="예: fruit, animal">
+          <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="category">카테고리</label>
+          <select id="edit-concept-category" class="w-full p-2 border rounded bg-white" onchange="updateEditEmojiOptions()">
+            <option value="" style="display: none;" data-i18n="select_category">카테고리 선택</option>
+          </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">이모지</label>
-          <input type="text" id="edit-concept-emoji" class="w-full p-2 border rounded" placeholder="📝" maxlength="2">
+          <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="emoji">이모지</label>
+          <select id="edit-concept-emoji" class="w-full p-2 border rounded bg-white">
+            <option value="" style="display: none;" data-i18n="select_emoji">이모지 선택</option>
+          </select>
         </div>
       </div>
 
       <!-- 언어별 표현 -->
       <div class="mb-6">
-        <h3 class="text-lg font-semibold mb-3">언어별 표현</h3>
+        <h3 class="text-lg font-semibold mb-3" data-i18n="language_expressions">언어별 표현</h3>
         
         <!-- 언어 탭 -->
         <div id="edit-language-tabs" class="border-b mb-4">
@@ -60,43 +70,50 @@
           <div id="korean-content" class="language-content">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
               <div>
-                <label class="block text-sm text-gray-600">단어</label>
+                <label class="block text-sm text-gray-600" data-i18n="word">단어</label>
                 <input type="text" id="edit-korean-word" class="w-full p-2 border rounded" placeholder="사과">
               </div>
               <div>
-                <label class="block text-sm text-gray-600">발음</label>
+                <label class="block text-sm text-gray-600" data-i18n="pronunciation">발음</label>
                 <input type="text" id="edit-korean-pronunciation" class="w-full p-2 border rounded" placeholder="sa-gwa">
               </div>
               <div class="md:col-span-2">
-                <label class="block text-sm text-gray-600">정의</label>
+                <label class="block text-sm text-gray-600" data-i18n="definition">정의</label>
                 <input type="text" id="edit-korean-definition" class="w-full p-2 border rounded" placeholder="둥글고 빨간 과일">
               </div>
               <div>
-                <label class="block text-sm text-gray-600">품사</label>
+                <label class="block text-sm text-gray-600" data-i18n="part_of_speech">품사</label>
                 <select id="edit-korean-pos" class="w-full p-2 border rounded">
+                  <option value="" style="display: none;">품사 선택</option>
                   <option value="명사">명사</option>
                   <option value="동사">동사</option>
                   <option value="형용사">형용사</option>
                   <option value="부사">부사</option>
+                  <option value="대명사">대명사</option>
+                  <option value="전치사">전치사</option>
+                  <option value="접속사">접속사</option>
+                  <option value="감탄사">감탄사</option>
+                  <option value="조사">조사</option>
+                  <option value="기타">기타</option>
                 </select>
               </div>
             </div>
             <!-- 고급 필드들 -->
             <div class="space-y-3">
               <div>
-                <label class="block text-sm text-gray-600">유사어 (쉼표로 구분)</label>
+                <label class="block text-sm text-gray-600" data-i18n="synonyms">유사어 (쉼표로 구분)</label>
                 <input type="text" id="edit-korean-synonyms" class="w-full p-2 border rounded" placeholder="과일, 열매">
               </div>
               <div>
-                <label class="block text-sm text-gray-600">반의어 (쉼표로 구분)</label>
+                <label class="block text-sm text-gray-600" data-i18n="antonyms">반의어 (쉼표로 구분)</label>
                 <input type="text" id="edit-korean-antonyms" class="w-full p-2 border rounded" placeholder="">
               </div>
               <div>
-                <label class="block text-sm text-gray-600">연어 (쉼표로 구분)</label>
+                <label class="block text-sm text-gray-600" data-i18n="collocations">연어 (쉼표로 구분)</label>
                 <input type="text" id="edit-korean-collocations" class="w-full p-2 border rounded" placeholder="빨간 사과, 신선한 사과">
               </div>
               <div>
-                <label class="block text-sm text-gray-600">복합어 (쉼표로 구분)</label>
+                <label class="block text-sm text-gray-600" data-i18n="compound_words">복합어 (쉼표로 구분)</label>
                 <input type="text" id="edit-korean-compound-words" class="w-full p-2 border rounded" placeholder="사과나무, 사과주스">
               </div>
             </div>
@@ -106,43 +123,50 @@
           <div id="english-content" class="language-content hidden">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
               <div>
-                <label class="block text-sm text-gray-600">단어</label>
+                <label class="block text-sm text-gray-600" data-i18n="word">단어</label>
                 <input type="text" id="edit-english-word" class="w-full p-2 border rounded" placeholder="apple">
               </div>
               <div>
-                <label class="block text-sm text-gray-600">발음</label>
+                <label class="block text-sm text-gray-600" data-i18n="pronunciation">발음</label>
                 <input type="text" id="edit-english-pronunciation" class="w-full p-2 border rounded" placeholder="/ˈæpəl/">
               </div>
               <div class="md:col-span-2">
-                <label class="block text-sm text-gray-600">정의</label>
+                <label class="block text-sm text-gray-600" data-i18n="definition">정의</label>
                 <input type="text" id="edit-english-definition" class="w-full p-2 border rounded" placeholder="a round fruit with red or green skin">
               </div>
               <div>
-                <label class="block text-sm text-gray-600">품사</label>
+                <label class="block text-sm text-gray-600" data-i18n="part_of_speech">품사</label>
                 <select id="edit-english-pos" class="w-full p-2 border rounded">
+                  <option value="" style="display: none;" data-i18n="select_pos">Part of speech selection</option>
                   <option value="noun">noun</option>
                   <option value="verb">verb</option>
                   <option value="adjective">adjective</option>
                   <option value="adverb">adverb</option>
+                  <option value="pronoun">pronoun</option>
+                  <option value="preposition">preposition</option>
+                  <option value="conjunction">conjunction</option>
+                  <option value="interjection">interjection</option>
+                  <option value="determiner">determiner</option>
+                  <option value="other">other</option>
                 </select>
               </div>
             </div>
             <!-- 고급 필드들 -->
             <div class="space-y-3">
               <div>
-                <label class="block text-sm text-gray-600">유사어 (쉼표로 구분)</label>
+                <label class="block text-sm text-gray-600" data-i18n="synonyms">유사어 (쉼표로 구분)</label>
                 <input type="text" id="edit-english-synonyms" class="w-full p-2 border rounded" placeholder="fruit, produce">
               </div>
               <div>
-                <label class="block text-sm text-gray-600">반의어 (쉼표로 구분)</label>
+                <label class="block text-sm text-gray-600" data-i18n="antonyms">반의어 (쉼표로 구분)</label>
                 <input type="text" id="edit-english-antonyms" class="w-full p-2 border rounded" placeholder="">
               </div>
               <div>
-                <label class="block text-sm text-gray-600">연어 (쉼표로 구분)</label>
+                <label class="block text-sm text-gray-600" data-i18n="collocations">연어 (쉼표로 구분)</label>
                 <input type="text" id="edit-english-collocations" class="w-full p-2 border rounded" placeholder="red apple, fresh apple">
               </div>
               <div>
-                <label class="block text-sm text-gray-600">복합어 (쉼표로 구분)</label>
+                <label class="block text-sm text-gray-600" data-i18n="compound_words">복합어 (쉼표로 구분)</label>
                 <input type="text" id="edit-english-compound-words" class="w-full p-2 border rounded" placeholder="apple tree, apple juice">
               </div>
             </div>
@@ -152,43 +176,50 @@
           <div id="japanese-content" class="language-content hidden">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
               <div>
-                <label class="block text-sm text-gray-600">단어</label>
+                <label class="block text-sm text-gray-600" data-i18n="word">단어</label>
                 <input type="text" id="edit-japanese-word" class="w-full p-2 border rounded" placeholder="りんご">
               </div>
               <div>
-                <label class="block text-sm text-gray-600">발음</label>
+                <label class="block text-sm text-gray-600" data-i18n="pronunciation">발음</label>
                 <input type="text" id="edit-japanese-pronunciation" class="w-full p-2 border rounded" placeholder="ringo">
               </div>
               <div class="md:col-span-2">
-                <label class="block text-sm text-gray-600">정의</label>
+                <label class="block text-sm text-gray-600" data-i18n="definition">정의</label>
                 <input type="text" id="edit-japanese-definition" class="w-full p-2 border rounded" placeholder="丸くて赤い果物">
               </div>
               <div>
-                <label class="block text-sm text-gray-600">품사</label>
+                <label class="block text-sm text-gray-600" data-i18n="part_of_speech">품사</label>
                 <select id="edit-japanese-pos" class="w-full p-2 border rounded">
+                  <option value="" style="display: none;" data-i18n="select_pos">品詞選択</option>
                   <option value="名詞">名詞</option>
                   <option value="動詞">動詞</option>
                   <option value="形容詞">形容詞</option>
                   <option value="副詞">副詞</option>
+                  <option value="代名詞">代名詞</option>
+                  <option value="前置詞">前置詞</option>
+                  <option value="接続詞">接続詞</option>
+                  <option value="感嘆詞">感嘆詞</option>
+                  <option value="助詞">助詞</option>
+                  <option value="その他">その他</option>
                 </select>
               </div>
             </div>
             <!-- 고급 필드들 -->
             <div class="space-y-3">
               <div>
-                <label class="block text-sm text-gray-600">유사어 (쉼표로 구분)</label>
+                <label class="block text-sm text-gray-600" data-i18n="synonyms">유사어 (쉼표로 구분)</label>
                 <input type="text" id="edit-japanese-synonyms" class="w-full p-2 border rounded" placeholder="果物、フルーツ">
               </div>
               <div>
-                <label class="block text-sm text-gray-600">반의어 (쉼표로 구분)</label>
+                <label class="block text-sm text-gray-600" data-i18n="antonyms">반의어 (쉼표로 구분)</label>
                 <input type="text" id="edit-japanese-antonyms" class="w-full p-2 border rounded" placeholder="">
               </div>
               <div>
-                <label class="block text-sm text-gray-600">연어 (쉼표로 구분)</label>
+                <label class="block text-sm text-gray-600" data-i18n="collocations">연어 (쉼표로 구분)</label>
                 <input type="text" id="edit-japanese-collocations" class="w-full p-2 border rounded" placeholder="赤いりんご、新鮮なりんご">
               </div>
               <div>
-                <label class="block text-sm text-gray-600">복합어 (쉼표로 구분)</label>
+                <label class="block text-sm text-gray-600" data-i18n="compound_words">복합어 (쉼표로 구분)</label>
                 <input type="text" id="edit-japanese-compound-words" class="w-full p-2 border rounded" placeholder="りんごの木、りんごジュース">
               </div>
             </div>
@@ -198,43 +229,50 @@
           <div id="chinese-content" class="language-content hidden">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
               <div>
-                <label class="block text-sm text-gray-600">단어</label>
+                <label class="block text-sm text-gray-600" data-i18n="word">단어</label>
                 <input type="text" id="edit-chinese-word" class="w-full p-2 border rounded" placeholder="苹果">
               </div>
               <div>
-                <label class="block text-sm text-gray-600">발음</label>
+                <label class="block text-sm text-gray-600" data-i18n="pronunciation">발음</label>
                 <input type="text" id="edit-chinese-pronunciation" class="w-full p-2 border rounded" placeholder="píngguǒ">
               </div>
               <div class="md:col-span-2">
-                <label class="block text-sm text-gray-600">정의</label>
+                <label class="block text-sm text-gray-600" data-i18n="definition">정의</label>
                 <input type="text" id="edit-chinese-definition" class="w-full p-2 border rounded" placeholder="圆形红色水果">
               </div>
               <div>
-                <label class="block text-sm text-gray-600">품사</label>
+                <label class="block text-sm text-gray-600" data-i18n="part_of_speech">품사</label>
                 <select id="edit-chinese-pos" class="w-full p-2 border rounded">
+                  <option value="" style="display: none;" data-i18n="select_pos">词性选择</option>
                   <option value="名词">名词</option>
                   <option value="动词">动词</option>
                   <option value="形容词">形容词</option>
                   <option value="副词">副词</option>
+                  <option value="代词">代词</option>
+                  <option value="介词">介词</option>
+                  <option value="连词">连词</option>
+                  <option value="感叹词">感叹词</option>
+                  <option value="量词">量词</option>
+                  <option value="其他">其他</option>
                 </select>
               </div>
             </div>
             <!-- 고급 필드들 -->
             <div class="space-y-3">
               <div>
-                <label class="block text-sm text-gray-600">유사어 (쉼표로 구분)</label>
+                <label class="block text-sm text-gray-600" data-i18n="synonyms">유사어 (쉼표로 구분)</label>
                 <input type="text" id="edit-chinese-synonyms" class="w-full p-2 border rounded" placeholder="水果、果实">
               </div>
               <div>
-                <label class="block text-sm text-gray-600">반의어 (쉼표로 구분)</label>
+                <label class="block text-sm text-gray-600" data-i18n="antonyms">반의어 (쉼표로 구분)</label>
                 <input type="text" id="edit-chinese-antonyms" class="w-full p-2 border rounded" placeholder="">
               </div>
               <div>
-                <label class="block text-sm text-gray-600">연어 (쉼표로 구분)</label>
+                <label class="block text-sm text-gray-600" data-i18n="collocations">연어 (쉼표로 구분)</label>
                 <input type="text" id="edit-chinese-collocations" class="w-full p-2 border rounded" placeholder="红苹果、新鲜苹果">
               </div>
               <div>
-                <label class="block text-sm text-gray-600">복합어 (쉼표로 구분)</label>
+                <label class="block text-sm text-gray-600" data-i18n="compound_words">복합어 (쉼표로 구분)</label>
                 <input type="text" id="edit-chinese-compound-words" class="w-full p-2 border rounded" placeholder="苹果树、苹果汁">
               </div>
             </div>
@@ -245,28 +283,57 @@
       <!-- 예문 -->
       <div class="mb-6">
         <div class="flex justify-between items-center mb-3">
-          <h3 class="text-lg font-semibold">예문</h3>
-          <button type="button" id="edit-add-example" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm">
-            <i class="fas fa-plus mr-1"></i>예문 추가
+          <h3 class="text-lg font-semibold" data-i18n="examples">예문</h3>
+          <button type="button" id="add-edit-example" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm">
+            <i class="fas fa-plus mr-1"></i><span data-i18n="add_example">예문 추가</span>
           </button>
         </div>
         <div id="edit-examples-container">
-          <!-- 예문들이 여기에 동적으로 추가됩니다 -->
+          <!-- 대표 예문 -->
+          <div class="example-item border p-4 rounded mb-4">
+            <div class="mb-2 flex justify-between items-center">
+              <span class="font-medium" data-i18n="representative_example">대표 예문</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm text-gray-600 mb-1" data-i18n="korean_example">한국어 예문</label>
+                <textarea class="korean-example w-full p-2 border rounded h-20" placeholder="나는 빨간 사과를 좋아한다."></textarea>
+              </div>
+              <div>
+                <label class="block text-sm text-gray-600 mb-1" data-i18n="english_example">English Example</label>
+                <textarea class="english-example w-full p-2 border rounded h-20" placeholder="I like red apples."></textarea>
+              </div>
+              <div>
+                <label class="block text-sm text-gray-600 mb-1" data-i18n="japanese_example">日本語の例</label>
+                <textarea class="japanese-example w-full p-2 border rounded h-20" placeholder="私は赤いりんごが好きです。"></textarea>
+              </div>
+              <div>
+                <label class="block text-sm text-gray-600 mb-1" data-i18n="chinese_example">中文例句</label>
+                <textarea class="chinese-example w-full p-2 border rounded h-20" placeholder="我喜欢红苹果。"></textarea>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- 버튼들 -->
-      <div class="flex justify-end space-x-3">
-        <button type="button" id="cancel-edit-concept" class="px-4 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-50">
+      <!-- 태그 -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="tags">태그 (쉼표로 구분)</label>
+        <input type="text" id="edit-concept-tags" class="w-full p-2 border rounded" placeholder="food, healthy, common">
+      </div>
+
+      <!-- 버튼 -->
+      <div class="flex justify-end space-x-4">
+        <button type="button" id="cancel-edit-concept" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded" data-i18n="cancel">
           취소
         </button>
-        <button type="button" id="reset-edit-concept-form" class="px-4 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-50">
-          초기화
-        </button>
-        <button type="submit" id="save-edit-concept" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-          수정하기
+        <button type="submit" id="save-edit-concept" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded" data-i18n="save">
+          저장
         </button>
       </div>
     </form>
   </div>
-</div> 
+</div>
+
+<!-- Domain-Category-Emoji JavaScript -->
+<script src="components/js/domain-category-emoji.js"></script>

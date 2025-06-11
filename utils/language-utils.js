@@ -240,10 +240,53 @@ const translations = {
     start: "시작하기",
     language_settings: "언어 설정",
     save: "저장",
+    cancel: "취소",
     total_concepts: "전체 개념 수",
     concepts_unit: "개",
     ai_usage: "AI 사용량",
     ai_recommend_concept: "AI 개념 추천받기",
+    // 모달 관련 번역
+    add_concept: "개념 추가",
+    edit_concept: "개념 수정",
+    domain: "도메인",
+    select_domain: "도메인 선택",
+    category: "카테고리",
+    category_placeholder: "예: fruit, animal",
+    emoji: "이모지",
+    language_expressions: "언어별 표현",
+    word: "단어",
+    pronunciation: "발음",
+    definition: "정의",
+    part_of_speech: "품사",
+    select_pos: "품사 선택",
+    // 품사 번역
+    noun: "명사",
+    verb: "동사",
+    adjective: "형용사",
+    adverb: "부사",
+    pronoun: "대명사",
+    preposition: "전치사",
+    conjunction: "접속사",
+    interjection: "감탄사",
+    particle: "조사",
+    determiner: "한정사",
+    classifier: "분류사",
+    other: "기타",
+    // 언어학적 용어 번역
+    synonyms: "유사어 (쉼표로 구분)",
+    antonyms: "반의어 (쉼표로 구분)",
+    collocations: "연어 (쉼표로 구분)",
+    compound_words: "복합어 (쉼표로 구분)",
+    examples: "예문",
+    add_example: "예문 추가",
+    representative_example: "대표 예문",
+    tags: "태그 (쉼표로 구분)",
+    // 도메인 번역
+    academic: "학술",
+    technology: "기술",
+    health: "건강",
+    sports: "스포츠",
+    entertainment: "엔터테인먼트",
     // 로그인 페이지 번역
     login_with_google: "Google로 로그인",
     login_with_github: "Github로 로그인",
@@ -275,7 +318,6 @@ const translations = {
     search_placeholder: "검색어 입력...",
     source_language: "원본 언어",
     target_language: "대상 언어",
-    category: "카테고리",
     all_categories: "모든 카테고리",
     fruit: "과일",
     food: "음식",
@@ -372,6 +414,79 @@ const translations = {
     games_played: "게임",
     wins: "승리",
     loading: "로딩 중...",
+    select_category: "카테고리 선택",
+    select_emoji: "이모지 선택",
+    emoji: "이모지",
+
+    // 일상 도메인 카테고리
+    household: "생활용품",
+    family: "가족",
+    routine: "일상생활",
+    clothing: "의류",
+    furniture: "가구",
+
+    // 음식 도메인 카테고리
+    fruit: "과일",
+    vegetable: "채소",
+    meat: "육류",
+    drink: "음료",
+    snack: "간식",
+
+    // 여행 도메인 카테고리
+    transportation: "교통수단",
+    accommodation: "숙박",
+    tourist_attraction: "관광지",
+    luggage: "짐",
+    direction: "길찾기",
+
+    // 비즈니스 도메인 카테고리
+    meeting: "회의",
+    finance: "금융",
+    marketing: "마케팅",
+    office: "사무실",
+    project: "프로젝트",
+
+    // 학술 도메인 카테고리
+    science: "과학",
+    literature: "문학",
+    history: "역사",
+    mathematics: "수학",
+    research: "연구",
+
+    // 자연 도메인 카테고리
+    animal: "동물",
+    plant: "식물",
+    weather: "날씨",
+    geography: "지리",
+    environment: "환경",
+
+    // 기술 도메인 카테고리
+    computer: "컴퓨터",
+    software: "소프트웨어",
+    internet: "인터넷",
+    mobile: "모바일",
+    ai: "인공지능",
+
+    // 건강 도메인 카테고리
+    exercise: "운동",
+    medicine: "의학",
+    nutrition: "영양",
+    mental_health: "정신건강",
+    hospital: "병원",
+
+    // 스포츠 도메인 카테고리
+    football: "축구",
+    basketball: "농구",
+    swimming: "수영",
+    running: "달리기",
+    equipment: "운동기구",
+
+    // 엔터테인먼트 도메인 카테고리
+    movie: "영화",
+    music: "음악",
+    game: "게임",
+    book: "도서",
+    art: "예술",
   },
   en: {
     home: "Home",
@@ -404,10 +519,49 @@ const translations = {
     start: "Start",
     language_settings: "Language Settings",
     save: "Save",
+    cancel: "Cancel",
     total_concepts: "Total Concepts",
     concepts_unit: "concepts",
     ai_usage: "AI Usage",
     ai_recommend_concept: "AI Concept Recommendation",
+    // Modal-related translations
+    add_concept: "Add Concept",
+    edit_concept: "Edit Concept",
+    select_domain: "Select Domain",
+    category_placeholder: "e.g.: fruit, animal",
+    language_expressions: "Language Expressions",
+    word: "Word",
+    pronunciation: "Pronunciation",
+    definition: "Definition",
+    part_of_speech: "Part of Speech",
+    select_pos: "Select Part of Speech",
+    // Part of speech translations
+    noun: "noun",
+    verb: "verb",
+    adjective: "adjective",
+    adverb: "adverb",
+    pronoun: "pronoun",
+    preposition: "preposition",
+    conjunction: "conjunction",
+    interjection: "interjection",
+    particle: "particle",
+    determiner: "determiner",
+    classifier: "classifier",
+    other: "other",
+    // Linguistic terms translations
+    synonyms: "Synonyms (comma separated)",
+    antonyms: "Antonyms (comma separated)",
+    collocations: "Collocations (comma separated)",
+    compound_words: "Compound Words (comma separated)",
+    representative_example: "Representative Example",
+    tags: "Tags (comma separated)",
+    // Domain translations
+    academic: "Academic",
+    nature: "Nature",
+    technology: "Technology",
+    health: "Health",
+    sports: "Sports",
+    entertainment: "Entertainment",
     // 로그인 페이지 번역
     login_with_google: "Login with Google",
     login_with_github: "Login with Github",
@@ -538,6 +692,79 @@ const translations = {
     games_played: "Games",
     wins: "Wins",
     loading: "Loading...",
+    select_category: "Select Category",
+    select_emoji: "Select Emoji",
+    emoji: "Emoji",
+
+    // Daily domain categories
+    household: "Household Items",
+    family: "Family",
+    routine: "Daily Routine",
+    clothing: "Clothing",
+    furniture: "Furniture",
+
+    // Food domain categories
+    fruit: "Fruit",
+    vegetable: "Vegetable",
+    meat: "Meat",
+    drink: "Drink",
+    snack: "Snack",
+
+    // Travel domain categories
+    transportation: "Transportation",
+    accommodation: "Accommodation",
+    tourist_attraction: "Tourist Attraction",
+    luggage: "Luggage",
+    direction: "Direction",
+
+    // Business domain categories
+    meeting: "Meeting",
+    finance: "Finance",
+    marketing: "Marketing",
+    office: "Office",
+    project: "Project",
+
+    // Academic domain categories
+    science: "Science",
+    literature: "Literature",
+    history: "History",
+    mathematics: "Mathematics",
+    research: "Research",
+
+    // Nature domain categories
+    animal: "Animal",
+    plant: "Plant",
+    weather: "Weather",
+    geography: "Geography",
+    environment: "Environment",
+
+    // Technology domain categories
+    computer: "Computer",
+    software: "Software",
+    internet: "Internet",
+    mobile: "Mobile",
+    ai: "AI",
+
+    // Health domain categories
+    exercise: "Exercise",
+    medicine: "Medicine",
+    nutrition: "Nutrition",
+    mental_health: "Mental Health",
+    hospital: "Hospital",
+
+    // Sports domain categories
+    football: "Football",
+    basketball: "Basketball",
+    swimming: "Swimming",
+    running: "Running",
+    equipment: "Equipment",
+
+    // Entertainment domain categories
+    movie: "Movie",
+    music: "Music",
+    game: "Game",
+    book: "Book",
+    art: "Art",
   },
   ja: {
     home: "ホーム",
@@ -570,10 +797,54 @@ const translations = {
     start: "始める",
     language_settings: "言語設定",
     save: "保存",
+    cancel: "キャンセル",
     total_concepts: "総概念数",
     concepts_unit: "個",
     ai_usage: "AI使用量",
     ai_recommend_concept: "AI概念推薦",
+    // Modal-related translations
+    add_concept: "概念追加",
+    edit_concept: "概念編集",
+    domain: "ドメイン",
+    select_domain: "ドメインを選択",
+    category: "カテゴリー",
+    category_placeholder: "例: fruit, animal",
+    emoji: "絵文字",
+    language_expressions: "言語別表現",
+    word: "単語",
+    pronunciation: "発音",
+    definition: "定義",
+    part_of_speech: "品詞",
+    select_pos: "品詞を選択",
+    // Part of speech translations
+    noun: "名詞",
+    verb: "動詞",
+    adjective: "形容詞",
+    adverb: "副詞",
+    pronoun: "代名詞",
+    preposition: "前置詞",
+    conjunction: "接続詞",
+    interjection: "感嘆詞",
+    particle: "助詞",
+    determiner: "限定詞",
+    classifier: "分類詞",
+    other: "その他",
+    // Linguistic terms translations
+    synonyms: "類義語 (カンマ区切り)",
+    antonyms: "反義語 (カンマ区切り)",
+    collocations: "連語 (カンマ区切り)",
+    compound_words: "複合語 (カンマ区切り)",
+    examples: "例文",
+    add_example: "例文追加",
+    representative_example: "代表例文",
+    tags: "タグ (カンマ区切り)",
+    // Domain translations
+    academic: "学術",
+    nature: "自然",
+    technology: "技術",
+    health: "健康",
+    sports: "スポーツ",
+    entertainment: "エンターテインメント",
     // 로그인 페이지 번역
     login_with_google: "Googleでログイン",
     login_with_github: "Githubでログイン",
@@ -702,6 +973,79 @@ const translations = {
     games_played: "ゲーム",
     wins: "勝利",
     loading: "読み込み中...",
+    select_category: "カテゴリ選択",
+    select_emoji: "絵文字選択",
+    emoji: "絵文字",
+
+    // Daily domain categories
+    household: "生活用品",
+    family: "家族",
+    routine: "日常生活",
+    clothing: "衣類",
+    furniture: "家具",
+
+    // Food domain categories
+    fruit: "果物",
+    vegetable: "野菜",
+    meat: "肉類",
+    drink: "飲み物",
+    snack: "お菓子",
+
+    // Travel domain categories
+    transportation: "交通手段",
+    accommodation: "宿泊",
+    tourist_attraction: "観光地",
+    luggage: "荷物",
+    direction: "道案内",
+
+    // Business domain categories
+    meeting: "会議",
+    finance: "金融",
+    marketing: "マーケティング",
+    office: "オフィス",
+    project: "プロジェクト",
+
+    // Academic domain categories
+    science: "科学",
+    literature: "文学",
+    history: "歴史",
+    mathematics: "数学",
+    research: "研究",
+
+    // Nature domain categories
+    animal: "動物",
+    plant: "植物",
+    weather: "天気",
+    geography: "地理",
+    environment: "環境",
+
+    // Technology domain categories
+    computer: "コンピュータ",
+    software: "ソフトウェア",
+    internet: "インターネット",
+    mobile: "モバイル",
+    ai: "AI",
+
+    // Health domain categories
+    exercise: "運動",
+    medicine: "医学",
+    nutrition: "栄養",
+    mental_health: "メンタルヘルス",
+    hospital: "病院",
+
+    // Sports domain categories
+    football: "サッカー",
+    basketball: "バスケットボール",
+    swimming: "水泳",
+    running: "ランニング",
+    equipment: "運動器具",
+
+    // Entertainment domain categories
+    movie: "映画",
+    music: "音楽",
+    game: "ゲーム",
+    book: "本",
+    art: "芸術",
   },
   zh: {
     home: "首页",
@@ -730,10 +1074,54 @@ const translations = {
     start: "开始",
     language_settings: "语言设置",
     save: "保存",
+    cancel: "取消",
     total_concepts: "总概念数",
     concepts_unit: "个",
     ai_usage: "AI使用量",
     ai_recommend_concept: "AI概念推荐",
+    // Modal-related translations
+    add_concept: "添加概念",
+    edit_concept: "编辑概念",
+    domain: "领域",
+    select_domain: "选择领域",
+    category: "类别",
+    category_placeholder: "例如: fruit, animal",
+    emoji: "表情符号",
+    language_expressions: "各语言表达",
+    word: "单词",
+    pronunciation: "发音",
+    definition: "定义",
+    part_of_speech: "词性",
+    select_pos: "选择词性",
+    // Part of speech translations
+    noun: "名词",
+    verb: "动词",
+    adjective: "形容词",
+    adverb: "副词",
+    pronoun: "代词",
+    preposition: "介词",
+    conjunction: "连词",
+    interjection: "感叹词",
+    particle: "助词",
+    determiner: "限定词",
+    classifier: "量词",
+    other: "其他",
+    // Linguistic terms translations
+    synonyms: "同义词 (逗号分隔)",
+    antonyms: "反义词 (逗号分隔)",
+    collocations: "搭配 (逗号分隔)",
+    compound_words: "复合词 (逗号分隔)",
+    examples: "例句",
+    add_example: "添加例句",
+    representative_example: "代表例句",
+    tags: "标签 (逗号分隔)",
+    // Domain translations
+    academic: "学术",
+    nature: "自然",
+    technology: "技术",
+    health: "健康",
+    sports: "体育",
+    entertainment: "娱乐",
     // 로그인 페이지 번역
     login_with_google: "使用Google登录",
     login_with_github: "使用Github登录",
@@ -862,8 +1250,86 @@ const translations = {
     games_played: "游戏",
     wins: "胜利",
     loading: "加载中...",
+    select_category: "选择类别",
+    select_emoji: "选择表情",
+    emoji: "表情",
+
+    // Daily domain categories
+    household: "生活用品",
+    family: "家庭",
+    routine: "日常生活",
+    clothing: "服装",
+    furniture: "家具",
+
+    // Food domain categories
+    fruit: "水果",
+    vegetable: "蔬菜",
+    meat: "肉类",
+    drink: "饮料",
+    snack: "零食",
+
+    // Travel domain categories
+    transportation: "交通工具",
+    accommodation: "住宿",
+    tourist_attraction: "旅游景点",
+    luggage: "行李",
+    direction: "方向",
+
+    // Business domain categories
+    meeting: "会议",
+    finance: "金融",
+    marketing: "营销",
+    office: "办公室",
+    project: "项目",
+
+    // Academic domain categories
+    science: "科学",
+    literature: "文学",
+    history: "历史",
+    mathematics: "数学",
+    research: "研究",
+
+    // Nature domain categories
+    animal: "动物",
+    plant: "植物",
+    weather: "天气",
+    geography: "地理",
+    environment: "环境",
+
+    // Technology domain categories
+    computer: "电脑",
+    software: "软件",
+    internet: "互联网",
+    mobile: "手机",
+    ai: "人工智能",
+
+    // Health domain categories
+    exercise: "运动",
+    medicine: "医学",
+    nutrition: "营养",
+    mental_health: "心理健康",
+    hospital: "医院",
+
+    // Sports domain categories
+    football: "足球",
+    basketball: "篮球",
+    swimming: "游泳",
+    running: "跑步",
+    equipment: "运动器材",
+
+    // Entertainment domain categories
+    movie: "电影",
+    music: "音乐",
+    game: "游戏",
+    book: "图书",
+    art: "艺术",
   },
 };
+
+// 전역 번역 객체로 설정
+if (typeof window !== "undefined") {
+  window.translations = translations;
+}
 
 // 언어 캐싱을 위한 변수
 let cachedLanguage = null;
@@ -935,6 +1401,7 @@ async function getActiveLanguage() {
     if (savedLang && savedLang !== "auto" && SUPPORTED_LANGUAGES[savedLang]) {
       console.log("저장된 언어 사용:", savedLang);
       cachedLanguage = savedLang;
+      localStorage.setItem("preferredLanguage", savedLang); // 도메인-카테고리-이모지용 언어 설정도 동기화
       return savedLang;
     }
 
@@ -946,6 +1413,7 @@ async function getActiveLanguage() {
     if (SUPPORTED_LANGUAGES[browserLang]) {
       console.log("브라우저 언어 사용:", browserLang);
       cachedLanguage = browserLang;
+      localStorage.setItem("preferredLanguage", browserLang); // 도메인-카테고리-이모지용 언어 설정도 동기화
       return browserLang;
     }
 
@@ -954,10 +1422,12 @@ async function getActiveLanguage() {
       const locationLang = await detectLanguageFromLocation();
       console.log("위치 기반 언어 사용:", locationLang);
       cachedLanguage = locationLang;
+      localStorage.setItem("preferredLanguage", locationLang); // 도메인-카테고리-이모지용 언어 설정도 동기화
       return locationLang;
     } catch (error) {
       console.error("위치 기반 언어 감지 실패, 기본 언어 사용");
       cachedLanguage = "ko"; // 최종 기본값: 한국어
+      localStorage.setItem("preferredLanguage", "ko"); // 도메인-카테고리-이모지용 언어 설정도 동기화
       return "ko";
     }
   } finally {
@@ -971,9 +1441,11 @@ function setLanguage(langCode) {
 
   if (langCode === "auto") {
     localStorage.removeItem("userLanguage");
+    localStorage.removeItem("preferredLanguage"); // 도메인-카테고리-이모지용 언어 설정도 제거
     cachedLanguage = null; // 캐시 초기화
   } else {
     localStorage.setItem("userLanguage", langCode);
+    localStorage.setItem("preferredLanguage", langCode); // 도메인-카테고리-이모지용 언어 설정도 저장
     cachedLanguage = langCode; // 캐시 업데이트
   }
 
@@ -1019,6 +1491,7 @@ async function applyLanguage() {
       return;
     }
 
+    // 일반 텍스트 요소 번역 (option 태그 포함)
     document.querySelectorAll("[data-i18n]").forEach((element) => {
       const key = element.getAttribute("data-i18n");
       if (translations[langCode][key]) {
@@ -1036,6 +1509,11 @@ async function applyLanguage() {
 
     // HTML lang 속성 변경
     document.documentElement.lang = langCode;
+
+    // 도메인-카테고리-이모지 옵션 업데이트 (있는 경우만)
+    if (typeof window.updateDomainCategoryEmojiLanguage === "function") {
+      window.updateDomainCategoryEmojiLanguage();
+    }
 
     // 이벤트 발생 - 언어 변경을 알림
     document.dispatchEvent(

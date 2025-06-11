@@ -10,7 +10,10 @@ import {
   conceptUtils,
   supportedLanguages,
 } from "../../js/firebase/firebase-init.js";
-import { getActiveLanguage } from "../../utils/language-utils.js";
+import {
+  getActiveLanguage,
+  applyLanguage,
+} from "../../utils/language-utils.js";
 
 // 지원 언어 목록 (호환성)
 const supportedLangs = {
@@ -20,15 +23,10 @@ const supportedLangs = {
   chinese: "中文",
 };
 
-// 언어별 기본 품사 반환
+// 언어별 기본 품사 반환 (빈 값으로 수정하여 플레이스홀더가 보이도록)
 export function getDefaultPartOfSpeech(langCode) {
-  const defaultPOS = {
-    korean: "명사",
-    english: "noun",
-    japanese: "名詞",
-    chinese: "名词",
-  };
-  return defaultPOS[langCode] || "명사";
+  // 플레이스홀더가 보이도록 빈 값 반환
+  return "";
 }
 
 // 품사 번역 (언어 간 변환)
@@ -137,9 +135,7 @@ export function collectFormData() {
           ? pronunciationField.value.trim()
           : "",
         definition: definitionField ? definitionField.value.trim() : "",
-        part_of_speech: posField
-          ? posField.value
-          : getDefaultPartOfSpeech(langCode),
+        part_of_speech: posField && posField.value ? posField.value : "",
         synonyms:
           synonymsField && synonymsField.value.trim()
             ? synonymsField.value
@@ -269,7 +265,7 @@ export function resetForm() {
     if (wordField) wordField.value = "";
     if (pronunciationField) pronunciationField.value = "";
     if (definitionField) definitionField.value = "";
-    if (posField) posField.value = getDefaultPartOfSpeech(langCode);
+    if (posField) posField.value = "";
 
     // 고급 필드들 초기화
     if (synonymsField) synonymsField.value = "";
@@ -362,6 +358,14 @@ export function switchLanguageTab(langCode) {
     console.log("✅ 콘텐츠 표시됨:", langCode);
   } else {
     console.error("❌ 콘텐츠를 찾을 수 없음:", `${langCode}-content`);
+  }
+
+  // 현재 언어 탭에 맞는 플레이스홀더 업데이트 (언어별 입력 필드)
+  updatePlaceholdersForCurrentLanguage(langCode);
+
+  // 언어 탭별 품사 옵션 업데이트
+  if (window.updatePartOfSpeechByLanguageTab) {
+    window.updatePartOfSpeechByLanguageTab();
   }
 }
 
@@ -486,6 +490,281 @@ export async function updateStaticLabels(userLanguage) {
   });
 }
 
+// 모달에 다국어 번역 적용
+export async function applyModalTranslations() {
+  try {
+    const userLanguage = await getActiveLanguage();
+    console.log("🌍 모달 번역 적용:", userLanguage);
+
+    // localStorage에도 언어 설정 저장
+    localStorage.setItem("preferredLanguage", userLanguage);
+    console.log("💾 preferredLanguage 저장:", userLanguage);
+
+    // data-i18n 속성이 있는 모든 요소에 번역 적용
+    await applyLanguage();
+
+    // 정적 레이블 업데이트
+    await updateStaticLabels(userLanguage);
+
+    // 플레이스홀더 텍스트 번역 적용
+    applyPlaceholderTranslations(userLanguage);
+
+    // 도메인-카테고리-이모지 옵션 업데이트 (여러 번의 시도로 확실하게)
+    console.log("🔄 도메인-카테고리 번역 시작");
+
+    // 즉시 한 번 실행
+    if (typeof window.updateDomainCategoryEmojiLanguage === "function") {
+      window.updateDomainCategoryEmojiLanguage();
+    }
+
+    // 100ms 후 다시 한 번
+    setTimeout(() => {
+      if (typeof window.updateDomainCategoryEmojiLanguage === "function") {
+        window.updateDomainCategoryEmojiLanguage();
+        console.log("🔄 도메인-카테고리 옵션 번역 업데이트 완료 (100ms 지연)");
+      }
+
+      // 품사 옵션들도 별도로 업데이트
+      if (typeof window.updatePartOfSpeechOptions === "function") {
+        window.updatePartOfSpeechOptions();
+        console.log("🔄 품사 옵션 번역 업데이트 완료 (100ms 지연)");
+      }
+
+      // 언어 탭별 품사 옵션 업데이트
+      if (typeof window.updatePartOfSpeechByLanguageTab === "function") {
+        window.updatePartOfSpeechByLanguageTab();
+        console.log("🔄 언어 탭별 품사 옵션 업데이트 완료 (100ms 지연)");
+      }
+    }, 100);
+
+    // 300ms 후 최종 확인
+    setTimeout(() => {
+      if (typeof window.updateDomainCategoryEmojiLanguage === "function") {
+        window.updateDomainCategoryEmojiLanguage();
+        console.log(
+          "🔄 도메인-카테고리 옵션 번역 최종 업데이트 완료 (300ms 지연)"
+        );
+      }
+    }, 300);
+
+    console.log("✅ 모달 번역 적용 완료");
+  } catch (error) {
+    console.error("❌ 모달 번역 적용 실패:", error);
+  }
+}
+
+// 플레이스홀더 텍스트 번역 적용
+function applyPlaceholderTranslations(userLanguage) {
+  const placeholderTranslations = {
+    ko: {
+      category_placeholder: "예: fruit, animal",
+    },
+    en: {
+      category_placeholder: "e.g.: fruit, animal",
+    },
+    ja: {
+      category_placeholder: "例: fruit, animal",
+    },
+    zh: {
+      category_placeholder: "例如: fruit, animal",
+    },
+  };
+
+  const translations =
+    placeholderTranslations[userLanguage] || placeholderTranslations.ko;
+
+  // data-i18n-placeholder 속성이 있는 요소들의 placeholder 업데이트
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
+    const key = element.getAttribute("data-i18n-placeholder");
+    if (translations[key]) {
+      element.placeholder = translations[key];
+    }
+  });
+}
+
+// 현재 언어 탭에 맞는 플레이스홀더 업데이트
+function updatePlaceholdersForCurrentLanguage(langCode) {
+  // 언어별 플레이스홀더 정의
+  const languagePlaceholders = {
+    korean: {
+      word: "사과",
+      pronunciation: "sa-gwa",
+      definition: "둥글고 빨간 과일",
+      synonyms: "과일, 열매",
+      collocations: "빨간 사과, 신선한 사과",
+      compound_words: "사과나무, 사과주스",
+      example: "나는 빨간 사과를 좋아한다.",
+    },
+    english: {
+      word: "apple",
+      pronunciation: "/ˈæpəl/",
+      definition: "a round fruit with red or green skin",
+      synonyms: "fruit, produce",
+      collocations: "red apple, fresh apple",
+      compound_words: "apple tree, apple juice",
+      example: "I like red apples.",
+    },
+    japanese: {
+      word: "りんご",
+      pronunciation: "ringo",
+      definition: "丸くて赤い果物",
+      synonyms: "果物、フルーツ",
+      collocations: "赤いりんご、新鮮なりんご",
+      compound_words: "りんごの木、りんごジュース",
+      example: "私は赤いりんごが好きです。",
+    },
+    chinese: {
+      word: "苹果",
+      pronunciation: "píngguǒ",
+      definition: "圆形红色水果",
+      synonyms: "水果、果实",
+      collocations: "红苹果、新鲜苹果",
+      compound_words: "苹果树、苹果汁",
+      example: "我喜欢红苹果。",
+    },
+  };
+
+  const placeholders = languagePlaceholders[langCode];
+  if (!placeholders) return;
+
+  // 언어별 플레이스홀더 업데이트 (추가 모달과 편집 모달 모두)
+  const prefixes = ["", "edit-"];
+
+  prefixes.forEach((prefix) => {
+    // 단어 필드
+    const wordField = document.getElementById(`${prefix}${langCode}-word`);
+    if (wordField) wordField.placeholder = placeholders.word;
+
+    // 발음 필드
+    const pronunciationField = document.getElementById(
+      `${prefix}${langCode}-pronunciation`
+    );
+    if (pronunciationField)
+      pronunciationField.placeholder = placeholders.pronunciation;
+
+    // 정의 필드
+    const definitionField = document.getElementById(
+      `${prefix}${langCode}-definition`
+    );
+    if (definitionField) definitionField.placeholder = placeholders.definition;
+
+    // 유사어 필드
+    const synonymsField = document.getElementById(
+      `${prefix}${langCode}-synonyms`
+    );
+    if (synonymsField) synonymsField.placeholder = placeholders.synonyms;
+
+    // 연어 필드
+    const collocationsField = document.getElementById(
+      `${prefix}${langCode}-collocations`
+    );
+    if (collocationsField)
+      collocationsField.placeholder = placeholders.collocations;
+
+    // 복합어 필드
+    const compoundWordsField = document.getElementById(
+      `${prefix}${langCode}-compound-words`
+    );
+    if (compoundWordsField)
+      compoundWordsField.placeholder = placeholders.compound_words;
+  });
+
+  // 예문 필드들 업데이트
+  document.querySelectorAll(`.${langCode}-example`).forEach((field) => {
+    field.placeholder = placeholders.example;
+  });
+}
+
+// 편집 모달에서 카테고리와 이모지 옵션 설정
+export function setEditModalCategoryAndEmoji(conceptData) {
+  // 개념 정보에서 도메인, 카테고리, 이모지 추출
+  const domain = conceptData.concept_info?.domain || conceptData.domain;
+  const category = conceptData.concept_info?.category || conceptData.category;
+  const emoji = conceptData.concept_info?.emoji || conceptData.emoji;
+
+  console.log("🔄 편집 모달 카테고리/이모지 설정:", {
+    domain,
+    category,
+    emoji,
+  });
+
+  // 도메인이 설정되어 있으면 카테고리 옵션 업데이트
+  if (domain) {
+    const domainSelect = document.getElementById("edit-concept-domain");
+    if (domainSelect) {
+      domainSelect.value = domain;
+
+      // 카테고리 옵션 업데이트 (window 객체를 통해 호출)
+      if (typeof window.updateEditCategoryOptions === "function") {
+        window.updateEditCategoryOptions();
+
+        // 카테고리 값 설정 (약간의 지연을 두어 옵션이 추가된 후 설정)
+        setTimeout(() => {
+          const categorySelect = document.getElementById(
+            "edit-concept-category"
+          );
+          if (categorySelect && category) {
+            categorySelect.value = category;
+            console.log(
+              "🔄 편집 모달 카테고리 직접 설정:",
+              category,
+              "현재 값:",
+              categorySelect.value
+            );
+
+            // 카테고리 설정이 제대로 되지 않았다면 다시 시도
+            if (categorySelect.value !== category) {
+              // 옵션이 존재하는지 확인
+              const categoryOption = categorySelect.querySelector(
+                `option[value="${category}"]`
+              );
+              if (categoryOption) {
+                categorySelect.value = category;
+                console.log("🔄 편집 모달 카테고리 재설정 시도:", category);
+              } else {
+                console.log("❌ 편집 모달 카테고리 옵션 없음:", category);
+              }
+            }
+
+            // 이모지 옵션 업데이트
+            if (typeof window.updateEditEmojiOptions === "function") {
+              window.updateEditEmojiOptions();
+
+              // 이모지 값 설정
+              setTimeout(() => {
+                const emojiSelect =
+                  document.getElementById("edit-concept-emoji");
+                if (emojiSelect && emoji) {
+                  emojiSelect.value = emoji;
+                  console.log(
+                    "🔄 편집 모달 이모지 설정:",
+                    emoji,
+                    "현재 값:",
+                    emojiSelect.value
+                  );
+
+                  // 이모지 설정이 제대로 되지 않았다면 다시 시도
+                  if (emojiSelect.value !== emoji) {
+                    const emojiOption = emojiSelect.querySelector(
+                      `option[value="${emoji}"]`
+                    );
+                    if (emojiOption) {
+                      emojiSelect.value = emoji;
+                      console.log("🔄 편집 모달 이모지 재설정 시도:", emoji);
+                    } else {
+                      console.log("❌ 편집 모달 이모지 옵션 없음:", emoji);
+                    }
+                  }
+                }
+              }, 100);
+            }
+          }
+        }, 100);
+      }
+    }
+  }
+}
+
 // 편집 모달용 함수들 (별도 ID 사용)
 
 // 편집 폼 검증
@@ -571,9 +850,7 @@ export function collectEditFormData() {
           ? pronunciationField.value.trim()
           : "",
         definition: definitionField ? definitionField.value.trim() : "",
-        part_of_speech: posField
-          ? posField.value
-          : getDefaultPartOfSpeech(langCode),
+        part_of_speech: posField && posField.value ? posField.value : "",
         // 고급 필드들 추가
         synonyms:
           synonymsField && synonymsField.value.trim()
@@ -702,7 +979,7 @@ export function resetEditForm() {
     if (wordField) wordField.value = "";
     if (pronunciationField) pronunciationField.value = "";
     if (definitionField) definitionField.value = "";
-    if (posField) posField.value = getDefaultPartOfSpeech(langCode);
+    if (posField) posField.value = "";
 
     // 고급 필드들 초기화
     if (synonymsField) synonymsField.value = "";

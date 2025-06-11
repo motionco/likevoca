@@ -1,16 +1,25 @@
-// 새 요소 다시 가져오기
-const newCloseBtn = document.getElementById("close-learn-modal");
-const newAnimateBtn = document.getElementById("animate-button");
-const newQuizBtn = document.getElementById("quiz-button");
-const newDeleteBtn = document.getElementById("delete-hangul");
-const newEditBtn = document.getElementById("edit-hangul");
+// 필요한 함수들 정의
+function closeModal() {
+  const modal = document.getElementById("learn-hangul-modal");
+  if (modal) {
+    modal.classList.add("hidden");
+  }
+}
 
-// 모달이 표시된 후 이벤트 리스너 설정 (새 요소에)
-newCloseBtn.addEventListener("click", closeModal);
-newAnimateBtn.addEventListener("click", toggleImage);
-newQuizBtn.addEventListener("click", playPronunciation);
-newDeleteBtn.addEventListener("click", deleteHangul);
-newEditBtn.addEventListener("click", editHangul);
+function toggleImage() {
+  console.log("이미지 토글 기능");
+  // 이미지 토글 로직을 여기에 추가
+}
+
+function playPronunciation() {
+  console.log("발음 재생 기능");
+  // 발음 재생 로직을 여기에 추가
+}
+
+function deleteHangul() {
+  console.log("한글 삭제 기능");
+  // 삭제 로직을 여기에 추가
+}
 
 console.log("모달 이벤트 리스너 새로 설정 완료");
 
@@ -63,4 +72,51 @@ function editHangul() {
 
   // 수정 모달 열기
   modal.classList.remove("hidden");
+}
+
+export function showLearnHangulModal(
+  hangul,
+  meaning,
+  pronunciation,
+  description,
+  date
+) {
+  console.log("showLearnHangulModal 호출됨", {
+    hangul,
+    meaning,
+    pronunciation,
+    description,
+    date,
+  });
+
+  // 모달 요소들 가져오기
+  const modal = document.getElementById("learn-hangul-modal");
+  const hangulElement = document.getElementById("learn-word");
+  const meaningElement = document.getElementById("learn-meaning");
+  const pronunciationElement = document.getElementById("learn-pronunciation");
+  const descriptionElement = document.getElementById("learn-description");
+  const dateElement = document.getElementById("learn-date");
+
+  if (!modal) {
+    console.error("learn-hangul-modal을 찾을 수 없습니다.");
+    return;
+  }
+
+  // 모달 내용 업데이트
+  if (hangulElement) hangulElement.textContent = hangul;
+  if (meaningElement) meaningElement.textContent = meaning;
+  if (pronunciationElement) pronunciationElement.textContent = pronunciation;
+  if (descriptionElement) descriptionElement.textContent = description;
+  if (dateElement) dateElement.textContent = date;
+
+  // 모달 표시
+  modal.classList.remove("hidden");
+
+  // 닫기 버튼 이벤트 리스너
+  const closeBtn = document.getElementById("close-learn-modal");
+  if (closeBtn) {
+    closeBtn.addEventListener("click", () => {
+      modal.classList.add("hidden");
+    });
+  }
 }
