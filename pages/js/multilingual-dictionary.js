@@ -1470,15 +1470,24 @@ function fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage) {
   tabContainer.innerHTML = "";
   contentContainer.innerHTML = "";
 
-  // 언어탭 순서: 대상 언어, 나머지 언어들
+  // 언어탭 순서: 대상언어 → 원본언어 → 나머지 언어들
   const orderedLanguages = [];
 
-  // 1. 대상 언어가 있으면 먼저 추가
-  if (conceptData.expressions?.[targetLanguage]?.word) {
+  // 1. 대상언어 먼저 추가 (있는 경우)
+  if (targetLanguage && conceptData.expressions?.[targetLanguage]?.word) {
     orderedLanguages.push(targetLanguage);
   }
 
-  // 2. 나머지 언어들 추가 (대상 언어 제외)
+  // 2. 원본언어 추가 (있고, 대상언어와 다른 경우)
+  if (
+    sourceLanguage &&
+    conceptData.expressions?.[sourceLanguage]?.word &&
+    sourceLanguage !== targetLanguage
+  ) {
+    orderedLanguages.push(sourceLanguage);
+  }
+
+  // 3. 나머지 언어들 추가 (원본언어, 대상언어 제외)
   Object.keys(conceptData.expressions || {}).forEach((langCode) => {
     if (
       !orderedLanguages.includes(langCode) &&
@@ -1892,7 +1901,11 @@ function setupModalButtons(conceptData) {
 
           // 모달 닫기
           const viewModal = document.getElementById("concept-view-modal");
-          if (viewModal) viewModal.classList.add("hidden");
+          if (viewModal) {
+            viewModal.classList.add("hidden");
+            viewModal.style.display = "none";
+            console.log("✅ 삭제 후 모달 닫기 완료");
+          }
 
           // 목록 새로고침
           window.dispatchEvent(new CustomEvent("concept-saved"));
@@ -2129,6 +2142,20 @@ function setupEventListeners() {
   // 개념 저장 이벤트 리스너 (모달에서 호출)
   window.addEventListener("concept-saved", () => {
     console.log("💾 개념 저장 이벤트 수신");
+    fetchAndDisplayConcepts();
+    updateUsageUI();
+  });
+
+  // 개념 삭제 이벤트 리스너
+  window.addEventListener("concept-deleted", () => {
+    console.log("🗑️ 개념 삭제 이벤트 수신");
+    fetchAndDisplayConcepts();
+    updateUsageUI();
+  });
+
+  // 대량 개념 추가 이벤트 리스너
+  window.addEventListener("concepts-bulk-saved", () => {
+    console.log("📦 대량 개념 저장 이벤트 수신");
     fetchAndDisplayConcepts();
     updateUsageUI();
   });

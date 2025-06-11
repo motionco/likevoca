@@ -336,40 +336,21 @@ export async function showConceptModal(
     return;
   }
 
-  // 언어 탭 순서 재정렬 (AI 단어장과 다국어 단어장 구분)
+  // 언어 탭 순서 재정렬: AI 단어장에서는 대상언어 → 원본언어 → 나머지 순서
   const orderedLanguages = [];
-  const isAIVocabulary = window.location.pathname.includes("ai-vocabulary");
 
-  if (isAIVocabulary) {
-    // AI 단어장: 대상언어 → 원본언어 → 나머지 순서
-    // 1. 대상언어 먼저 추가
-    if (targetLanguage && availableLanguages.includes(targetLanguage)) {
-      orderedLanguages.push(targetLanguage);
-    }
+  // 1. 대상언어 먼저 추가
+  if (targetLanguage && availableLanguages.includes(targetLanguage)) {
+    orderedLanguages.push(targetLanguage);
+  }
 
-    // 2. 원본언어 추가 (대상언어와 다른 경우)
-    if (
-      sourceLanguage &&
-      availableLanguages.includes(sourceLanguage) &&
-      sourceLanguage !== targetLanguage
-    ) {
-      orderedLanguages.push(sourceLanguage);
-    }
-  } else {
-    // 다국어 단어장: 원본언어 → 대상언어 → 나머지 순서
-    // 1. 원본언어 먼저 추가 (있는 경우)
-    if (sourceLanguage && availableLanguages.includes(sourceLanguage)) {
-      orderedLanguages.push(sourceLanguage);
-    }
-
-    // 2. 대상언어 추가 (있고, 원본언어와 다른 경우)
-    if (
-      targetLanguage &&
-      availableLanguages.includes(targetLanguage) &&
-      targetLanguage !== sourceLanguage
-    ) {
-      orderedLanguages.push(targetLanguage);
-    }
+  // 2. 원본언어 추가 (대상언어와 다른 경우)
+  if (
+    sourceLanguage &&
+    availableLanguages.includes(sourceLanguage) &&
+    sourceLanguage !== targetLanguage
+  ) {
+    orderedLanguages.push(sourceLanguage);
   }
 
   // 3. 나머지 언어들 추가
@@ -379,10 +360,7 @@ export async function showConceptModal(
     }
   });
 
-  console.log(
-    `재정렬된 언어 순서 (${isAIVocabulary ? "AI 단어장" : "다국어 단어장"}):`,
-    orderedLanguages
-  );
+  console.log("재정렬된 언어 순서 (AI 단어장):", orderedLanguages);
 
   // 기본 개념 정보 설정 - 대상언어 우선, 없으면 첫 번째 언어 사용
   const primaryLang =

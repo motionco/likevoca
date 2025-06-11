@@ -7,7 +7,7 @@ import {
 } from "../../js/firebase/firebase-init.js";
 import { getActiveLanguage } from "../../utils/language-utils.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
-import { showConceptModal } from "../../components/js/concept-modal.js";
+import { showConceptModal } from "../../components/js/ai-concept-modal.js";
 import { handleAIConceptRecommendation } from "../../utils/ai-concept-utils.js";
 
 // 로컬 환경 감지
@@ -157,7 +157,7 @@ async function loadConceptViewModal() {
     // 로드 후 필수 요소들이 존재하는지 확인
     const requiredElements = [
       "concept-view-modal",
-      "concept-emoji",
+      "concept-view-emoji",
       "concept-view-title",
       "concept-view-pronunciation",
       "language-tabs",

@@ -235,6 +235,12 @@ async function uploadConcepts(data) {
     }
   }
 
+  // 개념 추가 완료 이벤트 발생
+  if (success > 0) {
+    window.dispatchEvent(new CustomEvent("concepts-bulk-saved"));
+    console.log("📦 대량 개념 추가 완료 이벤트 발생");
+  }
+
   return { success, errors };
 }
 

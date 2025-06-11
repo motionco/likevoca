@@ -1076,8 +1076,8 @@ export const conceptUtils = {
             examples: concept.examples || [],
 
             // 시간 정보 (단일화)
-            created_at: concept.created_at || new Date(),
-            createdAt: concept.created_at || new Date(), // 호환성
+            created_at: concept.created_at || concept.createdAt || new Date(),
+            createdAt: concept.created_at || concept.createdAt || new Date(), // 호환성
           };
         });
 

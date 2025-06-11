@@ -22,12 +22,13 @@
 
 ### 3. 개념 보기 모달
 
-- **파일**: `concept-view-modal.html`, `concept-modal.js`
-- **역할**: 개념 상세 정보 보기 (읽기 전용)
+- **파일**: `concept-view-modal.html`, `ai-concept-modal.js`
+- **역할**: AI 단어장 개념 상세 정보 보기 (읽기 전용)
 - **특징**:
+  - AI 단어장 전용
   - 다국어 표현을 탭으로 표시
   - 편집/삭제 버튼 제공
-  - 전역 함수: `window.showConceptModal(concept, sourceLanguage, targetLanguage)`
+  - 전역 함수: `showConceptModal(concept, sourceLanguage, targetLanguage)`
 
 ### 4. 공통 유틸리티
 

@@ -6,7 +6,7 @@
  * 구분:
  * - ai-edit-concept-modal.js: AI 개념 편집 전용
  * - edit-concept-modal.js: 다국어 단어장 편집 전용 (이 파일)
- * - concept-modal.js: 개념 보기 전용 (읽기 전용)
+ * - ai-concept-modal.js: AI 단어장 개념 보기 전용 (읽기 전용)
  */
 
 import {
