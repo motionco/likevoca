@@ -526,15 +526,25 @@ export const conceptUtils = {
         }
       }
 
-      // 개념 문서 업데이트
+      // 개념 문서 업데이트 - unicode_emoji 우선 사용
       const updateData = {
         ...newData,
         concept_info: {
           ...oldData.concept_info,
           ...newData.concept_info,
+          // unicode_emoji 우선 사용, emoji는 제거
+          unicode_emoji:
+            newData.concept_info?.unicode_emoji ||
+            oldData.concept_info?.unicode_emoji ||
+            oldData.concept_info?.emoji,
           updated_at: new Date(),
         },
       };
+
+      // 기존 emoji 속성 제거 (unicode_emoji로 통일)
+      if (updateData.concept_info.emoji) {
+        delete updateData.concept_info.emoji;
+      }
 
       await updateDoc(conceptRef, updateData);
       return conceptId;

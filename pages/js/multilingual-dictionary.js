@@ -349,7 +349,21 @@ const grammarTranslations = {
 
 // 다국어 번역 텍스트 가져오기 함수
 function getTranslatedText(key) {
-  return pageTranslations[userLanguage][key] || pageTranslations.en[key] || key;
+  // 최신 환경 언어 가져오기
+  const currentLang =
+    localStorage.getItem("preferredLanguage") || userLanguage || "ko";
+
+  // 전역 번역 시스템 사용 (language-utils.js에서 로드)
+  if (
+    window.translations &&
+    window.translations[currentLang] &&
+    window.translations[currentLang][key]
+  ) {
+    return window.translations[currentLang][key];
+  }
+
+  // 로컬 번역 시스템 fallback
+  return pageTranslations[currentLang][key] || pageTranslations.en[key] || key;
 }
 
 // 문법 설명을 환경 언어로 번역하는 함수
@@ -455,11 +469,8 @@ function createConceptCard(concept) {
   // 예문 가져오기 (concepts 컬렉션의 대표 예문 사용)
   let example = null;
 
-  console.log("카드 예문 디버깅 - 개념 데이터:", concept);
-
   // 1. representative_example 확인 (새 구조 - 우선순위 최고)
   if (concept.representative_example) {
-    console.log("representative_example 발견:", concept.representative_example);
     const repExample = concept.representative_example;
 
     if (repExample.translations) {
@@ -473,24 +484,20 @@ function createConceptCard(concept) {
           repExample.translations[targetLanguage] ||
           "",
       };
-      console.log("representative_example에서 예문 추출:", example);
     }
   }
   // 2. featured_examples 확인 (기존 방식)
   else if (concept.featured_examples && concept.featured_examples.length > 0) {
-    console.log("featured_examples 발견:", concept.featured_examples);
     const firstExample = concept.featured_examples[0];
     if (firstExample.translations) {
       example = {
         source: firstExample.translations[sourceLanguage]?.text || "",
         target: firstExample.translations[targetLanguage]?.text || "",
       };
-      console.log("featured_examples에서 예문 추출:", example);
     }
   }
   // 3. core_examples 확인 (기존 방식 - 하위 호환성)
   else if (concept.core_examples && concept.core_examples.length > 0) {
-    console.log("core_examples 발견:", concept.core_examples);
     const firstExample = concept.core_examples[0];
     // 번역 구조 확인
     if (firstExample.translations) {
@@ -498,28 +505,22 @@ function createConceptCard(concept) {
         source: firstExample.translations[sourceLanguage]?.text || "",
         target: firstExample.translations[targetLanguage]?.text || "",
       };
-      console.log("core_examples에서 예문 추출:", example);
     } else {
       // 직접 언어 속성이 있는 경우
       example = {
         source: firstExample[sourceLanguage] || "",
         target: firstExample[targetLanguage] || "",
       };
-      console.log("core_examples 직접 언어 속성에서 예문 추출:", example);
     }
   }
   // 4. 기존 examples 확인 (하위 호환성)
   else if (concept.examples && concept.examples.length > 0) {
-    console.log("기존 examples 발견:", concept.examples);
     const firstExample = concept.examples[0];
     example = {
       source: firstExample[sourceLanguage] || "",
       target: firstExample[targetLanguage] || "",
     };
-    console.log("기존 examples에서 예문 추출:", example);
   }
-
-  console.log("최종 예문 결과:", example);
 
   // 개념 ID 생성 (document ID 우선 사용)
   const conceptId =
@@ -676,16 +677,11 @@ function handleSearch(elements) {
     );
 
     if (!hasAnyExpression) {
-      console.log("표현이 없는 개념 필터링:", concept.id || concept._id);
       return false;
     }
 
     // 현재 선택된 언어 조합에서 적어도 하나는 있어야 함
     if (!sourceExpression?.word && !targetExpression?.word) {
-      console.log(
-        "선택된 언어 조합에 표현이 없는 개념:",
-        concept.id || concept._id
-      );
       return false;
     }
 
@@ -734,8 +730,6 @@ function handleSearch(elements) {
 
     return true;
   });
-
-  console.log(`필터링 결과: ${filteredConcepts.length}개 개념`);
 
   // 정렬
   sortFilteredConcepts(sortOption);
@@ -846,8 +840,6 @@ function displayConceptList() {
       loadMoreBtn.classList.add("hidden");
     }
   }
-
-  console.log(`📄 ${cardHTMLs.length}개 카드 표시 완료`);
 }
 
 // 더 보기 버튼 처리
@@ -922,14 +914,11 @@ async function fetchAndDisplayConcepts() {
   try {
     if (!currentUser) return;
 
-    console.log("개념 데이터 가져오기 시작...");
-
     // 분리된 컬렉션과 통합 컬렉션 모두에서 개념 가져오기
     allConcepts = [];
     const conceptsRef = collection(db, "concepts");
 
     // 분리된 컬렉션만 조회 (metadata.created_at 필드가 있는 개념들)
-    console.log("🔍 분리된 컬렉션에서 개념 조회 중...");
 
     try {
       // metadata.created_at으로 정렬하여 분리된 컬렉션 개념만 조회
@@ -949,13 +938,8 @@ async function fetchAndDisplayConcepts() {
         // AI 생성 개념 제외, 분리된 컬렉션 개념만 포함
         if (!data.isAIGenerated && data.metadata?.created_at) {
           allConcepts.push(data);
-          console.log("📊 분리된 컬렉션 개념 로딩:", data.id, data.expressions);
         }
       });
-
-      console.log(
-        `📚 분리된 컬렉션 조회 완료: ${allConcepts.length}개 개념 로딩`
-      );
     } catch (metadataOrderError) {
       console.warn(
         "metadata.created_at 정렬 실패, 전체 조회로 분리된 컬렉션 개념 필터링"
@@ -974,13 +958,8 @@ async function fetchAndDisplayConcepts() {
         // AI 생성 개념 제외, 분리된 컬렉션 개념만 포함 (metadata.created_at 필드로 구분)
         if (!data.isAIGenerated && data.metadata?.created_at) {
           allConcepts.push(data);
-          console.log("📊 분리된 컬렉션 개념 로딩:", data.id, data.expressions);
         }
       });
-
-      console.log(
-        `📚 필터링 후 분리된 컬렉션 개념: ${allConcepts.length}개 로딩`
-      );
     }
 
     // JavaScript에서 정렬 (분리된 컬렉션과 통합 컬렉션 모두 지원)
@@ -1017,14 +996,8 @@ async function fetchAndDisplayConcepts() {
       return getTime(b) - getTime(a); // 내림차순 정렬
     });
 
-    console.log(`📚 총 ${allConcepts.length}개 개념 로딩 완료`);
-
     // 전역 변수 업데이트 (편집 모달에서 접근 가능하도록)
     window.allConcepts = allConcepts;
-    console.log(
-      "🌍 전역 allConcepts 업데이트 완료:",
-      window.allConcepts.length
-    );
 
     // 학습 페이지에서 사용할 수 있도록 sessionStorage에도 저장
     try {
@@ -1032,7 +1005,6 @@ async function fetchAndDisplayConcepts() {
         "learningConcepts",
         JSON.stringify(allConcepts.slice(0, 100))
       ); // 성능을 위해 최대 100개
-      console.log("💾 학습용 개념 데이터 sessionStorage에 저장 완료");
     } catch (error) {
       console.warn("⚠️ sessionStorage 저장 실패:", error);
     }
@@ -1056,13 +1028,10 @@ async function fetchAndDisplayConcepts() {
 // 개념 상세 보기 모달 열기 함수 (전역 함수, ID 조회 개선)
 window.openConceptViewModal = async function (conceptId) {
   try {
-    console.log("모달 열기 시도, conceptId:", conceptId);
-
     // 사용자 언어 설정 업데이트 (AI 단어장과 동일하게)
     try {
       if (typeof getActiveLanguage === "function") {
         userLanguage = await getActiveLanguage();
-        console.log("🔍 [다국어 단어장] 사용자 언어 업데이트됨:", userLanguage);
       } else {
         console.warn(
           "getActiveLanguage 함수를 찾을 수 없습니다. 기본값을 사용합니다."
@@ -1083,8 +1052,6 @@ window.openConceptViewModal = async function (conceptId) {
     const sourceLanguage = document.getElementById("source-language").value;
     const targetLanguage = document.getElementById("target-language").value;
 
-    console.log("현재 언어 설정:", { sourceLanguage, targetLanguage });
-
     // 먼저 메모리에서 개념 찾기 (빠른 검색)
     let conceptData = allConcepts.find(
       (concept) =>
@@ -1094,14 +1061,10 @@ window.openConceptViewModal = async function (conceptId) {
           conceptId
     );
 
-    console.log("메모리에서 개념 찾기 결과:", conceptData ? "발견" : "없음");
-
     // 메모리에서 찾지 못했으면 Firebase에서 조회
     if (!conceptData) {
-      console.log("Firebase에서 개념 조회 시도...");
       try {
         conceptData = await conceptUtils.getConcept(conceptId);
-        console.log("Firebase 조회 결과:", conceptData);
       } catch (error) {
         console.error("Firebase 조회 실패:", error);
 
@@ -1113,24 +1076,12 @@ window.openConceptViewModal = async function (conceptId) {
             const tgtExpr = concept.expressions?.[targetLanguage];
             return srcExpr?.word === sourceWord && tgtExpr?.word === targetWord;
           });
-          console.log(
-            "단어 조합으로 재검색 결과:",
-            conceptData ? "발견" : "없음"
-          );
         }
       }
     }
 
     if (!conceptData) {
       console.error("개념을 찾을 수 없습니다. conceptId:", conceptId);
-      console.log(
-        "사용 가능한 개념들:",
-        allConcepts.map((c) => ({
-          id: c.id || c._id,
-          sourceWord: c.expressions?.[sourceLanguage]?.word,
-          targetWord: c.expressions?.[targetLanguage]?.word,
-        }))
-      );
       alert("개념 정보를 찾을 수 없습니다.");
       return;
     }
@@ -1199,7 +1150,6 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
 
   // 개념 정보
   const conceptInfo = conceptData.concept_info || {};
-  console.log("🏷️ 개념 정보:", conceptInfo);
 
   // 이모지와 색상 (개념 카드와 동일한 우선순위 적용)
   const emoji =
@@ -1210,66 +1160,20 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
     "📝";
   const colorTheme = conceptInfo.color_theme || "#4B63AC";
 
-  console.log("🔍 이모지 선택 디버깅:", {
-    conceptInfo_unicode_emoji: conceptInfo.unicode_emoji,
-    conceptInfo_emoji: conceptInfo.emoji,
-    conceptData_emoji: conceptData.emoji,
-    conceptData_unicode_emoji: conceptData.unicode_emoji,
-    final_emoji: emoji,
-    concept_info: conceptInfo,
-    concept_data: conceptData,
-  });
-
   const emojiElement = document.getElementById("concept-view-emoji");
-  console.log("🔍 이모지 요소 검색:", {
-    emojiElement: emojiElement,
-    modal: document.getElementById("concept-view-modal"),
-    allEmojiElements: document.querySelectorAll("#concept-view-emoji"),
-    modalContent: document
-      .getElementById("concept-view-modal")
-      ?.innerHTML?.substring(0, 500),
-  });
 
-  // 요소를 찾을 수 없을 때 DOM 상태 상세 분석
+  // 요소를 찾을 수 없을 때 지연 후 재시도
   if (!emojiElement) {
-    console.log("🔍 DOM 상세 분석:");
-    const modalExists = !!document.getElementById("concept-view-modal");
-    const modalVisible =
-      modalExists &&
-      window.getComputedStyle(document.getElementById("concept-view-modal"))
-        .display !== "none";
-    const allDivs = document.querySelectorAll("div[id*='concept']");
-    const allEmojis = document.querySelectorAll("div[id*='emoji']");
-
-    console.log({
-      modalExists,
-      modalVisible,
-      allConceptDivs: allDivs.length,
-      allEmojiDivs: allEmojis.length,
-      allConceptIds: Array.from(allDivs).map((d) => d.id),
-      allEmojiIds: Array.from(allEmojis).map((d) => d.id),
-    });
-
-    // 약간의 지연 후 재시도
     setTimeout(() => {
       const delayedEmojiElement = document.getElementById("concept-view-emoji");
-      console.log("🔄 지연 후 이모지 요소 재검색:", delayedEmojiElement);
       if (delayedEmojiElement && emoji) {
         delayedEmojiElement.textContent = emoji;
-        console.log("✅ 지연 후 보기 모달 이모지 설정 완료:", emoji);
       }
     }, 100);
   }
 
   if (emojiElement && emoji) {
     emojiElement.textContent = emoji;
-    console.log("✅ 보기 모달 이모지 설정 완료:", emoji);
-  } else if (!emojiElement) {
-    console.log(
-      "❌ concept-view-emoji 요소를 찾을 수 없습니다. 모달이 제대로 로드되지 않았을 수 있습니다."
-    );
-  } else if (!emoji) {
-    console.log("❌ emoji가 없습니다.");
   }
 
   const headerElement = document.querySelector(".concept-view-header");
@@ -1296,65 +1200,18 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
 
   // 모달 내 다국어 번역 적용 - AI 단어장과 동일한 data-i18n 방식 사용
   setTimeout(() => {
-    console.log("🔍 [다국어 단어장] 모달 번역 적용 시작");
     const modal = document.getElementById("concept-view-modal");
-    console.log("🔍 [다국어 단어장] 모달 요소:", modal);
 
     if (modal) {
-      const dataI18nElements = modal.querySelectorAll("[data-i18n]");
-      console.log(
-        "🔍 [다국어 단어장] data-i18n 요소들:",
-        dataI18nElements.length,
-        "개"
-      );
-
-      // 모든 data-i18n 요소들 로그 출력
-      dataI18nElements.forEach((element, index) => {
-        const key = element.getAttribute("data-i18n");
-        console.log(`🔍 [다국어 단어장] 요소 ${index + 1}:`, {
-          element: element,
-          tagName: element.tagName,
-          key: key,
-          currentText: element.textContent,
-          className: element.className,
-        });
-      });
-
-      console.log("🔍 [다국어 단어장] 현재 사용자 언어:", userLanguage);
-      console.log(
-        "🔍 [다국어 단어장] pageTranslations 확인:",
-        pageTranslations
-      );
-      console.log(
-        "🔍 [다국어 단어장] pageTranslations[userLanguage]:",
-        pageTranslations[userLanguage]
-      );
-
       // 모달 내부의 data-i18n 요소들 번역 (AI 단어장과 동일한 방식)
-      modal.querySelectorAll("[data-i18n]").forEach((element, index) => {
+      modal.querySelectorAll("[data-i18n]").forEach((element) => {
         const key = element.getAttribute("data-i18n");
         const translatedText = getTranslatedText(key);
-        console.log(`🔍 [다국어 단어장] 번역 ${index + 1}:`, {
-          key: key,
-          translatedText: translatedText,
-          beforeText: element.textContent,
-        });
 
         if (translatedText) {
           element.textContent = translatedText;
-          console.log(`✅ [다국어 단어장] 번역 적용됨 ${index + 1}:`, {
-            key: key,
-            afterText: element.textContent,
-          });
-        } else {
-          console.log(`❌ [다국어 단어장] 번역 실패 ${index + 1}:`, {
-            key: key,
-            reason: "translatedText가 없음",
-          });
         }
       });
-    } else {
-      console.log("❌ [다국어 단어장] 모달 요소를 찾을 수 없음");
     }
   }, 100);
 }
@@ -1489,40 +1346,9 @@ async function loadAndDisplayExamples(
       `;
     });
 
-    console.log(
-      `모달에 표시할 예문 수: ${allExamples.length} (concepts 컬렉션에서만)`
-    );
-    console.log("🔍 생성된 examplesHTML:", examplesHTML);
-    console.log("📋 examplesContainer 요소:", examplesContainer);
-
     if (examplesHTML) {
-      console.log("✅ 예문 HTML을 컨테이너에 삽입 중...");
-      console.log("🔍 컨테이너 삽입 전 스타일:", {
-        display: getComputedStyle(examplesContainer).display,
-        visibility: getComputedStyle(examplesContainer).visibility,
-        opacity: getComputedStyle(examplesContainer).opacity,
-        height: getComputedStyle(examplesContainer).height,
-      });
       examplesContainer.innerHTML = examplesHTML;
-      console.log(
-        "✅ 예문 HTML 삽입 완료, 컨테이너 내용:",
-        examplesContainer.innerHTML
-      );
-      console.log("🔍 컨테이너 삽입 후 스타일:", {
-        display: getComputedStyle(examplesContainer).display,
-        visibility: getComputedStyle(examplesContainer).visibility,
-        opacity: getComputedStyle(examplesContainer).opacity,
-        height: getComputedStyle(examplesContainer).height,
-      });
-      console.log("🔍 컨테이너 부모 요소:", examplesContainer.parentElement);
-      console.log("🔍 모달 표시 상태:", {
-        modal: document.getElementById("concept-view-modal"),
-        modalDisplay: getComputedStyle(
-          document.getElementById("concept-view-modal")
-        ).display,
-      });
     } else {
-      console.log("⚠️ 예문 HTML이 비어있음, 기본 메시지 표시");
       examplesContainer.innerHTML = `
         <div class="text-center text-gray-500 py-4">
           <i class="fas fa-quote-left text-2xl mb-2"></i>

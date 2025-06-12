@@ -28,7 +28,6 @@ import {
   getDefaultPartOfSpeech,
   translatePartOfSpeech,
   applyModalTranslations,
-  setEditModalCategoryAndEmoji,
 } from "./concept-modal-utils.js";
 
 // 전역 변수 (편집 모드 전용)
@@ -37,8 +36,6 @@ let supportedLangs = { ...supportedLanguages };
 
 // 편집 모달 초기화
 export async function initialize() {
-  console.log("🔄 개념 편집 모달 초기화");
-
   // 편집 상태 확인
   editConceptId = sessionStorage.getItem("editConceptId");
 
@@ -48,8 +45,6 @@ export async function initialize() {
     closeModal();
     return;
   }
-
-  console.log("📝 편집 대상 개념 ID:", editConceptId);
 
   // 모달 제목과 버튼 설정
   const modalTitle = document.querySelector("#edit-concept-modal h2");
@@ -62,7 +57,7 @@ export async function initialize() {
   if (saveBtn) {
     saveBtn.addEventListener("click", (e) => {
       e.preventDefault();
-      console.log("💾 수정 버튼 클릭됨, 기본 동작 방지됨");
+
       saveConcept();
     });
   }
@@ -72,40 +67,23 @@ export async function initialize() {
   if (cancelBtn) {
     cancelBtn.addEventListener("click", (e) => {
       e.preventDefault();
-      console.log("❌ 취소 버튼 클릭됨");
 
       if (confirm("편집을 취소하시겠습니까? 변경사항이 저장되지 않습니다.")) {
         resetEditForm();
         closeEditModal();
         sessionStorage.removeItem("editConceptId");
         editConceptId = null;
-        console.log("✅ 편집 취소 완료");
       }
     });
   }
 
-  // X 버튼 이벤트 설정
-  const closeBtn = document.getElementById("close-edit-concept-modal");
-  if (closeBtn) {
-    closeBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      console.log("❌ X 버튼 클릭됨");
-
-      if (confirm("편집을 취소하시겠습니까? 변경사항이 저장되지 않습니다.")) {
-        resetEditForm();
-        closeEditModal();
-        sessionStorage.removeItem("editConceptId");
-        editConceptId = null;
-        console.log("✅ 편집 취소 완료");
-      }
-    });
-  }
+  // X 버튼 이벤트 설정 (중복 방지)
+  setupEditModalCloseButton();
 
   // 환경 설정 언어 가져오기
   let userLanguage = "ko";
   try {
     userLanguage = await getActiveLanguage();
-    console.log("🌐 사용자 언어:", userLanguage);
   } catch (error) {
     console.warn("언어 설정 로드 실패, 기본값 사용:", error);
   }
@@ -116,15 +94,11 @@ export async function initialize() {
   // 언어 탭 이벤트 리스너 설정 (커스텀 함수 사용)
   setupEditLanguageTabs();
 
-  // 예문 추가 버튼 이벤트 설정
-  const addExampleBtn = document.getElementById("edit-add-example");
-  if (addExampleBtn) {
-    addExampleBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      console.log("➕ 예문 추가 버튼 클릭됨");
-      addEditExampleFields(null, false);
-    });
-  }
+  // 편집 모달 도메인-카테고리 이벤트 리스너 설정
+  setupEditDomainCategoryListeners();
+
+  // 예문 추가 버튼 이벤트 설정 (중복 방지)
+  setupEditModalAddExampleButton();
 
   // 개념 데이터 로드 및 폼 채우기
   await fetchConceptForEdit(editConceptId);
@@ -133,8 +107,6 @@ export async function initialize() {
 // 편집용 개념 데이터 가져오기
 async function fetchConceptForEdit(conceptId) {
   try {
-    console.log("📋 편집용 개념 데이터 가져오기:", conceptId);
-
     let conceptData = null;
 
     // 메모리에서 개념 찾기 (여러 소스 확인)
@@ -154,7 +126,6 @@ async function fetchConceptForEdit(conceptId) {
             concept._id === conceptId
         );
         if (conceptData) {
-          console.log("💾 메모리에서 개념 발견");
           break;
         }
       }
@@ -162,7 +133,6 @@ async function fetchConceptForEdit(conceptId) {
 
     // 메모리에서 찾지 못했으면 Firebase 조회
     if (!conceptData) {
-      console.log("🔍 Firebase에서 개념 조회 시도...");
       try {
         conceptData = await conceptUtils.getConcept(conceptId);
         console.log(
@@ -181,7 +151,6 @@ async function fetchConceptForEdit(conceptId) {
       throw new Error("개념 정보를 찾을 수 없습니다.");
     }
 
-    console.log("✅ 개념 데이터 로드 성공");
     fillFormWithConceptData(conceptData);
   } catch (error) {
     console.error("❌ 개념 정보를 가져오는 중 오류:", error);
@@ -210,11 +179,36 @@ function fillFormWithConceptData(conceptData) {
       conceptData.concept_info?.category || conceptData.category || "common";
   }
   if (emojiField) {
-    emojiField.value =
-      conceptData.concept_info?.emoji ||
+    const emojiValue =
       conceptData.concept_info?.unicode_emoji ||
+      conceptData.concept_info?.emoji ||
       conceptData.unicode_emoji ||
       "📝";
+
+    // 전역 저장소에 이모지 값 저장
+    window.editConceptEmojiValue = emojiValue;
+    console.log(
+      "💾 편집 모달 초기화 시 전역 저장소에 이모지 값 저장:",
+      emojiValue
+    );
+
+    console.log("🔍 편집 모달 이모지 직접 설정 시도:", {
+      conceptData_concept_info: conceptData.concept_info,
+      conceptData_unicode_emoji: conceptData.unicode_emoji,
+      conceptData_emoji: conceptData.emoji,
+      emojiValue,
+      emojiField: emojiField,
+      emojiFieldId: emojiField.id,
+    });
+
+    emojiField.value = emojiValue;
+    console.log("🔍 편집 모달 이모지 직접 설정 완료:", {
+      emojiValue,
+      currentValue: emojiField.value,
+      success: emojiField.value === emojiValue,
+    });
+  } else {
+    console.log("❌ 편집 모달 이모지 필드를 찾을 수 없음");
   }
 
   // 언어별 표현 채우기
@@ -332,10 +326,27 @@ function fillFormWithConceptData(conceptData) {
       conceptData.examples.length > 0
     ) {
       console.log("🔍 다국어 추가 예문 처리:", conceptData.examples);
-      for (const example of conceptData.examples) {
-        console.log("✅ 다국어 추가 예문 추가:", example);
-        addEditExampleFields(example, false);
+
+      // 대표 예문이 없는 경우, 첫 번째 예문을 대표 예문으로 처리
+      if (!hasExamples && conceptData.examples.length > 0) {
+        const firstExample = conceptData.examples[0];
+        console.log("✅ 첫 번째 예문을 대표 예문으로 추가:", firstExample);
+        addEditExampleFields(firstExample, true);
         hasExamples = true;
+
+        // 나머지 예문들을 일반 예문으로 추가
+        for (let i = 1; i < conceptData.examples.length; i++) {
+          const example = conceptData.examples[i];
+          console.log("✅ 다국어 추가 예문 추가:", example);
+          addEditExampleFields(example, false);
+        }
+      } else {
+        // 대표 예문이 이미 있는 경우, 모든 예문을 일반 예문으로 추가
+        for (const example of conceptData.examples) {
+          console.log("✅ 다국어 추가 예문 추가:", example);
+          addEditExampleFields(example, false);
+          hasExamples = true;
+        }
       }
     } else {
       console.log(
@@ -357,31 +368,56 @@ function fillFormWithConceptData(conceptData) {
     );
   }
 
-  // 카테고리와 이모지 옵션 설정 (도메인 기반 캐스케이딩)
+  // 카테고리와 이모지 설정 (개념 추가와 동일한 방식)
   setEditModalCategoryAndEmoji(conceptData);
 
   console.log("✅ 폼 데이터 채우기 완료");
 }
 
+// 편집 모달 카테고리와 이모지 설정 (개념 추가와 동일한 방식)
+function setEditModalCategoryAndEmoji(conceptData) {
+  // 전역 저장소에 DB 이모지 값 저장 (옵션 생성에서 사용)
+  const dbEmoji =
+    conceptData.concept_info?.unicode_emoji ||
+    conceptData.concept_info?.emoji ||
+    conceptData.unicode_emoji;
+
+  if (dbEmoji) {
+    window.editConceptEmojiValue = dbEmoji;
+  }
+
+  // 도메인 설정
+  const domainField = document.getElementById("edit-concept-domain");
+  if (domainField && conceptData.domain) {
+    domainField.value = conceptData.domain;
+
+    // 도메인 변경 이벤트 트리거 (카테고리 옵션 자동 생성)
+    domainField.dispatchEvent(new Event("change"));
+
+    // 카테고리 설정 (도메인 변경 후 약간의 지연)
+    setTimeout(() => {
+      const categoryField = document.getElementById("edit-concept-category");
+      if (categoryField && conceptData.category) {
+        categoryField.value = conceptData.category;
+        // 카테고리 변경 이벤트 트리거 (이모지 옵션 자동 생성)
+        categoryField.dispatchEvent(new Event("change"));
+      }
+    }, 100);
+  }
+}
+
 // 개념 수정 저장
 async function saveConcept() {
   try {
-    console.log("🔄 개념 수정 시작:", editConceptId);
-
     if (!validateEditForm()) {
-      console.log("❌ 폼 검증 실패");
       return;
     }
 
-    console.log("✅ 폼 검증 통과");
     const conceptData = collectEditFormData();
-    console.log("📋 수집된 데이터:", conceptData);
 
     try {
       // 다국어 단어장 개념 수정
-      console.log("📝 다국어 단어장 개념 수정 시도...");
       await conceptUtils.updateConcept(editConceptId, conceptData);
-      console.log("✅ 다국어 단어장 개념 수정 성공");
 
       alert("개념이 성공적으로 수정되었습니다.");
 
@@ -389,10 +425,8 @@ async function saveConcept() {
       closeEditModal();
 
       // 화면 업데이트 이벤트 발생
-      console.log("🔔 개념 수정 완료 - 화면 업데이트 이벤트 발생");
       if (window.dispatchEvent) {
         window.dispatchEvent(new CustomEvent("concept-saved"));
-        console.log("✅ concept-saved 이벤트 발생 완료");
       }
 
       // 편집 상태 초기화
@@ -400,7 +434,6 @@ async function saveConcept() {
       editConceptId = null;
 
       // 페이지 새로고침으로 즉각 반영
-      console.log("🔄 페이지 새로고침으로 변경사항 즉각 반영");
       setTimeout(() => {
         window.location.reload();
       }, 100);
@@ -415,7 +448,103 @@ async function saveConcept() {
   }
 }
 
-// 편집 모달용 언어탭 설정
+// 편집 모달 X 버튼 이벤트 설정 (중복 방지)
+function setupEditModalCloseButton() {
+  const closeBtn = document.getElementById("close-edit-concept-modal");
+  if (closeBtn) {
+    // 기존 이벤트 리스너 제거 (클론으로 완전 제거)
+    const newCloseBtn = closeBtn.cloneNode(true);
+    closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+
+    // 새로운 이벤트 리스너 등록
+    newCloseBtn.addEventListener("click", handleEditModalClose);
+  }
+}
+
+// 편집 모달 X 버튼 클릭 핸들러
+function handleEditModalClose(e) {
+  e.preventDefault();
+
+  if (confirm("편집을 취소하시겠습니까? 변경사항이 저장되지 않습니다.")) {
+    resetEditForm();
+    closeEditModal();
+    sessionStorage.removeItem("editConceptId");
+    editConceptId = null;
+  }
+}
+
+// 편집 모달 예문 추가 버튼 이벤트 설정 (중복 방지)
+function setupEditModalAddExampleButton() {
+  const addExampleBtn = document.getElementById("edit-add-example");
+  if (addExampleBtn) {
+    // 기존 이벤트 리스너 제거 (클론으로 완전 제거)
+    const newAddExampleBtn = addExampleBtn.cloneNode(true);
+    addExampleBtn.parentNode.replaceChild(newAddExampleBtn, addExampleBtn);
+
+    // 새로운 이벤트 리스너 등록
+    newAddExampleBtn.addEventListener("click", handleAddExampleClick);
+  }
+}
+
+// 편집 모달 예문 추가 버튼 클릭 핸들러
+function handleAddExampleClick(e) {
+  e.preventDefault();
+
+  addEditExampleFields(null, false);
+}
+
+// 편집 모달 도메인-카테고리 이벤트 리스너 설정 (중복 방지)
+function setupEditDomainCategoryListeners() {
+  const domainSelect = document.getElementById("edit-concept-domain");
+  const categorySelect = document.getElementById("edit-concept-category");
+
+  if (domainSelect) {
+    // 클론 방식으로 기존 이벤트 리스너 완전 제거
+    const newDomainSelect = domainSelect.cloneNode(true);
+    domainSelect.parentNode.replaceChild(newDomainSelect, domainSelect);
+
+    // 새로운 이벤트 리스너 등록
+    newDomainSelect.addEventListener("change", handleEditDomainChange);
+  }
+
+  if (categorySelect) {
+    // 클론 방식으로 기존 이벤트 리스너 완전 제거
+    const newCategorySelect = categorySelect.cloneNode(true);
+    categorySelect.parentNode.replaceChild(newCategorySelect, categorySelect);
+
+    // 새로운 이벤트 리스너 등록
+    newCategorySelect.addEventListener("change", handleEditCategoryChange);
+  }
+}
+
+// 편집 모달 도메인 변경 핸들러
+function handleEditDomainChange(event) {
+  // 카테고리 옵션 업데이트
+  if (typeof updateEditCategoryOptions === "function") {
+    updateEditCategoryOptions();
+  }
+
+  // 카테고리 초기화 (첫 번째 옵션 선택)
+  setTimeout(() => {
+    const categorySelect = document.getElementById("edit-concept-category");
+    if (categorySelect && categorySelect.options.length > 1) {
+      categorySelect.selectedIndex = 1; // 첫 번째 실제 옵션 선택 (0은 플레이스홀더)
+
+      // 카테고리 변경 이벤트 트리거
+      categorySelect.dispatchEvent(new Event("change"));
+    }
+  }, 50);
+}
+
+// 편집 모달 카테고리 변경 핸들러
+function handleEditCategoryChange(event) {
+  // 이모지 옵션 업데이트
+  if (typeof updateEditEmojiOptions === "function") {
+    updateEditEmojiOptions();
+  }
+}
+
+// 편집 모달용 언어탭 설정 (중복 방지 개선)
 function setupEditLanguageTabs() {
   console.log("🔄 편집 모달 언어탭 설정");
 
@@ -430,17 +559,15 @@ function setupEditLanguageTabs() {
     "#edit-language-tabs .edit-language-tab"
   );
 
-  // 모든 기존 이벤트 리스너 완전 제거
+  // 모든 기존 이벤트 리스너 완전 제거 (클론 방식)
+  const newTabButtons = [];
   tabButtons.forEach((button) => {
-    // 새로운 클론 생성으로 모든 이벤트 리스너 제거
     const newButton = button.cloneNode(true);
     button.parentNode.replaceChild(newButton, button);
+    newTabButtons.push(newButton);
   });
 
   // 새로운 버튼들에 이벤트 리스너 추가
-  const newTabButtons = editModal.querySelectorAll(
-    "#edit-language-tabs .edit-language-tab"
-  );
   newTabButtons.forEach((button) => {
     button.addEventListener("click", handleTabClick);
   });
@@ -539,8 +666,6 @@ function switchEditLanguageTab(language) {
 
 // 편집 모달 열기 (전역 함수)
 window.openEditConceptModal = async function (conceptId) {
-  console.log("🔄 개념 편집 모달 열기:", conceptId);
-
   // 편집 상태 설정
   sessionStorage.setItem("editConceptId", conceptId);
   editConceptId = conceptId;

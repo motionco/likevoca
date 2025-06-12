@@ -543,10 +543,18 @@ function updateEditCategoryOptions() {
 
 // 편집 모달용 카테고리 선택 변경 시 이모지 업데이트
 function updateEditEmojiOptions() {
+  console.log("🔄 편집 모달 이모지 옵션 업데이트 시작");
+
   const categorySelect = document.getElementById("edit-concept-category");
   const emojiSelect = document.getElementById("edit-concept-emoji");
 
-  if (!categorySelect || !emojiSelect) return;
+  if (!categorySelect || !emojiSelect) {
+    console.log("❌ 편집 모달 이모지 업데이트: 필드를 찾을 수 없음", {
+      categorySelect: !!categorySelect,
+      emojiSelect: !!emojiSelect,
+    });
+    return;
+  }
 
   const selectedCategory = categorySelect.value;
   const currentLang =
@@ -554,29 +562,79 @@ function updateEditEmojiOptions() {
     localStorage.getItem("userLanguage") ||
     "ko";
 
-  // 현재 선택된 이모지 값 저장
-  const selectedEmoji = emojiSelect.value;
+  // DB에서 가져온 원본 이모지 값 (전역 저장소에서 확인)
+  const originalDbEmoji = window.editConceptEmojiValue;
+
+  console.log("🔍 편집 모달 이모지 업데이트:", {
+    selectedCategory,
+    currentLang,
+    originalDbEmoji,
+    categoryEmojiMapping: !!categoryEmojiMapping[selectedCategory],
+    availableEmojis: categoryEmojiMapping[selectedCategory],
+  });
 
   // 이모지 옵션 초기화 (현재 환경 언어로 플레이스홀더 설정)
   const emojiPlaceholder = getTranslation("select_emoji", currentLang);
   emojiSelect.innerHTML = `<option value="" style="display: none;">${emojiPlaceholder}</option>`;
 
   if (selectedCategory && categoryEmojiMapping[selectedCategory]) {
-    const emojis = categoryEmojiMapping[selectedCategory];
+    let emojis = [...categoryEmojiMapping[selectedCategory]]; // 복사본 생성
 
-    emojis.forEach((emoji) => {
+    // DB 이모지가 하드코딩 옵션에 없으면 동적으로 추가
+    if (originalDbEmoji && !emojis.includes(originalDbEmoji)) {
+      emojis.unshift(originalDbEmoji); // 맨 앞에 추가
+      console.log("🔄 DB 이모지를 옵션에 동적 추가:", {
+        originalDbEmoji,
+        wasInHardcoded: false,
+        newEmojiList: emojis,
+      });
+    }
+
+    console.log("✅ 편집 모달 이모지 옵션 생성:", emojis);
+
+    emojis.forEach((emoji, index) => {
       const option = document.createElement("option");
       option.value = emoji;
       option.textContent = emoji;
+
+      // DB 원본 이모지인 경우 표시
+      if (
+        emoji === originalDbEmoji &&
+        !categoryEmojiMapping[selectedCategory].includes(emoji)
+      ) {
+        option.textContent = `${emoji} (현재)`;
+        option.style.fontWeight = "bold";
+        option.style.color = "#2563eb";
+      }
+
       emojiSelect.appendChild(option);
     });
 
-    // 이모지 선택값 복원
-    if (selectedEmoji && emojis.includes(selectedEmoji)) {
-      emojiSelect.value = selectedEmoji;
-      console.log("✅ 편집 모달 이모지 값 복원:", selectedEmoji);
+    console.log("✅ 편집 모달 이모지 옵션 생성 완료, 총", emojis.length, "개");
+
+    // DB 원본 이모지로 선택 상태 설정
+    if (originalDbEmoji) {
+      emojiSelect.value = originalDbEmoji;
+      console.log("✅ 편집 모달 DB 원본 이모지로 설정:", {
+        originalDbEmoji,
+        finalValue: emojiSelect.value,
+        success: emojiSelect.value === originalDbEmoji,
+      });
+    } else {
+      // DB 이모지가 없으면 첫 번째 하드코딩 이모지 선택
+      if (emojis.length > 0) {
+        emojiSelect.value = emojis[0];
+        console.log("✅ 편집 모달 기본 이모지로 설정:", emojis[0]);
+      }
     }
+  } else {
+    console.log("❌ 편집 모달 이모지 매핑 없음:", {
+      selectedCategory,
+      hasCategoryMapping: !!categoryEmojiMapping[selectedCategory],
+    });
   }
+
+  console.log("✅ 편집 모달 이모지 옵션 업데이트 완료");
 }
 
 // 전체 도메인-카테고리-이모지 언어 업데이트 함수

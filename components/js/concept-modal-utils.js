@@ -102,7 +102,7 @@ export function collectFormData() {
   const conceptInfo = {
     domain: domainField ? domainField.value.trim() : "",
     category: categoryField ? categoryField.value.trim() : "",
-    emoji: emojiField ? emojiField.value.trim() : "",
+    unicode_emoji: emojiField ? emojiField.value.trim() : "", // emoji → unicode_emoji로 변경
     images: [],
   };
 
@@ -179,9 +179,9 @@ export function collectFormData() {
     let hasContent = false;
 
     // 대표 예문인지 확인
-    const isRepresentative = item
-      .querySelector("span")
-      .textContent.includes("대표 예문");
+    const spanElement = item.querySelector("span");
+    const isRepresentative =
+      spanElement && spanElement.textContent.includes("대표 예문");
 
     // 각 언어별 예제 수집
     for (const langCode of Object.keys(supportedLangs)) {
@@ -205,7 +205,14 @@ export function collectFormData() {
   });
 
   const result = {
-    concept_info: conceptInfo,
+    concept_info: {
+      domain: conceptInfo.domain,
+      category: conceptInfo.category,
+      unicode_emoji: conceptInfo.unicode_emoji, // 명시적으로 unicode_emoji 사용
+      images: conceptInfo.images || [],
+      created_at: new Date(),
+      updated_at: new Date(),
+    },
     expressions: expressions,
     examples: examples,
     // 기존 시스템과의 호환성을 위한 추가 필드들
@@ -411,15 +418,15 @@ export function addExampleFields(
     const langName = supportedLangs[langCode];
     const existingValue = existingExample?.[langCode] || "";
 
-    // 기본 예문 설정
-    const defaultExamples = {
+    // 플레이스홀더용 예문 설정 (실제 값으로 사용하지 않음)
+    const placeholderExamples = {
       korean: "나는 빨간 사과를 좋아한다.",
       english: "I like red apples.",
       japanese: "私は赤いりんごが好きです。",
       chinese: "我喜欢红苹果。",
     };
 
-    const defaultValue = existingValue;
+    const defaultValue = existingValue || "";
     const i18nKey = `${langCode}_example`;
 
     exampleHTML += `
@@ -429,7 +436,7 @@ export function addExampleFields(
           class="${langCode}-example w-full p-2 border rounded-md resize-none"
           rows="2"
           placeholder="${
-            defaultExamples[langCode] || `${langName} 예문을 입력하세요`
+            placeholderExamples[langCode] || `${langName} 예문을 입력하세요`
           }">${defaultValue}</textarea>
       </div>
     `;
@@ -689,94 +696,6 @@ function updatePlaceholdersForCurrentLanguage(langCode) {
 }
 
 // 편집 모달에서 카테고리와 이모지 옵션 설정
-export function setEditModalCategoryAndEmoji(conceptData) {
-  // 개념 정보에서 도메인, 카테고리, 이모지 추출
-  const domain = conceptData.concept_info?.domain || conceptData.domain;
-  const category = conceptData.concept_info?.category || conceptData.category;
-  const emoji = conceptData.concept_info?.emoji || conceptData.emoji;
-
-  console.log("🔄 편집 모달 카테고리/이모지 설정:", {
-    domain,
-    category,
-    emoji,
-  });
-
-  // 도메인이 설정되어 있으면 카테고리 옵션 업데이트
-  if (domain) {
-    const domainSelect = document.getElementById("edit-concept-domain");
-    if (domainSelect) {
-      domainSelect.value = domain;
-
-      // 카테고리 옵션 업데이트 (window 객체를 통해 호출)
-      if (typeof window.updateEditCategoryOptions === "function") {
-        window.updateEditCategoryOptions();
-
-        // 카테고리 값 설정 (약간의 지연을 두어 옵션이 추가된 후 설정)
-        setTimeout(() => {
-          const categorySelect = document.getElementById(
-            "edit-concept-category"
-          );
-          if (categorySelect && category) {
-            categorySelect.value = category;
-            console.log(
-              "🔄 편집 모달 카테고리 직접 설정:",
-              category,
-              "현재 값:",
-              categorySelect.value
-            );
-
-            // 카테고리 설정이 제대로 되지 않았다면 다시 시도
-            if (categorySelect.value !== category) {
-              // 옵션이 존재하는지 확인
-              const categoryOption = categorySelect.querySelector(
-                `option[value="${category}"]`
-              );
-              if (categoryOption) {
-                categorySelect.value = category;
-                console.log("🔄 편집 모달 카테고리 재설정 시도:", category);
-              } else {
-                console.log("❌ 편집 모달 카테고리 옵션 없음:", category);
-              }
-            }
-
-            // 이모지 옵션 업데이트
-            if (typeof window.updateEditEmojiOptions === "function") {
-              window.updateEditEmojiOptions();
-
-              // 이모지 값 설정
-              setTimeout(() => {
-                const emojiSelect =
-                  document.getElementById("edit-concept-emoji");
-                if (emojiSelect && emoji) {
-                  emojiSelect.value = emoji;
-                  console.log(
-                    "🔄 편집 모달 이모지 설정:",
-                    emoji,
-                    "현재 값:",
-                    emojiSelect.value
-                  );
-
-                  // 이모지 설정이 제대로 되지 않았다면 다시 시도
-                  if (emojiSelect.value !== emoji) {
-                    const emojiOption = emojiSelect.querySelector(
-                      `option[value="${emoji}"]`
-                    );
-                    if (emojiOption) {
-                      emojiSelect.value = emoji;
-                      console.log("🔄 편집 모달 이모지 재설정 시도:", emoji);
-                    } else {
-                      console.log("❌ 편집 모달 이모지 옵션 없음:", emoji);
-                    }
-                  }
-                }
-              }, 100);
-            }
-          }
-        }, 100);
-      }
-    }
-  }
-}
 
 // 편집 모달용 함수들 (별도 ID 사용)
 
@@ -824,7 +743,7 @@ export function collectEditFormData() {
   const conceptInfo = {
     domain: domainField ? domainField.value.trim() : "",
     category: categoryField ? categoryField.value.trim() : "",
-    emoji: emojiField ? emojiField.value.trim() : "",
+    unicode_emoji: emojiField ? emojiField.value.trim() : "", // emoji → unicode_emoji로 변경
     images: [], // 이미지는 나중에 구현
   };
 
@@ -910,9 +829,9 @@ export function collectEditFormData() {
       let hasContent = false;
 
       // 대표 예문인지 확인
-      const isRepresentative = item
-        .querySelector("span")
-        .textContent.includes("대표 예문");
+      const spanElement = item.querySelector("span");
+      const isRepresentative =
+        spanElement && spanElement.textContent.includes("대표 예문");
 
       // 각 언어별 예제 수집
       for (const langCode of Object.keys(supportedLangs)) {
@@ -938,7 +857,13 @@ export function collectEditFormData() {
     });
 
   const result = {
-    concept_info: conceptInfo,
+    concept_info: {
+      domain: conceptInfo.domain,
+      category: conceptInfo.category,
+      unicode_emoji: conceptInfo.unicode_emoji, // 명시적으로 unicode_emoji 사용
+      images: conceptInfo.images || [],
+      updated_at: new Date(),
+    },
     expressions: expressions,
     examples: examples,
     // 기존 시스템과의 호환성을 위한 추가 필드들
@@ -1016,6 +941,15 @@ export function closeEditModal() {
   if (modal) {
     modal.classList.add("hidden");
   }
+
+  // 전역 저장소 정리
+  if (window.editConceptEmojiValue) {
+    console.log(
+      "🧹 편집 모달 닫기 시 전역 저장소 정리:",
+      window.editConceptEmojiValue
+    );
+    delete window.editConceptEmojiValue;
+  }
 }
 
 // 편집 모달용 예제 필드 추가
@@ -1038,20 +972,20 @@ export function addEditExampleFields(
   const exampleItem = document.createElement("div");
   exampleItem.className = "example-item border rounded-lg p-4 mb-4";
 
-  // 예제 레이블 (대표 예문 레이블 제거)
+  // 예제 레이블 (대표 예문 포함)
   const labelText = isRepresentative
-    ? ""
+    ? "대표 예문"
     : `예문 ${containerFound.children.length + 1}`;
 
   let exampleHTML = `
-    ${
-      labelText
-        ? `<div class="flex justify-between items-center mb-3">
+    <div class="flex justify-between items-center mb-3">
       <span class="font-medium text-gray-700">${labelText}</span>
-      <button type="button" class="text-red-500 hover:text-red-700" onclick="this.closest('.example-item').remove()">삭제</button>
-    </div>`
-        : ""
-    }
+      ${
+        !isRepresentative
+          ? `<button type="button" class="text-red-500 hover:text-red-700" onclick="this.closest('.example-item').remove()">삭제</button>`
+          : ""
+      }
+    </div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
   `;
 
@@ -1060,17 +994,15 @@ export function addEditExampleFields(
     const langName = supportedLangs[langCode];
     const existingValue = existingExample?.[langCode] || "";
 
-    // 기본 예문 설정
-    const defaultExamples = {
+    // 플레이스홀더용 예문 설정 (실제 값으로 사용하지 않음)
+    const placeholderExamples = {
       korean: "나는 빨간 사과를 좋아한다.",
       english: "I like red apples.",
       japanese: "私は赤いりんごが好きです。",
       chinese: "我喜欢红苹果。",
     };
 
-    const defaultValue = isRepresentative
-      ? existingValue || defaultExamples[langCode] || ""
-      : existingValue;
+    const defaultValue = existingValue || "";
     const i18nKey = `${langCode}_example`;
 
     exampleHTML += `
@@ -1080,7 +1012,7 @@ export function addEditExampleFields(
           class="${langCode}-example w-full p-2 border rounded-md resize-none"
           rows="2"
           placeholder="${
-            defaultExamples[langCode] || `${langName} 예문을 입력하세요`
+            placeholderExamples[langCode] || `${langName} 예문을 입력하세요`
           }">${defaultValue}</textarea>
       </div>
     `;

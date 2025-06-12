@@ -152,7 +152,6 @@ async function loadConceptViewModal() {
     }
 
     modalContainer.innerHTML = html;
-    console.log("개념 보기 모달 로드 완료");
 
     // 로드 후 필수 요소들이 존재하는지 확인
     const requiredElements = [
@@ -171,7 +170,6 @@ async function loadConceptViewModal() {
     if (missingElements.length > 0) {
       console.warn("필수 모달 요소들이 누락됨:", missingElements);
     } else {
-      console.log("✅ 모든 필수 모달 요소가 로드됨");
     }
   } catch (error) {
     console.error("개념 보기 모달 로드 실패:", error);
@@ -198,15 +196,12 @@ async function loadEditConceptModal() {
 
     // 기존 내용에 편집 모달 추가
     modalContainer.innerHTML += html;
-    console.log("AI 개념 편집 모달 HTML 로드 완료");
 
     // AI 전용 편집 모달 스크립트 로드
     const editModalScript = document.createElement("script");
     editModalScript.type = "module";
     editModalScript.src = "../components/js/ai-edit-concept-modal.js";
-    editModalScript.onload = () => {
-      console.log("✅ AI 전용 개념 편집 모달 스크립트 로드 완료");
-    };
+    editModalScript.onload = () => {};
     editModalScript.onerror = (error) => {
       console.error("❌ AI 전용 개념 편집 모달 스크립트 로드 실패:", error);
     };
@@ -217,13 +212,10 @@ async function loadEditConceptModal() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-  console.log("AI 단어장 페이지 초기화 시작");
-
   try {
     // 사용자 언어 설정 초기화 (실패해도 계속 진행)
     try {
       await initializeUserLanguage();
-      console.log("언어 초기화 완료:", userLanguage);
     } catch (error) {
       console.error("언어 초기화 실패, 기본값 사용:", error);
       userLanguage = "ko";
@@ -259,10 +251,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUser = user;
-        console.log("사용자 로그인됨:", user.uid);
         await initializePage();
       } else {
-        console.log("사용자 로그인 필요");
         alert("로그인이 필요합니다.");
         window.location.href = "../login.html";
       }
@@ -319,7 +309,6 @@ function initializeEventListeners() {
 
   // 언어 변경 이벤트 리스너 추가
   document.addEventListener("languageChanged", async (event) => {
-    console.log("언어 변경 감지:", event.detail.language);
     // 사용자 언어 설정 업데이트 (실패해도 계속 진행)
     try {
       await initializeUserLanguage();
@@ -333,13 +322,11 @@ function initializeEventListeners() {
 
   // AI 개념 수정 완료 이벤트 리스너 추가
   document.addEventListener("concept-saved", async (event) => {
-    console.log("🔔 AI 개념 수정 완료 이벤트 감지");
     try {
       // AI 개념 목록 다시 로드
       await loadConcepts();
       // 필터 및 정렬 다시 적용
       applyFiltersAndSort();
-      console.log("✅ AI 개념 목록 업데이트 완료");
     } catch (error) {
       console.error("❌ AI 개념 목록 업데이트 실패:", error);
     }
@@ -358,29 +345,8 @@ async function initializePage() {
 
 async function loadConcepts() {
   try {
-    console.log("🔄 AI 개념 로드 시작");
     // ai-recommend 컬렉션에서 사용자의 AI 개념 가져오기 (분리된 컬렉션 구조)
     allConcepts = await conceptUtils.getUserAIConcepts(currentUser.email);
-    console.log("📊 로드된 AI 개념 수:", allConcepts.length);
-
-    if (allConcepts.length > 0) {
-      console.log("📋 첫 번째 AI 개념 샘플:", allConcepts[0]);
-      console.log("🏗️ 분리된 컬렉션 구조 확인:");
-      console.log("  - metadata:", allConcepts[0].metadata);
-      console.log("  - concept_info:", allConcepts[0].concept_info);
-      console.log(
-        "  - expressions:",
-        Object.keys(allConcepts[0].expressions || {})
-      );
-      console.log(
-        "  - representative_example:",
-        allConcepts[0].representative_example
-      );
-      console.log("  - examples:", allConcepts[0].examples);
-      console.log("  - ai_metadata:", allConcepts[0].ai_metadata);
-    } else {
-      console.log("📭 저장된 AI 개념이 없습니다");
-    }
 
     updateConceptCount();
   } catch (error) {
@@ -450,15 +416,6 @@ function applyFiltersAndSort() {
   const category = document.getElementById("category-filter")?.value || "all";
   const sortOption = document.getElementById("sort-option")?.value || "latest";
 
-  console.log("필터링 적용:", {
-    searchTerm,
-    sourceLanguage,
-    targetLanguage,
-    category,
-    sortOption,
-  });
-  console.log("전체 개념 수:", allConcepts.length);
-
   // 필터링
   filteredConcepts = allConcepts.filter((concept) => {
     // 검색어 필터
@@ -493,8 +450,6 @@ function applyFiltersAndSort() {
 
     return hasSourceLang && hasTargetLang;
   });
-
-  console.log("필터링 후 개념 수:", filteredConcepts.length);
 
   // 정렬
   filteredConcepts.sort((a, b) => {
@@ -607,7 +562,6 @@ function createConceptCard(concept, sourceLanguage, targetLanguage) {
       source: concept.representative_example.translations[sourceLanguage] || "",
       target: concept.representative_example.translations[targetLanguage] || "",
     };
-    console.log("다국어 단어장 구조 대표 예문 사용:", example);
   }
   // 2. 기존 구조 호환성 (분리된 컬렉션 구조)
   else if (concept.representative_example) {
@@ -615,7 +569,6 @@ function createConceptCard(concept, sourceLanguage, targetLanguage) {
       source: concept.representative_example[sourceLanguage] || "",
       target: concept.representative_example[targetLanguage] || "",
     };
-    console.log("기존 구조 대표 예문 사용:", example);
   }
   // 3. 추가 예문들 확인
   else if (concept.examples && concept.examples.length > 0) {
@@ -624,7 +577,6 @@ function createConceptCard(concept, sourceLanguage, targetLanguage) {
       source: firstExample[sourceLanguage] || "",
       target: firstExample[targetLanguage] || "",
     };
-    console.log("추가 예문 사용:", example);
   }
 
   // 날짜 포맷팅 개선

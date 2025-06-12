@@ -194,7 +194,21 @@ const pageTranslations = {
 
 // 다국어 번역 텍스트 가져오기 함수
 function getTranslatedText(key) {
-  return pageTranslations[userLanguage][key] || pageTranslations.en[key] || key;
+  // 최신 환경 언어 가져오기
+  const currentLang =
+    localStorage.getItem("preferredLanguage") || userLanguage || "ko";
+
+  // 전역 번역 시스템 사용 (language-utils.js에서 로드)
+  if (
+    window.translations &&
+    window.translations[currentLang] &&
+    window.translations[currentLang][key]
+  ) {
+    return window.translations[currentLang][key];
+  }
+
+  // 로컬 번역 시스템 fallback
+  return pageTranslations[currentLang][key] || pageTranslations.en[key] || key;
 }
 
 // 웹사이트 언어를 DB 언어 코드로 변환하는 함수
@@ -250,7 +264,6 @@ function addSpeakingStyles() {
 // 모든 상태 초기화 함수
 function resetAllState() {
   // currentConcept는 초기화하지 않음 (모달이 열려있는 동안 유지되어야 함)
-  console.log("상태 초기화 완료 (currentConcept 유지)");
 }
 
 // 모달 이벤트 리스너 설정
@@ -303,11 +316,6 @@ export async function showConceptModal(
     userLanguage = "ko";
   }
 
-  console.log("개념 모달 열기:", concept);
-  console.log("개념 표현들:", concept.expressions);
-  console.log("사용 가능한 언어들:", Object.keys(concept.expressions || {}));
-  console.log("전달받은 언어 설정:", { sourceLanguage, targetLanguage });
-
   // 언어 설정을 전역 변수로 저장
   window.currentSourceLanguage = sourceLanguage;
   window.currentTargetLanguage = targetLanguage;
@@ -319,7 +327,6 @@ export async function showConceptModal(
 
   // currentConcept를 먼저 설정
   currentConcept = concept;
-  console.log("currentConcept 설정됨:", currentConcept);
 
   const modal = document.getElementById("concept-view-modal");
   if (!modal) {
@@ -329,7 +336,6 @@ export async function showConceptModal(
 
   // 언어 탭 순서 재정렬: 원본언어, 대상언어, 나머지 언어 순
   const availableLanguages = Object.keys(concept.expressions || {});
-  console.log("사용 가능한 언어 목록:", availableLanguages);
 
   if (availableLanguages.length === 0) {
     console.error("사용 가능한 언어 표현이 없습니다.");
@@ -360,16 +366,12 @@ export async function showConceptModal(
     }
   });
 
-  console.log("재정렬된 언어 순서 (AI 단어장):", orderedLanguages);
-
   // 기본 개념 정보 설정 - 대상언어 우선, 없으면 첫 번째 언어 사용
   const primaryLang =
     targetLanguage && availableLanguages.includes(targetLanguage)
       ? targetLanguage
       : orderedLanguages[0];
   const primaryExpr = concept.expressions[primaryLang];
-
-  console.log("기본 언어 설정:", primaryLang, "표현:", primaryExpr);
 
   // 이모지 설정 개선 (안전한 접근)
   const emoji =
@@ -439,11 +441,6 @@ export async function showConceptModal(
       );
     }
     headerContainer.appendChild(categoryTag);
-
-    console.log(
-      "카테고리/도메인 태그 추가됨:",
-      `${translatedDomain}/${translatedCategory}`
-    );
   } else {
     console.warn(
       "concept-view-title 요소를 찾을 수 없어서 카테고리를 표시할 수 없습니다."
@@ -492,12 +489,9 @@ export async function showConceptModal(
   const contentContainer = document.getElementById("language-content");
 
   if (tabsContainer && contentContainer) {
-    console.log("탭 컨테이너 찾음, 탭 생성 중...");
-
     // 탭 버튼들 생성 (재정렬된 순서 사용)
     const tabsHTML = orderedLanguages
       .map((lang, index) => {
-        console.log(`탭 생성: ${lang} (${getLanguageName(lang)})`);
         return `
       <button 
         class="py-2 px-4 ${
@@ -513,11 +507,9 @@ export async function showConceptModal(
       })
       .join("");
 
-    console.log("생성된 탭 HTML:", tabsHTML);
     tabsContainer.innerHTML = tabsHTML;
 
     // 첫 번째 언어 내용 표시 (재정렬된 순서의 첫 번째)
-    console.log("첫 번째 언어 내용 표시:", orderedLanguages[0]);
     showLanguageContent(orderedLanguages[0], concept);
   } else {
     console.error("탭 컨테이너를 찾을 수 없습니다:", {
@@ -590,8 +582,6 @@ function getLanguageName(langCode) {
 
 // 언어별 내용 표시
 function showLanguageContent(lang, concept) {
-  console.log("언어별 내용 표시:", lang, "개념:", concept);
-
   const contentContainer = document.getElementById("language-content");
   if (!contentContainer) {
     console.error("language-content container를 찾을 수 없습니다.");
@@ -603,8 +593,6 @@ function showLanguageContent(lang, concept) {
     console.error(`${lang} 언어 표현이 없습니다:`, concept.expressions);
     return;
   }
-
-  console.log(`${lang} 표현:`, expression);
 
   // 상단 기본 정보를 현재 언어 탭에 맞게 업데이트
   updateModalHeader(lang, concept);
@@ -1032,7 +1020,6 @@ function updateBasicInfo(lang, concept) {
       concept.concept_info?.unicode_emoji ||
       "📝";
     emojiElement.textContent = emoji;
-    console.log("이모지 설정:", emoji, "원본 데이터:", concept.concept_info);
   }
 
   if (wordElement) {
