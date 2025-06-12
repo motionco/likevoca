@@ -1265,6 +1265,21 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
 
   // 모달 버튼 설정
   setupModalButtons(conceptData);
+
+  // 모달 내 다국어 번역 적용
+  setTimeout(() => {
+    const modal = document.getElementById("concept-view-modal");
+    if (modal) {
+      // 모달 내부의 data-i18n 요소들 번역
+      modal.querySelectorAll("[data-i18n]").forEach((element) => {
+        const key = element.getAttribute("data-i18n");
+        const translatedText = getTranslatedText(key);
+        if (translatedText) {
+          element.textContent = translatedText;
+        }
+      });
+    }
+  }, 100);
 }
 
 // 분리된 컬렉션에서 예문 로드 및 표시
@@ -1813,7 +1828,7 @@ function updateLanguageContent(langCode, conceptData, sourceLanguage) {
 function setupConceptTimestamp(conceptData) {
   const timestampElement = document.getElementById("concept-timestamp");
   if (timestampElement && conceptData) {
-    let timeText = "등록 시간";
+    let timeText = getTranslatedText("registration_time") || "등록 시간";
 
     console.log("⏰ 시간 설정 시도:", conceptData);
 
@@ -1894,10 +1909,18 @@ function setupModalButtons(conceptData) {
   const deleteButton = document.getElementById("delete-concept-button");
   if (deleteButton) {
     deleteButton.onclick = async () => {
-      if (confirm("정말로 이 개념을 삭제하시겠습니까?")) {
+      if (
+        confirm(
+          getTranslatedText("confirm_delete_concept") ||
+            "정말로 이 개념을 삭제하시겠습니까?"
+        )
+      ) {
         try {
           await conceptUtils.deleteConcept(conceptData.id || conceptData._id);
-          alert("개념이 성공적으로 삭제되었습니다.");
+          alert(
+            getTranslatedText("concept_deleted_success") ||
+              "개념이 성공적으로 삭제되었습니다."
+          );
 
           // 모달 닫기
           const viewModal = document.getElementById("concept-view-modal");
@@ -1911,7 +1934,12 @@ function setupModalButtons(conceptData) {
           window.dispatchEvent(new CustomEvent("concept-saved"));
         } catch (error) {
           console.error("개념 삭제 중 오류 발생:", error);
-          alert("개념 삭제 중 오류가 발생했습니다: " + error.message);
+          alert(
+            (getTranslatedText("concept_delete_error") ||
+              "개념 삭제 중 오류가 발생했습니다") +
+              ": " +
+              error.message
+          );
         }
       }
     };

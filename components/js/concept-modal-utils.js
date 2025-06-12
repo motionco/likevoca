@@ -389,35 +389,48 @@ export function addExampleFields(
   const exampleItem = document.createElement("div");
   exampleItem.className = "example-item border rounded-lg p-4 mb-4";
 
-  // 예제 레이블
+  // 예제 레이블 (대표 예문 레이블 제거)
   const labelText = isRepresentative
-    ? "대표 예문"
+    ? ""
     : `예문 ${containerFound.children.length + 1}`;
 
   let exampleHTML = `
-    <div class="flex justify-between items-center mb-3">
+    ${
+      labelText
+        ? `<div class="flex justify-between items-center mb-3">
       <span class="font-medium text-gray-700">${labelText}</span>
-      ${
-        !isRepresentative
-          ? '<button type="button" class="text-red-500 hover:text-red-700" onclick="this.closest(\'.example-item\').remove()">삭제</button>'
-          : ""
-      }
-    </div>
+      <button type="button" class="text-red-500 hover:text-red-700" onclick="this.closest('.example-item').remove()">삭제</button>
+    </div>`
+        : ""
+    }
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
   `;
 
-  // 각 언어별 예문 입력 필드
+  // 각 언어별 예문 입력 필드 (다국어 키 사용)
   Object.keys(supportedLangs).forEach((langCode) => {
     const langName = supportedLangs[langCode];
     const existingValue = existingExample?.[langCode] || "";
 
+    // 기본 예문 설정
+    const defaultExamples = {
+      korean: "나는 빨간 사과를 좋아한다.",
+      english: "I like red apples.",
+      japanese: "私は赤いりんごが好きです。",
+      chinese: "我喜欢红苹果。",
+    };
+
+    const defaultValue = existingValue;
+    const i18nKey = `${langCode}_example`;
+
     exampleHTML += `
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">${langName} 예문</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="${i18nKey}">${langName} 예문</label>
         <textarea
           class="${langCode}-example w-full p-2 border rounded-md resize-none"
           rows="2"
-          placeholder="${langName} 예문을 입력하세요">${existingValue}</textarea>
+          placeholder="${
+            defaultExamples[langCode] || `${langName} 예문을 입력하세요`
+          }">${defaultValue}</textarea>
       </div>
     `;
   });
@@ -1025,35 +1038,50 @@ export function addEditExampleFields(
   const exampleItem = document.createElement("div");
   exampleItem.className = "example-item border rounded-lg p-4 mb-4";
 
-  // 예제 레이블
+  // 예제 레이블 (대표 예문 레이블 제거)
   const labelText = isRepresentative
-    ? "대표 예문"
+    ? ""
     : `예문 ${containerFound.children.length + 1}`;
 
   let exampleHTML = `
-    <div class="flex justify-between items-center mb-3">
+    ${
+      labelText
+        ? `<div class="flex justify-between items-center mb-3">
       <span class="font-medium text-gray-700">${labelText}</span>
-      ${
-        !isRepresentative
-          ? '<button type="button" class="text-red-500 hover:text-red-700" onclick="this.closest(\'.example-item\').remove()">삭제</button>'
-          : ""
-      }
-    </div>
+      <button type="button" class="text-red-500 hover:text-red-700" onclick="this.closest('.example-item').remove()">삭제</button>
+    </div>`
+        : ""
+    }
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
   `;
 
-  // 각 언어별 예문 입력 필드
+  // 각 언어별 예문 입력 필드 (다국어 키 사용)
   Object.keys(supportedLangs).forEach((langCode) => {
     const langName = supportedLangs[langCode];
     const existingValue = existingExample?.[langCode] || "";
 
+    // 기본 예문 설정
+    const defaultExamples = {
+      korean: "나는 빨간 사과를 좋아한다.",
+      english: "I like red apples.",
+      japanese: "私は赤いりんごが好きです。",
+      chinese: "我喜欢红苹果。",
+    };
+
+    const defaultValue = isRepresentative
+      ? existingValue || defaultExamples[langCode] || ""
+      : existingValue;
+    const i18nKey = `${langCode}_example`;
+
     exampleHTML += `
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">${langName} 예문</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="${i18nKey}">${langName} 예문</label>
         <textarea
           class="${langCode}-example w-full p-2 border rounded-md resize-none"
           rows="2"
-          placeholder="${langName} 예문을 입력하세요">${existingValue}</textarea>
+          placeholder="${
+            defaultExamples[langCode] || `${langName} 예문을 입력하세요`
+          }">${defaultValue}</textarea>
       </div>
     `;
   });

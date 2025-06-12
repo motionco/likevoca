@@ -535,6 +535,21 @@ export async function showConceptModal(
   // 모달 표시
   modal.classList.remove("hidden");
   setupModalEventListeners();
+
+  // 모달 내 다국어 번역 적용
+  setTimeout(() => {
+    const modal = document.getElementById("concept-view-modal");
+    if (modal) {
+      // 모달 내부의 data-i18n 요소들 번역
+      modal.querySelectorAll("[data-i18n]").forEach((element) => {
+        const key = element.getAttribute("data-i18n");
+        const translatedText = getTranslatedText(key);
+        if (translatedText) {
+          element.textContent = translatedText;
+        }
+      });
+    }
+  }, 100);
 }
 
 // 언어 이름 가져오기 (환경설정 언어에 맞게)
@@ -745,13 +760,31 @@ function showLanguageContent(lang, concept) {
         <div class="bg-gray-50 p-3 rounded">
           <div class="flex items-center gap-2 mb-1">
             <p class="text-lg font-medium">${(() => {
-              // 품사 옆 단어는 원본 언어로 고정
-              const sourceLanguage = window.currentSourceLanguage;
-              const sourceExpression = sourceLanguage
-                ? concept.expressions[sourceLanguage]
-                : null;
-              return sourceExpression
-                ? sourceExpression.word
+              // 품사 옆 단어는 환경 언어로 표시
+              let userLangCode = "korean";
+              try {
+                if (typeof getUserLanguageCode === "function") {
+                  userLangCode = getUserLanguageCode();
+                } else if (
+                  typeof userLanguage !== "undefined" &&
+                  userLanguage
+                ) {
+                  const languageCodeMap = {
+                    ko: "korean",
+                    en: "english",
+                    ja: "japanese",
+                    zh: "chinese",
+                  };
+                  userLangCode = languageCodeMap[userLanguage] || "korean";
+                }
+              } catch (error) {
+                console.warn("환경설정 언어 확인 실패, 기본값 사용:", error);
+                userLangCode = "korean";
+              }
+
+              const envExpression = concept.expressions[userLangCode];
+              return envExpression
+                ? envExpression.word
                 : expression.word || "N/A";
             })()}</p>
             <span class="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">${getLocalizedPartOfSpeech(
@@ -878,6 +911,30 @@ function getLocalizedPartOfSpeech(pos) {
       determiner: "Determiner",
       particle: "Particle",
     },
+    japanese: {
+      noun: "名詞",
+      verb: "動詞",
+      adjective: "形容詞",
+      adverb: "副詞",
+      pronoun: "代名詞",
+      preposition: "前置詞",
+      conjunction: "接続詞",
+      interjection: "感嘆詞",
+      determiner: "限定詞",
+      particle: "助詞",
+    },
+    chinese: {
+      noun: "名词",
+      verb: "动词",
+      adjective: "形容词",
+      adverb: "副词",
+      pronoun: "代词",
+      preposition: "介词",
+      conjunction: "连词",
+      interjection: "感叹词",
+      determiner: "限定词",
+      particle: "助词",
+    },
   };
 
   // 환경설정 언어 확인 (기본값은 한국어)
@@ -889,8 +946,8 @@ function getLocalizedPartOfSpeech(pos) {
       const languageCodeMap = {
         ko: "korean",
         en: "english",
-        ja: "korean", // 일본어도 한국어 품사로 표시
-        zh: "korean", // 중국어도 한국어 품사로 표시
+        ja: "japanese",
+        zh: "chinese",
       };
       userLangCode = languageCodeMap[userLanguage] || "korean";
     }
@@ -1058,7 +1115,12 @@ async function deleteConcept() {
   const primaryLang = Object.keys(currentConcept.expressions)[0];
   const word = currentConcept.expressions[primaryLang]?.word || "이 개념";
 
-  if (!confirm(`"${word}"을(를) 정말 삭제하시겠습니까?`)) {
+  if (
+    !confirm(
+      getTranslatedText("confirm_delete_concept") ||
+        `"${word}"을(를) 정말 삭제하시겠습니까?`
+    )
+  ) {
     return;
   }
 
@@ -1081,16 +1143,25 @@ async function deleteConcept() {
 
       if (success) {
         console.log("AI 개념 삭제 성공");
-        alert("개념이 성공적으로 삭제되었습니다.");
+        alert(
+          getTranslatedText("concept_deleted_success") ||
+            "개념이 성공적으로 삭제되었습니다."
+        );
       } else {
-        throw new Error("AI 개념 삭제에 실패했습니다.");
+        throw new Error(
+          getTranslatedText("concept_delete_error") ||
+            "AI 개념 삭제에 실패했습니다."
+        );
       }
     } else {
       console.log("일반 개념 삭제 시도...");
       // 일반 개념 삭제
       await conceptUtils.deleteConcept(currentConcept.id || currentConcept._id);
       console.log("일반 개념 삭제 성공");
-      alert("개념이 성공적으로 삭제되었습니다.");
+      alert(
+        getTranslatedText("concept_deleted_success") ||
+          "개념이 성공적으로 삭제되었습니다."
+      );
     }
 
     closeModal();
@@ -1099,7 +1170,12 @@ async function deleteConcept() {
     window.location.reload();
   } catch (error) {
     console.error("개념 삭제 중 오류:", error);
-    alert("개념 삭제 중 오류가 발생했습니다: " + error.message);
+    alert(
+      (getTranslatedText("concept_delete_error") ||
+        "개념 삭제 중 오류가 발생했습니다") +
+        ": " +
+        error.message
+    );
   }
 }
 
@@ -1169,7 +1245,7 @@ document.addEventListener("languageChanged", async (event) => {
 function setupConceptTimestamp(conceptData) {
   const timestampElement = document.getElementById("concept-timestamp");
   if (timestampElement && conceptData) {
-    let timeText = "등록 시간";
+    let timeText = getTranslatedText("registration_time") || "등록 시간";
 
     console.log("⏰ AI 개념 시간 설정 시도:", conceptData);
 
