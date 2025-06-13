@@ -56,40 +56,21 @@
 
     <main class="container mx-auto max-w-7xl px-4 py-8">
       <div class="flex justify-between items-center mb-8">
-        <div>
-          <h1 class="text-4xl font-bold text-gray-800" data-i18n="ai_vocabulary">AI 단어장</h1>
-          <p class="text-gray-600">
-            <span data-i18n="total_concepts">전체 개념 수:</span> <span id="concept-count" class="font-semibold">0</span><span data-i18n="concepts_unit">개</span>
-          </p>
-        </div>
-        <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
-          <div class="bg-white rounded-lg shadow-sm p-3 min-w-[200px]">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-sm text-gray-600" data-i18n="ai_usage">AI 사용량</span>
-              <span class="text-sm font-medium" id="ai-usage-text">0/0</span>
-            </div>
-            <div class="w-full bg-gray-200 rounded-full h-2.5">
-              <div
-                class="bg-[#4B63AC] h-2.5 rounded-full"
-                id="ai-usage-bar"
-                style="width: 0%"
-              ></div>
-            </div>
-          </div>
-          <button
-            id="ai-add-concept"
-            class="bg-[#4B63AC] text-white px-4 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300 whitespace-nowrap flex items-center"
-            data-i18n="ai_recommend_concept"
-          >
-            <i class="fas fa-robot mr-2"></i> AI 개념 추천받기
-          </button>
-        </div>
+        <h1 class="text-3xl font-bold text-gray-800" data-i18n="ai_vocabulary">AI 단어장</h1>
+        <button
+          id="ai-add-concept"
+          class="bg-[#4B63AC] text-white px-4 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300 flex items-center"
+          data-i18n="ai_recommend_concept"
+        >
+          <i class="fas fa-robot mr-2"></i> AI 개념 추천받기
+        </button>
       </div>
 
       <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-        <div class="grid grid-cols-1 md:grid-cols-12 lg:grid-cols-12 gap-2 mb-4">
-          <div class="md:col-span-2 lg:col-span-2">
-            <label for="search-input" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="search">검색</label>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <!-- 검색 필터 -->
+          <div class="w-full">
+            <label for="search-input" class="hidden md:block text-sm font-medium mb-1 text-gray-700" data-i18n="search">검색</label>
             <div class="relative">
               <input
                 type="text"
@@ -102,70 +83,77 @@
             </div>
           </div>
 
-          <div class="md:col-span-4 lg:col-span-4">
-            <label for="source-language" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="source_language">
-              원본 언어
-            </label>
-            <select id="source-language" class="w-full p-2 border rounded h-10">
-              <option value="korean" data-i18n="korean">한국어</option>
-              <option value="english" data-i18n="english">영어</option>
-              <option value="japanese" data-i18n="japanese">일본어</option>
-              <option value="chinese" data-i18n="chinese">중국어</option>
-            </select>
+          <!-- 언어 필터 -->
+          <div class="w-full">
+            <label class="block text-sm font-medium mb-1 text-gray-700" data-i18n="language_filter">언어 필터</label>
+            <div class="grid grid-cols-5 gap-1 h-10">
+              <select id="source-language" class="col-span-2 p-2 border rounded text-sm">
+                <option value="korean" data-i18n="korean">한국어</option>
+                <option value="english" data-i18n="english">영어</option>
+                <option value="japanese" data-i18n="japanese">일본어</option>
+                <option value="chinese" data-i18n="chinese">중국어</option>
+              </select>
+              
+              <button
+                id="swap-languages"
+                class="w-full h-full text-gray-600 hover:text-[#4B63AC] hover:bg-gray-100 rounded-lg transition duration-200 border border-gray-300 hover:border-[#4B63AC] flex items-center justify-center"
+                title="언어 순서 바꾸기"
+                data-i18n-title="swap_languages"
+              >
+                <i class="fas fa-exchange-alt text-sm"></i>
+              </button>
+              
+              <select id="target-language" class="col-span-2 p-2 border rounded text-sm">
+                <option value="english" data-i18n="english">영어</option>
+                <option value="korean" data-i18n="korean">한국어</option>
+                <option value="japanese" data-i18n="japanese">일본어</option>
+                <option value="chinese" data-i18n="chinese">중국어</option>
+              </select>
+            </div>
           </div>
 
-          <div class="md:col-span-1 lg:col-span-1 flex items-end justify-center px-1">
-            <button
-              id="swap-languages"
-              class="w-10 h-10 text-gray-600 hover:text-[#4B63AC] hover:bg-gray-100 rounded-lg transition duration-200 border border-gray-300 hover:border-[#4B63AC] flex items-center justify-center"
-              title="언어 순서 바꾸기"
-              data-i18n-title="swap_languages"
-            >
-              <i class="fas fa-exchange-alt text-sm"></i>
-            </button>
-          </div>
-
-          <div class="md:col-span-4 lg:col-span-4">
-            <label for="target-language" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="target_language">
-              대상 언어
-            </label>
-            <select id="target-language" class="w-full p-2 border rounded h-10">
-              <option value="english" data-i18n="english">영어</option>
-              <option value="korean" data-i18n="korean">한국어</option>
-              <option value="japanese" data-i18n="japanese">일본어</option>
-              <option value="chinese" data-i18n="chinese">중국어</option>
-            </select>
-          </div>
-
-          <div class="md:col-span-1 lg:col-span-1">
-            <label for="category-filter" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="category">
-              카테고리
-            </label>
-            <select id="category-filter" class="w-full p-2 border rounded h-10 text-xs">
-              <option value="all" data-i18n="all_categories">전체</option>
-              <option value="fruit" data-i18n="fruit">과일</option>
-              <option value="food" data-i18n="food">음식</option>
-              <option value="animal" data-i18n="animal">동물</option>
-              <option value="daily" data-i18n="daily">일상</option>
-              <option value="travel" data-i18n="travel">여행</option>
-              <option value="business" data-i18n="business">비즈니스</option>
-            </select>
+          <!-- 카테고리 및 정렬 -->
+          <div class="w-full">
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label for="category-filter" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="category">카테고리</label>
+                <select id="category-filter" class="w-full p-2 border rounded h-10 text-sm">
+                  <option value="all" data-i18n="all_categories">전체</option>
+                  <option value="fruit" data-i18n="fruit">과일</option>
+                  <option value="food" data-i18n="food">음식</option>
+                  <option value="animal" data-i18n="animal">동물</option>
+                  <option value="daily" data-i18n="daily">일상</option>
+                  <option value="travel" data-i18n="travel">여행</option>
+                  <option value="business" data-i18n="business">비즈니스</option>
+                </select>
+              </div>
+              <div>
+                <label for="sort-option" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="sort">정렬</label>
+                <select id="sort-option" class="w-full p-2 border rounded h-10 text-sm">
+                  <option value="latest" data-i18n="latest">최신순</option>
+                  <option value="oldest" data-i18n="oldest">오래된순</option>
+                  <option value="a-z" data-i18n="alphabetical">가나다순</option>
+                  <option value="z-a" data-i18n="reverse_alphabetical">역가나다순</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="flex justify-between items-center">
+        <!-- 개념 수 및 AI 사용량 표시 -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div class="text-sm text-gray-600">
             <span id="filtered-count">0</span><span data-i18n="concept_count">개의 개념</span>
           </div>
 
-          <div class="flex items-center space-x-2">
-            <label for="sort-option" class="text-sm font-medium text-gray-700" data-i18n="sort">정렬</label>
-            <select id="sort-option" class="p-2 border rounded text-sm">
-              <option value="latest" data-i18n="latest">최신순</option>
-              <option value="oldest" data-i18n="oldest">오래된순</option>
-              <option value="a-z" data-i18n="alphabetical">가나다순</option>
-              <option value="z-a" data-i18n="reverse_alphabetical">역가나다순</option>
-            </select>
+          <div class="flex items-center gap-4 w-full md:w-auto">
+            <span class="text-sm font-medium text-gray-700 whitespace-nowrap" data-i18n="ai_usage">AI 사용량:</span>
+            <div class="flex items-center gap-2 min-w-[200px]">
+              <div class="flex-1 bg-gray-200 rounded-full h-2.5">
+                <div id="ai-usage-bar" class="bg-[#4B63AC] h-2.5 rounded-full" style="width: 0%"></div>
+              </div>
+              <span id="ai-usage-text" class="text-sm font-medium whitespace-nowrap">0/0</span>
+            </div>
           </div>
         </div>
       </div>

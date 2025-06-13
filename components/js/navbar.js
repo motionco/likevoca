@@ -3,7 +3,7 @@ import {
   onAuthStateChanged,
   signOut,
 } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
-import { deleteAccount } from "../../js/firebase/firebase-auth.js";
+
 import {
   showLanguageSettingsModal,
   applyLanguage,
@@ -114,19 +114,6 @@ function initializeNavbar() {
     mobileLogoutButton.addEventListener("click", handleLogout);
   }
 
-  const deleteAccountButton = document.getElementById("delete-account-button");
-  const mobileDeleteAccountButton = document.getElementById(
-    "mobile-delete-account-button"
-  );
-
-  if (deleteAccountButton) {
-    deleteAccountButton.addEventListener("click", handleDeleteAccount);
-  }
-
-  if (mobileDeleteAccountButton) {
-    mobileDeleteAccountButton.addEventListener("click", handleDeleteAccount);
-  }
-
   // 언어 설정 버튼 이벤트 리스너 추가
   const languageButton = document.getElementById("language-button");
   const mobileLanguageButton = document.getElementById(
@@ -190,26 +177,6 @@ function handleLogout() {
       alert("로그아웃에 실패했습니다.");
       console.error("로그아웃 오류: ", error);
     });
-}
-
-async function handleDeleteAccount() {
-  if (!auth) {
-    console.error("Firebase 인증이 초기화되지 않았습니다.");
-    alert("회원탈퇴에 실패했습니다. 페이지를 새로고침한 후 다시 시도해주세요.");
-    return;
-  }
-
-  const confirmed = confirm(
-    "정말로 회원탈퇴를 하시겠습니까? 이 작업은 되돌릴 수 없습니다."
-  );
-  if (confirmed) {
-    try {
-      await deleteAccount();
-      alert("회원탈퇴가 완료되었습니다.");
-    } catch (error) {
-      alert(error.message || "회원탈퇴 중 오류가 발생했습니다.");
-    }
-  }
 }
 
 function initializeAuthStateListener() {

@@ -8,7 +8,7 @@
 
     <button
       id="menu-toggle"
-      class="text-white text-2xl lg:hidden absolute right-8"
+      class="text-white text-2xl lg:hidden absolute right-4"
     >
       <i class="fa-solid fa-bars"></i>
     </button>
@@ -75,9 +75,9 @@
 
     <div
       id="user-profile"
-      class="relative flex items-center space-x-4 text-white mr-16"
+      class="relative hidden lg:flex items-center space-x-4 text-white mr-16"
     >
-      <div id="avatar-container" class="cursor-pointer hidden lg:block">
+      <div id="avatar-container" class="cursor-pointer">
         <div
           id="avatar"
           class="w-10 h-10 rounded-full overflow-hidden border-2 border-white"
@@ -91,13 +91,13 @@
         <div class="px-4 py-2 font-semibold border-b border-gray-200">
           <span id="user-name"></span>
         </div>
-        <button
-          id="delete-account-button"
-          class="block w-full text-left px-4 py-2 hover:bg-red-100 text-red-600"
-          data-i18n="delete_account"
+        <a
+          href="/profile.html"
+          class="block w-full text-left px-4 py-2 hover:bg-gray-100"
+          data-i18n="profile"
         >
-          회원탈퇴
-        </button>
+          프로필
+        </a>
         <button
           id="logout-button"
           class="block w-full text-left px-4 py-2 hover:bg-gray-100"
@@ -151,19 +151,19 @@
       id="mobile-user-profile"
       class="hidden flex flex-col items-center space-y-2 w-full"
     >
-      <div class="hidden text-lg font-semibold">
+      <div class="text-lg font-semibold mb-2">
         <span id="mobile-user-name"></span>
       </div>
-      <button
-        id="mobile-delete-account-button"
-        class="block w-full text-center py-2 hover:bg-red-700 text-red-100"
-        data-i18n="delete_account"
+      <a
+        href="/profile.html"
+        class="text-lg hover:text-yellow-400"
+        data-i18n="profile"
       >
-        회원탈퇴
-      </button>
+        프로필
+      </a>
       <button
         id="mobile-logout-button"
-        class="block w-full text-center py-2 hover:bg-[#3A4F8B]"
+        class="text-lg hover:text-yellow-400"
         data-i18n="logout"
       >
         로그아웃
