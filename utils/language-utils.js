@@ -206,6 +206,39 @@ const seoMetadata = {
       canonical: "https://likevoca.com/zh/pages/ai-vocabulary.html",
     },
   },
+  // 나만의 단어장 페이지 메타데이터
+  "my-vocabulary": {
+    ko: {
+      title: "LikeVoca - 나만의 단어장",
+      description:
+        "북마크한 단어들을 모아서 나만의 단어장을 만들고 효과적으로 학습하세요.",
+      keywords:
+        "나만의 단어장, 북마크 단어장, 다국어 단어장, 개인 단어장, 언어 학습",
+      canonical: "https://likevoca.com/ko/pages/my-word-list.html",
+    },
+    en: {
+      title: "LikeVoca - My Vocabulary",
+      description:
+        "Collect your bookmarked words to create your own vocabulary and learn effectively.",
+      keywords:
+        "my vocabulary, bookmarked vocabulary, multilingual vocabulary, personal vocabulary, language learning",
+      canonical: "https://likevoca.com/en/pages/my-word-list.html",
+    },
+    ja: {
+      title: "LikeVoca - 私の単語帳",
+      description:
+        "ブックマークした単語を集めて自分だけの単語帳を作成し、効果的に学習しましょう。",
+      keywords:
+        "私の単語帳, ブックマーク単語帳, 多言語単語帳, 個人単語帳, 言語学習",
+      canonical: "https://likevoca.com/ja/pages/my-word-list.html",
+    },
+    zh: {
+      title: "LikeVoca - 我的词汇本",
+      description: "收集您收藏的单词，创建您自己的词汇本并有效学习。",
+      keywords: "我的词汇本, 收藏词汇本, 多语言词汇本, 个人词汇本, 语言学习",
+      canonical: "https://likevoca.com/zh/pages/my-word-list.html",
+    },
+  },
 };
 
 // 번역 텍스트 저장소
@@ -495,6 +528,30 @@ const translations = {
     game: "게임",
     book: "도서",
     art: "예술",
+
+    // My Vocabulary page translations
+    my_vocabulary_title: "나만의 단어장",
+    bookmarked_word_count: "북마크한 단어 수:",
+    word_count_unit: "개",
+    bookmark_usage: "북마크 사용량",
+    unlimited: "무제한",
+    bookmark_words: "단어 북마크하기",
+    hangul: "한글",
+    meaning: "뜻",
+    pronunciation: "발음",
+    description: "설명",
+    search_placeholder: "검색어를 입력하세요",
+    load_more: "더 보기",
+    no_bookmarks_title: "북마크한 단어가 없습니다",
+    no_bookmarks_desc: "다국어 단어장에서 관심있는 단어들을 북마크해보세요!",
+    browse_words: "단어 둘러보기",
+    bookmarked: "북마크됨",
+    no_date: "날짜 없음",
+    login_required: "로그인이 필요합니다.",
+    error_loading_bookmarks: "북마크된 개념 로드 오류:",
+    concept_detail_view: "개념 상세 보기:",
+    expressions: "표현",
+    examples: "예문",
   },
   en: {
     home: "Home",
@@ -781,6 +838,31 @@ const translations = {
     game: "Game",
     book: "Book",
     art: "Art",
+
+    // My Vocabulary page translations
+    my_vocabulary_title: "My Vocabulary",
+    bookmarked_word_count: "Bookmarked words:",
+    word_count_unit: "",
+    bookmark_usage: "Bookmark Usage",
+    unlimited: "Unlimited",
+    bookmark_words: "Bookmark Words",
+    hangul: "Korean",
+    meaning: "Meaning",
+    pronunciation: "Pronunciation",
+    description: "Description",
+    search_placeholder: "Enter search term",
+    load_more: "Load More",
+    no_bookmarks_title: "No bookmarked words",
+    no_bookmarks_desc:
+      "Bookmark interesting words from the multilingual dictionary!",
+    browse_words: "Browse Words",
+    bookmarked: "Bookmarked",
+    no_date: "No date",
+    login_required: "Login required.",
+    error_loading_bookmarks: "Error loading bookmarked concepts:",
+    concept_detail_view: "Concept detail view:",
+    expressions: "Expressions",
+    examples: "Examples",
   },
   ja: {
     home: "ホーム",
@@ -1070,6 +1152,31 @@ const translations = {
     game: "ゲーム",
     book: "本",
     art: "芸術",
+
+    // My Vocabulary page translations
+    my_vocabulary_title: "私の単語帳",
+    bookmarked_word_count: "ブックマークした単語数:",
+    word_count_unit: "個",
+    bookmark_usage: "ブックマーク使用量",
+    unlimited: "無制限",
+    bookmark_words: "単語をブックマーク",
+    hangul: "韓国語",
+    meaning: "意味",
+    pronunciation: "発音",
+    description: "説明",
+    search_placeholder: "検索語を入力してください",
+    load_more: "もっと見る",
+    no_bookmarks_title: "ブックマークした単語がありません",
+    no_bookmarks_desc:
+      "多言語辞書から興味のある単語をブックマークしてみてください！",
+    browse_words: "単語を見る",
+    bookmarked: "ブックマーク済み",
+    no_date: "日付なし",
+    login_required: "ログインが必要です。",
+    error_loading_bookmarks: "ブックマークした概念の読み込みエラー:",
+    concept_detail_view: "概念詳細表示:",
+    expressions: "表現",
+    examples: "例文",
   },
   zh: {
     home: "首页",
@@ -1355,6 +1462,30 @@ const translations = {
     game: "游戏",
     book: "图书",
     art: "艺术",
+
+    // My Vocabulary page translations
+    my_vocabulary_title: "我的词汇本",
+    bookmarked_word_count: "收藏的单词数:",
+    word_count_unit: "个",
+    bookmark_usage: "收藏使用量",
+    unlimited: "无限制",
+    bookmark_words: "收藏单词",
+    hangul: "韩语",
+    meaning: "意思",
+    pronunciation: "发音",
+    description: "描述",
+    search_placeholder: "输入搜索词",
+    load_more: "加载更多",
+    no_bookmarks_title: "没有收藏的单词",
+    no_bookmarks_desc: "在多语言词典中收藏感兴趣的单词吧！",
+    browse_words: "浏览单词",
+    bookmarked: "已收藏",
+    no_date: "无日期",
+    login_required: "需要登录。",
+    error_loading_bookmarks: "加载收藏概念错误:",
+    concept_detail_view: "概念详细查看:",
+    expressions: "表达",
+    examples: "例句",
   },
 };
 

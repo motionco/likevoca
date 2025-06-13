@@ -412,39 +412,12 @@ export async function showConceptModal(
   const translatedCategory = getTranslatedText(categoryKey);
   const translatedDomain = getTranslatedText(domainKey);
 
-  // 카테고리/도메인 정보를 헤더에 표시 (발음기호 위치에 영향 주지 않도록)
-  const titleElement = document.getElementById("concept-view-title");
-  if (titleElement) {
-    // 기존 카테고리 태그가 있다면 제거
-    const existingCategory = document.querySelector(".category-tag");
-    if (existingCategory) {
-      existingCategory.remove();
-    }
-
-    // 제목과 발음기호가 있는 div 컨테이너를 찾기
-    const titleContainer = titleElement.parentElement;
-    const headerContainer = titleContainer.parentElement; // 이모지와 제목/발음기호가 있는 상위 컨테이너
-
-    // 새 카테고리 태그를 헤더 오른쪽에 추가 (제목 컨테이너 밖에)
-    const categoryTag = document.createElement("div");
-    categoryTag.className =
-      "category-tag text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full whitespace-nowrap ml-auto self-start";
-    categoryTag.textContent = `${translatedDomain}/${translatedCategory}`;
-
-    // 헤더 컨테이너를 flex로 만들고 카테고리 태그 추가
-    if (!headerContainer.classList.contains("flex")) {
-      headerContainer.classList.add(
-        "flex",
-        "items-start",
-        "justify-between",
-        "w-full"
-      );
-    }
-    headerContainer.appendChild(categoryTag);
-  } else {
-    console.warn(
-      "concept-view-title 요소를 찾을 수 없어서 카테고리를 표시할 수 없습니다."
-    );
+  // 도메인/카테고리 표시 (다국어 단어장과 동일한 방식)
+  const domainCategoryElement = document.getElementById(
+    "concept-view-domain-category"
+  );
+  if (domainCategoryElement) {
+    domainCategoryElement.textContent = `${translatedDomain}/${translatedCategory}`;
   }
 
   // 업데이트 날짜 설정

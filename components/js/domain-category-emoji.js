@@ -353,6 +353,50 @@ function translateCategoryKey(categoryKey, lang = null) {
   return categoryKey;
 }
 
+// 도메인 키를 현재 언어로 번역하는 함수
+function translateDomainKey(domainKey, lang = null) {
+  const currentLang = lang || localStorage.getItem("preferredLanguage") || "ko";
+
+  // 도메인 번역 매핑
+  const domainTranslations = {
+    daily: { ko: "일상", en: "Daily Life", ja: "日常生活", zh: "日常生活" },
+    business: { ko: "비즈니스", en: "Business", ja: "ビジネス", zh: "商务" },
+    academic: { ko: "학술", en: "Academic", ja: "学術", zh: "学术" },
+    travel: { ko: "여행", en: "Travel", ja: "旅行", zh: "旅行" },
+    food: { ko: "음식", en: "Food", ja: "食べ物", zh: "食物" },
+    nature: { ko: "자연", en: "Nature", ja: "自然", zh: "自然" },
+    technology: { ko: "기술", en: "Technology", ja: "技術", zh: "技术" },
+    health: { ko: "건강", en: "Health", ja: "健康", zh: "健康" },
+    sports: { ko: "스포츠", en: "Sports", ja: "スポーツ", zh: "体育" },
+    entertainment: {
+      ko: "엔터테인먼트",
+      en: "Entertainment",
+      ja: "エンターテインメント",
+      zh: "娱乐",
+    },
+    other: { ko: "기타", en: "Other", ja: "その他", zh: "其他" },
+  };
+
+  // 직접 매핑에서 번역 찾기
+  if (
+    domainTranslations[domainKey] &&
+    domainTranslations[domainKey][currentLang]
+  ) {
+    return domainTranslations[domainKey][currentLang];
+  }
+
+  // language-utils.js의 번역 시스템 사용 (fallback)
+  if (
+    typeof window.translations !== "undefined" &&
+    window.translations[currentLang] &&
+    window.translations[currentLang][domainKey]
+  ) {
+    return window.translations[currentLang][domainKey];
+  }
+
+  return domainKey;
+}
+
 // 도메인 선택 변경 시 카테고리 업데이트
 function updateCategoryOptions() {
   const domainSelect = document.getElementById("concept-domain");
@@ -453,9 +497,6 @@ function updateDomainOptions() {
           domainTranslations[domainKey][currentLang]
         ) {
           option.textContent = domainTranslations[domainKey][currentLang];
-          console.log(
-            `✅ 도메인 번역: ${domainKey} -> ${domainTranslations[domainKey][currentLang]}`
-          );
         } else {
           // window.translations에서 번역 찾기 (fallback)
           const translatedText = getTranslation(domainKey, currentLang);
@@ -499,10 +540,6 @@ function updateEditCategoryOptions() {
 
   // 현재 선택된 카테고리 값 저장
   const selectedCategory = categorySelect.value;
-  console.log("🔄 편집 모달 카테고리 업데이트:", {
-    selectedDomain,
-    selectedCategory,
-  });
 
   // 카테고리 옵션 초기화 (현재 환경 언어로 플레이스홀더 설정)
   const categoryPlaceholder = getTranslation("select_category", currentLang);
@@ -526,35 +563,21 @@ function updateEditCategoryOptions() {
     // 카테고리 선택값 복원
     if (selectedCategory && categories.includes(selectedCategory)) {
       categorySelect.value = selectedCategory;
-      console.log("✅ 편집 모달 카테고리 값 복원:", selectedCategory);
 
       // 카테고리가 복원되었으면 이모지 옵션도 업데이트
       if (categorySelect.value === selectedCategory) {
         updateEditEmojiOptions();
       }
-    } else if (selectedCategory) {
-      console.log("❌ 편집 모달 카테고리 복원 실패:", {
-        selectedCategory,
-        availableCategories: categories,
-      });
     }
   }
 }
 
 // 편집 모달용 카테고리 선택 변경 시 이모지 업데이트
 function updateEditEmojiOptions() {
-  console.log("🔄 편집 모달 이모지 옵션 업데이트 시작");
-
   const categorySelect = document.getElementById("edit-concept-category");
   const emojiSelect = document.getElementById("edit-concept-emoji");
 
-  if (!categorySelect || !emojiSelect) {
-    console.log("❌ 편집 모달 이모지 업데이트: 필드를 찾을 수 없음", {
-      categorySelect: !!categorySelect,
-      emojiSelect: !!emojiSelect,
-    });
-    return;
-  }
+  if (!categorySelect || !emojiSelect) return;
 
   const selectedCategory = categorySelect.value;
   const currentLang =
@@ -564,14 +587,6 @@ function updateEditEmojiOptions() {
 
   // DB에서 가져온 원본 이모지 값 (전역 저장소에서 확인)
   const originalDbEmoji = window.editConceptEmojiValue;
-
-  console.log("🔍 편집 모달 이모지 업데이트:", {
-    selectedCategory,
-    currentLang,
-    originalDbEmoji,
-    categoryEmojiMapping: !!categoryEmojiMapping[selectedCategory],
-    availableEmojis: categoryEmojiMapping[selectedCategory],
-  });
 
   // 이모지 옵션 초기화 (현재 환경 언어로 플레이스홀더 설정)
   const emojiPlaceholder = getTranslation("select_emoji", currentLang);
@@ -583,14 +598,7 @@ function updateEditEmojiOptions() {
     // DB 이모지가 하드코딩 옵션에 없으면 동적으로 추가
     if (originalDbEmoji && !emojis.includes(originalDbEmoji)) {
       emojis.unshift(originalDbEmoji); // 맨 앞에 추가
-      console.log("🔄 DB 이모지를 옵션에 동적 추가:", {
-        originalDbEmoji,
-        wasInHardcoded: false,
-        newEmojiList: emojis,
-      });
     }
-
-    console.log("✅ 편집 모달 이모지 옵션 생성:", emojis);
 
     emojis.forEach((emoji, index) => {
       const option = document.createElement("option");
@@ -610,37 +618,20 @@ function updateEditEmojiOptions() {
       emojiSelect.appendChild(option);
     });
 
-    console.log("✅ 편집 모달 이모지 옵션 생성 완료, 총", emojis.length, "개");
-
     // DB 원본 이모지로 선택 상태 설정
     if (originalDbEmoji) {
       emojiSelect.value = originalDbEmoji;
-      console.log("✅ 편집 모달 DB 원본 이모지로 설정:", {
-        originalDbEmoji,
-        finalValue: emojiSelect.value,
-        success: emojiSelect.value === originalDbEmoji,
-      });
     } else {
       // DB 이모지가 없으면 첫 번째 하드코딩 이모지 선택
       if (emojis.length > 0) {
         emojiSelect.value = emojis[0];
-        console.log("✅ 편집 모달 기본 이모지로 설정:", emojis[0]);
       }
     }
-  } else {
-    console.log("❌ 편집 모달 이모지 매핑 없음:", {
-      selectedCategory,
-      hasCategoryMapping: !!categoryEmojiMapping[selectedCategory],
-    });
   }
-
-  console.log("✅ 편집 모달 이모지 옵션 업데이트 완료");
 }
 
 // 전체 도메인-카테고리-이모지 언어 업데이트 함수
 function updateDomainCategoryEmojiLanguage() {
-  console.log("🔄 전체 도메인-카테고리-이모지 언어 업데이트 시작");
-
   // 도메인 옵션 업데이트
   updateDomainOptions();
 
@@ -655,8 +646,6 @@ function updateDomainCategoryEmojiLanguage() {
   if (editDomainSelect && editDomainSelect.value) {
     updateEditCategoryOptions();
   }
-
-  console.log("✅ 전체 도메인-카테고리-이모지 언어 업데이트 완료");
 }
 
 // 품사 선택 옵션들을 환경 언어로 번역하는 함수

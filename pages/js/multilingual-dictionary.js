@@ -13,6 +13,7 @@ import {
   orderBy,
   doc,
   getDoc,
+  setDoc,
   updateDoc,
   where,
   limit,
@@ -548,11 +549,21 @@ function createConceptCard(concept) {
           }</p>
           </div>
         </div>
-        <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-          ${getTranslatedText(conceptInfo.domain)}/${getTranslatedText(
+        <div class="flex items-center space-x-2">
+          <button 
+            class="bookmark-btn p-2 rounded-full hover:bg-gray-100 transition-colors duration-200" 
+            onclick="event.stopPropagation(); toggleBookmark('${conceptId}')"
+            data-concept-id="${conceptId}"
+            title="북마크"
+          >
+            <i class="fas fa-bookmark text-gray-400"></i>
+          </button>
+          <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+            ${getTranslatedText(conceptInfo.domain)}/${getTranslatedText(
     conceptInfo.category
   )}
-        </span>
+          </span>
+        </div>
       </div>
       
       <div class="border-t border-gray-200 pt-3 mt-3">
@@ -831,6 +842,9 @@ function displayConceptList() {
 
   // HTML 삽입
   conceptList.innerHTML = cardHTMLs.join("");
+
+  // 북마크 UI 업데이트
+  updateBookmarkUI();
 
   // 더 보기 버튼 표시/숨김
   if (loadMoreBtn) {
@@ -1150,6 +1164,18 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
 
   // 개념 정보
   const conceptInfo = conceptData.concept_info || {};
+
+  // 도메인/카테고리 표시
+  const domainCategoryElement = document.getElementById(
+    "concept-view-domain-category"
+  );
+  if (domainCategoryElement) {
+    const domain = conceptInfo.domain || conceptData.domain || "기타";
+    const category = conceptInfo.category || conceptData.category || "일반";
+    domainCategoryElement.textContent = `${getTranslatedText(
+      domain
+    )}/${getTranslatedText(category)}`;
+  }
 
   // 이모지와 색상 (개념 카드와 동일한 우선순위 적용)
   const emoji =
@@ -2111,6 +2137,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         currentUser = user;
         await fetchAndDisplayConcepts();
         await updateUsageUI();
+        await loadUserBookmarks(); // 북마크 로드 추가
       } else {
         alert(getTranslatedText("login_required"));
         window.location.href = "../login.html";
@@ -2264,3 +2291,114 @@ function showError(message, details = "") {
     }`
   );
 }
+
+// 북마크 관련 함수들
+let userBookmarks = [];
+
+// 사용자 북마크 로드
+async function loadUserBookmarks() {
+  if (!auth.currentUser) return;
+
+  try {
+    const userEmail = auth.currentUser.email;
+    const bookmarksRef = doc(db, "bookmarks", userEmail);
+    const bookmarkDoc = await getDoc(bookmarksRef);
+
+    if (bookmarkDoc.exists()) {
+      userBookmarks = bookmarkDoc.data().concept_ids || [];
+    } else {
+      userBookmarks = [];
+    }
+
+    // 북마크 상태 업데이트
+    updateBookmarkUI();
+  } catch (error) {
+    console.error("북마크 로드 오류:", error);
+  }
+}
+
+// 북마크 토글
+async function toggleBookmark(conceptId) {
+  if (!auth.currentUser) {
+    alert("로그인이 필요합니다.");
+    return;
+  }
+
+  try {
+    const userEmail = auth.currentUser.email;
+    const bookmarksRef = doc(db, "bookmarks", userEmail);
+
+    let updatedBookmarks;
+    const isBookmarked = userBookmarks.includes(conceptId);
+
+    if (isBookmarked) {
+      // 북마크 제거
+      updatedBookmarks = userBookmarks.filter((id) => id !== conceptId);
+      showMessage("북마크가 제거되었습니다.", "success");
+    } else {
+      // 북마크 추가
+      updatedBookmarks = [...userBookmarks, conceptId];
+      showMessage("북마크가 추가되었습니다.", "success");
+    }
+
+    // Firestore 업데이트
+    await setDoc(bookmarksRef, {
+      user_email: userEmail,
+      concept_ids: updatedBookmarks,
+      updated_at: new Date().toISOString(),
+    });
+
+    // 로컬 상태 업데이트
+    userBookmarks = updatedBookmarks;
+    updateBookmarkUI();
+  } catch (error) {
+    console.error("북마크 토글 오류:", error);
+    showError("북마크 처리 중 오류가 발생했습니다.");
+  }
+}
+
+// 북마크 UI 업데이트
+function updateBookmarkUI() {
+  const bookmarkButtons = document.querySelectorAll(".bookmark-btn");
+
+  bookmarkButtons.forEach((btn) => {
+    const conceptId = btn.getAttribute("data-concept-id");
+    const icon = btn.querySelector("i");
+
+    if (userBookmarks.includes(conceptId)) {
+      icon.className = "fas fa-bookmark text-yellow-500";
+      btn.title = "북마크 해제";
+    } else {
+      icon.className = "fas fa-bookmark text-gray-400";
+      btn.title = "북마크";
+    }
+  });
+}
+
+// 성공 메시지 표시
+function showMessage(message, type = "info") {
+  const messageContainer = document.createElement("div");
+  const bgColor =
+    type === "success"
+      ? "bg-green-100 border-green-400 text-green-700"
+      : type === "error"
+      ? "bg-red-100 border-red-400 text-red-700"
+      : "bg-blue-100 border-blue-400 text-blue-700";
+
+  messageContainer.className = `fixed top-4 right-4 ${bgColor} px-4 py-3 rounded z-50 border`;
+  messageContainer.innerHTML = `
+    ${message}
+    <button onclick="this.parentElement.remove()" class="ml-2 font-bold">×</button>
+  `;
+
+  document.body.appendChild(messageContainer);
+
+  setTimeout(() => {
+    if (messageContainer.parentElement) {
+      messageContainer.remove();
+    }
+  }, 3000);
+}
+
+// 전역 함수로 만들어서 HTML에서 호출 가능하게 함
+window.toggleBookmark = toggleBookmark;

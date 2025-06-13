@@ -537,23 +537,24 @@ export async function applyModalTranslations() {
       window.updateDomainCategoryEmojiLanguage();
     }
 
-    // 100ms 후 다시 한 번
+    // 100ms 후 도메인-카테고리 옵션 번역 업데이트
     setTimeout(() => {
-      if (typeof window.updateDomainCategoryEmojiLanguage === "function") {
-        window.updateDomainCategoryEmojiLanguage();
-        console.log("🔄 도메인-카테고리 옵션 번역 업데이트 완료 (100ms 지연)");
+      if (typeof window.updateDomainOptions === "function") {
+        window.updateDomainOptions();
       }
+    }, 100);
 
-      // 품사 옵션들도 별도로 업데이트
+    // 100ms 후 품사 옵션 번역 업데이트
+    setTimeout(() => {
       if (typeof window.updatePartOfSpeechOptions === "function") {
         window.updatePartOfSpeechOptions();
-        console.log("🔄 품사 옵션 번역 업데이트 완료 (100ms 지연)");
       }
+    }, 100);
 
-      // 언어 탭별 품사 옵션 업데이트
+    // 100ms 후 언어 탭별 품사 옵션 업데이트
+    setTimeout(() => {
       if (typeof window.updatePartOfSpeechByLanguageTab === "function") {
         window.updatePartOfSpeechByLanguageTab();
-        console.log("🔄 언어 탭별 품사 옵션 업데이트 완료 (100ms 지연)");
       }
     }, 100);
 
@@ -561,13 +562,8 @@ export async function applyModalTranslations() {
     setTimeout(() => {
       if (typeof window.updateDomainCategoryEmojiLanguage === "function") {
         window.updateDomainCategoryEmojiLanguage();
-        console.log(
-          "🔄 도메인-카테고리 옵션 번역 최종 업데이트 완료 (300ms 지연)"
-        );
       }
     }, 300);
-
-    console.log("✅ 모달 번역 적용 완료");
   } catch (error) {
     console.error("❌ 모달 번역 적용 실패:", error);
   }
