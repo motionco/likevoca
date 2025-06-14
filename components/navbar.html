@@ -1,27 +1,25 @@
-<nav class="bg-[#4B63AC] p-3 shadow-md">
-  <div class="container mx-auto flex justify-between items-center max-w-6xl">
+<nav class="bg-[#4B63AC] p-4 shadow-md">
+  <div class="container mx-auto flex justify-between items-center max-w-6xl relative">
     <a
       href="/"
-      class="text-white text-xl md:text-2xl lg:text-3xl font-bold ml-4 lg:ml-0"
+      class="text-white text-xl md:text-2xl lg:text-3xl font-bold ml-4 lg:ml-0 hidden lg:block"
       >LikeVoca</a
     >
 
     <button
       id="menu-toggle"
-      class="text-white text-2xl lg:hidden absolute right-4"
+      class="text-white text-2xl lg:hidden absolute left-4 z-50"
     >
       <i class="fa-solid fa-bars"></i>
     </button>
 
+    <a
+      href="/"
+      class="text-white text-xl md:text-2xl font-bold lg:hidden absolute left-1/2 transform -translate-x-1/2"
+      >LikeVoca</a
+    >
+
     <ul id="nav-menu" class="hidden lg:flex space-x-10 items-center mx-auto">
-      <li>
-        <a href="/" class="text-xl text-white hover:text-yellow-400" data-i18n="home">홈</a>
-      </li>
-      <li>
-        <a href="/pages/my-word-list.html" class="text-xl text-white hover:text-yellow-400" data-i18n="wordbook"
-          >단어장</a
-        >
-      </li>
       <li>
         <a href="/pages/multilingual-dictionary.html" class="text-xl text-white hover:text-yellow-400" data-i18n="multilingual_dictionary"
           >다국어 단어장</a
@@ -30,7 +28,6 @@
       <li>
         <a href="/pages/ai-vocabulary.html" class="text-xl text-white hover:text-yellow-400" data-i18n="ai_vocabulary">AI 단어장</a>
       </li>
-
       <li>
         <a href="/pages/enhanced-quiz.html" class="text-xl text-white hover:text-yellow-400" data-i18n="quiz">퀴즈</a>
       </li>
@@ -50,7 +47,8 @@
       </li>
     </ul>
 
-    <div class="hidden lg:flex space-x-4 mr-10">
+    <!-- Desktop: 로그인/회원가입 버튼 (로그인 전) -->
+    <div id="desktop-login-section" class="hidden lg:flex space-x-4 mr-10">
       <a
         href="login.html"
         id="login-button"
@@ -65,46 +63,73 @@
         data-i18n="signup"
         >회원가입</a
       >
-      <button
-        id="language-button"
-        class="border-2 border-white bg-[#4B63AC] text-white font-semibold px-4 py-2 rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
-      >
-        <i class="fas fa-globe mr-1"></i>
-      </button>
     </div>
 
-    <div
-      id="user-profile"
-      class="relative hidden lg:flex items-center space-x-4 text-white mr-16"
+    <!-- 통합 언어 설정 버튼 (반응형) - 데스크톱에서 아바타 앞으로 이동 -->
+    <button
+      id="language-button"
+      class="
+        text-white font-semibold transition duration-300
+        lg:border-2 lg:border-white lg:bg-[#4B63AC] lg:px-3 lg:py-2 lg:rounded-lg lg:hover:bg-white lg:hover:text-[#4B63AC]
+        hover:text-yellow-400 lg:hover:text-[#4B63AC]
+        lg:relative lg:mr-4
+        absolute right-8 lg:right-auto
+        text-xl lg:text-base
+        z-40
+        p-2 lg:p-2
+      "
     >
-      <div id="avatar-container" class="cursor-pointer">
-        <div
-          id="avatar"
-          class="w-10 h-10 rounded-full overflow-hidden border-2 border-white"
-        ></div>
-      </div>
+      <i class="fas fa-globe lg:mr-1"></i>
+      <span class="hidden lg:inline lg:ml-1">KR</span>
+    </button>
 
+    <!-- Desktop & Mobile: 유저 프로필 (반응형) - 가장 우측 -->
+    <div id="desktop-user-section" class="
+      hidden lg:flex items-center space-x-4 text-white mr-10
+      lg:relative
+      absolute right-2 lg:right-auto
+      z-30
+    ">
       <div
-        id="profile-dropdown"
-        class="hidden absolute top-12 right-0 bg-white shadow-lg rounded-lg py-2 w-48 text-gray-900"
+        id="user-profile"
+        class="relative flex items-center"
       >
-        <div class="px-4 py-2 font-semibold border-b border-gray-200">
-          <span id="user-name"></span>
+        <div id="avatar-container" class="cursor-pointer">
+          <div
+            id="avatar"
+            class="w-8 h-8 lg:w-10 lg:h-10 rounded-full overflow-hidden border-2 border-white"
+          ></div>
         </div>
-        <a
-          href="/profile.html"
-          class="block w-full text-left px-4 py-2 hover:bg-gray-100"
-          data-i18n="profile"
+
+        <div
+          id="profile-dropdown"
+          class="hidden absolute top-12 right-0 bg-white shadow-lg rounded-lg py-2 w-48 text-gray-900 z-50"
         >
-          프로필
-        </a>
-        <button
-          id="logout-button"
-          class="block w-full text-left px-4 py-2 hover:bg-gray-100"
-          data-i18n="logout"
-        >
-          로그아웃
-        </button>
+          <div class="px-4 py-2 font-semibold border-b border-gray-200">
+            <span id="user-name"></span>
+          </div>
+          <a
+            href="/pages/my-word-list.html"
+            class="block w-full text-left px-4 py-2 hover:bg-gray-100"
+            data-i18n="wordbook"
+          >
+            단어장
+          </a>
+          <a
+            href="/profile.html"
+            class="block w-full text-left px-4 py-2 hover:bg-gray-100"
+            data-i18n="profile"
+          >
+            프로필
+          </a>
+          <button
+            id="logout-button"
+            class="block w-full text-left px-4 py-2 hover:bg-gray-100"
+            data-i18n="logout"
+          >
+            로그아웃
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -113,24 +138,13 @@
     id="mobile-menu"
     class="hidden flex flex-col items-center space-y-4 bg-[#4B63AC] text-white p-3 lg:hidden"
   >
-    <a href="/" class="text-lg hover:text-yellow-400" data-i18n="home">홈</a>
-    <a href="/pages/my-word-list.html" class="text-lg hover:text-yellow-400" data-i18n="wordbook">단어장</a>
     <a href="/pages/multilingual-dictionary.html" class="text-lg hover:text-yellow-400" data-i18n="multilingual_dictionary">다국어 단어장</a>
     <a href="/pages/ai-vocabulary.html" class="text-lg hover:text-yellow-400" data-i18n="ai_vocabulary">AI 단어장</a>
-
     <a href="/pages/enhanced-quiz.html" class="text-lg hover:text-yellow-400" data-i18n="quiz">퀴즈</a>
     <a href="/pages/language-games.html" class="text-lg hover:text-yellow-400" data-i18n="language_games">게임</a>
     <a href="/pages/grammar-learning.html" class="text-lg hover:text-yellow-400" data-i18n="learning_title">학습하기</a>
     <a href="/pages/learning-progress.html" class="text-lg hover:text-yellow-400" data-i18n="learning_progress">학습 진도</a>
     <a href="/pages/inquiry.html" class="text-lg hover:text-yellow-400" data-i18n="inquiry">문의하기</a>
-
-    <button
-      id="mobile-language-button"
-      class="text-lg hover:text-yellow-400 flex items-center"
-    >
-      <i class="fas fa-globe mr-2"></i>
-      <span data-i18n="language_settings">언어 설정</span>
-    </button>
 
     <div id="mobile-login-buttons" class="flex space-x-4">
       <a
@@ -154,6 +168,13 @@
       <div class="text-lg font-semibold mb-2">
         <span id="mobile-user-name"></span>
       </div>
+      <a
+        href="/pages/my-word-list.html"
+        class="text-lg hover:text-yellow-400"
+        data-i18n="wordbook"
+      >
+        단어장
+      </a>
       <a
         href="/profile.html"
         class="text-lg hover:text-yellow-400"

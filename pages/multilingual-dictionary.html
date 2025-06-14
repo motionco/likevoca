@@ -97,27 +97,27 @@
             <label class="block text-sm font-medium mb-1 text-gray-700" data-i18n="language_filter">언어 필터</label>
             <div class="grid grid-cols-5 gap-1 h-10">
               <select id="source-language" class="col-span-2 p-2 border rounded text-sm">
-                <option value="korean" data-i18n="korean">한국어</option>
-                <option value="english" data-i18n="english">영어</option>
-                <option value="japanese" data-i18n="japanese">일본어</option>
-                <option value="chinese" data-i18n="chinese">중국어</option>
-              </select>
-              
-              <button
-                id="swap-languages"
+              <option value="korean" data-i18n="korean">한국어</option>
+              <option value="english" data-i18n="english">영어</option>
+              <option value="japanese" data-i18n="japanese">일본어</option>
+              <option value="chinese" data-i18n="chinese">중국어</option>
+            </select>
+
+            <button
+              id="swap-languages"
                 class="w-full h-full text-gray-600 hover:text-[#4B63AC] hover:bg-gray-100 rounded-lg transition duration-200 border border-gray-300 hover:border-[#4B63AC] flex items-center justify-center"
-                title="언어 순서 바꾸기"
-                data-i18n-title="swap_languages"
-              >
-                <i class="fas fa-exchange-alt text-sm"></i>
-              </button>
+              title="언어 순서 바꾸기"
+              data-i18n-title="swap_languages"
+            >
+              <i class="fas fa-exchange-alt text-sm"></i>
+            </button>
               
               <select id="target-language" class="col-span-2 p-2 border rounded text-sm">
-                <option value="english" data-i18n="english">영어</option>
-                <option value="korean" data-i18n="korean">한국어</option>
-                <option value="japanese" data-i18n="japanese">일본어</option>
-                <option value="chinese" data-i18n="chinese">중국어</option>
-              </select>
+              <option value="english" data-i18n="english">영어</option>
+              <option value="korean" data-i18n="korean">한국어</option>
+              <option value="japanese" data-i18n="japanese">일본어</option>
+              <option value="chinese" data-i18n="chinese">중국어</option>
+            </select>
             </div>
           </div>
 
@@ -127,26 +127,26 @@
               <div>
                 <label for="category-filter" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="category">카테고리</label>
                 <select id="category-filter" class="w-full p-2 border rounded h-10 text-sm">
-                  <option value="all" data-i18n="all_categories">전체</option>
-                  <option value="fruit" data-i18n="fruit">과일</option>
-                  <option value="food" data-i18n="food">음식</option>
-                  <option value="animal" data-i18n="animal">동물</option>
-                  <option value="daily" data-i18n="daily">일상</option>
-                  <option value="travel" data-i18n="travel">여행</option>
-                  <option value="business" data-i18n="business">비즈니스</option>
-                </select>
-              </div>
+              <option value="all" data-i18n="all_categories">전체</option>
+              <option value="fruit" data-i18n="fruit">과일</option>
+              <option value="food" data-i18n="food">음식</option>
+              <option value="animal" data-i18n="animal">동물</option>
+              <option value="daily" data-i18n="daily">일상</option>
+              <option value="travel" data-i18n="travel">여행</option>
+              <option value="business" data-i18n="business">비즈니스</option>
+            </select>
+          </div>
               <div>
                 <label for="sort-option" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="sort">정렬</label>
                 <select id="sort-option" class="w-full p-2 border rounded h-10 text-sm">
-                  <option value="latest" data-i18n="latest">최신순</option>
-                  <option value="oldest" data-i18n="oldest">오래된순</option>
-                  <option value="a-z" data-i18n="alphabetical">가나다순</option>
-                  <option value="z-a" data-i18n="reverse_alphabetical">역가나다순</option>
-                </select>
-              </div>
-            </div>
+              <option value="latest" data-i18n="latest">최신순</option>
+              <option value="oldest" data-i18n="oldest">오래된순</option>
+              <option value="a-z" data-i18n="alphabetical">가나다순</option>
+              <option value="z-a" data-i18n="reverse_alphabetical">역가나다순</option>
+            </select>
           </div>
+        </div>
+      </div>
         </div>
 
         <!-- 개념 수 및 사용량 표시 -->
@@ -159,7 +159,7 @@
             <span class="text-sm font-medium text-gray-700 whitespace-nowrap" data-i18n="concept_usage">개념 사용량:</span>
             <div class="flex items-center gap-2 min-w-[200px]">
               <div class="flex-1 bg-gray-200 rounded-full h-2.5">
-                <div id="concept-usage-bar" class="bg-[#4B63AC] h-2.5 rounded-full" style="width: 0%"></div>
+          <div id="concept-usage-bar" class="bg-[#4B63AC] h-2.5 rounded-full" style="width: 0%"></div>
               </div>
               <span id="concept-usage-text" class="text-sm font-medium whitespace-nowrap">0/100</span>
             </div>

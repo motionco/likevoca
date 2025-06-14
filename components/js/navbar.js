@@ -46,22 +46,31 @@ export async function loadNavbar() {
     const html = await response.text();
     document.getElementById("navbar-container").innerHTML = html;
 
+    // 초기 UI 상태 설정 (로그아웃 상태로 시작)
+    setInitialUIState();
+
     initializeNavbar();
 
     // 언어 설정 초기화 및 적용
     console.log("네비게이션바 로드 완료, 언어 설정 초기화 중...");
     await initializeLanguageSettings();
 
+    // 인증 상태 리스너 초기화 (중복 방지)
+    let authListenerInitialized = false;
+
+    const initAuthListener = () => {
+      if (!authListenerInitialized && auth) {
+        console.log("Auth 리스너 설정");
+        initializeAuthStateListener();
+        authListenerInitialized = true;
+      }
+    };
+
     // Firebase 초기화 완료 이벤트를 기다림
-    window.addEventListener("firebase-initialized", () => {
-      console.log("Firebase 초기화 완료, Auth 리스너 설정");
-      initializeAuthStateListener();
-    });
+    window.addEventListener("firebase-initialized", initAuthListener);
 
     // 이미 초기화되어 있을 수도 있으므로 바로 시도
-    if (auth) {
-      initializeAuthStateListener();
-    }
+    initAuthListener();
 
     // 언어 설정 표시 업데이트
     updateLanguageDisplay();
@@ -86,6 +95,7 @@ function initializeNavbar() {
     });
   }
 
+  // Desktop 아바타 클릭 이벤트
   if (avatar && profileDropdown) {
     avatar.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -114,18 +124,11 @@ function initializeNavbar() {
     mobileLogoutButton.addEventListener("click", handleLogout);
   }
 
-  // 언어 설정 버튼 이벤트 리스너 추가
+  // 통합 언어 설정 버튼 이벤트 리스너
   const languageButton = document.getElementById("language-button");
-  const mobileLanguageButton = document.getElementById(
-    "mobile-language-button"
-  );
 
   if (languageButton) {
     languageButton.addEventListener("click", showLanguageSettingsModal);
-  }
-
-  if (mobileLanguageButton) {
-    mobileLanguageButton.addEventListener("click", showLanguageSettingsModal);
   }
 
   // 언어 변경 이벤트 리스너
@@ -145,20 +148,27 @@ function initializeNavbar() {
 // 언어 설정 표시 업데이트
 async function updateLanguageDisplay() {
   const languageButton = document.getElementById("language-button");
-  if (!languageButton) return;
 
   const activeLang = await getActiveLanguage();
 
-  // 언어 코드에 따른 국기 이모지 (간단한 예시)
-  const langFlags = {
-    ko: "🇰🇷",
-    en: "🇺🇸",
-    ja: "🇯🇵",
-    zh: "🇨🇳",
+  // 언어 코드에 따른 표시 텍스트
+  const langDisplay = {
+    ko: "KR",
+    en: "EN",
+    ja: "JP",
+    zh: "CN",
   };
 
-  const flag = langFlags[activeLang] || "🌐";
-  languageButton.innerHTML = `<i class="fas fa-globe mr-1"></i> ${flag}`;
+  const displayText = langDisplay[activeLang] || "KR";
+
+  // 통합 언어 버튼 업데이트 (반응형)
+  if (languageButton) {
+    // 모바일: 아이콘만, 데스크톱: 아이콘 + 텍스트
+    languageButton.innerHTML = `
+      <i class="fas fa-globe mr-1 lg:mr-1"></i>
+      <span class="hidden lg:inline">${displayText}</span>
+    `;
+  }
 }
 
 function handleLogout() {
@@ -189,42 +199,93 @@ function initializeAuthStateListener() {
 
   try {
     onAuthStateChanged(auth, (user) => {
+      console.log("인증 상태 변경:", user ? "로그인됨" : "로그아웃됨", user);
+
       const mobileLoginButtons = document.getElementById(
         "mobile-login-buttons"
       );
-      const userProfile = document.getElementById("user-profile");
       const mobileUserProfile = document.getElementById("mobile-user-profile");
+      const desktopLoginSection = document.getElementById(
+        "desktop-login-section"
+      );
+      const desktopUserSection = document.getElementById(
+        "desktop-user-section"
+      );
       const avatar = document.getElementById("avatar");
 
-      if (!mobileLoginButtons || !userProfile || !mobileUserProfile || !avatar)
+      console.log("요소 확인:", {
+        mobileLoginButtons: !!mobileLoginButtons,
+        mobileUserProfile: !!mobileUserProfile,
+        desktopLoginSection: !!desktopLoginSection,
+        desktopUserSection: !!desktopUserSection,
+        avatar: !!avatar,
+      });
+
+      if (
+        !mobileLoginButtons ||
+        !mobileUserProfile ||
+        !desktopLoginSection ||
+        !desktopUserSection ||
+        !avatar
+      ) {
+        console.error("필수 요소를 찾을 수 없습니다.");
         return;
+      }
 
       if (user) {
-        document
-          .querySelectorAll("#login-button, #signup-button")
-          .forEach((el) => el.classList.add("hidden"));
+        console.log("로그인 상태 UI 업데이트 시작");
+
+        // Desktop & Mobile: 로그인 섹션 강제 숨김, 유저 섹션 강제 표시
+        desktopLoginSection.style.display = "none";
+        desktopLoginSection.classList.add("hidden");
+        desktopUserSection.style.display = "flex"; // 모바일에서도 표시
+        desktopUserSection.classList.remove("hidden");
+        desktopUserSection.classList.add("flex", "lg:flex"); // 모바일과 데스크톱 모두 flex
+        console.log("데스크톱 & 모바일 아바타 섹션 업데이트 완료");
+
+        // Mobile: 로그인 버튼들 숨기고 유저 프로필 표시 (햄버거 메뉴 내부용)
         mobileLoginButtons.classList.add("hidden");
-        userProfile.classList.remove("hidden");
         mobileUserProfile.classList.remove("hidden");
+        console.log("모바일 햄버거 메뉴 섹션 업데이트 완료");
 
         const userName = user.displayName || "사용자";
-        document.getElementById(
-          "user-name"
-        ).textContent = `환영합니다, ${userName}님`;
-        document.getElementById(
-          "mobile-user-name"
-        ).textContent = `환영합니다, ${userName}님`;
+        // '환영합니다' 문구 제거
+        const userNameElement = document.getElementById("user-name");
+        const mobileUserNameElement =
+          document.getElementById("mobile-user-name");
+
+        if (userNameElement) {
+          userNameElement.textContent = `${userName}님`;
+        }
+        if (mobileUserNameElement) {
+          mobileUserNameElement.textContent = `${userName}님`;
+        }
 
         const avatarURL =
           user.photoURL || "https://www.w3schools.com/howto/img_avatar.png";
-        avatar.innerHTML = `<img src="${avatarURL}" class="w-10 h-10 rounded-full" alt="프로필 사진">`;
+
+        // 데스크톱 & 모바일 아바타 설정 (반응형 크기 적용)
+        avatar.innerHTML = `<img src="${avatarURL}" class="w-8 h-8 lg:w-10 lg:h-10 rounded-full" alt="프로필 사진">`;
+
+        console.log("로그인 상태 UI 업데이트 완료");
       } else {
-        document
-          .querySelectorAll("#login-button, #signup-button")
-          .forEach((el) => el.classList.remove("hidden"));
-        mobileLoginButtons.classList.remove("hidden");
-        userProfile.classList.add("hidden");
+        console.log("로그아웃 상태 UI 업데이트 시작");
+
+        // Desktop & Mobile: 유저 섹션 강제 숨김, 로그인 섹션 강제 표시
+        desktopUserSection.style.display = "none";
+        desktopUserSection.classList.add("hidden");
+        desktopUserSection.classList.remove("flex", "lg:flex");
+        desktopLoginSection.style.display = "";
+        desktopLoginSection.classList.remove("hidden");
+        desktopLoginSection.classList.add("lg:flex");
+        console.log("데스크톱 섹션 업데이트 완료");
+
+        // Mobile: 유저 프로필 숨기고 로그인 버튼들 표시
         mobileUserProfile.classList.add("hidden");
+        mobileLoginButtons.classList.remove("hidden");
+        console.log("모바일 섹션 업데이트 완료");
+
+        console.log("로그아웃 상태 UI 업데이트 완료");
       }
     });
   } catch (error) {
@@ -326,6 +387,32 @@ function getPageType() {
   }
 
   return "home";
+}
+
+// 초기 UI 상태 설정 함수 추가
+function setInitialUIState() {
+  console.log("초기 UI 상태 설정 중...");
+
+  const desktopLoginSection = document.getElementById("desktop-login-section");
+  const desktopUserSection = document.getElementById("desktop-user-section");
+  const mobileLoginButtons = document.getElementById("mobile-login-buttons");
+  const mobileUserProfile = document.getElementById("mobile-user-profile");
+
+  // 초기 상태: 로그아웃 상태로 설정
+  if (desktopLoginSection) {
+    desktopLoginSection.classList.remove("hidden");
+  }
+  if (desktopUserSection) {
+    desktopUserSection.classList.add("hidden");
+  }
+  if (mobileLoginButtons) {
+    mobileLoginButtons.classList.remove("hidden");
+  }
+  if (mobileUserProfile) {
+    mobileUserProfile.classList.add("hidden");
+  }
+
+  console.log("초기 UI 상태 설정 완료");
 }
 
 document.addEventListener("DOMContentLoaded", async () => {

@@ -558,11 +558,11 @@ function createConceptCard(concept) {
           >
             <i class="fas fa-bookmark text-gray-400"></i>
           </button>
-          <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-            ${getTranslatedText(conceptInfo.domain)}/${getTranslatedText(
+        <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+          ${getTranslatedText(conceptInfo.domain)}/${getTranslatedText(
     conceptInfo.category
   )}
-          </span>
+        </span>
         </div>
       </div>
       
