@@ -114,14 +114,9 @@ function initializeNavbar() {
   }
 
   const logoutButton = document.getElementById("logout-button");
-  const mobileLogoutButton = document.getElementById("mobile-logout-button");
 
   if (logoutButton) {
     logoutButton.addEventListener("click", handleLogout);
-  }
-
-  if (mobileLogoutButton) {
-    mobileLogoutButton.addEventListener("click", handleLogout);
   }
 
   // 통합 언어 설정 버튼 이벤트 리스너
@@ -137,6 +132,15 @@ function initializeNavbar() {
 
     // 언어 버튼 표시 업데이트
     await updateLanguageDisplay();
+
+    // 사용자 이름 접미사 업데이트 (로그인 상태인 경우)
+    const userNameElement = document.getElementById("user-name");
+    if (userNameElement && auth?.currentUser) {
+      const userName = auth.currentUser.displayName || "사용자";
+      const userSuffix =
+        window.translations?.[userLanguage]?.user_suffix || "님";
+      userNameElement.textContent = `${userName}${userSuffix}`;
+    }
 
     // UI 언어만 변경하고 학습 언어 선택은 그대로 유지
     if (typeof displayConceptList === "function") {
@@ -204,7 +208,6 @@ function initializeAuthStateListener() {
       const mobileLoginButtons = document.getElementById(
         "mobile-login-buttons"
       );
-      const mobileUserProfile = document.getElementById("mobile-user-profile");
       const desktopLoginSection = document.getElementById(
         "desktop-login-section"
       );
@@ -215,7 +218,6 @@ function initializeAuthStateListener() {
 
       console.log("요소 확인:", {
         mobileLoginButtons: !!mobileLoginButtons,
-        mobileUserProfile: !!mobileUserProfile,
         desktopLoginSection: !!desktopLoginSection,
         desktopUserSection: !!desktopUserSection,
         avatar: !!avatar,
@@ -223,7 +225,6 @@ function initializeAuthStateListener() {
 
       if (
         !mobileLoginButtons ||
-        !mobileUserProfile ||
         !desktopLoginSection ||
         !desktopUserSection ||
         !avatar
@@ -243,22 +244,20 @@ function initializeAuthStateListener() {
         desktopUserSection.classList.add("flex", "lg:flex"); // 모바일과 데스크톱 모두 flex
         console.log("데스크톱 & 모바일 아바타 섹션 업데이트 완료");
 
-        // Mobile: 로그인 버튼들 숨기고 유저 프로필 표시 (햄버거 메뉴 내부용)
+        // Mobile: 로그인 버튼들 숨기기
         mobileLoginButtons.classList.add("hidden");
-        mobileUserProfile.classList.remove("hidden");
         console.log("모바일 햄버거 메뉴 섹션 업데이트 완료");
 
         const userName = user.displayName || "사용자";
         // '환영합니다' 문구 제거
         const userNameElement = document.getElementById("user-name");
-        const mobileUserNameElement =
-          document.getElementById("mobile-user-name");
 
         if (userNameElement) {
-          userNameElement.textContent = `${userName}님`;
-        }
-        if (mobileUserNameElement) {
-          mobileUserNameElement.textContent = `${userName}님`;
+          // 번역 시스템을 사용하여 사용자 이름 접미사 적용
+          const currentLang = localStorage.getItem("userLanguage") || "ko";
+          const userSuffix =
+            window.translations?.[currentLang]?.user_suffix || "님";
+          userNameElement.textContent = `${userName}${userSuffix}`;
         }
 
         const avatarURL =
@@ -280,8 +279,7 @@ function initializeAuthStateListener() {
         desktopLoginSection.classList.add("lg:flex");
         console.log("데스크톱 섹션 업데이트 완료");
 
-        // Mobile: 유저 프로필 숨기고 로그인 버튼들 표시
-        mobileUserProfile.classList.add("hidden");
+        // Mobile: 로그인 버튼들 표시
         mobileLoginButtons.classList.remove("hidden");
         console.log("모바일 섹션 업데이트 완료");
 
@@ -396,7 +394,6 @@ function setInitialUIState() {
   const desktopLoginSection = document.getElementById("desktop-login-section");
   const desktopUserSection = document.getElementById("desktop-user-section");
   const mobileLoginButtons = document.getElementById("mobile-login-buttons");
-  const mobileUserProfile = document.getElementById("mobile-user-profile");
 
   // 초기 상태: 모든 요소를 숨김으로 설정하여 깜빡임 방지
   // Firebase 인증 상태 확인 후 적절한 UI 표시
@@ -410,9 +407,6 @@ function setInitialUIState() {
   }
   if (mobileLoginButtons) {
     mobileLoginButtons.classList.add("hidden"); // 모바일 로그인 버튼도 숨김
-  }
-  if (mobileUserProfile) {
-    mobileUserProfile.classList.add("hidden");
   }
 
   console.log("초기 UI 상태 설정 완료 - 모든 요소 숨김");

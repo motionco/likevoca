@@ -149,28 +149,28 @@ const seoMetadata = {
       description: "재미있는 게임을 통해 다양한 언어를 즐겁게 배워보세요.",
       keywords:
         "언어 게임, 다국어 게임, 단어 게임, 언어 학습 게임, 영어, 일본어, 중국어, 한국어",
-      canonical: "https://likevoca.com/ko/pages/language-games.html",
+      canonical: "https://likevoca.com/ko/pages/games.html",
     },
     en: {
       title: "LikeVoca - Language Games",
       description: "Learn various languages enjoyably through fun games.",
       keywords:
         "language games, multilingual games, word games, language learning games, English, Japanese, Chinese, Korean",
-      canonical: "https://likevoca.com/en/pages/language-games.html",
+      canonical: "https://likevoca.com/en/pages/games.html",
     },
     ja: {
       title: "LikeVoca - 多言語ゲーム",
       description: "楽しいゲームを通して様々な言語を楽しく学びましょう。",
       keywords:
         "言語ゲーム, 多言語ゲーム, 単語ゲーム, 言語学習ゲーム, 英語, 日本語, 中国語, 韓国語",
-      canonical: "https://likevoca.com/ja/pages/language-games.html",
+      canonical: "https://likevoca.com/ja/pages/games.html",
     },
     zh: {
       title: "LikeVoca - 多语言游戏",
       description: "通过有趣的游戏愉快地学习各种语言。",
       keywords:
         "语言游戏, 多语言游戏, 单词游戏, 语言学习游戏, 英语, 日语, 中文, 韩语",
-      canonical: "https://likevoca.com/zh/pages/language-games.html",
+      canonical: "https://likevoca.com/zh/pages/games.html",
     },
   },
   // AI 단어장 페이지 메타데이터
@@ -257,8 +257,10 @@ const translations = {
     login: "로그인",
     signup: "회원가입",
     logout: "로그아웃",
+    profile: "프로필",
     delete_account: "회원탈퇴",
     welcome: "환영합니다",
+    user_suffix: "님",
     get_started_free: "무료로 시작하기",
     learn_languages: "다양한 언어를 쉽고 재미있게 배워보세요",
     effective_learning:
@@ -428,9 +430,11 @@ const translations = {
     example_word: "예시 단어",
     example_word_placeholder: "예: manzana, pomme",
     cancel: "취소",
-    // 다국어 게임 번역
-    language_games: commonTexts.ko.language_games,
-    language_games_desc: commonTexts.ko.language_games_desc,
+    // 게임 번역
+    games: "게임",
+    games_desc: "재미있는 게임을 통해 다양한 언어를 즐겁게 배워보세요.",
+    learning_title: "학습",
+    learning_title_desc: "체계적인 학습을 통해 언어 실력을 향상시키세요.",
     // 문법 및 학습 진도 페이지 번역
     grammar_progress: "문법 및 학습 진도",
     grammar_progress_title: "문법 및 학습 진도",
@@ -567,8 +571,10 @@ const translations = {
     login: "Login",
     signup: "Sign Up",
     logout: "Logout",
+    profile: "Profile",
     delete_account: "Delete Account",
     welcome: "Welcome",
+    user_suffix: "",
     get_started_free: "Get Started Free",
     learn_languages: "Learn various languages easily and fun",
     effective_learning:
@@ -736,9 +742,12 @@ const translations = {
     example_word: "Example Word",
     example_word_placeholder: "Ex: manzana, pomme",
     cancel: "Cancel",
-    // 다국어 게임 번역
-    language_games: commonTexts.en.language_games,
-    language_games_desc: commonTexts.en.language_games_desc,
+    // 게임 번역
+    games: "Games",
+    games_desc: "Learn various languages enjoyably through fun games.",
+    learning_title: "Learning",
+    learning_title_desc:
+      "Improve your language skills through systematic learning.",
     // 문법 및 학습 진도 페이지 번역
     grammar_progress: "Grammar & Learning Progress",
     grammar_progress_title: "Grammar & Learning Progress",
@@ -878,8 +887,10 @@ const translations = {
     login: "ログイン",
     signup: "会員登録",
     logout: "ログアウト",
+    profile: "プロフィール",
     delete_account: "退会",
     welcome: "ようこそ",
+    user_suffix: "さん",
     get_started_free: "無料で始める",
     learn_languages: "様々な言語を簡単に楽しく学びましょう",
     effective_learning:
@@ -1052,9 +1063,11 @@ const translations = {
     example_word: "例の単語",
     example_word_placeholder: "例：manzana, pomme",
     cancel: "キャンセル",
-    // 다국어 게임 번역
-    language_games: commonTexts.ja.language_games,
-    language_games_desc: commonTexts.ja.language_games_desc,
+    // 게임 번역
+    games: "ゲーム",
+    games_desc: "楽しいゲームを通して様々な言語を楽しく学びましょう。",
+    learning_title: "学習",
+    learning_title_desc: "体系的な学習を通して語学力を向上させましょう。",
     // 문법 및 학습 진도 페이지 번역
     grammar_progress: "文法と学習進捗",
     grammar_progress_title: "文法と学習進捗",
@@ -1192,8 +1205,10 @@ const translations = {
     login: "登录",
     signup: "注册",
     logout: "登出",
+    profile: "个人资料",
     delete_account: "注销账号",
     welcome: "欢迎",
+    user_suffix: "",
     get_started_free: "免费开始",
     learn_languages: "轻松有趣地学习各种语言",
     effective_learning:
@@ -1362,9 +1377,11 @@ const translations = {
     example_word: "示例单词",
     example_word_placeholder: "例如：manzana, pomme",
     cancel: "取消",
-    // 다국어 게임 번역
-    language_games: commonTexts.zh.language_games,
-    language_games_desc: commonTexts.zh.language_games_desc,
+    // 게임 번역
+    games: "游戏",
+    games_desc: "通过有趣的游戏愉快地学习各种语言。",
+    learning_title: "学习",
+    learning_title_desc: "通过系统的学习提高您的语言技能。",
     // 문법 및 학습 진도 페이지 번역
     grammar_progress: "语法和学习进度",
     grammar_progress_title: "语法和学习进度",

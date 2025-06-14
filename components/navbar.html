@@ -27,13 +27,13 @@
         <a href="/pages/ai-vocabulary.html" class="text-xl text-white hover:text-yellow-400" data-i18n="ai_vocabulary">AI 단어장</a>
       </li>
       <li>
-        <a href="/pages/enhanced-quiz.html" class="text-xl text-white hover:text-yellow-400" data-i18n="quiz">퀴즈</a>
+        <a href="/pages/quiz.html" class="text-xl text-white hover:text-yellow-400" data-i18n="quiz">퀴즈</a>
       </li>
       <li>
-        <a href="/pages/language-games.html" class="text-xl text-white hover:text-yellow-400" data-i18n="language_games">게임</a>
+        <a href="/pages/games.html" class="text-xl text-white hover:text-yellow-400" data-i18n="games">게임</a>
       </li>
       <li>
-        <a href="/pages/grammar-learning.html" class="text-xl text-white hover:text-yellow-400" data-i18n="learning_title">학습하기</a>
+        <a href="/pages/learning.html" class="text-xl text-white hover:text-yellow-400" data-i18n="learning_title">학습</a>
       </li>
       <li>
         <a href="/pages/learning-progress.html" class="text-xl text-white hover:text-yellow-400" data-i18n="learning_progress">학습 진도</a>
@@ -46,7 +46,7 @@
     </ul>
 
     <!-- 오른쪽: 언어 설정 + 로그인/회원가입 버튼 + 유저 프로필 -->
-    <div class="flex items-center space-x-3">
+    <div class="flex items-center space-x-1.5 lg:space-x-3">
       <!-- 언어 설정 버튼 (반응형) -->
       <button
         id="language-button"
@@ -70,13 +70,6 @@
           class="border-2 border-white bg-[#4B63AC] text-white font-semibold px-4 py-1.5 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
           data-i18n="login"
           >로그인</a
-        >
-        <a
-          href="signup.html"
-          id="signup-button"
-          class="border-2 border-white bg-[#4B63AC] text-white font-semibold px-4 py-1.5 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
-          data-i18n="signup"
-          >회원가입</a
         >
       </div>
 
@@ -133,9 +126,9 @@
   >
     <a href="/pages/multilingual-dictionary.html" class="text-lg hover:text-yellow-400" data-i18n="multilingual_dictionary">다국어 단어장</a>
     <a href="/pages/ai-vocabulary.html" class="text-lg hover:text-yellow-400" data-i18n="ai_vocabulary">AI 단어장</a>
-    <a href="/pages/enhanced-quiz.html" class="text-lg hover:text-yellow-400" data-i18n="quiz">퀴즈</a>
-    <a href="/pages/language-games.html" class="text-lg hover:text-yellow-400" data-i18n="language_games">게임</a>
-    <a href="/pages/grammar-learning.html" class="text-lg hover:text-yellow-400" data-i18n="learning_title">학습하기</a>
+    <a href="/pages/quiz.html" class="text-lg hover:text-yellow-400" data-i18n="quiz">퀴즈</a>
+    <a href="/pages/games.html" class="text-lg hover:text-yellow-400" data-i18n="games">게임</a>
+    <a href="/pages/learning.html" class="text-lg hover:text-yellow-400" data-i18n="learning_title">학습</a>
     <a href="/pages/learning-progress.html" class="text-lg hover:text-yellow-400" data-i18n="learning_progress">학습 진도</a>
     <a href="/pages/inquiry.html" class="text-lg hover:text-yellow-400" data-i18n="inquiry">문의하기</a>
 
@@ -154,34 +147,5 @@
       >
     </div>
 
-    <div
-      id="mobile-user-profile"
-      class="hidden flex flex-col items-center space-y-2 w-full"
-    >
-      <div class="text-lg font-semibold mb-2">
-        <span id="mobile-user-name"></span>
-      </div>
-      <a
-        href="/pages/my-word-list.html"
-        class="text-lg hover:text-yellow-400"
-        data-i18n="wordbook"
-      >
-        단어장
-      </a>
-      <a
-        href="/profile.html"
-        class="text-lg hover:text-yellow-400"
-        data-i18n="profile"
-      >
-        프로필
-      </a>
-      <button
-        id="mobile-logout-button"
-        class="text-lg hover:text-yellow-400"
-        data-i18n="logout"
-      >
-        로그아웃
-      </button>
-    </div>
   </div>
 </nav>

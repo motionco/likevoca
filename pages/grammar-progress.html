@@ -10,6 +10,12 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Firebase -->
+    <script type="module" src="../js/firebase/firebase-init.js"></script>
+    <script type="module" src="../utils/language-utils.js"></script>
+    <script type="module" src="../js/language-init.js"></script>
+    
     <style>
       .stat-card {
         transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -255,8 +261,10 @@
       </div>
     </main>
 
-    <!-- Firebase 및 스크립트 -->
-    <script type="module" src="../js/firebase/firebase-init.js"></script>
-    <script type="module" src="js/learning-progress.js"></script>
+    <!-- Navbar -->
+    <script type="module" src="../components/js/navbar.js"></script>
+    
+    <!-- 페이지별 스크립트 -->
+    <script type="module" src="js/grammar-progress.js"></script>
   </body>
 </html> 
