@@ -8,10 +8,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/profile.css">
+  <script type="module" src="components/js/navbar.js"></script>
 </head>
 <body class="bg-gray-100">
-  <!-- Navbar will be loaded here -->
-  <div id="navbar-placeholder"></div>
+  <!-- 네비게이션바 컨테이너 -->
+  <div id="navbar-container"></div>
 
   <main class="container mx-auto px-4 py-8">
     <div id="profile-container" class="bg-white rounded-lg shadow-md p-6">
@@ -87,5 +88,14 @@
   <!-- Firebase -->
   <script type="module" src="js/firebase/firebase-init.js"></script>
   <script type="module" src="js/profile.js"></script>
+  
+  <script type="module">
+    import { loadNavbar } from './components/js/navbar.js';
+    
+    // 네비게이션바 로드
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadNavbar();
+    });
+  </script>
 </body>
 </html> 

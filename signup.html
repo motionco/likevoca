@@ -9,12 +9,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="module" src="./js/auth/signup.js"></script>
     <script type="module" src="./js/language-init.js"></script>
+    <script type="module" src="./components/js/navbar.js"></script>
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
       rel="stylesheet"
     />
   </head>
-  <body class="bg-gray-100 flex items-center justify-center h-screen">
+  <body class="bg-gray-100 min-h-screen">
+    <!-- 네비게이션바 컨테이너 -->
+    <div id="navbar-container"></div>
+    
+    <div class="flex items-center justify-center min-h-screen py-12">
     <div class="bg-white shadow-lg rounded-lg w-11/12 sm:w-96 p-6">
       <h1 class="text-3xl font-bold text-gray-800 text-center mb-6" data-i18n="create_account">
         회원가입
@@ -105,37 +110,16 @@
         <a href="login.html" class="text-[#4B63AC] hover:underline" data-i18n="login">로그인</a>
       </p>
     </div>
-    
-    <!-- 언어 선택 버튼 추가 -->
-    <div class="absolute top-4 right-4">
-      <button 
-        id="language-button"
-        class="border-2 border-[#4B63AC] bg-white text-[#4B63AC] font-semibold px-4 py-2 rounded-lg hover:bg-[#4B63AC] hover:text-white transition duration-300"
-      >
-        <i class="fas fa-globe mr-1"></i>
-      </button>
     </div>
 
     <script type="module">
+      import { loadNavbar } from './components/js/navbar.js';
       import { showLanguageSettingsModal, getActiveLanguage } from './utils/language-utils.js';
       
-      // 언어 설정 버튼에 이벤트 리스너 추가
+      // 네비게이션바 로드
       document.addEventListener('DOMContentLoaded', async () => {
-        const languageButton = document.getElementById('language-button');
-        if (languageButton) {
-          languageButton.addEventListener('click', showLanguageSettingsModal);
-          
-          // 언어 설정 표시 업데이트
-          const activeLang = await getActiveLanguage();
-          const langFlags = {
-            'ko': '🇰🇷',
-            'en': '🇺🇸',
-            'ja': '🇯🇵',
-            'zh': '🇨🇳'
-          };
-          const flag = langFlags[activeLang] || '🌐';
-          languageButton.innerHTML = `<i class="fas fa-globe mr-1"></i> ${flag}`;
-        }
+        // 네비게이션바 로드 (언어 설정은 네비게이션바에서 처리)
+        await loadNavbar();
       });
     </script>
   </body>

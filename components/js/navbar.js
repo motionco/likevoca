@@ -46,21 +46,17 @@ export async function loadNavbar() {
     const html = await response.text();
     document.getElementById("navbar-container").innerHTML = html;
 
-    // 초기 UI 상태 설정 (로그아웃 상태로 시작)
+    // 초기 UI 상태 설정 (모든 요소 숨김으로 시작)
     setInitialUIState();
 
     initializeNavbar();
 
-    // 언어 설정 초기화 및 적용
-    console.log("네비게이션바 로드 완료, 언어 설정 초기화 중...");
-    await initializeLanguageSettings();
-
-    // 인증 상태 리스너 초기화 (중복 방지)
+    // 인증 상태 리스너를 가장 먼저 초기화 (UI 깜빡임 최소화)
     let authListenerInitialized = false;
 
     const initAuthListener = () => {
       if (!authListenerInitialized && auth) {
-        console.log("Auth 리스너 설정");
+        console.log("Auth 리스너 설정 - 우선순위");
         initializeAuthStateListener();
         authListenerInitialized = true;
       }
@@ -71,6 +67,10 @@ export async function loadNavbar() {
 
     // 이미 초기화되어 있을 수도 있으므로 바로 시도
     initAuthListener();
+
+    // 언어 설정 초기화 및 적용
+    console.log("네비게이션바 로드 완료, 언어 설정 초기화 중...");
+    await initializeLanguageSettings();
 
     // 언어 설정 표시 업데이트
     updateLanguageDisplay();
@@ -275,7 +275,7 @@ function initializeAuthStateListener() {
         desktopUserSection.style.display = "none";
         desktopUserSection.classList.add("hidden");
         desktopUserSection.classList.remove("flex", "lg:flex");
-        desktopLoginSection.style.display = "";
+        desktopLoginSection.style.display = ""; // 데스크톱에서만 보이도록 CSS 클래스에 맡김
         desktopLoginSection.classList.remove("hidden");
         desktopLoginSection.classList.add("lg:flex");
         console.log("데스크톱 섹션 업데이트 완료");
@@ -398,21 +398,24 @@ function setInitialUIState() {
   const mobileLoginButtons = document.getElementById("mobile-login-buttons");
   const mobileUserProfile = document.getElementById("mobile-user-profile");
 
-  // 초기 상태: 로그아웃 상태로 설정
+  // 초기 상태: 모든 요소를 숨김으로 설정하여 깜빡임 방지
+  // Firebase 인증 상태 확인 후 적절한 UI 표시
   if (desktopLoginSection) {
-    desktopLoginSection.classList.remove("hidden");
+    desktopLoginSection.style.display = "none"; // 완전히 숨김
+    desktopLoginSection.classList.add("hidden");
   }
   if (desktopUserSection) {
+    desktopUserSection.style.display = "none"; // 완전히 숨김
     desktopUserSection.classList.add("hidden");
   }
   if (mobileLoginButtons) {
-    mobileLoginButtons.classList.remove("hidden");
+    mobileLoginButtons.classList.add("hidden"); // 모바일 로그인 버튼도 숨김
   }
   if (mobileUserProfile) {
     mobileUserProfile.classList.add("hidden");
   }
 
-  console.log("초기 UI 상태 설정 완료");
+  console.log("초기 UI 상태 설정 완료 - 모든 요소 숨김");
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
