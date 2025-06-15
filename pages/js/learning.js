@@ -284,25 +284,18 @@ function showLearningModes(area) {
       if (uploadTitle) uploadTitle.textContent = "예문 데이터 업로드";
       modes = [
         {
-          id: "comprehension",
-          name: "문장 이해",
+          id: "example",
+          name: "예문 학습",
           icon: "fas fa-book-open",
           color: "blue",
-          description: "문장의 의미와 구조 파악하기",
+          description: "예문을 통한 일반적인 독해 학습",
         },
         {
-          id: "context",
-          name: "상황 학습",
-          icon: "fas fa-users",
-          color: "green",
-          description: "실제 상황에서의 표현 사용법",
-        },
-        {
-          id: "practice",
-          name: "반복 연습",
-          icon: "fas fa-repeat",
+          id: "flash",
+          name: "플래시 모드",
+          icon: "fas fa-bolt",
           color: "purple",
-          description: "여러 예문으로 반복 학습하기",
+          description: "플래시카드 방식으로 빠른 독해 연습",
         },
       ];
       break;
@@ -403,7 +396,17 @@ async function startLearningMode(area, mode) {
         }
         break;
       case "reading":
-        showReadingMode();
+        switch (mode) {
+          case "example":
+            showReadingExampleMode();
+            break;
+          case "flash":
+            showReadingFlashMode();
+            break;
+          default:
+            console.error(`❌ 알 수 없는 독해 학습 모드: ${mode}`);
+            showAreaSelection();
+        }
         break;
       default:
         console.error(`❌ 알 수 없는 학습 영역: ${area}`);
@@ -933,12 +936,12 @@ function flipGrammarCard() {
   }
 }
 
-function showReadingMode() {
-  console.log("📖 독해 모드 시작");
-  const readingMode = document.getElementById("reading-mode");
-  if (readingMode) {
-    readingMode.classList.remove("hidden");
-    updateReading();
+function showReadingExampleMode() {
+  console.log("📖 예문 독해 모드 시작");
+  const readingContainer = document.getElementById("reading-container");
+  if (readingContainer) {
+    readingContainer.classList.remove("hidden");
+    updateReadingExample();
   } else {
     console.error("❌ 독해 모드 요소를 찾을 수 없음");
     alert("독해 모드를 시작할 수 없습니다.");
@@ -946,33 +949,116 @@ function showReadingMode() {
   }
 }
 
-function updateReading() {
+function showReadingFlashMode() {
+  console.log("⚡ 플래시 독해 모드 시작");
+  const readingContainer = document.getElementById("reading-container");
+  if (readingContainer) {
+    readingContainer.classList.remove("hidden");
+    updateReadingFlash();
+  } else {
+    console.error("❌ 독해 모드 요소를 찾을 수 없음");
+    alert("독해 모드를 시작할 수 없습니다.");
+    showAreaSelection();
+  }
+}
+
+function updateReadingExample() {
   if (!currentData || currentData.length === 0) return;
 
   const example = currentData[currentIndex];
   const sourceLanguage = window.languageSettings?.sourceLanguage || "korean";
   const targetLanguage = window.languageSettings?.targetLanguage || "english";
 
-  const readingText = document.getElementById("reading-text");
-  const readingTranslation = document.getElementById("reading-translation");
-  const readingContext = document.getElementById("reading-context");
+  const container = document.getElementById("reading-example-container");
+  if (!container) return;
 
-  // 원문 표시
-  if (readingText) {
-    readingText.textContent =
-      example[sourceLanguage] || example.original || "원문";
-  }
+  // 예문 학습 모드 - 상세한 정보 표시
+  container.innerHTML = `
+    <div class="space-y-6">
+      <div class="text-center">
+        <div class="text-sm bg-purple-100 text-purple-800 px-3 py-1 rounded-full inline-block mb-4">
+          예문 학습 모드
+        </div>
+        <h3 class="text-2xl font-bold mb-4">
+          ${example[sourceLanguage] || example.original || "원문"}
+        </h3>
+        <p class="text-lg text-gray-600 mb-4">
+          ${example[targetLanguage] || example.translation || "번역"}
+        </p>
+        ${
+          example.context
+            ? `<p class="text-sm text-gray-500 bg-gray-100 p-3 rounded">상황: ${example.context}</p>`
+            : ""
+        }
+      </div>
+      
+      <div class="border-t pt-4">
+        <h4 class="font-semibold mb-2">학습 포인트:</h4>
+        <ul class="text-sm text-gray-700 space-y-1">
+          <li>• 문장 구조와 의미를 파악해보세요</li>
+          <li>• 핵심 단어와 표현을 기억해보세요</li>
+          <li>• 실제 상황에서 어떻게 사용되는지 생각해보세요</li>
+        </ul>
+      </div>
+    </div>
+  `;
 
-  // 번역 표시
-  if (readingTranslation) {
-    readingTranslation.textContent =
-      example[targetLanguage] || example.translation || "번역";
+  // 진행 상황 업데이트
+  const progress = document.getElementById("reading-progress");
+  if (progress) {
+    progress.textContent = `${currentIndex + 1} / ${currentData.length}`;
   }
+}
 
-  // 상황/맥락 표시
-  if (readingContext && example.context) {
-    readingContext.textContent = `상황: ${example.context}`;
-  }
+function updateReadingFlash() {
+  if (!currentData || currentData.length === 0) return;
+
+  const example = currentData[currentIndex];
+  const sourceLanguage = window.languageSettings?.sourceLanguage || "korean";
+  const targetLanguage = window.languageSettings?.targetLanguage || "english";
+
+  const container = document.getElementById("reading-example-container");
+  if (!container) return;
+
+  // 플래시 모드 - 간단한 카드 형태
+  container.innerHTML = `
+    <div class="text-center">
+      <div class="text-sm bg-purple-100 text-purple-800 px-3 py-1 rounded-full inline-block mb-6">
+        플래시 모드
+      </div>
+      
+      <div class="flip-card w-full max-w-lg mx-auto" id="reading-flash-card">
+        <div class="flip-card-inner">
+          <div class="flip-card-front bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg shadow-lg p-8">
+            <div class="text-center">
+              <h3 class="text-2xl font-bold mb-4">
+                ${example[sourceLanguage] || example.original || "원문"}
+              </h3>
+              <p class="text-purple-100 mt-8">(카드를 클릭하여 번역 보기)</p>
+            </div>
+          </div>
+          <div class="flip-card-back bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg shadow-lg p-8">
+            <div class="text-center">
+              <h3 class="text-2xl font-bold mb-4">
+                ${example[targetLanguage] || example.translation || "번역"}
+              </h3>
+              ${
+                example.context
+                  ? `<p class="text-blue-100 text-sm mt-4">상황: ${example.context}</p>`
+                  : ""
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-6">
+        <button onclick="flipReadingCard()" class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-lg">
+          카드 뒤집기
+        </button>
+      </div>
+    </div>
+  `;
 
   // 진행 상황 업데이트
   const progress = document.getElementById("reading-progress");
@@ -1016,8 +1102,25 @@ function navigateContent(direction) {
       }
       break;
     case "reading":
-      updateReading();
+      switch (currentLearningMode) {
+        case "example":
+          updateReadingExample();
+          break;
+        case "flash":
+          updateReadingFlash();
+          break;
+        default:
+          updateReadingExample();
+      }
       break;
+  }
+}
+
+// 독해 플래시 카드 뒤집기 함수
+function flipReadingCard() {
+  const card = document.getElementById("reading-flash-card");
+  if (card) {
+    card.classList.toggle("flipped");
   }
 }
 
@@ -1026,6 +1129,7 @@ window.startLearningMode = startLearningMode;
 window.flipCard = flipCard;
 window.checkTypingAnswer = checkTypingAnswer;
 window.flipGrammarCard = flipGrammarCard;
+window.flipReadingCard = flipReadingCard;
 
 // Enter 키로 타이핑 모드 답안 확인
 document.addEventListener("keypress", function (e) {

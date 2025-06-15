@@ -114,8 +114,14 @@
     <div id="navbar-container"></div>
 
     <main class="container mx-auto max-w-7xl px-4 py-8">
-      <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800" data-i18n="learning_title">학습</h1>
+      <!-- 모바일: 제목과 필터를 2행으로 분리, 데스크톱: 기존 2열 유지 -->
+      <div class="mb-8">
+        <!-- 제목 행 -->
+        <div class="flex justify-center md:justify-start mb-4 md:mb-8">
+          <h1 class="text-3xl font-bold text-gray-800" data-i18n="learning_title">학습</h1>
+        </div>
+        
+        <!-- 필터 행 -->
         <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
           <div>
             <label class="block text-xs font-medium mb-1">원본 언어</label>
@@ -215,7 +221,7 @@
               <div class="font-bold text-xl mb-2">독해 학습</div>
               <p class="text-sm opacity-80 mb-4">다양한 예문을 통한 읽기 이해력 향상</p>
               <div class="text-xs opacity-70">
-                예문 학습 • 맥락 이해 • 독해 연습
+                예문 학습 • 플래시 모드
               </div>
             </div>
           </div>
