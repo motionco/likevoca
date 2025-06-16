@@ -66,8 +66,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // 네비게이션바 로드 후 초기화
   setTimeout(() => {
+    // 언어 선택 요소들 초기화
+    updateLanguageSelectors();
     showAreaSelection();
+
+    // 초기 번역 적용
+    applyTranslations();
   }, 100);
+
+  // 언어 변경 핸들러 초기화
+  handleLanguageChange();
 });
 
 // 전역 함수들 노출
@@ -89,6 +97,16 @@ function initializeLanguageSettings() {
   sourceLanguage = window.languageSettings.sourceLanguage;
   targetLanguage = window.languageSettings.targetLanguage;
   currentUILanguage = window.languageSettings.currentUILanguage;
+
+  // 같은 언어 선택 방지
+  if (sourceLanguage === targetLanguage) {
+    const otherLanguages = ["korean", "english", "japanese", "chinese"].filter(
+      (lang) => lang !== sourceLanguage
+    );
+    targetLanguage = otherLanguages[0];
+    window.languageSettings.targetLanguage = targetLanguage;
+    sessionStorage.setItem("targetLanguage", targetLanguage);
+  }
 
   console.log("🌐 언어 설정 초기화:", {
     sourceLanguage,
@@ -200,41 +218,549 @@ function applyFilters(data) {
   return filteredData;
 }
 
+// 언어 변경 핸들러
 function handleLanguageChange() {
-  // 언어 버튼 변경 감지
-  document.addEventListener("languageChanged", (event) => {
-    console.log("🌐 언어 변경 감지:", event.detail);
+  // UI 언어 변경 이벤트 리스너
+  document.addEventListener("languageChanged", function (event) {
+    console.log("🌐 UI 언어 변경 감지:", event.detail.language);
+    currentUILanguage = event.detail.language;
 
-    // 언어 설정 업데이트
-    if (event.detail.sourceLanguage) {
-      sourceLanguage = event.detail.sourceLanguage;
-      window.languageSettings.sourceLanguage = sourceLanguage;
-      sessionStorage.setItem("sourceLanguage", sourceLanguage);
-    }
+    // 언어 선택 요소들 업데이트
+    updateLanguageSelectors();
 
-    if (event.detail.targetLanguage) {
-      targetLanguage = event.detail.targetLanguage;
-      window.languageSettings.targetLanguage = targetLanguage;
-      sessionStorage.setItem("targetLanguage", targetLanguage);
-    }
-
-    if (event.detail.currentUILanguage) {
-      currentUILanguage = event.detail.currentUILanguage;
-      window.languageSettings.currentUILanguage = currentUILanguage;
-      sessionStorage.setItem("currentUILanguage", currentUILanguage);
-    }
-
-    // 현재 학습 중인 경우 데이터 다시 로드
-    if (currentLearningArea && currentLearningMode) {
-      console.log("🔄 언어 변경으로 인한 데이터 재로드");
-      startLearningMode(currentLearningArea, currentLearningMode);
-    }
+    // 번역 적용
+    applyTranslations();
+    applyAdditionalTranslations();
   });
+
+  // 학습 언어 변경 이벤트 리스너 (언어 스왑 버튼)
+  const swapButton = document.getElementById("swap-languages");
+  if (swapButton) {
+    swapButton.addEventListener("click", function () {
+      console.log("🔄 언어 스왑 버튼 클릭");
+
+      // 현재 언어 설정 가져오기
+      const sourceSelect = document.getElementById("source-language");
+      const targetSelect = document.getElementById("target-language");
+
+      if (sourceSelect && targetSelect) {
+        // 언어 스왑
+        const tempSource = sourceSelect.value;
+        sourceSelect.value = targetSelect.value;
+        targetSelect.value = tempSource;
+
+        // 전역 변수 업데이트
+        sourceLanguage = sourceSelect.value;
+        targetLanguage = targetSelect.value;
+
+        // 세션 스토리지 업데이트
+        sessionStorage.setItem("sourceLanguage", sourceLanguage);
+        sessionStorage.setItem("targetLanguage", targetLanguage);
+
+        // 언어 설정 객체 업데이트
+        if (window.languageSettings) {
+          window.languageSettings.sourceLanguage = sourceLanguage;
+          window.languageSettings.targetLanguage = targetLanguage;
+        }
+
+        console.log("🔄 언어 스왑 완료:", {
+          sourceLanguage,
+          targetLanguage,
+        });
+
+        // 현재 학습 중인 경우 데이터 다시 로드
+        if (currentLearningArea && currentLearningMode) {
+          console.log("🔄 언어 스왑으로 인한 데이터 재로드");
+          currentIndex = 0; // 인덱스 초기화
+          startLearningMode(currentLearningArea, currentLearningMode);
+        }
+      }
+    });
+  }
+
+  // 언어 선택 드롭다운 변경 이벤트
+  const sourceSelect = document.getElementById("source-language");
+  const targetSelect = document.getElementById("target-language");
+
+  if (sourceSelect) {
+    sourceSelect.addEventListener("change", function () {
+      sourceLanguage = this.value;
+      sessionStorage.setItem("sourceLanguage", sourceLanguage);
+
+      if (window.languageSettings) {
+        window.languageSettings.sourceLanguage = sourceLanguage;
+      }
+
+      // 같은 언어 선택 방지
+      if (sourceLanguage === targetLanguage) {
+        const otherLanguages = [
+          "korean",
+          "english",
+          "japanese",
+          "chinese",
+        ].filter((lang) => lang !== sourceLanguage);
+        targetLanguage = otherLanguages[0];
+        targetSelect.value = targetLanguage;
+        sessionStorage.setItem("targetLanguage", targetLanguage);
+
+        if (window.languageSettings) {
+          window.languageSettings.targetLanguage = targetLanguage;
+        }
+      }
+
+      console.log("🌐 원본 언어 변경:", sourceLanguage);
+
+      // 현재 학습 중인 경우 데이터 다시 로드
+      if (currentLearningArea && currentLearningMode) {
+        currentIndex = 0;
+        startLearningMode(currentLearningArea, currentLearningMode);
+      }
+    });
+  }
+
+  if (targetSelect) {
+    targetSelect.addEventListener("change", function () {
+      targetLanguage = this.value;
+      sessionStorage.setItem("targetLanguage", targetLanguage);
+
+      if (window.languageSettings) {
+        window.languageSettings.targetLanguage = targetLanguage;
+      }
+
+      // 같은 언어 선택 방지
+      if (sourceLanguage === targetLanguage) {
+        const otherLanguages = [
+          "korean",
+          "english",
+          "japanese",
+          "chinese",
+        ].filter((lang) => lang !== targetLanguage);
+        sourceLanguage = otherLanguages[0];
+        sourceSelect.value = sourceLanguage;
+        sessionStorage.setItem("sourceLanguage", sourceLanguage);
+
+        if (window.languageSettings) {
+          window.languageSettings.sourceLanguage = sourceLanguage;
+        }
+      }
+
+      console.log("🌐 대상 언어 변경:", targetLanguage);
+
+      // 현재 학습 중인 경우 데이터 다시 로드
+      if (currentLearningArea && currentLearningMode) {
+        currentIndex = 0;
+        startLearningMode(currentLearningArea, currentLearningMode);
+      }
+    });
+  }
+}
+
+// 번역 적용 함수
+function applyTranslations() {
+  // language-utils.js의 applyLanguage 함수 호출
+  if (window.applyLanguage) {
+    window.applyLanguage();
+  }
+}
+
+// 추가 번역 키들을 직접 처리하는 함수
+function applyAdditionalTranslations() {
+  const currentLang = getCurrentLanguage();
+  console.log("🌐 학습 페이지 추가 번역 적용:", currentLang);
+
+  // 추가 번역 키들 정의
+  const additionalTranslations = {
+    ko: {
+      flashcard_learning: "🃏 플래시카드 학습",
+      typing_learning: "⌨️ 타이핑 학습",
+      pronunciation_practice: "🎤 발음 연습",
+      grammar_pattern_analysis: "📝 문법 패턴 분석",
+      grammar_practice: "📚 문법 실습 연습",
+      reading_learning: "📖 독해 학습",
+      click_to_check_meaning: "클릭하여 의미 확인",
+      click_to_see_word: "다시 클릭하여 단어 보기",
+      typing_answer_placeholder: "답안을 입력하세요",
+      check: "확인",
+      pronunciation_coming_soon: "발음 연습 모드는 준비 중입니다.",
+      click_to_see_explanation: "클릭하여 설명 보기",
+      original_text: "원문",
+      translation: "번역",
+      context: "상황",
+      home: "홈으로",
+      back_to_home: "홈으로 돌아가기",
+      no_data: "데이터가 없습니다",
+      no_data_description:
+        "학습할 데이터가 없습니다. 먼저 데이터를 업로드해주세요.",
+      concept_upload: "개념 업로드",
+      grammar_pattern_upload: "문법 패턴 업로드",
+      example_upload: "예문 업로드",
+      upload_csv_json_concept:
+        "CSV 또는 JSON 파일을 업로드하여 개념을 추가하세요.",
+      upload_csv_json_grammar:
+        "CSV 또는 JSON 파일을 업로드하여 문법 패턴을 추가하세요.",
+      upload_csv_json_example:
+        "CSV 또는 JSON 파일을 업로드하여 예문을 추가하세요.",
+      upload: "업로드",
+      download_template: "템플릿 다운로드",
+      // 학습 모드 카드 번역
+      flashcard_mode: "플래시카드",
+      flashcard_mode_desc: "카드를 뒤집어가며 단어와 의미 학습",
+      typing_mode: "타이핑",
+      typing_mode_desc: "듣고 정확하게 타이핑하여 스펠링 연습",
+      pronunciation_mode: "발음 연습",
+      pronunciation_mode_desc: "음성 인식으로 정확한 발음 훈련",
+      pattern_analysis_mode: "패턴 분석",
+      pattern_analysis_mode_desc: "문법 구조와 패턴을 체계적으로 학습",
+      practice_mode: "실습 연습",
+      practice_mode_desc: "플래시카드 방식으로 문법 패턴 연습",
+      example_learning_mode: "예문 학습",
+      example_learning_mode_desc: "예문을 통한 일반적인 독해 학습",
+      flash_mode: "플래시 모드",
+      flash_mode_desc: "플래시카드 방식으로 빠른 독해 연습",
+      // 학습 모드 제목 번역
+      vocabulary_learning_modes: "단어 학습 모드",
+      grammar_learning_modes: "문법 학습 모드",
+      reading_learning_modes: "독해 학습 모드",
+      vocabulary_data_upload: "단어 데이터 업로드",
+      grammar_pattern_data_upload: "문법 패턴 데이터 업로드",
+      reading_data_upload: "독해 데이터 업로드",
+    },
+    en: {
+      flashcard_learning: "🃏 Flashcard Learning",
+      typing_learning: "⌨️ Typing Learning",
+      pronunciation_practice: "🎤 Pronunciation Practice",
+      grammar_pattern_analysis: "📝 Grammar Pattern Analysis",
+      grammar_practice: "📚 Grammar Practice",
+      reading_learning: "📖 Reading Learning",
+      click_to_check_meaning: "Click to check meaning",
+      click_to_see_word: "Click again to see word",
+      typing_answer_placeholder: "Enter your answer",
+      check: "Check",
+      pronunciation_coming_soon: "Pronunciation practice mode is coming soon.",
+      click_to_see_explanation: "Click to see explanation",
+      original_text: "Original Text",
+      translation: "Translation",
+      context: "Context",
+      home: "Home",
+      back_to_home: "Back to Home",
+      no_data: "No Data Available",
+      no_data_description:
+        "There is no data to learn. Please upload data first.",
+      concept_upload: "Concept Upload",
+      grammar_pattern_upload: "Grammar Pattern Upload",
+      example_upload: "Example Upload",
+      upload_csv_json_concept: "Upload CSV or JSON files to add concepts.",
+      upload_csv_json_grammar:
+        "Upload CSV or JSON files to add grammar patterns.",
+      upload_csv_json_example: "Upload CSV or JSON files to add examples.",
+      upload: "Upload",
+      download_template: "Download Template",
+      // 학습 모드 카드 번역
+      flashcard_mode: "Flashcard",
+      flashcard_mode_desc: "Learn words and meanings by flipping cards",
+      typing_mode: "Typing",
+      typing_mode_desc: "Practice spelling by listening and typing accurately",
+      pronunciation_mode: "Pronunciation",
+      pronunciation_mode_desc:
+        "Train accurate pronunciation with voice recognition",
+      pattern_analysis_mode: "Pattern Analysis",
+      pattern_analysis_mode_desc:
+        "Systematically learn grammar structures and patterns",
+      practice_mode: "Practice",
+      practice_mode_desc: "Practice grammar patterns with flashcard method",
+      example_learning_mode: "Example Learning",
+      example_learning_mode_desc:
+        "General reading comprehension through examples",
+      flash_mode: "Flash Mode",
+      flash_mode_desc: "Quick reading practice with flashcard method",
+      // 학습 모드 제목 번역
+      vocabulary_learning_modes: "Vocabulary Learning Modes",
+      grammar_learning_modes: "Grammar Learning Modes",
+      reading_learning_modes: "Reading Learning Modes",
+      vocabulary_data_upload: "Vocabulary Data Upload",
+      grammar_pattern_data_upload: "Grammar Pattern Data Upload",
+      reading_data_upload: "Reading Data Upload",
+    },
+    ja: {
+      flashcard_learning: "🃏 フラッシュカード学習",
+      typing_learning: "⌨️ タイピング学習",
+      pronunciation_practice: "🎤 発音練習",
+      grammar_pattern_analysis: "📝 文法パターン分析",
+      grammar_practice: "📚 文法実習練習",
+      reading_learning: "📖 読解学習",
+      click_to_check_meaning: "クリックして意味を確認",
+      click_to_see_word: "再度クリックして単語を見る",
+      typing_answer_placeholder: "答えを入力してください",
+      check: "確認",
+      pronunciation_coming_soon: "発音練習モードは準備中です。",
+      click_to_see_explanation: "クリックして説明を見る",
+      original_text: "原文",
+      translation: "翻訳",
+      context: "状況",
+      home: "ホーム",
+      back_to_home: "ホームに戻る",
+      no_data: "データがありません",
+      no_data_description:
+        "学習するデータがありません。まずデータをアップロードしてください。",
+      concept_upload: "概念アップロード",
+      grammar_pattern_upload: "文法パターンアップロード",
+      example_upload: "例文アップロード",
+      upload_csv_json_concept:
+        "CSVまたはJSONファイルをアップロードして概念を追加してください。",
+      upload_csv_json_grammar:
+        "CSVまたはJSONファイルをアップロードして文法パターンを追加してください。",
+      upload_csv_json_example:
+        "CSVまたはJSONファイルをアップロードして例文を追加してください。",
+      upload: "アップロード",
+      download_template: "テンプレートダウンロード",
+      // 학습 모드 카드 번역
+      flashcard_mode: "フラッシュカード",
+      flashcard_mode_desc: "カードをめくって単語と意味を学習",
+      typing_mode: "タイピング",
+      typing_mode_desc: "聞いて正確にタイピングしてスペリング練習",
+      pronunciation_mode: "発音練習",
+      pronunciation_mode_desc: "音声認識で正確な発音を訓練",
+      pattern_analysis_mode: "パターン分析",
+      pattern_analysis_mode_desc: "文法構造とパターンを体系的に学習",
+      practice_mode: "実習練習",
+      practice_mode_desc: "フラッシュカード方式で文法パターン練習",
+      example_learning_mode: "例文学習",
+      example_learning_mode_desc: "例文を通じた一般的な読解学習",
+      flash_mode: "フラッシュモード",
+      flash_mode_desc: "フラッシュカード方式で素早い読解練習",
+      // 학습 모드 제목 번역
+      vocabulary_learning_modes: "単語学習モード",
+      grammar_learning_modes: "文法学習モード",
+      reading_learning_modes: "読解学習モード",
+      vocabulary_data_upload: "単語データアップロード",
+      grammar_pattern_data_upload: "文法パターンデータアップロード",
+      reading_data_upload: "読解データアップロード",
+    },
+    zh: {
+      flashcard_learning: "🃏 闪卡学习",
+      typing_learning: "⌨️ 打字学习",
+      pronunciation_practice: "🎤 发音练习",
+      grammar_pattern_analysis: "📝 语法模式分析",
+      grammar_practice: "📚 语法练习",
+      reading_learning: "📖 阅读学习",
+      click_to_check_meaning: "点击查看含义",
+      click_to_see_word: "再次点击查看单词",
+      typing_answer_placeholder: "请输入您的答案",
+      check: "检查",
+      pronunciation_coming_soon: "发音练习模式即将推出。",
+      click_to_see_explanation: "点击查看解释",
+      original_text: "原文",
+      translation: "翻译",
+      context: "语境",
+      home: "首页",
+      back_to_home: "返回首页",
+      no_data: "无数据",
+      no_data_description: "没有学习数据。请先上传数据。",
+      concept_upload: "概念上传",
+      grammar_pattern_upload: "语法模式上传",
+      example_upload: "例句上传",
+      upload_csv_json_concept: "上传CSV或JSON文件以添加概念。",
+      upload_csv_json_grammar: "上传CSV或JSON文件以添加语法模式。",
+      upload_csv_json_example: "上传CSV或JSON文件以添加例句。",
+      upload: "上传",
+      download_template: "下载模板",
+      // 학습 모드 카드 번역
+      flashcard_mode: "闪卡",
+      flashcard_mode_desc: "翻转卡片学习单词和含义",
+      typing_mode: "打字",
+      typing_mode_desc: "听写并准确打字练习拼写",
+      pronunciation_mode: "发音练习",
+      pronunciation_mode_desc: "通过语音识别训练准确发音",
+      pattern_analysis_mode: "模式分析",
+      pattern_analysis_mode_desc: "系统学习语法结构和模式",
+      practice_mode: "练习",
+      practice_mode_desc: "用闪卡方式练习语法模式",
+      example_learning_mode: "例句学习",
+      example_learning_mode_desc: "通过例句进行一般阅读理解",
+      flash_mode: "闪读模式",
+      flash_mode_desc: "用闪卡方式进行快速阅读练习",
+      // 학습 모드 제목 번역
+      vocabulary_learning_modes: "词汇学习模式",
+      grammar_learning_modes: "语法学习模式",
+      reading_learning_modes: "阅读学习模式",
+      vocabulary_data_upload: "词汇数据上传",
+      grammar_pattern_data_upload: "语法模式数据上传",
+      reading_data_upload: "阅读数据上传",
+    },
+  };
+
+  // 현재 언어의 번역 적용
+  if (additionalTranslations[currentLang]) {
+    const translations = additionalTranslations[currentLang];
+    console.log("🔍 번역 키 개수:", Object.keys(translations).length);
+
+    // 일반 텍스트 요소 번역
+    const i18nElements = document.querySelectorAll("[data-i18n]");
+    console.log("🔍 data-i18n 요소 개수:", i18nElements.length);
+
+    i18nElements.forEach((element) => {
+      const key = element.getAttribute("data-i18n");
+      if (translations[key]) {
+        element.textContent = translations[key];
+        console.log("✅ 번역 적용:", key, "->", translations[key]);
+      }
+    });
+
+    // placeholder 속성 번역
+    const placeholderElements = document.querySelectorAll(
+      "[data-i18n-placeholder]"
+    );
+    console.log(
+      "🔍 data-i18n-placeholder 요소 개수:",
+      placeholderElements.length
+    );
+
+    placeholderElements.forEach((element) => {
+      const key = element.getAttribute("data-i18n-placeholder");
+      if (translations[key]) {
+        element.placeholder = translations[key];
+        console.log("✅ placeholder 번역 적용:", key, "->", translations[key]);
+      }
+    });
+  } else {
+    console.warn("⚠️ 해당 언어의 번역 데이터가 없습니다:", currentLang);
+  }
+}
+
+// 현재 언어 가져오기 함수
+function getCurrentLanguage() {
+  // utils/language-utils.js와 동일한 방식으로 언어 감지
+  const savedLanguage = localStorage.getItem("preferredLanguage");
+  if (savedLanguage) {
+    console.log("🔍 localStorage에서 언어 감지:", savedLanguage);
+    return savedLanguage;
+  }
+
+  const sessionLanguage = sessionStorage.getItem("currentUILanguage");
+  if (sessionLanguage) {
+    console.log("🔍 sessionStorage에서 언어 감지:", sessionLanguage);
+    return sessionLanguage;
+  }
+
+  console.log("🔍 기본 언어 사용: ko");
+  return "ko";
+}
+
+// 언어 선택 요소들 업데이트 함수
+function updateLanguageSelectors() {
+  const sourceLanguageSelect = document.getElementById("source-language");
+  const targetLanguageSelect = document.getElementById("target-language");
+
+  if (sourceLanguageSelect && targetLanguageSelect) {
+    sourceLanguageSelect.value = sourceLanguage;
+    targetLanguageSelect.value = targetLanguage;
+    console.log("🔄 언어 선택 요소 업데이트:", {
+      sourceLanguage,
+      targetLanguage,
+    });
+  }
 }
 
 function setupEventListeners() {
   // 기존 이벤트 리스너들 제거
   document.removeEventListener("click", globalClickHandler);
+
+  // 언어 선택 요소들 설정
+  const sourceLanguageSelect = document.getElementById("source-language");
+  const targetLanguageSelect = document.getElementById("target-language");
+
+  if (sourceLanguageSelect && targetLanguageSelect) {
+    // 초기 값 설정
+    sourceLanguageSelect.value = sourceLanguage;
+    targetLanguageSelect.value = targetLanguage;
+
+    // 언어 변경 이벤트 리스너
+    sourceLanguageSelect.addEventListener("change", (e) => {
+      sourceLanguage = e.target.value;
+      window.languageSettings.sourceLanguage = sourceLanguage;
+      sessionStorage.setItem("sourceLanguage", sourceLanguage);
+
+      console.log("🌐 원본 언어 변경:", sourceLanguage);
+
+      // 같은 언어 선택 방지
+      if (sourceLanguage === targetLanguage) {
+        // 대상 언어를 다른 언어로 자동 변경
+        const otherLanguages = [
+          "korean",
+          "english",
+          "japanese",
+          "chinese",
+        ].filter((lang) => lang !== sourceLanguage);
+        targetLanguage = otherLanguages[0];
+        targetLanguageSelect.value = targetLanguage;
+        window.languageSettings.targetLanguage = targetLanguage;
+        sessionStorage.setItem("targetLanguage", targetLanguage);
+      }
+
+      handleFilterChange();
+    });
+
+    targetLanguageSelect.addEventListener("change", (e) => {
+      targetLanguage = e.target.value;
+      window.languageSettings.targetLanguage = targetLanguage;
+      sessionStorage.setItem("targetLanguage", targetLanguage);
+
+      console.log("🌐 대상 언어 변경:", targetLanguage);
+
+      // 같은 언어 선택 방지
+      if (sourceLanguage === targetLanguage) {
+        // 원본 언어를 다른 언어로 자동 변경
+        const otherLanguages = [
+          "korean",
+          "english",
+          "japanese",
+          "chinese",
+        ].filter((lang) => lang !== targetLanguage);
+        sourceLanguage = otherLanguages[0];
+        sourceLanguageSelect.value = sourceLanguage;
+        window.languageSettings.sourceLanguage = sourceLanguage;
+        sessionStorage.setItem("sourceLanguage", sourceLanguage);
+      }
+
+      handleFilterChange();
+    });
+  }
+
+  // 언어 전환 버튼 이벤트 리스너
+  const swapButton = document.getElementById("swap-languages");
+  if (swapButton) {
+    swapButton.addEventListener("click", () => {
+      // 버튼 애니메이션 효과
+      swapButton.style.transform = "scale(0.9) rotate(180deg)";
+
+      setTimeout(() => {
+        // 언어 전환
+        const tempLanguage = sourceLanguage;
+        sourceLanguage = targetLanguage;
+        targetLanguage = tempLanguage;
+
+        // 전역 설정 업데이트
+        window.languageSettings.sourceLanguage = sourceLanguage;
+        window.languageSettings.targetLanguage = targetLanguage;
+        sessionStorage.setItem("sourceLanguage", sourceLanguage);
+        sessionStorage.setItem("targetLanguage", targetLanguage);
+
+        // UI 업데이트
+        if (sourceLanguageSelect && targetLanguageSelect) {
+          sourceLanguageSelect.value = sourceLanguage;
+          targetLanguageSelect.value = targetLanguage;
+        }
+
+        console.log("🔄 언어 전환:", { sourceLanguage, targetLanguage });
+
+        // 버튼 애니메이션 복원
+        swapButton.style.transform = "scale(1) rotate(0deg)";
+
+        // 필터 변경 처리
+        handleFilterChange();
+      }, 150);
+    });
+  }
 
   // 필터 이벤트 리스너 추가
   const domainFilter = document.getElementById("domain-filter");
@@ -520,6 +1046,12 @@ function showAreaSelection() {
     areaSelection.classList.remove("hidden");
   }
 
+  // 번역 적용
+  setTimeout(() => {
+    applyTranslations();
+    applyAdditionalTranslations();
+  }, 50);
+
   // 학습 영역 카드들에 이벤트 리스너 추가 (기존 리스너가 없을 때만)
   const areaCards = document.querySelectorAll(".learning-area-card");
   console.log(`🎯 학습 영역 카드 ${areaCards.length}개 발견`);
@@ -580,72 +1112,75 @@ function showLearningModes(area) {
 
   switch (area) {
     case "vocabulary":
-      title = "단어 학습 모드";
+      title = "vocabulary_learning_modes";
       if (uploadBtn) uploadBtn.classList.remove("hidden");
-      if (uploadTitle) uploadTitle.textContent = "단어 데이터 업로드";
+      if (uploadTitle)
+        uploadTitle.setAttribute("data-i18n", "vocabulary_data_upload");
       modes = [
         {
           id: "flashcard",
-          name: "플래시카드",
+          nameKey: "flashcard_mode",
           icon: "fas fa-clone",
           color: "blue",
-          description: "카드를 뒤집어가며 단어와 의미 학습",
+          descriptionKey: "flashcard_mode_desc",
         },
         {
           id: "typing",
-          name: "타이핑",
+          nameKey: "typing_mode",
           icon: "fas fa-keyboard",
           color: "green",
-          description: "듣고 정확하게 타이핑하여 스펠링 연습",
+          descriptionKey: "typing_mode_desc",
         },
         {
           id: "pronunciation",
-          name: "발음 연습",
+          nameKey: "pronunciation_mode",
           icon: "fas fa-microphone",
           color: "purple",
-          description: "음성 인식으로 정확한 발음 훈련",
+          descriptionKey: "pronunciation_mode_desc",
         },
       ];
       break;
     case "grammar":
-      title = "문법 학습 모드";
+      title = "grammar_learning_modes";
       if (uploadBtn) uploadBtn.classList.remove("hidden");
-      if (uploadTitle) uploadTitle.textContent = "문법 패턴 데이터 업로드";
+      if (uploadTitle)
+        uploadTitle.setAttribute("data-i18n", "grammar_pattern_data_upload");
       modes = [
         {
           id: "pattern",
-          name: "패턴 분석",
+          nameKey: "pattern_analysis_mode",
           icon: "fas fa-search",
           color: "blue",
-          description: "문법 구조와 패턴을 체계적으로 학습",
+          descriptionKey: "pattern_analysis_mode_desc",
         },
         {
           id: "practice",
-          name: "실습 연습",
+          nameKey: "practice_mode",
           icon: "fas fa-edit",
           color: "green",
-          description: "플래시카드 방식으로 문법 패턴 연습",
+          descriptionKey: "practice_mode_desc",
         },
       ];
       break;
     case "reading":
-      title = "독해 학습 모드";
+      title = "reading_learning_modes";
       if (uploadBtn) uploadBtn.classList.remove("hidden");
-      if (uploadTitle) uploadTitle.textContent = "예문 데이터 업로드";
+      if (uploadTitle)
+        uploadTitle.setAttribute("data-i18n", "reading_data_upload");
       modes = [
         {
           id: "example",
-          name: "예문 학습",
+          nameKey: "example_learning_mode",
           icon: "fas fa-book-open",
           color: "blue",
-          description: "예문을 통한 일반적인 독해 학습",
+          descriptionKey: "example_learning_mode_desc",
         },
         {
           id: "flash",
-          name: "플래시 모드",
+          nameKey: "flash_mode",
           icon: "fas fa-bolt",
           color: "purple",
-          description: "플래시카드 방식으로 빠른 독해 연습",
+          descriptionKey: "flash_mode_desc",
         },
       ];
       break;
@@ -654,7 +1189,7 @@ function showLearningModes(area) {
       return;
   }
 
-  modeTitle.textContent = title;
+  modeTitle.setAttribute("data-i18n", title);
   modeContainer.innerHTML = modes
     .map(
       (mode) => `
@@ -672,10 +1207,12 @@ function showLearningModes(area) {
         <i class="${mode.icon} text-4xl"></i>
       </div>
       <div class="text-center">
-      <div class="font-bold text-xl mb-2">${mode.name}</div>
+      <div class="font-bold text-xl mb-2" data-i18n="${
+        mode.nameKey
+      }">Loading...</div>
         ${
-          mode.description
-            ? `<p class="text-sm opacity-90 leading-tight">${mode.description}</p>`
+          mode.descriptionKey
+            ? `<p class="text-sm opacity-90 leading-tight" data-i18n="${mode.descriptionKey}">Loading...</p>`
             : ""
         }
       </div>
@@ -688,6 +1225,12 @@ function showLearningModes(area) {
   console.log("🖥️ 모드 선택 섹션 표시...");
 
   modeSection.classList.remove("hidden");
+
+  // 번역 적용
+  setTimeout(() => {
+    applyTranslations();
+    applyAdditionalTranslations();
+  }, 50);
 
   // 학습 모드 카드들에 이벤트 리스너 추가
   const modeCards = modeContainer.querySelectorAll(".learning-mode-card");
@@ -1061,6 +1604,11 @@ function showNoDataMessage(area) {
     if (messageElement) {
       messageElement.textContent = `${dataType} 데이터가 없습니다. 먼저 데이터를 업로드해주세요.`;
     }
+
+    // 번역 적용
+    setTimeout(() => {
+      applyTranslations();
+    }, 50);
   } else {
     alert(`${dataType} 데이터가 없습니다. 먼저 데이터를 업로드해주세요.`);
     showAreaSelection();
@@ -1124,6 +1672,11 @@ function showFlashcardMode() {
   if (flashcardMode) {
     flashcardMode.classList.remove("hidden");
     updateFlashcard();
+
+    // 번역 적용
+    setTimeout(() => {
+      applyTranslations();
+    }, 50);
 
     // 플래시카드 클릭 이벤트 추가 (기존 리스너 제거 후 새로 추가)
     const flashcard = document.querySelector(".flip-card");
@@ -1307,6 +1860,11 @@ function showTypingMode() {
     typingMode.classList.remove("hidden");
     updateTyping();
 
+    // 번역 적용
+    setTimeout(() => {
+      applyTranslations();
+    }, 50);
+
     // 엔터키 이벤트 리스너 추가
     const answerInput = document.getElementById("typing-answer");
     if (answerInput) {
@@ -1412,8 +1970,19 @@ function checkTypingAnswer() {
 
 function showPronunciationMode() {
   console.log("🎤 발음 연습 모드 (구현 예정)");
-  alert("발음 연습 모드는 아직 구현중입니다.");
-  showAreaSelection();
+
+  const pronunciationMode = document.getElementById("pronunciation-mode");
+  if (pronunciationMode) {
+    pronunciationMode.classList.remove("hidden");
+
+    // 번역 적용
+    setTimeout(() => {
+      applyTranslations();
+    }, 50);
+  } else {
+    alert("발음 연습 모드는 아직 구현중입니다.");
+    showAreaSelection();
+  }
 }
 
 function showGrammarPatternMode() {
@@ -1422,6 +1991,11 @@ function showGrammarPatternMode() {
   if (patternMode) {
     patternMode.classList.remove("hidden");
     updateGrammarPatterns();
+
+    // 번역 적용
+    setTimeout(() => {
+      applyTranslations();
+    }, 50);
   } else {
     console.error("❌ 문법 패턴 모드 요소를 찾을 수 없음");
     alert("문법 패턴 모드를 시작할 수 없습니다.");
@@ -1483,6 +2057,11 @@ function showGrammarPracticeMode() {
   if (practiceMode) {
     practiceMode.classList.remove("hidden");
     updateGrammarPractice();
+
+    // 번역 적용
+    setTimeout(() => {
+      applyTranslations();
+    }, 50);
 
     // 문법 카드 클릭 이벤트 추가
     setTimeout(() => {
@@ -1576,6 +2155,11 @@ function showReadingExampleMode() {
   if (readingContainer) {
     readingContainer.classList.remove("hidden");
     updateReadingExample();
+
+    // 번역 적용
+    setTimeout(() => {
+      applyTranslations();
+    }, 50);
   } else {
     console.error("❌ 독해 모드 요소를 찾을 수 없음");
     alert("독해 모드를 시작할 수 없습니다.");
@@ -1589,6 +2173,11 @@ function showReadingFlashMode() {
   if (readingContainer) {
     readingContainer.classList.remove("hidden");
     updateReadingFlash();
+
+    // 번역 적용
+    setTimeout(() => {
+      applyTranslations();
+    }, 50);
   } else {
     console.error("❌ 독해 모드 요소를 찾을 수 없음");
     alert("독해 모드를 시작할 수 없습니다.");

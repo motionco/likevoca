@@ -122,8 +122,8 @@
         </div>
         
         <!-- 필터 행 -->
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-          <div>
+        <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
+          <div class="relative">
             <label class="block text-xs font-medium mb-1" data-i18n="source_language">원본 언어</label>
             <select id="source-language" class="w-full border p-2 rounded text-sm">
               <option value="korean" data-i18n="korean">한국어</option>
@@ -131,6 +131,11 @@
               <option value="japanese" data-i18n="japanese">일본어</option>
               <option value="chinese" data-i18n="chinese">중국어</option>
             </select>
+          </div>
+          <div class="relative flex items-end justify-center">
+            <button id="swap-languages" class="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white px-3 py-2 rounded-full transition-all duration-200 transform hover:scale-110 active:scale-95 shadow-md hover:shadow-lg" title="언어 전환">
+              <i class="fas fa-exchange-alt text-sm"></i>
+            </button>
           </div>
           <div>
             <label class="block text-xs font-medium mb-1" data-i18n="target_language">대상 언어</label>
@@ -142,12 +147,12 @@
             </select>
           </div>
           <div>
-            <label class="block text-xs font-medium mb-1">난이도</label>
+            <label class="block text-xs font-medium mb-1" data-i18n="difficulty_level">난이도</label>
             <select id="difficulty-level" class="w-full border p-2 rounded text-sm">
-              <option value="all">전체 난이도</option>
-              <option value="beginner">초급</option>
-              <option value="intermediate">중급</option>
-              <option value="advanced">고급</option>
+              <option value="all" data-i18n="all_difficulties">전체 난이도</option>
+              <option value="beginner" data-i18n="beginner">초급</option>
+              <option value="intermediate" data-i18n="intermediate">중급</option>
+              <option value="advanced" data-i18n="advanced">고급</option>
             </select>
           </div>
           <div>
@@ -168,13 +173,13 @@
             </select>
           </div>
           <div>
-            <label class="block text-xs font-medium mb-1">패턴 유형</label>
+            <label class="block text-xs font-medium mb-1" data-i18n="pattern_type">패턴 유형</label>
             <select id="pattern-type" class="w-full border p-2 rounded text-sm">
-              <option value="all">전체 패턴</option>
-              <option value="grammar">문법 패턴</option>
-              <option value="syntax">문장 구조</option>
-              <option value="expression">표현 패턴</option>
-              <option value="conversation">회화 패턴</option>
+              <option value="all" data-i18n="all_patterns">전체 패턴</option>
+              <option value="grammar" data-i18n="grammar_pattern">문법 패턴</option>
+              <option value="syntax" data-i18n="syntax_structure">문장 구조</option>
+              <option value="expression" data-i18n="expression_pattern">표현 패턴</option>
+              <option value="conversation" data-i18n="conversation_pattern">회화 패턴</option>
             </select>
           </div>
         </div>
@@ -185,7 +190,7 @@
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-bold" data-i18n="learning_areas">학습 영역</h2>
           <a href="quiz.html" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-            <i class="fas fa-brain mr-2"></i>퀴즈 테스트
+            <i class="fas fa-brain mr-2"></i><span data-i18n="quiz_test">퀴즈 테스트</span>
           </a>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -195,9 +200,9 @@
               <i class="fas fa-book text-4xl"></i>
             </div>
             <div class="text-center">
-              <div class="font-bold text-xl mb-2">단어 학습</div>
-              <p class="text-sm opacity-80 mb-4">어휘력 향상을 위한 플래시카드와 타이핑 학습</p>
-              <div class="text-xs opacity-70">
+              <div class="font-bold text-xl mb-2" data-i18n="vocabulary_learning">단어 학습</div>
+              <p class="text-sm opacity-80 mb-4" data-i18n="vocabulary_learning_desc">어휘력 향상을 위한 플래시카드와 타이핑 학습</p>
+              <div class="text-xs opacity-70" data-i18n="vocabulary_modes">
                 플래시카드 • 타이핑 • 발음 연습
               </div>
             </div>
@@ -209,9 +214,9 @@
               <i class="fas fa-language text-4xl"></i>
             </div>
             <div class="text-center">
-              <div class="font-bold text-xl mb-2">문법 학습</div>
-              <p class="text-sm opacity-80 mb-4">체계적인 문법 패턴 분석과 실습</p>
-              <div class="text-xs opacity-70">
+              <div class="font-bold text-xl mb-2" data-i18n="grammar_learning">문법 학습</div>
+              <p class="text-sm opacity-80 mb-4" data-i18n="grammar_learning_desc">체계적인 문법 패턴 분석과 실습</p>
+              <div class="text-xs opacity-70" data-i18n="grammar_modes">
                 문법 패턴 • 예문 분석 • 실습 문제
               </div>
             </div>
@@ -223,9 +228,9 @@
               <i class="fas fa-file-text text-4xl"></i>
             </div>
             <div class="text-center">
-              <div class="font-bold text-xl mb-2">독해 학습</div>
-              <p class="text-sm opacity-80 mb-4">다양한 예문을 통한 읽기 이해력 향상</p>
-              <div class="text-xs opacity-70">
+              <div class="font-bold text-xl mb-2" data-i18n="reading_learning">독해 학습</div>
+              <p class="text-sm opacity-80 mb-4" data-i18n="reading_learning_desc">다양한 예문을 통한 읽기 이해력 향상</p>
+              <div class="text-xs opacity-70" data-i18n="reading_modes">
                 예문 학습 • 플래시 모드
               </div>
             </div>
@@ -236,13 +241,13 @@
       <!-- 학습 모드 선택 -->
       <div id="mode-selection" class="bg-white rounded-lg shadow-md p-6 mb-8 hidden">
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold" id="mode-title">학습 모드</h2>
+          <h2 class="text-xl font-bold" id="mode-title" data-i18n="learning_modes">학습 모드</h2>
           <div class="flex space-x-2">
             <button id="upload-for-mode" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hidden">
               <i class="fas fa-upload mr-2"></i>데이터 업로드
             </button>
           <button id="back-to-areas" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg">
-            <i class="fas fa-arrow-left mr-2"></i>영역 선택으로 돌아가기
+            <i class="fas fa-arrow-left mr-2"></i><span data-i18n="back_to_areas">영역 선택으로 돌아가기</span>
           </button>
         </div>
         </div>
@@ -274,31 +279,31 @@
       <!-- 플래시카드 학습 영역 (단어) -->
       <div id="flashcard-container" class="mb-8 hidden">
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold">플래시카드 학습</h2>
+          <h2 class="text-xl font-bold" data-i18n="flashcards">플래시카드 학습</h2>
           <div class="flex space-x-2">
             <button id="upload-vocabulary-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
-              <i class="fas fa-upload mr-2"></i>데이터 업로드
+              <i class="fas fa-upload mr-2"></i><span data-i18n="upload_data">데이터 업로드</span>
             </button>
           <button id="back-from-flashcard" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg">
-            <i class="fas fa-arrow-left mr-2"></i>돌아가기
+            <i class="fas fa-arrow-left mr-2"></i><span data-i18n="back">돌아가기</span>
           </button>
           </div>
         </div>
         
         <!-- 인라인 업로드 UI -->
         <div id="vocabulary-upload-section" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 hidden">
-          <h3 class="text-lg font-medium mb-3">단어 데이터 업로드</h3>
+          <h3 class="text-lg font-medium mb-3" data-i18n="upload_word_data">단어 데이터 업로드</h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium mb-2">파일 선택:</label>
+              <label class="block text-sm font-medium mb-2" data-i18n="select_file">파일 선택:</label>
               <input type="file" id="vocabulary-file-input" accept=".csv,.json" class="w-full p-2 border rounded">
             </div>
             <div class="flex items-end space-x-2">
               <button id="upload-vocabulary-file" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-                업로드
+                <span data-i18n="upload">업로드</span>
               </button>
               <button id="download-vocabulary-template" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
-                템플릿
+                <span data-i18n="template">템플릿</span>
               </button>
             </div>
           </div>
@@ -309,7 +314,7 @@
               <div id="front-emoji" class="text-6xl mb-4">📚</div>
               <h2 id="front-word" class="text-4xl font-bold mb-4"></h2>
               <p id="front-pronunciation" class="text-xl text-gray-600 mb-4"></p>
-              <p class="text-gray-500 mt-8">(카드를 클릭하여 뒤집기)</p>
+              <p class="text-gray-500 mt-8" data-i18n="click_to_flip">(카드를 클릭하여 뒤집기)</p>
             </div>
             <div class="flip-card-back bg-white rounded-lg shadow-lg p-8 text-center">
               <div id="back-emoji" class="text-4xl mb-2">📚</div>
@@ -325,13 +330,13 @@
         
         <div class="flex justify-center space-x-4 mt-6">
           <button id="prev-card" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-            <i class="fas fa-arrow-left mr-2"></i>이전
+            <i class="fas fa-arrow-left mr-2"></i><span data-i18n="previous">이전</span>
           </button>
           <button id="flip-card" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-            뒤집기
+            <span data-i18n="flip">뒤집기</span>
           </button>
           <button id="next-card" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-            다음<i class="fas fa-arrow-right ml-2"></i>
+            <span data-i18n="next">다음</span><i class="fas fa-arrow-right ml-2"></i>
           </button>
         </div>
         
@@ -343,34 +348,34 @@
         </div>
       </div>
 
-      <!-- 타이핑 학습 영역 (단어) -->
+      <!-- 타이학 학습 영역 (단어) -->
       <div id="typing-container" class="mb-8 hidden">
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold">타이핑 학습</h2>
+          <h2 class="text-xl font-bold" data-i18n="typing">타이핑 학습</h2>
           <div class="flex space-x-2">
             <button id="upload-typing-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
-              <i class="fas fa-upload mr-2"></i>데이터 업로드
+              <i class="fas fa-upload mr-2"></i><span data-i18n="upload_data">데이터 업로드</span>
             </button>
           <button id="back-from-typing" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg">
-            <i class="fas fa-arrow-left mr-2"></i>돌아가기
+            <i class="fas fa-arrow-left mr-2"></i><span data-i18n="back">돌아가기</span>
           </button>
           </div>
         </div>
         
         <!-- 인라인 업로드 UI -->
         <div id="typing-upload-section" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 hidden">
-          <h3 class="text-lg font-medium mb-3">단어 데이터 업로드</h3>
+          <h3 class="text-lg font-medium mb-3" data-i18n="upload_word_data">단어 데이터 업로드</h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium mb-2">파일 선택:</label>
+              <label class="block text-sm font-medium mb-2" data-i18n="select_file">파일 선택:</label>
               <input type="file" id="typing-file-input" accept=".csv,.json" class="w-full p-2 border rounded">
             </div>
             <div class="flex items-end space-x-2">
               <button id="upload-typing-file" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-                업로드
+                <span data-i18n="upload">업로드</span>
               </button>
               <button id="download-typing-template" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
-                템플릿
+                <span data-i18n="template">템플릿</span>
               </button>
             </div>
           </div>
@@ -381,11 +386,12 @@
           <p id="typing-pronunciation" class="text-gray-600 mb-6"></p>
           
           <div class="mb-4">
-            <label for="typing-answer" class="block text-sm font-medium mb-2">정답을 입력하세요:</label>
+            <label for="typing-answer" class="block text-sm font-medium mb-2" data-i18n="typing_prompt">정답을 입력하세요:</label>
             <input 
               type="text" 
               id="typing-answer" 
               class="w-full p-3 border rounded-lg text-lg"
+              data-i18n-placeholder="typing_placeholder"
               placeholder="정답 입력..."
             >
           </div>
@@ -394,10 +400,10 @@
           
           <div class="flex justify-end mt-4">
             <button id="check-answer" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded">
-              정답 확인
+              <span data-i18n="check_answer">정답 확인</span>
             </button>
             <button id="next-typing" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded ml-3 hidden">
-              다음 단어
+              <span data-i18n="next_word">다음 단어</span>
             </button>
           </div>
         </div>
@@ -405,9 +411,9 @@
         <div class="mt-6 text-center">
           <span id="typing-progress">0/0</span>
           <div class="mt-2">
-            <span id="typing-correct" class="text-green-600 font-medium">맞춘 개수: 0</span>
+            <span id="typing-correct" class="text-green-600 font-medium"><span data-i18n="correct_count">맞춘 개수:</span> 0</span>
             <span class="mx-2">|</span>
-            <span id="typing-wrong" class="text-red-600 font-medium">틀린 개수: 0</span>
+            <span id="typing-wrong" class="text-red-600 font-medium"><span data-i18n="wrong_count">틀린 개수:</span> 0</span>
           </div>
         </div>
       </div>
@@ -415,9 +421,9 @@
       <!-- 문법 학습 영역 -->
       <div id="grammar-container" class="mb-8 hidden">
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold">문법 패턴 학습</h2>
+          <h2 class="text-xl font-bold" data-i18n="grammar_pattern_learning">문법 패턴 학습</h2>
           <button id="back-from-grammar" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg">
-            <i class="fas fa-arrow-left mr-2"></i>돌아가기
+            <i class="fas fa-arrow-left mr-2"></i><span data-i18n="back">돌아가기</span>
           </button>
         </div>
           <div id="grammar-pattern-container">
@@ -426,10 +432,10 @@
         
         <div class="flex justify-center space-x-4 mt-6">
           <button id="prev-grammar" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-            <i class="fas fa-arrow-left mr-2"></i>이전
+            <i class="fas fa-arrow-left mr-2"></i><span data-i18n="previous">이전</span>
           </button>
           <button id="next-grammar" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-            다음<i class="fas fa-arrow-right ml-2"></i>
+            <span data-i18n="next">다음</span><i class="fas fa-arrow-right ml-2"></i>
           </button>
         </div>
         
@@ -441,9 +447,9 @@
       <!-- 독해 학습 영역 -->
       <div id="reading-container" class="mb-8 hidden">
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold">예문 독해 학습</h2>
+          <h2 class="text-xl font-bold" data-i18n="reading_example_learning">예문 독해 학습</h2>
           <button id="back-from-reading" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg">
-            <i class="fas fa-arrow-left mr-2"></i>돌아가기
+            <i class="fas fa-arrow-left mr-2"></i><span data-i18n="back">돌아가기</span>
           </button>
         </div>
         <div class="bg-white rounded-lg shadow-lg p-8 max-w-4xl mx-auto">
@@ -454,10 +460,10 @@
         
         <div class="flex justify-center space-x-4 mt-6">
           <button id="prev-reading" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-            <i class="fas fa-arrow-left mr-2"></i>이전
+            <i class="fas fa-arrow-left mr-2"></i><span data-i18n="previous">이전</span>
           </button>
           <button id="next-reading" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-            다음<i class="fas fa-arrow-right ml-2"></i>
+            <span data-i18n="next">다음</span><i class="fas fa-arrow-right ml-2"></i>
           </button>
         </div>
         
@@ -471,7 +477,7 @@
       <div id="flashcard-mode" class="hidden mb-8">
         <div class="bg-white rounded-lg shadow-md p-6">
           <div class="text-center mb-6">
-            <h2 class="text-2xl font-bold mb-2">🃏 플래시카드 학습</h2>
+            <h2 class="text-2xl font-bold mb-2" data-i18n="flashcard_learning">🃏 플래시카드 학습</h2>
             <div id="flashcard-progress" class="text-gray-600">0 / 0</div>
           </div>
           
@@ -481,14 +487,14 @@
                 <div class="text-center">
                   <h3 id="flashcard-front-word" class="text-4xl font-bold text-gray-800 mb-4">단어</h3>
                   <p id="flashcard-front-transcription" class="text-gray-600">발음</p>
-                  <p class="text-gray-500 mt-8 text-sm">클릭하여 의미 확인</p>
+                  <p class="text-gray-500 mt-8 text-sm" data-i18n="click_to_check_meaning">클릭하여 의미 확인</p>
                 </div>
               </div>
               <div class="flip-card-back bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg p-8">
                 <div class="text-center">
                   <h3 id="flashcard-back-word" class="text-3xl font-bold text-green-600 mb-4">의미</h3>
                   <p id="flashcard-back-definition" class="text-gray-700">설명</p>
-                  <p class="text-gray-500 mt-8 text-sm">다시 클릭하여 단어 보기</p>
+                  <p class="text-gray-500 mt-8 text-sm" data-i18n="click_to_see_word">다시 클릭하여 단어 보기</p>
                 </div>
               </div>
             </div>
@@ -496,34 +502,35 @@
           
           <div class="flex justify-center space-x-4 mt-6">
             <button id="prev-grammar" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-              <i class="fas fa-arrow-left mr-2"></i>이전
+              <i class="fas fa-arrow-left mr-2"></i><span data-i18n="previous">이전</span>
             </button>
             <button id="home-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-              홈으로
+              <span data-i18n="home">홈으로</span>
             </button>
             <button id="next-grammar" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-              다음<i class="fas fa-arrow-right ml-2"></i>
+              <span data-i18n="next">다음</span><i class="fas fa-arrow-right ml-2"></i>
             </button>
           </div>
         </div>
       </div>
 
-      <!-- 타이핑 모드 -->
+      <!-- 타이학 모드 -->
       <div id="typing-mode" class="hidden mb-8">
         <div class="bg-white rounded-lg shadow-md p-6">
           <div class="text-center mb-6">
-            <h2 class="text-2xl font-bold mb-2">⌨️ 타이핑 학습</h2>
+            <h2 class="text-2xl font-bold mb-2" data-i18n="typing_learning">⌨️ 타이핑 학습</h2>
             <div id="typing-progress" class="text-gray-600">0 / 0</div>
           </div>
           
           <div class="max-w-lg mx-auto">
             <div id="typing-question" class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6 text-center">
-              <div class="text-xl font-bold mb-2">단어</div>
-              <div class="text-gray-600">의미</div>
+              <div class="text-xl font-bold mb-2" data-i18n="word">단어</div>
+              <div class="text-gray-600" data-i18n="meaning">의미</div>
             </div>
             
             <div class="mb-6">
               <input type="text" id="typing-answer" class="w-full p-4 text-xl border rounded-lg text-center" 
+                     data-i18n-placeholder="typing_answer_placeholder"
                      placeholder="답안을 입력하세요" onkeypress="if(event.key==='Enter') checkTypingAnswer()">
             </div>
             
@@ -531,20 +538,20 @@
             
             <div class="text-center mt-4">
               <button onclick="checkTypingAnswer()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg">
-                확인
+                <span data-i18n="check">확인</span>
               </button>
             </div>
           </div>
           
           <div class="flex justify-center space-x-4 mt-6">
             <button id="prev-grammar" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-              <i class="fas fa-arrow-left mr-2"></i>이전
+              <i class="fas fa-arrow-left mr-2"></i><span data-i18n="previous">이전</span>
             </button>
             <button id="home-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-              홈으로
+              <span data-i18n="home">홈으로</span>
             </button>
             <button id="next-grammar" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-              다음<i class="fas fa-arrow-right ml-2"></i>
+              <span data-i18n="next">다음</span><i class="fas fa-arrow-right ml-2"></i>
             </button>
           </div>
         </div>
@@ -553,10 +560,10 @@
       <!-- 발음 연습 모드 -->
       <div id="pronunciation-mode" class="hidden mb-8">
         <div class="bg-white rounded-lg shadow-md p-6 text-center">
-          <h2 class="text-2xl font-bold mb-4">🎤 발음 연습</h2>
-          <p class="text-gray-600">발음 연습 모드는 준비 중입니다.</p>
+          <h2 class="text-2xl font-bold mb-4" data-i18n="pronunciation_practice">🎤 발음 연습</h2>
+          <p class="text-gray-600" data-i18n="pronunciation_coming_soon">발음 연습 모드는 준비 중입니다.</p>
           <button id="home-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mt-4">
-            홈으로 돌아가기
+            <span data-i18n="back_to_home">홈으로 돌아가기</span>
           </button>
         </div>
       </div>
@@ -565,19 +572,19 @@
       <div id="grammar-pattern-mode" class="hidden mb-8">
         <div class="bg-white rounded-lg shadow-md p-6">
           <div class="text-center mb-6">
-            <h2 class="text-2xl font-bold mb-2">📝 문법 패턴 분석</h2>
+            <h2 class="text-2xl font-bold mb-2" data-i18n="grammar_pattern_analysis">📝 문법 패턴 분석</h2>
             <div id="pattern-progress" class="text-gray-600">0 / 0</div>
           </div>
           
           <div class="max-w-2xl mx-auto">
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
-              <h3 id="pattern-title" class="text-xl font-bold mb-4">문법 패턴</h3>
+              <h3 id="pattern-title" class="text-xl font-bold mb-4" data-i18n="grammar_pattern">문법 패턴</h3>
               <div class="text-lg font-mono bg-white p-3 rounded border mb-4">
                 <span id="pattern-structure">패턴 구조</span>
               </div>
               <p id="pattern-explanation" class="text-gray-700 mb-4">설명</p>
               <div class="bg-white rounded p-4 border">
-                <h4 class="font-semibold mb-2">예문:</h4>
+                <h4 class="font-semibold mb-2" data-i18n="examples">예문:</h4>
                 <ul id="pattern-examples" class="list-disc list-inside">
                   <li>예문이 여기에 표시됩니다</li>
                 </ul>
@@ -587,13 +594,13 @@
           
           <div class="flex justify-center space-x-4 mt-6">
             <button id="prev-pattern" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-              <i class="fas fa-arrow-left mr-2"></i>이전
+              <i class="fas fa-arrow-left mr-2"></i><span data-i18n="previous">이전</span>
             </button>
             <button id="home-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-              홈으로
+              <span data-i18n="home">홈으로</span>
             </button>
             <button id="next-pattern" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-              다음<i class="fas fa-arrow-right ml-2"></i>
+              <span data-i18n="next">다음</span><i class="fas fa-arrow-right ml-2"></i>
             </button>
           </div>
           
@@ -609,23 +616,23 @@
       <div id="grammar-practice-mode" class="hidden mb-8">
         <div class="bg-white rounded-lg shadow-md p-6">
           <div class="text-center mb-6">
-            <h2 class="text-2xl font-bold mb-2">📚 문법 실습 연습</h2>
+            <h2 class="text-2xl font-bold mb-2" data-i18n="grammar_practice">📚 문법 실습 연습</h2>
           </div>
           
           <div id="grammar-card" class="flip-card max-w-md mx-auto cursor-pointer">
             <div class="flip-card-inner">
               <div class="flip-card-front bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg p-8">
                 <div class="text-center">
-                  <h3 id="grammar-front-title" class="text-2xl font-bold text-green-800 mb-4">문법 패턴</h3>
+                  <h3 id="grammar-front-title" class="text-2xl font-bold text-green-800 mb-4" data-i18n="grammar_pattern">문법 패턴</h3>
                   <div id="grammar-front-structure" class="text-3xl font-mono font-bold text-gray-800 mb-4">패턴</div>
-                  <p class="text-gray-500 mt-8 text-sm">클릭하여 설명 보기</p>
+                  <p class="text-gray-500 mt-8 text-sm" data-i18n="click_to_see_explanation">클릭하여 설명 보기</p>
                 </div>
               </div>
               <div class="flip-card-back bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-8">
                 <div class="text-center">
                   <p id="grammar-back-explanation" class="text-gray-700 mb-4">설명</p>
                   <div class="bg-white rounded-lg p-4 border border-blue-300">
-                    <h4 class="font-semibold mb-2">예문:</h4>
+                    <h4 class="font-semibold mb-2" data-i18n="examples">예문:</h4>
                     <ul id="grammar-back-examples" class="list-disc list-inside text-left">
                       <li>예문이 여기에 표시됩니다</li>
                     </ul>
@@ -637,13 +644,13 @@
           
           <div class="flex justify-center space-x-4 mt-6">
             <button id="prev-practice" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-              <i class="fas fa-arrow-left mr-2"></i>이전
+              <i class="fas fa-arrow-left mr-2"></i><span data-i18n="previous">이전</span>
             </button>
             <button id="home-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-              홈으로
+              <span data-i18n="home">홈으로</span>
             </button>
             <button id="next-practice" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-              다음<i class="fas fa-arrow-right ml-2"></i>
+              <span data-i18n="next">다음</span><i class="fas fa-arrow-right ml-2"></i>
             </button>
           </div>
           
@@ -660,7 +667,7 @@
       <div id="reading-mode" class="hidden mb-8">
         <div class="bg-white rounded-lg shadow-md p-6">
           <div class="text-center mb-6">
-            <h2 class="text-2xl font-bold mb-2">📖 독해 학습</h2>
+            <h2 class="text-2xl font-bold mb-2" data-i18n="reading_learning">📖 독해 학습</h2>
             <div id="reading-progress" class="text-gray-600">0 / 0</div>
           </div>
           
@@ -668,21 +675,21 @@
             <div class="space-y-6">
               <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
                 <h3 class="font-bold text-blue-800 text-lg mb-4">
-                  <i class="fas fa-book-open mr-2"></i>원문
+                  <i class="fas fa-book-open mr-2"></i><span data-i18n="original_text">원문</span>
                 </h3>
                 <p id="reading-text" class="text-xl leading-relaxed text-gray-800">원문이 여기에 표시됩니다</p>
               </div>
               
               <div class="bg-green-50 border border-green-200 rounded-lg p-6">
                 <h3 class="font-bold text-green-800 text-lg mb-4">
-                  <i class="fas fa-language mr-2"></i>번역
+                  <i class="fas fa-language mr-2"></i><span data-i18n="translation">번역</span>
                 </h3>
                 <p id="reading-translation" class="text-lg text-gray-700">번역이 여기에 표시됩니다</p>
               </div>
               
               <div class="bg-purple-50 border border-purple-200 rounded-lg p-6">
                 <h3 class="font-bold text-purple-800 text-lg mb-4">
-                  <i class="fas fa-info-circle mr-2"></i>상황
+                  <i class="fas fa-info-circle mr-2"></i><span data-i18n="context">상황</span>
                 </h3>
                 <p id="reading-context" class="text-gray-700">상황 설명이 여기에 표시됩니다</p>
               </div>
@@ -691,13 +698,13 @@
           
           <div class="flex justify-center space-x-4 mt-6">
             <button id="prev-grammar" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-              <i class="fas fa-arrow-left mr-2"></i>이전
+              <i class="fas fa-arrow-left mr-2"></i><span data-i18n="previous">이전</span>
             </button>
             <button id="home-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-              홈으로
+              <span data-i18n="home">홈으로</span>
             </button>
             <button id="next-grammar" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-              다음<i class="fas fa-arrow-right ml-2"></i>
+              <span data-i18n="next">다음</span><i class="fas fa-arrow-right ml-2"></i>
             </button>
           </div>
         </div>
@@ -707,10 +714,10 @@
       <div id="no-data-message" class="hidden mb-8">
         <div class="bg-white rounded-lg shadow-md p-6 text-center">
           <div class="text-6xl mb-4">📭</div>
-          <h2 class="text-2xl font-bold mb-4">데이터가 없습니다</h2>
-          <p class="text-gray-600 mb-6">학습할 데이터가 없습니다. 먼저 데이터를 업로드해주세요.</p>
+          <h2 class="text-2xl font-bold mb-4" data-i18n="no_data">데이터가 없습니다</h2>
+          <p class="text-gray-600 mb-6" data-i18n="no_data_description">학습할 데이터가 없습니다. 먼저 데이터를 업로드해주세요.</p>
           <button id="home-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-            홈으로 돌아가기
+            <span data-i18n="back_to_home">홈으로 돌아가기</span>
           </button>
         </div>
       </div>
@@ -723,20 +730,20 @@
     <div id="concept-upload-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
       <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-2xl max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold text-gray-800">개념 업로드</h2>
+          <h2 class="text-xl font-bold text-gray-800" data-i18n="concept_upload">개념 업로드</h2>
           <button id="close-concept-upload-modal" class="text-gray-500 hover:text-gray-700">
             <i class="fas fa-times text-xl"></i>
           </button>
         </div>
         <div class="text-center">
-          <p class="text-gray-600 mb-4">CSV 또는 JSON 파일을 업로드하여 개념을 추가하세요.</p>
+          <p class="text-gray-600 mb-4" data-i18n="upload_csv_json_concept">CSV 또는 JSON 파일을 업로드하여 개념을 추가하세요.</p>
           <input type="file" id="concept-file-input" accept=".csv,.json" class="mb-4">
           <div class="flex justify-center space-x-4">
             <button id="upload-concept-file" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg">
-              업로드
+              <span data-i18n="upload">업로드</span>
             </button>
             <button id="download-concept-template" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg">
-              템플릿 다운로드
+              <span data-i18n="download_template">템플릿 다운로드</span>
             </button>
           </div>
         </div>
@@ -747,20 +754,20 @@
     <div id="grammar-upload-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
       <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-2xl max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold text-gray-800">문법 패턴 업로드</h2>
+          <h2 class="text-xl font-bold text-gray-800" data-i18n="grammar_pattern_upload">문법 패턴 업로드</h2>
           <button id="close-grammar-upload-modal" class="text-gray-500 hover:text-gray-700">
             <i class="fas fa-times text-xl"></i>
           </button>
         </div>
         <div class="text-center">
-          <p class="text-gray-600 mb-4">CSV 또는 JSON 파일을 업로드하여 문법 패턴을 추가하세요.</p>
+          <p class="text-gray-600 mb-4" data-i18n="upload_csv_json_grammar">CSV 또는 JSON 파일을 업로드하여 문법 패턴을 추가하세요.</p>
           <input type="file" id="grammar-file-input" accept=".csv,.json" class="mb-4">
           <div class="flex justify-center space-x-4">
             <button id="upload-grammar-file" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg">
-              업로드
+              <span data-i18n="upload">업로드</span>
             </button>
             <button id="download-grammar-template" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg">
-              템플릿 다운로드
+              <span data-i18n="download_template">템플릿 다운로드</span>
             </button>
           </div>
         </div>
@@ -771,20 +778,20 @@
     <div id="example-upload-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
       <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-2xl max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold text-gray-800">예문 업로드</h2>
+          <h2 class="text-xl font-bold text-gray-800" data-i18n="example_upload">예문 업로드</h2>
           <button id="close-example-upload-modal" class="text-gray-500 hover:text-gray-700">
             <i class="fas fa-times text-xl"></i>
           </button>
         </div>
         <div class="text-center">
-          <p class="text-gray-600 mb-4">CSV 또는 JSON 파일을 업로드하여 예문을 추가하세요.</p>
+          <p class="text-gray-600 mb-4" data-i18n="upload_csv_json_example">CSV 또는 JSON 파일을 업로드하여 예문을 추가하세요.</p>
           <input type="file" id="example-file-input" accept=".csv,.json" class="mb-4">
           <div class="flex justify-center space-x-4">
             <button id="upload-example-file" class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-lg">
-              업로드
+              <span data-i18n="upload">업로드</span>
             </button>
             <button id="download-example-template" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg">
-              템플릿 다운로드
+              <span data-i18n="download_template">템플릿 다운로드</span>
             </button>
           </div>
         </div>

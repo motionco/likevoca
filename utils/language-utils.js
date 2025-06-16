@@ -412,13 +412,13 @@ const translations = {
     quiz_question: "문제",
     next_question: "다음 문제",
     quiz_progress: "진행률",
-    typing_prompt: "답을 입력하세요:",
-    typing_placeholder: "답을 입력하세요...",
+    typing_prompt: "정답을 입력하세요:",
+    typing_placeholder: "정답 입력...",
     check_answer: "정답 확인",
     next_word: "다음 단어",
     typing_progress: "진행률",
-    correct_count: "정답:",
-    wrong_count: "오답:",
+    correct_count: "맞춘 개수:",
+    wrong_count: "틀린 개수:",
     // 단어장 상세보기 모달 번역
     concept_detail_view: "개념 상세 보기",
     expressions_by_language: "언어별 표현",
@@ -463,6 +463,45 @@ const translations = {
     learning_progress: "학습 진도",
     learning_progress_title: "학습 진도",
     learning_progress_subtitle: "개인 학습 성과와 진도를 추적하고 분석하세요",
+
+    // 학습 페이지 번역
+    learning_areas: "학습 영역",
+    vocabulary_learning: "단어 학습",
+    vocabulary_learning_desc: "어휘력 향상을 위한 플래시카드와 타이핑 학습",
+    vocabulary_modes: "플래시카드 • 타이핑 • 발음 연습",
+    grammar_learning: "문법 학습",
+    grammar_learning_desc: "체계적인 문법 패턴 분석과 실습 학습",
+    grammar_modes: "문법 패턴 • 예문 분석 • 실습 문제",
+    reading_learning: "독해 학습",
+    reading_learning_desc: "다양한 예문을 통한 읽기 이해력 향상",
+    reading_modes: "예문 학습 • 플래시 모드",
+    quiz_test: "퀴즈 테스트",
+
+    // 학습 모드 번역
+    learning_modes: "학습 모드",
+    back_to_areas: "영역 선택으로 돌아가기",
+    pattern_analysis: "패턴 분석",
+    pattern_analysis_desc: "문법 구조와 패턴을 체계적으로 학습",
+    example_practice: "예문 실습",
+    example_practice_desc: "플래시카드 방식으로 문법 패턴 연습",
+    general_example_learning: "일반 예문 학습",
+    general_example_learning_desc: "다양한 예문을 통한 독해 능력 향상",
+    flash_mode: "플래시 모드",
+    flash_mode_desc: "빠른 속도로 예문을 학습하는 집중 모드",
+
+    // 필터 및 설정 번역
+    difficulty_level: "난이도",
+    all_difficulties: "전체 난이도",
+    beginner: "초급",
+    intermediate: "중급",
+    advanced: "고급",
+    pattern_type: "패턴 유형",
+    all_patterns: "전체 패턴",
+    grammar_pattern: "문법 패턴",
+    syntax_structure: "문장 구조",
+    expression_pattern: "표현 패턴",
+    conversation_pattern: "회화 패턴",
+
     learning_streak: "학습 스트릭",
     learning_goals: "학습 목표",
     quiz_performance: "퀴즈 성과",
@@ -575,6 +614,55 @@ const translations = {
     concept_detail_view: "개념 상세 보기:",
     expressions: "표현",
     examples: "예문",
+
+    // 학습 모드 카드 번역
+    flashcard_learning: "🃏 플래시카드 학습",
+    typing_learning: "⌨️ 타이핑 학습",
+    pronunciation_practice: "🎤 발음 연습",
+    grammar_pattern_analysis: "📝 문법 패턴 분석",
+    grammar_practice: "📚 문법 실습 연습",
+    reading_learning: "📖 독해 학습",
+
+    // 플래시카드 모드 번역
+    click_to_check_meaning: "클릭하여 의미 확인",
+    click_to_see_word: "다시 클릭하여 단어 보기",
+
+    // 타이핑 모드 번역
+    typing_answer_placeholder: "답안을 입력하세요",
+    check: "확인",
+
+    // 발음 연습 모드 번역
+    pronunciation_coming_soon: "발음 연습 모드는 준비 중입니다.",
+
+    // 문법 모드 번역
+    click_to_see_explanation: "클릭하여 설명 보기",
+
+    // 독해 모드 번역
+    original_text: "원문",
+    translation: "번역",
+    context: "상황",
+
+    // 공통 버튼 번역
+    home: "홈으로",
+    back_to_home: "홈으로 돌아가기",
+
+    // 데이터 없음 메시지
+    no_data: "데이터가 없습니다",
+    no_data_description:
+      "학습할 데이터가 없습니다. 먼저 데이터를 업로드해주세요.",
+
+    // 업로드 모달 번역
+    concept_upload: "개념 업로드",
+    grammar_pattern_upload: "문법 패턴 업로드",
+    example_upload: "예문 업로드",
+    upload_csv_json_concept:
+      "CSV 또는 JSON 파일을 업로드하여 개념을 추가하세요.",
+    upload_csv_json_grammar:
+      "CSV 또는 JSON 파일을 업로드하여 문법 패턴을 추가하세요.",
+    upload_csv_json_example:
+      "CSV 또는 JSON 파일을 업로드하여 예문을 추가하세요.",
+    upload: "업로드",
+    download_template: "템플릿 다운로드",
   },
   en: {
     home: "Home",
@@ -797,6 +885,62 @@ const translations = {
     learning_progress_title: "Learning Progress",
     learning_progress_subtitle:
       "Track and analyze your personal learning achievements and progress",
+
+    // 학습 페이지 번역
+    learning_areas: "Learning Areas",
+    vocabulary_learning: "Vocabulary Learning",
+    vocabulary_learning_desc:
+      "Flashcards and typing practice to improve vocabulary",
+    vocabulary_modes: "Flashcards • Typing • Pronunciation",
+    grammar_learning: "Grammar Learning",
+    grammar_learning_desc: "Systematic grammar pattern analysis and practice",
+    grammar_modes: "Grammar Patterns • Example Analysis • Practice Problems",
+    reading_learning: "Reading Learning",
+    reading_learning_desc:
+      "Improve reading comprehension through various examples",
+    reading_modes: "Example Learning • Flash Mode",
+    quiz_test: "Quiz Test",
+
+    // 학습 모드 번역
+    learning_modes: "Learning Modes",
+    back_to_areas: "Back to Area Selection",
+    pattern_analysis: "Pattern Analysis",
+    pattern_analysis_desc:
+      "Systematically learn grammar structures and patterns",
+    example_practice: "Example Practice",
+    example_practice_desc: "Practice grammar patterns with flashcard method",
+    general_example_learning: "General Example Learning",
+    general_example_learning_desc:
+      "Improve reading skills through various examples",
+    flash_mode: "Flash Mode",
+    flash_mode_desc: "Intensive mode for rapid example learning",
+
+    // 필터 및 설정 번역
+    difficulty_level: "Difficulty Level",
+    all_difficulties: "All Difficulties",
+    beginner: "Beginner",
+    intermediate: "Intermediate",
+    advanced: "Advanced",
+    pattern_type: "Pattern Type",
+    all_patterns: "All Patterns",
+    grammar_pattern: "Grammar Pattern",
+    syntax_structure: "Syntax Structure",
+    expression_pattern: "Expression Pattern",
+    conversation_pattern: "Conversation Pattern",
+    domain_filter: "Domain",
+    all_domains: "All Domains",
+    domain_daily: "Daily",
+    domain_business: "Business",
+    domain_academic: "Academic",
+    domain_travel: "Travel",
+    domain_food: "Food",
+    domain_nature: "Nature",
+    domain_technology: "Technology",
+    domain_health: "Health",
+    domain_sports: "Sports",
+    domain_entertainment: "Entertainment",
+    domain_other: "Other",
+
     learning_streak: "Learning Streak",
     learning_goals: "Learning Goals",
     quiz_performance: "Quiz Performance",
@@ -910,6 +1054,52 @@ const translations = {
     concept_detail_view: "Concept detail view:",
     expressions: "Expressions",
     examples: "Examples",
+
+    // 학습 모드 카드 번역
+    flashcard_learning: "🃏 Flashcard Learning",
+    typing_learning: "⌨️ Typing Learning",
+    pronunciation_practice: "🎤 Pronunciation Practice",
+    grammar_pattern_analysis: "📝 Grammar Pattern Analysis",
+    grammar_practice: "📚 Grammar Practice",
+    reading_learning: "📖 Reading Learning",
+
+    // 플래시카드 모드 번역
+    click_to_check_meaning: "Click to check meaning",
+    click_to_see_word: "Click again to see word",
+
+    // 타이핑 모드 번역
+    typing_answer_placeholder: "Enter your answer",
+    check: "Check",
+
+    // 발음 연습 모드 번역
+    pronunciation_coming_soon: "Pronunciation practice mode is coming soon.",
+
+    // 문법 모드 번역
+    click_to_see_explanation: "Click to see explanation",
+
+    // 독해 모드 번역
+    original_text: "Original Text",
+    translation: "Translation",
+    context: "Context",
+
+    // 공통 버튼 번역
+    home: "Home",
+    back_to_home: "Back to Home",
+
+    // 데이터 없음 메시지
+    no_data: "No Data Available",
+    no_data_description: "There is no data to learn. Please upload data first.",
+
+    // 업로드 모달 번역
+    concept_upload: "Concept Upload",
+    grammar_pattern_upload: "Grammar Pattern Upload",
+    example_upload: "Example Upload",
+    upload_csv_json_concept: "Upload CSV or JSON files to add concepts.",
+    upload_csv_json_grammar:
+      "Upload CSV or JSON files to add grammar patterns.",
+    upload_csv_json_example: "Upload CSV or JSON files to add examples.",
+    upload: "Upload",
+    download_template: "Download Template",
   },
   ja: {
     home: "ホーム",
@@ -1134,127 +1324,66 @@ const translations = {
     learning_progress: "学習進度",
     learning_progress_title: "学習進度",
     learning_progress_subtitle: "個人学習成果と進度を追跡し、分析する",
-    learning_streak: "学習ストリーク",
-    learning_goals: "学習目標",
-    quiz_performance: "クイズ成績",
-    game_performance: "ゲーム成績",
-    language_progress: "言語別学習進度",
-    category_distribution: "カテゴリ別分布",
-    grammar: "文法パターン分析",
-    recent_activity: "最近の学習活動",
-    refresh: "更新",
-    export: "エクスポート",
-    attempts: "試行",
-    correct: "正解",
-    games_played: "ゲーム",
-    wins: "勝利",
-    loading: "読み込み中...",
-    select_category: "カテゴリ選択",
-    select_emoji: "絵文字選択",
-    emoji: "絵文字",
 
-    // Daily domain categories
-    household: "生活用品",
-    family: "家族",
-    routine: "日常生活",
-    clothing: "衣類",
-    furniture: "家具",
+    // 学習ページ翻訳
+    learning_areas: "学習領域",
+    vocabulary_learning: "単語学習",
+    vocabulary_learning_desc:
+      "語彙力向上のためのフラッシュカードとタイピング学習",
+    vocabulary_modes: "フラッシュカード • タイピング • 発音練習",
+    grammar_learning: "文法学習",
+    grammar_learning_desc: "体系的な文法パターン分析と実習学習",
+    grammar_modes: "文法パターン • 例文分析 • 実習問題",
+    reading_learning: "読解学習",
+    reading_learning_desc: "様々な例文を通した読解力向上",
+    reading_modes: "例文学習 • フラッシュモード",
+    quiz_test: "クイズテスト",
 
-    // Food domain categories
-    fruit: "果物",
-    vegetable: "野菜",
-    meat: "肉類",
-    drink: "飲み物",
-    snack: "お菓子",
+    // 学習モード翻訳
+    learning_modes: "学習モード",
+    back_to_areas: "領域選択に戻る",
+    pattern_analysis: "パターン分析",
+    pattern_analysis_desc: "文法構造とパターンを体系的に学習",
+    example_practice: "例文実習",
+    example_practice_desc: "フラッシュカード方式で文法パターン練習",
+    general_example_learning: "一般例文学習",
+    general_example_learning_desc: "様々な例文を通した読解能力向上",
+    flash_mode: "フラッシュモード",
+    flash_mode_desc: "高速で例文を学習する集中モード",
 
-    // Travel domain categories
-    transportation: "交通手段",
-    accommodation: "宿泊",
-    tourist_attraction: "観光地",
-    luggage: "荷物",
-    direction: "道案内",
-
-    // Business domain categories
-    meeting: "会議",
-    finance: "金融",
-    marketing: "マーケティング",
-    office: "オフィス",
-    project: "プロジェクト",
-
-    // Academic domain categories
-    science: "科学",
-    literature: "文学",
-    history: "歴史",
-    mathematics: "数学",
-    research: "研究",
-
-    // Nature domain categories
-    animal: "動物",
-    plant: "植物",
-    weather: "天気",
-    geography: "地理",
-    environment: "環境",
-
-    // Technology domain categories
-    computer: "コンピュータ",
-    software: "ソフトウェア",
-    internet: "インターネット",
-    mobile: "モバイル",
-    ai: "AI",
-
-    // Health domain categories
-    exercise: "運動",
-    medicine: "医学",
-    nutrition: "栄養",
-    mental_health: "メンタルヘルス",
-    hospital: "病院",
-
-    // Sports domain categories
-    football: "サッカー",
-    basketball: "バスケットボール",
-    swimming: "水泳",
-    running: "ランニング",
-    equipment: "運動器具",
-
-    // Entertainment domain categories
-    movie: "映画",
-    music: "音楽",
-    game: "ゲーム",
-    book: "本",
-    art: "芸術",
-
-    // My Vocabulary page translations
-    my_vocabulary_title: "私の単語帳",
-    bookmarked_word_count: "ブックマークした単語数:",
-    word_count_unit: "個",
-    bookmark_usage: "ブックマーク使用量",
-    unlimited: "無制限",
-    bookmark_words: "単語をブックマーク",
-    hangul: "韓国語",
-    meaning: "意味",
-    pronunciation: "発音",
-    description: "説明",
-    search_placeholder: "検索語を入力してください",
-    load_more: "もっと見る",
-    no_bookmarks_title: "ブックマークした単語がありません",
-    no_bookmarks_desc:
-      "多言語辞書から興味のある単語をブックマークしてみてください！",
-    browse_words: "単語を見る",
-    bookmarked: "ブックマーク済み",
-    no_date: "日付なし",
-    login_required: "ログインが必要です。",
-    error_loading_bookmarks: "ブックマークした概念の読み込みエラー:",
-    concept_detail_view: "概念詳細表示:",
-    expressions: "表現",
-    examples: "例文",
+    // フィルターと設定翻訳
+    difficulty_level: "難易度",
+    all_difficulties: "全難易度",
+    beginner: "初級",
+    intermediate: "中級",
+    advanced: "上級",
+    pattern_type: "パターンタイプ",
+    all_patterns: "全パターン",
+    grammar_pattern: "文法パターン",
+    syntax_structure: "文章構造",
+    expression_pattern: "表現パターン",
+    conversation_pattern: "会話パターン",
+    domain_filter: "ドメイン",
+    all_domains: "全ドメイン",
+    domain_daily: "日常",
+    domain_business: "ビジネス",
+    domain_academic: "学術",
+    domain_travel: "旅行",
+    domain_food: "食べ物",
+    domain_nature: "自然",
+    domain_technology: "技術",
+    domain_health: "健康",
+    domain_sports: "スポーツ",
+    domain_entertainment: "エンターテインメント",
+    domain_other: "その他",
   },
   zh: {
     home: "首页",
-    wordbook: "单词本",
-    vocabulary: "词汇本",
+    wordbook: "词汇本",
+    vocabulary: "词汇",
     multilingual_dictionary: "多语言词典",
-    ai_wordbook: "AI单词本",
-    ai_vocabulary: "AI词汇本",
+    ai_wordbook: "AI词汇本",
+    ai_vocabulary: "AI词汇",
     language_learning: commonTexts.zh.language_learning,
     language_learning_desc: commonTexts.zh.language_learning_desc,
     language_games: commonTexts.zh.language_games,
@@ -1264,15 +1393,16 @@ const translations = {
     signup: "注册",
     logout: "登出",
     profile: "个人资料",
-    delete_account: "注销账号",
+    delete_account: "删除账户",
     welcome: "欢迎",
     user_suffix: "",
     get_started_free: "免费开始",
     learn_languages: "轻松有趣地学习各种语言",
     effective_learning:
-      "通过系统的课程和直观的学习系统，使您的语言学习更加有效。",
-    wordbook_desc: "输入要学习的单词，创建您自己的多语言单词本。",
-    ai_wordbook_desc: "从Google Gemini AI获取定制单词推荐，提高您的语言技能。",
+      "通过系统化课程和直观学习系统，让您的语言学习更加高效。",
+    wordbook_desc: "输入要学习的单词，创建您自己的多语言词汇本。",
+    ai_wordbook_desc:
+      "通过Google Gemini AI获得定制单词推荐，提高您的语言技能。",
     ai_vocabulary_desc: "学习AI推荐的多语言概念，提高您的语言技能。",
     inquiry_desc: "如果您有任何问题或需要帮助，请随时咨询。",
     start: "开始",
@@ -1283,21 +1413,21 @@ const translations = {
     concepts_unit: "个",
     ai_usage: "AI使用量",
     ai_recommend_concept: "AI概念推荐",
-    // Modal-related translations
+    // 模态框相关翻译
     add_concept: "添加概念",
     edit_concept: "编辑概念",
     domain: "领域",
     select_domain: "选择领域",
     category: "类别",
-    category_placeholder: "例如: fruit, animal",
+    category_placeholder: "例如：fruit, animal",
     emoji: "表情符号",
-    language_expressions: "各语言表达",
+    language_expressions: "语言表达",
     word: "单词",
     pronunciation: "发音",
     definition: "定义",
     part_of_speech: "词性",
     select_pos: "选择词性",
-    // Part of speech translations
+    // 词性翻译
     noun: "名词",
     verb: "动词",
     adjective: "形容词",
@@ -1310,11 +1440,11 @@ const translations = {
     determiner: "限定词",
     classifier: "量词",
     other: "其他",
-    // Linguistic terms translations
-    synonyms: "同义词 (逗号分隔)",
-    antonyms: "反义词 (逗号分隔)",
-    collocations: "搭配 (逗号分隔)",
-    compound_words: "复合词 (逗号分隔)",
+    // 语言学术语翻译
+    synonyms: "同义词（逗号分隔）",
+    antonyms: "反义词（逗号分隔）",
+    collocations: "搭配（逗号分隔）",
+    compound_words: "复合词（逗号分隔）",
     examples: "例句",
     add_example: "添加例句",
     representative_example: "代表例句",
@@ -1322,15 +1452,14 @@ const translations = {
     english_example: "英语例句",
     japanese_example: "日语例句",
     chinese_example: "中文例句",
-    tags: "标签 (逗号分隔)",
-    // Domain translations
+    tags: "标签（逗号分隔）",
+    // 领域翻译
     academic: "学术",
-    nature: "自然",
     technology: "技术",
     health: "健康",
     sports: "体育",
     entertainment: "娱乐",
-    // Domain filter translations
+    // 领域过滤器翻译
     domain_filter: "领域",
     all_domains: "全部领域",
     domain_daily: "日常",
@@ -1344,7 +1473,7 @@ const translations = {
     domain_sports: "体育",
     domain_entertainment: "娱乐",
     domain_other: "其他",
-    // 로그인 페이지 번역
+    // 登录页面翻译
     login_with_google: "使用Google登录",
     login_with_github: "使用Github登录",
     or: "或者",
@@ -1467,118 +1596,112 @@ const translations = {
     learning_progress: "学习进度",
     learning_progress_title: "学习进度",
     learning_progress_subtitle: "跟踪个人学习成果和进度",
-    learning_streak: "学习 streak",
-    learning_goals: "学习目标",
-    quiz_performance: "测验成绩",
-    game_performance: "游戏成绩",
-    language_progress: "语言学习进度",
-    category_distribution: "类别分布",
-    grammar: "语法模式分析",
-    recent_activity: "最近学习活动",
-    refresh: "刷新",
-    export: "导出",
-    attempts: "尝试",
-    correct: "正确",
-    games_played: "游戏",
-    wins: "胜利",
-    loading: "加载中...",
-    select_category: "选择类别",
-    select_emoji: "选择表情",
-    emoji: "表情",
 
-    // Daily domain categories
-    household: "生活用品",
-    family: "家庭",
-    routine: "日常生活",
-    clothing: "服装",
-    furniture: "家具",
+    // 学习页面翻译
+    learning_areas: "学习领域",
+    vocabulary_learning: "词汇学习",
+    vocabulary_learning_desc: "通过闪卡和打字练习提高词汇量",
+    vocabulary_modes: "闪卡 • 打字 • 发音练习",
+    grammar_learning: "语法学习",
+    grammar_learning_desc: "系统的语法模式分析和实践学习",
+    grammar_modes: "语法模式 • 例句分析 • 练习题",
+    reading_learning: "阅读学习",
+    reading_learning_desc: "通过各种例句提高阅读理解能力",
+    reading_modes: "例句学习 • 闪卡模式",
+    quiz_test: "测验测试",
 
-    // Food domain categories
-    fruit: "水果",
-    vegetable: "蔬菜",
-    meat: "肉类",
-    drink: "饮料",
-    snack: "零食",
+    // 学习模式翻译
+    learning_modes: "学习模式",
+    back_to_areas: "返回领域选择",
+    pattern_analysis: "模式分析",
+    pattern_analysis_desc: "系统学习语法结构和模式",
+    example_practice: "例句练习",
+    example_practice_desc: "通过闪卡方式练习语法模式",
+    general_example_learning: "一般例句学习",
+    general_example_learning_desc: "通过各种例句提高阅读能力",
+    flash_mode: "闪卡模式",
+    flash_mode_desc: "快速学习例句的集中模式",
 
-    // Travel domain categories
-    transportation: "交通工具",
-    accommodation: "住宿",
-    tourist_attraction: "旅游景点",
-    luggage: "行李",
-    direction: "方向",
+    // 过滤器和设置翻译
+    difficulty_level: "难度等级",
+    all_difficulties: "全部难度",
+    beginner: "初级",
+    intermediate: "中级",
+    advanced: "高级",
+    pattern_type: "模式类型",
+    all_patterns: "全部模式",
+    grammar_pattern: "语法模式",
+    syntax_structure: "句法结构",
+    expression_pattern: "表达模式",
+    conversation_pattern: "对话模式",
+    domain_filter: "领域",
+    all_domains: "全部领域",
+    domain_daily: "日常",
+    domain_business: "商务",
+    domain_academic: "学术",
+    domain_travel: "旅行",
+    domain_food: "食物",
+    domain_nature: "自然",
+    domain_technology: "技术",
+    domain_health: "健康",
+    domain_sports: "体育",
+    domain_entertainment: "娱乐",
+    domain_other: "其他",
 
-    // Business domain categories
-    meeting: "会议",
-    finance: "金融",
-    marketing: "营销",
-    office: "办公室",
-    project: "项目",
+    // 学习模式卡片翻译
+    vocabulary_learning_modes: "词汇学习模式",
+    vocabulary_data_upload: "词汇数据上传",
+    flashcard_mode: "闪卡",
+    flashcard_mode_desc: "通过翻转卡片学习单词和含义",
+    typing_mode: "打字",
+    typing_mode_desc: "通过听写和准确打字练习拼写",
+    pronunciation_mode: "发音练习",
+    pronunciation_mode_desc: "通过语音识别训练准确发音",
 
-    // Academic domain categories
-    science: "科学",
-    literature: "文学",
-    history: "历史",
-    mathematics: "数学",
-    research: "研究",
+    // 学习模式翻译
+    flashcard_learning: "🃏 闪卡学习",
+    typing_learning: "⌨️ 打字学习",
+    pronunciation_practice: "🎤 发音练习",
+    grammar_pattern_analysis: "📝 语法模式分析",
+    grammar_practice: "📚 语法练习",
+    reading_learning: "📖 阅读学习",
 
-    // Nature domain categories
-    animal: "动物",
-    plant: "植物",
-    weather: "天气",
-    geography: "地理",
-    environment: "环境",
+    // 闪卡模式翻译
+    click_to_check_meaning: "点击查看含义",
+    click_to_see_word: "再次点击查看单词",
 
-    // Technology domain categories
-    computer: "电脑",
-    software: "软件",
-    internet: "互联网",
-    mobile: "手机",
-    ai: "人工智能",
+    // 打字模式翻译
+    typing_answer_placeholder: "请输入答案",
+    check: "检查",
 
-    // Health domain categories
-    exercise: "运动",
-    medicine: "医学",
-    nutrition: "营养",
-    mental_health: "心理健康",
-    hospital: "医院",
+    // 发音练习模式翻译
+    pronunciation_coming_soon: "发音练习模式即将推出。",
 
-    // Sports domain categories
-    football: "足球",
-    basketball: "篮球",
-    swimming: "游泳",
-    running: "跑步",
-    equipment: "运动器材",
+    // 语法模式翻译
+    click_to_see_explanation: "点击查看解释",
 
-    // Entertainment domain categories
-    movie: "电影",
-    music: "音乐",
-    game: "游戏",
-    book: "图书",
-    art: "艺术",
+    // 阅读模式翻译
+    original_text: "原文",
+    translation: "翻译",
+    context: "语境",
 
-    // My Vocabulary page translations
-    my_vocabulary_title: "我的词汇本",
-    bookmarked_word_count: "收藏的单词数:",
-    word_count_unit: "个",
-    bookmark_usage: "收藏使用量",
-    unlimited: "无限制",
-    bookmark_words: "收藏单词",
-    hangul: "韩语",
-    meaning: "意思",
-    pronunciation: "发音",
-    description: "描述",
-    search_placeholder: "输入搜索词",
-    load_more: "加载更多",
-    no_bookmarks_title: "没有收藏的单词",
-    no_bookmarks_desc: "在多语言词典中收藏感兴趣的单词吧！",
-    browse_words: "浏览单词",
-    bookmarked: "已收藏",
-    no_date: "无日期",
-    login_required: "需要登录。",
-    error_loading_bookmarks: "加载收藏概念错误:",
-    concept_detail_view: "概念详细查看:",
-    expressions: "表达",
-    examples: "例句",
+    // 公共按钮翻译
+    home: "首页",
+    back_to_home: "返回首页",
+
+    // 无数据消息
+    no_data: "没有数据",
+    no_data_description: "没有学习数据。请先上传数据。",
+
+    // 上传模态框翻译
+    concept_upload: "概念上传",
+    grammar_pattern_upload: "语法模式上传",
+    example_upload: "例句上传",
+    upload_csv_json_concept: "上传CSV或JSON文件以添加概念。",
+    upload_csv_json_grammar: "上传CSV或JSON文件以添加语法模式。",
+    upload_csv_json_example: "上传CSV或JSON文件以添加例句。",
+    upload: "上传",
+    download_template: "下载模板",
   },
 };
 
