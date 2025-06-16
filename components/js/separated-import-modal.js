@@ -3,6 +3,7 @@ import {
   db,
   conceptUtils,
   supportedLanguages,
+  serverTimestamp,
 } from "../../js/firebase/firebase-init.js";
 import { collectionManager } from "../../js/firebase/firebase-collection-manager.js";
 import { readFile } from "./csv-parser-utils.js";
@@ -188,11 +189,13 @@ async function uploadConcepts(data) {
         expressions: conceptData.expressions || {},
         representative_example: conceptData.representative_example || null,
         learning_metadata: {
-          created_from: "separated_import",
-          import_date: new Date(),
-          version: "3.0",
-          structure_type: "separated_collections",
+          pattern_name: null,
+          structural_pattern: null,
+          learning_weight: 5,
+          quiz_eligible: true,
+          game_eligible: true,
         },
+        created_at: serverTimestamp(),
       };
 
       await collectionManager.createConcept(conceptDoc);
@@ -217,14 +220,19 @@ async function uploadExamples(data) {
         example_id:
           exampleData.example_id ||
           `example_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        domain: exampleData.domain || "general",
+        category: exampleData.category || "common",
         context: exampleData.context || "general",
         difficulty: exampleData.difficulty || "beginner",
         tags: exampleData.tags || [],
         translations: exampleData.translations || {},
-        metadata: {
-          created_from: "separated_import",
-          import_date: new Date(),
-          version: "3.0",
+        learning_metadata: {
+          pattern_name: exampleData.learning_metadata?.pattern_name || null,
+          structural_pattern:
+            exampleData.learning_metadata?.structural_pattern || null,
+          learning_weight: exampleData.learning_metadata?.learning_weight || 5,
+          quiz_eligible: exampleData.learning_metadata?.quiz_eligible !== false,
+          game_eligible: exampleData.learning_metadata?.game_eligible !== false,
         },
       };
 
@@ -252,15 +260,14 @@ async function uploadGrammarPatterns(data) {
           `pattern_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         pattern_name: patternData.pattern_name || "기본 패턴",
         pattern_type: patternData.pattern_type || "basic",
+        domain: patternData.domain || "general",
+        category: patternData.category || "common",
         difficulty: patternData.difficulty || "beginner",
         tags: patternData.tags || [],
         learning_focus: patternData.learning_focus || [],
+        structural_pattern: patternData.structural_pattern || "",
         explanations: patternData.explanations || {},
-        metadata: {
-          created_from: "separated_import",
-          import_date: new Date(),
-          version: "3.0",
-        },
+        usage_examples: patternData.usage_examples || [],
       };
 
       await collectionManager.createGrammarPattern(patternDoc);
@@ -414,21 +421,53 @@ function downloadExamplesJSONTemplate() {
   const template = [
     {
       example_id: "example_001",
+      domain: "daily",
+      category: "routine",
       context: "daily_conversation",
       difficulty: "beginner",
-      tags: ["greeting", "politeness", "daily"],
+      tags: ["greeting", "polite", "formal"],
       translations: {
         korean: {
-          text: "안녕하세요, 오늘 날씨가 좋네요.",
-          romanization: "annyeonghaseyo, oneul nalssiga joneyo",
+          text: "안녕하세요! 처음 뵙겠습니다.",
+          romanization: "annyeonghaseyo! cheoeum boepgetseumnida",
         },
         english: {
-          text: "Hello, the weather is nice today.",
-          phonetic: "/həˈloʊ ðə ˈwɛðər ɪz naɪs təˈdeɪ/",
+          text: "Hello! Nice to meet you for the first time.",
+          phonetic: "/həˈloʊ naɪs tu mit ju fɔr ðə fɜrst taɪm/",
         },
         japanese: {
-          text: "こんにちは、今日はいい天気ですね。",
-          romanization: "konnichiwa, kyou wa ii tenki desu ne",
+          text: "こんにちは！初めてお会いします。",
+          romanization: "konnichiwa! hajimete oai shimasu",
+        },
+        chinese: {
+          text: "你好！初次见面。",
+          pinyin: "nǐ hǎo! chū cì jiàn miàn",
+        },
+      },
+    },
+    {
+      example_id: "example_002",
+      domain: "food",
+      category: "fruit",
+      context: "restaurant",
+      difficulty: "beginner",
+      tags: ["food", "ordering", "restaurant"],
+      translations: {
+        korean: {
+          text: "사과 주스 하나 주세요.",
+          romanization: "sagwa juseu hana juseyo",
+        },
+        english: {
+          text: "Please give me one apple juice.",
+          phonetic: "/pliːz ɡɪv mi wʌn ˈæpəl ʤus/",
+        },
+        japanese: {
+          text: "りんごジュースを一つください。",
+          romanization: "ringo juusu wo hitotsu kudasai",
+        },
+        chinese: {
+          text: "请给我一杯苹果汁。",
+          pinyin: "qǐng gěi wǒ yī bēi píng guǒ zhī",
         },
       },
     },
@@ -440,6 +479,8 @@ function downloadExamplesJSONTemplate() {
 function downloadExamplesCSVTemplate() {
   const headers = [
     "example_id",
+    "domain",
+    "category",
     "context",
     "difficulty",
     "tags",
@@ -449,20 +490,26 @@ function downloadExamplesCSVTemplate() {
     "english_phonetic",
     "japanese_text",
     "japanese_romanization",
+    "chinese_text",
+    "chinese_pinyin",
   ];
 
   const sampleData = [
     [
       "example_001",
+      "daily",
+      "routine",
       "daily_conversation",
       "beginner",
-      "greeting|politeness|daily",
-      "안녕하세요, 오늘 날씨가 좋네요.",
-      "annyeonghaseyo, oneul nalssiga joneyo",
-      "Hello, the weather is nice today.",
-      "/həˈloʊ ðə ˈwɛðər ɪz naɪs təˈdeɪ/",
-      "こんにちは、今日はいい天気ですね。",
-      "konnichiwa, kyou wa ii tenki desu ne",
+      "greeting|polite|formal",
+      "안녕하세요! 처음 뵙겠습니다.",
+      "annyeonghaseyo! cheoeum boepgetseumnida",
+      "Hello! Nice to meet you for the first time.",
+      "/həˈloʊ naɪs tu mit ju fɔr ðə fɜrst taɪm/",
+      "こんにちは！初めてお会いします。",
+      "konnichiwa! hajimete oai shimasu",
+      "你好！初次见面。",
+      "nǐ hǎo! chū cì jiàn miàn",
     ],
   ];
 
@@ -484,21 +531,53 @@ function downloadGrammarJSONTemplate() {
   const template = [
     {
       pattern_id: "pattern_001",
-      pattern_name: "목적어 표시 패턴",
-      pattern_type: "syntax",
+      pattern_name: "기본 인사",
+      pattern_type: "greeting",
+      domain: "daily",
+      category: "routine",
       difficulty: "beginner",
-      tags: ["object_marking", "basic_grammar", "daily_use"],
-      learning_focus: ["시간 표현", "목적어 표시", "현재 시제"],
+      tags: ["greeting", "basic", "daily"],
+      learning_focus: ["pronunciation", "usage"],
+      structural_pattern: "안녕하세요",
       explanations: {
-        korean: {
-          pattern: "명사 + 을/를 + 동사",
-          explanation: "목적어를 나타내는 기본적인 문법 패턴입니다.",
-        },
-        english: {
-          pattern: "Object + Verb pattern",
-          explanation: "Basic grammar pattern for expressing objects.",
-        },
+        korean: "가장 기본적인 인사 표현입니다.",
+        english: "Basic greeting expression.",
+        japanese: "基本的な挨拶表現です。",
+        chinese: "最基本的问候表达。",
       },
+      usage_examples: [
+        {
+          korean: "안녕하세요! 만나서 반갑습니다.",
+          english: "Hello! Nice to meet you.",
+          japanese: "こんにちは！お会いできて嬉しいです。",
+          chinese: "你好！很高兴见到你。",
+        },
+      ],
+    },
+    {
+      pattern_id: "pattern_002",
+      pattern_name: "음식 주문",
+      pattern_type: "request",
+      domain: "food",
+      category: "drink",
+      difficulty: "beginner",
+      tags: ["food", "request", "restaurant"],
+      learning_focus: ["grammar", "vocabulary"],
+      structural_pattern: "___을/를 주세요",
+      explanations: {
+        korean: "음식이나 물건을 정중하게 요청할 때 사용합니다.",
+        english: "Used to politely request food or items.",
+        japanese: "食べ物や物を丁寧に頼む時に使います。",
+        chinese: "用于礼貌地请求食物或物品。",
+      },
+      usage_examples: [
+        {
+          korean: "김치찌개를 주세요.",
+          english: "Please give me kimchi stew.",
+          japanese: "キムチチゲをください。",
+          chinese: "请给我泡菜汤。",
+        },
+      ],
     },
   ];
 
@@ -510,27 +589,33 @@ function downloadGrammarCSVTemplate() {
     "pattern_id",
     "pattern_name",
     "pattern_type",
+    "domain",
+    "category",
     "difficulty",
     "tags",
     "learning_focus",
-    "korean_pattern",
+    "structural_pattern",
     "korean_explanation",
-    "english_pattern",
     "english_explanation",
+    "japanese_explanation",
+    "chinese_explanation",
   ];
 
   const sampleData = [
     [
       "pattern_001",
-      "목적어 표시 패턴",
-      "syntax",
+      "기본 인사",
+      "greeting",
+      "daily",
+      "routine",
       "beginner",
-      "object_marking|basic_grammar|daily_use",
-      "시간 표현|목적어 표시|현재 시제",
-      "명사 + 을/를 + 동사",
-      "목적어를 나타내는 기본적인 문법 패턴입니다.",
-      "Object + Verb pattern",
-      "Basic grammar pattern for expressing objects.",
+      "greeting|basic|daily",
+      "pronunciation|usage",
+      "안녕하세요",
+      "가장 기본적인 인사 표현입니다.",
+      "Basic greeting expression.",
+      "基本的な挨拶表現です。",
+      "最基本的问候表达。",
     ],
   ];
 
@@ -607,6 +692,8 @@ function convertCSVToConcept(item) {
 function convertCSVToExample(item) {
   return {
     example_id: item.example_id || `example_${Date.now()}`,
+    domain: item.domain || "general",
+    category: item.category || "common",
     context: item.context || "general",
     difficulty: item.difficulty || "beginner",
     tags: item.tags ? item.tags.split("|") : [],
@@ -632,19 +719,19 @@ function convertCSVToGrammar(item) {
     pattern_id: item.pattern_id || `pattern_${Date.now()}`,
     pattern_name: item.pattern_name || "기본 패턴",
     pattern_type: item.pattern_type || "basic",
+    domain: item.domain || "general",
+    category: item.category || "common",
     difficulty: item.difficulty || "beginner",
     tags: item.tags ? item.tags.split("|") : [],
     learning_focus: item.learning_focus ? item.learning_focus.split("|") : [],
+    structural_pattern: item.structural_pattern || "",
     explanations: {
-      korean: {
-        pattern: item.korean_pattern || "",
-        explanation: item.korean_explanation || "",
-      },
-      english: {
-        pattern: item.english_pattern || "",
-        explanation: item.english_explanation || "",
-      },
+      korean: item.korean_explanation || "",
+      english: item.english_explanation || "",
+      japanese: item.japanese_explanation || "",
+      chinese: item.chinese_explanation || "",
     },
+    usage_examples: item.usage_examples ? JSON.parse(item.usage_examples) : [],
   };
 }
 

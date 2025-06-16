@@ -3,6 +3,7 @@ import {
   db,
   conceptUtils,
   supportedLanguages,
+  serverTimestamp,
 } from "../../js/firebase/firebase-init.js";
 import {
   GRAMMAR_TAGS,
@@ -225,6 +226,7 @@ async function uploadConcepts(data) {
           version: "3.0",
           structure_type: "separated_collections",
         },
+        created_at: serverTimestamp(),
       };
 
       await collectionManager.createConcept(conceptDoc);
@@ -264,6 +266,7 @@ async function uploadExamples(data) {
           import_date: new Date(),
           version: "3.0",
         },
+        created_at: serverTimestamp(),
       };
 
       await collectionManager.createExample(exampleDoc);
@@ -293,12 +296,11 @@ async function uploadGrammarPatterns(data) {
         difficulty: patternData.difficulty || "beginner",
         tags: patternData.tags || [],
         learning_focus: patternData.learning_focus || [],
+        structural_pattern: patternData.structural_pattern || "",
         explanations: patternData.explanations || {},
-        metadata: {
-          created_from: "separated_import",
-          import_date: new Date(),
-          version: "3.0",
-        },
+        usage_examples: patternData.usage_examples || [],
+        teaching_notes: patternData.teaching_notes || {},
+        created_at: serverTimestamp(),
       };
 
       await collectionManager.createGrammarPattern(patternDoc);
@@ -429,34 +431,54 @@ function downloadExamplesJSONTemplate() {
   const template = [
     {
       example_id: "example_001",
+      domain: "daily",
+      category: "routine",
       context: "daily_conversation",
       difficulty: "beginner",
-      tags: ["greeting", "polite"],
+      tags: ["greeting", "polite", "formal"],
       translations: {
-        korean: "안녕하세요! 만나서 반갑습니다.",
-        english: "Hello! Nice to meet you.",
-        japanese: "こんにちは！お会いできて嬉しいです。",
-      },
-      learning_metadata: {
-        pattern_name: "greeting_pattern",
-        structural_pattern: "[greeting] + [polite_expression]",
-        learning_weight: 10,
+        korean: {
+          text: "안녕하세요! 처음 뵙겠습니다.",
+          romanization: "annyeonghaseyo! cheoeum boepgetseumnida",
+        },
+        english: {
+          text: "Hello! Nice to meet you for the first time.",
+          phonetic: "/həˈloʊ naɪs tu mit ju fɔr ðə fɜrst taɪm/",
+        },
+        japanese: {
+          text: "こんにちは！初めてお会いします。",
+          romanization: "konnichiwa! hajimete oai shimasu",
+        },
+        chinese: {
+          text: "你好！初次见面。",
+          pinyin: "nǐ hǎo! chū cì jiàn miàn",
+        },
       },
     },
     {
       example_id: "example_002",
+      domain: "food",
+      category: "fruit",
       context: "restaurant",
-      difficulty: "intermediate",
-      tags: ["ordering", "food"],
+      difficulty: "beginner",
+      tags: ["food", "ordering", "restaurant"],
       translations: {
-        korean: "메뉴를 보여주세요.",
-        english: "Please show me the menu.",
-        japanese: "メニューを見せてください。",
-      },
-      learning_metadata: {
-        pattern_name: "request_pattern",
-        structural_pattern: "[object] + [polite_request]",
-        learning_weight: 8,
+        korean: {
+          text: "사과 주스 하나 주세요.",
+          romanization: "sagwa juseu hana juseyo",
+        },
+        english: {
+          text: "Please give me one apple juice.",
+          phonetic: "/pliːz ɡɪv mi wʌn ˈæpəl ʤus/",
+        },
+        japanese: {
+          text: "りんごジュースを一つください。",
+          romanization: "ringo juusu wo hitotsu kudasai",
+        },
+        chinese: {
+          text: "请给我一杯苹果汁。",
+          pinyin: "qǐng gěi wǒ yī bēi píng guǒ zhī",
+        },
       },
     },
   ];
@@ -465,10 +487,9 @@ function downloadExamplesJSONTemplate() {
 }
 
 function downloadExamplesCSVTemplate() {
-  const csvContent = `example_id,context,difficulty,tags,korean,english,japanese,pattern_name,structural_pattern
-example_001,daily_conversation,beginner,"greeting,polite",안녕하세요! 만나서 반갑습니다.,Hello! Nice to meet you.,こんにちは！お会いできて嬉しいです。,greeting_pattern,[greeting] + [polite_expression]
-example_002,restaurant,intermediate,"ordering,food",메뉴를 보여주세요.,Please show me the menu.,メニューを見せてください。,request_pattern,[object] + [polite_request]
-example_003,shopping,beginner,"price,question",이것은 얼마예요?,How much is this?,これはいくらですか？,price_inquiry,[demonstrative] + [price_question]`;
+  const csvContent = `example_id,domain,category,context,difficulty,tags,korean,english,japanese,chinese
+example_001,daily,routine,daily_conversation,beginner,"greeting,polite,formal",안녕하세요! 처음 뵙겠습니다.,Hello! Nice to meet you for the first time.,こんにちは！初めてお会いします。,你好！初次见面。
+example_002,food,fruit,restaurant,beginner,"food,ordering,restaurant",사과 주스 하나 주세요.,Please give me one apple juice.,りんごジュースを一つください。,请给我一杯苹果汁。`;
 
   downloadCSV(csvContent, "examples_template.csv");
 }
@@ -477,68 +498,91 @@ function downloadGrammarJSONTemplate() {
   const template = [
     {
       pattern_id: "pattern_001",
-      pattern_name: "Present Tense Pattern",
-      pattern_type: "tense",
+      pattern_name: "기본 인사",
+      pattern_type: "greeting",
+      domain: "daily",
+      category: "routine",
       difficulty: "beginner",
-      tags: ["present", "basic", "verb"],
-      learning_focus: ["conjugation", "sentence_structure"],
-      structural_pattern: "[Subject] + [Verb-present] + [Object]",
+      tags: ["greeting", "basic", "daily"],
+      learning_focus: ["pronunciation", "usage"],
+      structural_pattern: "안녕하세요",
       explanations: {
-        korean: "현재 시제를 나타내는 기본 문법 패턴입니다.",
-        english: "Basic grammar pattern for present tense.",
-        japanese: "現在時制を表す基本的な文法パターンです。",
+        korean: "가장 기본적인 인사 표현입니다.",
+        english: "Basic greeting expression.",
+        japanese: "基本的な挨拶表現です。",
+        chinese: "最基本的问候表达。",
       },
       usage_examples: [
         {
-          korean: "나는 책을 읽는다.",
-          english: "I read a book.",
-          japanese: "私は本を読みます。",
+          korean: "안녕하세요! 만나서 반갑습니다.",
+          english: "Hello! Nice to meet you.",
+          japanese: "こんにちは！お会いできて嬉しいです。",
+          chinese: "你好！很高兴见到你。",
         },
       ],
-      teaching_notes: {
-        korean: "동사 활용에 주의하세요.",
-        english: "Pay attention to verb conjugation.",
-        japanese: "動詞の活用に注意してください。",
-      },
     },
     {
       pattern_id: "pattern_002",
-      pattern_name: "Polite Request Pattern",
-      pattern_type: "expression",
-      difficulty: "intermediate",
-      tags: ["polite", "request", "honorific"],
-      learning_focus: ["politeness", "social_context"],
-      structural_pattern: "[Object] + [을/를] + [Verb-polite] + [주세요]",
+      pattern_name: "음식 주문",
+      pattern_type: "request",
+      domain: "food",
+      category: "drink",
+      difficulty: "beginner",
+      tags: ["food", "request", "restaurant"],
+      learning_focus: ["grammar", "vocabulary"],
+      structural_pattern: "___을/를 주세요",
       explanations: {
-        korean: "정중한 요청을 할 때 사용하는 패턴입니다.",
-        english: "Pattern used for making polite requests.",
-        japanese: "丁寧な依頼をする時に使うパターンです。",
+        korean: "음식이나 물건을 정중하게 요청할 때 사용합니다.",
+        english: "Used to politely request food or items.",
+        japanese: "食べ物や物を丁寧に頼む時に使います。",
+        chinese: "用于礼貌地请求食物或物品。",
       },
       usage_examples: [
         {
-          korean: "물을 주세요.",
-          english: "Please give me water.",
-          japanese: "水をください。",
+          korean: "김치찌개를 주세요.",
+          english: "Please give me kimchi stew.",
+          japanese: "キムチチゲをください。",
+          chinese: "请给我泡菜汤。",
         },
       ],
-      teaching_notes: {
-        korean: "상황에 따라 높임말 수준을 조절하세요.",
-        english: "Adjust the level of politeness according to the situation.",
-        japanese: "状況に応じて敬語のレベルを調整してください。",
+    },
+    {
+      pattern_id: "pattern_003",
+      pattern_name: "과거 경험",
+      pattern_type: "tense",
+      domain: "academic",
+      category: "literature",
+      difficulty: "intermediate",
+      tags: ["past", "experience", "verb"],
+      learning_focus: ["conjugation", "time_expression"],
+      structural_pattern: "___었/았어요",
+      explanations: {
+        korean: "과거에 일어난 일을 표현할 때 사용합니다.",
+        english: "Used to express past events or experiences.",
+        japanese: "過去に起こったことを表現する時に使います。",
+        chinese: "用于表达过去发生的事情。",
       },
+      usage_examples: [
+        {
+          korean: "어제 영화를 봤어요.",
+          english: "I watched a movie yesterday.",
+          japanese: "昨日映画を見ました。",
+          chinese: "我昨天看了电影。",
+        },
+      ],
     },
   ];
 
-  downloadJSON(template, "grammar_patterns_template.json");
+  downloadJSON(template, "grammar_template.json");
 }
 
 function downloadGrammarCSVTemplate() {
-  const csvContent = `pattern_id,pattern_name,pattern_type,difficulty,tags,learning_focus,structural_pattern,korean_explanation,english_explanation,example_korean,example_english
-pattern_001,Present Tense Pattern,tense,beginner,"present,basic,verb","conjugation,sentence_structure",[Subject] + [Verb-present] + [Object],현재 시제를 나타내는 기본 문법 패턴입니다.,Basic grammar pattern for present tense.,나는 책을 읽는다.,I read a book.
-pattern_002,Polite Request Pattern,expression,intermediate,"polite,request,honorific","politeness,social_context",[Object] + [을/를] + [Verb-polite] + [주세요],정중한 요청을 할 때 사용하는 패턴입니다.,Pattern used for making polite requests.,물을 주세요.,Please give me water.
-pattern_003,Past Tense Pattern,tense,beginner,"past,basic,verb","conjugation,time_expression",[Subject] + [Verb-past] + [Object],과거 시제를 나타내는 기본 문법 패턴입니다.,Basic grammar pattern for past tense.,나는 어제 영화를 봤다.,I watched a movie yesterday.`;
+  const csvContent = `pattern_id,pattern_name,pattern_type,domain,category,difficulty,tags,learning_focus,structural_pattern,korean_explanation,english_explanation,japanese_explanation,chinese_explanation,korean_example,english_example,japanese_example,chinese_example
+pattern_001,기본 인사,greeting,daily,routine,beginner,"greeting,basic,daily","pronunciation,usage",안녕하세요,가장 기본적인 인사 표현입니다.,Basic greeting expression.,基本的な挨拶表現です。,最基本的问候表达。,안녕하세요! 만나서 반갑습니다.,Hello! Nice to meet you.,こんにちは！お会いできて嬉しいです。,你好！很高兴见到你。
+pattern_002,음식 주문,request,food,drink,beginner,"food,request,restaurant","grammar,vocabulary",___을/를 주세요,음식이나 물건을 정중하게 요청할 때 사용합니다.,Used to politely request food or items.,食べ物や物を丁寧に頼む時に使います。,用于礼貌地请求食物或物品。,김치찌개를 주세요.,Please give me kimchi stew.,キムチチゲをください。,请给我泡菜汤。
+pattern_003,과거 경험,tense,academic,literature,intermediate,"past,experience,verb","conjugation,time_expression",___었/았어요,과거에 일어난 일을 표현할 때 사용합니다.,Used to express past events or experiences.,過去に起こったことを表現する時に使います。,用于表达过去发生的事情。,어제 영화를 봤어요.,I watched a movie yesterday.,昨日映画を見ました。,我昨天看了电影。`;
 
-  downloadCSV(csvContent, "grammar_patterns_template.csv");
+  downloadCSV(csvContent, "grammar_template.csv");
 }
 
 function downloadJSON(data, filename) {
@@ -753,6 +797,8 @@ function parseExampleFromCSV(row) {
   try {
     return {
       example_id: row.example_id || null,
+      domain: row.domain || "general",
+      category: row.category || "common",
       context: row.context || "general",
       difficulty: row.difficulty || "beginner",
       tags: row.tags ? row.tags.split(",").map((t) => t.trim()) : [],
@@ -761,11 +807,6 @@ function parseExampleFromCSV(row) {
         english: row.english || "",
         japanese: row.japanese || "",
         chinese: row.chinese || "",
-      },
-      learning_metadata: {
-        pattern_name: row.pattern_name || "",
-        structural_pattern: row.structural_pattern || "",
-        learning_weight: row.learning_weight || 0,
       },
     };
   } catch (error) {
@@ -777,30 +818,34 @@ function parseExampleFromCSV(row) {
 // 문법 패턴 CSV 파싱
 function parseGrammarPatternFromCSV(row) {
   try {
+    // 단일 예문을 객체로 변환
+    const usageExample = {
+      korean: row.korean_example || "",
+      english: row.english_example || "",
+      japanese: row.japanese_example || "",
+      chinese: row.chinese_example || "",
+    };
+
     return {
       pattern_id: row.pattern_id || "",
       pattern_name: row.pattern_name || "",
       pattern_type: row.pattern_type || "",
+      domain: row.domain || "general",
+      category: row.category || "common",
       difficulty: row.difficulty || "",
       tags: row.tags ? row.tags.split(",").map((t) => t.trim()) : [],
       learning_focus: row.learning_focus
         ? row.learning_focus.split(",").map((t) => t.trim())
         : [],
+      structural_pattern: row.structural_pattern || "",
       explanations: {
         korean: row.korean_explanation || "",
         english: row.english_explanation || "",
         japanese: row.japanese_explanation || "",
         chinese: row.chinese_explanation || "",
       },
-      usage_examples: row.usage_examples
-        ? row.usage_examples.split(",").map((t) => t.trim())
-        : [],
-      teaching_notes: {
-        korean: row.korean_teaching_notes || "",
-        english: row.english_teaching_notes || "",
-        japanese: row.japanese_teaching_notes || "",
-        chinese: row.chinese_teaching_notes || "",
-      },
+      usage_examples: [usageExample],
+      created_at: serverTimestamp(),
     };
   } catch (error) {
     console.error("문법 패턴 CSV 파싱 오류:", error);

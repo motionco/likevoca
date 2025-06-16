@@ -17,7 +17,7 @@ class DataUploadProcessor {
     const results = {
       concepts: { success: 0, error: 0 },
       examples: { success: 0, error: 0 },
-      grammar_patterns: { success: 0, error: 0 },
+      grammar: { success: 0, error: 0 },
       references: { created: 0, error: 0 },
     };
 
@@ -25,10 +25,10 @@ class DataUploadProcessor {
       console.log("통합 데이터 처리 시작...");
 
       // 1단계: Grammar Patterns 먼저 저장 (참조 무결성)
-      if (comprehensiveData.grammar_patterns) {
+      if (comprehensiveData.grammar) {
         console.log("문법 패턴 저장 중...");
-        results.grammar_patterns = await this.saveGrammarPatterns(
-          comprehensiveData.grammar_patterns
+        results.grammar = await this.processGrammarData(
+          comprehensiveData.grammar
         );
       }
 
@@ -38,10 +38,12 @@ class DataUploadProcessor {
         results.concepts = await this.saveConcepts(comprehensiveData.concepts);
       }
 
-      // 3단계: Examples 저장 (concepts와 grammar_patterns 참조)
+      // 3단계: Examples 저장 (concepts와 grammar 참조)
       if (comprehensiveData.examples) {
         console.log("예문 데이터 저장 중...");
-        results.examples = await this.saveExamples(comprehensiveData.examples);
+        results.examples = await this.processExampleData(
+          comprehensiveData.examples
+        );
       }
 
       // 4단계: 참조 관계 설정
@@ -59,35 +61,52 @@ class DataUploadProcessor {
   /**
    * 문법 패턴 저장
    */
-  async saveGrammarPatterns(patterns) {
-    let success = 0,
-      error = 0;
+  async processGrammarData(data) {
+    console.log("📝 문법 패턴 데이터 처리 시작:", data.length);
 
-    for (const batch of this.createBatches(patterns)) {
+    const results = {
+      success: 0,
+      failed: 0,
+      errors: [],
+    };
+
+    for (const item of data) {
       try {
-        const firestoreBatch = writeBatch(this.db);
+        const grammarData = {
+          pattern_id:
+            item.pattern_id ||
+            `pattern_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          pattern_name: item.pattern_name || "기본 패턴",
+          pattern_type: item.pattern_type || "basic",
+          domain: item.domain || "general",
+          category: item.category || "common",
+          difficulty: item.difficulty || "beginner",
+          tags: Array.isArray(item.tags) ? item.tags : [],
+          learning_focus: Array.isArray(item.learning_focus)
+            ? item.learning_focus
+            : [],
+          structural_pattern: item.structural_pattern || "",
+          explanations: item.explanations || {},
+          usage_examples: Array.isArray(item.usage_examples)
+            ? item.usage_examples
+            : [],
+        };
 
-        batch.forEach((pattern) => {
-          const docRef = doc(
-            collection(this.db, "grammar_patterns"),
-            pattern.id
-          );
-          firestoreBatch.set(docRef, {
-            ...pattern,
-            created_at: serverTimestamp(),
-            updated_at: serverTimestamp(),
-          });
+        await this.collectionManager.createGrammarPattern(grammarData);
+        results.success++;
+        console.log(`✅ 문법 패턴 처리 완료: ${grammarData.pattern_id}`);
+      } catch (error) {
+        console.error("문법 패턴 처리 실패:", error);
+        results.failed++;
+        results.errors.push({
+          item: item.pattern_id || "unknown",
+          error: error.message,
         });
-
-        await firestoreBatch.commit();
-        success += batch.length;
-      } catch (err) {
-        console.error("문법 패턴 저장 오류:", err);
-        error += batch.length;
       }
     }
 
-    return { success, error };
+    console.log("📝 문법 패턴 처리 완료:", results);
+    return results;
   }
 
   /**
@@ -222,7 +241,7 @@ class DataUploadProcessor {
     const errors = [];
 
     // 필수 필드 검증
-    if (!data.concepts && !data.examples && !data.grammar_patterns) {
+    if (!data.concepts && !data.examples && !data.grammar) {
       errors.push("최소 하나의 데이터 섹션이 필요합니다.");
     }
 
@@ -248,6 +267,55 @@ class DataUploadProcessor {
     }
 
     return errors;
+  }
+
+  async processExampleData(data) {
+    console.log("📖 예문 데이터 처리 시작:", data.length);
+
+    const results = {
+      success: 0,
+      failed: 0,
+      errors: [],
+    };
+
+    for (const item of data) {
+      try {
+        const exampleData = {
+          example_id:
+            item.example_id ||
+            `example_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          concept_id: item.concept_id || null,
+          domain: item.domain || "general",
+          category: item.category || "common",
+          context: item.context || "general",
+          difficulty: item.difficulty || "beginner",
+          tags: Array.isArray(item.tags) ? item.tags : [],
+          translations: item.translations || {},
+          learning_metadata: {
+            pattern_name: item.learning_metadata?.pattern_name || null,
+            structural_pattern:
+              item.learning_metadata?.structural_pattern || null,
+            learning_weight: item.learning_metadata?.learning_weight || 5,
+            quiz_eligible: item.learning_metadata?.quiz_eligible !== false,
+            game_eligible: item.learning_metadata?.game_eligible !== false,
+          },
+        };
+
+        await this.collectionManager.createExample(exampleData);
+        results.success++;
+        console.log(`✅ 예문 처리 완료: ${exampleData.example_id}`);
+      } catch (error) {
+        console.error("예문 처리 실패:", error);
+        results.failed++;
+        results.errors.push({
+          item: item.example_id || "unknown",
+          error: error.message,
+        });
+      }
+    }
+
+    console.log("📖 예문 처리 완료:", results);
+    return results;
   }
 }
 
@@ -330,20 +398,20 @@ export async function processBulkUpload(conceptsData) {
           }
         }
 
-        // 3. grammar_patterns 컬렉션 처리
+        // 3. grammar 컬렉션 처리
         if (conceptData.grammar_pattern) {
           // concept_id 업데이트
           conceptData.grammar_pattern.concept_id = conceptId;
 
           const grammarDoc = await db
-            .collection("grammar_patterns")
+            .collection("grammar")
             .add(conceptData.grammar_pattern);
           results.grammarPatterns.push({
             id: grammarDoc.id,
             concept_id: conceptId,
             data: conceptData.grammar_pattern,
           });
-          console.log("grammar_patterns 저장됨:", grammarDoc.id);
+          console.log("grammar 저장됨:", grammarDoc.id);
         }
       }
       // 기존 방식 호환성 (featured_examples가 있는 경우)
@@ -471,7 +539,7 @@ export function validateExampleStructure(exampleData) {
   return { valid: true };
 }
 
-// grammar_patterns 컬렉션 구조 검증
+// grammar 컬렉션 구조 검증
 export function validateGrammarPatternStructure(grammarData) {
   const required = ["pattern_id", "concept_id", "pattern_name"];
 

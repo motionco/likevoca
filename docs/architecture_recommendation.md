@@ -23,7 +23,7 @@
 ├── 문법 패턴 연결
 └── 학습 메타데이터
 
-📁 grammar_patterns (문법 규칙 중심)
+📁 grammar (문법 규칙 중심)
 ├── 문법 규칙 설명
 ├── 구조 패턴
 └── 학습 포인트
@@ -37,7 +37,7 @@
 // concepts 문서
 {
   "word": "먹다",
-  "related_grammar_patterns": ["present_tense_basic", "past_tense_action"],
+  "related_grammar": ["present_tense_basic", "past_tense_action"],
   "example_ids": ["example_001", "example_002"]
 }
 
@@ -78,7 +78,7 @@
 // 단어에서 문법으로
 async function getRelatedGrammar(conceptId) {
   const concept = await getDoc(doc(db, "concepts", conceptId));
-  const grammarIds = concept.data().related_grammar_patterns;
+  const grammarIds = concept.data().related_grammar;
   return await getGrammarPatterns(grammarIds);
 }
 
@@ -86,7 +86,7 @@ async function getRelatedGrammar(conceptId) {
 async function getRelatedConcepts(grammarPatternId) {
   const q = query(
     collection(db, "concepts"),
-    where("related_grammar_patterns", "array-contains", grammarPatternId)
+    where("related_grammar", "array-contains", grammarPatternId)
   );
   return await getDocs(q);
 }

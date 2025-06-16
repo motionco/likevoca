@@ -22,7 +22,7 @@ import {
  * 분리된 컬렉션 관리 시스템
  * - concepts: 핵심 개념 정보
  * - examples: 예문 정보
- * - grammar_patterns: 문법 패턴 정보
+ * - grammar: 문법 패턴 정보
  * - quiz_templates: 퀴즈 템플릿 정보
  * - user_progress: 사용자 학습 진도
  * - language_indexes: 언어별 인덱스 (기존 유지)
@@ -57,9 +57,8 @@ export class CollectionManager {
           integratedConceptData.featured_examples?.length || 0,
         has_core_examples: !!integratedConceptData.core_examples,
         core_examples_count: integratedConceptData.core_examples?.length || 0,
-        has_grammar_patterns: !!integratedConceptData.grammar_patterns,
-        grammar_patterns_count:
-          integratedConceptData.grammar_patterns?.length || 0,
+        has_grammar: !!integratedConceptData.grammar,
+        grammar_count: integratedConceptData.grammar?.length || 0,
         has_grammar_system_in_examples: this.hasGrammarSystemInExamples(
           integratedConceptData
         ),
@@ -161,22 +160,22 @@ export class CollectionManager {
         }
       }
 
-      // 3. 문법 패턴 정보 저장 (grammar_patterns 컬렉션) - 개별 처리
+      // 3. 문법 패턴 정보 저장 (grammar 컬렉션) - 개별 처리
       const grammarPatternIds = [];
       const processedPatterns = new Set();
 
       console.log(`🔍 문법 패턴 처리 시작...`);
 
-      // 직접 제공된 grammar_patterns 배열 처리 (우선)
+      // 직접 제공된 grammar 배열 처리 (우선)
       if (
-        integratedConceptData.grammar_patterns &&
-        Array.isArray(integratedConceptData.grammar_patterns)
+        integratedConceptData.grammar &&
+        Array.isArray(integratedConceptData.grammar)
       ) {
         console.log(
-          `📝 직접 제공된 문법 패턴: ${integratedConceptData.grammar_patterns.length}개`
+          `📝 직접 제공된 문법 패턴: ${integratedConceptData.grammar.length}개`
         );
 
-        for (const grammarPatternData of integratedConceptData.grammar_patterns) {
+        for (const grammarPatternData of integratedConceptData.grammar) {
           // === 수정: 개념별 고유 패턴 ID 생성 ===
           const originalPatternId = grammarPatternData.pattern_id;
           const uniquePatternId = `${conceptId}_${originalPatternId}`;
@@ -185,20 +184,17 @@ export class CollectionManager {
           );
 
           if (!processedPatterns.has(uniquePatternId)) {
-            const patternRef = doc(db, "grammar_patterns", uniquePatternId);
+            const patternRef = doc(db, "grammar", uniquePatternId);
 
             try {
               await setDoc(patternRef, {
                 ...grammarPatternData,
                 pattern_id: uniquePatternId, // 고유 ID로 업데이트
-                related_concepts: [conceptId], // 개념 참조 추가
                 created_at: serverTimestamp(),
                 updated_at: serverTimestamp(),
               });
               grammarPatternIds.push(uniquePatternId);
-              console.log(
-                `✓ grammar_patterns 컬렉션에 저장 완료: ${uniquePatternId}`
-              );
+              console.log(`✓ grammar 컬렉션에 저장 완료: ${uniquePatternId}`);
 
               // BloomFilter 에러 방지를 위한 짧은 지연
               await new Promise((resolve) => setTimeout(resolve, 50));
@@ -210,7 +206,7 @@ export class CollectionManager {
           }
         }
       } else {
-        console.log(`⚠️ 직접 제공된 grammar_patterns 없음`);
+        console.log(`⚠️ 직접 제공된 grammar 없음`);
       }
 
       // 예문에서 문법 패턴 추출
@@ -228,7 +224,7 @@ export class CollectionManager {
               `🔄 예문에서 문법 패턴 추출: ${uniquePatternId} (원본: ${originalPatternId})`
             );
 
-            const patternRef = doc(db, "grammar_patterns", uniquePatternId);
+            const patternRef = doc(db, "grammar", uniquePatternId);
 
             try {
               const patternDoc = this.generateGrammarPatternDoc(
@@ -240,7 +236,7 @@ export class CollectionManager {
               await setDoc(patternRef, patternDoc);
               grammarPatternIds.push(uniquePatternId);
               console.log(
-                `✓ grammar_patterns 컬렉션에 저장 완료: ${uniquePatternId} (예문에서 추출)`
+                `✓ grammar 컬렉션에 저장 완료: ${uniquePatternId} (예문에서 추출)`
               );
 
               // BloomFilter 에러 방지를 위한 짧은 지연
@@ -266,7 +262,7 @@ export class CollectionManager {
               `🔄 grammar_system에서 문법 패턴 생성: ${uniquePatternId}`
             );
 
-            const patternRef = doc(db, "grammar_patterns", uniquePatternId);
+            const patternRef = doc(db, "grammar", uniquePatternId);
 
             try {
               const patternDoc = this.generateGrammarPatternFromSystem(
@@ -278,7 +274,7 @@ export class CollectionManager {
               await setDoc(patternRef, patternDoc);
               grammarPatternIds.push(uniquePatternId);
               console.log(
-                `✓ grammar_patterns 컬렉션에 저장 완료: ${uniquePatternId} (grammar_system에서 생성)`
+                `✓ grammar 컬렉션에 저장 완료: ${uniquePatternId} (grammar_system에서 생성)`
               );
             } catch (error) {
               console.warn(`문법 패턴 ${uniquePatternId} 처리 중 오류:`, error);
@@ -356,7 +352,7 @@ export class CollectionManager {
         collections: {
           concepts: "1개 저장됨",
           examples: `${exampleIds.length}개 저장됨`,
-          grammar_patterns: `${grammarPatternIds.length}개 저장됨`,
+          grammar: `${grammarPatternIds.length}개 저장됨`,
           quiz_templates: `${quizTemplateIds.length}개 저장됨`,
         },
       });
@@ -541,7 +537,7 @@ export class CollectionManager {
         !processedPatterns.has(example.grammar_pattern_id)
       ) {
         const patternId = example.grammar_pattern_id;
-        const patternRef = doc(db, "grammar_patterns", patternId);
+        const patternRef = doc(db, "grammar", patternId);
 
         // 기존 패턴이 있는지 확인
         try {
@@ -558,7 +554,6 @@ export class CollectionManager {
           } else {
             // 기존 패턴에 개념 참조 추가
             const updateData = {
-              related_concepts: arrayUnion(conceptId),
               updated_at: serverTimestamp(),
             };
             batch.update(patternRef, updateData);
@@ -798,11 +793,8 @@ export class CollectionManager {
       const examplesSnapshot = await getDocs(examplesQuery);
       const examples = examplesSnapshot.docs.map((doc) => doc.data());
 
-      // 3. 관련 문법 패턴들
-      const grammarPatternsQuery = query(
-        collection(db, "grammar_patterns"),
-        where("related_concepts", "array-contains", conceptId)
-      );
+      // 3. 관련 문법 패턴들 (단순하게 모든 패턴 조회)
+      const grammarPatternsQuery = query(collection(db, "grammar"), limit(20));
       const grammarPatternsSnapshot = await getDocs(grammarPatternsQuery);
       const grammarPatterns = grammarPatternsSnapshot.docs.map((doc) =>
         doc.data()
@@ -820,7 +812,7 @@ export class CollectionManager {
       return {
         ...conceptData,
         core_examples: examples,
-        grammar_patterns: grammarPatterns,
+        grammar: grammarPatterns,
         quiz_templates: quizTemplates,
       };
     } catch (error) {
@@ -1070,9 +1062,6 @@ export class CollectionManager {
         usage_frequency: "medium",
       },
 
-      // 관련 개념들
-      related_concepts: [conceptId],
-
       // 예문 참조
       example_references: [example.example_id || `${conceptId}_example_1`],
 
@@ -1083,11 +1072,7 @@ export class CollectionManager {
         quiz_eligible: true,
       },
 
-      metadata: {
-        created_at: serverTimestamp(),
-        inferred: true, // 패턴 ID에서 추론됨
-        source: "bulk_import",
-      },
+      created_at: serverTimestamp(),
     };
   }
 
@@ -1116,9 +1101,6 @@ export class CollectionManager {
       // 언어별 문법 특징
       grammatical_features: grammarSystem.grammatical_features || {},
 
-      // 교육 메타데이터
-      teaching_notes: grammarSystem.teaching_notes || {},
-
       // 난이도 요소
       difficulty_factors: grammarSystem.difficulty_factors || {
         vocabulary: 15,
@@ -1127,8 +1109,6 @@ export class CollectionManager {
         pronunciation: 15,
       },
 
-      // 관련 개념들
-      related_concepts: [conceptId],
       related_languages: ["korean", "english", "japanese", "chinese"],
 
       // 학습 메타데이터
@@ -1140,11 +1120,7 @@ export class CollectionManager {
         quiz_eligible: true,
       },
 
-      metadata: {
-        created_at: serverTimestamp(),
-        inferred: false, // grammar_system에서 직접 생성됨
-        source: "grammar_system_import",
-      },
+      created_at: serverTimestamp(),
     };
   }
 
@@ -1305,10 +1281,7 @@ export class CollectionManager {
   ) {
     try {
       // 복합 인덱스 없이 단순 쿼리 사용
-      const grammarQuery = query(
-        collection(db, "grammar_patterns"),
-        limit(limitCount)
-      );
+      const grammarQuery = query(collection(db, "grammar"), limit(limitCount));
 
       const snapshot = await getDocs(grammarQuery);
       const patterns = snapshot.docs.map((doc) => ({
@@ -1628,6 +1601,8 @@ export class CollectionManager {
       const exampleDoc = {
         example_id: exampleData.example_id || exampleId,
         concept_id: exampleData.concept_id || null,
+        domain: exampleData.domain || "general",
+        category: exampleData.category || "common",
         context: exampleData.context || "general",
         difficulty: exampleData.difficulty || "beginner",
         tags: exampleData.tags || [],
@@ -1640,11 +1615,7 @@ export class CollectionManager {
           quiz_eligible: exampleData.learning_metadata?.quiz_eligible !== false,
           game_eligible: exampleData.learning_metadata?.game_eligible !== false,
         },
-        metadata: {
-          created_at: serverTimestamp(),
-          created_from: "separated_import",
-          version: "3.0",
-        },
+        created_at: serverTimestamp(),
       };
 
       await setDoc(exampleRef, exampleDoc);
@@ -1661,26 +1632,23 @@ export class CollectionManager {
    */
   async createGrammarPattern(patternData) {
     try {
-      const patternRef = doc(collection(db, "grammar_patterns"));
+      const patternRef = doc(collection(db, "grammar"));
       const patternId = patternRef.id;
 
       const patternDoc = {
         pattern_id: patternData.pattern_id || patternId,
         pattern_name: patternData.pattern_name || "기본 패턴",
         pattern_type: patternData.pattern_type || "basic",
+        domain: patternData.domain || "general",
+        category: patternData.category || "common",
         difficulty: patternData.difficulty || "beginner",
         tags: patternData.tags || [],
         learning_focus: patternData.learning_focus || [],
         structural_pattern: patternData.structural_pattern || "",
         explanations: patternData.explanations || {},
         usage_examples: patternData.usage_examples || [],
-        teaching_notes: patternData.teaching_notes || {},
-        related_concepts: patternData.related_concepts || [],
-        metadata: {
-          created_at: serverTimestamp(),
-          created_from: "separated_import",
-          version: "3.0",
-        },
+        created_at: serverTimestamp(),
+        updated_at: serverTimestamp(),
       };
 
       await setDoc(patternRef, patternDoc);
@@ -1753,7 +1721,7 @@ export class CollectionManager {
    */
   async getGrammarPatternsByTags(tags, limit = 20) {
     try {
-      const patternsRef = collection(db, "grammar_patterns");
+      const patternsRef = collection(db, "grammar");
       const q = query(patternsRef, limit(limit));
       const snapshot = await getDocs(q);
 
@@ -1807,7 +1775,7 @@ export class CollectionManager {
 
   async getGrammarPatternsOnly(limit = 50) {
     try {
-      const patternsRef = collection(db, "grammar_patterns");
+      const patternsRef = collection(db, "grammar");
       const q = query(patternsRef, limit(limit));
       const snapshot = await getDocs(q);
 

@@ -3,7 +3,10 @@ import {
   getAuth,
   onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
+import {
+  getFirestore,
+  serverTimestamp,
+} from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 import {
   doc,
   collection,
@@ -12,6 +15,7 @@ import {
   updateDoc,
   query,
   where,
+  orderBy,
   getDocs,
   addDoc,
   deleteDoc,
@@ -680,34 +684,8 @@ export const conceptUtils = {
         console.warn("예문 삭제 중 오류:", error);
       }
 
-      // 2. 관련 문법 패턴 삭제 (grammar_patterns 컬렉션)
-      try {
-        const grammarQuery = query(
-          collection(db, "grammar_patterns"),
-          where("related_concepts", "array-contains", conceptId)
-        );
-        const grammarSnapshot = await getDocs(grammarQuery);
-
-        for (const grammarDoc of grammarSnapshot.docs) {
-          const grammarData = grammarDoc.data();
-          const updatedConcepts = grammarData.related_concepts.filter(
-            (id) => id !== conceptId
-          );
-
-          if (updatedConcepts.length === 0) {
-            // 관련 개념이 없으면 문법 패턴 삭제
-            await deleteDoc(grammarDoc.ref);
-          } else {
-            // 관련 개념 리스트에서만 제거
-            await updateDoc(grammarDoc.ref, {
-              related_concepts: updatedConcepts,
-            });
-          }
-        }
-        console.log(`${grammarSnapshot.size}개의 관련 문법 패턴 처리 완료`);
-      } catch (error) {
-        console.warn("문법 패턴 삭제 중 오류:", error);
-      }
+      // 2. 관련 문법 패턴 삭제 (grammar 컬렉션)
+      // 문법 패턴은 독립적으로 관리되므로 개념 삭제 시 별도 처리 불필요
 
       // 3. 관련 퀴즈 템플릿 삭제 (quiz_templates 컬렉션)
       try {
@@ -2218,12 +2196,11 @@ export const exampleUtils = {
 export const grammarPatternUtils = {
   async createGrammarPattern(patternData) {
     try {
-      const patternRef = doc(collection(db, "grammar_patterns"));
+      const patternRef = doc(collection(db, "grammar"));
       await setDoc(patternRef, {
         ...patternData,
-        userId: auth.currentUser?.email || "anonymous",
-        created_at: new Date(),
-        _id: patternRef.id,
+        created_at: serverTimestamp(),
+        updated_at: serverTimestamp(),
       });
       return patternRef.id;
     } catch (error) {
@@ -2234,7 +2211,7 @@ export const grammarPatternUtils = {
 
   async getGrammarPattern(patternId) {
     try {
-      const patternDoc = await getDoc(doc(db, "grammar_patterns", patternId));
+      const patternDoc = await getDoc(doc(db, "grammar", patternId));
       if (patternDoc.exists()) {
         return { id: patternDoc.id, ...patternDoc.data() };
       }
@@ -2247,7 +2224,7 @@ export const grammarPatternUtils = {
 
   async updateGrammarPattern(patternId, newData) {
     try {
-      await updateDoc(doc(db, "grammar_patterns", patternId), {
+      await updateDoc(doc(db, "grammar", patternId), {
         ...newData,
         updated_at: new Date(),
       });
@@ -2259,7 +2236,7 @@ export const grammarPatternUtils = {
 
   async deleteGrammarPattern(patternId) {
     try {
-      await deleteDoc(doc(db, "grammar_patterns", patternId));
+      await deleteDoc(doc(db, "grammar", patternId));
     } catch (error) {
       console.error("문법 패턴 삭제 중 오류:", error);
       throw error;
@@ -2283,5 +2260,32 @@ export {
   deleteDoc,
   addDoc,
   where,
+  orderBy,
   onAuthStateChanged,
+  serverTimestamp,
 };
+
+// 전역 객체로 Firebase 인스턴스와 함수들 노출 (모든 유틸리티 함수 선언 후)
+window.firebaseInit = {
+  app,
+  auth,
+  db,
+  collection,
+  getDocs,
+  query,
+  limit,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  addDoc,
+  where,
+  orderBy,
+  onAuthStateChanged,
+  conceptUtils,
+  exampleUtils,
+  grammarPatternUtils,
+};
+
+console.log("🔥 Firebase 전역 객체 설정 완료:", window.firebaseInit);

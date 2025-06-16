@@ -316,16 +316,13 @@ export class EnhancedConceptModal {
     const conceptInfo = this.currentConcept.concept_info;
     const references = this.currentConcept.references;
 
-    // 새로운 참조 기반: grammar_patterns 참조
-    if (
-      references?.grammar_patterns &&
-      references.grammar_patterns.length > 0
-    ) {
+    // 새로운 참조 기반: grammar 참조
+    if (references?.grammar && references.grammar.length > 0) {
       return {
         type: "pattern_references",
-        pattern_ids: references.grammar_patterns,
+        pattern_ids: references.grammar,
         // 향후: 실제 grammar 컬렉션에서 조회
-        // patterns: await grammarService.getPatterns(references.grammar_patterns)
+        // patterns: await grammarService.getPatterns(references.grammar)
       };
     }
 
@@ -338,10 +335,10 @@ export class EnhancedConceptModal {
     }
 
     // 레거시 구조
-    if (this.currentConcept.grammar_patterns) {
+    if (this.currentConcept.grammar) {
       return {
         type: "pattern_based",
-        patterns: this.currentConcept.grammar_patterns,
+        patterns: this.currentConcept.grammar,
       };
     }
 
@@ -634,7 +631,7 @@ export class EnhancedConceptModal {
       references: {
         concept_id: conceptId,
         available_examples: references.core_examples?.length || 0,
-        grammar_patterns: references.grammar_patterns?.length || 0,
+        grammar: references.grammar?.length || 0,
         quiz_templates: references.quiz_templates?.length || 0,
         game_types: references.game_types?.length || 0,
       },
