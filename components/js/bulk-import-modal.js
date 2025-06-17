@@ -17,11 +17,6 @@ import { readFile } from "./csv-parser-utils.js";
 
 // 전역 변수
 let currentTab = "concepts";
-let selectedFiles = {
-  concepts: null,
-  examples: null,
-  grammar: null,
-};
 
 export function initialize() {
   console.log("분리된 대량 가져오기 모달 초기화");
@@ -92,11 +87,18 @@ function setupTabEventListeners(tabName) {
     fileInput.addEventListener("change", (e) => {
       const file = e.target.files[0];
       if (file) {
-        selectedFiles[tabName] = file;
         fileName.textContent = `선택된 파일: ${file.name}`;
         uploadBtn.disabled = false;
         uploadBtn.classList.remove("bg-gray-400");
-        uploadBtn.classList.add("bg-blue-500", "hover:bg-blue-600");
+
+        // 탭별 색상 적용
+        if (tabName === "concepts") {
+          uploadBtn.classList.add("bg-blue-500", "hover:bg-blue-600");
+        } else if (tabName === "examples") {
+          uploadBtn.classList.add("bg-green-500", "hover:bg-green-600");
+        } else if (tabName === "grammar") {
+          uploadBtn.classList.add("bg-purple-500", "hover:bg-purple-600");
+        }
       }
     });
   }
@@ -115,14 +117,19 @@ function closeModal() {
   if (modal) {
     modal.classList.add("hidden");
 
-    // 초기화
-    selectedFiles = { concepts: null, examples: null, grammar: null };
+    // 각 탭 초기화
     ["concepts", "examples", "grammar"].forEach((tab) => {
       const fileName = document.getElementById(`${tab}-file-name`);
+      const fileInput = document.getElementById(`${tab}-file-input`);
       const uploadBtn = document.getElementById(`start-${tab}-import`);
       const progressDiv = document.getElementById(`${tab}-import-status`);
 
-      if (fileName)
+      // 파일 입력 초기화
+      if (fileInput) {
+        fileInput.value = "";
+      }
+
+      if (fileName) {
         fileName.textContent = `${
           tab === "concepts"
             ? "개념"
@@ -130,6 +137,8 @@ function closeModal() {
             ? "예문"
             : "문법 패턴"
         } 파일을 선택하세요.`;
+      }
+
       if (uploadBtn) {
         uploadBtn.disabled = true;
         uploadBtn.classList.add("bg-gray-400");
@@ -142,61 +151,94 @@ function closeModal() {
           "hover:bg-purple-600"
         );
       }
-      if (progressDiv) progressDiv.classList.add("hidden");
+
+      if (progressDiv) {
+        progressDiv.classList.add("hidden");
+      }
     });
   }
 }
 
 async function uploadFile(tabName) {
-  const file = selectedFiles[tabName];
-  if (!file) return;
-
+  const fileInput = document.getElementById(`${tabName}-file-input`);
   const formatSelect = document.getElementById(`${tabName}-import-mode`);
-  const format = formatSelect.value;
-  const progressDiv = document.getElementById(`${tabName}-import-status`);
   const progressBar = document.getElementById(`${tabName}-import-progress`);
   const statusDiv = document.getElementById(`${tabName}-import-result`);
+  const statusContainer = document.getElementById(`${tabName}-import-status`);
+
+  if (!fileInput.files.length) {
+    statusDiv.innerHTML = '<p class="text-red-500">파일을 선택해주세요.</p>';
+    return;
+  }
+
+  const file = fileInput.files[0];
+  const format = formatSelect.value;
+
+  console.log(`🚀 ${tabName} 파일 업로드 시작:`, {
+    fileName: file.name,
+    fileSize: file.size,
+    format: format,
+  });
 
   try {
-    progressDiv.classList.remove("hidden");
-    statusDiv.textContent = "파일을 읽는 중...";
-    progressBar.style.width = "20%";
+    // 상태 컨테이너 표시
+    statusContainer.classList.remove("hidden");
 
-    const fileContent = await readFileContent(file);
+    progressBar.style.width = "25%";
+    statusDiv.innerHTML = '<p class="text-blue-500">파일을 읽는 중...</p>';
+
+    const content = await readFileContent(file);
+    console.log(`📄 파일 내용 읽기 완료, 길이: ${content.length}`);
+    console.log(`📄 파일 내용 미리보기 (첫 500자):`, content.substring(0, 500));
+
+    progressBar.style.width = "50%";
+    statusDiv.innerHTML =
+      '<p class="text-blue-500">데이터를 파싱하는 중...</p>';
+
     let data;
-
     if (format === "json") {
-      data = JSON.parse(fileContent);
+      console.log("🔧 JSON 파싱 시작");
+      data = JSON.parse(content);
+      console.log("✅ JSON 파싱 완료, 데이터:", data);
     } else {
-      data = parseCSV(fileContent, tabName);
+      console.log("🔧 CSV 파싱 시작");
+      data = parseCSV(content, tabName);
+      console.log("✅ CSV 파싱 완료, 데이터:", data);
     }
 
-    statusDiv.textContent = "데이터를 처리하는 중...";
-    progressBar.style.width = "50%";
+    progressBar.style.width = "75%";
+    statusDiv.innerHTML =
+      '<p class="text-blue-500">데이터를 업로드하는 중...</p>';
 
-    // 컬렉션별 업로드 처리
     let result;
     switch (tabName) {
       case "concepts":
+        console.log("📝 개념 업로드 시작");
         result = await uploadConcepts(data);
         break;
       case "examples":
+        console.log("📝 예문 업로드 시작");
         result = await uploadExamples(data);
         break;
       case "grammar":
+        console.log("📝 문법 패턴 업로드 시작");
         result = await uploadGrammarPatterns(data);
         break;
     }
 
     progressBar.style.width = "100%";
-    statusDiv.textContent = `업로드 완료: ${result.success}개 성공, ${result.errors}개 실패`;
+    statusDiv.innerHTML = `<p class="text-green-500">업로드 완료! 성공: ${result.success}, 실패: ${result.errors}</p>`;
 
+    console.log(`✅ ${tabName} 업로드 완료:`, result);
+
+    // 3초 후 상태 숨기기
     setTimeout(() => {
-      progressDiv.classList.add("hidden");
+      statusContainer.classList.add("hidden");
+      progressBar.style.width = "0%";
     }, 3000);
   } catch (error) {
-    console.error(`${tabName} 업로드 오류:`, error);
-    statusDiv.textContent = `오류 발생: ${error.message}`;
+    console.error(`❌ ${tabName} 업로드 오류:`, error);
+    statusDiv.innerHTML = `<p class="text-red-500">오류: ${error.message}</p>`;
     progressBar.style.width = "0%";
   }
 }
@@ -281,36 +323,43 @@ async function uploadExamples(data) {
 }
 
 async function uploadGrammarPatterns(data) {
+  console.log("🔥 uploadGrammarPatterns 시작, 받은 데이터:", data);
+
   const patterns = Array.isArray(data) ? data : [data];
+  console.log("📋 처리할 패턴 개수:", patterns.length);
+
   let success = 0;
   let errors = 0;
 
   for (const patternData of patterns) {
     try {
+      console.log("📝 원본 패턴 데이터:", patternData);
+
       const patternDoc = {
-        pattern_id:
-          patternData.pattern_id ||
-          `pattern_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         pattern_name: patternData.pattern_name || "기본 패턴",
-        pattern_type: patternData.pattern_type || "basic",
-        difficulty: patternData.difficulty || "beginner",
-        tags: patternData.tags || [],
-        learning_focus: patternData.learning_focus || [],
         structural_pattern: patternData.structural_pattern || "",
-        explanations: patternData.explanations || {},
-        usage_examples: patternData.usage_examples || [],
-        teaching_notes: patternData.teaching_notes || {},
-        created_at: serverTimestamp(),
+        explanation: patternData.explanation || "",
+        example: patternData.example || {},
+        difficulty: patternData.difficulty || "basic",
+        tags: patternData.tags || [],
+        created_at: patternData.created_at || new Date().toISOString(),
       };
+
+      console.log("🔧 변환된 패턴 문서:", patternDoc);
+      console.log("📖 explanation 값:", patternDoc.explanation);
+      console.log("📚 example 값:", patternDoc.example);
 
       await collectionManager.createGrammarPattern(patternDoc);
       success++;
+      console.log("✅ 패턴 업로드 성공:", patternDoc.pattern_name);
     } catch (error) {
-      console.error("문법 패턴 업로드 오류:", error);
+      console.error("❌ 문법 패턴 업로드 오류:", error);
+      console.error("❌ 실패한 데이터:", patternData);
       errors++;
     }
   }
 
+  console.log("📊 업로드 결과 - 성공:", success, "실패:", errors);
   return { success, errors };
 }
 
@@ -497,79 +546,49 @@ example_002,food,fruit,restaurant,beginner,"food,ordering,restaurant",사과 주
 function downloadGrammarJSONTemplate() {
   const template = [
     {
-      pattern_id: "pattern_001",
       pattern_name: "기본 인사",
-      pattern_type: "greeting",
-      domain: "daily",
-      category: "routine",
-      difficulty: "beginner",
-      tags: ["greeting", "basic", "daily"],
-      learning_focus: ["pronunciation", "usage"],
       structural_pattern: "안녕하세요",
-      explanations: {
-        korean: "가장 기본적인 인사 표현입니다.",
-        english: "Basic greeting expression.",
-        japanese: "基本的な挨拶表現です。",
-        chinese: "最基本的问候表达。",
+      explanation:
+        "가장 기본적인 한국어 인사말로, 누구에게나 사용할 수 있는 정중한 표현입니다.",
+      example: {
+        korean: "안녕하세요, 처음 뵙겠습니다.",
+        english: "Hello, nice to meet you.",
+        japanese: "こんにちは、初めまして。",
+        chinese: "您好，初次见面。",
       },
-      usage_examples: [
-        {
-          korean: "안녕하세요! 만나서 반갑습니다.",
-          english: "Hello! Nice to meet you.",
-          japanese: "こんにちは！お会いできて嬉しいです。",
-          chinese: "你好！很高兴见到你。",
-        },
-      ],
+      difficulty: "basic",
+      tags: ["formal", "greeting"],
+      created_at: "2024-01-01T00:00:00Z",
     },
     {
-      pattern_id: "pattern_002",
       pattern_name: "음식 주문",
-      pattern_type: "request",
-      domain: "food",
-      category: "drink",
-      difficulty: "beginner",
-      tags: ["food", "request", "restaurant"],
-      learning_focus: ["grammar", "vocabulary"],
       structural_pattern: "___을/를 주세요",
-      explanations: {
-        korean: "음식이나 물건을 정중하게 요청할 때 사용합니다.",
-        english: "Used to politely request food or items.",
-        japanese: "食べ物や物を丁寧に頼む時に使います。",
-        chinese: "用于礼貌地请求食物或物品。",
+      explanation:
+        "음식점이나 상점에서 무언가를 주문하거나 요청할 때 사용하는 정중한 표현입니다.",
+      example: {
+        korean: "김치찌개를 주세요.",
+        english: "Please give me kimchi stew.",
+        japanese: "キムチチゲをください。",
+        chinese: "请给我泡菜汤。",
       },
-      usage_examples: [
-        {
-          korean: "김치찌개를 주세요.",
-          english: "Please give me kimchi stew.",
-          japanese: "キムチチゲをください。",
-          chinese: "请给我泡菜汤。",
-        },
-      ],
+      difficulty: "basic",
+      tags: ["casual", "request"],
+      created_at: "2024-01-01T00:00:00Z",
     },
     {
-      pattern_id: "pattern_003",
-      pattern_name: "과거 경험",
-      pattern_type: "tense",
-      domain: "academic",
-      category: "literature",
-      difficulty: "intermediate",
-      tags: ["past", "experience", "verb"],
-      learning_focus: ["conjugation", "time_expression"],
+      pattern_name: "과거형 표현",
       structural_pattern: "___었/았어요",
-      explanations: {
-        korean: "과거에 일어난 일을 표현할 때 사용합니다.",
-        english: "Used to express past events or experiences.",
-        japanese: "過去に起こったことを表現する時に使います。",
-        chinese: "用于表达过去发生的事情。",
+      explanation:
+        "과거에 일어난 일을 표현할 때 사용하는 기본적인 과거형 어미입니다.",
+      example: {
+        korean: "어제 친구를 만났어요.",
+        english: "I met a friend yesterday.",
+        japanese: "昨日友達に会いました。",
+        chinese: "昨天见了朋友。",
       },
-      usage_examples: [
-        {
-          korean: "어제 영화를 봤어요.",
-          english: "I watched a movie yesterday.",
-          japanese: "昨日映画を見ました。",
-          chinese: "我昨天看了电影。",
-        },
-      ],
+      difficulty: "intermediate",
+      tags: ["formal", "description"],
+      created_at: "2024-01-01T00:00:00Z",
     },
   ];
 
@@ -577,10 +596,10 @@ function downloadGrammarJSONTemplate() {
 }
 
 function downloadGrammarCSVTemplate() {
-  const csvContent = `pattern_id,pattern_name,pattern_type,domain,category,difficulty,tags,learning_focus,structural_pattern,korean_explanation,english_explanation,japanese_explanation,chinese_explanation,korean_example,english_example,japanese_example,chinese_example
-pattern_001,기본 인사,greeting,daily,routine,beginner,"greeting,basic,daily","pronunciation,usage",안녕하세요,가장 기본적인 인사 표현입니다.,Basic greeting expression.,基本的な挨拶表現です。,最基本的问候表达。,안녕하세요! 만나서 반갑습니다.,Hello! Nice to meet you.,こんにちは！お会いできて嬉しいです。,你好！很高兴见到你。
-pattern_002,음식 주문,request,food,drink,beginner,"food,request,restaurant","grammar,vocabulary",___을/를 주세요,음식이나 물건을 정중하게 요청할 때 사용합니다.,Used to politely request food or items.,食べ物や物を丁寧に頼む時に使います。,用于礼貌地请求食物或物品。,김치찌개를 주세요.,Please give me kimchi stew.,キムチチゲをください。,请给我泡菜汤。
-pattern_003,과거 경험,tense,academic,literature,intermediate,"past,experience,verb","conjugation,time_expression",___었/았어요,과거에 일어난 일을 표현할 때 사용합니다.,Used to express past events or experiences.,過去に起こったことを表現する時に使います。,用于表达过去发生的事情。,어제 영화를 봤어요.,I watched a movie yesterday.,昨日映画を見ました。,我昨天看了电影。`;
+  const csvContent = `pattern_name,structural_pattern,explanation,korean_example,english_example,japanese_example,chinese_example,difficulty,tags,created_at
+기본 인사,안녕하세요,가장 기본적인 한국어 인사말로 누구에게나 사용할 수 있는 정중한 표현입니다,"안녕하세요, 처음 뵙겠습니다.","Hello, nice to meet you.","こんにちは、初めまして。","您好，初次见面。",basic,"formal,greeting",2024-01-01T00:00:00Z
+음식 주문,___을/를 주세요,음식점이나 상점에서 무언가를 주문하거나 요청할 때 사용하는 정중한 표현입니다,김치찌개를 주세요.,"Please give me kimchi stew.",キムチチゲをください。,请给我泡菜汤。,basic,"casual,request",2024-01-01T00:00:00Z
+과거형 표현,___었/았어요,과거에 일어난 일을 표현할 때 사용하는 기본적인 과거형 어미입니다,어제 친구를 만났어요.,"I met a friend yesterday.",昨日友達に会いました。,昨天见了朋友。,intermediate,"formal,description",2024-01-01T00:00:00Z`;
 
   downloadCSV(csvContent, "grammar_template.csv");
 }
@@ -818,37 +837,36 @@ function parseExampleFromCSV(row) {
 // 문법 패턴 CSV 파싱
 function parseGrammarPatternFromCSV(row) {
   try {
-    // 단일 예문을 객체로 변환
-    const usageExample = {
+    console.log("🔍 CSV 파싱 시작, 원본 row:", row);
+
+    // 단일 예문 객체 생성
+    const example = {
       korean: row.korean_example || "",
       english: row.english_example || "",
       japanese: row.japanese_example || "",
       chinese: row.chinese_example || "",
     };
 
-    return {
-      pattern_id: row.pattern_id || "",
+    console.log("📝 예문 생성:", example);
+
+    const result = {
       pattern_name: row.pattern_name || "",
-      pattern_type: row.pattern_type || "",
-      domain: row.domain || "general",
-      category: row.category || "common",
-      difficulty: row.difficulty || "",
-      tags: row.tags ? row.tags.split(",").map((t) => t.trim()) : [],
-      learning_focus: row.learning_focus
-        ? row.learning_focus.split(",").map((t) => t.trim())
-        : [],
       structural_pattern: row.structural_pattern || "",
-      explanations: {
-        korean: row.korean_explanation || "",
-        english: row.english_explanation || "",
-        japanese: row.japanese_explanation || "",
-        chinese: row.chinese_explanation || "",
-      },
-      usage_examples: [usageExample],
-      created_at: serverTimestamp(),
+      explanation: row.explanation || "",
+      example: example,
+      difficulty: row.difficulty || "basic",
+      tags: row.tags ? row.tags.split(",").map((t) => t.trim()) : [],
+      created_at: row.created_at || new Date().toISOString(),
     };
+
+    console.log("🔧 파싱 결과:", result);
+    console.log("📖 파싱된 explanation:", result.explanation);
+    console.log("📚 파싱된 example:", result.example);
+
+    return result;
   } catch (error) {
-    console.error("문법 패턴 CSV 파싱 오류:", error);
+    console.error("❌ 문법 패턴 CSV 파싱 오류:", error);
+    console.error("❌ 파싱 실패 데이터:", row);
     return null;
   }
 }

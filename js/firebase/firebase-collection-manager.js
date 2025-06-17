@@ -1632,30 +1632,38 @@ export class CollectionManager {
    */
   async createGrammarPattern(patternData) {
     try {
+      console.log(
+        "🔥 [CollectionManager] createGrammarPattern 시작, 받은 데이터:",
+        patternData
+      );
+
       const patternRef = doc(collection(db, "grammar"));
       const patternId = patternRef.id;
 
       const patternDoc = {
-        pattern_id: patternData.pattern_id || patternId,
         pattern_name: patternData.pattern_name || "기본 패턴",
-        pattern_type: patternData.pattern_type || "basic",
-        domain: patternData.domain || "general",
-        category: patternData.category || "common",
-        difficulty: patternData.difficulty || "beginner",
-        tags: patternData.tags || [],
-        learning_focus: patternData.learning_focus || [],
         structural_pattern: patternData.structural_pattern || "",
-        explanations: patternData.explanations || {},
-        usage_examples: patternData.usage_examples || [],
+        explanation: patternData.explanation || "",
+        example: patternData.example || {},
+        difficulty: patternData.difficulty || "basic",
+        tags: patternData.tags || [],
         created_at: serverTimestamp(),
         updated_at: serverTimestamp(),
       };
 
+      console.log("🔧 [CollectionManager] 저장할 문서:", patternDoc);
+      console.log(
+        "📖 [CollectionManager] explanation 값:",
+        patternDoc.explanation
+      );
+      console.log("📚 [CollectionManager] example 값:", patternDoc.example);
+
       await setDoc(patternRef, patternDoc);
-      console.log(`✓ 문법 패턴 생성 완료: ${patternId}`);
+      console.log(`✅ [CollectionManager] 문법 패턴 생성 완료: ${patternId}`);
       return patternId;
     } catch (error) {
-      console.error("문법 패턴 생성 오류:", error);
+      console.error("❌ [CollectionManager] 문법 패턴 생성 오류:", error);
+      console.error("❌ [CollectionManager] 실패한 데이터:", patternData);
       throw error;
     }
   }

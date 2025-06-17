@@ -1,0 +1,6 @@
+korean,english,japanese,chinese,context,difficulty,tags,created_at
+"실례합니다, 화장실이 어디에 있나요?","Excuse me, where is the bathroom?","すみません、トイレはどこにありますか？","不好意思，洗手间在哪里？",공공장소에서 화장실 위치를 묻는 상황,basic,"public,question",2024-01-01T00:00:00Z
+"회의 시간을 변경해도 될까요?","Would it be possible to change the meeting time?","会議の時間を変更してもいいでしょうか？","可以更改会议时间吗？",직장에서 회의 일정 변경을 요청하는 상황,intermediate,"work,request",2024-01-01T00:00:00Z
+정말 고마워요!,Thank you so much!,本当にありがとうございます！,真的太谢谢了！,친구나 가족에게 감사를 표현하는 상황,basic,"casual,thanking",2024-01-01T00:00:00Z
+"죄송합니다, 늦었습니다.","I'm sorry, I'm late.","すみません、遅れました。","对不起，我迟到了。",학교나 직장에서 지각했을 때 사과하는 상황,basic,"formal,apology",2024-01-01T00:00:00Z
+이 제품을 추천하고 싶어요.,I would like to recommend this product.,この商品をおすすめしたいです。,我想推荐这个产品。,온라인 쇼핑몰에서 상품을 추천하는 상황,intermediate,"online,suggestion",2024-01-01T00:00:00Z 

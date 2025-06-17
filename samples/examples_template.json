@@ -1,0 +1,52 @@
+[
+  {
+    "korean": "실례합니다, 화장실이 어디에 있나요?",
+    "english": "Excuse me, where is the bathroom?",
+    "japanese": "すみません、トイレはどこにありますか？",
+    "chinese": "不好意思，洗手间在哪里？",
+    "context": "공공장소에서 화장실 위치를 묻는 상황",
+    "difficulty": "beginner",
+    "tags": ["public", "question"],
+    "created_at": "2024-01-01T00:00:00Z"
+  },
+  {
+    "korean": "회의 시간을 변경해도 될까요?",
+    "english": "Would it be possible to change the meeting time?",
+    "japanese": "会議の時間を変更してもいいでしょうか？",
+    "chinese": "可以更改会议时间吗？",
+    "context": "직장에서 회의 일정 변경을 요청하는 상황",
+    "difficulty": "intermediate",
+    "tags": ["work", "request"],
+    "created_at": "2024-01-01T00:00:00Z"
+  },
+  {
+    "korean": "정말 고마워요!",
+    "english": "Thank you so much!",
+    "japanese": "本当にありがとうございます！",
+    "chinese": "真的太谢谢了！",
+    "context": "친구나 가족에게 감사를 표현하는 상황",
+    "difficulty": "beginner",
+    "tags": ["casual", "thanking"],
+    "created_at": "2024-01-01T00:00:00Z"
+  },
+  {
+    "korean": "죄송합니다, 늦었습니다.",
+    "english": "I'm sorry, I'm late.",
+    "japanese": "すみません、遅れました。",
+    "chinese": "对不起，我迟到了。",
+    "context": "학교나 직장에서 지각했을 때 사과하는 상황",
+    "difficulty": "beginner",
+    "tags": ["formal", "apology"],
+    "created_at": "2024-01-01T00:00:00Z"
+  },
+  {
+    "korean": "이 제품을 추천하고 싶어요.",
+    "english": "I would like to recommend this product.",
+    "japanese": "この商品をおすすめしたいです。",
+    "chinese": "我想推荐这个产品。",
+    "context": "온라인 쇼핑몰에서 상품을 추천하는 상황",
+    "difficulty": "intermediate",
+    "tags": ["online", "suggestion"],
+    "created_at": "2024-01-01T00:00:00Z"
+  }
+] 

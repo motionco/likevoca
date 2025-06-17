@@ -248,36 +248,43 @@ async function uploadExamples(data) {
 }
 
 async function uploadGrammarPatterns(data) {
+  console.log("🔥 [분리모달] uploadGrammarPatterns 시작, 받은 데이터:", data);
+
   const patterns = Array.isArray(data) ? data : [data];
+  console.log("📋 [분리모달] 처리할 패턴 개수:", patterns.length);
+
   let success = 0;
   let errors = 0;
 
   for (const patternData of patterns) {
     try {
+      console.log("📝 [분리모달] 원본 패턴 데이터:", patternData);
+
       const patternDoc = {
-        pattern_id:
-          patternData.pattern_id ||
-          `pattern_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         pattern_name: patternData.pattern_name || "기본 패턴",
-        pattern_type: patternData.pattern_type || "basic",
-        domain: patternData.domain || "general",
-        category: patternData.category || "common",
-        difficulty: patternData.difficulty || "beginner",
-        tags: patternData.tags || [],
-        learning_focus: patternData.learning_focus || [],
         structural_pattern: patternData.structural_pattern || "",
-        explanations: patternData.explanations || {},
-        usage_examples: patternData.usage_examples || [],
+        explanation: patternData.explanation || "",
+        example: patternData.example || {},
+        difficulty: patternData.difficulty || "basic",
+        tags: patternData.tags || [],
+        created_at: patternData.created_at || new Date().toISOString(),
       };
+
+      console.log("🔧 [분리모달] 변환된 패턴 문서:", patternDoc);
+      console.log("📖 [분리모달] explanation 값:", patternDoc.explanation);
+      console.log("📚 [분리모달] example 값:", patternDoc.example);
 
       await collectionManager.createGrammarPattern(patternDoc);
       success++;
+      console.log("✅ [분리모달] 패턴 업로드 성공:", patternDoc.pattern_name);
     } catch (error) {
-      console.error("문법 패턴 업로드 오류:", error);
+      console.error("❌ [분리모달] 문법 패턴 업로드 오류:", error);
+      console.error("❌ [분리모달] 실패한 데이터:", patternData);
       errors++;
     }
   }
 
+  console.log("📊 [분리모달] 업로드 결과 - 성공:", success, "실패:", errors);
   return { success, errors };
 }
 
@@ -530,54 +537,49 @@ function downloadGrammarTemplate() {
 function downloadGrammarJSONTemplate() {
   const template = [
     {
-      pattern_id: "pattern_001",
       pattern_name: "기본 인사",
-      pattern_type: "greeting",
-      domain: "daily",
-      category: "routine",
-      difficulty: "beginner",
-      tags: ["greeting", "basic", "daily"],
-      learning_focus: ["pronunciation", "usage"],
       structural_pattern: "안녕하세요",
-      explanations: {
-        korean: "가장 기본적인 인사 표현입니다.",
-        english: "Basic greeting expression.",
-        japanese: "基本的な挨拶表現です。",
-        chinese: "最基本的问候表达。",
+      explanation:
+        "가장 기본적인 한국어 인사말로, 누구에게나 사용할 수 있는 정중한 표현입니다.",
+      example: {
+        korean: "안녕하세요, 처음 뵙겠습니다.",
+        english: "Hello, nice to meet you.",
+        japanese: "こんにちは、初めまして。",
+        chinese: "您好，初次见面。",
       },
-      usage_examples: [
-        {
-          korean: "안녕하세요! 만나서 반갑습니다.",
-          english: "Hello! Nice to meet you.",
-          japanese: "こんにちは！お会いできて嬉しいです。",
-          chinese: "你好！很高兴见到你。",
-        },
-      ],
+      difficulty: "basic",
+      tags: ["formal", "greeting"],
+      created_at: "2024-01-01T00:00:00Z",
     },
     {
-      pattern_id: "pattern_002",
       pattern_name: "음식 주문",
-      pattern_type: "request",
-      domain: "food",
-      category: "drink",
-      difficulty: "beginner",
-      tags: ["food", "request", "restaurant"],
-      learning_focus: ["grammar", "vocabulary"],
       structural_pattern: "___을/를 주세요",
-      explanations: {
-        korean: "음식이나 물건을 정중하게 요청할 때 사용합니다.",
-        english: "Used to politely request food or items.",
-        japanese: "食べ物や物を丁寧に頼む時に使います。",
-        chinese: "用于礼貌地请求食物或物品。",
+      explanation:
+        "음식점이나 상점에서 무언가를 주문하거나 요청할 때 사용하는 정중한 표현입니다.",
+      example: {
+        korean: "김치찌개를 주세요.",
+        english: "Please give me kimchi stew.",
+        japanese: "キムチチゲをください。",
+        chinese: "请给我泡菜汤。",
       },
-      usage_examples: [
-        {
-          korean: "김치찌개를 주세요.",
-          english: "Please give me kimchi stew.",
-          japanese: "キムチチゲをください。",
-          chinese: "请给我泡菜汤。",
-        },
-      ],
+      difficulty: "basic",
+      tags: ["casual", "request"],
+      created_at: "2024-01-01T00:00:00Z",
+    },
+    {
+      pattern_name: "과거형 표현",
+      structural_pattern: "___었/았어요",
+      explanation:
+        "과거에 일어난 일을 표현할 때 사용하는 기본적인 과거형 어미입니다.",
+      example: {
+        korean: "어제 친구를 만났어요.",
+        english: "I met a friend yesterday.",
+        japanese: "昨日友達に会いました。",
+        chinese: "昨天见了朋友。",
+      },
+      difficulty: "intermediate",
+      tags: ["formal", "description"],
+      created_at: "2024-01-01T00:00:00Z",
     },
   ];
 
@@ -586,36 +588,54 @@ function downloadGrammarJSONTemplate() {
 
 function downloadGrammarCSVTemplate() {
   const headers = [
-    "pattern_id",
     "pattern_name",
-    "pattern_type",
-    "domain",
-    "category",
+    "structural_pattern",
+    "explanation",
+    "korean_example",
+    "english_example",
+    "japanese_example",
+    "chinese_example",
     "difficulty",
     "tags",
-    "learning_focus",
-    "structural_pattern",
-    "korean_explanation",
-    "english_explanation",
-    "japanese_explanation",
-    "chinese_explanation",
+    "created_at",
   ];
 
   const sampleData = [
     [
-      "pattern_001",
       "기본 인사",
-      "greeting",
-      "daily",
-      "routine",
-      "beginner",
-      "greeting|basic|daily",
-      "pronunciation|usage",
       "안녕하세요",
-      "가장 기본적인 인사 표현입니다.",
-      "Basic greeting expression.",
-      "基本的な挨拶表現です。",
-      "最基本的问候表达。",
+      "가장 기본적인 한국어 인사말로 누구에게나 사용할 수 있는 정중한 표현입니다",
+      "안녕하세요, 처음 뵙겠습니다.",
+      "Hello, nice to meet you.",
+      "こんにちは、初めまして。",
+      "您好，初次见面。",
+      "basic",
+      "formal,greeting",
+      "2024-01-01T00:00:00Z",
+    ],
+    [
+      "음식 주문",
+      "___을/를 주세요",
+      "음식점이나 상점에서 무언가를 주문하거나 요청할 때 사용하는 정중한 표현입니다",
+      "김치찌개를 주세요.",
+      "Please give me kimchi stew.",
+      "キムチチゲをください。",
+      "请给我泡菜汤。",
+      "basic",
+      "casual,request",
+      "2024-01-01T00:00:00Z",
+    ],
+    [
+      "과거형 표현",
+      "___었/았어요",
+      "과거에 일어난 일을 표현할 때 사용하는 기본적인 과거형 어미입니다",
+      "어제 친구를 만났어요.",
+      "I met a friend yesterday.",
+      "昨日友達に会いました。",
+      "昨天见了朋友。",
+      "intermediate",
+      "formal,description",
+      "2024-01-01T00:00:00Z",
     ],
   ];
 
@@ -715,24 +735,33 @@ function convertCSVToExample(item) {
 }
 
 function convertCSVToGrammar(item) {
-  return {
-    pattern_id: item.pattern_id || `pattern_${Date.now()}`,
-    pattern_name: item.pattern_name || "기본 패턴",
-    pattern_type: item.pattern_type || "basic",
-    domain: item.domain || "general",
-    category: item.category || "common",
-    difficulty: item.difficulty || "beginner",
-    tags: item.tags ? item.tags.split("|") : [],
-    learning_focus: item.learning_focus ? item.learning_focus.split("|") : [],
-    structural_pattern: item.structural_pattern || "",
-    explanations: {
-      korean: item.korean_explanation || "",
-      english: item.english_explanation || "",
-      japanese: item.japanese_explanation || "",
-      chinese: item.chinese_explanation || "",
-    },
-    usage_examples: item.usage_examples ? JSON.parse(item.usage_examples) : [],
+  console.log("🔍 [분리모달] CSV 변환 시작, 원본 item:", item);
+
+  // 단일 예문 객체 생성
+  const example = {
+    korean: item.korean_example || "",
+    english: item.english_example || "",
+    japanese: item.japanese_example || "",
+    chinese: item.chinese_example || "",
   };
+
+  console.log("📝 [분리모달] 예문 생성:", example);
+
+  const result = {
+    pattern_name: item.pattern_name || "기본 패턴",
+    structural_pattern: item.structural_pattern || "",
+    explanation: item.explanation || "",
+    example: example,
+    difficulty: item.difficulty || "basic",
+    tags: item.tags ? item.tags.split(",").map((t) => t.trim()) : [],
+    created_at: item.created_at || new Date().toISOString(),
+  };
+
+  console.log("🔧 [분리모달] 변환 결과:", result);
+  console.log("📖 [분리모달] 변환된 explanation:", result.explanation);
+  console.log("📚 [분리모달] 변환된 example:", result.example);
+
+  return result;
 }
 
 function downloadJSON(data, filename) {

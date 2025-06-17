@@ -134,12 +134,14 @@ function handleFilterChange() {
 function getCurrentFilters() {
   const domainFilter = document.getElementById("domain-filter");
   const difficultyFilter = document.getElementById("difficulty-level");
-  const patternTypeFilter = document.getElementById("pattern-type");
+  const situationFilter = document.getElementById("situation-filter");
+  const purposeFilter = document.getElementById("purpose-filter");
 
   return {
     domain: domainFilter ? domainFilter.value : "all",
     difficulty: difficultyFilter ? difficultyFilter.value : "all",
-    patternType: patternTypeFilter ? patternTypeFilter.value : "all",
+    situation: situationFilter ? situationFilter.value : "all",
+    purpose: purposeFilter ? purposeFilter.value : "all",
   };
 }
 
@@ -203,11 +205,27 @@ function applyFilters(data) {
       }
     }
 
-    // 패턴 유형 필터 (문법 패턴에만 적용)
-    if (filters.patternType !== "all" && item.pattern_type) {
-      if (item.pattern_type !== filters.patternType) {
+    // 상황 필터 (tags 배열에 포함된 항목 필터링)
+    if (filters.situation !== "all") {
+      const itemTags = item.tags || item.concept_info?.tags || [];
+      if (!Array.isArray(itemTags) || !itemTags.includes(filters.situation)) {
         console.log(
-          `🔍 패턴 유형 필터로 제외: ${item.pattern_type} !== ${filters.patternType}`
+          `🔍 상황 필터로 제외: ${JSON.stringify(itemTags)} does not include ${
+            filters.situation
+          }`
+        );
+        return false;
+      }
+    }
+
+    // 목적 필터 (tags 배열에 포함된 항목 필터링)
+    if (filters.purpose !== "all") {
+      const itemTags = item.tags || item.concept_info?.tags || [];
+      if (!Array.isArray(itemTags) || !itemTags.includes(filters.purpose)) {
+        console.log(
+          `🔍 목적 필터로 제외: ${JSON.stringify(itemTags)} does not include ${
+            filters.purpose
+          }`
         );
         return false;
       }
@@ -768,7 +786,8 @@ function setupEventListeners() {
   // 필터 이벤트 리스너 추가
   const domainFilter = document.getElementById("domain-filter");
   const difficultyFilter = document.getElementById("difficulty-level");
-  const patternTypeFilter = document.getElementById("pattern-type");
+  const situationFilter = document.getElementById("situation-filter");
+  const purposeFilter = document.getElementById("purpose-filter");
 
   if (domainFilter) {
     domainFilter.addEventListener("change", handleFilterChange);
@@ -776,8 +795,11 @@ function setupEventListeners() {
   if (difficultyFilter) {
     difficultyFilter.addEventListener("change", handleFilterChange);
   }
-  if (patternTypeFilter) {
-    patternTypeFilter.addEventListener("change", handleFilterChange);
+  if (situationFilter) {
+    situationFilter.addEventListener("change", handleFilterChange);
+  }
+  if (purposeFilter) {
+    purposeFilter.addEventListener("change", handleFilterChange);
   }
 
   // 네비게이션 버튼들 - 개별 이벤트 리스너만 사용
@@ -1517,6 +1539,9 @@ function startDataPreloading() {
   setTimeout(() => preloadAreaData("vocabulary"), 1000);
   setTimeout(() => preloadAreaData("grammar"), 2000);
   setTimeout(() => preloadAreaData("reading"), 3000);
+
+  // 상황 및 목적 필터 옵션 로드
+  setTimeout(() => loadSituationAndPurposeFilterOptions(), 500);
 }
 
 // 특정 영역 데이터 프리로드
@@ -1561,6 +1586,115 @@ async function loadLearningDataOptimized(area) {
 
   // 프리로드된 데이터가 없으면 일반 로드
   await loadLearningData(area);
+}
+
+// 번역 텍스트 가져오기 함수
+function getTranslatedText(key) {
+  const currentLang = getCurrentLanguage();
+  if (
+    window.translations &&
+    window.translations[currentLang] &&
+    window.translations[currentLang][key]
+  ) {
+    return window.translations[currentLang][key];
+  }
+  return key;
+}
+
+// 필터 옵션 업데이트 함수 (언어 변경 시 호출)
+function updateFilterOptionsLanguage() {
+  loadSituationAndPurposeFilterOptions();
+}
+
+// 전역 함수로 등록
+window.updateFilterOptionsLanguage = updateFilterOptionsLanguage;
+
+// 상황 및 목적 필터 옵션 동적 로드
+async function loadSituationAndPurposeFilterOptions() {
+  try {
+    console.log("🏷️ 상황 및 목적 필터 옵션 로드 중...");
+
+    // 상황 태그 목록 정의
+    const situationTags = [
+      "formal", // 격식
+      "casual", // 비격식
+      "work", // 직장
+      "school", // 학교
+      "social", // 사교
+      "travel", // 여행
+      "shopping", // 쇼핑
+      "home", // 가정
+      "public", // 공공장소
+      "online", // 온라인
+      "medical", // 의료
+    ];
+
+    // 목적 태그 목록 정의
+    const purposeTags = [
+      "greeting", // 인사
+      "thanking", // 감사
+      "request", // 요청
+      "question", // 질문
+      "opinion", // 의견
+      "agreement", // 동의
+      "refusal", // 거절
+      "apology", // 사과
+      "instruction", // 지시
+      "description", // 설명
+      "suggestion", // 제안
+      "emotion", // 감정표현
+    ];
+
+    // 상황 필터 옵션 생성
+    const situationFilter = document.getElementById("situation-filter");
+    if (situationFilter) {
+      // 기존 옵션 제거 (전체 상황 옵션 제외)
+      const allSituationOption = situationFilter.querySelector(
+        'option[value="all"]'
+      );
+      situationFilter.innerHTML = "";
+      if (allSituationOption) {
+        situationFilter.appendChild(allSituationOption);
+      }
+
+      // 상황 태그 옵션 추가 (환경 언어에 맞게 번역)
+      situationTags.forEach((tag) => {
+        const option = document.createElement("option");
+        option.value = tag;
+        option.textContent = getTranslatedText(tag) || tag;
+        situationFilter.appendChild(option);
+      });
+
+      console.log(
+        `✅ 상황 필터 옵션 로드 완료: ${situationTags.length}개 태그`
+      );
+    }
+
+    // 목적 필터 옵션 생성
+    const purposeFilter = document.getElementById("purpose-filter");
+    if (purposeFilter) {
+      // 기존 옵션 제거 (전체 목적 옵션 제외)
+      const allPurposeOption = purposeFilter.querySelector(
+        'option[value="all"]'
+      );
+      purposeFilter.innerHTML = "";
+      if (allPurposeOption) {
+        purposeFilter.appendChild(allPurposeOption);
+      }
+
+      // 목적 태그 옵션 추가 (환경 언어에 맞게 번역)
+      purposeTags.forEach((tag) => {
+        const option = document.createElement("option");
+        option.value = tag;
+        option.textContent = getTranslatedText(tag) || tag;
+        purposeFilter.appendChild(option);
+      });
+
+      console.log(`✅ 목적 필터 옵션 로드 완료: ${purposeTags.length}개 태그`);
+    }
+  } catch (error) {
+    console.error("❌ 상황 및 목적 필터 옵션 로드 실패:", error);
+  }
 }
 
 function showLearningModes(area) {
@@ -3203,21 +3337,27 @@ function getLocalizedPatternExplanation(data) {
   const currentLanguage =
     window.languageSettings?.currentUILanguage || "korean";
 
-  // 실제 DB 구조: explanations 객체에서 현재 언어로 설명 가져오기
+  console.log("🔍 문법 설명 지역화:", data);
+
+  // 새로운 단일 설명 구조: explanation 문자열
+  if (data.explanation && typeof data.explanation === "string") {
+    console.log("✅ 새로운 explanation 구조 사용:", data.explanation);
+    return data.explanation;
+  }
+
+  // 이전 구조 호환성: explanations 객체에서 현재 언어로 설명 가져오기
   if (data.explanations && data.explanations[currentLanguage]) {
+    console.log("📋 이전 explanations 구조 사용 (현재 언어)");
     return data.explanations[currentLanguage];
   }
 
   // 기본 언어(한국어) 설명 시도
   if (data.explanations && data.explanations.korean) {
+    console.log("📋 이전 explanations 구조 사용 (한국어)");
     return data.explanations.korean;
   }
 
-  // 기존 구조 지원
-  if (data.explanation) {
-    return data.explanation;
-  }
-
+  console.log("❌ 사용 가능한 설명 없음");
   return "설명 정보 없음";
 }
 
@@ -3227,39 +3367,81 @@ function getLocalizedPatternExamples(data) {
   const sourceLanguage = window.languageSettings?.sourceLanguage || "korean";
   const targetLanguage = window.languageSettings?.targetLanguage || "english";
 
-  // 실제 DB 구조: usage_examples 배열에서 다국어 예문 가져오기
+  console.log("🔍 문법 예문 지역화:", data);
+
+  // 새로운 단일 예문 구조: example 객체
+  if (data.example && typeof data.example === "object") {
+    console.log("✅ 새로운 example 구조 발견:", data.example);
+
+    const sourceText =
+      data.example[sourceLanguage] || data.example.korean || "";
+    const targetText =
+      data.example[targetLanguage] || data.example.english || "";
+
+    if (sourceText && targetText) {
+      const result = [`${sourceText} → ${targetText}`];
+      console.log("✅ 단일 예문 변환 완료:", result);
+      return result;
+    } else if (sourceText) {
+      const result = [sourceText];
+      console.log("✅ 소스 언어 예문만 사용:", result);
+      return result;
+    }
+  }
+
+  // 이전 구조 호환성: usage_examples 배열
   if (data.usage_examples && Array.isArray(data.usage_examples)) {
+    console.log("📋 이전 usage_examples 구조 사용");
     return data.usage_examples
       .map((example) => {
         if (typeof example === "object") {
-          // 다국어 객체 형태의 예문
           const sourceText = example[sourceLanguage] || example.korean || "";
           const targetText = example[targetLanguage] || example.english || "";
           return sourceText && targetText
             ? `${sourceText} → ${targetText}`
             : sourceText || targetText;
         }
-        // 문자열 형태의 예문
         return example;
       })
-      .filter((example) => example); // 빈 예문 제거
+      .filter((example) => example);
+  }
+
+  // examples 배열 구조 (이전 호환성)
+  if (data.examples && Array.isArray(data.examples)) {
+    console.log("📋 이전 examples 배열 구조 사용");
+    return data.examples
+      .map((example) => {
+        if (typeof example === "object") {
+          const sourceText = example[sourceLanguage] || example.korean || "";
+          const targetText = example[targetLanguage] || example.english || "";
+          return sourceText && targetText
+            ? `${sourceText} → ${targetText}`
+            : sourceText || targetText;
+        }
+        return example;
+      })
+      .filter((example) => example);
+  }
+
+  // explanation을 예문으로 사용 (fallback)
+  if (data.explanation) {
+    console.log("📝 explanation을 예문으로 사용");
+    return [data.explanation];
   }
 
   // teaching_notes에서 예문 추출 시도
   if (data.teaching_notes && data.teaching_notes[currentLanguage]) {
+    console.log("📚 teaching_notes에서 예문 추출");
     return [data.teaching_notes[currentLanguage]];
   }
 
   // learning_focus를 예문으로 변환
   if (data.learning_focus && Array.isArray(data.learning_focus)) {
+    console.log("🎯 learning_focus를 예문으로 변환");
     return data.learning_focus.map((focus) => `${focus} 관련 학습`);
   }
 
-  // 기존 구조 지원
-  if (data.examples && Array.isArray(data.examples)) {
-    return data.examples;
-  }
-
+  console.log("❌ 사용 가능한 예문 없음");
   return ["사용 예문이 없습니다."];
 }
 
