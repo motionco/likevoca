@@ -466,6 +466,8 @@ const translations = {
 
     // 학습 페이지 번역
     learning_areas: "학습 영역",
+    learning_dashboard: "학습 대시보드",
+    continue_learning: "학습 이어하기",
     vocabulary_learning: "단어 학습",
     vocabulary_learning_desc: "어휘력 향상을 위한 플래시카드와 타이핑 학습",
     vocabulary_modes: "플래시카드 • 타이핑 • 발음 연습",
@@ -476,6 +478,40 @@ const translations = {
     reading_learning_desc: "다양한 예문을 통한 읽기 이해력 향상",
     reading_modes: "예문 학습 • 플래시 모드",
     quiz_test: "퀴즈 테스트",
+
+    // 통합 학습 모드 번역
+    flashcard_mode: "플래시카드",
+    flashcard_quick_desc: "카드 뒤집기 학습",
+    typing_mode: "타이핑",
+    typing_quick_desc: "직접 입력 학습",
+    pronunciation_mode: "발음 연습",
+    pronunciation_quick_desc: "음성 인식 학습",
+    pattern_analysis_mode: "패턴 분석",
+    pattern_quick_desc: "문법 구조 학습",
+    practice_mode: "실습 문제",
+    practice_quick_desc: "문법 적용 연습",
+    example_learning_mode: "예문 학습",
+    example_quick_desc: "문맥 이해 학습",
+    flash_mode: "플래시 모드",
+    flash_quick_desc: "빠른 독해 연습",
+
+    // 학습 특징 설명
+    vocabulary_flashcard_features: "시각적 학습 • 즉시 피드백",
+    vocabulary_typing_features: "정확한 철자 • 기억력 강화",
+    vocabulary_pronunciation_features: "정확한 발음 • 듣기 향상",
+    grammar_pattern_features: "체계적 분석 • 구조 이해",
+    grammar_practice_features: "실전 연습 • 응용 능력",
+    reading_example_features: "문맥 파악 • 이해력 향상",
+    reading_flash_features: "속독 연습 • 집중력 향상",
+
+    // 학습 통계 및 추천
+    estimated_time: "예상 시간",
+    recent_activity: "최근 활동",
+    no_recent_activity: "최근 학습 기록이 없습니다",
+    recommended_mode: "추천 학습",
+    vocabulary_flashcard_recommended: "단어 플래시카드 추천",
+    learning_streak: "학습 연속일",
+    days: "일",
 
     // 학습 모드 번역
     learning_modes: "학습 모드",
@@ -621,11 +657,13 @@ const translations = {
     pronunciation_practice: "🎤 발음 연습",
     grammar_pattern_analysis: "📝 문법 패턴 분석",
     grammar_practice: "📚 문법 실습 연습",
-    reading_learning: "📖 독해 학습",
+    reading_learning: "독해 학습",
 
     // 플래시카드 모드 번역
     click_to_check_meaning: "클릭하여 의미 확인",
     click_to_see_word: "다시 클릭하여 단어 보기",
+    back_to_dashboard: "대시보드로",
+    back: "돌아가기",
 
     // 타이핑 모드 번역
     typing_answer_placeholder: "답안을 입력하세요",
@@ -663,6 +701,11 @@ const translations = {
       "CSV 또는 JSON 파일을 업로드하여 예문을 추가하세요.",
     upload: "업로드",
     download_template: "템플릿 다운로드",
+
+    // 추천 학습 관련 번역
+    flashcard_recommended: "플래시카드",
+    recommended: "추천",
+    recommendation_reason: "최근 학습 패턴을 기반으로 추천됩니다",
   },
   en: {
     home: "Home",
@@ -888,6 +931,8 @@ const translations = {
 
     // 학습 페이지 번역
     learning_areas: "Learning Areas",
+    learning_dashboard: "Learning Dashboard",
+    continue_learning: "Continue Learning",
     vocabulary_learning: "Vocabulary Learning",
     vocabulary_learning_desc:
       "Flashcards and typing practice to improve vocabulary",
@@ -900,6 +945,42 @@ const translations = {
       "Improve reading comprehension through various examples",
     reading_modes: "Example Learning • Flash Mode",
     quiz_test: "Quiz Test",
+
+    // 통합 학습 모드 번역
+    flashcard_mode: "Flashcards",
+    flashcard_quick_desc: "Card flipping learning",
+    typing_mode: "Typing",
+    typing_quick_desc: "Direct input learning",
+    pronunciation_mode: "Pronunciation",
+    pronunciation_quick_desc: "Voice recognition learning",
+    pattern_analysis_mode: "Pattern Analysis",
+    pattern_quick_desc: "Grammar structure learning",
+    practice_mode: "Practice",
+    practice_quick_desc: "Grammar application practice",
+    example_learning_mode: "Example Learning",
+    example_quick_desc: "Context understanding learning",
+    flash_mode: "Flash Mode",
+    flash_quick_desc: "Speed reading practice",
+
+    // 학습 특징 설명
+    vocabulary_flashcard_features: "Visual Learning • Instant Feedback",
+    vocabulary_typing_features: "Accurate Spelling • Memory Enhancement",
+    vocabulary_pronunciation_features:
+      "Accurate Pronunciation • Listening Improvement",
+    grammar_pattern_features: "Systematic Analysis • Structure Understanding",
+    grammar_practice_features: "Practical Exercise • Application Skills",
+    reading_example_features:
+      "Context Comprehension • Understanding Improvement",
+    reading_flash_features: "Speed Reading • Concentration Enhancement",
+
+    // 학습 통계 및 추천
+    estimated_time: "Estimated Time",
+    recent_activity: "Recent Activity",
+    no_recent_activity: "No recent learning records",
+    recommended_mode: "Recommended Learning",
+    vocabulary_flashcard_recommended: "Vocabulary Flashcards Recommended",
+    learning_streak: "Learning Streak",
+    days: "days",
 
     // 학습 모드 번역
     learning_modes: "Learning Modes",
@@ -1061,11 +1142,13 @@ const translations = {
     pronunciation_practice: "🎤 Pronunciation Practice",
     grammar_pattern_analysis: "📝 Grammar Pattern Analysis",
     grammar_practice: "📚 Grammar Practice",
-    reading_learning: "📖 Reading Learning",
+    reading_learning: "Reading Learning",
 
     // 플래시카드 모드 번역
     click_to_check_meaning: "Click to check meaning",
     click_to_see_word: "Click again to see word",
+    back_to_dashboard: "Back to Dashboard",
+    back: "Back",
 
     // 타이핑 모드 번역
     typing_answer_placeholder: "Enter your answer",
@@ -1100,6 +1183,11 @@ const translations = {
     upload_csv_json_example: "Upload CSV or JSON files to add examples.",
     upload: "Upload",
     download_template: "Download Template",
+
+    // 추천 학습 관련 번역
+    flashcard_recommended: "Flashcard",
+    recommended: "Recommended",
+    recommendation_reason: "Recommended based on recent learning patterns",
   },
   ja: {
     home: "ホーム",
@@ -1327,6 +1415,8 @@ const translations = {
 
     // 学習ページ翻訳
     learning_areas: "学習領域",
+    learning_dashboard: "学習ダッシュボード",
+    continue_learning: "学習を続ける",
     vocabulary_learning: "単語学習",
     vocabulary_learning_desc:
       "語彙力向上のためのフラッシュカードとタイピング学習",
@@ -1338,6 +1428,40 @@ const translations = {
     reading_learning_desc: "様々な例文を通した読解力向上",
     reading_modes: "例文学習 • フラッシュモード",
     quiz_test: "クイズテスト",
+
+    // 統合学習モード翻訳
+    flashcard_mode: "フラッシュカード",
+    flashcard_quick_desc: "カード反転学習",
+    typing_mode: "タイピング",
+    typing_quick_desc: "直接入力学習",
+    pronunciation_mode: "発音練習",
+    pronunciation_quick_desc: "音声認識学習",
+    pattern_analysis_mode: "パターン分析",
+    pattern_quick_desc: "文法構造学習",
+    practice_mode: "実習問題",
+    practice_quick_desc: "文法応用練習",
+    example_learning_mode: "例文学習",
+    example_quick_desc: "文脈理解学習",
+    flash_mode: "フラッシュモード",
+    flash_quick_desc: "速読練習",
+
+    // 学習特徴説明
+    vocabulary_flashcard_features: "視覚的学習 • 即時フィードバック",
+    vocabulary_typing_features: "正確なスペル • 記憶力強化",
+    vocabulary_pronunciation_features: "正確な発音 • リスニング向上",
+    grammar_pattern_features: "体系的分析 • 構造理解",
+    grammar_practice_features: "実践練習 • 応用能力",
+    reading_example_features: "文脈把握 • 理解力向上",
+    reading_flash_features: "速読練習 • 集中力向上",
+
+    // 学習統計と推奨
+    estimated_time: "予想時間",
+    recent_activity: "最近の活動",
+    no_recent_activity: "最近の学習記録がありません",
+    recommended_mode: "推奨学習",
+    vocabulary_flashcard_recommended: "単語フラッシュカード推奨",
+    learning_streak: "学習連続日",
+    days: "日",
 
     // 学習モード翻訳
     learning_modes: "学習モード",
@@ -1376,6 +1500,15 @@ const translations = {
     domain_sports: "スポーツ",
     domain_entertainment: "エンターテインメント",
     domain_other: "その他",
+
+    // 플래시카드 모드 번역
+    back_to_dashboard: "ダッシュボードに戻る",
+    back: "戻る",
+
+    // 추천 학습 관련 번역
+    flashcard_recommended: "フラッシュカード",
+    recommended: "推奨",
+    recommendation_reason: "最近の学習パターンに基づいて推奨されます",
   },
   zh: {
     home: "首页",
@@ -1599,6 +1732,8 @@ const translations = {
 
     // 学习页面翻译
     learning_areas: "学习领域",
+    learning_dashboard: "学习仪表板",
+    continue_learning: "继续学习",
     vocabulary_learning: "词汇学习",
     vocabulary_learning_desc: "通过闪卡和打字练习提高词汇量",
     vocabulary_modes: "闪卡 • 打字 • 发音练习",
@@ -1609,6 +1744,40 @@ const translations = {
     reading_learning_desc: "通过各种例句提高阅读理解能力",
     reading_modes: "例句学习 • 闪卡模式",
     quiz_test: "测验测试",
+
+    // 统合学习模式翻译
+    flashcard_mode: "闪卡",
+    flashcard_quick_desc: "卡片翻转学习",
+    typing_mode: "打字",
+    typing_quick_desc: "直接输入学习",
+    pronunciation_mode: "发音练习",
+    pronunciation_quick_desc: "语音识别学习",
+    pattern_analysis_mode: "模式分析",
+    pattern_quick_desc: "语法结构学习",
+    practice_mode: "练习题",
+    practice_quick_desc: "语法应用练习",
+    example_learning_mode: "例句学习",
+    example_quick_desc: "语境理解学习",
+    flash_mode: "闪卡模式",
+    flash_quick_desc: "快速阅读练习",
+
+    // 学习特征说明
+    vocabulary_flashcard_features: "视觉学习 • 即时反馈",
+    vocabulary_typing_features: "准确拼写 • 记忆增强",
+    vocabulary_pronunciation_features: "准确发音 • 听力提升",
+    grammar_pattern_features: "系统分析 • 结构理解",
+    grammar_practice_features: "实战练习 • 应用能力",
+    reading_example_features: "语境理解 • 理解力提升",
+    reading_flash_features: "速读练习 • 专注力提升",
+
+    // 学习统计和推荐
+    estimated_time: "预计时间",
+    recent_activity: "最近活动",
+    no_recent_activity: "没有最近的学习记录",
+    recommended_mode: "推荐学习",
+    vocabulary_flashcard_recommended: "推荐词汇闪卡",
+    learning_streak: "学习连续天数",
+    days: "天",
 
     // 学习模式翻译
     learning_modes: "学习模式",
@@ -1664,11 +1833,13 @@ const translations = {
     pronunciation_practice: "🎤 发音练习",
     grammar_pattern_analysis: "📝 语法模式分析",
     grammar_practice: "📚 语法练习",
-    reading_learning: "📖 阅读学习",
+    reading_learning: "阅读学习",
 
     // 闪卡模式翻译
     click_to_check_meaning: "点击查看含义",
     click_to_see_word: "再次点击查看单词",
+    back_to_dashboard: "返回仪表板",
+    back: "返回",
 
     // 打字模式翻译
     typing_answer_placeholder: "请输入答案",
@@ -1702,6 +1873,11 @@ const translations = {
     upload_csv_json_example: "上传CSV或JSON文件以添加例句。",
     upload: "上传",
     download_template: "下载模板",
+
+    // 추천 학습 관련 번역
+    flashcard_recommended: "闪卡",
+    recommended: "推荐",
+    recommendation_reason: "基于最近学习模式推荐",
   },
 };
 

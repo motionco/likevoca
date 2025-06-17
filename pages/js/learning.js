@@ -72,6 +72,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 초기 번역 적용
     applyTranslations();
+
+    // 데이터 프리로딩 시작
+    startDataPreloading();
   }, 100);
 
   // 언어 변경 핸들러 초기화
@@ -376,7 +379,7 @@ function applyAdditionalTranslations() {
       pronunciation_practice: "🎤 발음 연습",
       grammar_pattern_analysis: "📝 문법 패턴 분석",
       grammar_practice: "📚 문법 실습 연습",
-      reading_learning: "📖 독해 학습",
+      reading_learning: "독해 학습",
       click_to_check_meaning: "클릭하여 의미 확인",
       click_to_see_word: "다시 클릭하여 단어 보기",
       typing_answer_placeholder: "답안을 입력하세요",
@@ -431,7 +434,7 @@ function applyAdditionalTranslations() {
       pronunciation_practice: "🎤 Pronunciation Practice",
       grammar_pattern_analysis: "📝 Grammar Pattern Analysis",
       grammar_practice: "📚 Grammar Practice",
-      reading_learning: "📖 Reading Learning",
+      reading_learning: "Reading Learning",
       click_to_check_meaning: "Click to check meaning",
       click_to_see_word: "Click again to see word",
       typing_answer_placeholder: "Enter your answer",
@@ -487,7 +490,7 @@ function applyAdditionalTranslations() {
       pronunciation_practice: "🎤 発音練習",
       grammar_pattern_analysis: "📝 文法パターン分析",
       grammar_practice: "📚 文法実習練習",
-      reading_learning: "📖 読解学習",
+      reading_learning: "読解学習",
       click_to_check_meaning: "クリックして意味を確認",
       click_to_see_word: "再度クリックして単語を見る",
       typing_answer_placeholder: "答えを入力してください",
@@ -542,7 +545,7 @@ function applyAdditionalTranslations() {
       pronunciation_practice: "🎤 发音练习",
       grammar_pattern_analysis: "📝 语法模式分析",
       grammar_practice: "📚 语法练习",
-      reading_learning: "📖 阅读学习",
+      reading_learning: "阅读学习",
       click_to_check_meaning: "点击查看含义",
       click_to_see_word: "再次点击查看单词",
       typing_answer_placeholder: "请输入您的答案",
@@ -899,6 +902,101 @@ function setupEventListeners() {
     }
   });
 
+  // 새로운 통합 버튼들 설정
+  // 플래시카드 모드 버튼들
+  const prevFlashcardBtn = document.getElementById("prev-flashcard-btn");
+  const nextFlashcardBtn = document.getElementById("next-flashcard-btn");
+  const flipFlashcardBtn = document.getElementById("flip-flashcard-btn");
+
+  if (prevFlashcardBtn) {
+    prevFlashcardBtn.removeEventListener("click", prevCardHandler);
+    prevFlashcardBtn.addEventListener("click", prevCardHandler);
+  }
+  if (nextFlashcardBtn) {
+    nextFlashcardBtn.removeEventListener("click", nextCardHandler);
+    nextFlashcardBtn.addEventListener("click", nextCardHandler);
+  }
+  if (flipFlashcardBtn) {
+    flipFlashcardBtn.removeEventListener("click", flipCard);
+    flipFlashcardBtn.addEventListener("click", flipCard);
+  }
+
+  // 타이핑 모드 버튼들
+  const prevTypingBtnNew = document.getElementById("prev-typing-btn");
+  const nextTypingBtnNew = document.getElementById("next-typing-btn");
+  const checkTypingAnswerBtn = document.getElementById(
+    "check-typing-answer-btn"
+  );
+
+  if (prevTypingBtnNew) {
+    prevTypingBtnNew.removeEventListener("click", prevCardHandler);
+    prevTypingBtnNew.addEventListener("click", prevCardHandler);
+  }
+  if (nextTypingBtnNew) {
+    nextTypingBtnNew.removeEventListener("click", nextCardHandler);
+    nextTypingBtnNew.addEventListener("click", nextCardHandler);
+  }
+  if (checkTypingAnswerBtn) {
+    checkTypingAnswerBtn.removeEventListener("click", checkTypingAnswer);
+    checkTypingAnswerBtn.addEventListener("click", checkTypingAnswer);
+  }
+
+  // 독해 모드 버튼들
+  const prevReadingBtnNew = document.getElementById("prev-reading-btn");
+  const nextReadingBtnNew = document.getElementById("next-reading-btn");
+
+  if (prevReadingBtnNew) {
+    prevReadingBtnNew.removeEventListener("click", prevReadingHandler);
+    prevReadingBtnNew.addEventListener("click", prevReadingHandler);
+  }
+  if (nextReadingBtnNew) {
+    nextReadingBtnNew.removeEventListener("click", nextReadingHandler);
+    nextReadingBtnNew.addEventListener("click", nextReadingHandler);
+  }
+
+  // 독해 플래시카드 뒤집기 버튼
+  const flipReadingCardBtn = document.getElementById("flip-reading-card");
+  if (flipReadingCardBtn) {
+    flipReadingCardBtn.removeEventListener("click", flipReadingCard);
+    flipReadingCardBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log("🔄 독해 플래시카드 뒤집기 버튼 클릭");
+      flipReadingCard();
+    });
+  }
+
+  // 문법 실습 뒤집기 버튼
+  const flipGrammarPracticeBtn = document.getElementById(
+    "flip-grammar-practice-btn"
+  );
+  if (flipGrammarPracticeBtn) {
+    flipGrammarPracticeBtn.removeEventListener("click", flipGrammarCard);
+    flipGrammarPracticeBtn.addEventListener("click", flipGrammarCard);
+  }
+
+  // 대시보드로 돌아가기 버튼들
+  // 우측 상단 돌아가기 버튼들 (기존 돌아가기 버튼이 없는 모드들)
+  const backToDashboardBtns = [
+    "back-to-dashboard-pronunciation",
+    "back-to-dashboard-pattern",
+    "back-to-dashboard-practice",
+    "back-to-dashboard-nodata",
+  ];
+
+  backToDashboardBtns.forEach((btnId) => {
+    const btn = document.getElementById(btnId);
+    if (btn) {
+      btn.removeEventListener("click", showAreaSelection);
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log(`🏠 ${btnId} 클릭 - 돌아가기`);
+        showAreaSelection();
+      });
+    }
+  });
+
   // 전역 이벤트 리스너 추가 (중복 방지)
   document.addEventListener("click", globalClickHandler);
 }
@@ -1038,7 +1136,7 @@ function globalClickHandler(e) {
 }
 
 function showAreaSelection() {
-  console.log("🏠 학습 영역 선택 화면 표시");
+  console.log("🏠 통합 학습 대시보드 표시");
   hideAllSections();
 
   const areaSelection = document.getElementById("area-selection");
@@ -1052,32 +1150,37 @@ function showAreaSelection() {
     applyAdditionalTranslations();
   }, 50);
 
-  // 학습 영역 카드들에 이벤트 리스너 추가 (기존 리스너가 없을 때만)
-  const areaCards = document.querySelectorAll(".learning-area-card");
-  console.log(`🎯 학습 영역 카드 ${areaCards.length}개 발견`);
+  // 통합 학습 모드 카드들에 이벤트 리스너 추가
+  const modeCards = document.querySelectorAll(".learning-mode-card");
+  console.log(`🎯 통합 학습 모드 카드 ${modeCards.length}개 발견`);
 
-  if (areaCards.length === 0) {
+  if (modeCards.length === 0) {
     console.warn(
-      "⚠️ 학습 영역 카드를 찾을 수 없습니다. HTML 구조를 확인해주세요."
+      "⚠️ 학습 모드 카드를 찾을 수 없습니다. HTML 구조를 확인해주세요."
     );
   }
 
-  areaCards.forEach((card, index) => {
-    console.log(
-      `🔍 카드 ${index + 1}: data-area="${card.getAttribute("data-area")}"`
-    );
+  modeCards.forEach((card, index) => {
+    const area = card.getAttribute("data-area");
+    const mode = card.getAttribute("data-mode");
+    console.log(`🔍 카드 ${index + 1}: ${area} - ${mode}`);
 
     // 이미 이벤트 리스너가 있는지 확인
     if (!card.hasAttribute("data-listener-added")) {
       card.addEventListener("click", function (e) {
         e.preventDefault();
         e.stopPropagation();
-        const area = this.getAttribute("data-area");
-        console.log(`🎯 학습 영역 카드 클릭됨: ${area}`);
-        if (area) {
-          showLearningModes(area);
+        const cardArea = this.getAttribute("data-area");
+        const cardMode = this.getAttribute("data-mode");
+        console.log(`🎯 통합 학습 모드 카드 클릭됨: ${cardArea} - ${cardMode}`);
+
+        if (cardArea && cardMode) {
+          // 로딩 표시
+          showLoadingState(this);
+          // 바로 학습 모드 시작
+          startLearningMode(cardArea, cardMode);
         } else {
-          console.error("❌ data-area 속성이 없습니다.");
+          console.error("❌ data-area 또는 data-mode 속성이 없습니다.");
         }
       });
       card.setAttribute("data-listener-added", "true");
@@ -1086,6 +1189,378 @@ function showAreaSelection() {
       console.log(`⚠️ 카드 ${index + 1}에 이미 이벤트 리스너가 있습니다.`);
     }
   });
+
+  // 학습 이어하기 버튼 이벤트 리스너
+  const quickContinueBtn = document.getElementById("quick-continue");
+  if (
+    quickContinueBtn &&
+    !quickContinueBtn.hasAttribute("data-listener-added")
+  ) {
+    quickContinueBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      const lastArea = sessionStorage.getItem("lastLearningArea");
+      const lastMode = sessionStorage.getItem("lastLearningMode");
+      if (lastArea && lastMode) {
+        console.log(`🔄 학습 이어하기: ${lastArea} - ${lastMode}`);
+        startLearningMode(lastArea, lastMode);
+      }
+    });
+    quickContinueBtn.setAttribute("data-listener-added", "true");
+  }
+
+  // 최근 학습 기록 표시
+  updateRecentActivity();
+  updateLearningStreak();
+}
+
+// 로딩 상태 표시 함수
+function showLoadingState(card) {
+  const originalContent = card.innerHTML;
+  card.innerHTML = `
+    <div class="flex items-center justify-center h-full">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+      <span class="ml-3 text-white">로딩 중...</span>
+    </div>
+  `;
+
+  // 3초 후 원래 내용으로 복원 (에러 방지)
+  setTimeout(() => {
+    if (card.innerHTML.includes("로딩 중...")) {
+      card.innerHTML = originalContent;
+    }
+  }, 3000);
+}
+
+// 최근 활동 업데이트
+function updateRecentActivity() {
+  const recentActivityEl = document.getElementById("recent-activity");
+  const lastArea = sessionStorage.getItem("lastLearningArea");
+  const lastMode = sessionStorage.getItem("lastLearningMode");
+  const lastTime = sessionStorage.getItem("lastLearningTime");
+
+  if (lastArea && lastMode && lastTime) {
+    const timeAgo = getTimeAgo(new Date(lastTime));
+    const areaName = getAreaName(lastArea);
+    const modeName = getModeName(lastMode);
+
+    recentActivityEl.innerHTML = `
+      <div class="text-sm">
+        <div class="font-medium">${areaName} - ${modeName}</div>
+        <div class="text-gray-500">${timeAgo}</div>
+      </div>
+    `;
+
+    // 학습 이어하기 버튼 표시
+    const quickContinueBtn = document.getElementById("quick-continue");
+    if (quickContinueBtn) {
+      quickContinueBtn.classList.remove("hidden");
+    }
+  }
+
+  // 추천 학습도 함께 업데이트
+  updateRecommendedLearning();
+}
+
+// 추천 학습 업데이트 (실제 학습 패턴 기반)
+function updateRecommendedLearning() {
+  const recommendedEl = document.getElementById("recommended-mode");
+
+  // 학습 기록에서 패턴 분석
+  const learningHistory = JSON.parse(
+    localStorage.getItem("learningHistory") || "[]"
+  );
+  const lastWeekHistory = learningHistory.filter((record) => {
+    const recordDate = new Date(record.timestamp);
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    return recordDate > weekAgo;
+  });
+
+  let recommendation = getSmartRecommendation(lastWeekHistory);
+
+  recommendedEl.innerHTML = `
+    <div class="space-y-2">
+      <div class="flex items-center justify-between p-2 bg-white rounded border cursor-pointer hover:bg-gray-50" 
+           onclick="startLearningMode('${recommendation.area}', '${recommendation.mode}')">
+        <div class="flex items-center">
+          <i class="${recommendation.icon} text-${recommendation.color}-500 mr-2"></i>
+          <div>
+            <div class="font-medium">${recommendation.title}</div>
+            <div class="text-xs text-gray-500">${recommendation.subtitle}</div>
+          </div>
+        </div>
+        <span class="text-xs text-green-600 font-medium" data-i18n="recommended">추천</span>
+      </div>
+      <div class="text-xs text-gray-500">
+        ${recommendation.reason}
+      </div>
+    </div>
+  `;
+}
+
+// 스마트 추천 로직
+function getSmartRecommendation(history) {
+  // 기본 추천
+  let recommendation = {
+    area: "vocabulary",
+    mode: "flashcard",
+    title: "단어 플래시카드",
+    subtitle: "기본 단어 학습",
+    icon: "fas fa-clone",
+    color: "blue",
+    reason: "새로운 학습을 시작해보세요",
+  };
+
+  if (history.length === 0) {
+    return recommendation;
+  }
+
+  // 최근 학습 패턴 분석
+  const areaCounts = {};
+  const modeCounts = {};
+  const recentAreas = [];
+
+  history.forEach((record) => {
+    areaCounts[record.area] = (areaCounts[record.area] || 0) + 1;
+    modeCounts[record.mode] = (modeCounts[record.mode] || 0) + 1;
+    recentAreas.push(record.area);
+  });
+
+  // 가장 많이 학습한 영역
+  const mostStudiedArea = Object.keys(areaCounts).reduce((a, b) =>
+    areaCounts[a] > areaCounts[b] ? a : b
+  );
+
+  // 최근 3일간 학습하지 않은 영역 찾기
+  const recent3Days = history.filter((record) => {
+    const recordDate = new Date(record.timestamp);
+    const threeDaysAgo = new Date();
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+    return recordDate > threeDaysAgo;
+  });
+
+  const recent3DaysAreas = [...new Set(recent3Days.map((r) => r.area))];
+  const allAreas = ["vocabulary", "grammar", "reading"];
+  const neglectedAreas = allAreas.filter(
+    (area) => !recent3DaysAreas.includes(area)
+  );
+
+  // 추천 로직
+  if (neglectedAreas.length > 0) {
+    // 소홀한 영역 추천
+    const neglectedArea = neglectedAreas[0];
+    const modes = {
+      vocabulary: { mode: "flashcard", icon: "fas fa-clone", color: "blue" },
+      grammar: { mode: "pattern", icon: "fas fa-search", color: "green" },
+      reading: { mode: "flash", icon: "fas fa-bolt", color: "purple" },
+    };
+
+    recommendation = {
+      area: neglectedArea,
+      mode: modes[neglectedArea].mode,
+      title: `${getAreaName(neglectedArea)} - ${getModeName(
+        modes[neglectedArea].mode
+      )}`,
+      subtitle: "균형잡힌 학습",
+      icon: modes[neglectedArea].icon,
+      color: modes[neglectedArea].color,
+      reason: "최근 학습하지 않은 영역입니다",
+    };
+  } else if (mostStudiedArea) {
+    // 가장 많이 학습한 영역의 다른 모드 추천
+    const areaHistory = history.filter((r) => r.area === mostStudiedArea);
+    const usedModes = [...new Set(areaHistory.map((r) => r.mode))];
+
+    const allModes = {
+      vocabulary: ["flashcard", "typing", "pronunciation"],
+      grammar: ["pattern", "practice"],
+      reading: ["example", "flash"],
+    };
+
+    const unusedModes = allModes[mostStudiedArea]?.filter(
+      (mode) => !usedModes.includes(mode)
+    );
+
+    if (unusedModes && unusedModes.length > 0) {
+      const recommendedMode = unusedModes[0];
+      const modeIcons = {
+        flashcard: "fas fa-clone",
+        typing: "fas fa-keyboard",
+        pronunciation: "fas fa-microphone",
+        pattern: "fas fa-search",
+        practice: "fas fa-edit",
+        example: "fas fa-book-open",
+        flash: "fas fa-bolt",
+      };
+
+      recommendation = {
+        area: mostStudiedArea,
+        mode: recommendedMode,
+        title: `${getAreaName(mostStudiedArea)} - ${getModeName(
+          recommendedMode
+        )}`,
+        subtitle: "새로운 학습 방식",
+        icon: modeIcons[recommendedMode] || "fas fa-star",
+        color:
+          mostStudiedArea === "vocabulary"
+            ? "blue"
+            : mostStudiedArea === "grammar"
+            ? "green"
+            : "purple",
+        reason: "새로운 학습 방식을 시도해보세요",
+      };
+    }
+  }
+
+  return recommendation;
+}
+
+// 학습 연속일 업데이트
+function updateLearningStreak() {
+  const streakEl = document.getElementById("learning-streak");
+  const streak = parseInt(localStorage.getItem("learningStreak") || "0");
+
+  if (streakEl) {
+    streakEl.querySelector(".text-2xl").textContent = streak;
+  }
+}
+
+// 시간 차이 계산
+function getTimeAgo(date) {
+  const now = new Date();
+  const diffMs = now - date;
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 60) return `${diffMins}분 전`;
+  if (diffHours < 24) return `${diffHours}시간 전`;
+  return `${diffDays}일 전`;
+}
+
+// 영역 이름 가져오기
+function getAreaName(area) {
+  const names = {
+    vocabulary: "단어 학습",
+    grammar: "문법 학습",
+    reading: "독해 학습",
+  };
+  return names[area] || area;
+}
+
+// 모드 이름 가져오기
+function getModeName(mode) {
+  const names = {
+    flashcard: "플래시카드",
+    typing: "타이핑",
+    pronunciation: "발음 연습",
+    pattern: "패턴 분석",
+    practice: "실습 문제",
+    example: "예문 학습",
+    flash: "플래시 모드",
+  };
+  return names[mode] || mode;
+}
+
+// 학습 연속일 업데이트 (학습 시작 시)
+function updateLearningStreakOnStart() {
+  const today = new Date().toDateString();
+  const lastLearningDate = localStorage.getItem("lastLearningDate");
+  const currentStreak = parseInt(localStorage.getItem("learningStreak") || "0");
+
+  if (lastLearningDate !== today) {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    if (lastLearningDate === yesterday.toDateString()) {
+      // 연속 학습
+      localStorage.setItem("learningStreak", (currentStreak + 1).toString());
+    } else if (
+      !lastLearningDate ||
+      lastLearningDate !== yesterday.toDateString()
+    ) {
+      // 첫 학습 또는 연속성 끊김
+      localStorage.setItem("learningStreak", "1");
+    }
+
+    localStorage.setItem("lastLearningDate", today);
+    console.log(
+      `📅 학습 연속일 업데이트: ${localStorage.getItem("learningStreak")}일`
+    );
+  }
+}
+
+// 데이터 프리로딩 (백그라운드에서 미리 로드)
+// 📝 프리로딩 설명:
+// - 화면 표시와 무관하게 백그라운드에서 데이터를 미리 로드
+// - 사용자가 학습 모드를 클릭했을 때 즉시 시작 가능
+// - 프리로딩이 완료되지 않아도 화면은 정상 표시됨
+// - 프리로딩 실패 시 일반 로드 방식으로 자동 전환
+//
+// 🚀 효율성 및 비용 최적화:
+// - 모든 DB 데이터를 다운로드하지 않음 (limit 적용)
+// - 단어: 최대 50개, 문법: 최대 30개, 독해: 최대 20개만 프리로드
+// - 필터링된 데이터만 로드하여 트래픽 최소화
+// - 사용자가 실제 학습을 시작할 때만 추가 데이터 로드
+let preloadedData = {
+  vocabulary: null,
+  grammar: null,
+  reading: null,
+};
+
+// 페이지 로드 시 데이터 프리로딩 시작
+function startDataPreloading() {
+  console.log("🔄 데이터 프리로딩 시작 (백그라운드)");
+  console.log("📌 프리로딩은 화면 표시와 무관하게 진행됩니다");
+
+  // 각 영역별로 순차적으로 프리로드 (동시에 하면 부하가 클 수 있음)
+  setTimeout(() => preloadAreaData("vocabulary"), 1000);
+  setTimeout(() => preloadAreaData("grammar"), 2000);
+  setTimeout(() => preloadAreaData("reading"), 3000);
+}
+
+// 특정 영역 데이터 프리로드
+async function preloadAreaData(area) {
+  if (preloadedData[area]) return; // 이미 로드됨
+
+  try {
+    console.log(`📦 ${area} 데이터 프리로딩 중...`);
+
+    let data = [];
+    switch (area) {
+      case "vocabulary":
+        data = await loadVocabularyData();
+        break;
+      case "grammar":
+        data = await loadGrammarData();
+        break;
+      case "reading":
+        data = await loadReadingData();
+        break;
+    }
+
+    if (data && data.length > 0) {
+      preloadedData[area] = data;
+      console.log(`✅ ${area} 데이터 프리로딩 완료: ${data.length}개`);
+    }
+  } catch (error) {
+    console.warn(`⚠️ ${area} 데이터 프리로딩 실패:`, error);
+  }
+}
+
+// 프리로드된 데이터 사용하도록 loadLearningData 수정
+async function loadLearningDataOptimized(area) {
+  console.log(`📚 ${area} 학습 데이터 로드 시작`);
+
+  // 프리로드된 데이터가 있으면 사용
+  if (preloadedData[area]) {
+    console.log(`⚡ ${area} 프리로드된 데이터 사용`);
+    currentData = applyFilters(preloadedData[area]);
+    return;
+  }
+
+  // 프리로드된 데이터가 없으면 일반 로드
+  await loadLearningData(area);
 }
 
 function showLearningModes(area) {
@@ -1275,8 +1750,43 @@ window.startLearningMode = async function startLearningMode(area, mode) {
   currentLearningArea = area;
   currentLearningMode = mode;
 
+  // 📊 실제 학습 활동 연동:
+  // - 최근 학습 활동: sessionStorage에 실시간 저장
+  // - 학습 스트릭: localStorage에 연속일 계산 및 저장
+  // - 추천 학습: 최근 활동 기반으로 동적 추천
+  // - 모든 데이터는 실제 학습 행동과 연동됨
+
+  // 학습 기록 저장 (최근 활동용)
+  sessionStorage.setItem("lastLearningArea", area);
+  sessionStorage.setItem("lastLearningMode", mode);
+  sessionStorage.setItem("lastLearningTime", new Date().toISOString());
+
+  // 학습 기록을 localStorage에도 저장 (추천 시스템용)
+  const learningHistory = JSON.parse(
+    localStorage.getItem("learningHistory") || "[]"
+  );
+  learningHistory.push({
+    area: area,
+    mode: mode,
+    timestamp: new Date().toISOString(),
+    date: new Date().toDateString(),
+  });
+
+  // 최근 30일 기록만 유지 (성능 최적화)
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const filteredHistory = learningHistory.filter(
+    (record) => new Date(record.timestamp) > thirtyDaysAgo
+  );
+
+  localStorage.setItem("learningHistory", JSON.stringify(filteredHistory));
+  console.log(`📊 학습 기록 저장: ${area} - ${mode}`);
+
+  // 학습 연속일 업데이트 (스트릭 계산)
+  updateLearningStreakOnStart();
+
   try {
-    await loadLearningData(area);
+    await loadLearningDataOptimized(area);
 
     if (!currentData || currentData.length === 0) {
       console.log("📭 학습할 데이터가 없어서 학습 모드를 시작할 수 없습니다.");
