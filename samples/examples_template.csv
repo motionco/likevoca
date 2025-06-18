@@ -1,6 +1,8 @@
-korean,english,japanese,chinese,context,difficulty,tags,created_at
-"실례합니다, 화장실이 어디에 있나요?","Excuse me, where is the bathroom?","すみません、トイレはどこにありますか？","不好意思，洗手间在哪里？",공공장소에서 화장실 위치를 묻는 상황,basic,"public,question",2024-01-01T00:00:00Z
-"회의 시간을 변경해도 될까요?","Would it be possible to change the meeting time?","会議の時間を変更してもいいでしょうか？","可以更改会议时间吗？",직장에서 회의 일정 변경을 요청하는 상황,intermediate,"work,request",2024-01-01T00:00:00Z
-정말 고마워요!,Thank you so much!,本当にありがとうございます！,真的太谢谢了！,친구나 가족에게 감사를 표현하는 상황,basic,"casual,thanking",2024-01-01T00:00:00Z
-"죄송합니다, 늦었습니다.","I'm sorry, I'm late.","すみません、遅れました。","对不起，我迟到了。",학교나 직장에서 지각했을 때 사과하는 상황,basic,"formal,apology",2024-01-01T00:00:00Z
-이 제품을 추천하고 싶어요.,I would like to recommend this product.,この商品をおすすめしたいです。,我想推荐这个产品。,온라인 쇼핑몰에서 상품을 추천하는 상황,intermediate,"online,suggestion",2024-01-01T00:00:00Z 
+domain,category,difficulty,situation,purpose,korean_text,english_text,japanese_text,chinese_text
+daily,routine,basic,"formal,social",greeting,안녕하세요! 처음 뵙겠습니다.,Hello! Nice to meet you for the first time.,こんにちは！初めてお会いします。,你好！初次见面。
+food,fruit,basic,shopping,request,사과 주스 하나 주세요.,Please give me one apple juice.,りんごジュースを一つください。,请给我一杯苹果汁。
+school,education,intermediate,school,question,이 문제를 어떻게 풀어야 하나요?,How should I solve this problem?,この問題をどう解けばいいですか？,这个问题应该怎么解决？
+travel,transportation,intermediate,"travel,public",instruction,공항까지 가는 길을 알려주세요.,Please tell me the way to the airport.,空港までの道を教えてください。,请告诉我去机场的路。
+health,medical,intermediate,medical,request,병원 예약을 하고 싶습니다.,I would like to make a hospital appointment.,病院の予約を取りたいです。,我想预约医院。
+work,business,intermediate,"work,online",request,회의 자료를 이메일로 보내주세요.,Please send me the meeting materials by email.,会議資料をメールで送ってください。,请通过邮件发送会议资料。
+daily,family,basic,home,conversation,저녁 뭐 먹을까요?,What should we have for dinner?,夕食は何にしましょうか？,晚餐吃什么？ 

@@ -28,6 +28,9 @@ let currentUILanguage = "korean";
 // 네비게이션 중복 실행 방지
 let isNavigating = false;
 
+// 플래시카드 뒤집기 상태
+let isFlipped = false;
+
 // Firebase 초기화 대기 함수 수정
 async function waitForFirebaseInit() {
   let attempts = 0;
@@ -399,6 +402,7 @@ function applyAdditionalTranslations() {
       grammar_pattern_analysis: "📝 문법 패턴 분석",
       grammar_practice: "📚 문법 실습 연습",
       reading_learning: "독해 학습",
+      reading_flash_card: "플래시 카드",
       click_to_check_meaning: "클릭하여 의미 확인",
       click_to_see_word: "다시 클릭하여 단어 보기",
       typing_answer_placeholder: "답안을 입력하세요",
@@ -454,6 +458,7 @@ function applyAdditionalTranslations() {
       grammar_pattern_analysis: "📝 Grammar Pattern Analysis",
       grammar_practice: "📚 Grammar Practice",
       reading_learning: "Reading Learning",
+      reading_flash_card: "Flashcard Reading",
       click_to_check_meaning: "Click to check meaning",
       click_to_see_word: "Click again to see word",
       typing_answer_placeholder: "Enter your answer",
@@ -510,6 +515,7 @@ function applyAdditionalTranslations() {
       grammar_pattern_analysis: "📝 文法パターン分析",
       grammar_practice: "📚 文法実習練習",
       reading_learning: "読解学習",
+      reading_flash_card: "フラッシュカード",
       click_to_check_meaning: "クリックして意味を確認",
       click_to_see_word: "再度クリックして単語を見る",
       typing_answer_placeholder: "答えを入力してください",
@@ -565,6 +571,7 @@ function applyAdditionalTranslations() {
       grammar_pattern_analysis: "📝 语法模式分析",
       grammar_practice: "📚 语法练习",
       reading_learning: "阅读学习",
+      reading_flash_card: "闪卡阅读",
       click_to_check_meaning: "点击查看含义",
       click_to_see_word: "再次点击查看单词",
       typing_answer_placeholder: "请输入您的答案",
@@ -845,48 +852,67 @@ function setupEventListeners() {
     nextPracticeBtn.addEventListener("click", nextPracticeHandler);
   }
 
-  // 플래시카드 관련 버튼들 (단어 학습용)
-  const flipCardBtn = document.getElementById("flip-card");
-  if (flipCardBtn) {
-    flipCardBtn.removeEventListener("click", flipCard);
-    flipCardBtn.addEventListener("click", flipCard);
+  // 플래시카드 관련 버튼들 (단어 학습용) - 올바른 ID 사용
+  const flipFlashcardBtn = document.getElementById("flip-flashcard-btn");
+  if (
+    flipFlashcardBtn &&
+    !flipFlashcardBtn.hasAttribute("data-listener-added")
+  ) {
+    flipFlashcardBtn.addEventListener("click", flipCard);
+    flipFlashcardBtn.setAttribute("data-listener-added", "true");
   }
 
-  const prevCardBtn = document.getElementById("prev-card");
-  const nextCardBtn = document.getElementById("next-card");
+  const prevFlashcardBtn = document.getElementById("prev-flashcard-btn");
+  const nextFlashcardBtn = document.getElementById("next-flashcard-btn");
 
-  if (prevCardBtn) {
-    prevCardBtn.removeEventListener("click", prevCardHandler);
-    prevCardBtn.addEventListener("click", prevCardHandler);
+  if (
+    prevFlashcardBtn &&
+    !prevFlashcardBtn.hasAttribute("data-listener-added")
+  ) {
+    prevFlashcardBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      navigateContent(-1);
+    });
+    prevFlashcardBtn.setAttribute("data-listener-added", "true");
   }
 
-  if (nextCardBtn) {
-    nextCardBtn.removeEventListener("click", nextCardHandler);
-    nextCardBtn.addEventListener("click", nextCardHandler);
+  if (
+    nextFlashcardBtn &&
+    !nextFlashcardBtn.hasAttribute("data-listener-added")
+  ) {
+    nextFlashcardBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      navigateContent(1);
+    });
+    nextFlashcardBtn.setAttribute("data-listener-added", "true");
   }
 
   // 독해 학습 네비게이션 버튼들
-  const prevReadingBtn = document.getElementById("prev-reading");
-  const nextReadingBtn = document.getElementById("next-reading");
+  const prevReadingBtn = document.getElementById("prev-reading-btn");
+  const nextReadingBtn = document.getElementById("next-reading-btn");
 
   if (prevReadingBtn) {
-    prevReadingBtn.removeEventListener("click", prevReadingHandler);
-    prevReadingBtn.addEventListener("click", prevReadingHandler);
+    prevReadingBtn.removeEventListener("click", () => navigateContent(-1));
+    prevReadingBtn.addEventListener("click", () => navigateContent(-1));
   }
 
   if (nextReadingBtn) {
-    nextReadingBtn.removeEventListener("click", nextReadingHandler);
-    nextReadingBtn.addEventListener("click", nextReadingHandler);
+    nextReadingBtn.removeEventListener("click", () => navigateContent(1));
+    nextReadingBtn.addEventListener("click", () => navigateContent(1));
   }
 
   // 타이핑 관련 버튼들
-  const checkAnswerBtn = document.getElementById("check-answer");
-  if (checkAnswerBtn) {
-    checkAnswerBtn.removeEventListener("click", checkTypingAnswer);
-    checkAnswerBtn.addEventListener("click", checkTypingAnswer);
+  const checkTypingAnswerBtn = document.getElementById(
+    "check-typing-answer-btn"
+  );
+  if (checkTypingAnswerBtn) {
+    checkTypingAnswerBtn.removeEventListener("click", checkTypingAnswer);
+    checkTypingAnswerBtn.addEventListener("click", checkTypingAnswer);
   }
 
-  const nextTypingBtn = document.getElementById("next-typing");
+  const nextTypingBtn = document.getElementById("next-typing-btn");
   if (nextTypingBtn) {
     nextTypingBtn.removeEventListener("click", nextTypingHandler);
     nextTypingBtn.addEventListener("click", nextTypingHandler);
@@ -908,36 +934,38 @@ function setupEventListeners() {
 
   // 모든 돌아가기 버튼들 설정
   const backButtons = [
-    "back-from-flashcard",
-    "back-from-typing",
+    "back-from-vocabulary",
     "back-from-grammar",
     "back-from-reading",
+    "back-from-flashcard",
+    "back-from-typing",
+    "back-to-dashboard-pronunciation",
+    "back-to-dashboard-pattern",
+    "back-to-dashboard-practice",
+    "back-to-dashboard-nodata",
   ];
 
   backButtons.forEach((buttonId) => {
     const button = document.getElementById(buttonId);
+    console.log(`🔍 돌아가기 버튼 확인: ${buttonId}`, button);
     if (button) {
-      button.removeEventListener("click", showAreaSelection);
-      button.addEventListener("click", () => {
-        console.log(`🔙 ${buttonId} 클릭`);
-        showAreaSelection();
-      });
+      button.removeEventListener("click", backToAreasHandler);
+      button.addEventListener("click", backToAreasHandler);
+      console.log(`✅ ${buttonId} 이벤트 리스너 등록 완료`);
+    } else {
+      console.warn(`⚠️ ${buttonId} 버튼을 찾을 수 없음`);
     }
   });
 
   // 새로운 통합 버튼들 설정
-  // 플래시카드 모드 버튼들
-  const prevFlashcardBtn = document.getElementById("prev-flashcard-btn");
-  const nextFlashcardBtn = document.getElementById("next-flashcard-btn");
-  const flipFlashcardBtn = document.getElementById("flip-flashcard-btn");
-
+  // 플래시카드 모드 버튼들 (기존 변수 사용)
   if (prevFlashcardBtn) {
-    prevFlashcardBtn.removeEventListener("click", prevCardHandler);
-    prevFlashcardBtn.addEventListener("click", prevCardHandler);
+    prevFlashcardBtn.removeEventListener("click", () => navigateContent(-1));
+    prevFlashcardBtn.addEventListener("click", () => navigateContent(-1));
   }
   if (nextFlashcardBtn) {
-    nextFlashcardBtn.removeEventListener("click", nextCardHandler);
-    nextFlashcardBtn.addEventListener("click", nextCardHandler);
+    nextFlashcardBtn.removeEventListener("click", () => navigateContent(1));
+    nextFlashcardBtn.addEventListener("click", () => navigateContent(1));
   }
   if (flipFlashcardBtn) {
     flipFlashcardBtn.removeEventListener("click", flipCard);
@@ -947,46 +975,28 @@ function setupEventListeners() {
   // 타이핑 모드 버튼들
   const prevTypingBtnNew = document.getElementById("prev-typing-btn");
   const nextTypingBtnNew = document.getElementById("next-typing-btn");
-  const checkTypingAnswerBtn = document.getElementById(
-    "check-typing-answer-btn"
-  );
 
   if (prevTypingBtnNew) {
-    prevTypingBtnNew.removeEventListener("click", prevCardHandler);
-    prevTypingBtnNew.addEventListener("click", prevCardHandler);
+    prevTypingBtnNew.removeEventListener("click", () => navigateContent(-1));
+    prevTypingBtnNew.addEventListener("click", () => navigateContent(-1));
   }
   if (nextTypingBtnNew) {
-    nextTypingBtnNew.removeEventListener("click", nextCardHandler);
-    nextTypingBtnNew.addEventListener("click", nextCardHandler);
+    nextTypingBtnNew.removeEventListener("click", () => navigateContent(1));
+    nextTypingBtnNew.addEventListener("click", () => navigateContent(1));
   }
   if (checkTypingAnswerBtn) {
     checkTypingAnswerBtn.removeEventListener("click", checkTypingAnswer);
     checkTypingAnswerBtn.addEventListener("click", checkTypingAnswer);
   }
 
-  // 독해 모드 버튼들
-  const prevReadingBtnNew = document.getElementById("prev-reading-btn");
-  const nextReadingBtnNew = document.getElementById("next-reading-btn");
-
-  if (prevReadingBtnNew) {
-    prevReadingBtnNew.removeEventListener("click", prevReadingHandler);
-    prevReadingBtnNew.addEventListener("click", prevReadingHandler);
+  // 독해 모드 버튼들 (기존 변수 사용)
+  if (prevReadingBtn) {
+    prevReadingBtn.removeEventListener("click", () => navigateContent(-1));
+    prevReadingBtn.addEventListener("click", () => navigateContent(-1));
   }
-  if (nextReadingBtnNew) {
-    nextReadingBtnNew.removeEventListener("click", nextReadingHandler);
-    nextReadingBtnNew.addEventListener("click", nextReadingHandler);
-  }
-
-  // 독해 플래시카드 뒤집기 버튼
-  const flipReadingCardBtn = document.getElementById("flip-reading-card");
-  if (flipReadingCardBtn) {
-    flipReadingCardBtn.removeEventListener("click", flipReadingCard);
-    flipReadingCardBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      console.log("🔄 독해 플래시카드 뒤집기 버튼 클릭");
-      flipReadingCard();
-    });
+  if (nextReadingBtn) {
+    nextReadingBtn.removeEventListener("click", () => navigateContent(1));
+    nextReadingBtn.addEventListener("click", () => navigateContent(1));
   }
 
   // 문법 실습 뒤집기 버튼
@@ -1022,6 +1032,21 @@ function setupEventListeners() {
 
   // 전역 이벤트 리스너 추가 (중복 방지)
   document.addEventListener("click", globalClickHandler);
+
+  // 독해 플래시카드 뒤집기 버튼
+  const flipReadingCardBtn = document.getElementById("flip-reading-card");
+  if (flipReadingCardBtn) {
+    flipReadingCardBtn.removeEventListener("click", flipReadingCard);
+    flipReadingCardBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log("🔄 독해 플래시카드 뒤집기 버튼 클릭");
+      // 플래시 모드일 때만 뒤집기 기능 작동
+      if (currentLearningMode === "flash") {
+        flipReadingCard();
+      }
+    });
+  }
 }
 
 // 이벤트 핸들러 함수들 정의
@@ -1111,6 +1136,9 @@ function nextTypingHandler(e) {
 }
 
 function backToAreasHandler(e) {
+  console.log("🔙 backToAreasHandler 함수 호출됨");
+  console.log("🔍 이벤트 대상:", e.target);
+  console.log("🔍 이벤트 타입:", e.type);
   e.preventDefault();
   e.stopPropagation();
   console.log("🔙 영역 선택으로 돌아가기");
@@ -1119,12 +1147,62 @@ function backToAreasHandler(e) {
 
 // 전역 클릭 핸들러
 function globalClickHandler(e) {
+  // 돌아가기 버튼 처리 (우선순위 높음)
+  if (
+    e.target.id === "back-from-flashcard" ||
+    e.target.closest("#back-from-flashcard")
+  ) {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("🔙 back-from-flashcard 버튼 클릭 (globalClickHandler)");
+    backToAreasHandler(e);
+    return;
+  }
+
+  // 다른 돌아가기 버튼들도 처리
+  const backButtonIds = [
+    "back-from-vocabulary",
+    "back-from-grammar",
+    "back-from-reading",
+    "back-from-typing",
+    "back-to-dashboard-pronunciation",
+    "back-to-dashboard-pattern",
+    "back-to-dashboard-practice",
+    "back-to-dashboard-nodata",
+  ];
+
+  for (const buttonId of backButtonIds) {
+    if (e.target.id === buttonId || e.target.closest(`#${buttonId}`)) {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log(`🔙 ${buttonId} 버튼 클릭 (globalClickHandler)`);
+      backToAreasHandler(e);
+      return;
+    }
+  }
+
   // 홈 버튼 (중복 ID 처리)
   if (e.target.id === "home-btn" || e.target.matches(".home-btn")) {
     e.preventDefault();
     e.stopPropagation();
     console.log("🏠 홈 버튼 클릭");
     showAreaSelection();
+    return;
+  }
+
+  // 단어 학습 플래시카드 뒤집기
+  if (e.target.closest("#flashcard-mode-card")) {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("🔄 단어 학습 플래시카드 클릭");
+    console.log("🔍 현재 학습 모드:", currentLearningMode);
+    // 플래시카드 모드일 때만 뒤집기 기능 작동
+    if (currentLearningMode === "flashcard") {
+      console.log("✅ 플래시카드 모드 확인됨, 뒤집기 실행");
+      flipCard();
+    } else {
+      console.log("❌ 플래시카드 모드가 아님, 뒤집기 실행 안함");
+    }
     return;
   }
 
@@ -1138,11 +1216,18 @@ function globalClickHandler(e) {
   }
 
   // 독해 플래시 카드 뒤집기
-  if (e.target.matches("#reading-flash-card, #reading-flash-card *")) {
+  if (e.target.closest("#reading-flash-card")) {
     e.preventDefault();
     e.stopPropagation();
-    console.log("🔄 독해 플래시 카드 뒤집기");
-    flipReadingCard();
+    console.log("🔄 독해 플래시 카드 클릭");
+    console.log("🔍 현재 학습 모드:", currentLearningMode);
+    // 플래시 모드일 때만 뒤집기 기능 작동
+    if (currentLearningMode === "flash") {
+      console.log("✅ 플래시 모드 확인됨, 뒤집기 실행");
+      flipReadingCard();
+    } else {
+      console.log("❌ 플래시 모드가 아님, 뒤집기 실행 안함");
+    }
     return;
   }
 
@@ -1619,6 +1704,7 @@ async function loadSituationAndPurposeFilterOptions() {
     const situationTags = [
       "formal", // 격식
       "casual", // 비격식
+
       "urgent", // 긴급한
       "work", // 직장
       "school", // 학교
@@ -2029,54 +2115,93 @@ async function loadLearningData(area) {
 async function loadVocabularyData() {
   console.log("🔍 단어 데이터 소스 확인...");
 
-  // 1. sessionStorage에서 학습 데이터 확인 (가장 우선)
+  // 1. sessionStorage에서 학습 데이터 확인 (concepts 데이터만)
   try {
     const storedData = sessionStorage.getItem("learningConcepts");
     if (storedData) {
       const parsedData = JSON.parse(storedData);
-      currentData = filterDataByLanguage(parsedData);
-      // 필터 적용
-      currentData = applyFilters(currentData);
-      console.log(
-        `💾 sessionStorage에서 단어 데이터: ${currentData.length}개 (필터 적용 후)`
-      );
-      return;
+      // concepts 데이터인지 엄격하게 검증 (expressions 필드가 있고 examples 데이터가 아님)
+      const validConceptsData = parsedData.filter((item) => {
+        // expressions가 있고, korean/english 등의 직접 언어 필드가 없어야 함 (examples 데이터 제외)
+        return (
+          item.expressions &&
+          !item.korean &&
+          !item.english &&
+          !item.japanese &&
+          !item.chinese
+        );
+      });
+      if (validConceptsData.length > 0) {
+        currentData = filterDataByLanguage(validConceptsData);
+        // 필터 적용
+        currentData = applyFilters(currentData);
+        console.log(
+          `💾 sessionStorage에서 단어 데이터: ${currentData.length}개 (필터 적용 후)`
+        );
+        return;
+      } else {
+        console.log(
+          "💾 sessionStorage에 유효한 concepts 데이터가 없음, 새로 로드"
+        );
+        // 잘못된 데이터 삭제
+        sessionStorage.removeItem("learningConcepts");
+      }
     }
   } catch (error) {
     console.warn("sessionStorage 로드 실패:", error);
   }
 
-  // 2. window 전역 변수들 확인
+  // 2. window 전역 변수들 확인 (concepts 데이터만)
   const globalSources = ["allConcepts", "currentConcepts"];
   for (const sourceName of globalSources) {
     if (window[sourceName] && Array.isArray(window[sourceName])) {
-      currentData = filterDataByLanguage(window[sourceName]);
-      // 필터 적용
-      currentData = applyFilters(currentData);
-      console.log(
-        `💾 window.${sourceName}에서 단어 데이터: ${currentData.length}개 (필터 적용 후)`
+      // concepts 데이터인지 검증
+      const validConceptsData = window[sourceName].filter(
+        (item) => item.expressions
       );
-      return;
+      if (validConceptsData.length > 0) {
+        currentData = filterDataByLanguage(validConceptsData);
+        // 필터 적용
+        currentData = applyFilters(currentData);
+        console.log(
+          `💾 window.${sourceName}에서 단어 데이터: ${currentData.length}개 (필터 적용 후)`
+        );
+        return;
+      }
     }
   }
 
-  // 3. Firebase에서 직접 로드
+  // 3. Firebase에서 직접 로드 (concepts 컬렉션만)
   console.log("🔥 Firebase에서 단어 데이터 직접 로드 시도...");
   try {
     const conceptsRef = collection(db, "concepts");
-    const q = query(conceptsRef, limit(50));
+    const q = query(conceptsRef, limit(100)); // 제한 증가
     const snapshot = await getDocs(q);
+
+    console.log(`🔥 Firebase 쿼리 결과: ${snapshot.size}개 문서`);
 
     const rawData = [];
     snapshot.forEach((doc) => {
-      rawData.push({
-        id: doc.id,
-        concept_id: doc.id,
-        ...doc.data(),
-      });
+      const data = doc.data();
+      // AI 생성 개념 제외하고 expressions가 있는 데이터만 포함
+      if (!data.isAIGenerated && data.expressions) {
+        rawData.push({
+          id: doc.id,
+          concept_id: doc.id,
+          ...data,
+        });
+        console.log(`🔥 개념 로드: ${doc.id}`, {
+          hasExpressions: !!data.expressions,
+          expressionKeys: Object.keys(data.expressions || {}),
+        });
+      }
     });
 
+    console.log(`🔥 유효한 개념 수: ${rawData.length}개`);
+
     currentData = filterDataByLanguage(rawData);
+    console.log(`🔥 언어 필터링 후: ${currentData.length}개`);
+
     // 필터 적용
     currentData = applyFilters(currentData);
     console.log(
@@ -2314,7 +2439,7 @@ function hideLearningModeSections() {
 
 function showFlashcardMode() {
   console.log("🃏 플래시카드 모드 시작");
-  const flashcardMode = document.getElementById("flashcard-container");
+  const flashcardMode = document.getElementById("flashcard-mode");
   if (flashcardMode) {
     flashcardMode.classList.remove("hidden");
     updateFlashcard();
@@ -2324,41 +2449,17 @@ function showFlashcardMode() {
       applyTranslations();
     }, 50);
 
-    // 플래시카드 클릭 이벤트 추가 (기존 리스너 제거 후 새로 추가)
-    const flashcard = document.querySelector(".flip-card");
-    if (flashcard) {
-      // 기존 리스너 제거
-      flashcard.removeEventListener("click", flipCard);
-      // 새 리스너 추가
-      flashcard.addEventListener("click", (e) => {
-        // 버튼이 아닌 경우만 뒤집기
-        if (!e.target.matches("button, .btn")) {
-          e.preventDefault();
-          e.stopPropagation();
-          flipCard();
-        }
-      });
-    }
-
-    // 플래시카드 버튼들 이벤트 리스너 재설정
+    // back-from-flashcard 버튼에 직접 이벤트 리스너 등록
     setTimeout(() => {
-      const flipBtn = document.getElementById("flip-card");
-      const prevBtn = document.getElementById("prev-card");
-      const nextBtn = document.getElementById("next-card");
-
-      if (flipBtn) {
-        flipBtn.removeEventListener("click", flipCard);
-        flipBtn.addEventListener("click", flipCard);
-      }
-
-      if (prevBtn) {
-        prevBtn.removeEventListener("click", () => navigateContent(-1));
-        prevBtn.addEventListener("click", () => navigateContent(-1));
-      }
-
-      if (nextBtn) {
-        nextBtn.removeEventListener("click", () => navigateContent(1));
-        nextBtn.addEventListener("click", () => navigateContent(1));
+      const backButton = document.getElementById("back-from-flashcard");
+      console.log("🔍 플래시카드 돌아가기 버튼 찾기:", backButton);
+      if (backButton) {
+        // 기존 이벤트 리스너 제거 후 새로 등록
+        backButton.removeEventListener("click", backToAreasHandler);
+        backButton.addEventListener("click", backToAreasHandler);
+        console.log("✅ back-from-flashcard 이벤트 리스너 등록 완료");
+      } else {
+        console.error("❌ back-from-flashcard 버튼을 찾을 수 없음");
       }
     }, 100);
   } else {
@@ -2386,116 +2487,91 @@ function updateFlashcard() {
     concept: concept,
   });
 
-  // 언어별 표현 가져오기
-  const sourceExpression = concept.expressions?.[currentSourceLanguage];
-  const targetExpression = concept.expressions?.[currentTargetLanguage];
+  let frontText = "";
+  let backText = "";
+  let frontPronunciation = "";
+  let backDefinition = "";
 
-  if (!sourceExpression || !targetExpression) {
-    console.warn("⚠️ 언어별 표현을 찾을 수 없음:", {
-      concept,
-      sourceLanguage: currentSourceLanguage,
-      targetLanguage: currentTargetLanguage,
-      sourceExpression,
-      targetExpression,
-    });
+  // 1. concepts 데이터 구조 (expressions 있음) - 단어 학습
+  if (concept.expressions) {
+    const sourceExpression = concept.expressions[currentSourceLanguage];
+    const targetExpression = concept.expressions[currentTargetLanguage];
+
+    console.log("✅ concepts 데이터 구조 사용");
+
+    if (sourceExpression && targetExpression) {
+      // 단어 학습: 앞면은 대상언어 단어, 뒤면은 원본언어 단어
+      frontText = targetExpression.word || "";
+      backText = sourceExpression.word || "";
+      frontPronunciation = targetExpression.pronunciation || "";
+      backDefinition = sourceExpression.definition || "";
+    }
+  }
+  // concepts 데이터가 아닌 경우 에러 처리
+  else {
+    console.error("❌ 단어 학습에 잘못된 데이터 구조:", concept);
+    alert("단어 학습 데이터에 문제가 있습니다. 새로고침 후 다시 시도해주세요.");
+    showAreaSelection();
     return;
   }
 
-  // 앞면 업데이트
-  const frontWord = document.getElementById("front-word");
-  const frontPronunciation = document.getElementById("front-pronunciation");
+  // UI 업데이트 - 올바른 HTML ID 사용
+  const frontWordElement = document.getElementById("flashcard-front-word");
+  const frontPronElement = document.getElementById(
+    "flashcard-front-transcription"
+  );
+  const backWordElement = document.getElementById("flashcard-back-word");
+  const backDefElement = document.getElementById("flashcard-back-definition");
+  const progressElement = document.getElementById("flashcard-mode-progress");
 
-  if (frontWord) frontWord.textContent = sourceExpression.word || "";
-  if (frontPronunciation) {
-    frontPronunciation.textContent = sourceExpression.pronunciation || "";
+  if (frontWordElement) frontWordElement.textContent = frontText;
+  if (frontPronElement) frontPronElement.textContent = frontPronunciation;
+  if (backWordElement) backWordElement.textContent = backText;
+  if (backDefElement) backDefElement.textContent = backDefinition;
+  if (progressElement) {
+    progressElement.textContent = `${currentIndex + 1} / ${currentData.length}`;
   }
 
-  // 뒷면 업데이트
-  const backWord = document.getElementById("back-word");
-  const backPronunciation = document.getElementById("back-pronunciation");
-  const backMeaning = document.getElementById("back-meaning");
-
-  if (backWord) backWord.textContent = targetExpression.word || "";
-  if (backPronunciation) {
-    backPronunciation.textContent = targetExpression.pronunciation || "";
-  }
-  if (backMeaning) backMeaning.textContent = targetExpression.meaning || "";
-
-  // 이모지와 카테고리 업데이트 - 다양한 필드에서 이모지 찾기
-  const frontEmoji = document.getElementById("front-emoji");
-  const backEmoji = document.getElementById("back-emoji");
-  const backCategory = document.getElementById("back-category");
-
-  // 이모지 우선순위: concept_info.unicode_emoji > emoji > representative_emoji > 기본값
-  const emoji =
-    concept.concept_info?.unicode_emoji ||
-    concept.concept_info?.emoji ||
-    concept.emoji ||
-    concept.representative_emoji ||
-    "📝";
-
-  const category =
-    concept.concept_info?.category ||
-    concept.category ||
-    concept.main_category ||
-    "일반";
-
-  console.log("🎨 이모지 및 카테고리 설정:", {
-    emoji,
-    category,
-    concept_info: concept.concept_info,
+  console.log("✅ 플래시카드 업데이트 완료:", {
+    frontText,
+    backText,
+    frontPronunciation,
+    backDefinition,
   });
 
-  if (frontEmoji) frontEmoji.textContent = emoji;
-  if (backEmoji) backEmoji.textContent = emoji;
-  if (backCategory) backCategory.textContent = category;
-
-  // 대표 예문 표시
-  const backExample = document.getElementById("back-example");
-  if (
-    backExample &&
-    sourceExpression.examples &&
-    sourceExpression.examples.length > 0
-  ) {
-    backExample.textContent = sourceExpression.examples[0];
-  } else if (backExample) {
-    backExample.textContent = "";
-  }
-
-  // 진행 상황 업데이트
-  const progress = document.getElementById("flashcard-progress");
-  if (progress) {
-    progress.textContent = `${currentIndex + 1} / ${currentData.length}`;
-  }
-
-  // 삭제 버튼 추가
-  const deleteButtonContainer = document.getElementById(
-    "flashcard-delete-container"
-  );
-  if (deleteButtonContainer) {
-    deleteButtonContainer.innerHTML = `
-      <button class="delete-btn bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm" 
-              data-item-id="${concept.id}" 
-              data-item-type="vocabulary">
-        🗑️ 삭제
-      </button>
-    `;
-  }
-
-  // 카드 앞면으로 리셋
-  const card = document.getElementById("flashcard");
-  if (card) {
-    card.classList.remove("flipped");
+  // 카드 뒤집기 상태 초기화 (앞면 표시)
+  isFlipped = false;
+  const flashcardElement = document.querySelector(".flashcard");
+  if (flashcardElement) {
+    flashcardElement.classList.remove("flipped");
   }
 }
 
 function flipCard() {
-  const card = document.querySelector(".flip-card");
+  console.log("🔄 flipCard 함수 시작");
+  const card = document.getElementById("flashcard-mode-card");
+  console.log("🔍 카드 요소 찾기:", card);
+
   if (card) {
-    card.classList.toggle("flipped");
-    console.log("🔄 카드 뒤집기 상태:", card.classList.contains("flipped"));
+    console.log("🔍 현재 카드 클래스:", card.className);
+    isFlipped = !isFlipped;
+    console.log("🔄 뒤집기 상태 변경:", isFlipped);
+
+    if (isFlipped) {
+      card.classList.add("flipped");
+      console.log("✅ 'flipped' 클래스 추가됨");
+    } else {
+      card.classList.remove("flipped");
+      console.log("✅ 'flipped' 클래스 제거됨");
+    }
+
+    console.log("🔍 변경 후 카드 클래스:", card.className);
+    console.log("🔄 카드 뒤집기 상태:", isFlipped);
   } else {
-    console.log("❌ .flip-card 요소를 찾을 수 없음");
+    console.error("❌ flashcard-mode-card 요소를 찾을 수 없음");
+    // 전체 DOM에서 플래시카드 요소 찾기
+    const allFlipCards = document.querySelectorAll(".flip-card");
+    console.log("🔍 전체 flip-card 요소들:", allFlipCards);
   }
 }
 
@@ -2532,44 +2608,61 @@ function updateTyping() {
 
   const concept = currentData[currentIndex];
 
+  // 최신 언어 설정 사용
+  const currentSourceLanguage =
+    window.languageSettings?.sourceLanguage || sourceLanguage || "korean";
+  const currentTargetLanguage =
+    window.languageSettings?.targetLanguage || targetLanguage || "english";
+
   const wordElement = document.getElementById("typing-word");
   const pronunciationElement = document.getElementById("typing-pronunciation");
   const answerInput = document.getElementById("typing-answer");
   const resultDiv = document.getElementById("typing-result");
 
-  if (
-    concept.expressions &&
-    concept.expressions[sourceLanguage] &&
-    concept.expressions[targetLanguage]
-  ) {
-    const sourceExpr = concept.expressions[sourceLanguage];
-    const targetExpr = concept.expressions[targetLanguage];
+  let sourceText = "";
+  let sourcePronunciation = "";
+  let correctAnswer = "";
 
-    if (wordElement) {
-      wordElement.textContent = sourceExpr.word || "";
-    }
-    if (pronunciationElement) {
-      pronunciationElement.textContent = sourceExpr.pronunciation || "";
-    }
+  // 1. concepts 데이터 구조 (expressions 있음)
+  if (concept.expressions) {
+    const sourceExpr = concept.expressions[currentSourceLanguage];
+    const targetExpr = concept.expressions[currentTargetLanguage];
 
-    // 정답 저장
-    if (answerInput) {
-      answerInput.dataset.correctAnswer = targetExpr.word.toLowerCase();
+    if (sourceExpr && targetExpr) {
+      sourceText = sourceExpr.word || "";
+      sourcePronunciation = sourceExpr.pronunciation || "";
+      correctAnswer = targetExpr.word.toLowerCase();
+      console.log("✅ 타이핑 모드: concepts 데이터 구조 사용");
+    } else {
+      console.warn(
+        "⚠️ 타이핑 모드: concepts 데이터에서 언어별 표현을 찾을 수 없음"
+      );
+      return;
     }
-  } else {
-    // 대체 데이터 구조 지원
-    if (wordElement) {
-      wordElement.textContent =
-        concept[sourceLanguage] || concept.word || "단어";
-    }
-    if (pronunciationElement) {
-      pronunciationElement.textContent = "";
-    }
+  }
+  // 2. examples 데이터 구조 (직접 언어별 텍스트)
+  else if (concept[currentSourceLanguage] && concept[currentTargetLanguage]) {
+    sourceText = concept[currentSourceLanguage];
+    sourcePronunciation = concept.pronunciation || "";
+    correctAnswer = concept[currentTargetLanguage].toLowerCase();
+    console.log("✅ 타이핑 모드: examples 데이터 구조 사용");
+  }
+  // 3. 지원되지 않는 구조
+  else {
+    console.warn("⚠️ 타이핑 모드: 지원되지 않는 데이터 구조:", concept);
+    return;
+  }
 
-    if (answerInput) {
-      const answer = concept[targetLanguage] || concept.meaning || "answer";
-      answerInput.dataset.correctAnswer = answer.toLowerCase();
-    }
+  if (wordElement) {
+    wordElement.textContent = sourceText;
+  }
+  if (pronunciationElement) {
+    pronunciationElement.textContent = sourcePronunciation;
+  }
+
+  // 정답 저장
+  if (answerInput) {
+    answerInput.dataset.correctAnswer = correctAnswer;
   }
 
   // 입력 필드 초기화
@@ -2802,6 +2895,12 @@ function showReadingExampleMode() {
     readingContainer.classList.remove("hidden");
     updateReadingExample();
 
+    // 예문 모드에서는 뒤집기 버튼 숨김
+    const flipBtn = document.getElementById("flip-reading-card");
+    if (flipBtn) {
+      flipBtn.style.display = "none";
+    }
+
     // 번역 적용
     setTimeout(() => {
       applyTranslations();
@@ -2819,6 +2918,12 @@ function showReadingFlashMode() {
   if (readingContainer) {
     readingContainer.classList.remove("hidden");
     updateReadingFlash();
+
+    // 플래시 모드에서는 뒤집기 버튼 표시
+    const flipBtn = document.getElementById("flip-reading-card");
+    if (flipBtn) {
+      flipBtn.style.display = "inline-block";
+    }
 
     // 번역 적용
     setTimeout(() => {
@@ -2841,7 +2946,7 @@ function updateReadingExample() {
   const container = document.getElementById("reading-example-container");
   if (!container) return;
 
-  // 예문 학습 모드 - 상세한 정보 표시
+  // 예문 학습 모드 - 간소화된 정보 표시
   container.innerHTML = `
     <div class="space-y-6">
       <div class="text-center">
@@ -2859,15 +2964,6 @@ function updateReadingExample() {
             ? `<p class="text-sm text-gray-500 bg-gray-100 p-3 rounded">상황: ${example.context}</p>`
             : ""
         }
-      </div>
-      
-      <div class="border-t pt-4">
-        <h4 class="font-semibold mb-2">학습 포인트:</h4>
-        <ul class="text-sm text-gray-700 space-y-1">
-          <li>• 문장 구조와 의미를 파악해보세요</li>
-          <li>• 핵심 단어와 표현을 기억해보세요</li>
-          <li>• 실제 상황에서 어떻게 사용되는지 생각해보세요</li>
-        </ul>
       </div>
       
       <div class="text-center pt-4 border-t" id="reading-delete-container">
@@ -3012,18 +3108,10 @@ function navigateContent(direction) {
         break;
     }
   } finally {
-    // 네비게이션 완료 후 플래그 해제
+    // 네비게이션 완료 후 플래그 해제 (더 짧은 시간으로 조정)
     setTimeout(() => {
       isNavigating = false;
-    }, 100);
-  }
-}
-
-// 독해 플래시 카드 뒤집기 함수
-function flipReadingCard() {
-  const card = document.getElementById("reading-flash-card");
-  if (card) {
-    card.classList.toggle("flipped");
+    }, 50);
   }
 }
 
@@ -3748,5 +3836,21 @@ function updateCurrentView() {
     console.log("✅ 현재 뷰 업데이트 완료");
   } catch (error) {
     console.error("❌ 뷰 업데이트 중 오류:", error);
+  }
+}
+
+// 독해 플래시 카드 뒤집기 함수
+function flipReadingCard() {
+  console.log("🔄 flipReadingCard 함수 실행");
+  const card = document.getElementById("reading-flash-card");
+  console.log("🔍 카드 요소 찾기:", card);
+
+  if (card) {
+    console.log("✅ 카드 요소 발견, 현재 클래스:", card.className);
+    card.classList.toggle("flipped");
+    console.log("🔄 뒤집기 후 클래스:", card.className);
+    console.log("✅ 독해 플래시 카드 뒤집기 완료");
+  } else {
+    console.error("❌ reading-flash-card 요소를 찾을 수 없습니다");
   }
 }

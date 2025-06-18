@@ -470,11 +470,20 @@ function createConceptCard(concept) {
   // 예문 가져오기 (concepts 컬렉션의 대표 예문 사용)
   let example = null;
 
-  // 1. representative_example 확인 (새 구조 - 우선순위 최고)
+  // 1. representative_example 확인 (새 구조와 기존 구조 모두 지원)
   if (concept.representative_example) {
     const repExample = concept.representative_example;
 
-    if (repExample.translations) {
+    // 새로운 구조: 직접 언어별 텍스트
+    if (repExample[sourceLanguage] && repExample[targetLanguage]) {
+      example = {
+        source: repExample[sourceLanguage],
+        target: repExample[targetLanguage],
+      };
+      console.log("✅ 카드: 새로운 대표 예문 구조 사용");
+    }
+    // 기존 구조: translations 객체
+    else if (repExample.translations) {
       example = {
         source:
           repExample.translations[sourceLanguage]?.text ||
@@ -485,6 +494,7 @@ function createConceptCard(concept) {
           repExample.translations[targetLanguage] ||
           "",
       };
+      console.log("✅ 카드: 기존 대표 예문 구조 사용");
     }
   }
   // 2. featured_examples 확인 (기존 방식)
@@ -932,35 +942,13 @@ async function fetchAndDisplayConcepts() {
     allConcepts = [];
     const conceptsRef = collection(db, "concepts");
 
-    // 분리된 컬렉션만 조회 (metadata.created_at 필드가 있는 개념들)
+    // 모든 concepts 컬렉션 데이터 조회 (분리된 컬렉션과 기존 구조 모두 포함)
+    console.log("📚 concepts 컬렉션에서 데이터 로드 시작...");
 
     try {
-      // metadata.created_at으로 정렬하여 분리된 컬렉션 개념만 조회
-      const queryWithMetadataOrder = query(
-        conceptsRef,
-        orderBy("metadata.created_at", "desc")
-      );
-      const querySnapshot = await getDocs(queryWithMetadataOrder);
-
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        data.id = doc.id;
-        if (!data._id) {
-          data._id = doc.id;
-        }
-
-        // AI 생성 개념 제외, 분리된 컬렉션 개념만 포함
-        if (!data.isAIGenerated && data.metadata?.created_at) {
-          allConcepts.push(data);
-        }
-      });
-    } catch (metadataOrderError) {
-      console.warn(
-        "metadata.created_at 정렬 실패, 전체 조회로 분리된 컬렉션 개념 필터링"
-      );
-
-      // 정렬 실패 시 전체 조회 후 분리된 컬렉션 개념만 필터링
+      // 전체 조회 후 필터링 (더 안전한 방식)
       const querySnapshot = await getDocs(conceptsRef);
+      console.log(`📊 concepts 컬렉션에서 ${querySnapshot.size}개 문서 발견`);
 
       querySnapshot.forEach((doc) => {
         const data = doc.data();
@@ -969,11 +957,24 @@ async function fetchAndDisplayConcepts() {
           data._id = doc.id;
         }
 
-        // AI 생성 개념 제외, 분리된 컬렉션 개념만 포함 (metadata.created_at 필드로 구분)
-        if (!data.isAIGenerated && data.metadata?.created_at) {
+        // AI 생성 개념 제외하고 모든 개념 포함 (분리된 컬렉션과 기존 구조 모두)
+        if (!data.isAIGenerated) {
+          console.log(`✅ 개념 추가: ${doc.id}`, {
+            hasMetadata: !!data.metadata,
+            hasCreatedAt: !!data.created_at,
+            hasExpressions: !!data.expressions,
+            expressionKeys: Object.keys(data.expressions || {}),
+          });
           allConcepts.push(data);
+        } else {
+          console.log(`⏭️ AI 생성 개념 제외: ${doc.id}`);
         }
       });
+
+      console.log(`📋 총 로드된 개념 수: ${allConcepts.length}개`);
+    } catch (queryError) {
+      console.error("concepts 컬렉션 조회 실패:", queryError);
+      allConcepts = [];
     }
 
     // JavaScript에서 정렬 (분리된 컬렉션과 통합 컬렉션 모두 지원)
@@ -1271,8 +1272,33 @@ async function loadAndDisplayExamples(
       console.log("대표 예문 발견:", currentConcept.representative_example);
 
       const repExample = currentConcept.representative_example;
-      if (repExample.translations) {
-        console.log("🔍 대표 예문 translations 구조:", repExample.translations);
+
+      // 새로운 구조: 직접 언어별 텍스트 (translations 없음)
+      if (repExample[sourceLanguage] && repExample[targetLanguage]) {
+        console.log("🔍 새로운 대표 예문 구조 (직접 언어별):", repExample);
+
+        const sourceText = repExample[sourceLanguage];
+        const targetText = repExample[targetLanguage];
+
+        console.log("📝 추출된 예문 (새 구조):", { sourceText, targetText });
+
+        if (sourceText && targetText) {
+          allExamples.push({
+            sourceText,
+            targetText,
+            priority: repExample.priority || 10,
+            context: repExample.context || "대표 예문",
+            isRepresentative: true,
+          });
+          console.log("✅ 대표 예문을 allExamples에 추가함 (새 구조)");
+        }
+      }
+      // 기존 구조: translations 객체 포함
+      else if (repExample.translations) {
+        console.log(
+          "🔍 기존 대표 예문 구조 (translations):",
+          repExample.translations
+        );
         console.log(
           "🔍 sourceLanguage:",
           sourceLanguage,
@@ -1289,7 +1315,7 @@ async function loadAndDisplayExamples(
           repExample.translations[targetLanguage] ||
           "";
 
-        console.log("📝 추출된 예문:", { sourceText, targetText });
+        console.log("📝 추출된 예문 (기존 구조):", { sourceText, targetText });
 
         if (sourceText && targetText) {
           allExamples.push({
@@ -1299,12 +1325,12 @@ async function loadAndDisplayExamples(
             context: repExample.context || "대표 예문",
             isRepresentative: true,
           });
-          console.log("✅ 대표 예문을 allExamples에 추가함");
+          console.log("✅ 대표 예문을 allExamples에 추가함 (기존 구조)");
         } else {
-          console.log("⚠️ sourceText 또는 targetText가 비어있음");
+          console.log("⚠️ sourceText 또는 targetText가 비어있음 (기존 구조)");
         }
       } else {
-        console.log("⚠️ repExample.translations가 없음");
+        console.log("⚠️ 지원되지 않는 대표 예문 구조:", repExample);
       }
     }
 

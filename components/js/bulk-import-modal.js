@@ -14,6 +14,14 @@ import {
 } from "../../js/grammar-tags-system.js";
 import { collectionManager } from "../../js/firebase/firebase-collection-manager.js";
 import { readFile } from "./csv-parser-utils.js";
+import {
+  EXAMPLES_TEMPLATE,
+  CONCEPTS_TEMPLATE,
+  GRAMMAR_TEMPLATE,
+  examplesTemplateToCSV,
+  conceptsTemplateToCSV,
+  grammarTemplateToCSV,
+} from "../../samples/templates.js";
 
 // 전역 변수
 let currentTab = "concepts";
@@ -299,8 +307,15 @@ async function uploadExamples(data) {
         example_id:
           exampleData.example_id ||
           `example_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        context: exampleData.context || "general",
+        domain: exampleData.domain || "general",
+        category: exampleData.category || "common",
         difficulty: exampleData.difficulty || "beginner",
+        situation: Array.isArray(exampleData.situation)
+          ? exampleData.situation
+          : typeof exampleData.situation === "string"
+          ? exampleData.situation.split(",").map((s) => s.trim())
+          : [],
+        purpose: exampleData.purpose || null,
         tags: exampleData.tags || [],
         translations: exampleData.translations || {},
         metadata: {
@@ -393,215 +408,196 @@ function downloadTemplate(tabName) {
 }
 
 function downloadConceptsJSONTemplate() {
-  const template = [
-    {
-      concept_info: {
-        domain: "daily",
-        category: "fruit",
-        difficulty: "beginner",
-        unicode_emoji: "🍎",
-        color_theme: "#FF6B6B",
-        tags: ["food", "healthy", "common"],
-      },
-      expressions: {
-        korean: {
-          word: "사과",
-          pronunciation: "sa-gwa",
-          definition: "둥글고 빨간 과일",
-          part_of_speech: "명사",
-          level: "beginner",
-          synonyms: ["능금"],
-          antonyms: [],
-          word_family: ["과일", "음식"],
-          compound_words: ["사과나무", "사과즙"],
-          collocations: ["빨간 사과", "맛있는 사과"],
-        },
-        english: {
-          word: "apple",
-          pronunciation: "/ˈæpəl/",
-          definition: "a round fruit with red or green skin",
-          part_of_speech: "noun",
-          level: "beginner",
-          synonyms: [],
-          antonyms: [],
-          word_family: ["fruit", "food"],
-          compound_words: ["apple tree", "apple juice"],
-          collocations: ["red apple", "fresh apple"],
-        },
-        chinese: {
-          word: "苹果",
-          pronunciation: "píng guǒ",
-          definition: "圆形的红色或绿色水果",
-          part_of_speech: "名词",
-          level: "beginner",
-          synonyms: ["苹子"],
-          antonyms: [],
-          word_family: ["水果", "食物"],
-          compound_words: ["苹果树", "苹果汁"],
-          collocations: ["红苹果", "新鲜苹果"],
-        },
-        japanese: {
-          word: "りんご",
-          pronunciation: "ringo",
-          definition: "赤いまたは緑色の丸い果物",
-          part_of_speech: "名詞",
-          level: "beginner",
-          synonyms: ["アップル"],
-          antonyms: [],
-          word_family: ["果物", "食べ物"],
-          compound_words: ["りんごの木", "りんごジュース"],
-          collocations: ["赤いりんご", "新鮮なりんご"],
-        },
-      },
-      representative_example: {
-        translations: {
-          korean: "나는 빨간 사과를 좋아한다.",
-          english: "I like red apples.",
-          chinese: "我喜欢红苹果。",
-          japanese: "私は赤いりんごが好きです。",
-        },
-        context: "daily_conversation",
-        difficulty: "beginner",
-      },
-    },
-  ];
-
-  downloadJSON(template, "concepts_template.json");
+  console.log("✅ 개념 템플릿 다운로드:", CONCEPTS_TEMPLATE.length, "개 개념");
+  downloadJSON(CONCEPTS_TEMPLATE, "concepts_template.json");
 }
 
 function downloadConceptsCSVTemplate() {
-  const csvContent = `domain,category,difficulty,unicode_emoji,color_theme,tags,korean_word,korean_pronunciation,korean_definition,korean_part_of_speech,korean_level,korean_synonyms,korean_word_family,korean_compound_words,korean_collocations,english_word,english_pronunciation,english_definition,english_part_of_speech,english_level,english_synonyms,english_word_family,english_compound_words,english_collocations,chinese_word,chinese_pronunciation,chinese_definition,chinese_part_of_speech,chinese_level,chinese_synonyms,chinese_word_family,chinese_compound_words,chinese_collocations,japanese_word,japanese_pronunciation,japanese_definition,japanese_part_of_speech,japanese_level,japanese_synonyms,japanese_word_family,japanese_compound_words,japanese_collocations,example_korean,example_english,example_chinese,example_japanese,example_context,example_difficulty
-daily,fruit,beginner,🍎,#FF6B6B,"food,healthy,common",사과,sa-gwa,둥글고 빨간 과일,명사,beginner,능금,"과일,음식","사과나무,사과즙","빨간 사과,맛있는 사과",apple,/ˈæpəl/,a round fruit with red or green skin,noun,beginner,,"fruit,food","apple tree,apple juice","red apple,fresh apple",苹果,píng guǒ,圆形的红色或绿色水果,名词,beginner,苹子,"水果,食物","苹果树,苹果汁","红苹果,新鲜苹果",りんご,ringo,赤いまたは緑色の丸い果物,名詞,beginner,アップル,"果物,食べ物","りんごの木,りんごジュース","赤いりんご,新鮮なりんご",나는 빨간 사과를 좋아한다.,I like red apples.,我喜欢红苹果。,私は赤いりんごが好きです。,daily_conversation,beginner`;
+  console.log("✅ 개념 CSV 템플릿 다운로드");
 
-  downloadCSV(csvContent, "concepts_template.csv");
+  const headers = [
+    "domain",
+    "category",
+    "difficulty",
+    "unicode_emoji",
+    "color_theme",
+    "tags",
+    "korean_word",
+    "korean_pronunciation",
+    "korean_definition",
+    "korean_part_of_speech",
+    "korean_level",
+    "korean_synonyms",
+    "korean_word_family",
+    "korean_compound_words",
+    "korean_collocations",
+    "english_word",
+    "english_pronunciation",
+    "english_definition",
+    "english_part_of_speech",
+    "english_level",
+    "english_synonyms",
+    "english_word_family",
+    "english_compound_words",
+    "english_collocations",
+    "chinese_word",
+    "chinese_pronunciation",
+    "chinese_definition",
+    "chinese_part_of_speech",
+    "chinese_level",
+    "chinese_synonyms",
+    "chinese_word_family",
+    "chinese_compound_words",
+    "chinese_collocations",
+    "japanese_word",
+    "japanese_pronunciation",
+    "japanese_definition",
+    "japanese_part_of_speech",
+    "japanese_level",
+    "japanese_synonyms",
+    "japanese_word_family",
+    "japanese_compound_words",
+    "japanese_collocations",
+    "example_korean",
+    "example_english",
+    "example_chinese",
+    "example_japanese",
+    "example_context",
+    "example_difficulty",
+  ];
+
+  const rows = CONCEPTS_TEMPLATE.map((concept) => [
+    concept.concept_info.domain,
+    concept.concept_info.category,
+    concept.concept_info.difficulty,
+    concept.concept_info.unicode_emoji,
+    concept.concept_info.color_theme,
+    concept.concept_info.tags.join(","),
+    concept.expressions.korean.word,
+    concept.expressions.korean.pronunciation,
+    concept.expressions.korean.definition,
+    concept.expressions.korean.part_of_speech,
+    concept.expressions.korean.level,
+    concept.expressions.korean.synonyms.join(","),
+    concept.expressions.korean.word_family.join(","),
+    concept.expressions.korean.compound_words.join(","),
+    concept.expressions.korean.collocations.join(","),
+    concept.expressions.english.word,
+    concept.expressions.english.pronunciation,
+    concept.expressions.english.definition,
+    concept.expressions.english.part_of_speech,
+    concept.expressions.english.level,
+    concept.expressions.english.synonyms.join(","),
+    concept.expressions.english.word_family.join(","),
+    concept.expressions.english.compound_words.join(","),
+    concept.expressions.english.collocations.join(","),
+    concept.expressions.chinese.word,
+    concept.expressions.chinese.pronunciation,
+    concept.expressions.chinese.definition,
+    concept.expressions.chinese.part_of_speech,
+    concept.expressions.chinese.level,
+    concept.expressions.chinese.synonyms.join(","),
+    concept.expressions.chinese.word_family.join(","),
+    concept.expressions.chinese.compound_words.join(","),
+    concept.expressions.chinese.collocations.join(","),
+    concept.expressions.japanese.word,
+    concept.expressions.japanese.pronunciation,
+    concept.expressions.japanese.definition,
+    concept.expressions.japanese.part_of_speech,
+    concept.expressions.japanese.level,
+    concept.expressions.japanese.synonyms.join(","),
+    concept.expressions.japanese.word_family.join(","),
+    concept.expressions.japanese.compound_words.join(","),
+    concept.expressions.japanese.collocations.join(","),
+    concept.representative_example.translations.korean,
+    concept.representative_example.translations.english,
+    concept.representative_example.translations.chinese,
+    concept.representative_example.translations.japanese,
+    concept.representative_example.context,
+    concept.representative_example.difficulty,
+  ]);
+
+  downloadCSV(
+    [headers, ...rows].map((row) => row.join(",")).join("\n"),
+    "concepts_template.csv"
+  );
 }
 
 function downloadExamplesJSONTemplate() {
-  const template = [
-    {
-      example_id: "example_001",
-      domain: "daily",
-      category: "routine",
-      context: "daily_conversation",
-      difficulty: "beginner",
-      tags: ["greeting", "polite", "formal"],
-      translations: {
-        korean: {
-          text: "안녕하세요! 처음 뵙겠습니다.",
-          romanization: "annyeonghaseyo! cheoeum boepgetseumnida",
-        },
-        english: {
-          text: "Hello! Nice to meet you for the first time.",
-          phonetic: "/həˈloʊ naɪs tu mit ju fɔr ðə fɜrst taɪm/",
-        },
-        japanese: {
-          text: "こんにちは！初めてお会いします。",
-          romanization: "konnichiwa! hajimete oai shimasu",
-        },
-        chinese: {
-          text: "你好！初次见面。",
-          pinyin: "nǐ hǎo! chū cì jiàn miàn",
-        },
-      },
-    },
-    {
-      example_id: "example_002",
-      domain: "food",
-      category: "fruit",
-      context: "restaurant",
-      difficulty: "beginner",
-      tags: ["food", "ordering", "restaurant"],
-      translations: {
-        korean: {
-          text: "사과 주스 하나 주세요.",
-          romanization: "sagwa juseu hana juseyo",
-        },
-        english: {
-          text: "Please give me one apple juice.",
-          phonetic: "/pliːz ɡɪv mi wʌn ˈæpəl ʤus/",
-        },
-        japanese: {
-          text: "りんごジュースを一つください。",
-          romanization: "ringo juusu wo hitotsu kudasai",
-        },
-        chinese: {
-          text: "请给我一杯苹果汁。",
-          pinyin: "qǐng gěi wǒ yī bēi píng guǒ zhī",
-        },
-      },
-    },
-  ];
-
-  downloadJSON(template, "examples_template.json");
+  console.log("✅ 예문 템플릿 다운로드:", EXAMPLES_TEMPLATE.length, "개 예문");
+  downloadJSON(EXAMPLES_TEMPLATE, "examples_template.json");
 }
 
 function downloadExamplesCSVTemplate() {
-  const csvContent = `example_id,domain,category,context,difficulty,tags,korean,english,japanese,chinese
-example_001,daily,routine,daily_conversation,beginner,"greeting,polite,formal",안녕하세요! 처음 뵙겠습니다.,Hello! Nice to meet you for the first time.,こんにちは！初めてお会いします。,你好！初次见面。
-example_002,food,fruit,restaurant,beginner,"food,ordering,restaurant",사과 주스 하나 주세요.,Please give me one apple juice.,りんごジュースを一つください。,请给我一杯苹果汁。`;
+  console.log("✅ 예문 CSV 템플릿 다운로드");
 
-  downloadCSV(csvContent, "examples_template.csv");
+  const headers = [
+    "domain",
+    "category",
+    "difficulty",
+    "situation",
+    "purpose",
+    "korean_text",
+    "english_text",
+    "japanese_text",
+    "chinese_text",
+  ];
+  const rows = EXAMPLES_TEMPLATE.map((item) => [
+    item.domain,
+    item.category,
+    item.difficulty,
+    Array.isArray(item.situation) ? item.situation.join(",") : item.situation,
+    item.purpose,
+    item.translations.korean,
+    item.translations.english,
+    item.translations.japanese,
+    item.translations.chinese,
+  ]);
+
+  downloadCSV(
+    [headers, ...rows].map((row) => row.join(",")).join("\n"),
+    "examples_template.csv"
+  );
 }
 
 function downloadGrammarJSONTemplate() {
-  const template = [
-    {
-      pattern_name: "기본 인사",
-      structural_pattern: "안녕하세요",
-      explanation:
-        "가장 기본적인 한국어 인사말로, 누구에게나 사용할 수 있는 정중한 표현입니다.",
-      example: {
-        korean: "안녕하세요, 처음 뵙겠습니다.",
-        english: "Hello, nice to meet you.",
-        japanese: "こんにちは、初めまして。",
-        chinese: "您好，初次见面。",
-      },
-      difficulty: "basic",
-      tags: ["formal", "greeting"],
-      created_at: "2024-01-01T00:00:00Z",
-    },
-    {
-      pattern_name: "음식 주문",
-      structural_pattern: "___을/를 주세요",
-      explanation:
-        "음식점이나 상점에서 무언가를 주문하거나 요청할 때 사용하는 정중한 표현입니다.",
-      example: {
-        korean: "김치찌개를 주세요.",
-        english: "Please give me kimchi stew.",
-        japanese: "キムチチゲをください。",
-        chinese: "请给我泡菜汤。",
-      },
-      difficulty: "basic",
-      tags: ["casual", "request"],
-      created_at: "2024-01-01T00:00:00Z",
-    },
-    {
-      pattern_name: "과거형 표현",
-      structural_pattern: "___었/았어요",
-      explanation:
-        "과거에 일어난 일을 표현할 때 사용하는 기본적인 과거형 어미입니다.",
-      example: {
-        korean: "어제 친구를 만났어요.",
-        english: "I met a friend yesterday.",
-        japanese: "昨日友達に会いました。",
-        chinese: "昨天见了朋友。",
-      },
-      difficulty: "intermediate",
-      tags: ["formal", "description"],
-      created_at: "2024-01-01T00:00:00Z",
-    },
-  ];
-
-  downloadJSON(template, "grammar_template.json");
+  console.log("✅ 문법 템플릿 다운로드:", GRAMMAR_TEMPLATE.length, "개 패턴");
+  downloadJSON(GRAMMAR_TEMPLATE, "grammar_template.json");
 }
 
 function downloadGrammarCSVTemplate() {
-  const csvContent = `pattern_name,structural_pattern,explanation,korean_example,english_example,japanese_example,chinese_example,difficulty,tags,created_at
-기본 인사,안녕하세요,가장 기본적인 한국어 인사말로 누구에게나 사용할 수 있는 정중한 표현입니다,"안녕하세요, 처음 뵙겠습니다.","Hello, nice to meet you.","こんにちは、初めまして。","您好，初次见面。",basic,"formal,greeting",2024-01-01T00:00:00Z
-음식 주문,___을/를 주세요,음식점이나 상점에서 무언가를 주문하거나 요청할 때 사용하는 정중한 표현입니다,김치찌개를 주세요.,"Please give me kimchi stew.",キムチチゲをください。,请给我泡菜汤。,basic,"casual,request",2024-01-01T00:00:00Z
-과거형 표현,___었/았어요,과거에 일어난 일을 표현할 때 사용하는 기본적인 과거형 어미입니다,어제 친구를 만났어요.,"I met a friend yesterday.",昨日友達に会いました。,昨天见了朋友。,intermediate,"formal,description",2024-01-01T00:00:00Z`;
+  console.log("✅ 문법 CSV 템플릿 다운로드");
 
-  downloadCSV(csvContent, "grammar_template.csv");
+  const headers = [
+    "pattern_name",
+    "structural_pattern",
+    "explanation",
+    "korean_example",
+    "english_example",
+    "japanese_example",
+    "chinese_example",
+    "difficulty",
+    "tags",
+    "created_at",
+  ];
+
+  const rows = GRAMMAR_TEMPLATE.map((grammar) => [
+    grammar.pattern_name,
+    grammar.structural_pattern,
+    grammar.explanation,
+    grammar.example.korean,
+    grammar.example.english,
+    grammar.example.japanese,
+    grammar.example.chinese,
+    grammar.difficulty,
+    grammar.tags.join(","),
+    grammar.created_at,
+  ]);
+
+  downloadCSV(
+    [headers, ...rows].map((row) => row.join(",")).join("\n"),
+    "grammar_template.csv"
+  );
 }
 
 function downloadJSON(data, filename) {
@@ -815,17 +811,18 @@ function parseConceptFromCSV(row) {
 function parseExampleFromCSV(row) {
   try {
     return {
-      example_id: row.example_id || null,
       domain: row.domain || "general",
       category: row.category || "common",
-      context: row.context || "general",
-      difficulty: row.difficulty || "beginner",
-      tags: row.tags ? row.tags.split(",").map((t) => t.trim()) : [],
+      difficulty: row.difficulty || "basic",
+      situation: row.situation
+        ? row.situation.split(",").map((s) => s.trim())
+        : ["casual"],
+      purpose: row.purpose || null,
       translations: {
-        korean: row.korean || "",
-        english: row.english || "",
-        japanese: row.japanese || "",
-        chinese: row.chinese || "",
+        korean: row.korean_text || "",
+        english: row.english_text || "",
+        japanese: row.japanese_text || "",
+        chinese: row.chinese_text || "",
       },
     };
   } catch (error) {

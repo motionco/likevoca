@@ -126,21 +126,18 @@ function parseConceptFromCSV(row) {
 function parseExampleFromCSV(row) {
   try {
     return {
-      example_id: row.example_id || null,
-      context: row.context || "general",
+      domain: row.domain || "general",
+      category: row.category || "common",
       difficulty: row.difficulty || "beginner",
-      tags: row.tags ? row.tags.split(",").map((t) => t.trim()) : [],
+      situation: row.situation
+        ? row.situation.split(",").map((s) => s.trim())
+        : ["casual"],
+      purpose: row.purpose || null,
       translations: {
-        korean: row.korean || "",
-        english: row.english || "",
-        japanese: row.japanese || "",
-      },
-      learning_metadata: {
-        pattern_name: row.pattern_name || null,
-        structural_pattern: row.structural_pattern || null,
-        learning_weight: parseInt(row.learning_weight) || 5,
-        quiz_eligible: row.quiz_eligible !== "false",
-        game_eligible: row.game_eligible !== "false",
+        korean: row.korean_text || row.korean || "",
+        english: row.english_text || row.english || "",
+        japanese: row.japanese_text || row.japanese || "",
+        chinese: row.chinese_text || row.chinese || "",
       },
     };
   } catch (error) {

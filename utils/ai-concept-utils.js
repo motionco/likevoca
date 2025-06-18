@@ -183,23 +183,24 @@ const TEST_CONCEPTS = [
     },
     // 대표 예문 (다국어 단어장과 동일한 구조)
     representative_example: {
-      translations: {
-        korean: "나는 빨간 사과를 좋아한다.",
-        english: "I like red apples.",
-        chinese: "我喜欢红苹果。",
-        japanese: "私は赤いりんごが好きです。",
-      },
-      context: "daily_conversation",
-      difficulty: "beginner",
+      korean: "사과 주스 하나 주세요.",
+      english: "Please give me one apple juice.",
+      chinese: "请给我一杯苹果汁。",
+      japanese: "りんごジュースを一つください。",
     },
-
-    // 추가 예문들 (분리된 컬렉션 구조)
+    // 추가 예문들 (다국어 단어장과 동일한 구조)
     examples: [
       {
         korean: "이 사과는 정말 달아요.",
         english: "This apple is really sweet.",
         japanese: "このりんごはとても甘いです。",
         chinese: "这个苹果真甜。",
+      },
+      {
+        korean: "사과를 깎아서 드세요.",
+        english: "Please peel and eat the apple.",
+        japanese: "りんごを剥いて食べてください。",
+        chinese: "请削苹果吃。",
       },
     ],
     // 최소 호환성 필드들
@@ -269,15 +270,29 @@ const TEST_CONCEPTS = [
     },
     // 대표 예문 (다국어 단어장과 동일한 구조)
     representative_example: {
-      translations: {
-        korean: "우리 집에는 귀여운 고양이가 있습니다.",
-        english: "We have a cute cat at home.",
-        chinese: "我们家有一只可爱的猫。",
-        japanese: "私たちの家にはかわいい猫がいます。",
-      },
-      context: "daily_conversation",
-      difficulty: "beginner",
+      korean: "우리 집에는 귀여운 고양이가 있습니다.",
+      english: "We have a cute cat at home.",
+      chinese: "我们家有一只可爱的猫。",
+      japanese: "私たちの家にはかわいい猫がいます。",
     },
+    // 추가 예문들 (다국어 단어장과 동일한 구조)
+    examples: [
+      {
+        korean: "고양이가 야옹야옹 울고 있어요.",
+        english: "The cat is meowing.",
+        chinese: "猫在叫。",
+        japanese: "猫がニャーニャー鳴いています。",
+      },
+      {
+        korean: "고양이에게 먹이를 주세요.",
+        english: "Please feed the cat.",
+        chinese: "请喂猫。",
+        japanese: "猫にえさをあげてください。",
+      },
+    ],
+    // 최소 호환성 필드들
+    domain: "animal",
+    category: "pet",
   },
 ];
 
@@ -370,15 +385,15 @@ export async function handleAIConceptRecommendation(currentUser, db) {
       conceptData.expressions = filteredExpressions;
 
       // 예제도 필터링 (다국어 단어장 구조)
-      if (conceptData.representative_example?.translations) {
+      if (conceptData.representative_example) {
         const filteredTranslations = {};
         selectedLanguages.forEach((lang) => {
-          if (conceptData.representative_example.translations[lang]) {
+          if (conceptData.representative_example[lang]) {
             filteredTranslations[lang] =
-              conceptData.representative_example.translations[lang];
+              conceptData.representative_example[lang];
           }
         });
-        conceptData.representative_example.translations = filteredTranslations;
+        conceptData.representative_example = filteredTranslations;
       }
 
       // 추가 예문들도 필터링
@@ -393,6 +408,7 @@ export async function handleAIConceptRecommendation(currentUser, db) {
           return filteredExample;
         });
         conceptData.examples = filteredExamples;
+        console.log(`📝 필터링된 예문 수: ${filteredExamples.length}개`);
       }
       console.log("테스트 개념 데이터 생성 완료:", conceptData);
     } else {
@@ -445,9 +461,13 @@ export async function handleAIConceptRecommendation(currentUser, db) {
         conceptData.featured_examples.length > 0
           ? conceptData.featured_examples[0]
           : null),
+
+      // 추가 예문들 (다국어 단어장과 완전히 동일한 구조)
+      examples: conceptData.examples || [],
     };
 
     console.log("🔧 변환된 개념 데이터:", transformedConceptData);
+    console.log("🔧 예문 개수:", transformedConceptData.examples.length);
 
     // ai-recommend 컬렉션에 저장 (분리된 컬렉션 구조)
     console.log("💾 ai-recommend 컬렉션에 개념 저장 중...");

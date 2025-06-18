@@ -284,21 +284,17 @@ class DataUploadProcessor {
           example_id:
             item.example_id ||
             `example_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          concept_id: item.concept_id || null,
           domain: item.domain || "general",
           category: item.category || "common",
-          context: item.context || "general",
           difficulty: item.difficulty || "beginner",
+          situation: Array.isArray(item.situation)
+            ? item.situation
+            : typeof item.situation === "string"
+            ? item.situation.split(",").map((s) => s.trim())
+            : [],
+          purpose: item.purpose || null,
           tags: Array.isArray(item.tags) ? item.tags : [],
           translations: item.translations || {},
-          learning_metadata: {
-            pattern_name: item.learning_metadata?.pattern_name || null,
-            structural_pattern:
-              item.learning_metadata?.structural_pattern || null,
-            learning_weight: item.learning_metadata?.learning_weight || 5,
-            quiz_eligible: item.learning_metadata?.quiz_eligible !== false,
-            game_eligible: item.learning_metadata?.game_eligible !== false,
-          },
         };
 
         await this.collectionManager.createExample(exampleData);

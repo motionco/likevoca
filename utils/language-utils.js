@@ -1,7 +1,7 @@
-// 지?�하???�어 목록
+// 지원하는 언어 목록
 const SUPPORTED_LANGUAGES = {
   ko: {
-    name: "?�국??,
+    name: "한국어",
     code: "ko",
   },
   en: {
@@ -9,24 +9,24 @@ const SUPPORTED_LANGUAGES = {
     code: "en",
   },
   ja: {
-    name: "?�本�?,
+    name: "日本語",
     code: "ja",
   },
   zh: {
-    name: "�?��",
+    name: "中文",
     code: "zh",
   },
 };
 
-// 공통?�로 ?�용?�는 ?�스???�의
+// 공통으로 사용되는 텍스트 정의
 const commonTexts = {
   ko: {
-    language_learning: "?�국???�습",
+    language_learning: "다국어 학습",
     language_learning_desc:
-      "?�래?�카?? ?�즈, ?�?�핑 ???�양??방식?�로 ?�어�??�습?�세??",
-    language_games: "?�국??게임",
+      "플래시카드, 퀴즈, 타이핑 등 다양한 방식으로 언어를 학습하세요.",
+    language_games: "다국어 게임",
     language_games_desc:
-      "?��??�는 게임???�해 ?�양???�어�?즐겁�?배워보세??",
+      "재미있는 게임을 통해 다양한 언어를 즐겁게 배워보세요.",
   },
   en: {
     language_learning: "Language Learning",
@@ -36,28 +36,29 @@ const commonTexts = {
     language_games_desc: "Learn various languages enjoyably through fun games.",
   },
   ja: {
-    language_learning: "多�?語�?�?,
+    language_learning: "多言語学習",
     language_learning_desc:
-      "?�ラ?�シ?�カ?�ド?�ク?�ズ?�タ?�ピ?�グ?�ど?�様?�な?�法?��?語を学び?�し?�う??,
-    language_games: "多�?語ゲ?�ム",
-    language_games_desc: "楽し?�ゲ?�ム?�通し??��?�な言語を楽し?��??�ま?�ょ?��?,
+      "フラッシュカード、クイズ、タイピングなど、様々な方法で言語を学びましょう。",
+    language_games: "多言語ゲーム",
+    language_games_desc: "楽しいゲームを通して様々な言語を楽しく学びましょう。",
   },
   zh: {
-    language_learning: "多�?言学习",
-    language_learning_desc: "?�过?�卡?�测验和?�字等多种方式�?习�?言??,
-    language_games: "多�?言游戏",
-    language_games_desc: "?�过?�趣?�游?�愉快地学习?�种�????,
+    language_learning: "多语言学习",
+    language_learning_desc: "通过闪卡、测验和打字等多种方式学习语言。",
+    language_games: "多语言游戏",
+    language_games_desc: "通过有趣的游戏愉快地学习各种语言。",
   },
 };
 
-// SEO�??�한 메�??�이???�정
+// SEO를 위한 메타데이터 설정
 const seoMetadata = {
-  // ?�페?��? 메�??�이??  home: {
+  // 홈페이지 메타데이터
+  home: {
     ko: {
       title: "LikeVoca - " + commonTexts.ko.language_learning,
       description: commonTexts.ko.language_learning_desc,
       keywords:
-        "?�어 ?�습, ?�국?? ?�어?? AI ?�어?? ?�어, ?�본?? 중국?? ?�국??,
+        "언어 학습, 다국어, 단어장, AI 단어장, 영어, 일본어, 중국어, 한국어",
       canonical: "https://likevoca.com/ko",
     },
     en: {
@@ -71,22 +72,23 @@ const seoMetadata = {
       title: "LikeVoca - " + commonTexts.ja.language_learning,
       description: commonTexts.ja.language_learning_desc,
       keywords:
-        "語�?�?��, 多�?�? ?�語�? AI?�語�? ?�語, ?�本�? �?���? ?�国�?,
+        "語学学習, 多言語, 単語帳, AI単語帳, 英語, 日本語, 中国語, 韓国語",
       canonical: "https://likevoca.com/ja",
     },
     zh: {
       title: "LikeVoca - " + commonTexts.zh.language_learning,
       description: commonTexts.zh.language_learning_desc,
-      keywords: "�??学习, 多�?言, ?�词?? AI?�词?? ?��?, ?��?, �?��, ?��?",
+      keywords: "语言学习, 多语言, 单词本, AI单词本, 英语, 日语, 中文, 韩语",
       canonical: "https://likevoca.com/zh",
     },
   },
-  // ?�국???�어???�이지 메�??�이??  dictionary: {
+  // 다국어 단어장 페이지 메타데이터
+  dictionary: {
     ko: {
-      title: "LikeVoca - ?�국???�어??,
-      description: "?�만???�국???�어?�을 만들�??�과?�으�??�습?�세??",
+      title: "LikeVoca - 다국어 단어장",
+      description: "나만의 다국어 단어장을 만들고 효과적으로 학습하세요.",
       keywords:
-        "?�국???�어?? ?�어 ?�어?? ?�본???�어?? 중국???�어?? ?�어 ?�습",
+        "다국어 단어장, 영어 단어장, 일본어 단어장, 중국어 단어장, 언어 학습",
       canonical: "https://likevoca.com/ko/pages/multilingual-dictionary.html",
     },
     en: {
@@ -98,24 +100,25 @@ const seoMetadata = {
       canonical: "https://likevoca.com/en/pages/multilingual-dictionary.html",
     },
     ja: {
-      title: "LikeVoca - 多�?語辞??,
-      description: "?�分?�け??��言語辞?�を作成?�、効?�的?��?習し?�し?�う??,
-      keywords: "多�?語辞?? ?�語辞書, ?�本語辞?? �?��語辞?? 言語�?�?,
+      title: "LikeVoca - 多言語辞書",
+      description: "自分だけの多言語辞書を作成し、効果的に学習しましょう。",
+      keywords: "多言語辞書, 英語辞書, 日本語辞書, 中国語辞書, 言語学習",
       canonical: "https://likevoca.com/ja/pages/multilingual-dictionary.html",
     },
     zh: {
-      title: "LikeVoca - 多�?言词典",
-      description: "?�建?�自己的多�?言词典并有?��?习�?,
-      keywords: "多�?言词典, ?��?词典, ?��?词典, �?��词典, �??学习",
+      title: "LikeVoca - 多语言词典",
+      description: "创建您自己的多语言词典并有效学习。",
+      keywords: "多语言词典, 英语词典, 日语词典, 中文词典, 语言学习",
       canonical: "https://likevoca.com/zh/pages/multilingual-dictionary.html",
     },
   },
-  // ?�국???�습 ?�이지 메�??�이??  learning: {
+  // 다국어 학습 페이지 메타데이터
+  learning: {
     ko: {
       title: "LikeVoca - " + commonTexts.ko.language_learning,
       description: commonTexts.ko.language_learning_desc,
       keywords:
-        "?�국???�습, ?�어 ?�습, ?�래?�카?? ?�즈, ?�어, ?�본?? 중국?? ?�국??,
+        "다국어 학습, 언어 학습, 플래시카드, 퀴즈, 영어, 일본어, 중국어, 한국어",
       canonical: "https://likevoca.com/ko/pages/language-learning.html",
     },
     en: {
@@ -129,22 +132,23 @@ const seoMetadata = {
       title: "LikeVoca - " + commonTexts.ja.language_learning,
       description: commonTexts.ja.language_learning_desc,
       keywords:
-        "多�?語�?�? 言語�?�? ?�ラ?�シ?�カ?�ド, ??��?? ?�語, ?�本�? �?���? ?�国�?,
+        "多言語学習, 言語学習, フラッシュカード, クイズ, 英語, 日本語, 中国語, 韓国語",
       canonical: "https://likevoca.com/ja/pages/language-learning.html",
     },
     zh: {
       title: "LikeVoca - " + commonTexts.zh.language_learning,
       description: commonTexts.zh.language_learning_desc,
-      keywords: "多�?言学习, �??学习, ?�卡, 测验, ?��?, ?��?, �?��, ?��?",
+      keywords: "多语言学习, 语言学习, 闪卡, 测验, 英语, 日语, 中文, 韩语",
       canonical: "https://likevoca.com/zh/pages/language-learning.html",
     },
   },
-  // ?�국??게임 ?�이지 메�??�이??  games: {
+  // 다국어 게임 페이지 메타데이터
+  games: {
     ko: {
-      title: "LikeVoca - ?�국??게임",
-      description: "?��??�는 게임???�해 ?�양???�어�?즐겁�?배워보세??",
+      title: "LikeVoca - 다국어 게임",
+      description: "재미있는 게임을 통해 다양한 언어를 즐겁게 배워보세요.",
       keywords:
-        "?�어 게임, ?�국??게임, ?�어 게임, ?�어 ?�습 게임, ?�어, ?�본?? 중국?? ?�국??,
+        "언어 게임, 다국어 게임, 단어 게임, 언어 학습 게임, 영어, 일본어, 중국어, 한국어",
       canonical: "https://likevoca.com/ko/pages/games.html",
     },
     en: {
@@ -155,27 +159,28 @@ const seoMetadata = {
       canonical: "https://likevoca.com/en/pages/games.html",
     },
     ja: {
-      title: "LikeVoca - 多�?語ゲ?�ム",
-      description: "楽し?�ゲ?�ム?�通し??��?�な言語を楽し?��??�ま?�ょ?��?,
+      title: "LikeVoca - 多言語ゲーム",
+      description: "楽しいゲームを通して様々な言語を楽しく学びましょう。",
       keywords:
-        "言語ゲ?�ム, 多�?語ゲ?�ム, ?�語?�ー?? 言語�?習ゲ?�ム, ?�語, ?�本�? �?���? ?�国�?,
+        "言語ゲーム, 多言語ゲーム, 単語ゲーム, 言語学習ゲーム, 英語, 日本語, 中国語, 韓国語",
       canonical: "https://likevoca.com/ja/pages/games.html",
     },
     zh: {
-      title: "LikeVoca - 多�?言游戏",
-      description: "?�过?�趣?�游?�愉快地学习?�种�????,
+      title: "LikeVoca - 多语言游戏",
+      description: "通过有趣的游戏愉快地学习各种语言。",
       keywords:
-        "�??游戏, 多�?言游戏, ?�词游戏, �??学习游戏, ?��?, ?��?, �?��, ?��?",
+        "语言游戏, 多语言游戏, 单词游戏, 语言学习游戏, 英语, 日语, 中文, 韩语",
       canonical: "https://likevoca.com/zh/pages/games.html",
     },
   },
-  // AI ?�어???�이지 메�??�이??  "ai-vocabulary": {
+  // AI 단어장 페이지 메타데이터
+  "ai-vocabulary": {
     ko: {
-      title: "LikeVoca - AI ?�어??,
+      title: "LikeVoca - AI 단어장",
       description:
-        "AI가 추천?�는 ?�국???�어?�을 만들�??�과?�으�??�습?�세??",
+        "AI가 추천하는 다국어 단어장을 만들고 효과적으로 학습하세요.",
       keywords:
-        "AI ?�어?? ?�국???�어?? ?�어 ?�어?? ?�본???�어?? 중국???�어?? AI ?�어 ?�습",
+        "AI 단어장, 다국어 단어장, 영어 단어장, 일본어 단어장, 중국어 단어장, AI 언어 학습",
       canonical: "https://likevoca.com/ko/pages/ai-vocabulary.html",
     },
     en: {
@@ -187,27 +192,28 @@ const seoMetadata = {
       canonical: "https://likevoca.com/en/pages/ai-vocabulary.html",
     },
     ja: {
-      title: "LikeVoca - AI?�語�?,
-      description: "AI?�推?�す?�多言語単語帳?�作?�し?�効?�的?��?習し?�し?�う??,
+      title: "LikeVoca - AI単語帳",
+      description: "AIが推薦する多言語単語帳を作成し、効果的に学習しましょう。",
       keywords:
-        "AI?�語�? 多�?語単語帳, ?�語?�語�? ?�本語単語帳, �?��語単語帳, AI言語�?�?,
+        "AI単語帳, 多言語単語帳, 英語単語帳, 日本語単語帳, 中国語単語帳, AI言語学習",
       canonical: "https://likevoca.com/ja/pages/ai-vocabulary.html",
     },
     zh: {
-      title: "LikeVoca - AI词汇??,
-      description: "?�建AI?�荐?�多�??词汇?�并?�效学习??,
+      title: "LikeVoca - AI词汇本",
+      description: "创建AI推荐的多语言词汇本并有效学习。",
       keywords:
-        "AI词汇?? 多�?言词汇?? ?��?词汇?? ?��?词汇?? �?��词汇?? AI�??学习",
+        "AI词汇本, 多语言词汇本, 英语词汇本, 日语词汇本, 中文词汇本, AI语言学习",
       canonical: "https://likevoca.com/zh/pages/ai-vocabulary.html",
     },
   },
-  // ?�만???�어???�이지 메�??�이??  "my-vocabulary": {
+  // 나만의 단어장 페이지 메타데이터
+  "my-vocabulary": {
     ko: {
-      title: "LikeVoca - ?�만???�어??,
+      title: "LikeVoca - 나만의 단어장",
       description:
-        "북마?�한 ?�어?�을 모아???�만???�어?�을 만들�??�과?�으�??�습?�세??",
+        "북마크한 단어들을 모아서 나만의 단어장을 만들고 효과적으로 학습하세요.",
       keywords:
-        "?�만???�어?? 북마???�어?? ?�국???�어?? 개인 ?�어?? ?�어 ?�습",
+        "나만의 단어장, 북마크 단어장, 다국어 단어장, 개인 단어장, 언어 학습",
       canonical: "https://likevoca.com/ko/pages/my-word-list.html",
     },
     en: {
@@ -219,520 +225,521 @@ const seoMetadata = {
       canonical: "https://likevoca.com/en/pages/my-word-list.html",
     },
     ja: {
-      title: "LikeVoca - 私の?�語�?,
+      title: "LikeVoca - 私の単語帳",
       description:
-        "?�ッ??��?�ク?�た?�語?�集?�て?�分?�け??��語帳?�作?�し?�効?�的?��?習し?�し?�う??,
+        "ブックマークした単語を集めて自分だけの単語帳を作成し、効果的に学習しましょう。",
       keywords:
-        "私の?�語�? ?�ッ??��?�ク?�語�? 多�?語単語帳, ?�人?�語�? 言語�?�?,
+        "私の単語帳, ブックマーク単語帳, 多言語単語帳, 個人単語帳, 言語学習",
       canonical: "https://likevoca.com/ja/pages/my-word-list.html",
     },
     zh: {
-      title: "LikeVoca - ?�的词汇??,
-      description: "?�集?�收?�的?�词，创建您?�己?�词汇本并有?��?习�?,
-      keywords: "?�的词汇?? ?�藏词汇?? 多�?言词汇?? 个人词汇?? �??学习",
+      title: "LikeVoca - 我的词汇本",
+      description: "收集您收藏的单词，创建您自己的词汇本并有效学习。",
+      keywords: "我的词汇本, 收藏词汇本, 多语言词汇本, 个人词汇本, 语言学习",
       canonical: "https://likevoca.com/zh/pages/my-word-list.html",
     },
   },
 };
 
-// 번역 ?�스???�?�소
+// 번역 텍스트 저장소
 const translations = {
   ko: {
-    home: "??,
-    wordbook: "?�어??,
-    vocabulary: "?�어??,
-    multilingual_dictionary: "?�국???�어??,
-    ai_wordbook: "AI ?�어??,
-    ai_vocabulary: "AI ?�어??,
+    home: "홈",
+    wordbook: "단어장",
+    vocabulary: "단어장",
+    multilingual_dictionary: "다국어 단어장",
+    ai_wordbook: "AI 단어장",
+    ai_vocabulary: "AI 단어장",
     language_learning: commonTexts.ko.language_learning,
     language_learning_desc: commonTexts.ko.language_learning_desc,
     language_games: commonTexts.ko.language_games,
     language_games_desc: commonTexts.ko.language_games_desc,
-    inquiry: "문의?�기",
-    login: "로그??,
-    signup: "?�원가??,
-    logout: "로그?�웃",
-    profile: "?�로??,
-    delete_account: "?�원?�퇴",
-    welcome: "?�영?�니??,
-    user_suffix: "??,
-    get_started_free: "무료�??�작?�기",
-    learn_languages: "?�양???�어�??�고 ?��??�게 배워보세??,
+    inquiry: "문의하기",
+    login: "로그인",
+    signup: "회원가입",
+    logout: "로그아웃",
+    profile: "프로필",
+    delete_account: "회원탈퇴",
+    welcome: "환영합니다",
+    user_suffix: "님",
+    get_started_free: "무료로 시작하기",
+    learn_languages: "다양한 언어를 쉽고 재미있게 배워보세요",
     effective_learning:
-      "체계?�인 커리?�럼�?직�??�인 ?�습 ?�스?�으�??�신???�어 ?�습???�욱 ?�과?�으�?만들?�드립니??",
+      "체계적인 커리큘럼과 직관적인 학습 시스템으로 당신의 언어 학습을 더욱 효과적으로 만들어드립니다.",
     wordbook_desc:
-      "?�습???�어�??�력?�고 ?�만???�국???�어?�을 만들?�보?�요.",
+      "학습할 단어를 입력하고 나만의 다국어 단어장을 만들어보세요.",
     ai_wordbook_desc:
-      "Google Gemini AI�?맞춤 ?�어�?추천받고, ?�어 ?�력???�우?�요.",
+      "Google Gemini AI로 맞춤 단어를 추천받고, 언어 실력을 키우세요.",
     ai_vocabulary_desc:
-      "AI가 추천?�는 ?�국??개념???�습?�고 ?�어 ?�력???�상?�키?�요.",
-    inquiry_desc: "궁금???�이 ?�거???��????�요?�시�??�제?��? 문의?�세??",
-    start: "?�작?�기",
-    language_settings: "?�어 ?�정",
-    save: "?�??,
+      "AI가 추천하는 다국어 개념을 학습하고 언어 실력을 향상시키세요.",
+    inquiry_desc: "궁금한 점이 있거나 도움이 필요하시면 언제든지 문의하세요.",
+    start: "시작하기",
+    language_settings: "언어 설정",
+    save: "저장",
     cancel: "취소",
-    total_concepts: "?�체 개념 ??,
-    concepts_unit: "�?,
-    ai_usage: "AI ?�용??,
+    total_concepts: "전체 개념 수",
+    concepts_unit: "개",
+    ai_usage: "AI 사용량",
     ai_recommend_concept: "AI 개념 추천받기",
-    // 모달 관??번역
-    add_concept: "개념 추�?",
-    edit_concept: "개념 ?�정",
-    domain: "?�메??,
-    select_domain: "?�메???�택",
+    // 모달 관련 번역
+    add_concept: "개념 추가",
+    edit_concept: "개념 수정",
+    domain: "도메인",
+    select_domain: "도메인 선택",
     category: "카테고리",
-    category_placeholder: "?? fruit, animal",
-    emoji: "?�모지",
-    language_expressions: "?�어�??�현",
-    word: "?�어",
+    category_placeholder: "예: fruit, animal",
+    emoji: "이모지",
+    language_expressions: "언어별 표현",
+    word: "단어",
     pronunciation: "발음",
-    definition: "?�의",
-    part_of_speech: "?�사",
-    select_pos: "?�사 ?�택",
-    // ?�사 번역
+    definition: "정의",
+    part_of_speech: "품사",
+    select_pos: "품사 선택",
+    // 품사 번역
     noun: "명사",
-    verb: "?�사",
-    adjective: "?�용??,
-    adverb: "부??,
-    pronoun: "?�명사",
-    preposition: "?�치??,
-    conjunction: "?�속??,
-    interjection: "감탄??,
+    verb: "동사",
+    adjective: "형용사",
+    adverb: "부사",
+    pronoun: "대명사",
+    preposition: "전치사",
+    conjunction: "접속사",
+    interjection: "감탄사",
     particle: "조사",
-    determiner: "?�정??,
-    classifier: "분류??,
-    other: "기�?",
-    // ?�어?�적 ?�어 번역
-    synonyms: "?�사??(?�표�?구분)",
-    antonyms: "반의??(?�표�?구분)",
-    collocations: "?�어 (?�표�?구분)",
-    compound_words: "복합??(?�표�?구분)",
-    examples: "?�문",
-    add_example: "?�문 추�?",
-    representative_example: "?�???�문",
-    korean_example: "?�국???�문",
-    english_example: "?�어 ?�문",
-    japanese_example: "?�본???�문",
-    chinese_example: "중국???�문",
-    tags: "?�그 (?�표�?구분)",
-    // ?�메??번역
-    academic: "?�술",
+    determiner: "한정사",
+    classifier: "분류사",
+    other: "기타",
+    // 언어학적 용어 번역
+    synonyms: "유사어 (쉼표로 구분)",
+    antonyms: "반의어 (쉼표로 구분)",
+    collocations: "연어 (쉼표로 구분)",
+    compound_words: "복합어 (쉼표로 구분)",
+    examples: "예문",
+    add_example: "예문 추가",
+    representative_example: "대표 예문",
+    korean_example: "한국어 예문",
+    english_example: "영어 예문",
+    japanese_example: "일본어 예문",
+    chinese_example: "중국어 예문",
+    tags: "태그 (쉼표로 구분)",
+    // 도메인 번역
+    academic: "학술",
     technology: "기술",
     health: "건강",
-    sports: "?�포�?,
-    entertainment: "?�터?�인먼트",
-    // ?�메???�터 번역
-    domain_filter: "?�메??,
-    all_domains: "?�체 ?�메??,
-    domain_daily: "?�상",
-    domain_business: "비즈?�스",
-    domain_academic: "?�술",
-    domain_travel: "?�행",
-    domain_food: "?�식",
-    domain_nature: "?�연",
+    sports: "스포츠",
+    entertainment: "엔터테인먼트",
+    // 도메인 필터 번역
+    domain_filter: "도메인",
+    all_domains: "전체 도메인",
+    domain_daily: "일상",
+    domain_business: "비즈니스",
+    domain_academic: "학술",
+    domain_travel: "여행",
+    domain_food: "음식",
+    domain_nature: "자연",
     domain_technology: "기술",
     domain_health: "건강",
-    domain_sports: "?�포�?,
-    domain_entertainment: "?�터?�인먼트",
-    domain_other: "기�?",
-    // 로그???�이지 번역
-    login_with_google: "Google�?로그??,
-    login_with_github: "Github�?로그??,
-    or: "?�는",
-    email: "?�메??,
-    email_placeholder: "?�메?�을 ?�력?�세??,
-    password: "비�?번호",
-    password_placeholder: "비�?번호�??�력?�세??,
-    auto_login: "?�동 로그??,
-    forgot_password: "비�?번호�??�으?�나??",
-    no_account: "계정???�으?��???",
-    // ?�원가???�이지 번역
-    create_account: "계정 만들�?,
-    name: "?�름",
-    name_placeholder: "?�름???�력?�세??,
-    confirm_password: "비�?번호 ?�인",
-    confirm_password_placeholder: "비�?번호�??�시 ?�력?�세??,
-    agree_terms: "?�용?��????�의?�니??,
-    already_account: "?��? 계정???�으?��???",
-    // 문의 ?�이지 번역
-    contact_us: "문의?�기",
-    subject: "?�목",
-    subject_placeholder: "문의 ?�목???�력?�세??,
+    domain_sports: "스포츠",
+    domain_entertainment: "엔터테인먼트",
+    domain_other: "기타",
+    // 로그인 페이지 번역
+    login_with_google: "Google로 로그인",
+    login_with_github: "Github로 로그인",
+    or: "또는",
+    email: "이메일",
+    email_placeholder: "이메일을 입력하세요",
+    password: "비밀번호",
+    password_placeholder: "비밀번호를 입력하세요",
+    auto_login: "자동 로그인",
+    forgot_password: "비밀번호를 잊으셨나요?",
+    no_account: "계정이 없으신가요?",
+    // 회원가입 페이지 번역
+    create_account: "계정 만들기",
+    name: "이름",
+    name_placeholder: "이름을 입력하세요",
+    confirm_password: "비밀번호 확인",
+    confirm_password_placeholder: "비밀번호를 다시 입력하세요",
+    agree_terms: "이용약관에 동의합니다",
+    already_account: "이미 계정이 있으신가요?",
+    // 문의 페이지 번역
+    contact_us: "문의하기",
+    subject: "제목",
+    subject_placeholder: "문의 제목을 입력하세요",
     message: "메시지",
-    message_placeholder: "문의 ?�용???�력?�세??,
-    send: "보내�?,
-    // ?�국???�어???�이지 번역
-    search: "검??,
-    search_placeholder: "검?�어 ?�력...",
-    source_language: "?�본 ?�어",
-    target_language: "?�???�어",
+    message_placeholder: "문의 내용을 입력하세요",
+    send: "보내기",
+    // 다국어 단어장 페이지 번역
+    search: "검색",
+    search_placeholder: "검색어 입력...",
+    source_language: "원본 언어",
+    target_language: "대상 언어",
     all_categories: "모든 카테고리",
     fruit: "과일",
-    food: "?�식",
-    animal: "?�물",
-    daily: "?�상",
-    travel: "?�행",
-    business: "비즈?�스",
+    food: "음식",
+    animal: "동물",
+    daily: "일상",
+    travel: "여행",
+    business: "비즈니스",
     concept_count: "개의 개념",
-    sort: "?�렬",
-    latest: "최신??,
-    oldest: "?�래?�순",
-    alphabetical: "가?�다??,
-    reverse_alphabetical: "????�다??,
-    concept_usage: "개념 ?�용??,
-    add_new_concept: "??개념 추�?",
-    bulk_add_concept: "?�??개념 추�?",
-    load_more: "??보기",
-    korean: "?�국??,
-    english: "?�어",
-    japanese: "?�본??,
-    chinese: "중국??,
-    // ?�국???�습 ?�이지 번역
-    language_learning_title: "?�국???�습",
-    select_source_language: "?�본 ?�어 ?�택",
-    select_target_language: "?�???�어 ?�택",
-    learning_mode: "?�습 모드",
-    flashcards: "?�래?�카??,
-    flashcards_desc: "?�어 ?�면/?�면?�로 ?�습",
-    quiz: "?�즈",
-    quiz_desc: "객�???문제�??�습",
-    typing: "?�?�핑",
-    typing_desc: "직접 ?�력?�여 ?�습",
-    previous: "?�전",
-    flip: "?�집�?,
-    next: "?�음",
-    examples: "?�문:",
-    card_progress: "진행�?,
+    sort: "정렬",
+    latest: "최신순",
+    oldest: "오래된순",
+    alphabetical: "가나다순",
+    reverse_alphabetical: "역가나다순",
+    concept_usage: "개념 사용량",
+    add_new_concept: "새 개념 추가",
+    bulk_add_concept: "대량 개념 추가",
+    load_more: "더 보기",
+    korean: "한국어",
+    english: "영어",
+    japanese: "일본어",
+    chinese: "중국어",
+    // 다국어 학습 페이지 번역
+    language_learning_title: "다국어 학습",
+    select_source_language: "원본 언어 선택",
+    select_target_language: "대상 언어 선택",
+    learning_mode: "학습 모드",
+    flashcards: "플래시카드",
+    flashcards_desc: "단어 앞면/뒷면으로 학습",
+    quiz: "퀴즈",
+    quiz_desc: "객관식 문제로 학습",
+    typing: "타이핑",
+    typing_desc: "직접 입력하여 학습",
+    previous: "이전",
+    flip: "뒤집기",
+    next: "다음",
+    examples: "예문:",
+    card_progress: "진행률",
     quiz_question: "문제",
-    next_question: "?�음 문제",
-    quiz_progress: "진행�?,
-    typing_prompt: "?�답???�력?�세??",
-    typing_placeholder: "?�답 ?�력...",
-    check_answer: "?�답 ?�인",
-    next_word: "?�음 ?�어",
-    typing_progress: "진행�?,
+    next_question: "다음 문제",
+    quiz_progress: "진행률",
+    typing_prompt: "정답을 입력하세요:",
+    typing_placeholder: "정답 입력...",
+    check_answer: "정답 확인",
+    next_word: "다음 단어",
+    typing_progress: "진행률",
     correct_count: "맞춘 개수:",
-    wrong_count: "?��?개수:",
-    // ?�어???�세보기 모달 번역
-    concept_detail_view: "개념 ?�세 보기",
-    expressions_by_language: "?�어�??�현",
-    close: "?�기",
-    delete: "??��",
-    edit: "?�집",
-    confirm_delete_concept: "?�말�???개념????��?�시겠습?�까?",
-    concept_deleted_success: "개념???�공?�으�???��?�었?�니??",
-    concept_delete_error: "개념 ??�� �??�류가 발생?�습?�다",
-    registration_time: "?�록 ?�간",
-    // 개념 추�? 모달 번역
-    domain: "?�메??,
-    domain_placeholder: "?? daily, food, business",
-    emoji: "?�모지",
-    emoji_placeholder: "?? ?��, ?��, ?��",
-    reset: "초기??,
-    add: "추�??�기",
-    add_example: "?�문 추�?",
-    add_new_language: "???�어 추�?",
-    language_name_ko: "?�어 ?�름 (?�국??",
-    language_name_ko_placeholder: "?? ?�페?�어, ?�랑?�어",
-    language_code: "?�어 코드",
-    language_code_placeholder: "?? spanish, french",
-    example_word: "?�시 ?�어",
-    example_word_placeholder: "?? manzana, pomme",
+    wrong_count: "틀린 개수:",
+    // 단어장 상세보기 모달 번역
+    concept_detail_view: "개념 상세 보기",
+    expressions_by_language: "언어별 표현",
+    close: "닫기",
+    delete: "삭제",
+    edit: "편집",
+    confirm_delete_concept: "정말로 이 개념을 삭제하시겠습니까?",
+    concept_deleted_success: "개념이 성공적으로 삭제되었습니다.",
+    concept_delete_error: "개념 삭제 중 오류가 발생했습니다",
+    registration_time: "등록 시간",
+    // 개념 추가 모달 번역
+    domain: "도메인",
+    domain_placeholder: "예: daily, food, business",
+    emoji: "이모지",
+    emoji_placeholder: "예: 🍎, 🚆, 👋",
+    reset: "초기화",
+    add: "추가하기",
+    add_example: "예문 추가",
+    add_new_language: "새 언어 추가",
+    language_name_ko: "언어 이름 (한국어)",
+    language_name_ko_placeholder: "예: 스페인어, 프랑스어",
+    language_code: "언어 코드",
+    language_code_placeholder: "예: spanish, french",
+    example_word: "예시 단어",
+    example_word_placeholder: "예: manzana, pomme",
     cancel: "취소",
     // 게임 번역
     games: "게임",
-    games_desc: "?��??�는 게임???�해 ?�양???�어�?즐겁�?배워보세??",
-    learning_title: "?�습",
-    source_language: "?�본 ?�어",
-    target_language: "?�???�어",
-    learning_title_desc: "체계?�인 ?�습???�해 ?�어 ?�력???�상?�키?�요.",
-    // 문법 �??�습 진도 ?�이지 번역
-    grammar_progress: "문법 �??�습 진도",
-    grammar_progress_title: "문법 �??�습 진도",
-    grammar_progress_subtitle: "?�습 ?�과?� 문법 ?�턴 분석???�인?�세??,
-    total_concepts: "�?개념 ??,
-    concepts_breakdown: "카테고리�?분포",
+    games_desc: "재미있는 게임을 통해 다양한 언어를 즐겁게 배워보세요.",
+    learning_title: "학습",
+    source_language: "원본 언어",
+    target_language: "대상 언어",
+    learning_title_desc: "체계적인 학습을 통해 언어 실력을 향상시키세요.",
+    // 문법 및 학습 진도 페이지 번역
+    grammar_progress: "문법 및 학습 진도",
+    grammar_progress_title: "문법 및 학습 진도",
+    grammar_progress_subtitle: "학습 성과와 문법 패턴 분석을 확인하세요",
+    total_concepts: "총 개념 수",
+    concepts_breakdown: "카테고리별 분포",
     progress: "진도",
     progress_title: "진도",
-    learning_progress: "?�습 진도",
-    learning_progress_title: "?�습 진도",
-    learning_progress_subtitle: "개인 ?�습 ?�과?� 진도�?추적?�고 분석?�세??,
+    learning_progress: "학습 진도",
+    learning_progress_title: "학습 진도",
+    learning_progress_subtitle: "개인 학습 성과와 진도를 추적하고 분석하세요",
 
-    // ?�습 ?�이지 번역
-    learning_areas: "?�습 ?�역",
-    learning_dashboard: "?�습 ?�?�보??,
-    continue_learning: "?�습 ?�어?�기",
-    vocabulary_learning: "?�어 ?�습",
-    vocabulary_learning_desc: "?�휘???�상???�한 ?�래?�카?��? ?�?�핑 ?�습",
-    vocabulary_modes: "?�래?�카?????�?�핑 ??발음 ?�습",
-    grammar_learning: "문법 ?�습",
-    grammar_learning_desc: "체계?�인 문법 ?�턴 분석�??�습 ?�습",
-    grammar_modes: "문법 ?�턴 ???�문 분석 ???�습 문제",
-    reading_learning: "?�해 ?�습",
-    reading_learning_desc: "?�양???�문???�한 ?�기 ?�해???�상",
-    reading_modes: "?�문 ?�습 ???�래??모드",
-    quiz_test: "?�즈 ?�스??,
+    // 학습 페이지 번역
+    learning_areas: "학습 영역",
+    learning_dashboard: "학습 대시보드",
+    continue_learning: "학습 이어하기",
+    vocabulary_learning: "단어 학습",
+    vocabulary_learning_desc: "어휘력 향상을 위한 플래시카드와 타이핑 학습",
+    vocabulary_modes: "플래시카드 • 타이핑 • 발음 연습",
+    grammar_learning: "문법 학습",
+    grammar_learning_desc: "체계적인 문법 패턴 분석과 실습 학습",
+    grammar_modes: "문법 패턴 • 예문 분석 • 실습 문제",
+    reading_learning: "독해 학습",
+    reading_learning_desc: "다양한 예문을 통한 읽기 이해력 향상",
+    reading_modes: "예문 학습 • 플래시 모드",
+    quiz_test: "퀴즈 테스트",
 
-    // ?�합 ?�습 모드 번역
-    flashcard_mode: "?�래?�카??,
-    flashcard_quick_desc: "카드 ?�집�??�습",
-    typing_mode: "?�?�핑",
-    typing_quick_desc: "직접 ?�력 ?�습",
-    pronunciation_mode: "발음 ?�습",
-    pronunciation_quick_desc: "?�성 ?�식 ?�습",
-    pattern_analysis_mode: "?�턴 분석",
-    pattern_quick_desc: "문법 구조 ?�습",
-    practice_mode: "?�습 문제",
-    practice_quick_desc: "문법 ?�용 ?�습",
-    example_learning_mode: "?�문 ?�습",
-    example_quick_desc: "문맥 ?�해 ?�습",
-    flash_mode: "?�래??모드",
-    flash_quick_desc: "빠른 ?�해 ?�습",
+    // 통합 학습 모드 번역
+    flashcard_mode: "플래시카드",
+    flashcard_quick_desc: "카드 뒤집기 학습",
+    typing_mode: "타이핑",
+    typing_quick_desc: "직접 입력 학습",
+    pronunciation_mode: "발음 연습",
+    pronunciation_quick_desc: "음성 인식 학습",
+    pattern_analysis_mode: "패턴 분석",
+    pattern_quick_desc: "문법 구조 학습",
+    practice_mode: "실습 문제",
+    practice_quick_desc: "문법 적용 연습",
+    example_learning_mode: "예문 학습",
+    example_quick_desc: "문맥 이해 학습",
+    flash_mode: "플래시 모드",
+    flash_quick_desc: "빠른 독해 연습",
 
-    // ?�습 ?�징 ?�명
-    vocabulary_flashcard_features: "?�각???�습 ??즉시 ?�드�?,
-    vocabulary_typing_features: "?�확??철자 ??기억??강화",
-    vocabulary_pronunciation_features: "?�확??발음 ???�기 ?�상",
-    grammar_pattern_features: "체계??분석 ??구조 ?�해",
-    grammar_practice_features: "?�전 ?�습 ???�용 ?�력",
-    reading_example_features: "문맥 ?�악 ???�해???�상",
-    reading_flash_features: "?�독 ?�습 ??집중???�상",
+    // 학습 특징 설명
+    vocabulary_flashcard_features: "시각적 학습 • 즉시 피드백",
+    vocabulary_typing_features: "정확한 철자 • 기억력 강화",
+    vocabulary_pronunciation_features: "정확한 발음 • 듣기 향상",
+    grammar_pattern_features: "체계적 분석 • 구조 이해",
+    grammar_practice_features: "실전 연습 • 응용 능력",
+    reading_example_features: "문맥 파악 • 이해력 향상",
+    reading_flash_features: "속독 연습 • 집중력 향상",
 
-    // ?�습 ?�계 �?추천
-    estimated_time: "?�상 ?�간",
-    recent_activity: "최근 ?�동",
-    no_recent_activity: "최근 ?�습 기록???�습?�다",
-    recommended_mode: "추천 ?�습",
-    vocabulary_flashcard_recommended: "?�어 ?�래?�카??추천",
-    learning_streak: "?�습 ?�속??,
-    days: "??,
+    // 학습 통계 및 추천
+    estimated_time: "예상 시간",
+    recent_activity: "최근 활동",
+    no_recent_activity: "최근 학습 기록이 없습니다",
+    recommended_mode: "추천 학습",
+    vocabulary_flashcard_recommended: "단어 플래시카드 추천",
+    learning_streak: "학습 연속일",
+    days: "일",
 
-    // ?�습 모드 번역
-    learning_modes: "?�습 모드",
-    back_to_areas: "?�역 ?�택?�로 ?�아가�?,
-    pattern_analysis: "?�턴 분석",
-    pattern_analysis_desc: "문법 구조?� ?�턴??체계?�으�??�습",
-    example_practice: "?�문 ?�습",
-    example_practice_desc: "?�래?�카??방식?�로 문법 ?�턴 ?�습",
-    general_example_learning: "?�반 ?�문 ?�습",
-    general_example_learning_desc: "?�양???�문???�한 ?�해 ?�력 ?�상",
-    flash_mode: "?�래??모드",
-    flash_mode_desc: "빠른 ?�도�??�문???�습?�는 집중 모드",
+    // 학습 모드 번역
+    learning_modes: "학습 모드",
+    back_to_areas: "영역 선택으로 돌아가기",
+    pattern_analysis: "패턴 분석",
+    pattern_analysis_desc: "문법 구조와 패턴을 체계적으로 학습",
+    example_practice: "예문 실습",
+    example_practice_desc: "플래시카드 방식으로 문법 패턴 연습",
+    general_example_learning: "일반 예문 학습",
+    general_example_learning_desc: "다양한 예문을 통한 독해 능력 향상",
+    flash_mode: "플래시 모드",
+    flash_mode_desc: "빠른 속도로 예문을 학습하는 집중 모드",
 
-    // ?�터 �??�정 번역
-    difficulty_level: "?�이??,
-    all_difficulties: "?�체 ?�이??,
+    // 필터 및 설정 번역
+    difficulty_level: "난이도",
+    all_difficulties: "전체 난이도",
     basic: "기초",
     intermediate: "중급",
     advanced: "고급",
-    fluent: "?�창",
-    technical: "?�문?�어",
-    pattern_type: "?�턴 ?�형",
-    all_patterns: "?�체 ?�턴",
-    grammar_pattern: "문법 ?�턴",
+    fluent: "유창",
+    technical: "전문용어",
+    pattern_type: "패턴 유형",
+    all_patterns: "전체 패턴",
+    grammar_pattern: "문법 패턴",
     syntax_structure: "문장 구조",
-    expression_pattern: "?�현 ?�턴",
-    conversation_pattern: "?�화 ?�턴",
-    situation: "?�황",
-    all_situation: "?�체 ?�황",
+    expression_pattern: "표현 패턴",
+    conversation_pattern: "회화 패턴",
+    situation: "상황",
+    all_situation: "전체 상황",
     purpose: "목적",
-    all_purpose: "?�체 목적",
+    all_purpose: "전체 목적",
 
-    // ?�황 ?�그 번역
+    // 상황 태그 번역
     formal: "격식",
-    casual: "비격??,
-    urgent: "긴급??,
+    casual: "비격식",
+
+    urgent: "긴급한",
     work: "직장",
-    school: "?�교",
-    social: "?�교",
-    shopping: "?�핑",
-    home: "가??,
-    public: "공공?�소",
-    online: "?�라??,
-    medical: "?�료",
+    school: "학교",
+    social: "사교",
+    shopping: "쇼핑",
+    home: "가정",
+    public: "공공장소",
+    online: "온라인",
+    medical: "의료",
 
-    // 목적 ?�그 번역
-    greeting: "?�사",
+    // 목적 태그 번역
+    greeting: "인사",
     thanking: "감사",
-    request: "?�청",
+    request: "요청",
     question: "질문",
-    opinion: "?�견",
-    agreement: "?�의",
+    opinion: "의견",
+    agreement: "동의",
     refusal: "거절",
-    apology: "?�과",
-    instruction: "지??,
-    description: "?�명",
-    suggestion: "?�안",
-    emotion: "감정?�현",
+    apology: "사과",
+    instruction: "지시",
+    description: "설명",
+    suggestion: "제안",
+    emotion: "감정표현",
 
-    learning_streak: "?�습 ?�트�?,
-    learning_goals: "?�습 목표",
-    quiz_performance: "?�즈 ?�과",
-    game_performance: "게임 ?�과",
-    language_progress: "?�어�??�습 진도",
-    category_distribution: "카테고리�?분포",
-    grammar: "문법 ?�턴 분석",
-    recent_activity: "최근 ?�습 ?�동",
-    refresh: "?�로고침",
-    export: "?�보?�기",
-    attempts: "?�도",
-    correct: "?�답",
+    learning_streak: "학습 스트릭",
+    learning_goals: "학습 목표",
+    quiz_performance: "퀴즈 성과",
+    game_performance: "게임 성과",
+    language_progress: "언어별 학습 진도",
+    category_distribution: "카테고리별 분포",
+    grammar: "문법 패턴 분석",
+    recent_activity: "최근 학습 활동",
+    refresh: "새로고침",
+    export: "내보내기",
+    attempts: "시도",
+    correct: "정답",
     games_played: "게임",
-    wins: "?�리",
-    loading: "로딩 �?..",
-    select_category: "카테고리 ?�택",
-    select_emoji: "?�모지 ?�택",
-    emoji: "?�모지",
+    wins: "승리",
+    loading: "로딩 중...",
+    select_category: "카테고리 선택",
+    select_emoji: "이모지 선택",
+    emoji: "이모지",
 
-    // ?�상 ?�메??카테고리
-    household: "?�활?�품",
-    family: "가�?,
-    routine: "?�상?�활",
-    clothing: "?�류",
-    furniture: "가�?,
+    // 일상 도메인 카테고리
+    household: "생활용품",
+    family: "가족",
+    routine: "일상생활",
+    clothing: "의류",
+    furniture: "가구",
 
-    // ?�식 ?�메??카테고리
+    // 음식 도메인 카테고리
     fruit: "과일",
     vegetable: "채소",
-    meat: "?�류",
-    drink: "?�료",
+    meat: "육류",
+    drink: "음료",
     snack: "간식",
 
-    // ?�행 ?�메??카테고리
-    transportation: "교통?�단",
-    accommodation: "?�박",
-    tourist_attraction: "관광�?",
-    luggage: "�?,
-    direction: "길찾�?,
+    // 여행 도메인 카테고리
+    transportation: "교통수단",
+    accommodation: "숙박",
+    tourist_attraction: "관광지",
+    luggage: "짐",
+    direction: "길찾기",
 
-    // 비즈?�스 ?�메??카테고리
-    meeting: "?�의",
+    // 비즈니스 도메인 카테고리
+    meeting: "회의",
     finance: "금융",
-    marketing: "마�???,
-    office: "?�무??,
-    project: "?�로?�트",
+    marketing: "마케팅",
+    office: "사무실",
+    project: "프로젝트",
 
-    // ?�술 ?�메??카테고리
+    // 학술 도메인 카테고리
     science: "과학",
     literature: "문학",
-    history: "??��",
-    mathematics: "?�학",
-    research: "?�구",
+    history: "역사",
+    mathematics: "수학",
+    research: "연구",
 
-    // ?�연 ?�메??카테고리
-    animal: "?�물",
-    plant: "?�물",
-    weather: "?�씨",
-    geography: "지�?,
-    environment: "?�경",
+    // 자연 도메인 카테고리
+    animal: "동물",
+    plant: "식물",
+    weather: "날씨",
+    geography: "지리",
+    environment: "환경",
 
-    // 기술 ?�메??카테고리
-    computer: "컴퓨??,
-    software: "?�프?�웨??,
-    internet: "?�터??,
-    mobile: "모바??,
-    ai: "?�공지??,
+    // 기술 도메인 카테고리
+    computer: "컴퓨터",
+    software: "소프트웨어",
+    internet: "인터넷",
+    mobile: "모바일",
+    ai: "인공지능",
 
-    // 건강 ?�메??카테고리
-    exercise: "?�동",
-    medicine: "?�학",
-    nutrition: "?�양",
-    mental_health: "?�신건강",
+    // 건강 도메인 카테고리
+    exercise: "운동",
+    medicine: "의학",
+    nutrition: "영양",
+    mental_health: "정신건강",
     hospital: "병원",
 
-    // ?�포�??�메??카테고리
+    // 스포츠 도메인 카테고리
     football: "축구",
-    basketball: "?�구",
-    swimming: "?�영",
-    running: "?�리�?,
-    equipment: "?�동기구",
+    basketball: "농구",
+    swimming: "수영",
+    running: "달리기",
+    equipment: "운동기구",
 
-    // ?�터?�인먼트 ?�메??카테고리
-    movie: "?�화",
-    music: "?�악",
+    // 엔터테인먼트 도메인 카테고리
+    movie: "영화",
+    music: "음악",
     game: "게임",
-    book: "?�서",
-    art: "?�술",
+    book: "도서",
+    art: "예술",
 
     // My Vocabulary page translations
-    my_vocabulary_title: "?�만???�어??,
-    bookmarked_word_count: "북마?�한 ?�어 ??",
-    word_count_unit: "�?,
-    bookmark_usage: "북마???�용??,
-    unlimited: "무제??,
-    bookmark_words: "?�어 북마?�하�?,
-    hangul: "?��?",
-    meaning: "??,
+    my_vocabulary_title: "나만의 단어장",
+    bookmarked_word_count: "북마크한 단어 수:",
+    word_count_unit: "개",
+    bookmark_usage: "북마크 사용량",
+    unlimited: "무제한",
+    bookmark_words: "단어 북마크하기",
+    hangul: "한글",
+    meaning: "뜻",
     pronunciation: "발음",
-    description: "?�명",
-    search_placeholder: "검?�어�??�력?�세??,
-    load_more: "??보기",
-    no_bookmarks_title: "북마?�한 ?�어가 ?�습?�다",
-    no_bookmarks_desc: "?�국???�어?�에??관?�있???�어?�을 북마?�해보세??",
-    browse_words: "?�어 ?�러보기",
-    bookmarked: "북마?�됨",
-    no_date: "?�짜 ?�음",
-    login_required: "로그?�이 ?�요?�니??",
-    error_loading_bookmarks: "북마?�된 개념 로드 ?�류:",
-    concept_detail_view: "개념 ?�세 보기:",
-    expressions: "?�현",
-    examples: "?�문",
+    description: "설명",
+    search_placeholder: "검색어를 입력하세요",
+    load_more: "더 보기",
+    no_bookmarks_title: "북마크한 단어가 없습니다",
+    no_bookmarks_desc: "다국어 단어장에서 관심있는 단어들을 북마크해보세요!",
+    browse_words: "단어 둘러보기",
+    bookmarked: "북마크됨",
+    no_date: "날짜 없음",
+    login_required: "로그인이 필요합니다.",
+    error_loading_bookmarks: "북마크된 개념 로드 오류:",
+    concept_detail_view: "개념 상세 보기:",
+    expressions: "표현",
+    examples: "예문",
 
-    // ?�습 모드 카드 번역
-    flashcard_learning: "?�� ?�래?�카???�습",
-    typing_learning: "?�️ ?�?�핑 ?�습",
-    pronunciation_practice: "?�� 발음 ?�습",
-    grammar_pattern_analysis: "?�� 문법 ?�턴 분석",
-    grammar_practice: "?�� 문법 ?�습 ?�습",
-    reading_learning: "?�해 ?�습",
+    // 학습 모드 카드 번역
+    flashcard_learning: "🃏 플래시카드 학습",
+    typing_learning: "⌨️ 타이핑 학습",
+    pronunciation_practice: "🎤 발음 연습",
+    grammar_pattern_analysis: "📝 문법 패턴 분석",
+    grammar_practice: "📚 문법 실습 연습",
+    reading_learning: "독해 학습",
 
-    // ?�래?�카??모드 번역
-    click_to_check_meaning: "?�릭?�여 ?��? ?�인",
-    click_to_see_word: "?�시 ?�릭?�여 ?�어 보기",
-    back_to_dashboard: "?�?�보?�로",
-    back: "?�아가�?,
+    // 플래시카드 모드 번역
+    click_to_check_meaning: "클릭하여 의미 확인",
+    click_to_see_word: "다시 클릭하여 단어 보기",
+    back_to_dashboard: "대시보드로",
+    back: "돌아가기",
 
-    // ?�?�핑 모드 번역
-    typing_answer_placeholder: "?�안???�력?�세??,
-    check: "?�인",
+    // 타이핑 모드 번역
+    typing_answer_placeholder: "답안을 입력하세요",
+    check: "확인",
 
-    // 발음 ?�습 모드 번역
-    pronunciation_coming_soon: "발음 ?�습 모드??준�?중입?�다.",
+    // 발음 연습 모드 번역
+    pronunciation_coming_soon: "발음 연습 모드는 준비 중입니다.",
 
     // 문법 모드 번역
-    click_to_see_explanation: "?�릭?�여 ?�명 보기",
+    click_to_see_explanation: "클릭하여 설명 보기",
 
-    // ?�해 모드 번역
-    original_text: "?�문",
+    // 독해 모드 번역
+    original_text: "원문",
     translation: "번역",
-    context: "?�황",
+    context: "상황",
 
     // 공통 버튼 번역
-    home: "?�으�?,
-    back_to_home: "?�으�??�아가�?,
+    home: "홈으로",
+    back_to_home: "홈으로 돌아가기",
 
-    // ?�이???�음 메시지
-    no_data: "?�이?��? ?�습?�다",
+    // 데이터 없음 메시지
+    no_data: "데이터가 없습니다",
     no_data_description:
-      "?�습???�이?��? ?�습?�다. 먼�? ?�이?��? ?�로?�해주세??",
+      "학습할 데이터가 없습니다. 먼저 데이터를 업로드해주세요.",
 
-    // ?�로??모달 번역
-    concept_upload: "개념 ?�로??,
-    grammar_pattern_upload: "문법 ?�턴 ?�로??,
-    example_upload: "?�문 ?�로??,
+    // 업로드 모달 번역
+    concept_upload: "개념 업로드",
+    grammar_pattern_upload: "문법 패턴 업로드",
+    example_upload: "예문 업로드",
     upload_csv_json_concept:
-      "CSV ?�는 JSON ?�일???�로?�하??개념??추�??�세??",
+      "CSV 또는 JSON 파일을 업로드하여 개념을 추가하세요.",
     upload_csv_json_grammar:
-      "CSV ?�는 JSON ?�일???�로?�하??문법 ?�턴??추�??�세??",
+      "CSV 또는 JSON 파일을 업로드하여 문법 패턴을 추가하세요.",
     upload_csv_json_example:
-      "CSV ?�는 JSON ?�일???�로?�하???�문??추�??�세??",
-    upload: "?�로??,
-    download_template: "?�플�??�운로드",
+      "CSV 또는 JSON 파일을 업로드하여 예문을 추가하세요.",
+    upload: "업로드",
+    download_template: "템플릿 다운로드",
 
-    // 추천 ?�습 관??번역
-    flashcard_recommended: "?�래?�카??,
+    // 추천 학습 관련 번역
+    flashcard_recommended: "플래시카드",
     recommended: "추천",
-    recommendation_reason: "최근 ?�습 ?�턴??기반?�로 추천?�니??,
+    recommendation_reason: "최근 학습 패턴을 기반으로 추천됩니다",
   },
   en: {
     home: "Home",
@@ -829,7 +836,7 @@ const translations = {
     domain_sports: "Sports",
     domain_entertainment: "Entertainment",
     domain_other: "Other",
-    // 로그???�이지 번역
+    // 로그인 페이지 번역
     login_with_google: "Login with Google",
     login_with_github: "Login with Github",
     or: "or",
@@ -840,7 +847,7 @@ const translations = {
     auto_login: "Auto Login",
     forgot_password: "Forgot password?",
     no_account: "Don't have an account?",
-    // ?�원가???�이지 번역
+    // 회원가입 페이지 번역
     create_account: "Create Account",
     name: "Name",
     name_placeholder: "Enter your name",
@@ -848,14 +855,14 @@ const translations = {
     confirm_password_placeholder: "Enter your password again",
     agree_terms: "I agree to the terms of service",
     already_account: "Already have an account?",
-    // 문의 ?�이지 번역
+    // 문의 페이지 번역
     contact_us: "Contact Us",
     subject: "Subject",
     subject_placeholder: "Enter subject",
     message: "Message",
     message_placeholder: "Enter your message",
     send: "Send",
-    // ?�국???�어???�이지 번역
+    // 다국어 단어장 페이지 번역
     search: "Search",
     search_placeholder: "Enter search term...",
     source_language: "Source Language",
@@ -882,7 +889,7 @@ const translations = {
     english: "English",
     japanese: "Japanese",
     chinese: "Chinese",
-    // ?�국???�습 ?�이지 번역
+    // 다국어 학습 페이지 번역
     language_learning_title: "Multilingual Learning",
     select_source_language: "Select Source Language",
     select_target_language: "Select Target Language",
@@ -908,7 +915,7 @@ const translations = {
     typing_progress: "Progress",
     correct_count: "Correct:",
     wrong_count: "Wrong:",
-    // ?�어???�세보기 모달 번역
+    // 단어장 상세보기 모달 번역
     concept_detail_view: "Concept Detail View",
     expressions_by_language: "Expressions by Language",
     close: "Close",
@@ -918,11 +925,11 @@ const translations = {
     concept_deleted_success: "Concept has been successfully deleted.",
     concept_delete_error: "An error occurred while deleting the concept",
     registration_time: "Registration Time",
-    // 개념 추�? 모달 번역
+    // 개념 추가 모달 번역
     domain: "Domain",
     domain_placeholder: "Ex: daily, food, business",
     emoji: "Emoji",
-    emoji_placeholder: "Ex: ?��, ?��, ?��",
+    emoji_placeholder: "Ex: 🍎, 🚆, 👋",
     reset: "Reset",
     add: "Add",
     add_example: "Add Example",
@@ -942,7 +949,7 @@ const translations = {
     target_language: "Target Language",
     learning_title_desc:
       "Improve your language skills through systematic learning.",
-    // 문법 �??�습 진도 ?�이지 번역
+    // 문법 및 학습 진도 페이지 번역
     grammar_progress: "Grammar & Learning Progress",
     grammar_progress_title: "Grammar & Learning Progress",
     grammar_progress_subtitle:
@@ -956,24 +963,24 @@ const translations = {
     learning_progress_subtitle:
       "Track and analyze your personal learning achievements and progress",
 
-    // ?�습 ?�이지 번역
+    // 학습 페이지 번역
     learning_areas: "Learning Areas",
     learning_dashboard: "Learning Dashboard",
     continue_learning: "Continue Learning",
     vocabulary_learning: "Vocabulary Learning",
     vocabulary_learning_desc:
       "Flashcards and typing practice to improve vocabulary",
-    vocabulary_modes: "Flashcards ??Typing ??Pronunciation",
+    vocabulary_modes: "Flashcards • Typing • Pronunciation",
     grammar_learning: "Grammar Learning",
     grammar_learning_desc: "Systematic grammar pattern analysis and practice",
-    grammar_modes: "Grammar Patterns ??Example Analysis ??Practice Problems",
+    grammar_modes: "Grammar Patterns • Example Analysis • Practice Problems",
     reading_learning: "Reading Learning",
     reading_learning_desc:
       "Improve reading comprehension through various examples",
-    reading_modes: "Example Learning ??Flash Mode",
+    reading_modes: "Example Learning • Flash Mode",
     quiz_test: "Quiz Test",
 
-    // ?�합 ?�습 모드 번역
+    // 통합 학습 모드 번역
     flashcard_mode: "Flashcards",
     flashcard_quick_desc: "Card flipping learning",
     typing_mode: "Typing",
@@ -989,18 +996,18 @@ const translations = {
     flash_mode: "Flash Mode",
     flash_quick_desc: "Speed reading practice",
 
-    // ?�습 ?�징 ?�명
-    vocabulary_flashcard_features: "Visual Learning ??Instant Feedback",
-    vocabulary_typing_features: "Accurate Spelling ??Memory Enhancement",
+    // 학습 특징 설명
+    vocabulary_flashcard_features: "Visual Learning • Instant Feedback",
+    vocabulary_typing_features: "Accurate Spelling • Memory Enhancement",
     vocabulary_pronunciation_features:
-      "Accurate Pronunciation ??Listening Improvement",
-    grammar_pattern_features: "Systematic Analysis ??Structure Understanding",
-    grammar_practice_features: "Practical Exercise ??Application Skills",
+      "Accurate Pronunciation • Listening Improvement",
+    grammar_pattern_features: "Systematic Analysis • Structure Understanding",
+    grammar_practice_features: "Practical Exercise • Application Skills",
     reading_example_features:
-      "Context Comprehension ??Understanding Improvement",
-    reading_flash_features: "Speed Reading ??Concentration Enhancement",
+      "Context Comprehension • Understanding Improvement",
+    reading_flash_features: "Speed Reading • Concentration Enhancement",
 
-    // ?�습 ?�계 �?추천
+    // 학습 통계 및 추천
     estimated_time: "Estimated Time",
     recent_activity: "Recent Activity",
     no_recent_activity: "No recent learning records",
@@ -1009,7 +1016,7 @@ const translations = {
     learning_streak: "Learning Streak",
     days: "days",
 
-    // ?�습 모드 번역
+    // 학습 모드 번역
     learning_modes: "Learning Modes",
     back_to_areas: "Back to Area Selection",
     pattern_analysis: "Pattern Analysis",
@@ -1023,7 +1030,7 @@ const translations = {
     flash_mode: "Flash Mode",
     flash_mode_desc: "Intensive mode for rapid example learning",
 
-    // ?�터 �??�정 번역
+    // 필터 및 설정 번역
     difficulty_level: "Difficulty Level",
     all_difficulties: "All Difficulties",
     basic: "Basic",
@@ -1042,9 +1049,10 @@ const translations = {
     purpose: "Purpose",
     all_purpose: "All Purposes",
 
-    // ?�황 ?�그 번역
+    // 상황 태그 번역
     formal: "Formal",
     casual: "Casual",
+
     urgent: "Urgent",
     work: "Work",
     school: "School",
@@ -1055,7 +1063,7 @@ const translations = {
     online: "Online",
     medical: "Medical",
 
-    // 목적 ?�그 번역
+    // 목적 태그 번역
     greeting: "Greeting",
     thanking: "Thanking",
     request: "Request",
@@ -1196,31 +1204,31 @@ const translations = {
     expressions: "Expressions",
     examples: "Examples",
 
-    // ?�습 모드 카드 번역
-    flashcard_learning: "?�� Flashcard Learning",
-    typing_learning: "?�️ Typing Learning",
-    pronunciation_practice: "?�� Pronunciation Practice",
-    grammar_pattern_analysis: "?�� Grammar Pattern Analysis",
-    grammar_practice: "?�� Grammar Practice",
+    // 학습 모드 카드 번역
+    flashcard_learning: "🃏 Flashcard Learning",
+    typing_learning: "⌨️ Typing Learning",
+    pronunciation_practice: "🎤 Pronunciation Practice",
+    grammar_pattern_analysis: "📝 Grammar Pattern Analysis",
+    grammar_practice: "📚 Grammar Practice",
     reading_learning: "Reading Learning",
 
-    // ?�래?�카??모드 번역
+    // 플래시카드 모드 번역
     click_to_check_meaning: "Click to check meaning",
     click_to_see_word: "Click again to see word",
     back_to_dashboard: "Back to Dashboard",
     back: "Back",
 
-    // ?�?�핑 모드 번역
+    // 타이핑 모드 번역
     typing_answer_placeholder: "Enter your answer",
     check: "Check",
 
-    // 발음 ?�습 모드 번역
+    // 발음 연습 모드 번역
     pronunciation_coming_soon: "Pronunciation practice mode is coming soon.",
 
     // 문법 모드 번역
     click_to_see_explanation: "Click to see explanation",
 
-    // ?�해 모드 번역
+    // 독해 모드 번역
     original_text: "Original Text",
     translation: "Translation",
     context: "Context",
@@ -1229,11 +1237,11 @@ const translations = {
     home: "Home",
     back_to_home: "Back to Home",
 
-    // ?�이???�음 메시지
+    // 데이터 없음 메시지
     no_data: "No Data Available",
     no_data_description: "There is no data to learn. Please upload data first.",
 
-    // ?�로??모달 번역
+    // 업로드 모달 번역
     concept_upload: "Concept Upload",
     grammar_pattern_upload: "Grammar Pattern Upload",
     example_upload: "Example Upload",
@@ -1244,786 +1252,801 @@ const translations = {
     upload: "Upload",
     download_template: "Download Template",
 
-    // 추천 ?�습 관??번역
+    // 추천 학습 관련 번역
     flashcard_recommended: "Flashcard",
     recommended: "Recommended",
     recommendation_reason: "Recommended based on recent learning patterns",
+
+    // 뒤집기 버튼 번역
+    flip: "Flip",
   },
   ja: {
-    home: "?�ー??,
-    wordbook: "?�語�?,
-    vocabulary: "?�語�?,
-    multilingual_dictionary: "多�?語辞??,
-    ai_wordbook: "AI?�語�?,
-    ai_vocabulary: "AI?�語�?,
+    home: "ホーム",
+    wordbook: "単語帳",
+    vocabulary: "単語帳",
+    multilingual_dictionary: "多言語辞書",
+    ai_wordbook: "AI単語帳",
+    ai_vocabulary: "AI単語帳",
     language_learning: commonTexts.ja.language_learning,
     language_learning_desc: commonTexts.ja.language_learning_desc,
     language_games: commonTexts.ja.language_games,
     language_games_desc: commonTexts.ja.language_games_desc,
-    inquiry: "?�問?�合?�せ",
-    login: "??��?�ン",
-    signup: "会員?�録",
-    logout: "??��?�ウ??,
-    profile: "?�ロ?�ィ?�ル",
-    delete_account: "?��?,
-    welcome: "?�う?�そ",
-    user_suffix: "?�ん",
-    get_started_free: "?�料?�始?�る",
-    learn_languages: "様々な言語を簡単?��??�く学び?�し?�う",
+    inquiry: "お問い合わせ",
+    login: "ログイン",
+    signup: "会員登録",
+    logout: "ログアウト",
+    profile: "プロフィール",
+    delete_account: "退会",
+    welcome: "ようこそ",
+    user_suffix: "さん",
+    get_started_free: "無料で始める",
+    learn_languages: "様々な言語を簡単に楽しく学びましょう",
     effective_learning:
-      "体系?�な?�リ??��?�ム?�直?�的?��?習シ?�テ?�で?�あ?�た??���??習を?�り?�果?�に?�ま?��?,
+      "体系的なカリキュラムと直感的な学習システムで、あなたの語学学習をより効果的にします。",
     wordbook_desc:
-      "�?��?�る?�語?�入?�し?�、自?�だ?�の多�?語単語帳?�作?�ま?�ょ?��?,
+      "学習する単語を入力して、自分だけの多言語単語帳を作りましょう。",
     ai_wordbook_desc:
-      "Google Gemini AI?�ら?�ス?�ム?�語??��?�す?�を?�け?�り?�語�?��?�向上さ?�ま?�ょ?��?,
+      "Google Gemini AIからカスタム単語のおすすめを受け取り、語学力を向上させましょう。",
     ai_vocabulary_desc:
-      "AI?�推?�す?�多言語概念を学び?�語�?��?�向上さ?�ま?�ょ?��?,
+      "AIが推薦する多言語概念を学び、語学力を向上させましょう。",
     inquiry_desc:
-      "質問?�あ?�場?�や?�け?�必要な?�合??��お気軽?�お?�い?�わ?�く?�さ?��?,
-    start: "始め??,
-    language_settings: "言語設�?,
+      "質問がある場合や助けが必要な場合は、お気軽にお問い合わせください。",
+    start: "始める",
+    language_settings: "言語設定",
     save: "保存",
-    cancel: "??��?�セ??,
+    cancel: "キャンセル",
     total_concepts: "総概念数",
-    concepts_unit: "??,
-    ai_usage: "AI使用??,
-    ai_recommend_concept: "AI概念?�薦",
+    concepts_unit: "個",
+    ai_usage: "AI使用量",
+    ai_recommend_concept: "AI概念推薦",
     // Modal-related translations
     add_concept: "概念追加",
     edit_concept: "概念編集",
-    domain: "?�メ?�ン",
-    select_domain: "?�メ?�ン?�選??,
-    category: "?�テ?�リ??,
-    category_placeholder: "�? fruit, animal",
-    emoji: "絵文�?,
+    domain: "ドメイン",
+    select_domain: "ドメインを選択",
+    category: "カテゴリー",
+    category_placeholder: "例: fruit, animal",
+    emoji: "絵文字",
     language_expressions: "言語別表現",
-    word: "?�語",
-    pronunciation: "?�音",
+    word: "単語",
+    pronunciation: "発音",
     definition: "定義",
-    part_of_speech: "?�詞",
-    select_pos: "?�詞?�選??,
+    part_of_speech: "品詞",
+    select_pos: "品詞を選択",
     // Part of speech translations
-    noun: "?�詞",
-    verb: "?�詞",
-    adjective: "形�?�?,
-    adverb: "??��",
-    pronoun: "代名�?,
-    preposition: "?�置�?,
-    conjunction: "?�続�?,
-    interjection: "?�嘆�?,
-    particle: "?�詞",
-    determiner: "?�定�?,
-    classifier: "?�類�?,
-    other: "?�の�?,
+    noun: "名詞",
+    verb: "動詞",
+    adjective: "形容詞",
+    adverb: "副詞",
+    pronoun: "代名詞",
+    preposition: "前置詞",
+    conjunction: "接続詞",
+    interjection: "感嘆詞",
+    particle: "助詞",
+    determiner: "限定詞",
+    classifier: "分類詞",
+    other: "その他",
     // Linguistic terms translations
-    synonyms: "類義�?(?�ン?�区?�り)",
-    antonyms: "?�義�?(?�ン?�区?�り)",
-    collocations: "?�語 (?�ン?�区?�り)",
-    compound_words: "複合�?(?�ン?�区?�り)",
+    synonyms: "類義語 (カンマ区切り)",
+    antonyms: "反義語 (カンマ区切り)",
+    collocations: "連語 (カンマ区切り)",
+    compound_words: "複合語 (カンマ区切り)",
     examples: "例文",
     add_example: "例文追加",
     representative_example: "代表例文",
-    korean_example: "?�国語例??,
-    english_example: "?�語例文",
-    japanese_example: "?�本語例??,
-    chinese_example: "�?��語例??,
-    tags: "?�グ (?�ン?�区?�り)",
+    korean_example: "韓国語例文",
+    english_example: "英語例文",
+    japanese_example: "日本語例文",
+    chinese_example: "中国語例文",
+    tags: "タグ (カンマ区切り)",
     // Domain translations
-    academic: "�?��",
-    nature: "?�然",
-    technology: "?��?,
-    health: "?�康",
-    sports: "?�ポ?�ツ",
-    entertainment: "?�ン?�ー?�イ?�メ?�ト",
+    academic: "学術",
+    nature: "自然",
+    technology: "技術",
+    health: "健康",
+    sports: "スポーツ",
+    entertainment: "エンターテインメント",
     // Domain filter translations
-    domain_filter: "?�域",
-    all_domains: "?�領??,
-    domain_daily: "?�常",
-    domain_business: "?�ジ?�ス",
-    domain_academic: "�?��",
-    domain_travel: "?�行",
+    domain_filter: "領域",
+    all_domains: "全領域",
+    domain_daily: "日常",
+    domain_business: "ビジネス",
+    domain_academic: "学術",
+    domain_travel: "旅行",
     domain_food: "食品",
-    domain_nature: "?�然",
-    domain_technology: "?��?,
-    domain_health: "?�康",
-    domain_sports: "?�ポ?�ツ",
-    domain_entertainment: "?�ン?�ー?�イ?�メ?�ト",
-    domain_other: "?�の�?,
-    // 로그???�이지 번역
-    login_with_google: "Google?�ロ?�イ??,
-    login_with_github: "Github?�ロ?�イ??,
-    or: "?�た??,
-    email: "?�ー?�ア?�レ??,
-    email_placeholder: "?�ー?�ア?�レ?�を?�力?�て?�だ?�い",
-    password: "?�ス??��??,
-    password_placeholder: "?�ス??��?�を?�力?�て?�だ?�い",
-    auto_login: "?�動??��?�ン",
-    forgot_password: "?�ス??��?�を?�忘?�で?�か�?,
-    no_account: "?�カ?�ン?�を?�持?�で?�い?�す?�？",
-    // ?�원가???�이지 번역
-    create_account: "?�カ?�ン?�作??,
-    name: "?�名??,
-    name_placeholder: "?�名?�を?�力?�て?�だ?�い",
-    confirm_password: "?�ス??��?�確�?,
-    confirm_password_placeholder: "?�ス??��?�を?�入?�し?�く?�さ??,
-    agree_terms: "?�用規約?�同?�し?�す",
-    already_account: "?�で?�ア?�ウ?�ト?�お?�ち?�す?�？",
-    // 문의 ?�이지 번역
-    contact_us: "?�問?�合?�せ",
+    domain_nature: "自然",
+    domain_technology: "技術",
+    domain_health: "健康",
+    domain_sports: "スポーツ",
+    domain_entertainment: "エンターテインメント",
+    domain_other: "その他",
+    // 로그인 페이지 번역
+    login_with_google: "Googleでログイン",
+    login_with_github: "Githubでログイン",
+    or: "または",
+    email: "メールアドレス",
+    email_placeholder: "メールアドレスを入力してください",
+    password: "パスワード",
+    password_placeholder: "パスワードを入力してください",
+    auto_login: "自動ログイン",
+    forgot_password: "パスワードをお忘れですか？",
+    no_account: "アカウントをお持ちでないですか？",
+    // 회원가입 페이지 번역
+    create_account: "アカウント作成",
+    name: "お名前",
+    name_placeholder: "お名前を入力してください",
+    confirm_password: "パスワード確認",
+    confirm_password_placeholder: "パスワードを再入力してください",
+    agree_terms: "利用規約に同意します",
+    already_account: "すでにアカウントをお持ちですか？",
+    // 문의 페이지 번역
+    contact_us: "お問い合わせ",
     subject: "件名",
-    subject_placeholder: "件名?�入?�し?�く?�さ??,
-    message: "?�ッ?�ー??,
-    message_placeholder: "?�ッ?�ー?�を?�力?�て?�だ?�い",
-    send: "?�信",
-    // ?�국???�어???�이지 번역
+    subject_placeholder: "件名を入力してください",
+    message: "メッセージ",
+    message_placeholder: "メッセージを入力してください",
+    send: "送信",
+    // 다국어 단어장 페이지 번역
     search: "検索",
-    search_placeholder: "検索語を?�力...",
-    source_language: "?�語",
-    target_language: "対象言�?,
-    category: "?�テ?�リ??,
-    all_categories: "?�べ?�の?�テ?�リ??,
-    fruit: "?�物",
-    food: "食べ??,
-    animal: "?�物",
-    daily: "?�常",
-    travel: "?�行",
-    business: "?�ジ?�ス",
-    concept_count: "??���?,
-    sort: "並べ?�え",
-    latest: "?�?�順",
-    oldest: "?�い??,
-    alphabetical: "?�い?�え?�順",
-    reverse_alphabetical: "?�あ?�う?�お??,
-    concept_usage: "概念使用??,
-    add_new_concept: "?�し?�概念を追加",
-    bulk_add_concept: "一?�概念追??,
-    load_more: "?�っ?�見??,
-    korean: "?�国�?,
-    english: "?�語",
-    japanese: "?�本�?,
-    chinese: "�?���?,
-    // ?�국???�습 ?�이지 번역
-    language_learning_title: "多�?語�?�?,
-    select_source_language: "?�語?�選??,
-    select_target_language: "対象言語を?�択",
-    learning_mode: "�?��?�ー??,
-    flashcards: "?�ラ?�シ?�カ?�ド",
-    flashcards_desc: "?�ー?�の表裏?��?�?,
-    quiz: "??��??,
-    quiz_desc: "多肢?�択?�題?��?�?,
-    typing: "?�イ?�ン??,
-    typing_desc: "?�接?�力?�て�?��",
-    previous: "?�へ",
-    flip: "裏返??,
+    search_placeholder: "検索語を入力...",
+    source_language: "原語",
+    target_language: "対象言語",
+    category: "カテゴリー",
+    all_categories: "すべてのカテゴリー",
+    fruit: "果物",
+    food: "食べ物",
+    animal: "動物",
+    daily: "日常",
+    travel: "旅行",
+    business: "ビジネス",
+    concept_count: "の概念",
+    sort: "並べ替え",
+    latest: "最新順",
+    oldest: "古い順",
+    alphabetical: "あいうえお順",
+    reverse_alphabetical: "逆あいうえお順",
+    concept_usage: "概念使用量",
+    add_new_concept: "新しい概念を追加",
+    bulk_add_concept: "一括概念追加",
+    load_more: "もっと見る",
+    korean: "韓国語",
+    english: "英語",
+    japanese: "日本語",
+    chinese: "中国語",
+    // 다국어 학습 페이지 번역
+    language_learning_title: "多言語学習",
+    select_source_language: "原語を選択",
+    select_target_language: "対象言語を選択",
+    learning_mode: "学習モード",
+    flashcards: "フラッシュカード",
+    flashcards_desc: "カードの表裏で学習",
+    quiz: "クイズ",
+    quiz_desc: "多肢選択問題で学習",
+    typing: "タイピング",
+    typing_desc: "直接入力して学習",
+    previous: "前へ",
+    flip: "裏返す",
     next: "次へ",
     examples: "例文:",
-    card_progress: "?�捗?�況",
-    quiz_question: "?�題",
-    next_question: "次の?�題",
-    quiz_progress: "?�捗?�況",
-    typing_prompt: "答え?�入?�し?�く?�さ??",
-    typing_placeholder: "答え?�入??..",
-    check_answer: "答え?�わ??,
-    next_word: "次の?�語",
-    typing_progress: "?�捗?�況",
-    correct_count: "正解??",
-    wrong_count: "不�?解数:",
-    // ?�어???�세보기 모달 번역
+    card_progress: "進捗状況",
+    quiz_question: "問題",
+    next_question: "次の問題",
+    quiz_progress: "進捗状況",
+    typing_prompt: "答えを入力してください:",
+    typing_placeholder: "答えを入力...",
+    check_answer: "答え合わせ",
+    next_word: "次の単語",
+    typing_progress: "進捗状況",
+    correct_count: "正解数:",
+    wrong_count: "不正解数:",
+    // 단어장 상세보기 모달 번역
     concept_detail_view: "概念詳細表示",
     expressions_by_language: "言語別表現",
-    close: "?�じ??,
-    delete: "?�除",
+    close: "閉じる",
+    delete: "削除",
     edit: "編集",
-    confirm_delete_concept: "?�当?�こ??��念を?�除?�ま?�か�?,
-    concept_deleted_success: "概念?��?常に?�除?�れ?�し?��?,
-    concept_delete_error: "概念??��?�中?�エ?�ー?�発?�し?�し??,
-    registration_time: "?�録?�間",
-    // 개념 추�? 모달 번역
-    domain: "?�メ?�ン",
+    confirm_delete_concept: "本当にこの概念を削除しますか？",
+    concept_deleted_success: "概念が正常に削除されました。",
+    concept_delete_error: "概念の削除中にエラーが発生しました",
+    registration_time: "登録時間",
+    // 개념 추가 모달 번역
+    domain: "ドメイン",
     domain_placeholder: "例：daily, food, business",
-    emoji: "絵文�?,
-    emoji_placeholder: "例：?��, ?��, ?��",
-    reset: "?�セ?�ト",
+    emoji: "絵文字",
+    emoji_placeholder: "例：🍎, 🚆, 👋",
+    reset: "リセット",
     add: "追加",
-    add_example: "例文?�追??,
-    add_new_language: "?�し?��?語を追加",
-    language_name_ko: "言語名（韓?�語�?,
-    language_name_ko_placeholder: "例：?�ペ?�ン語、フ?�ン?�語",
-    language_code: "言語コ?�ド",
+    add_example: "例文を追加",
+    add_new_language: "新しい言語を追加",
+    language_name_ko: "言語名（韓国語）",
+    language_name_ko_placeholder: "例：スペイン語、フランス語",
+    language_code: "言語コード",
     language_code_placeholder: "例：spanish, french",
-    example_word: "例の?�語",
+    example_word: "例の単語",
     example_word_placeholder: "例：manzana, pomme",
-    cancel: "??��?�セ??,
+    cancel: "キャンセル",
     // 게임 번역
-    games: "?�ー??,
-    games_desc: "楽し?�ゲ?�ム?�通し??��?�な言語を楽し?��??�ま?�ょ?��?,
-    learning_title: "�?��",
-    source_language: "?��?�?,
-    target_language: "対象言�?,
-    learning_title_desc: "体系?�な�?��?�通し??���?��?�向上さ?�ま?�ょ?��?,
-    // 문법 �??�습 진도 ?�이지 번역
-    grammar_progress: "?�法?��?習進捗",
-    grammar_progress_title: "?�法?��?習進捗",
-    grammar_progress_subtitle: "�?��?�果?�文法パ?�ー?�を確認?�る",
+    games: "ゲーム",
+    games_desc: "楽しいゲームを通して様々な言語を楽しく学びましょう。",
+    learning_title: "学習",
+    source_language: "元言語",
+    target_language: "対象言語",
+    learning_title_desc: "体系的な学習を通して語学力を向上させましょう。",
+    // 문법 및 학습 진도 페이지 번역
+    grammar_progress: "文法と学習進捗",
+    grammar_progress_title: "文法と学習進捗",
+    grammar_progress_subtitle: "学習成果と文法パターンを確認する",
     total_concepts: "総概念数",
-    concepts_breakdown: "?�テ?�リ?�分�?,
-    progress: "?�度",
-    progress_title: "?�度",
-    learning_progress: "�?��?�度",
-    learning_progress_title: "�?��?�度",
-    learning_progress_subtitle: "?�人�?��?�果?�進度?�追跡し?�分?�す??,
+    concepts_breakdown: "カテゴリ別分布",
+    progress: "進度",
+    progress_title: "進度",
+    learning_progress: "学習進度",
+    learning_progress_title: "学習進度",
+    learning_progress_subtitle: "個人学習成果と進度を追跡し、分析する",
 
-    // �?��?�ー?�翻�?    learning_areas: "�?��?�域",
-    learning_dashboard: "�?��?�?�シ?�ボ?�ド",
-    continue_learning: "�?��?�続?�る",
-    vocabulary_learning: "?�語�?��",
+    // 学習ページ翻訳
+    learning_areas: "学習領域",
+    learning_dashboard: "学習ダッシュボード",
+    continue_learning: "学習を続ける",
+    vocabulary_learning: "単語学習",
     vocabulary_learning_desc:
-      "語彙?�向上の?�め??��?�ッ?�ュ?�ー?�と?�イ?�ン?��?�?,
-    vocabulary_modes: "?�ラ?�シ?�カ?�ド ???�イ?�ン?????�音練習",
-    grammar_learning: "?�法�?��",
-    grammar_learning_desc: "体系?�な?�法?�タ?�ン?�析?�実習�?�?,
-    grammar_modes: "?�法?�タ?�ン ??例文?�析 ??実習?�題",
-    reading_learning: "�?���?��",
-    reading_learning_desc: "様々な例文?�通し?�読解力?�上",
-    reading_modes: "例文�?�� ???�ラ?�シ?�モ?�ド",
-    quiz_test: "??��?�テ?�ト",
+      "語彙力向上のためのフラッシュカードとタイピング学習",
+    vocabulary_modes: "フラッシュカード • タイピング • 発音練習",
+    grammar_learning: "文法学習",
+    grammar_learning_desc: "体系的な文法パターン分析と実習学習",
+    grammar_modes: "文法パターン • 例文分析 • 実習問題",
+    reading_learning: "読解学習",
+    reading_learning_desc: "様々な例文を通した読解力向上",
+    reading_modes: "例文学習 • フラッシュモード",
+    quiz_test: "クイズテスト",
 
-    // 統合�?��?�ー?�翻�?    flashcard_mode: "?�ラ?�シ?�カ?�ド",
-    flashcard_quick_desc: "?�ー?�反転�?�?,
-    typing_mode: "?�イ?�ン??,
-    typing_quick_desc: "?�接?�力�?��",
-    pronunciation_mode: "?�音練習",
-    pronunciation_quick_desc: "?�声認識�?��",
-    pattern_analysis_mode: "?�タ?�ン?�析",
-    pattern_quick_desc: "?�法構造�?�?,
-    practice_mode: "実習?�題",
-    practice_quick_desc: "?�法応用練習",
-    example_learning_mode: "例文�?��",
-    example_quick_desc: "?�脈?�解�?��",
-    flash_mode: "?�ラ?�シ?�モ?�ド",
-    flash_quick_desc: "?�読練習",
+    // 統合学習モード翻訳
+    flashcard_mode: "フラッシュカード",
+    flashcard_quick_desc: "カード反転学習",
+    typing_mode: "タイピング",
+    typing_quick_desc: "直接入力学習",
+    pronunciation_mode: "発音練習",
+    pronunciation_quick_desc: "音声認識学習",
+    pattern_analysis_mode: "パターン分析",
+    pattern_quick_desc: "文法構造学習",
+    practice_mode: "実習問題",
+    practice_quick_desc: "文法応用練習",
+    example_learning_mode: "例文学習",
+    example_quick_desc: "文脈理解学習",
+    flash_mode: "フラッシュモード",
+    flash_quick_desc: "速読練習",
 
-    // �?��?�徴説明
-    vocabulary_flashcard_features: "視覚?��?�????�時?�ィ?�ド?�ッ??,
-    vocabulary_typing_features: "正確?�ス?�ル ??記憶?�強??,
-    vocabulary_pronunciation_features: "正確?�発?????�ス?�ン?�向�?,
-    grammar_pattern_features: "体系?�分????構造理�?,
-    grammar_practice_features: "実践練習 ??応用?�力",
-    reading_example_features: "?�脈?�握 ???�解?�向�?,
-    reading_flash_features: "?�読練習 ???�中?�向�?,
+    // 学習特徴説明
+    vocabulary_flashcard_features: "視覚的学習 • 即時フィードバック",
+    vocabulary_typing_features: "正確なスペル • 記憶力強化",
+    vocabulary_pronunciation_features: "正確な発音 • リスニング向上",
+    grammar_pattern_features: "体系的分析 • 構造理解",
+    grammar_practice_features: "実践練習 • 応用能力",
+    reading_example_features: "文脈把握 • 理解力向上",
+    reading_flash_features: "速読練習 • 集中力向上",
 
-    // �?��統計?�推�?    estimated_time: "予想?�間",
-    recent_activity: "?�近の活動",
-    no_recent_activity: "?�近の�?��記録?�あ?�ま?�ん",
-    recommended_mode: "?�奨�?��",
-    vocabulary_flashcard_recommended: "?�語?�ラ?�シ?�カ?�ド?�奨",
-    learning_streak: "�?��?�続??,
-    days: "??,
+    // 学習統計と推奨
+    estimated_time: "予想時間",
+    recent_activity: "最近の活動",
+    no_recent_activity: "最近の学習記録がありません",
+    recommended_mode: "推奨学習",
+    vocabulary_flashcard_recommended: "単語フラッシュカード推奨",
+    learning_streak: "学習連続日",
+    days: "日",
 
-    // �?��?�ー?�翻�?    learning_modes: "�?��?�ー??,
-    back_to_areas: "?�域?�択?�戻??,
-    pattern_analysis: "?�タ?�ン?�析",
-    pattern_analysis_desc: "?�法構造と?�タ?�ン?�体系的?��?�?,
+    // 学習モード翻訳
+    learning_modes: "学習モード",
+    back_to_areas: "領域選択に戻る",
+    pattern_analysis: "パターン分析",
+    pattern_analysis_desc: "文法構造とパターンを体系的に学習",
     example_practice: "例文実習",
-    example_practice_desc: "?�ラ?�シ?�カ?�ド?�式?�文法パ?�ー?�練�?,
-    general_example_learning: "一?�例?��?�?,
-    general_example_learning_desc: "様々な例文?�通し?�読解能?�向�?,
-    flash_mode: "?�ラ?�シ?�モ?�ド",
-    flash_mode_desc: "高速で例文?��?習す?�集�?��?�ド",
+    example_practice_desc: "フラッシュカード方式で文法パターン練習",
+    general_example_learning: "一般例文学習",
+    general_example_learning_desc: "様々な例文を通した読解能力向上",
+    flash_mode: "フラッシュモード",
+    flash_mode_desc: "高速で例文を学習する集中モード",
 
-    // ?�ィ?�タ?�と�?��翻訳
-    difficulty_level: "?�易�?,
-    all_difficulties: "?�難?�度",
-    basic: "?�礎",
-    intermediate: "�?��",
+    // フィルターと設定翻訳
+    difficulty_level: "難易度",
+    all_difficulties: "全難易度",
+    basic: "基礎",
+    intermediate: "中級",
     advanced: "上級",
     fluent: "流暢",
-    technical: "専�??�語",
-    pattern_type: "?�タ?�ン?�イ??,
-    all_patterns: "?�パ?�ー??,
-    grammar_pattern: "?�法?�タ?�ン",
-    syntax_structure: "?�章構�?,
-    expression_pattern: "表現?�タ?�ン",
-    conversation_pattern: "会話?�タ?�ン",
-    situation: "?�況",
-    all_situation: "?�状�?,
-    purpose: "??��",
-    all_purpose: "?�目??,
+    technical: "専門用語",
+    pattern_type: "パターンタイプ",
+    all_patterns: "全パターン",
+    grammar_pattern: "文法パターン",
+    syntax_structure: "文章構造",
+    expression_pattern: "表現パターン",
+    conversation_pattern: "会話パターン",
+    situation: "状況",
+    all_situation: "全状況",
+    purpose: "目的",
+    all_purpose: "全目的",
 
-    // ?�황 ?�그 번역
-    formal: "?�ォ?�マ??,
-    casual: "?�ジ?�ア??,
-    urgent: "緊�?,
-    work: "?�場",
-    school: "�?��",
+    // 상황 태그 번역
+    formal: "フォーマル",
+    casual: "カジュアル",
+    urgent: "緊急",
+    work: "職場",
+    school: "学校",
     social: "社交",
-    shopping: "?�ョ?�ピ?�グ",
+    shopping: "ショッピング",
     home: "家庭",
-    public: "?�共?��?",
-    online: "?�ン?�イ??,
-    medical: "?�療",
+    public: "公共場所",
+    online: "オンライン",
+    medical: "医療",
 
-    // 목적 ?�그 번역
-    greeting: "?�拶",
-    thanking: "?�謝",
+    // 목적 태그 번역
+    greeting: "挨拶",
+    thanking: "感謝",
     request: "依頼",
     question: "質問",
-    opinion: "?�見",
-    agreement: "?�意",
-    refusal: "?�否",
+    opinion: "意見",
+    agreement: "同意",
+    refusal: "拒否",
     apology: "謝罪",
-    instruction: "?�示",
+    instruction: "指示",
     description: "説明",
-    suggestion: "?�案",
-    emotion: "?�情表現",
-    domain_filter: "?�メ?�ン",
-    all_domains: "?�ド?�イ??,
-    domain_daily: "?�常",
-    domain_business: "?�ジ?�ス",
-    domain_academic: "�?��",
-    domain_travel: "?�行",
-    domain_food: "食べ??,
-    domain_nature: "?�然",
-    domain_technology: "?��?,
-    domain_health: "?�康",
-    domain_sports: "?�ポ?�ツ",
-    domain_entertainment: "?�ン?�ー?�イ?�メ?�ト",
-    domain_other: "?�の�?,
+    suggestion: "提案",
+    emotion: "感情表現",
+    domain_filter: "ドメイン",
+    all_domains: "全ドメイン",
+    domain_daily: "日常",
+    domain_business: "ビジネス",
+    domain_academic: "学術",
+    domain_travel: "旅行",
+    domain_food: "食べ物",
+    domain_nature: "自然",
+    domain_technology: "技術",
+    domain_health: "健康",
+    domain_sports: "スポーツ",
+    domain_entertainment: "エンターテインメント",
+    domain_other: "その他",
 
-    // ?�래?�카??모드 번역
-    back_to_dashboard: "?�?�シ?�ボ?�ド?�戻??,
-    back: "?�る",
+    // 플래시카드 모드 번역
+    back_to_dashboard: "ダッシュボードに戻る",
+    back: "戻る",
 
-    // 추천 ?�습 관??번역
-    flashcard_recommended: "?�ラ?�シ?�カ?�ド",
-    recommended: "?�奨",
-    recommendation_reason: "?�近の�?��?�タ?�ン?�基?�い??��奨さ?�ま??,
+    // 추천 학습 관련 번역
+    flashcard_recommended: "フラッシュカード",
+    recommended: "推奨",
+    recommendation_reason: "最近の学習パターンに基づいて推奨されます",
+
+    // 뒤집기 버튼 번역
+    flip: "反転",
   },
   zh: {
     home: "首页",
-    wordbook: "词汇??,
+    wordbook: "词汇本",
     vocabulary: "词汇",
-    multilingual_dictionary: "多�?言词典",
-    ai_wordbook: "AI词汇??,
+    multilingual_dictionary: "多语言词典",
+    ai_wordbook: "AI词汇本",
     ai_vocabulary: "AI词汇",
     language_learning: commonTexts.zh.language_learning,
     language_learning_desc: commonTexts.zh.language_learning_desc,
     language_games: commonTexts.zh.language_games,
     language_games_desc: commonTexts.zh.language_games_desc,
-    inquiry: "?��?",
-    login: "?�录",
+    inquiry: "咨询",
+    login: "登录",
     signup: "注册",
-    logout: "?�出",
+    logout: "登出",
     profile: "个人资料",
-    delete_account: "?�除�?��",
-    welcome: "�?��",
+    delete_account: "删除账户",
+    welcome: "欢迎",
     user_suffix: "",
-    get_started_free: "?�费开�?,
-    learn_languages: "轻松?�趣?��?习各种�?言",
+    get_started_free: "免费开始",
+    learn_languages: "轻松有趣地学习各种语言",
     effective_learning:
-      "?�过系统?��?程和?�观学习系统，�??�的�??学习?�加高效??,
-    wordbook_desc: "输入要�?习的?�词，创建您?�己?�多�??词汇?��?,
+      "通过系统化课程和直观学习系统，让您的语言学习更加高效。",
+    wordbook_desc: "输入要学习的单词，创建您自己的多语言词汇本。",
     ai_wordbook_desc:
-      "?�过Google Gemini AI?�得定制?�词?�荐，提高您?��?言?�?��?,
-    ai_vocabulary_desc: "学习AI?�荐?�多�??概念，提高您?��?言?�?��?,
-    inquiry_desc: "如果?�有任何??��?��?要帮?�，请随?�咨询�?,
-    start: "开�?,
-    language_settings: "�??设置",
+      "通过Google Gemini AI获得定制单词推荐，提高您的语言技能。",
+    ai_vocabulary_desc: "学习AI推荐的多语言概念，提高您的语言技能。",
+    inquiry_desc: "如果您有任何问题或需要帮助，请随时咨询。",
+    start: "开始",
+    language_settings: "语言设置",
     save: "保存",
-    cancel: "?�消",
-    total_concepts: "?�概念数",
-    concepts_unit: "�?,
-    ai_usage: "AI使用??,
-    ai_recommend_concept: "AI概念?�荐",
-    // 模态框?�关翻译
+    cancel: "取消",
+    total_concepts: "总概念数",
+    concepts_unit: "个",
+    ai_usage: "AI使用量",
+    ai_recommend_concept: "AI概念推荐",
+    // 模态框相关翻译
     add_concept: "添加概念",
     edit_concept: "编辑概念",
     domain: "领域",
-    select_domain: "?�择领域",
+    select_domain: "选择领域",
     category: "类别",
     category_placeholder: "例如：fruit, animal",
-    emoji: "表情�?��",
-    language_expressions: "�??表达",
-    word: "?�词",
-    pronunciation: "?�音",
+    emoji: "表情符号",
+    language_expressions: "语言表达",
+    word: "单词",
+    pronunciation: "发音",
     definition: "定义",
-    part_of_speech: "词�?,
-    select_pos: "?�择词�?,
-    // 词性翻�?    noun: "?�词",
-    verb: "?�词",
-    adjective: "形�?�?,
-    adverb: "??��",
+    part_of_speech: "词性",
+    select_pos: "选择词性",
+    // 词性翻译
+    noun: "名词",
+    verb: "动词",
+    adjective: "形容词",
+    adverb: "副词",
     pronoun: "代词",
     preposition: "介词",
     conjunction: "连词",
-    interjection: "?�叹�?,
-    particle: "?�词",
-    determiner: "?�定�?,
-    classifier: "?�词",
-    other: "?�他",
-    // �??�?���?���?    synonyms: "?�义词（?�号?�隔�?,
-    antonyms: "?�义词（?�号?�隔�?,
-    collocations: "??��（逗号?�隔�?,
-    compound_words: "复合词（?�号?�隔�?,
+    interjection: "感叹词",
+    particle: "助词",
+    determiner: "限定词",
+    classifier: "量词",
+    other: "其他",
+    // 语言学术语翻译
+    synonyms: "同义词（逗号分隔）",
+    antonyms: "反义词（逗号分隔）",
+    collocations: "搭配（逗号分隔）",
+    compound_words: "复合词（逗号分隔）",
     examples: "例句",
     add_example: "添加例句",
     representative_example: "代表例句",
-    korean_example: "?��?例句",
-    english_example: "?��?例句",
-    japanese_example: "?��?例句",
-    chinese_example: "�?��例句",
-    tags: "?��?（逗号?�隔�?,
+    korean_example: "韩语例句",
+    english_example: "英语例句",
+    japanese_example: "日语例句",
+    chinese_example: "中文例句",
+    tags: "标签（逗号分隔）",
     // 领域翻译
-    academic: "�?��",
-    technology: "?�??,
-    health: "?�康",
+    academic: "学术",
+    technology: "技术",
+    health: "健康",
     sports: "体育",
     entertainment: "娱乐",
-    // 领域过滤?�翻�?    domain_filter: "领域",
-    all_domains: "?�部领域",
-    domain_daily: "?�常",
-    domain_business: "?�务",
-    domain_academic: "�?��",
-    domain_travel: "?�行",
+    // 领域过滤器翻译
+    domain_filter: "领域",
+    all_domains: "全部领域",
+    domain_daily: "日常",
+    domain_business: "商务",
+    domain_academic: "学术",
+    domain_travel: "旅行",
     domain_food: "食物",
-    domain_nature: "?�然",
-    domain_technology: "?�??,
-    domain_health: "?�康",
+    domain_nature: "自然",
+    domain_technology: "技术",
+    domain_health: "健康",
     domain_sports: "体育",
     domain_entertainment: "娱乐",
-    domain_other: "?�他",
-    // ?�录页面翻译
-    login_with_google: "使用Google?�录",
-    login_with_github: "使用Github?�录",
-    or: "?��?,
-    email: "?�子??��",
-    email_placeholder: "请输?�您?�电子邮�?,
+    domain_other: "其他",
+    // 登录页面翻译
+    login_with_google: "使用Google登录",
+    login_with_github: "使用Github登录",
+    or: "或者",
+    email: "电子邮件",
+    email_placeholder: "请输入您的电子邮件",
     password: "密码",
-    password_placeholder: "请输?�您?�密??,
-    auto_login: "?�动?�录",
-    forgot_password: "忘�?密码�?,
-    no_account: "没有�?���?,
-    // ?�원가???�이지 번역
-    create_account: "?�建�?��",
+    password_placeholder: "请输入您的密码",
+    auto_login: "自动登录",
+    forgot_password: "忘记密码？",
+    no_account: "没有账号？",
+    // 회원가입 페이지 번역
+    create_account: "创建账号",
     name: "姓名",
-    name_placeholder: "请输?�您?�姓??,
-    confirm_password: "�??密码",
-    confirm_password_placeholder: "请再次输?�密??,
-    agree_terms: "?�同?�服?�条�?,
-    already_account: "已有�?���?,
-    // 문의 ?�이지 번역
-    contact_us: "?�系?�们",
+    name_placeholder: "请输入您的姓名",
+    confirm_password: "确认密码",
+    confirm_password_placeholder: "请再次输入密码",
+    agree_terms: "我同意服务条款",
+    already_account: "已有账号？",
+    // 문의 페이지 번역
+    contact_us: "联系我们",
     subject: "主题",
-    subject_placeholder: "请输?�主�?,
+    subject_placeholder: "请输入主题",
     message: "信息",
-    message_placeholder: "请输?�您?�信??,
-    send: "?��?,
-    // ?�국???�어???�이지 번역
-    search: "?�索",
-    search_placeholder: "输入?�索�?..",
-    source_language: "源�?言",
-    target_language: "??���??",
+    message_placeholder: "请输入您的信息",
+    send: "发送",
+    // 다국어 단어장 페이지 번역
+    search: "搜索",
+    search_placeholder: "输入搜索词...",
+    source_language: "源语言",
+    target_language: "目标语言",
     category: "类别",
-    all_categories: "?�?�类??,
+    all_categories: "所有类别",
     fruit: "水果",
     food: "食物",
-    animal: "?�物",
-    daily: "?�常",
-    travel: "?�行",
-    business: "?�务",
-    concept_count: "个概�?,
-    sort: "?�序",
-    latest: "?�??,
-    oldest: "?�??,
+    animal: "动物",
+    daily: "日常",
+    travel: "旅行",
+    business: "商务",
+    concept_count: "个概念",
+    sort: "排序",
+    latest: "最新",
+    oldest: "最早",
     alphabetical: "字母顺序",
-    reverse_alphabetical: "?�字母顺�?,
-    concept_usage: "概念使用??,
-    add_new_concept: "添加?�概�?,
-    bulk_add_concept: "?�量添加概念",
-    load_more: "?�载?�多",
-    korean: "?��?",
-    english: "?��?",
-    japanese: "?��?",
-    chinese: "�?��",
-    // ?�국???�습 ?�이지 번역
-    language_learning_title: "多�?言学习",
-    select_source_language: "?�择源�?言",
-    select_target_language: "?�择??���??",
+    reverse_alphabetical: "反字母顺序",
+    concept_usage: "概念使用量",
+    add_new_concept: "添加新概念",
+    bulk_add_concept: "批量添加概念",
+    load_more: "加载更多",
+    korean: "韩语",
+    english: "英语",
+    japanese: "日语",
+    chinese: "中文",
+    // 다국어 학습 페이지 번역
+    language_learning_title: "多语言学习",
+    select_source_language: "选择源语言",
+    select_target_language: "选择目标语言",
     learning_mode: "学习模式",
-    flashcards: "?�卡",
-    flashcards_desc: "?�过?�词正反?��?�?,
+    flashcards: "闪卡",
+    flashcards_desc: "通过单词正反面学习",
     quiz: "测验",
-    quiz_desc: "?�过?�择题�?�?,
-    typing: "?�字",
-    typing_desc: "?�过?�接输入学习",
-    previous: "上�?�?,
+    quiz_desc: "通过选择题学习",
+    typing: "打字",
+    typing_desc: "通过直接输入学习",
+    previous: "上一个",
     flip: "翻转",
-    next: "下�?�?,
+    next: "下一个",
     examples: "例句:",
     card_progress: "进度",
-    quiz_question: "??��",
-    next_question: "下�?�?,
+    quiz_question: "问题",
+    next_question: "下一题",
     quiz_progress: "进度",
-    typing_prompt: "请输?�答�?",
+    typing_prompt: "请输入答案:",
     typing_placeholder: "输入答案...",
-    check_answer: "检?�答�?,
-    next_word: "下�?个单�?,
+    check_answer: "检查答案",
+    next_word: "下一个单词",
     typing_progress: "进度",
-    correct_count: "正确??",
-    wrong_count: "?��???",
-    // ?�어???�세보기 모달 번역
-    concept_detail_view: "概念�?��?�看",
-    expressions_by_language: "?��?言表达",
-    close: "?�闭",
-    delete: "?�除",
+    correct_count: "正确数:",
+    wrong_count: "错误数:",
+    // 단어장 상세보기 모달 번역
+    concept_detail_view: "概念详细查看",
+    expressions_by_language: "按语言表达",
+    close: "关闭",
+    delete: "删除",
     edit: "编辑",
-    confirm_delete_concept: "?�确定要?�除这个概念?�？",
-    concept_deleted_success: "概念已成?�删?��?,
-    concept_delete_error: "?�除概念?�发?�错�?,
-    registration_time: "注册?�间",
-    // 개념 추�? 모달 번역
+    confirm_delete_concept: "您确定要删除这个概念吗？",
+    concept_deleted_success: "概念已成功删除。",
+    concept_delete_error: "删除概念时发生错误",
+    registration_time: "注册时间",
+    // 개념 추가 모달 번역
     domain: "领域",
     domain_placeholder: "例如：daily, food, business",
-    emoji: "表情�?��",
-    emoji_placeholder: "例如：�? ?��, ?��",
-    reset: "?�置",
+    emoji: "表情符号",
+    emoji_placeholder: "例如：🍎, 🚆, 👋",
+    reset: "重置",
     add: "添加",
     add_example: "添加例句",
-    add_new_language: "添加?��?言",
-    language_name_ko: "�???�称（韩�?��",
-    language_name_ko_placeholder: "例如：�???���?��法�?",
-    language_code: "�??代码",
+    add_new_language: "添加新语言",
+    language_name_ko: "语言名称（韩语）",
+    language_name_ko_placeholder: "例如：西班牙语，法语",
+    language_code: "语言代码",
     language_code_placeholder: "例如：spanish, french",
-    example_word: "示例?�词",
+    example_word: "示例单词",
     example_word_placeholder: "例如：manzana, pomme",
-    cancel: "?�消",
+    cancel: "取消",
     // 게임 번역
     games: "游戏",
-    games_desc: "?�过?�趣?�游?�愉快地学习?�种�????,
+    games_desc: "通过有趣的游戏愉快地学习各种语言。",
     learning_title: "学习",
-    source_language: "源�?言",
-    target_language: "??���??",
-    learning_title_desc: "?�过系统?��?习提高您?��?言?�?��?,
-    // 문법 �??�습 진도 ?�이지 번역
-    grammar_progress: "�?��?��?习进�?,
-    grammar_progress_title: "�?��?��?习进�?,
-    grammar_progress_subtitle: "?�看学习?�果?��?法模式分??,
-    total_concepts: "?�概念数",
-    concepts_breakdown: "类别?�布",
+    source_language: "源语言",
+    target_language: "目标语言",
+    learning_title_desc: "通过系统的学习提高您的语言技能。",
+    // 문법 및 학습 진도 페이지 번역
+    grammar_progress: "语法和学习进度",
+    grammar_progress_title: "语法和学习进度",
+    grammar_progress_subtitle: "查看学习成果和语法模式分析",
+    total_concepts: "总概念数",
+    concepts_breakdown: "类别分布",
     progress: "进度",
     progress_title: "进度",
     learning_progress: "学习进度",
     learning_progress_title: "学习进度",
-    learning_progress_subtitle: "跟踪个人学习?�果?�进�?,
+    learning_progress_subtitle: "跟踪个人学习成果和进度",
 
     // 学习页面翻译
     learning_areas: "学习领域",
-    learning_dashboard: "学习仪表??,
+    learning_dashboard: "学习仪表板",
     continue_learning: "继续学习",
     vocabulary_learning: "词汇学习",
-    vocabulary_learning_desc: "?�过?�卡?�打字练习提高词汇量",
-    vocabulary_modes: "?�卡 ???�字 ???�音练习",
-    grammar_learning: "�?��学习",
-    grammar_learning_desc: "系统?��?法模式分?�和实践学习",
-    grammar_modes: "�?��模式 ??例句?�析 ??练习�?,
-    reading_learning: "?��?学习",
-    reading_learning_desc: "?�过?�种例句?�高?��??�解?�力",
-    reading_modes: "例句学习 ???�卡模式",
+    vocabulary_learning_desc: "通过闪卡和打字练习提高词汇量",
+    vocabulary_modes: "闪卡 • 打字 • 发音练习",
+    grammar_learning: "语法学习",
+    grammar_learning_desc: "系统的语法模式分析和实践学习",
+    grammar_modes: "语法模式 • 例句分析 • 练习题",
+    reading_learning: "阅读学习",
+    reading_learning_desc: "通过各种例句提高阅读理解能力",
+    reading_modes: "例句学习 • 闪卡模式",
     quiz_test: "测验测试",
 
     // 统合学习模式翻译
-    flashcard_mode: "?�卡",
-    flashcard_quick_desc: "?�片翻转学习",
-    typing_mode: "?�字",
-    typing_quick_desc: "?�接输入学习",
-    pronunciation_mode: "?�音练习",
-    pronunciation_quick_desc: "�?��识别学习",
-    pattern_analysis_mode: "模式?�析",
-    pattern_quick_desc: "�?��结构学习",
-    practice_mode: "练习�?,
-    practice_quick_desc: "�?��应用练习",
+    flashcard_mode: "闪卡",
+    flashcard_quick_desc: "卡片翻转学习",
+    typing_mode: "打字",
+    typing_quick_desc: "直接输入学习",
+    pronunciation_mode: "发音练习",
+    pronunciation_quick_desc: "语音识别学习",
+    pattern_analysis_mode: "模式分析",
+    pattern_quick_desc: "语法结构学习",
+    practice_mode: "练习题",
+    practice_quick_desc: "语法应用练习",
     example_learning_mode: "例句学习",
-    example_quick_desc: "�?��?�解学习",
-    flash_mode: "?�卡模式",
-    flash_quick_desc: "快速阅读练�?,
+    example_quick_desc: "语境理解学习",
+    flash_mode: "闪卡模式",
+    flash_quick_desc: "快速阅读练习",
 
-    // 学习?�征说明
-    vocabulary_flashcard_features: "视觉学习 ???�时?�馈",
-    vocabulary_typing_features: "?�确?�写 ??记忆增强",
-    vocabulary_pronunciation_features: "?�确?�音 ???�力?�升",
-    grammar_pattern_features: "系统?�析 ??结构?�解",
-    grammar_practice_features: "实战练习 ??应用?�力",
-    reading_example_features: "�?��?�解 ???�解?�提??,
-    reading_flash_features: "?��?练习 ??专注?�提??,
+    // 学习特征说明
+    vocabulary_flashcard_features: "视觉学习 • 即时反馈",
+    vocabulary_typing_features: "准确拼写 • 记忆增强",
+    vocabulary_pronunciation_features: "准确发音 • 听力提升",
+    grammar_pattern_features: "系统分析 • 结构理解",
+    grammar_practice_features: "实战练习 • 应用能力",
+    reading_example_features: "语境理解 • 理解力提升",
+    reading_flash_features: "速读练习 • 专注力提升",
 
-    // 学习统�??�推??    estimated_time: "预�??�间",
-    recent_activity: "?�近活??,
-    no_recent_activity: "没有?�近的学习记录",
-    recommended_mode: "?�荐学习",
-    vocabulary_flashcard_recommended: "?�荐词汇?�卡",
+    // 学习统计和推荐
+    estimated_time: "预计时间",
+    recent_activity: "最近活动",
+    no_recent_activity: "没有最近的学习记录",
+    recommended_mode: "推荐学习",
+    vocabulary_flashcard_recommended: "推荐词汇闪卡",
     learning_streak: "学习连续天数",
-    days: "�?,
+    days: "天",
 
     // 学习模式翻译
     learning_modes: "学习模式",
-    back_to_areas: "返回领域?�择",
-    pattern_analysis: "模式?�析",
-    pattern_analysis_desc: "系统学习�?��结构?�模�?,
+    back_to_areas: "返回领域选择",
+    pattern_analysis: "模式分析",
+    pattern_analysis_desc: "系统学习语法结构和模式",
     example_practice: "例句练习",
-    example_practice_desc: "?�过?�卡?�式练习�?��模式",
-    general_example_learning: "一?�例?��?�?,
-    general_example_learning_desc: "?�过?�种例句?�高?��??�力",
-    flash_mode: "?�卡模式",
-    flash_mode_desc: "快速�?习例?�的?�中模式",
+    example_practice_desc: "通过闪卡方式练习语法模式",
+    general_example_learning: "一般例句学习",
+    general_example_learning_desc: "通过各种例句提高阅读能力",
+    flash_mode: "闪卡模式",
+    flash_mode_desc: "快速学习例句的集中模式",
 
-    // 过滤?�和设置翻译
-    difficulty_level: "?�度等级",
-    all_difficulties: "?�部?�度",
-    basic: "?��?",
-    intermediate: "�?��",
+    // 过滤器和设置翻译
+    difficulty_level: "难度等级",
+    all_difficulties: "全部难度",
+    basic: "基础",
+    intermediate: "中级",
     advanced: "高级",
     fluent: "流利",
-    technical: "专业???",
+    technical: "专业术语",
     pattern_type: "模式类型",
-    all_patterns: "?�部模式",
-    grammar_pattern: "�?��模式",
-    syntax_structure: "?�法结构",
+    all_patterns: "全部模式",
+    grammar_pattern: "语法模式",
+    syntax_structure: "句法结构",
     expression_pattern: "表达模式",
     conversation_pattern: "对话模式",
-    situation: "?�境",
-    all_situation: "?�部?�境",
-    purpose: "??��",
-    all_purpose: "?�部??��",
+    situation: "情境",
+    all_situation: "全部情境",
+    purpose: "目的",
+    all_purpose: "全部目的",
 
-    // ?�황 ?�그 번역
+    // 상황 태그 번역
     formal: "正式",
-    casual: "?��?�?,
-    polite: "礼貌",
-    urgent: "紧�?,
+    casual: "非正式",
+    urgent: "紧急",
     work: "工作",
-    school: "�?��",
+    school: "学校",
     social: "社交",
-    shopping: "�?��",
+    shopping: "购物",
     home: "家庭",
-    public: "?�共?��?",
-    online: "?�线",
-    medical: "?�疗",
+    public: "公共场所",
+    online: "在线",
+    medical: "医疗",
 
-    // 목적 ?�그 번역
-    greeting: "??�?,
-    thanking: "?�谢",
+    // 목적 태그 번역
+    greeting: "问候",
+    thanking: "感谢",
     request: "请求",
-    question: "?�问",
-    opinion: "?�见",
-    agreement: "?�意",
-    refusal: "?�绝",
-    apology: "?�歉",
-    instruction: "?�示",
-    description: "?�述",
-    suggestion: "建�?",
-    emotion: "?�感表达",
+    question: "提问",
+    opinion: "意见",
+    agreement: "同意",
+    refusal: "拒绝",
+    apology: "道歉",
+    instruction: "指示",
+    description: "描述",
+    suggestion: "建议",
+    emotion: "情感表达",
     domain_filter: "领域",
-    all_domains: "?�部领域",
-    domain_daily: "?�常",
-    domain_business: "?�务",
-    domain_academic: "�?��",
-    domain_travel: "?�行",
+    all_domains: "全部领域",
+    domain_daily: "日常",
+    domain_business: "商务",
+    domain_academic: "学术",
+    domain_travel: "旅行",
     domain_food: "食物",
-    domain_nature: "?�然",
-    domain_technology: "?�??,
-    domain_health: "?�康",
+    domain_nature: "自然",
+    domain_technology: "技术",
+    domain_health: "健康",
     domain_sports: "体育",
     domain_entertainment: "娱乐",
-    domain_other: "?�他",
+    domain_other: "其他",
 
-    // 学习模式?�片翻译
+    // 学习模式卡片翻译
     vocabulary_learning_modes: "词汇学习模式",
-    vocabulary_data_upload: "词汇?�据上传",
-    flashcard_mode: "?�卡",
-    flashcard_mode_desc: "?�过翻转?�片学习?�词?�含�?,
-    typing_mode: "?�字",
-    typing_mode_desc: "?�过?�写?�准�?��字练习拼??,
-    pronunciation_mode: "?�音练习",
-    pronunciation_mode_desc: "?�过�?��识别�?��?�确?�音",
+    vocabulary_data_upload: "词汇数据上传",
+    flashcard_mode: "闪卡",
+    flashcard_mode_desc: "通过翻转卡片学习单词和含义",
+    typing_mode: "打字",
+    typing_mode_desc: "通过听写和准确打字练习拼写",
+    pronunciation_mode: "发音练习",
+    pronunciation_mode_desc: "通过语音识别训练准确发音",
 
     // 学习模式翻译
-    flashcard_learning: "?�� ?�卡学习",
-    typing_learning: "?�️ ?�字学习",
-    pronunciation_practice: "?�� ?�音练习",
-    grammar_pattern_analysis: "?�� �?��模式?�析",
-    grammar_practice: "?�� �?��练习",
-    reading_learning: "?��?学习",
+    flashcard_learning: "🃏 闪卡学习",
+    typing_learning: "⌨️ 打字学习",
+    pronunciation_practice: "🎤 发音练习",
+    grammar_pattern_analysis: "📝 语法模式分析",
+    grammar_practice: "📚 语法练习",
+    reading_learning: "阅读学习",
 
-    // ?�卡模式翻译
-    click_to_check_meaning: "?�击?�看?�义",
-    click_to_see_word: "?�次?�击?�看?�词",
-    back_to_dashboard: "返回仪表??,
+    // 闪卡模式翻译
+    click_to_check_meaning: "点击查看含义",
+    click_to_see_word: "再次点击查看单词",
+    back_to_dashboard: "返回仪表板",
     back: "返回",
 
-    // ?�字模式翻译
-    typing_answer_placeholder: "请输?�答�?,
-    check: "检??,
+    // 打字模式翻译
+    typing_answer_placeholder: "请输入答案",
+    check: "检查",
 
-    // ?�音练习模式翻译
-    pronunciation_coming_soon: "?�音练习模式?�将?�出??,
+    // 发音练习模式翻译
+    pronunciation_coming_soon: "发音练习模式即将推出。",
 
-    // �?��模式翻译
-    click_to_see_explanation: "?�击?�看解释",
+    // 语法模式翻译
+    click_to_see_explanation: "点击查看解释",
 
-    // ?��?模式翻译
-    original_text: "?�文",
+    // 阅读模式翻译
+    original_text: "原文",
     translation: "翻译",
-    context: "�?��",
+    context: "语境",
 
-    // ?�共?�钮翻译
+    // 公共按钮翻译
     home: "首页",
     back_to_home: "返回首页",
 
-    // ?�数??��??    no_data: "没有?�据",
-    no_data_description: "没有学习?�据?��??�上传数??�?,
+    // 无数据消息
+    no_data: "没有数据",
+    no_data_description: "没有学习数据。请先上传数据。",
 
     // 上传模态框翻译
     concept_upload: "概念上传",
-    grammar_pattern_upload: "�?��模式上传",
+    grammar_pattern_upload: "语法模式上传",
     example_upload: "例句上传",
-    upload_csv_json_concept: "上传CSV?�JSON?�件以添?�概念�?,
-    upload_csv_json_grammar: "上传CSV?�JSON?�件以添?��?法模式�?,
-    upload_csv_json_example: "上传CSV?�JSON?�件以添?�例?��?,
+    upload_csv_json_concept: "上传CSV或JSON文件以添加概念。",
+    upload_csv_json_grammar: "上传CSV或JSON文件以添加语法模式。",
+    upload_csv_json_example: "上传CSV或JSON文件以添加例句。",
     upload: "上传",
     download_template: "下载模板",
 
-    // 추천 ?�습 관??번역
-    flashcard_recommended: "?�卡",
-    recommended: "?�荐",
-    recommendation_reason: "?�于?�近�?习模式推??,
+    // 추천 학습 관련 번역
+    flashcard_recommended: "闪卡",
+    recommended: "推荐",
+    recommendation_reason: "基于最近学习模式推荐",
   },
 };
 
-// ?�역 번역 객체�??�정
+// 전역 번역 객체로 설정
 if (typeof window !== "undefined") {
   window.translations = translations;
 }
 
-// ?�어 캐싱???�한 변??let cachedLanguage = null;
+// 언어 캐싱을 위한 변수
+let cachedLanguage = null;
 let languageDetectionInProgress = false;
 
-// 브라?��? 기본 ?�어 감�?
+// 브라우저 기본 언어 감지
 function detectBrowserLanguage() {
   const language = navigator.language || navigator.userLanguage;
-  const shortLang = language.split("-")[0]; // ko-KR, en-US ?�에??�??�어 코드�?추출
+  const shortLang = language.split("-")[0]; // ko-KR, en-US 등에서 주 언어 코드만 추출
 
-  // 지?�되???�어?��? ?�인
-  return SUPPORTED_LANGUAGES[shortLang] ? shortLang : "en"; // 지?�되지 ?�으�??�어가 기본
+  // 지원되는 언어인지 확인
+  return SUPPORTED_LANGUAGES[shortLang] ? shortLang : "en"; // 지원되지 않으면 영어가 기본
 }
 
-// ?�용?�의 ?�치 ?�보�??�어 추측
+// 사용자의 위치 정보로 언어 추측
 async function detectLanguageFromLocation() {
   try {
-    // IP 기반 ?�치 ?�보 API ?�용
+    // IP 기반 위치 정보 API 사용
     const response = await fetch("https://ipapi.co/json/");
     const data = await response.json();
 
-    // �?? 코드???�른 ?�어 매핑 (간단???�시)
+    // 국가 코드에 따른 언어 매핑 (간단한 예시)
     const countryToLang = {
       KR: "ko",
       JP: "ja",
@@ -2034,18 +2057,20 @@ async function detectLanguageFromLocation() {
 
     return countryToLang[data.country] || detectBrowserLanguage();
   } catch (error) {
-    console.error("?�치 기반 ?�어 감�? ?�패:", error);
+    console.error("위치 기반 언어 감지 실패:", error);
     return detectBrowserLanguage();
   }
 }
 
-// ?�재 ?�용 ?�어 가?�오�?function getCurrentLanguage() {
+// 현재 사용 언어 가져오기
+function getCurrentLanguage() {
   return localStorage.getItem("userLanguage") || "auto";
 }
 
-// ?�재 ?�성?�된 ?�어 코드 가?�오�?(캐싱 �?중복 ?�출 방�?)
+// 현재 활성화된 언어 코드 가져오기 (캐싱 및 중복 호출 방지)
 async function getActiveLanguage() {
-  // ?��? 감�? 중이�??��?  if (languageDetectionInProgress) {
+  // 이미 감지 중이면 대기
+  if (languageDetectionInProgress) {
     return new Promise((resolve) => {
       const checkInterval = setInterval(() => {
         if (!languageDetectionInProgress && cachedLanguage) {
@@ -2056,66 +2081,73 @@ async function getActiveLanguage() {
     });
   }
 
-  // 캐시???�어가 ?�으�?반환
+  // 캐시된 언어가 있으면 반환
   if (cachedLanguage) {
-    console.log("캐시???�어 ?�용:", cachedLanguage);
+    console.log("캐시된 언어 사용:", cachedLanguage);
     return cachedLanguage;
   }
 
   languageDetectionInProgress = true;
 
   try {
-    // 1. 먼�? localStorage?�서 ?�용?��? 직접 ?�정???�어 ?�인
+    // 1. 먼저 localStorage에서 사용자가 직접 설정한 언어 확인
     const savedLang = localStorage.getItem("userLanguage");
 
     if (savedLang && savedLang !== "auto" && SUPPORTED_LANGUAGES[savedLang]) {
-      console.log("?�?�된 ?�어 ?�용:", savedLang);
+      console.log("저장된 언어 사용:", savedLang);
       cachedLanguage = savedLang;
-      localStorage.setItem("preferredLanguage", savedLang); // ?�메??카테고리-?�모지???�어 ?�정???�기??      return savedLang;
+      localStorage.setItem("preferredLanguage", savedLang); // 도메인-카테고리-이모지용 언어 설정도 동기화
+      return savedLang;
     }
 
-    // 2. ?�동 ?�정?�거???�?�된 ?�어가 ?�는 경우
-    console.log("?�동 ?�어 감�? ?�도...");
+    // 2. 자동 설정이거나 저장된 언어가 없는 경우
+    console.log("자동 언어 감지 시도...");
 
-    // 먼�? 브라?��? ?�어 ?�도
+    // 먼저 브라우저 언어 시도
     const browserLang = detectBrowserLanguage();
     if (SUPPORTED_LANGUAGES[browserLang]) {
-      console.log("브라?��? ?�어 ?�용:", browserLang);
+      console.log("브라우저 언어 사용:", browserLang);
       cachedLanguage = browserLang;
-      localStorage.setItem("preferredLanguage", browserLang); // ?�메??카테고리-?�모지???�어 ?�정???�기??      return browserLang;
+      localStorage.setItem("preferredLanguage", browserLang); // 도메인-카테고리-이모지용 언어 설정도 동기화
+      return browserLang;
     }
 
-    // 브라?��? ?�어가 지?�되지 ?�으�??�치 기반 감�?
+    // 브라우저 언어가 지원되지 않으면 위치 기반 감지
     try {
       const locationLang = await detectLanguageFromLocation();
-      console.log("?�치 기반 ?�어 ?�용:", locationLang);
+      console.log("위치 기반 언어 사용:", locationLang);
       cachedLanguage = locationLang;
-      localStorage.setItem("preferredLanguage", locationLang); // ?�메??카테고리-?�모지???�어 ?�정???�기??      return locationLang;
+      localStorage.setItem("preferredLanguage", locationLang); // 도메인-카테고리-이모지용 언어 설정도 동기화
+      return locationLang;
     } catch (error) {
-      console.error("?�치 기반 ?�어 감�? ?�패, 기본 ?�어 ?�용");
-      cachedLanguage = "ko"; // 최종 기본�? ?�국??      localStorage.setItem("preferredLanguage", "ko"); // ?�메??카테고리-?�모지???�어 ?�정???�기??      return "ko";
+      console.error("위치 기반 언어 감지 실패, 기본 언어 사용");
+      cachedLanguage = "ko"; // 최종 기본값: 한국어
+      localStorage.setItem("preferredLanguage", "ko"); // 도메인-카테고리-이모지용 언어 설정도 동기화
+      return "ko";
     }
   } finally {
     languageDetectionInProgress = false;
   }
 }
 
-// ?�어 ?�정 ?�??�??�용
+// 언어 설정 저장 및 적용
 function setLanguage(langCode) {
-  console.log("?�어 ?�정 변�?", langCode);
+  console.log("언어 설정 변경:", langCode);
 
   if (langCode === "auto") {
     localStorage.removeItem("userLanguage");
-    localStorage.removeItem("preferredLanguage"); // ?�메??카테고리-?�모지???�어 ?�정???�거
-    cachedLanguage = null; // 캐시 초기??  } else {
+    localStorage.removeItem("preferredLanguage"); // 도메인-카테고리-이모지용 언어 설정도 제거
+    cachedLanguage = null; // 캐시 초기화
+  } else {
     localStorage.setItem("userLanguage", langCode);
-    localStorage.setItem("preferredLanguage", langCode); // ?�메??카테고리-?�모지???�어 ?�정???�??    cachedLanguage = langCode; // 캐시 ?�데?�트
+    localStorage.setItem("preferredLanguage", langCode); // 도메인-카테고리-이모지용 언어 설정도 저장
+    cachedLanguage = langCode; // 캐시 업데이트
   }
 
-  // ?�어 ?�용 �?메�??�이???�데?�트
+  // 언어 적용 및 메타데이터 업데이트
   applyLanguage();
 
-  // ?�재 ?�이지 ?�형 감�??�여 ?�절??메�??�이???�데?�트
+  // 현재 페이지 유형 감지하여 적절한 메타데이터 업데이트
   const currentPath = window.location.pathname.toLowerCase();
   let pageType = "home";
 
@@ -2144,17 +2176,17 @@ function setLanguage(langCode) {
   updateMetadata(pageType);
 }
 
-// ?�어 변�??�용 (무한루프 방�?)
+// 언어 변경 적용 (무한루프 방지)
 async function applyLanguage() {
   try {
     const langCode = await getActiveLanguage();
 
     if (!translations[langCode]) {
-      console.error(`번역 ?�이?��? ?�는 ?�어?�니?? ${langCode}`);
+      console.error(`번역 데이터가 없는 언어입니다: ${langCode}`);
       return;
     }
 
-    // ?�반 ?�스???�소 번역 (option ?�그 ?�함)
+    // 일반 텍스트 요소 번역 (option 태그 포함)
     document.querySelectorAll("[data-i18n]").forEach((element) => {
       const key = element.getAttribute("data-i18n");
       if (translations[langCode][key]) {
@@ -2162,7 +2194,7 @@ async function applyLanguage() {
       }
     });
 
-    // placeholder ?�성???�는 ?�력 ?�드???�??번역 ?�용
+    // placeholder 속성이 있는 입력 필드에 대해 번역 적용
     document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
       const key = element.getAttribute("data-i18n-placeholder");
       if (translations[langCode][key]) {
@@ -2170,28 +2202,29 @@ async function applyLanguage() {
       }
     });
 
-    // HTML lang ?�성 변�?    document.documentElement.lang = langCode;
+    // HTML lang 속성 변경
+    document.documentElement.lang = langCode;
 
-    // ?�메??카테고리-?�모지 ?�션 ?�데?�트 (?�는 경우�?
+    // 도메인-카테고리-이모지 옵션 업데이트 (있는 경우만)
     if (typeof window.updateDomainCategoryEmojiLanguage === "function") {
       window.updateDomainCategoryEmojiLanguage();
     }
 
-    // ?�습 ?�이지???�터 ?�션 ?�데?�트 (?�는 경우�?
+    // 학습 페이지의 필터 옵션 업데이트 (있는 경우만)
     if (typeof window.updateFilterOptionsLanguage === "function") {
       window.updateFilterOptionsLanguage();
     }
 
-    // ?�벤??발생 - ?�어 변경을 ?�림
+    // 이벤트 발생 - 언어 변경을 알림
     document.dispatchEvent(
       new CustomEvent("languageChanged", { detail: { language: langCode } })
     );
   } catch (error) {
-    console.error("?�어 ?�용 �??�류:", error);
+    console.error("언어 적용 중 오류:", error);
   }
 }
 
-// ?�어 ?�정 모달 ?�시
+// 언어 설정 모달 표시
 function showLanguageSettingsModal() {
   if (document.getElementById("language-settings-modal")) {
     document
@@ -2206,7 +2239,7 @@ function showLanguageSettingsModal() {
     <div id="language-settings-modal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
       <div class="bg-white rounded-lg p-6 max-w-md w-full">
         <div class="flex justify-between items-center mb-4">
-          <h3 class="text-xl font-bold" data-i18n="language_settings">?�어 ?�정</h3>
+          <h3 class="text-xl font-bold" data-i18n="language_settings">언어 설정</h3>
           <button id="close-language-modal" class="text-gray-500 hover:text-gray-700">
             <i class="fas fa-times"></i>
           </button>
@@ -2217,7 +2250,7 @@ function showLanguageSettingsModal() {
               <input type="radio" id="lang-auto" name="language" value="auto" class="mr-2" ${
                 currentLang === "auto" ? "checked" : ""
               }>
-              <label for="lang-auto">?�동 감�? (Auto Detect)</label>
+              <label for="lang-auto">자동 감지 (Auto Detect)</label>
             </div>
             ${Object.values(SUPPORTED_LANGUAGES)
               .map(
@@ -2235,18 +2268,19 @@ function showLanguageSettingsModal() {
           </div>
         </div>
         <div class="flex justify-end">
-          <button id="save-language" class="bg-[#4B63AC] text-white px-4 py-2 rounded hover:bg-[#3A4F8B]" data-i18n="save">?�??/button>
+          <button id="save-language" class="bg-[#4B63AC] text-white px-4 py-2 rounded hover:bg-[#3A4F8B]" data-i18n="save">저장</button>
         </div>
       </div>
     </div>
   `;
 
-  // 모달 추�?
+  // 모달 추가
   const modalContainer = document.createElement("div");
   modalContainer.innerHTML = modalHTML;
   document.body.appendChild(modalContainer.firstElementChild);
 
-  // ?�벤???�들??  document
+  // 이벤트 핸들러
+  document
     .getElementById("close-language-modal")
     .addEventListener("click", () => {
       document
@@ -2259,61 +2293,61 @@ function showLanguageSettingsModal() {
       'input[name="language"]:checked'
     ).value;
 
-    console.log("?�어 ?�정 ?�??", selectedLang);
+    console.log("언어 설정 저장:", selectedLang);
 
-    // ?�어 ?�정 ?�??�??�용
+    // 언어 설정 저장 및 적용
     setLanguage(selectedLang);
 
-    // 모달 ?�기
+    // 모달 닫기
     document.getElementById("language-settings-modal").classList.add("hidden");
 
-    // ?�공 메시지 (?�택?�항)
-    console.log("?�어 ?�정???�?�되?�습?�다:", selectedLang);
+    // 성공 메시지 (선택사항)
+    console.log("언어 설정이 저장되었습니다:", selectedLang);
   });
 }
 
-// 메�??�이???�데?�트 ?�수 (캐시???�어 ?�용)
+// 메타데이터 업데이트 함수 (캐시된 언어 사용)
 async function updateMetadata(pageType = "home") {
   try {
-    // 캐시???�어�?먼�? ?�인, ?�으�?감�?
+    // 캐시된 언어를 먼저 확인, 없으면 감지
     let langCode = cachedLanguage;
     if (!langCode) {
       langCode = await getActiveLanguage();
     }
 
     if (!seoMetadata[pageType] || !seoMetadata[pageType][langCode]) {
-      console.error(`메�??�이?��? ?�습?�다: ${pageType}, ${langCode}`);
+      console.error(`메타데이터가 없습니다: ${pageType}, ${langCode}`);
       return;
     }
 
     const metadata = seoMetadata[pageType][langCode];
 
-    // ?�?��? ?�데?�트
+    // 타이틀 업데이트
     document.title = metadata.title;
 
-    // 메�? ?�그 ?�데?�트 ?�는 ?�성
+    // 메타 태그 업데이트 또는 생성
     updateOrCreateMetaTag("description", metadata.description);
     updateOrCreateMetaTag("keywords", metadata.keywords);
 
-    // Open Graph 메�? ?�그
+    // Open Graph 메타 태그
     updateOrCreateMetaTag("og:title", metadata.title, "property");
     updateOrCreateMetaTag("og:description", metadata.description, "property");
     updateOrCreateMetaTag("og:locale", langCode, "property");
 
-    // ?��??�어 링크 ?�데?�트
+    // 대체 언어 링크 업데이트
     updateAlternateLanguageLinks(pageType, langCode);
 
-    // ?��? 링크(canonical) ?�데?�트
+    // 표준 링크(canonical) 업데이트
     updateOrCreateLinkTag("canonical", metadata.canonical);
 
-    // hreflang ?�그 ?�데?�트
+    // hreflang 태그 업데이트
     updateHreflangTags(pageType, langCode);
   } catch (error) {
-    console.error("메�??�이???�데?�트 �??�류 발생:", error);
+    console.error("메타데이터 업데이트 중 오류 발생:", error);
   }
 }
 
-// 메�? ?�그 ?�데?�트 ?�는 ?�성 ?�퍼 ?�수
+// 메타 태그 업데이트 또는 생성 헬퍼 함수
 function updateOrCreateMetaTag(name, content, attribute = "name") {
   let metaTag = document.querySelector(`meta[${attribute}="${name}"]`);
 
@@ -2327,7 +2361,7 @@ function updateOrCreateMetaTag(name, content, attribute = "name") {
   }
 }
 
-// 링크 ?�그 ?�데?�트 ?�는 ?�성 ?�퍼 ?�수
+// 링크 태그 업데이트 또는 생성 헬퍼 함수
 function updateOrCreateLinkTag(rel, href) {
   let linkTag = document.querySelector(`link[rel="${rel}"]`);
 
@@ -2341,14 +2375,14 @@ function updateOrCreateLinkTag(rel, href) {
   }
 }
 
-// hreflang ?�그 ?�데?�트 ?�수
+// hreflang 태그 업데이트 함수
 function updateHreflangTags(pageType, currentLangCode) {
-  // 기존 hreflang ?�그 모두 ?�거
+  // 기존 hreflang 태그 모두 제거
   document
     .querySelectorAll('link[rel="alternate"][hreflang]')
     .forEach((tag) => tag.remove());
 
-  // �?지???�어???�??hreflang ?�그 추�?
+  // 각 지원 언어에 대해 hreflang 태그 추가
   Object.keys(SUPPORTED_LANGUAGES).forEach((langCode) => {
     const href = seoMetadata[pageType][langCode].canonical;
 
@@ -2359,7 +2393,7 @@ function updateHreflangTags(pageType, currentLangCode) {
     document.head.appendChild(linkTag);
   });
 
-  // x-default hreflang ?�그 추�? (기본?�으�??�어 버전?�로 ?�정)
+  // x-default hreflang 태그 추가 (기본적으로 영어 버전으로 설정)
   const defaultHref = seoMetadata[pageType]["en"].canonical;
   const defaultLinkTag = document.createElement("link");
   defaultLinkTag.setAttribute("rel", "alternate");
@@ -2368,9 +2402,9 @@ function updateHreflangTags(pageType, currentLangCode) {
   document.head.appendChild(defaultLinkTag);
 }
 
-// ?��??�어 링크 ?�데?�트 ?�수
+// 대체 언어 링크 업데이트 함수
 function updateAlternateLanguageLinks(pageType, currentLangCode) {
-  // ?�른 ?�어 버전???�??링크 ?�데?�트
+  // 다른 언어 버전에 대한 링크 업데이트
   Object.entries(SUPPORTED_LANGUAGES).forEach(([langCode, langInfo]) => {
     if (langCode !== currentLangCode) {
       const href = seoMetadata[pageType][langCode].canonical;

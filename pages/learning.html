@@ -625,10 +625,13 @@
       <!-- 독해 학습 영역 -->
       <div id="reading-container" class="mb-8 hidden">
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold" data-i18n="reading_example_learning">예문 독해 학습</h2>
-          <button id="back-from-reading" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg">
-            <i class="fas fa-arrow-left mr-2"></i><span data-i18n="back">돌아가기</span>
-          </button>
+          <div class="flex-1"></div>
+          <h2 class="text-xl font-bold text-center" data-i18n="reading_example_learning">예문 학습</h2>
+          <div class="flex-1 flex justify-end">
+            <button id="back-from-reading" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg">
+              <i class="fas fa-arrow-left mr-2"></i><span data-i18n="back">돌아가기</span>
+            </button>
+          </div>
         </div>
         <div class="bg-white rounded-lg shadow-lg p-8 max-w-4xl mx-auto">
           <div id="reading-example-container">
@@ -656,13 +659,16 @@
       <!-- 새로운 학습 모드 섹션들 -->
       <!-- 플래시카드 모드 -->
       <div id="flashcard-mode" class="hidden mb-8">
-        <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="relative">
+          <button id="back-from-flashcard" class="absolute top-4 right-4 bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm z-10">
+            <i class="fas fa-arrow-left mr-1"></i><span data-i18n="back">돌아가기</span>
+          </button>
           <div class="text-center mb-6">
             <h2 class="text-2xl font-bold mb-2" data-i18n="flashcard_learning">🃏 플래시카드 학습</h2>
             <div id="flashcard-mode-progress" class="text-gray-600">0 / 0</div>
           </div>
           
-          <div id="flashcard-mode-card" class="flip-card max-w-md mx-auto cursor-pointer" onclick="flipCard()">
+          <div id="flashcard-mode-card" class="flip-card max-w-md mx-auto cursor-pointer">
             <div class="flip-card-inner">
               <div class="flip-card-front bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-8">
                 <div class="text-center">
@@ -697,7 +703,10 @@
 
       <!-- 타이학 학습 영역 -->
       <div id="typing-mode" class="hidden mb-8">
-        <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="bg-white rounded-lg shadow-md p-6 relative">
+          <button id="back-from-typing" class="absolute top-4 right-4 bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm">
+            <i class="fas fa-arrow-left mr-1"></i><span data-i18n="back">돌아가기</span>
+          </button>
           <div class="text-center mb-6">
             <h2 class="text-2xl font-bold mb-2" data-i18n="typing_learning">⌨️ 타이핑 학습</h2>
             <div id="typing-mode-progress" class="text-gray-600">0 / 0</div>
@@ -850,7 +859,7 @@
       <div id="reading-mode" class="hidden mb-8">
         <div class="bg-white rounded-lg shadow-md p-6">
           <div class="text-center mb-6">
-            <h2 class="text-2xl font-bold mb-2" data-i18n="reading_learning">독해 학습</h2>
+            <h2 class="text-2xl font-bold mb-2" data-i18n="reading_flash_card">플래시 카드</h2>
             <div id="reading-progress" class="text-gray-600">0 / 0</div>
           </div>
           

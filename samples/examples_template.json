@@ -1,52 +1,93 @@
 [
   {
-    "korean": "실례합니다, 화장실이 어디에 있나요?",
-    "english": "Excuse me, where is the bathroom?",
-    "japanese": "すみません、トイレはどこにありますか？",
-    "chinese": "不好意思，洗手间在哪里？",
-    "context": "공공장소에서 화장실 위치를 묻는 상황",
-    "difficulty": "beginner",
-    "tags": ["public", "question"],
-    "created_at": "2024-01-01T00:00:00Z"
+    "domain": "daily",
+    "category": "routine",
+    "difficulty": "basic",
+    "situation": ["formal", "social"],
+    "purpose": "greeting",
+    "translations": {
+      "korean": "안녕하세요! 처음 뵙겠습니다.",
+      "english": "Hello! Nice to meet you for the first time.",
+      "japanese": "こんにちは！初めてお会いします。",
+      "chinese": "你好！初次见面。"
+    }
   },
   {
-    "korean": "회의 시간을 변경해도 될까요?",
-    "english": "Would it be possible to change the meeting time?",
-    "japanese": "会議の時間を変更してもいいでしょうか？",
-    "chinese": "可以更改会议时间吗？",
-    "context": "직장에서 회의 일정 변경을 요청하는 상황",
+    "domain": "food",
+    "category": "fruit",
+    "difficulty": "basic",
+    "situation": ["shopping"],
+    "purpose": "request",
+    "translations": {
+      "korean": "사과 주스 하나 주세요.",
+      "english": "Please give me one apple juice.",
+      "japanese": "りんごジュースを一つください。",
+      "chinese": "请给我一杯苹果汁。"
+    }
+  },
+  {
+    "domain": "school",
+    "category": "education",
     "difficulty": "intermediate",
-    "tags": ["work", "request"],
-    "created_at": "2024-01-01T00:00:00Z"
+    "situation": ["school"],
+    "purpose": "question",
+    "translations": {
+      "korean": "이 문제를 어떻게 풀어야 하나요?",
+      "english": "How should I solve this problem?",
+      "japanese": "この問題をどう解けばいいですか？",
+      "chinese": "这个问题应该怎么解决？"
+    }
   },
   {
-    "korean": "정말 고마워요!",
-    "english": "Thank you so much!",
-    "japanese": "本当にありがとうございます！",
-    "chinese": "真的太谢谢了！",
-    "context": "친구나 가족에게 감사를 표현하는 상황",
-    "difficulty": "beginner",
-    "tags": ["casual", "thanking"],
-    "created_at": "2024-01-01T00:00:00Z"
-  },
-  {
-    "korean": "죄송합니다, 늦었습니다.",
-    "english": "I'm sorry, I'm late.",
-    "japanese": "すみません、遅れました。",
-    "chinese": "对不起，我迟到了。",
-    "context": "학교나 직장에서 지각했을 때 사과하는 상황",
-    "difficulty": "beginner",
-    "tags": ["formal", "apology"],
-    "created_at": "2024-01-01T00:00:00Z"
-  },
-  {
-    "korean": "이 제품을 추천하고 싶어요.",
-    "english": "I would like to recommend this product.",
-    "japanese": "この商品をおすすめしたいです。",
-    "chinese": "我想推荐这个产品。",
-    "context": "온라인 쇼핑몰에서 상품을 추천하는 상황",
+    "domain": "travel",
+    "category": "transportation",
     "difficulty": "intermediate",
-    "tags": ["online", "suggestion"],
-    "created_at": "2024-01-01T00:00:00Z"
+    "situation": ["travel", "public"],
+    "purpose": "instruction",
+    "translations": {
+      "korean": "공항까지 가는 길을 알려주세요.",
+      "english": "Please tell me the way to the airport.",
+      "japanese": "空港までの道を教えてください。",
+      "chinese": "请告诉我去机场的路。"
+    }
+  },
+  {
+    "domain": "health",
+    "category": "medical",
+    "difficulty": "intermediate",
+    "situation": ["medical"],
+    "purpose": "request",
+    "translations": {
+      "korean": "병원 예약을 하고 싶습니다.",
+      "english": "I would like to make a hospital appointment.",
+      "japanese": "病院の予約を取りたいです。",
+      "chinese": "我想预约医院。"
+    }
+  },
+  {
+    "domain": "work",
+    "category": "business",
+    "difficulty": "intermediate",
+    "situation": ["work", "online"],
+    "purpose": "request",
+    "translations": {
+      "korean": "회의 자료를 이메일로 보내주세요.",
+      "english": "Please send me the meeting materials by email.",
+      "japanese": "会議資料をメールで送ってください。",
+      "chinese": "请通过邮件发送会议资料。"
+    }
+  },
+  {
+    "domain": "daily",
+    "category": "family",
+    "difficulty": "basic",
+    "situation": ["home"],
+    "purpose": "conversation",
+    "translations": {
+      "korean": "저녁 뭐 먹을까요?",
+      "english": "What should we have for dinner?",
+      "japanese": "夕食は何にしましょうか？",
+      "chinese": "晚餐吃什么？"
+    }
   }
 ] 

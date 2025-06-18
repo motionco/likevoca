@@ -114,14 +114,11 @@ export class CollectionManager {
 
       // 모든 예문을 examples 컬렉션에 저장
       for (const [index, example] of allExamples.entries()) {
-        const exampleId =
-          example.example_id ||
-          example.id ||
-          `${conceptId}_example_${index + 1}`;
-        const exampleRef = doc(db, "examples", exampleId);
+        const exampleRef = doc(collection(db, "examples"));
+        const exampleId = exampleRef.id;
 
         const exampleDoc = {
-          example_id: exampleId,
+          // example_id 속성 제거 - Firestore 자동 부여 ID만 사용
           concept_id: conceptId,
           order_index: index, // 0부터 시작
           context: example.context || "general",
@@ -411,32 +408,16 @@ export class CollectionManager {
    * 핵심 개념 문서 준비 (대표 예문 포함)
    */
   async prepareCoreConceptDoc(conceptId, integratedData) {
-    // 대표 예문 선택 (우선순위: representative_example > featured_examples[0] > core_examples[0] > additional_examples[0])
-    let representativeExample = null;
-
-    if (integratedData.representative_example) {
-      representativeExample = integratedData.representative_example;
-    } else if (
-      integratedData.featured_examples &&
-      integratedData.featured_examples.length > 0
-    ) {
-      representativeExample = integratedData.featured_examples[0];
-    } else if (
-      integratedData.core_examples &&
-      integratedData.core_examples.length > 0
-    ) {
-      representativeExample = integratedData.core_examples[0];
-    } else if (
-      integratedData.additional_examples &&
-      integratedData.additional_examples.length > 0
-    ) {
-      representativeExample = integratedData.additional_examples[0];
-    }
+    // 대표 예문 선택 (카드 표시용)
+    const representativeExample = this.selectRepresentativeExample(
+      integratedData.core_examples,
+      integratedData.additional_examples
+    );
 
     return {
       // concept_id 중복 제거 - Firestore document ID 사용
       concept_info: {
-        // concept_id: conceptId, // 제거: document ID와 중복
+        // concept_id 제거: document ID와 중복
         ...integratedData.concept_info,
         updated_at: serverTimestamp(),
       },
@@ -467,12 +448,8 @@ export class CollectionManager {
 
       // 미디어 정보 제거 (템플릿에서 지원하지 않음)
 
-      metadata: {
-        created_at: serverTimestamp(),
-        created_from: integratedData.metadata?.created_from || "manual",
-        version: "3.0_with_representative_example",
-        collection_structure: "separated_with_representative",
-      },
+      // 생성 시간만 포함 (created_at 속성으로 통일)
+      created_at: serverTimestamp(),
     };
   }
 
@@ -1009,6 +986,16 @@ export class CollectionManager {
   }
 
   // === 헬퍼 메서드들 ===
+
+  selectRepresentativeExample(coreExamples, additionalExamples) {
+    // 대표 예문 선택 (우선순위: core_examples[0] > additional_examples[0])
+    if (coreExamples && coreExamples.length > 0) {
+      return coreExamples[0];
+    } else if (additionalExamples && additionalExamples.length > 0) {
+      return additionalExamples[0];
+    }
+    return null;
+  }
 
   generateConceptId(conceptData) {
     const primaryWord =
@@ -1565,7 +1552,7 @@ export class CollectionManager {
       const conceptId = conceptRef.id;
 
       const conceptDoc = {
-        concept_id: conceptId,
+        // concept_id 제거: Firestore document ID와 중복
         concept_info: conceptData.concept_info || {
           domain: conceptData.domain || "general",
           category: conceptData.category || "uncategorized",
@@ -1574,11 +1561,8 @@ export class CollectionManager {
         },
         expressions: conceptData.expressions || {},
         representative_example: conceptData.representative_example || null,
-        metadata: {
-          created_at: serverTimestamp(),
-          created_from: "separated_import",
-          version: "3.0",
-        },
+        // metadata 제거, created_at으로 통일
+        created_at: serverTimestamp(),
       };
 
       await setDoc(conceptRef, conceptDoc);
@@ -1598,23 +1582,33 @@ export class CollectionManager {
       const exampleRef = doc(collection(db, "examples"));
       const exampleId = exampleRef.id;
 
+      // translations 속성을 간소화된 형태로 처리
+      const cleanTranslations = {};
+      if (exampleData.translations) {
+        Object.keys(exampleData.translations).forEach((lang) => {
+          const translation = exampleData.translations[lang];
+          // 이미 문자열 형태라면 그대로 사용, 객체 형태라면 text 속성 추출
+          cleanTranslations[lang] =
+            typeof translation === "string"
+              ? translation
+              : translation.text || "";
+        });
+      }
+
       const exampleDoc = {
-        example_id: exampleData.example_id || exampleId,
-        concept_id: exampleData.concept_id || null,
+        // example_id 속성 제거 - Firestore 자동 부여 ID만 사용
         domain: exampleData.domain || "general",
         category: exampleData.category || "common",
-        context: exampleData.context || "general",
         difficulty: exampleData.difficulty || "beginner",
-        tags: exampleData.tags || [],
-        translations: exampleData.translations || {},
-        learning_metadata: {
-          pattern_name: exampleData.learning_metadata?.pattern_name || null,
-          structural_pattern:
-            exampleData.learning_metadata?.structural_pattern || null,
-          learning_weight: exampleData.learning_metadata?.learning_weight || 5,
-          quiz_eligible: exampleData.learning_metadata?.quiz_eligible !== false,
-          game_eligible: exampleData.learning_metadata?.game_eligible !== false,
-        },
+        situation: exampleData.situation
+          ? Array.isArray(exampleData.situation)
+            ? exampleData.situation
+            : typeof exampleData.situation === "string"
+            ? exampleData.situation.split(",").map((s) => s.trim())
+            : null
+          : null,
+        purpose: exampleData.purpose || null,
+        translations: cleanTranslations,
         created_at: serverTimestamp(),
       };
 
