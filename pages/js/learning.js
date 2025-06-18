@@ -205,27 +205,28 @@ function applyFilters(data) {
       }
     }
 
-    // 상황 필터 (tags 배열에 포함된 항목 필터링)
+    // 상황 필터 (situation 배열에 포함된 항목 필터링)
     if (filters.situation !== "all") {
-      const itemTags = item.tags || item.concept_info?.tags || [];
-      if (!Array.isArray(itemTags) || !itemTags.includes(filters.situation)) {
+      const itemSituations = item.situation || [];
+      if (
+        !Array.isArray(itemSituations) ||
+        !itemSituations.includes(filters.situation)
+      ) {
         console.log(
-          `🔍 상황 필터로 제외: ${JSON.stringify(itemTags)} does not include ${
-            filters.situation
-          }`
+          `🔍 상황 필터로 제외: ${JSON.stringify(
+            itemSituations
+          )} does not include ${filters.situation}`
         );
         return false;
       }
     }
 
-    // 목적 필터 (tags 배열에 포함된 항목 필터링)
+    // 목적 필터 (purpose 필드 직접 비교)
     if (filters.purpose !== "all") {
-      const itemTags = item.tags || item.concept_info?.tags || [];
-      if (!Array.isArray(itemTags) || !itemTags.includes(filters.purpose)) {
+      const itemPurpose = item.purpose || "";
+      if (itemPurpose !== filters.purpose) {
         console.log(
-          `🔍 목적 필터로 제외: ${JSON.stringify(itemTags)} does not include ${
-            filters.purpose
-          }`
+          `🔍 목적 필터로 제외: ${itemPurpose} !== ${filters.purpose}`
         );
         return false;
       }
@@ -1618,6 +1619,7 @@ async function loadSituationAndPurposeFilterOptions() {
     const situationTags = [
       "formal", // 격식
       "casual", // 비격식
+      "urgent", // 긴급한
       "work", // 직장
       "school", // 학교
       "social", // 사교
@@ -3387,23 +3389,6 @@ function getLocalizedPatternExamples(data) {
       console.log("✅ 소스 언어 예문만 사용:", result);
       return result;
     }
-  }
-
-  // 이전 구조 호환성: usage_examples 배열
-  if (data.usage_examples && Array.isArray(data.usage_examples)) {
-    console.log("📋 이전 usage_examples 구조 사용");
-    return data.usage_examples
-      .map((example) => {
-        if (typeof example === "object") {
-          const sourceText = example[sourceLanguage] || example.korean || "";
-          const targetText = example[targetLanguage] || example.english || "";
-          return sourceText && targetText
-            ? `${sourceText} → ${targetText}`
-            : sourceText || targetText;
-        }
-        return example;
-      })
-      .filter((example) => example);
   }
 
   // examples 배열 구조 (이전 호환성)
