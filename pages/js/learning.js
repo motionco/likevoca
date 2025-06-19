@@ -43,10 +43,20 @@ let areaData = {
 
 // 현재 데이터 getter 함수
 function getCurrentData() {
+  console.log(
+    `🔍 getCurrentData 호출 - currentLearningArea: ${currentLearningArea}`
+  );
+  console.log(`🔍 areaData 전체:`, areaData);
+
   const data = areaData[currentLearningArea] || [];
   console.log(
     `🔍 getCurrentData: area=${currentLearningArea}, length=${data.length}`
   );
+
+  if (data.length > 0) {
+    console.log(`🔍 첫 번째 데이터 샘플:`, data[0]);
+  }
+
   return data;
 }
 
@@ -64,20 +74,18 @@ function setCurrentData(data) {
 
 // Firebase 초기화 대기 함수 수정
 async function waitForFirebaseInit() {
-  let attempts = 0;
-  const maxAttempts = 100; // 10초 대기
-
-  while (attempts < maxAttempts) {
-    if (window.firebaseInit && window.firebaseInit.db) {
-      console.log("✅ Firebase 초기화 확인됨");
-      return true;
-    }
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    attempts++;
-  }
-
-  console.error("❌ Firebase 초기화 대기 시간 초과");
-  return false;
+  return new Promise((resolve) => {
+    const checkFirebase = () => {
+      if (window.firebaseInit && window.firebaseInit.db) {
+        console.log("✅ Firebase 초기화 완료");
+        resolve();
+      } else {
+        console.log("⏳ Firebase 초기화 대기 중...");
+        setTimeout(checkFirebase, 100);
+      }
+    };
+    checkFirebase();
+  });
 }
 
 // DOM 로드 완료 시 초기화
@@ -287,6 +295,50 @@ function handleLanguageChange() {
     // 번역 적용
     applyTranslations();
     applyAdditionalTranslations();
+
+    // 현재 학습 중인 내용이 있으면 실시간 업데이트
+    if (currentLearningArea && currentLearningMode) {
+      console.log("🔄 언어 변경으로 인한 학습 내용 실시간 업데이트:", {
+        area: currentLearningArea,
+        mode: currentLearningMode,
+      });
+
+      // 각 학습 모드별로 업데이트
+      switch (currentLearningArea) {
+        case "vocabulary":
+          switch (currentLearningMode) {
+            case "flashcard":
+              updateFlashcard();
+              break;
+            case "typing":
+              updateTyping();
+              break;
+          }
+          break;
+
+        case "grammar":
+          switch (currentLearningMode) {
+            case "pattern":
+              updateGrammarPatterns();
+              break;
+            case "practice":
+              updateGrammarPractice();
+              break;
+          }
+          break;
+
+        case "reading":
+          switch (currentLearningMode) {
+            case "example":
+              updateReadingExample();
+              break;
+            case "flash":
+              updateReadingFlash();
+              break;
+          }
+          break;
+      }
+    }
   });
 
   // 중복된 언어 스왑 버튼 이벤트 리스너 제거됨 - setupEventListeners 함수 하단에 올바른 버전 존재
@@ -2082,235 +2134,197 @@ async function loadLearningData(area) {
 async function loadVocabularyData() {
   console.log("🔍 단어 데이터 소스 확인...");
 
-  // 1. sessionStorage에서 학습 데이터 확인 (concepts 데이터만)
-  try {
-    const storedData = sessionStorage.getItem("learningConcepts");
-    if (storedData) {
-      const parsedData = JSON.parse(storedData);
-      // concepts 데이터인지 엄격하게 검증 (expressions 필드가 있고 examples 데이터가 아님)
-      const validConceptsData = parsedData.filter((item) => {
-        // expressions가 있고, korean/english 등의 직접 언어 필드가 없어야 함 (examples 데이터 제외)
-        return (
-          item.expressions &&
-          !item.korean &&
-          !item.english &&
-          !item.japanese &&
-          !item.chinese
-        );
-      });
-      if (validConceptsData.length > 0) {
-        let data = filterDataByLanguage(validConceptsData);
-        // 필터 적용
-        data = applyFilters(data);
-        setCurrentData(data);
-        console.log(
-          `💾 sessionStorage에서 단어 데이터: ${data.length}개 (필터 적용 후)`
-        );
-        return;
-      } else {
-        console.log(
-          "💾 sessionStorage에 유효한 concepts 데이터가 없음, 새로 로드"
-        );
-        // 잘못된 데이터 삭제
-        sessionStorage.removeItem("learningConcepts");
+  let data = [];
+
+  // 1. sessionStorage에서 단어 데이터 확인
+  const sessionData = sessionStorage.getItem("conceptsData");
+  if (sessionData) {
+    try {
+      const parsedData = JSON.parse(sessionData);
+      if (Array.isArray(parsedData) && parsedData.length > 0) {
+        console.log(`💾 sessionStorage에서 ${parsedData.length}개 단어 발견`);
+        data = parsedData;
       }
+    } catch (error) {
+      console.error("❌ sessionStorage 데이터 파싱 실패:", error);
     }
-  } catch (error) {
-    console.warn("sessionStorage 로드 실패:", error);
   }
 
-  // 2. window 전역 변수들 확인 (concepts 데이터만)
-  const globalSources = ["allConcepts", "currentConcepts"];
-  for (const sourceName of globalSources) {
-    if (window[sourceName] && Array.isArray(window[sourceName])) {
-      // concepts 데이터인지 검증
-      const validConceptsData = window[sourceName].filter(
-        (item) => item.expressions
+  // 2. sessionStorage에 데이터가 없으면 DB에서 로드
+  if (data.length === 0) {
+    try {
+      // Firebase가 초기화되었는지 확인
+      if (!window.firebaseInit || !window.firebaseInit.collection) {
+        throw new Error("Firebase가 초기화되지 않았습니다.");
+      }
+
+      console.log("🔍 DB에서 단어 데이터 로드 시도...");
+      const conceptsRef = window.firebaseInit.collection(
+        window.firebaseInit.db,
+        "concepts"
       );
-      if (validConceptsData.length > 0) {
-        let data = filterDataByLanguage(validConceptsData);
-        // 필터 적용
-        data = applyFilters(data);
-        setCurrentData(data);
-        console.log(
-          `💾 window.${sourceName}에서 단어 데이터: ${data.length}개 (필터 적용 후)`
-        );
-        return;
+      const querySnapshot = await window.firebaseInit.getDocs(
+        window.firebaseInit.query(conceptsRef, window.firebaseInit.limit(50))
+      );
+
+      if (!querySnapshot.empty) {
+        data = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        console.log(`📚 DB에서 ${data.length}개 단어 로드`);
+
+        // sessionStorage에 저장
+        sessionStorage.setItem("conceptsData", JSON.stringify(data));
+      } else {
+        console.log("📚 DB에 단어 데이터 없음");
       }
+    } catch (error) {
+      console.error("❌ DB 단어 데이터 로드 실패:", error);
     }
   }
 
-  // 3. Firebase에서 직접 로드 (concepts 컬렉션만)
-  console.log("🔥 Firebase에서 단어 데이터 직접 로드 시도...");
-  try {
-    const conceptsRef = collection(db, "concepts");
-    const q = query(conceptsRef, limit(100)); // 제한 증가
-    const snapshot = await getDocs(q);
+  // 필터 적용
+  const filteredData = applyFilters(data);
 
-    console.log(`🔥 Firebase 쿼리 결과: ${snapshot.size}개 문서`);
+  // vocabulary 영역에 데이터 저장 (전역 areaData 사용)
+  areaData.vocabulary = filteredData;
 
-    const rawData = [];
-    snapshot.forEach((doc) => {
-      const data = doc.data();
-      // AI 생성 개념 제외하고 expressions가 있는 데이터만 포함
-      if (!data.isAIGenerated && data.expressions) {
-        rawData.push({
-          id: doc.id,
-          concept_id: doc.id,
-          ...data,
-        });
-        console.log(`🔥 개념 로드: ${doc.id}`, {
-          hasExpressions: !!data.expressions,
-          expressionKeys: Object.keys(data.expressions || {}),
-        });
-      }
-    });
-
-    console.log(`🔥 유효한 개념 수: ${rawData.length}개`);
-
-    let data = filterDataByLanguage(rawData);
-    console.log(`🔥 언어 필터링 후: ${data.length}개`);
-
-    // 필터 적용
-    data = applyFilters(data);
-    setCurrentData(data);
-    console.log(`🔥 Firebase에서 단어 데이터: ${data.length}개 (필터 적용 후)`);
-  } catch (error) {
-    console.warn("Firebase 직접 로드 실패:", error);
-    setCurrentData([]);
-  }
+  console.log(
+    `💾 sessionStorage에서 단어 데이터: ${filteredData.length}개 (필터 적용 후)`
+  );
+  return filteredData;
 }
 
 async function loadGrammarData() {
   console.log("📝 문법 패턴 데이터 로딩 시작...");
 
   try {
-    // grammar 컬렉션에서만 로드 (examples 컬렉션 사용 안함)
-    const patternsRef = collection(db, "grammar");
-    const patternsQuery = query(patternsRef, limit(30));
-    const patternsSnapshot = await getDocs(patternsQuery);
+    // Firebase가 초기화되었는지 확인
+    if (!window.firebaseInit || !window.firebaseInit.collection) {
+      throw new Error("Firebase가 초기화되지 않았습니다.");
+    }
 
-    if (patternsSnapshot.size > 0) {
-      console.log(`📝 grammar 컬렉션에서 ${patternsSnapshot.size}개 패턴 발견`);
+    const grammarRef = window.firebaseInit.collection(
+      window.firebaseInit.db,
+      "grammar"
+    );
+    const querySnapshot = await window.firebaseInit.getDocs(
+      window.firebaseInit.query(grammarRef, window.firebaseInit.limit(30))
+    );
 
-      let data = [];
-      patternsSnapshot.forEach((doc) => {
+    if (!querySnapshot.empty) {
+      console.log(`📝 grammar 컬렉션에서 ${querySnapshot.size}개 패턴 발견`);
+
+      const data = querySnapshot.docs.map((doc) => {
         const docData = doc.data();
-
-        // 새 템플릿 구조에 맞게 데이터 처리
-        const processedData = {
+        return {
           id: doc.id,
-          pattern_id: docData.pattern_id || doc.id,
+          pattern_id: doc.id,
           pattern_name: docData.pattern_name || "문법 패턴",
           pattern_type: docData.pattern_type || "basic",
-          difficulty: docData.difficulty || "beginner",
-          tags: docData.tags || [],
-          learning_focus: docData.learning_focus || [],
-          title: getLocalizedPatternTitle(docData),
-          structure: getLocalizedPatternStructure(docData),
-          explanation: getLocalizedPatternExplanation(docData),
-          examples: getLocalizedPatternExamples(docData),
-          source: "grammar", // 실제 DB 데이터 마킹
+          difficulty: docData.difficulty || "intermediate",
+          domain: docData.domain || "daily",
           ...docData,
-          // source 필드를 마지막에 다시 설정하여 덮어쓰기 방지
         };
-        processedData.source = "grammar";
-
-        data.push(processedData);
       });
 
       // 필터 적용
-      data = applyFilters(data);
-      setCurrentData(data);
+      const filteredData = applyFilters(data);
+
+      // grammar 영역에 데이터 저장 (전역 areaData 사용)
+      areaData.grammar = filteredData;
+
       console.log(
-        `✅ 문법 패턴 데이터 로딩 완료: ${data.length}개 (필터 적용 후)`
+        `✅ 문법 패턴 데이터 로딩 완료: ${filteredData.length}개 (필터 적용 후)`
       );
-      return;
+      return filteredData;
+    } else {
+      console.log("📝 grammar 컬렉션에 문서가 없음");
     }
   } catch (error) {
-    console.warn("grammar 컬렉션 로드 실패:", error);
+    console.error("📝 문법 패턴 데이터 로딩 실패:", error);
   }
 
-  // DB에 데이터가 없으면 빈 배열로 설정 (메시지 표시용)
-  setCurrentData([]);
   console.log("📝 문법 패턴 DB 데이터 없음");
+  return [];
 }
 
 async function loadReadingData() {
   console.log("📖 독해 예문 데이터 로딩 시작...");
 
-  try {
-    // Firebase 초기화 확인
-    if (!db) {
-      console.error("❌ Firebase db가 초기화되지 않음");
-      setCurrentData([]);
-      return;
-    }
+  // 현재 언어 설정 가져오기
+  const currentSourceLanguage =
+    window.languageSettings?.sourceLanguage || "korean";
+  const currentTargetLanguage =
+    window.languageSettings?.targetLanguage || "english";
 
-    // examples 컬렉션에서 독해용 예문들 로드
-    const examplesRef = collection(db, "examples");
-    let examplesQuery;
-    let examplesSnapshot;
+  try {
+    // Firebase가 초기화되었는지 확인
+    if (!window.firebaseInit || !window.firebaseInit.collection) {
+      throw new Error("Firebase가 초기화되지 않았습니다.");
+    }
 
     console.log("📖 examples 컬렉션 쿼리 시작...");
 
-    // 먼저 기본 쿼리로 시도 (order_index 없이)
-    try {
-      examplesQuery = query(examplesRef, limit(50));
-      examplesSnapshot = await getDocs(examplesQuery);
-      console.log("📖 기본 쿼리 성공");
-    } catch (basicError) {
-      console.error("📖 기본 쿼리 실패:", basicError);
-      setCurrentData([]);
-      return;
-    }
+    // examples 컬렉션에서 데이터 가져오기
+    const examplesRef = window.firebaseInit.collection(
+      window.firebaseInit.db,
+      "examples"
+    );
+    const query = window.firebaseInit.query(
+      examplesRef,
+      window.firebaseInit.limit(20)
+    ); // 독해 데이터 제한
+    console.log("📖 기본 쿼리 성공");
 
-    console.log(`📖 쿼리 결과: ${examplesSnapshot.size}개 문서`);
+    const querySnapshot = await window.firebaseInit.getDocs(query);
+    console.log("📖 쿼리 결과:", querySnapshot.size, "개 문서");
 
-    if (examplesSnapshot.size > 0) {
-      console.log(
-        `📖 examples 컬렉션에서 ${examplesSnapshot.size}개 예문 발견`
-      );
+    if (!querySnapshot.empty) {
+      console.log("📖 examples 컬렉션에서", querySnapshot.size, "개 예문 발견");
 
-      let data = [];
-      examplesSnapshot.forEach((doc) => {
-        const docData = doc.data();
-        console.log("📖 원본 예문 데이터:", docData);
+      const data = querySnapshot.docs
+        .map((doc) => {
+          const docData = doc.data();
+          console.log("📖 원본 예문 데이터:", docData);
 
-        const localizedExample = getLocalizedReadingExample(docData);
-        console.log("📖 지역화된 예문:", localizedExample);
-
-        if (localizedExample) {
-          const processedData = {
+          // 지역화된 예문 생성
+          const localizedExample = getLocalizedReadingExample({
             id: doc.id,
-            example_id: docData.example_id || doc.id,
-            context: docData.context || "general",
-            difficulty: docData.difficulty || "beginner",
-            tags: docData.tags || [],
-            ...localizedExample,
-            source: "examples", // 실제 DB 데이터 마킹
-          };
-          // source 필드를 확실히 설정
-          processedData.source = "examples";
-          console.log("📖 처리된 예문 데이터:", processedData);
-          data.push(processedData);
-        } else {
-          console.warn("📖 예문 지역화 실패:", docData);
-        }
-      });
+            ...docData,
+          });
+          console.log("📖 지역화된 예문:", localizedExample);
+
+          if (localizedExample) {
+            const processedData = {
+              id: doc.id,
+              example_id: doc.id,
+              ...localizedExample,
+              tags: [], // 빈 태그 배열로 초기화
+            };
+            console.log("📖 처리된 예문 데이터:", processedData);
+            return processedData;
+          }
+          return null;
+        })
+        .filter(Boolean);
 
       // 언어별 필터링
       const filteredData = filterDataByLanguage(data);
       console.log(`📖 언어 필터링 후: ${filteredData.length}개`);
 
       if (filteredData.length > 0) {
-        // 필터 적용
+        // 필터 적용 - reading 영역 전용 데이터 저장
         const finalData = applyFilters(filteredData);
-        setCurrentData(finalData);
+
+        // reading 영역에 데이터 저장 (전역 areaData 사용)
+        areaData.reading = finalData;
+
         console.log(
           `✅ examples에서 독해 데이터 로딩 완료: ${finalData.length}개 (필터 적용 후)`
         );
-        return;
+        return finalData;
       }
     } else {
       console.log("📖 examples 컬렉션에 문서가 없음");
@@ -2319,12 +2333,9 @@ async function loadReadingData() {
     console.error("📖 examples 컬렉션 로드 실패:", error);
   }
 
-  // DB에 데이터가 없으면 빈 배열로 설정 (메시지 표시용)
-  setCurrentData([]);
-  console.log(
-    "📖 독해 예문 DB 데이터 없음 - 최종 데이터 길이:",
-    getCurrentData().length
-  );
+  // DB에 데이터가 없으면 빈 배열 반환
+  console.log("📖 독해 예문 DB 데이터 없음");
+  return [];
 }
 
 function showNoDataMessage(area) {
@@ -2699,7 +2710,11 @@ function showGrammarPatternMode() {
   const patternMode = document.getElementById("grammar-pattern-mode");
   if (patternMode) {
     patternMode.classList.remove("hidden");
-    updateGrammarPatterns();
+
+    // 언어 설정이 완전히 로드된 후 업데이트
+    setTimeout(() => {
+      updateGrammarPatterns();
+    }, 100);
 
     // 번역 적용
     setTimeout(() => {
@@ -2766,7 +2781,11 @@ function showGrammarPracticeMode() {
   const practiceMode = document.getElementById("grammar-practice-mode");
   if (practiceMode) {
     practiceMode.classList.remove("hidden");
-    updateGrammarPractice();
+
+    // 언어 설정이 완전히 로드된 후 업데이트
+    setTimeout(() => {
+      updateGrammarPractice();
+    }, 100);
 
     // 번역 적용
     setTimeout(() => {
@@ -3429,44 +3448,72 @@ function generateBasicReadingExamples() {
 
 // 지역화 헬퍼 함수들
 function getLocalizedPatternTitle(data) {
-  // pattern 객체 안의 현재 언어 데이터에서 제목 확인
+  // 더 안정적인 언어 감지 로직
   const currentLanguage =
-    window.languageSettings?.currentUILanguage || "korean";
+    currentUILanguage ||
+    getCurrentLanguage() ||
+    window.languageSettings?.currentUILanguage ||
+    localStorage.getItem("preferredLanguage") ||
+    "korean";
+
+  // 짧은 언어 코드를 긴 언어 이름으로 매핑
+  const languageMap = {
+    ko: "korean",
+    en: "english",
+    ja: "japanese",
+    zh: "chinese",
+    korean: "korean",
+    english: "english",
+    japanese: "japanese",
+    chinese: "chinese",
+  };
+
+  const mappedLanguage = languageMap[currentLanguage] || currentLanguage;
+  console.log(`🌐 제목 언어 매핑: ${currentLanguage} → ${mappedLanguage}`);
+
+  // pattern 객체 안의 현재 언어 데이터에서 제목 확인
   if (
     data.pattern &&
-    data.pattern[currentLanguage] &&
-    data.pattern[currentLanguage].title
+    data.pattern[mappedLanguage] &&
+    data.pattern[mappedLanguage].title
   ) {
-    return data.pattern[currentLanguage].title;
+    console.log(`✅ pattern.${mappedLanguage}.title에서 제목 발견`);
+    return data.pattern[mappedLanguage].title;
   }
 
-  // pattern 객체 안의 한국어 데이터에서 제목 확인
+  // pattern 객체 안의 한국어 데이터에서 제목 확인 (fallback)
   if (data.pattern && data.pattern.korean && data.pattern.korean.title) {
+    console.log(`✅ fallback: pattern.korean.title에서 제목 발견`);
     return data.pattern.korean.title;
   }
 
   // pattern 객체 안의 제목 확인
   if (data.pattern && data.pattern.title) {
+    console.log(`✅ pattern.title에서 제목 발견`);
     return data.pattern.title;
   }
 
   // pattern 객체 안의 name 확인
   if (data.pattern && data.pattern.name) {
+    console.log(`✅ pattern.name에서 제목 발견`);
     return data.pattern.name;
   }
 
   // pattern 객체 안의 pattern_name 확인
   if (data.pattern && data.pattern.pattern_name) {
+    console.log(`✅ pattern.pattern_name에서 제목 발견`);
     return data.pattern.pattern_name;
   }
 
   // 실제 DB 구조: pattern_name 필드 우선 사용
   if (data.pattern_name && data.pattern_name !== "문법 패턴") {
+    console.log(`✅ data.pattern_name에서 제목 발견`);
     return data.pattern_name;
   }
 
   // 기존 구조 지원
   if (data.title) {
+    console.log(`✅ data.title에서 제목 발견`);
     return data.title;
   }
 
@@ -3495,19 +3542,26 @@ function getLocalizedPatternTitle(data) {
     const koreanCategory = categoryMap[category] || category;
 
     if (koreanPurpose && koreanCategory) {
+      console.log(
+        `✅ purpose-category 기반 제목 생성: ${koreanPurpose} - ${koreanCategory}`
+      );
       return `${koreanPurpose} - ${koreanCategory}`;
     } else if (koreanPurpose) {
+      console.log(`✅ purpose 기반 제목 생성: ${koreanPurpose} 패턴`);
       return `${koreanPurpose} 패턴`;
     } else if (koreanCategory) {
+      console.log(`✅ category 기반 제목 생성: ${koreanCategory} 문법`);
       return `${koreanCategory} 문법`;
     }
   }
 
   // 패턴 ID에서 제목 생성
   if (data.pattern_id) {
+    console.log(`✅ pattern_id 기반 제목 생성`);
     return generatePatternTitle(data.pattern_id, data);
   }
 
+  console.log(`⚠️ 기본 제목 사용: 문법 패턴`);
   return "문법 패턴";
 }
 
@@ -3572,78 +3626,203 @@ function getLocalizedPatternStructure(data) {
 }
 
 function getLocalizedPatternExplanation(data) {
+  // 더 안정적인 언어 감지 로직
   const currentLanguage =
-    window.languageSettings?.currentUILanguage || "korean";
+    currentUILanguage ||
+    getCurrentLanguage() ||
+    window.languageSettings?.currentUILanguage ||
+    localStorage.getItem("preferredLanguage") ||
+    "korean";
 
-  // pattern 객체 안의 현재 언어 데이터에서 설명 확인
+  // 짧은 언어 코드를 긴 언어 이름으로 매핑
+  const languageMap = {
+    ko: "korean",
+    en: "english",
+    ja: "japanese",
+    zh: "chinese",
+    korean: "korean",
+    english: "english",
+    japanese: "japanese",
+    chinese: "chinese",
+  };
+
+  const mappedLanguage = languageMap[currentLanguage] || currentLanguage;
+  console.log(`🌐 설명 언어 매핑: ${currentLanguage} → ${mappedLanguage}`);
+
+  // 1. 최상위 descriptions 객체에서 현재 언어 확인 (가장 일반적인 구조)
+  if (data.descriptions && data.descriptions[mappedLanguage]) {
+    console.log(`✅ descriptions.${mappedLanguage}에서 설명 발견`);
+    return data.descriptions[mappedLanguage];
+  }
+
+  // 2. pattern 객체 안의 현재 언어 데이터에서 설명 확인
   if (
     data.pattern &&
-    data.pattern[currentLanguage] &&
-    data.pattern[currentLanguage].explanation
+    data.pattern[mappedLanguage] &&
+    data.pattern[mappedLanguage].explanation
   ) {
-    return data.pattern[currentLanguage].explanation;
+    console.log(`✅ pattern.${mappedLanguage}.explanation에서 설명 발견`);
+    return data.pattern[mappedLanguage].explanation;
   }
 
-  // pattern 객체 안의 한국어 데이터에서 설명 확인
-  if (data.pattern && data.pattern.korean && data.pattern.korean.explanation) {
-    return data.pattern.korean.explanation;
-  }
-
-  // pattern 객체 안의 현재 언어 데이터에서 description 확인
+  // 3. pattern 객체 안의 현재 언어 데이터에서 description 확인
   if (
     data.pattern &&
-    data.pattern[currentLanguage] &&
-    data.pattern[currentLanguage].description
+    data.pattern[mappedLanguage] &&
+    data.pattern[mappedLanguage].description
   ) {
-    return data.pattern[currentLanguage].description;
+    console.log(`✅ pattern.${mappedLanguage}.description에서 설명 발견`);
+    return data.pattern[mappedLanguage].description;
   }
 
-  // pattern 객체 안의 한국어 데이터에서 description 확인
-  if (data.pattern && data.pattern.korean && data.pattern.korean.description) {
-    return data.pattern.korean.description;
-  }
-
-  // pattern 객체 안의 설명 확인
-  if (data.pattern && data.pattern.explanation) {
-    return data.pattern.explanation;
-  }
-
-  // pattern 객체 안의 description 확인
-  if (data.pattern && data.pattern.description) {
-    return data.pattern.description;
-  }
-
-  // pattern 객체 안의 다국어 설명 확인
+  // 4. pattern 객체 안의 다국어 설명 확인
   if (
     data.pattern &&
     data.pattern.explanations &&
-    data.pattern.explanations[currentLanguage]
+    data.pattern.explanations[mappedLanguage]
   ) {
-    return data.pattern.explanations[currentLanguage];
+    console.log(`✅ pattern.explanations.${mappedLanguage}에서 설명 발견`);
+    return data.pattern.explanations[mappedLanguage];
   }
 
-  // 새로운 단일 설명 구조: explanation 문자열
-  if (data.explanation && typeof data.explanation === "string") {
+  // 5. pattern 객체 안의 descriptions 확인
+  if (
+    data.pattern &&
+    data.pattern.descriptions &&
+    data.pattern.descriptions[mappedLanguage]
+  ) {
+    console.log(`✅ pattern.descriptions.${mappedLanguage}에서 설명 발견`);
+    return data.pattern.descriptions[mappedLanguage];
+  }
+
+  // 6. 새로운 단일 설명 구조: explanation 문자열 (현재 언어가 한국어인 경우만)
+  if (
+    data.explanation &&
+    typeof data.explanation === "string" &&
+    mappedLanguage === "korean"
+  ) {
+    console.log(`✅ explanation 문자열에서 설명 발견 (한국어)`);
     return data.explanation;
   }
 
-  // 이전 구조 호환성: explanations 객체에서 현재 언어로 설명 가져오기
-  if (data.explanations && data.explanations[currentLanguage]) {
-    return data.explanations[currentLanguage];
+  // 7. 한국어 fallback들 (현재 언어가 한국어가 아닌 경우 마지막에 시도)
+  if (mappedLanguage !== "korean") {
+    // 영어 fallback 시도
+    if (mappedLanguage === "english") {
+      if (data.descriptions && data.descriptions.english) {
+        console.log(`✅ fallback: descriptions.english에서 설명 발견`);
+        return data.descriptions.english;
+      }
+      if (
+        data.pattern &&
+        data.pattern.english &&
+        data.pattern.english.explanation
+      ) {
+        console.log(`✅ fallback: pattern.english.explanation에서 설명 발견`);
+        return data.pattern.english.explanation;
+      }
+      if (
+        data.pattern &&
+        data.pattern.english &&
+        data.pattern.english.description
+      ) {
+        console.log(`✅ fallback: pattern.english.description에서 설명 발견`);
+        return data.pattern.english.description;
+      }
+    }
+
+    // 일본어 fallback 시도
+    if (mappedLanguage === "japanese") {
+      if (data.descriptions && data.descriptions.japanese) {
+        console.log(`✅ fallback: descriptions.japanese에서 설명 발견`);
+        return data.descriptions.japanese;
+      }
+      if (
+        data.pattern &&
+        data.pattern.japanese &&
+        data.pattern.japanese.explanation
+      ) {
+        console.log(`✅ fallback: pattern.japanese.explanation에서 설명 발견`);
+        return data.pattern.japanese.explanation;
+      }
+      if (
+        data.pattern &&
+        data.pattern.japanese &&
+        data.pattern.japanese.description
+      ) {
+        console.log(`✅ fallback: pattern.japanese.description에서 설명 발견`);
+        return data.pattern.japanese.description;
+      }
+    }
+
+    // 중국어 fallback 시도
+    if (mappedLanguage === "chinese") {
+      if (data.descriptions && data.descriptions.chinese) {
+        console.log(`✅ fallback: descriptions.chinese에서 설명 발견`);
+        return data.descriptions.chinese;
+      }
+      if (
+        data.pattern &&
+        data.pattern.chinese &&
+        data.pattern.chinese.explanation
+      ) {
+        console.log(`✅ fallback: pattern.chinese.explanation에서 설명 발견`);
+        return data.pattern.chinese.explanation;
+      }
+      if (
+        data.pattern &&
+        data.pattern.chinese &&
+        data.pattern.chinese.description
+      ) {
+        console.log(`✅ fallback: pattern.chinese.description에서 설명 발견`);
+        return data.pattern.chinese.description;
+      }
+    }
   }
 
-  // 기본 언어(한국어) 설명 시도
-  if (data.explanations && data.explanations.korean) {
-    return data.explanations.korean;
+  // 8. 한국어 데이터에서 설명 확인 (최종 fallback)
+  if (data.descriptions && data.descriptions.korean) {
+    console.log(`✅ final fallback: descriptions.korean에서 설명 발견`);
+    return data.descriptions.korean;
   }
 
-  // purpose나 category 기반으로 기본 설명 생성 (최후의 수단)
+  if (data.pattern && data.pattern.korean && data.pattern.korean.explanation) {
+    console.log(`✅ final fallback: pattern.korean.explanation에서 설명 발견`);
+    return data.pattern.korean.explanation;
+  }
+
+  if (data.pattern && data.pattern.korean && data.pattern.korean.description) {
+    console.log(`✅ final fallback: pattern.korean.description에서 설명 발견`);
+    return data.pattern.korean.description;
+  }
+
+  // 9. pattern 객체 안의 설명 확인
+  if (data.pattern && data.pattern.explanation) {
+    console.log(`✅ pattern.explanation에서 설명 발견`);
+    return data.pattern.explanation;
+  }
+
+  // 10. pattern 객체 안의 description 확인
+  if (data.pattern && data.pattern.description) {
+    console.log(`✅ pattern.description에서 설명 발견`);
+    return data.pattern.description;
+  }
+
+  // 11. 새로운 단일 설명 구조: explanation 문자열
+  if (data.explanation && typeof data.explanation === "string") {
+    console.log(`✅ explanation 문자열에서 설명 발견`);
+    return data.explanation;
+  }
+
+  // 12. purpose나 category 기반으로 기본 설명 생성 (최후의 수단)
   if (data.purpose || data.category) {
     const purpose = data.purpose || "일반";
     const category = data.category || "기본";
+    console.log(`⚠️ 기본 설명 생성: ${purpose} - ${category}`);
     return `${purpose} 상황에서 사용하는 ${category} 문법 패턴입니다.`;
   }
 
+  console.log(`❌ 설명을 찾을 수 없음`);
   return "설명 정보 없음";
 }
 
@@ -3653,7 +3832,7 @@ function getLocalizedPatternExamples(data) {
   const sourceLanguage = window.languageSettings?.sourceLanguage || "korean";
   const targetLanguage = window.languageSettings?.targetLanguage || "english";
 
-  // 새로운 단일 예문 구조: example 객체
+  // 새로운 단일 예문 구조: example 객체 - 대상언어 → 원본언어 순으로 표시
   if (data.example && typeof data.example === "object") {
     const sourceText =
       data.example[sourceLanguage] || data.example.korean || "";
@@ -3661,13 +3840,13 @@ function getLocalizedPatternExamples(data) {
       data.example[targetLanguage] || data.example.english || "";
 
     if (sourceText && targetText) {
-      return [`${sourceText} → ${targetText}`];
+      return [`${targetText} → ${sourceText}`];
     } else if (sourceText) {
       return [sourceText];
     }
   }
 
-  // examples 배열 구조 (이전 호환성)
+  // examples 배열 구조 (이전 호환성) - 대상언어 → 원본언어 순으로 표시
   if (data.examples && Array.isArray(data.examples)) {
     return data.examples
       .map((example) => {
@@ -3675,7 +3854,7 @@ function getLocalizedPatternExamples(data) {
           const sourceText = example[sourceLanguage] || example.korean || "";
           const targetText = example[targetLanguage] || example.english || "";
           return sourceText && targetText
-            ? `${sourceText} → ${targetText}`
+            ? `${targetText} → ${sourceText}`
             : sourceText || targetText;
         }
         return example;
