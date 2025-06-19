@@ -494,6 +494,8 @@ const translations = {
     example_quick_desc: "문맥 이해 학습",
     flash_mode: "플래시 모드",
     flash_quick_desc: "빠른 독해 연습",
+    reading_example_learning: "예문 학습",
+    reading_flash_mode: "플래시 모드",
 
     // 학습 특징 설명
     vocabulary_flashcard_features: "시각적 학습 • 즉시 피드백",
@@ -995,6 +997,8 @@ const translations = {
     example_quick_desc: "Context understanding learning",
     flash_mode: "Flash Mode",
     flash_quick_desc: "Speed reading practice",
+    reading_example_learning: "Example Learning",
+    reading_flash_mode: "Flash Mode",
 
     // 학습 특징 설명
     vocabulary_flashcard_features: "Visual Learning • Instant Feedback",
@@ -1515,6 +1519,8 @@ const translations = {
     example_quick_desc: "文脈理解学習",
     flash_mode: "フラッシュモード",
     flash_quick_desc: "速読練習",
+    reading_example_learning: "例文学習",
+    reading_flash_mode: "フラッシュモード",
 
     // 学習特徴説明
     vocabulary_flashcard_features: "視覚的学習 • 即時フィードバック",
@@ -1867,6 +1873,8 @@ const translations = {
     example_quick_desc: "语境理解学习",
     flash_mode: "闪卡模式",
     flash_quick_desc: "快速阅读练习",
+    reading_example_learning: "例句学习",
+    reading_flash_mode: "闪卡模式",
 
     // 学习特征说明
     vocabulary_flashcard_features: "视觉学习 • 即时反馈",

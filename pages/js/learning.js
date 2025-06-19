@@ -890,17 +890,17 @@ function setupEventListeners() {
   }
 
   // 독해 학습 네비게이션 버튼들
-  const prevReadingBtn = document.getElementById("prev-reading-btn");
-  const nextReadingBtn = document.getElementById("next-reading-btn");
+  const prevReadingBtn = document.getElementById("prev-reading");
+  const nextReadingBtn = document.getElementById("next-reading");
 
   if (prevReadingBtn) {
-    prevReadingBtn.removeEventListener("click", () => navigateContent(-1));
-    prevReadingBtn.addEventListener("click", () => navigateContent(-1));
+    prevReadingBtn.removeEventListener("click", prevReadingHandler);
+    prevReadingBtn.addEventListener("click", prevReadingHandler);
   }
 
   if (nextReadingBtn) {
-    nextReadingBtn.removeEventListener("click", () => navigateContent(1));
-    nextReadingBtn.addEventListener("click", () => navigateContent(1));
+    nextReadingBtn.removeEventListener("click", nextReadingHandler);
+    nextReadingBtn.addEventListener("click", nextReadingHandler);
   }
 
   // 타이핑 관련 버튼들
@@ -2893,6 +2893,16 @@ function showReadingExampleMode() {
   const readingContainer = document.getElementById("reading-container");
   if (readingContainer) {
     readingContainer.classList.remove("hidden");
+
+    // 모드 제목 업데이트
+    const modeTitle = document.getElementById("reading-mode-title");
+    if (modeTitle) {
+      const translatedTitle =
+        getTranslatedText("reading_example_learning") || "예문 학습";
+      modeTitle.textContent = translatedTitle;
+      modeTitle.setAttribute("data-i18n", "reading_example_learning");
+    }
+
     updateReadingExample();
 
     // 예문 모드에서는 뒤집기 버튼 숨김
@@ -2917,6 +2927,16 @@ function showReadingFlashMode() {
   const readingContainer = document.getElementById("reading-container");
   if (readingContainer) {
     readingContainer.classList.remove("hidden");
+
+    // 모드 제목 업데이트
+    const modeTitle = document.getElementById("reading-mode-title");
+    if (modeTitle) {
+      const translatedTitle =
+        getTranslatedText("reading_flash_mode") || "플래시 모드";
+      modeTitle.textContent = translatedTitle;
+      modeTitle.setAttribute("data-i18n", "reading_flash_mode");
+    }
+
     updateReadingFlash();
 
     // 플래시 모드에서는 뒤집기 버튼 표시
@@ -2946,24 +2966,50 @@ function updateReadingExample() {
   const container = document.getElementById("reading-example-container");
   if (!container) return;
 
-  // 예문 학습 모드 - 간소화된 정보 표시
+  // 디버깅 로그 추가
+  console.log("🔍 updateReadingExample - example 데이터:", example);
+  console.log("🔍 example.situation:", example.situation);
+  console.log(
+    "🔍 Array.isArray(example.situation):",
+    Array.isArray(example.situation)
+  );
+  console.log(
+    "🔍 situation 값:",
+    Array.isArray(example.situation) && example.situation.length > 0
+      ? example.situation[0]
+      : example.situation || "예문 학습"
+  );
+
+  // 상황 정보 준비
+  const situationInfo =
+    Array.isArray(example.situation) && example.situation.length > 0
+      ? example.situation.join(", ")
+      : example.situation || "일반";
+
   container.innerHTML = `
     <div class="space-y-6">
       <div class="text-center">
-        <div class="text-sm bg-purple-100 text-purple-800 px-3 py-1 rounded-full inline-block mb-4">
-          예문 학습 모드
-        </div>
         <h3 class="text-2xl font-bold mb-4">
-          ${example[sourceLanguage] || example.original || "원문"}
+          ${
+            example.translations?.[sourceLanguage] ||
+            example[sourceLanguage] ||
+            example.original ||
+            "원문"
+          }
         </h3>
         <p class="text-lg text-gray-600 mb-4">
-          ${example[targetLanguage] || example.translation || "번역"}
+          ${
+            example.translations?.[targetLanguage] ||
+            example[targetLanguage] ||
+            example.translation ||
+            "번역"
+          }
         </p>
-        ${
-          example.context
-            ? `<p class="text-sm text-gray-500 bg-gray-100 p-3 rounded">상황: ${example.context}</p>`
-            : ""
-        }
+        <div class="flex flex-wrap gap-2 justify-center">
+          <span class="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+            📍 ${situationInfo}
+          </span>
+        </div>
       </div>
       
       <div class="text-center pt-4 border-t" id="reading-delete-container">
@@ -2993,45 +3039,69 @@ function updateReadingFlash() {
   const container = document.getElementById("reading-example-container");
   if (!container) return;
 
+  // 디버깅 로그 추가
+  console.log("🔍 updateReadingFlash - example 데이터:", example);
+  console.log("🔍 example.situation:", example.situation);
+  console.log(
+    "🔍 Array.isArray(example.situation):",
+    Array.isArray(example.situation)
+  );
+  console.log(
+    "🔍 situation 값:",
+    Array.isArray(example.situation) && example.situation.length > 0
+      ? example.situation[0]
+      : example.situation || "플래시 모드"
+  );
+
+  // 상황 정보 준비
+  const situationInfo =
+    Array.isArray(example.situation) && example.situation.length > 0
+      ? example.situation.join(", ")
+      : example.situation || "일반";
+
   // 플래시 모드 - 간단한 카드 형태
   container.innerHTML = `
-    <div class="text-center">
-      <div class="text-sm bg-purple-100 text-purple-800 px-3 py-1 rounded-full inline-block mb-6">
-        플래시 모드
-      </div>
-      
-      <div class="flip-card w-full max-w-lg mx-auto" id="reading-flash-card">
-        <div class="flip-card-inner">
-          <div class="flip-card-front bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg shadow-lg p-8">
-            <div class="text-center">
-              <h3 class="text-2xl font-bold mb-4">
-                ${example[sourceLanguage] || example.original || "원문"}
-              </h3>
-              <p class="text-purple-100 mt-8">(카드를 클릭하여 번역 보기)</p>
-            </div>
-          </div>
-          <div class="flip-card-back bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg shadow-lg p-8">
-            <div class="text-center">
-              <h3 class="text-2xl font-bold mb-4">
-                ${example[targetLanguage] || example.translation || "번역"}
-              </h3>
+    <div class="flip-card w-full max-w-lg mx-auto" id="reading-flash-card">
+      <div class="flip-card-inner">
+        <div class="flip-card-front bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg shadow-lg p-8">
+          <div class="text-center">
+            <h3 class="text-2xl font-bold mb-4">
               ${
-                example.context
-                  ? `<p class="text-blue-100 text-sm mt-4">상황: ${example.context}</p>`
-                  : ""
+                example.translations?.[sourceLanguage] ||
+                example[sourceLanguage] ||
+                example.original ||
+                "원문"
               }
+            </h3>
+            <p class="text-purple-100 mt-8">(카드를 클릭하여 번역 보기)</p>
+          </div>
+        </div>
+        <div class="flip-card-back bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg shadow-lg p-8">
+          <div class="text-center">
+            <h3 class="text-2xl font-bold mb-4">
+              ${
+                example.translations?.[targetLanguage] ||
+                example[targetLanguage] ||
+                example.translation ||
+                "번역"
+              }
+            </h3>
+            <div class="flex flex-wrap gap-2 justify-center mt-4">
+              <span class="text-sm text-blue-100 bg-blue-400 bg-opacity-30 px-3 py-1 rounded-full">
+                📍 ${situationInfo}
+              </span>
             </div>
           </div>
         </div>
       </div>
-      
-      <div class="mt-6" id="reading-flash-delete-container">
-        <button class="delete-btn bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm" 
-                data-item-id="${example.id}" 
-                data-item-type="reading">
-          🗑️ 삭제
-        </button>
-      </div>
+    </div>
+    
+    <div class="mt-6 text-center" id="reading-flash-delete-container">
+      <button class="delete-btn bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm" 
+              data-item-id="${example.id}" 
+              data-item-type="reading">
+        🗑️ 삭제
+      </button>
     </div>
   `;
 
@@ -3555,6 +3625,9 @@ function getLocalizedReadingExample(data) {
           typeof targetText === "object" ? targetText.text : targetText,
         context: data.context || "일반",
         difficulty: data.difficulty || "beginner",
+        situation: data.situation, // situation 속성 추가
+        domain: data.domain, // domain 속성 추가
+        purpose: data.purpose, // purpose 속성 추가
         romanization:
           (typeof sourceText === "object" ? sourceText.romanization : "") || "",
         phonetic:
@@ -3572,6 +3645,9 @@ function getLocalizedReadingExample(data) {
       [currentTargetLanguage]: data[currentTargetLanguage],
       context: data.context || "일반",
       difficulty: data.difficulty || "beginner",
+      situation: data.situation, // situation 속성 추가
+      domain: data.domain, // domain 속성 추가
+      purpose: data.purpose, // purpose 속성 추가
     };
     console.log("✅ 직접 언어 필드로 변환:", result);
     return result;
@@ -3585,6 +3661,9 @@ function getLocalizedReadingExample(data) {
       [currentTargetLanguage]: text, // 번역이 없으면 동일한 텍스트 사용
       context: data.context || "일반",
       difficulty: data.difficulty || "beginner",
+      situation: data.situation, // situation 속성 추가
+      domain: data.domain, // domain 속성 추가
+      purpose: data.purpose, // purpose 속성 추가
     };
     console.log("✅ 기본 텍스트로 변환:", result);
     return result;
