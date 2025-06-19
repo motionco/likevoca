@@ -31,6 +31,9 @@ let isNavigating = false;
 // 플래시카드 뒤집기 상태
 let isFlipped = false;
 
+// 언어 스왑 중복 이벤트 방지 플래그
+let isLanguageSwapping = false;
+
 // Firebase 초기화 대기 함수 수정
 async function waitForFirebaseInit() {
   let attempts = 0;
@@ -258,66 +261,28 @@ function handleLanguageChange() {
     applyAdditionalTranslations();
   });
 
-  // 학습 언어 변경 이벤트 리스너 (언어 스왑 버튼)
-  const swapButton = document.getElementById("swap-languages");
-  if (swapButton) {
-    swapButton.addEventListener("click", function () {
-      console.log("🔄 언어 스왑 버튼 클릭");
-
-      // 현재 언어 설정 가져오기
-      const sourceSelect = document.getElementById("source-language");
-      const targetSelect = document.getElementById("target-language");
-
-      if (sourceSelect && targetSelect) {
-        // 언어 스왑
-        const tempSource = sourceSelect.value;
-        sourceSelect.value = targetSelect.value;
-        targetSelect.value = tempSource;
-
-        // 전역 변수 업데이트
-        sourceLanguage = sourceSelect.value;
-        targetLanguage = targetSelect.value;
-
-        // 세션 스토리지 업데이트
-        sessionStorage.setItem("sourceLanguage", sourceLanguage);
-        sessionStorage.setItem("targetLanguage", targetLanguage);
-
-        // 언어 설정 객체 업데이트
-        if (window.languageSettings) {
-          window.languageSettings.sourceLanguage = sourceLanguage;
-          window.languageSettings.targetLanguage = targetLanguage;
-        }
-
-        console.log("🔄 언어 스왑 완료:", {
-          sourceLanguage,
-          targetLanguage,
-        });
-
-        // 현재 학습 중인 경우 데이터 다시 로드
-        if (currentLearningArea && currentLearningMode) {
-          console.log("🔄 언어 스왑으로 인한 데이터 재로드");
-          currentIndex = 0; // 인덱스 초기화
-          startLearningMode(currentLearningArea, currentLearningMode);
-        }
-      }
-    });
-  }
+  // 중복된 언어 스왑 버튼 이벤트 리스너 제거됨 - setupEventListeners 함수 하단에 올바른 버전 존재
 
   // 언어 선택 드롭다운 변경 이벤트
   const sourceSelect = document.getElementById("source-language");
   const targetSelect = document.getElementById("target-language");
 
   if (sourceSelect) {
-    sourceSelect.addEventListener("change", function () {
-      sourceLanguage = this.value;
+    sourceSelect.addEventListener("change", (e) => {
+      // 스왑 중인 경우 이벤트 무시
+      if (isLanguageSwapping) {
+        return;
+      }
+
+      sourceLanguage = e.target.value;
+      window.languageSettings.sourceLanguage = sourceLanguage;
       sessionStorage.setItem("sourceLanguage", sourceLanguage);
 
-      if (window.languageSettings) {
-        window.languageSettings.sourceLanguage = sourceLanguage;
-      }
+      console.log("🌐 원본 언어 변경:", sourceLanguage);
 
       // 같은 언어 선택 방지
       if (sourceLanguage === targetLanguage) {
+        // 대상 언어를 다른 언어로 자동 변경
         const otherLanguages = [
           "korean",
           "english",
@@ -325,35 +290,31 @@ function handleLanguageChange() {
           "chinese",
         ].filter((lang) => lang !== sourceLanguage);
         targetLanguage = otherLanguages[0];
-        targetSelect.value = targetLanguage;
+        targetLanguageSelect.value = targetLanguage;
+        window.languageSettings.targetLanguage = targetLanguage;
         sessionStorage.setItem("targetLanguage", targetLanguage);
-
-        if (window.languageSettings) {
-          window.languageSettings.targetLanguage = targetLanguage;
-        }
       }
 
-      console.log("🌐 원본 언어 변경:", sourceLanguage);
-
-      // 현재 학습 중인 경우 데이터 다시 로드
-      if (currentLearningArea && currentLearningMode) {
-        currentIndex = 0;
-        startLearningMode(currentLearningArea, currentLearningMode);
-      }
+      handleFilterChange();
     });
   }
 
   if (targetSelect) {
-    targetSelect.addEventListener("change", function () {
-      targetLanguage = this.value;
+    targetSelect.addEventListener("change", (e) => {
+      // 스왑 중인 경우 이벤트 무시
+      if (isLanguageSwapping) {
+        return;
+      }
+
+      targetLanguage = e.target.value;
+      window.languageSettings.targetLanguage = targetLanguage;
       sessionStorage.setItem("targetLanguage", targetLanguage);
 
-      if (window.languageSettings) {
-        window.languageSettings.targetLanguage = targetLanguage;
-      }
+      console.log("🌐 대상 언어 변경:", targetLanguage);
 
       // 같은 언어 선택 방지
       if (sourceLanguage === targetLanguage) {
+        // 원본 언어를 다른 언어로 자동 변경
         const otherLanguages = [
           "korean",
           "english",
@@ -361,21 +322,12 @@ function handleLanguageChange() {
           "chinese",
         ].filter((lang) => lang !== targetLanguage);
         sourceLanguage = otherLanguages[0];
-        sourceSelect.value = sourceLanguage;
+        sourceLanguageSelect.value = sourceLanguage;
+        window.languageSettings.sourceLanguage = sourceLanguage;
         sessionStorage.setItem("sourceLanguage", sourceLanguage);
-
-        if (window.languageSettings) {
-          window.languageSettings.sourceLanguage = sourceLanguage;
-        }
       }
 
-      console.log("🌐 대상 언어 변경:", targetLanguage);
-
-      // 현재 학습 중인 경우 데이터 다시 로드
-      if (currentLearningArea && currentLearningMode) {
-        currentIndex = 0;
-        startLearningMode(currentLearningArea, currentLearningMode);
-      }
+      handleFilterChange();
     });
   }
 }
@@ -705,6 +657,11 @@ function setupEventListeners() {
 
     // 언어 변경 이벤트 리스너
     sourceLanguageSelect.addEventListener("change", (e) => {
+      // 스왑 중인 경우 이벤트 무시
+      if (isLanguageSwapping) {
+        return;
+      }
+
       sourceLanguage = e.target.value;
       window.languageSettings.sourceLanguage = sourceLanguage;
       sessionStorage.setItem("sourceLanguage", sourceLanguage);
@@ -730,6 +687,11 @@ function setupEventListeners() {
     });
 
     targetLanguageSelect.addEventListener("change", (e) => {
+      // 스왑 중인 경우 이벤트 무시
+      if (isLanguageSwapping) {
+        return;
+      }
+
       targetLanguage = e.target.value;
       window.languageSettings.targetLanguage = targetLanguage;
       sessionStorage.setItem("targetLanguage", targetLanguage);
@@ -759,6 +721,11 @@ function setupEventListeners() {
   const swapButton = document.getElementById("swap-languages");
   if (swapButton) {
     swapButton.addEventListener("click", () => {
+      console.log("🔄 언어 스왑 버튼 클릭");
+
+      // 중복 이벤트 방지 플래그 설정
+      isLanguageSwapping = true;
+
       // 버튼 애니메이션 효과
       swapButton.style.transform = "scale(0.9) rotate(180deg)";
 
@@ -774,7 +741,10 @@ function setupEventListeners() {
         sessionStorage.setItem("sourceLanguage", sourceLanguage);
         sessionStorage.setItem("targetLanguage", targetLanguage);
 
-        // UI 업데이트
+        // UI 업데이트 (드롭다운 값 변경)
+        const sourceLanguageSelect = document.getElementById("source-language");
+        const targetLanguageSelect = document.getElementById("target-language");
+
         if (sourceLanguageSelect && targetLanguageSelect) {
           sourceLanguageSelect.value = sourceLanguage;
           targetLanguageSelect.value = targetLanguage;
@@ -787,6 +757,11 @@ function setupEventListeners() {
 
         // 필터 변경 처리
         handleFilterChange();
+
+        // 플래그 해제
+        setTimeout(() => {
+          isLanguageSwapping = false;
+        }, 100);
       }, 150);
     });
   }
@@ -1704,7 +1679,7 @@ async function loadSituationAndPurposeFilterOptions() {
     const situationTags = [
       "formal", // 격식
       "casual", // 비격식
-
+      "polite", // 정중한
       "urgent", // 긴급한
       "work", // 직장
       "school", // 학교
@@ -3456,40 +3431,217 @@ function generateBasicReadingExamples() {
 
 // 지역화 헬퍼 함수들
 function getLocalizedPatternTitle(data) {
+  console.log("🔍 문법 제목 지역화:", data);
+
+  // pattern 객체가 있는지 확인하고 내부 구조 로그 출력
+  if (data.pattern) {
+    console.log("🔍 제목용 pattern 객체 발견:", data.pattern);
+    console.log("🔍 제목용 pattern 객체 키들:", Object.keys(data.pattern));
+
+    // 현재 UI 언어에 해당하는 pattern 데이터 확인
+    const currentLanguage =
+      window.languageSettings?.currentUILanguage || "korean";
+    if (data.pattern[currentLanguage]) {
+      console.log(
+        `🔍 ${currentLanguage} 언어 pattern 데이터:`,
+        data.pattern[currentLanguage]
+      );
+      console.log(
+        `🔍 ${currentLanguage} pattern 키들:`,
+        Object.keys(data.pattern[currentLanguage])
+      );
+    }
+
+    // 한국어 pattern 데이터도 확인
+    if (data.pattern.korean) {
+      console.log("🔍 korean pattern 데이터:", data.pattern.korean);
+      console.log("🔍 korean pattern 키들:", Object.keys(data.pattern.korean));
+    }
+  }
+
+  // pattern 객체 안의 현재 언어 데이터에서 제목 확인
+  const currentLanguage =
+    window.languageSettings?.currentUILanguage || "korean";
+  if (
+    data.pattern &&
+    data.pattern[currentLanguage] &&
+    data.pattern[currentLanguage].title
+  ) {
+    console.log(
+      `✅ pattern.${currentLanguage}.title 사용:`,
+      data.pattern[currentLanguage].title
+    );
+    return data.pattern[currentLanguage].title;
+  }
+
+  // pattern 객체 안의 한국어 데이터에서 제목 확인
+  if (data.pattern && data.pattern.korean && data.pattern.korean.title) {
+    console.log("✅ pattern.korean.title 사용:", data.pattern.korean.title);
+    return data.pattern.korean.title;
+  }
+
+  // pattern 객체 안의 제목 확인
+  if (data.pattern && data.pattern.title) {
+    console.log("✅ pattern.title 사용:", data.pattern.title);
+    return data.pattern.title;
+  }
+
+  // pattern 객체 안의 name 확인
+  if (data.pattern && data.pattern.name) {
+    console.log("✅ pattern.name 사용:", data.pattern.name);
+    return data.pattern.name;
+  }
+
+  // pattern 객체 안의 pattern_name 확인
+  if (data.pattern && data.pattern.pattern_name) {
+    console.log("✅ pattern.pattern_name 사용:", data.pattern.pattern_name);
+    return data.pattern.pattern_name;
+  }
+
   // 실제 DB 구조: pattern_name 필드 우선 사용
-  if (data.pattern_name) {
+  if (data.pattern_name && data.pattern_name !== "문법 패턴") {
+    console.log("✅ 루트 pattern_name 사용:", data.pattern_name);
     return data.pattern_name;
   }
 
   // 기존 구조 지원
   if (data.title) {
+    console.log("✅ 루트 title 사용:", data.title);
     return data.title;
+  }
+
+  // purpose와 category 기반으로 제목 생성
+  if (data.purpose || data.category) {
+    const purpose = data.purpose || "";
+    const category = data.category || "";
+
+    // purpose를 한국어로 변환
+    const purposeMap = {
+      description: "설명",
+      request: "요청",
+      greeting: "인사",
+      question: "질문",
+      statement: "진술",
+      command: "명령",
+    };
+
+    const categoryMap = {
+      general: "일반",
+      formal: "격식",
+      casual: "비격식",
+    };
+
+    const koreanPurpose = purposeMap[purpose] || purpose;
+    const koreanCategory = categoryMap[category] || category;
+
+    if (koreanPurpose && koreanCategory) {
+      const generatedTitle = `${koreanPurpose} - ${koreanCategory}`;
+      console.log("🔧 자동 생성된 제목:", generatedTitle);
+      return generatedTitle;
+    } else if (koreanPurpose) {
+      const generatedTitle = `${koreanPurpose} 패턴`;
+      console.log("🔧 자동 생성된 제목:", generatedTitle);
+      return generatedTitle;
+    } else if (koreanCategory) {
+      const generatedTitle = `${koreanCategory} 문법`;
+      console.log("🔧 자동 생성된 제목:", generatedTitle);
+      return generatedTitle;
+    }
   }
 
   // 패턴 ID에서 제목 생성
   if (data.pattern_id) {
-    return generatePatternTitle(data.pattern_id, data);
+    const generatedTitle = generatePatternTitle(data.pattern_id, data);
+    console.log("🔧 패턴 ID로 생성된 제목:", generatedTitle);
+    return generatedTitle;
   }
 
+  console.log("⚠️ 기본 제목 사용: 문법 패턴");
   return "문법 패턴";
 }
 
 function getLocalizedPatternStructure(data) {
+  console.log("🔍 문법 구조 지역화:", data);
+
+  // pattern 객체가 있는지 확인하고 내부 구조 로그 출력
+  if (data.pattern) {
+    console.log("🔍 구조용 pattern 객체 발견:", data.pattern);
+    console.log("🔍 구조용 pattern 객체 키들:", Object.keys(data.pattern));
+
+    // 현재 UI 언어에 해당하는 pattern 데이터 확인
+    const currentLanguage =
+      window.languageSettings?.currentUILanguage || "korean";
+    if (data.pattern[currentLanguage]) {
+      console.log(
+        `🔍 ${currentLanguage} 언어 구조 pattern 데이터:`,
+        data.pattern[currentLanguage]
+      );
+      console.log(
+        `🔍 ${currentLanguage} 구조 pattern 키들:`,
+        Object.keys(data.pattern[currentLanguage])
+      );
+    }
+  }
+
+  // pattern 객체 안의 현재 언어 데이터에서 구조 확인
+  const currentLanguage =
+    window.languageSettings?.currentUILanguage || "korean";
+  if (
+    data.pattern &&
+    data.pattern[currentLanguage] &&
+    data.pattern[currentLanguage].structure
+  ) {
+    console.log(
+      `✅ pattern.${currentLanguage}.structure 사용:`,
+      data.pattern[currentLanguage].structure
+    );
+    return data.pattern[currentLanguage].structure;
+  }
+
+  // pattern 객체 안의 한국어 데이터에서 구조 확인
+  if (data.pattern && data.pattern.korean && data.pattern.korean.structure) {
+    console.log(
+      "✅ pattern.korean.structure 사용:",
+      data.pattern.korean.structure
+    );
+    return data.pattern.korean.structure;
+  }
+
+  // pattern 객체 안의 구조 정보 확인
+  if (data.pattern && data.pattern.structure) {
+    console.log("✅ pattern.structure 사용:", data.pattern.structure);
+    return data.pattern.structure;
+  }
+
+  // pattern 객체 안의 structural_pattern 확인
+  if (data.pattern && data.pattern.structural_pattern) {
+    console.log(
+      "✅ pattern.structural_pattern 사용:",
+      data.pattern.structural_pattern
+    );
+    return data.pattern.structural_pattern;
+  }
+
   // 실제 DB 구조: structural_pattern 필드 사용
   if (data.structural_pattern) {
+    console.log("✅ 루트 structural_pattern 사용:", data.structural_pattern);
     return data.structural_pattern;
   }
 
   // 새 템플릿 구조 지원
-  if (data.explanations && data.explanations[currentUILanguage]) {
-    return data.explanations[currentUILanguage].pattern || "";
+  if (data.explanations && data.explanations[currentLanguage]) {
+    const structure = data.explanations[currentLanguage].pattern || "";
+    console.log("✅ explanations 구조 사용:", structure);
+    return structure;
   }
 
   // 기존 구조 지원
   if (data.structure) {
+    console.log("✅ 루트 structure 사용:", data.structure);
     return data.structure;
   }
 
+  console.log("⚠️ 구조 정보 없음");
   return "구조 정보 없음";
 }
 
@@ -3498,6 +3650,93 @@ function getLocalizedPatternExplanation(data) {
     window.languageSettings?.currentUILanguage || "korean";
 
   console.log("🔍 문법 설명 지역화:", data);
+
+  // pattern 객체가 있는지 확인하고 내부 구조 로그 출력
+  if (data.pattern) {
+    console.log("🔍 pattern 객체 발견:", data.pattern);
+    console.log("🔍 pattern 객체 키들:", Object.keys(data.pattern));
+
+    // 현재 UI 언어에 해당하는 pattern 데이터 확인
+    if (data.pattern[currentLanguage]) {
+      console.log(
+        `🔍 ${currentLanguage} 언어 설명 pattern 데이터:`,
+        data.pattern[currentLanguage]
+      );
+      console.log(
+        `🔍 ${currentLanguage} 설명 pattern 키들:`,
+        Object.keys(data.pattern[currentLanguage])
+      );
+    }
+  }
+
+  // pattern 객체 안의 현재 언어 데이터에서 설명 확인
+  if (
+    data.pattern &&
+    data.pattern[currentLanguage] &&
+    data.pattern[currentLanguage].explanation
+  ) {
+    console.log(
+      `✅ pattern.${currentLanguage}.explanation 사용:`,
+      data.pattern[currentLanguage].explanation
+    );
+    return data.pattern[currentLanguage].explanation;
+  }
+
+  // pattern 객체 안의 한국어 데이터에서 설명 확인
+  if (data.pattern && data.pattern.korean && data.pattern.korean.explanation) {
+    console.log(
+      "✅ pattern.korean.explanation 사용:",
+      data.pattern.korean.explanation
+    );
+    return data.pattern.korean.explanation;
+  }
+
+  // pattern 객체 안의 현재 언어 데이터에서 description 확인
+  if (
+    data.pattern &&
+    data.pattern[currentLanguage] &&
+    data.pattern[currentLanguage].description
+  ) {
+    console.log(
+      `✅ pattern.${currentLanguage}.description 사용:`,
+      data.pattern[currentLanguage].description
+    );
+    return data.pattern[currentLanguage].description;
+  }
+
+  // pattern 객체 안의 한국어 데이터에서 description 확인
+  if (data.pattern && data.pattern.korean && data.pattern.korean.description) {
+    console.log(
+      "✅ pattern.korean.description 사용:",
+      data.pattern.korean.description
+    );
+    return data.pattern.korean.description;
+  }
+
+  // pattern 객체 안의 설명 확인
+  if (data.pattern && data.pattern.explanation) {
+    console.log("✅ pattern.explanation 구조 사용:", data.pattern.explanation);
+    return data.pattern.explanation;
+  }
+
+  // pattern 객체 안의 description 확인
+  if (data.pattern && data.pattern.description) {
+    console.log("✅ pattern.description 구조 사용:", data.pattern.description);
+    return data.pattern.description;
+  }
+
+  // pattern 객체 안의 다국어 설명 확인
+  if (
+    data.pattern &&
+    data.pattern.explanations &&
+    data.pattern.explanations[currentLanguage]
+  ) {
+    console.log(
+      "✅ pattern.explanations 구조 사용:",
+      data.pattern.explanations[currentLanguage]
+    );
+    return data.pattern.explanations[currentLanguage];
+  }
 
   // 새로운 단일 설명 구조: explanation 문자열
   if (data.explanation && typeof data.explanation === "string") {
@@ -3515,6 +3754,25 @@ function getLocalizedPatternExplanation(data) {
   if (data.explanations && data.explanations.korean) {
     console.log("📋 이전 explanations 구조 사용 (한국어)");
     return data.explanations.korean;
+  }
+
+  // 자동 생성 전에 더 많은 필드 확인
+  console.log("⚠️ 자동 생성 전 데이터 전체 구조 확인:", {
+    hasPattern: !!data.pattern,
+    hasTitle: !!data.title,
+    hasDescription: !!data.description,
+    purpose: data.purpose,
+    category: data.category,
+    allKeys: Object.keys(data),
+  });
+
+  // purpose나 category 기반으로 기본 설명 생성 (최후의 수단)
+  if (data.purpose || data.category) {
+    const purpose = data.purpose || "일반";
+    const category = data.category || "기본";
+    const explanation = `${purpose} 상황에서 사용하는 ${category} 문법 패턴입니다.`;
+    console.log("🔧 자동 생성된 설명:", explanation);
+    return explanation;
   }
 
   console.log("❌ 사용 가능한 설명 없음");

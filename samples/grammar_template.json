@@ -1,44 +1,137 @@
 [
   {
-    "pattern_name": "기본 인사",
-    "structural_pattern": "안녕하세요",
-    "explanation": "가장 기본적인 한국어 인사말로, 누구에게나 사용할 수 있는 정중한 표현입니다.",
-    "example": {
-      "korean": "안녕하세요, 처음 뵙겠습니다.",
-      "english": "Hello, nice to meet you.",
-      "japanese": "こんにちは、初めまして。",
-      "chinese": "您好，初次见面。"
+    "grammar_id": "grammar_001",
+    "pattern_name": "현재 시제 기본형",
+    "pattern": {
+      "korean": "주어 + 동사 + 목적어",
+      "english": "Subject + Verb + Object",
+      "japanese": "主語 + 動詞 + 目的語",
+      "chinese": "主语 + 动词 + 宾语"
     },
+    "domain": "daily",
+    "category": "basic_grammar",
     "difficulty": "basic",
-    "tags": ["formal", "greeting"],
-    "created_at": "2024-01-01T00:00:00Z"
+    "situation": ["casual"],
+    "purpose": "description",
+    "korean_explanation": "현재 상황이나 습관을 나타내는 기본 문장 구조입니다.",
+    "english_explanation": "Basic sentence structure expressing current situations or habits.",
+    "japanese_explanation": "現在の状況や習慣を表す基本的な文構造です。",
+    "chinese_explanation": "表示现在情况或习惯的基本句子结构。",
+    "example_translations": {
+      "korean": "나는 사과를 먹어요.",
+      "english": "I eat an apple.",
+      "japanese": "私はりんごを食べます。",
+      "chinese": "我吃苹果。"
+    },
+    "created_at": "2024-01-15T09:00:00Z",
+    "updated_at": "2024-01-15T09:00:00Z"
   },
   {
-    "pattern_name": "음식 주문",
-    "structural_pattern": "___을/를 주세요",
-    "explanation": "음식점이나 상점에서 무언가를 주문하거나 요청할 때 사용하는 정중한 표현입니다.",
-    "example": {
-      "korean": "김치찌개를 주세요.",
-      "english": "Please give me kimchi stew.",
-      "japanese": "キムチチゲをください。",
-      "chinese": "请给我泡菜汤。"
+    "grammar_id": "grammar_002",
+    "pattern_name": "과거 시제",
+    "pattern": {
+      "korean": "주어 + 과거동사 + 목적어",
+      "english": "Subject + Past Verb + Object",
+      "japanese": "主語 + 過去動詞 + 目的語", 
+      "chinese": "主语 + 过去动词 + 宾语"
     },
+    "domain": "daily",
+    "category": "basic_grammar",
     "difficulty": "basic",
-    "tags": ["casual", "request"],
-    "created_at": "2024-01-01T00:00:00Z"
+    "situation": ["casual"],
+    "purpose": "description",
+    "korean_explanation": "과거에 일어난 일이나 완료된 행동을 나타내는 문장 구조입니다.",
+    "english_explanation": "Sentence structure expressing past events or completed actions.",
+    "japanese_explanation": "過去に起こった出来事や完了した行動を表す文構造です。",
+    "chinese_explanation": "表示过去发生的事件或完成的行动的句子结构。",
+    "example_translations": {
+      "korean": "어제 영화를 봤어요.",
+      "english": "I watched a movie yesterday.",
+      "japanese": "昨日映画を見ました。",
+      "chinese": "昨天我看了电影。"
+    },
+    "created_at": "2024-01-15T09:00:00Z",
+    "updated_at": "2024-01-15T09:00:00Z"
   },
   {
-    "pattern_name": "과거형 표현",
-    "structural_pattern": "___었/았어요",
-    "explanation": "과거에 일어난 일을 표현할 때 사용하는 기본적인 과거형 어미입니다.",
-    "example": {
-      "korean": "어제 친구를 만났어요.",
-      "english": "I met a friend yesterday.",
-      "japanese": "昨日友達に会いました。",
-      "chinese": "昨天见了朋友。"
+    "grammar_id": "grammar_003",
+    "pattern_name": "정중한 요청",
+    "pattern": {
+      "korean": "동사 어간 + 아/어 주세요",
+      "english": "Please + Verb",
+      "japanese": "動詞 + てください",
+      "chinese": "请 + 动词"
     },
+    "domain": "business",
+    "category": "politeness",
     "difficulty": "intermediate",
-    "tags": ["formal", "description"],
-    "created_at": "2024-01-01T00:00:00Z"
+    "situation": ["formal", "work"],
+    "purpose": "request",
+    "korean_explanation": "다른 사람에게 정중하게 부탁할 때 사용하는 표현입니다.",
+    "english_explanation": "Expression used to make polite requests to others.",
+    "japanese_explanation": "他の人に丁寧にお願いするときに使う表現です。",
+    "chinese_explanation": "用于向他人礼貌地提出请求的表达方式。",
+    "example_translations": {
+      "korean": "회의 자료를 준비해 주세요.",
+      "english": "Please prepare the meeting materials.",
+      "japanese": "会議資料を準備してください。",
+      "chinese": "请准备会议资料。"
+    },
+    "created_at": "2024-01-15T09:00:00Z",
+    "updated_at": "2024-01-15T09:00:00Z"
+  },
+  {
+    "grammar_id": "grammar_004",
+    "pattern_name": "질문 표현",
+    "pattern": {
+      "korean": "의문사 + 주어 + 동사 + 까요?",
+      "english": "Question word + Subject + Verb + ?",
+      "japanese": "疑問詞 + 主語 + 動詞 + か？",
+      "chinese": "疑问词 + 主语 + 动词 + ？"
+    },
+    "domain": "education",
+    "category": "question",
+    "difficulty": "intermediate",
+    "situation": ["school"],
+    "purpose": "question",
+    "korean_explanation": "정보를 묻거나 확인할 때 사용하는 질문 표현입니다.",
+    "english_explanation": "Question expression used to ask for information or confirmation.",
+    "japanese_explanation": "情報を尋ねたり確認したりするときに使う質問表現です。",
+    "chinese_explanation": "用于询问信息或确认的疑问表达方式。",
+    "example_translations": {
+      "korean": "이 문제를 어떻게 풀까요?",
+      "english": "How should we solve this problem?",
+      "japanese": "この問題をどう解きましょうか？",
+      "chinese": "这个问题应该怎么解决？"
+    },
+    "created_at": "2024-01-15T09:00:00Z",
+    "updated_at": "2024-01-15T09:00:00Z"
+  },
+  {
+    "grammar_id": "grammar_005",
+    "pattern_name": "가능성 표현",
+    "pattern": {
+      "korean": "동사 어간 + ㄹ/을 수 있다",
+      "english": "can/be able to + Verb",
+      "japanese": "動詞 + ことができる",
+      "chinese": "会/能 + 动词"
+    },
+    "domain": "daily",
+    "category": "ability",
+    "difficulty": "intermediate",
+    "situation": ["casual"],
+    "purpose": "description",
+    "korean_explanation": "어떤 일이 가능하거나 능력이 있음을 나타내는 표현입니다.",
+    "english_explanation": "Expression indicating that something is possible or showing ability.",
+    "japanese_explanation": "何かが可能であったり能力があることを表す表現です。",
+    "chinese_explanation": "表示某事可能或显示能力的表达方式。",
+    "example_translations": {
+      "korean": "한국어를 말할 수 있어요.",
+      "english": "I can speak Korean.",
+      "japanese": "韓国語を話すことができます。",
+      "chinese": "我会说韩语。"
+    },
+    "created_at": "2024-01-15T09:00:00Z",
+    "updated_at": "2024-01-15T09:00:00Z"
   }
 ] 

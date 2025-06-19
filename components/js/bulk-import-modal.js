@@ -352,11 +352,16 @@ async function uploadGrammarPatterns(data) {
 
       const patternDoc = {
         pattern_name: patternData.pattern_name || "기본 패턴",
-        structural_pattern: patternData.structural_pattern || "",
+        pattern: patternData.pattern || patternData.structural_pattern || "",
         explanation: patternData.explanation || "",
         example: patternData.example || {},
         difficulty: patternData.difficulty || "basic",
-        tags: patternData.tags || [],
+        situation: Array.isArray(patternData.situation)
+          ? patternData.situation
+          : typeof patternData.situation === "string"
+          ? patternData.situation.split(",").map((s) => s.trim())
+          : ["casual"],
+        purpose: patternData.purpose || "description",
         created_at: patternData.created_at || new Date().toISOString(),
       };
 
@@ -566,38 +571,77 @@ function downloadGrammarJSONTemplate() {
 }
 
 function downloadGrammarCSVTemplate() {
-  console.log("✅ 문법 CSV 템플릿 다운로드");
-
   const headers = [
-    "pattern_name",
-    "structural_pattern",
-    "explanation",
+    "domain",
+    "category",
+    "korean_title",
+    "korean_structure",
+    "korean_description",
+    "english_title",
+    "english_structure",
+    "english_description",
+    "japanese_title",
+    "japanese_structure",
+    "japanese_description",
+    "chinese_title",
+    "chinese_structure",
+    "chinese_description",
     "korean_example",
     "english_example",
     "japanese_example",
     "chinese_example",
     "difficulty",
-    "tags",
-    "created_at",
+    "situation",
+    "purpose",
   ];
 
-  const rows = GRAMMAR_TEMPLATE.map((grammar) => [
-    grammar.pattern_name,
-    grammar.structural_pattern,
-    grammar.explanation,
-    grammar.example.korean,
-    grammar.example.english,
-    grammar.example.japanese,
-    grammar.example.chinese,
-    grammar.difficulty,
-    grammar.tags.join(","),
-    grammar.created_at,
-  ]);
+  const sampleData = [
+    [
+      "daily",
+      "greeting",
+      "기본 인사",
+      "안녕하세요",
+      "가장 기본적인 한국어 인사말로, 누구에게나 사용할 수 있는 정중한 표현입니다.",
+      "Basic Greeting",
+      "Hello",
+      "The most basic Korean greeting that can be used with anyone politely.",
+      "基本的な挨拶",
+      "こんにちは",
+      "誰にでも丁寧に使える最も基本的な韓国語の挨拶です。",
+      "基本问候",
+      "您好",
+      "最基本的韩语问候语，可以礼貌地对任何人使用。",
+      "안녕하세요, 처음 뵙겠습니다.",
+      "Hello, nice to meet you.",
+      "こんにちは、初めまして。",
+      "您好，初次见面。",
+      "basic",
+      "formal,social",
+      "greeting",
+    ],
+  ];
 
-  downloadCSV(
-    [headers, ...rows].map((row) => row.join(",")).join("\n"),
-    "grammar_template.csv"
-  );
+  const csvContent = [headers, ...sampleData]
+    .map((row) =>
+      row
+        .map((cell) =>
+          typeof cell === "string" && (cell.includes(",") || cell.includes('"'))
+            ? `"${cell.replace(/"/g, '""')}"`
+            : cell
+        )
+        .join(",")
+    )
+    .join("\n");
+
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  link.setAttribute("href", url);
+  link.setAttribute("download", "grammar_template.csv");
+  link.style.visibility = "hidden";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 
 function downloadJSON(data, filename) {
@@ -654,7 +698,7 @@ function parseCSV(content, tabName) {
           parsedData = parseExampleFromCSV(row);
           break;
         case "grammar":
-          parsedData = parseGrammarPatternFromCSV(row);
+          parsedData = parseGrammarPatternFromCSV(row, headers);
           break;
         default:
           parsedData = row;
@@ -832,40 +876,57 @@ function parseExampleFromCSV(row) {
 }
 
 // 문법 패턴 CSV 파싱
-function parseGrammarPatternFromCSV(row) {
-  try {
-    console.log("🔍 CSV 파싱 시작, 원본 row:", row);
+function parseGrammarPatternFromCSV(row, headers) {
+  const pattern = {};
 
-    // 단일 예문 객체 생성
-    const example = {
-      korean: row.korean_example || "",
-      english: row.english_example || "",
-      japanese: row.japanese_example || "",
-      chinese: row.chinese_example || "",
-    };
+  // 기본 속성들
+  pattern.domain = row[headers.indexOf("domain")] || "daily";
+  pattern.category = row[headers.indexOf("category")] || "general";
+  pattern.difficulty = row[headers.indexOf("difficulty")] || "basic";
+  pattern.purpose = row[headers.indexOf("purpose")] || "description";
 
-    console.log("📝 예문 생성:", example);
+  // situation 처리 (배열로 변환)
+  const situationValue = row[headers.indexOf("situation")] || "casual";
+  pattern.situation =
+    typeof situationValue === "string"
+      ? situationValue.split(",").map((s) => s.trim())
+      : situationValue;
 
-    const result = {
-      pattern_name: row.pattern_name || "",
-      structural_pattern: row.structural_pattern || "",
-      explanation: row.explanation || "",
-      example: example,
-      difficulty: row.difficulty || "basic",
-      tags: row.tags ? row.tags.split(",").map((t) => t.trim()) : [],
-      created_at: row.created_at || new Date().toISOString(),
-    };
+  // pattern 중첩 객체 구조
+  pattern.pattern = {
+    korean: {
+      title: row[headers.indexOf("korean_title")] || "",
+      structure: row[headers.indexOf("korean_structure")] || "",
+      description: row[headers.indexOf("korean_description")] || "",
+    },
+    english: {
+      title: row[headers.indexOf("english_title")] || "",
+      structure: row[headers.indexOf("english_structure")] || "",
+      description: row[headers.indexOf("english_description")] || "",
+    },
+    japanese: {
+      title: row[headers.indexOf("japanese_title")] || "",
+      structure: row[headers.indexOf("japanese_structure")] || "",
+      description: row[headers.indexOf("japanese_description")] || "",
+    },
+    chinese: {
+      title: row[headers.indexOf("chinese_title")] || "",
+      structure: row[headers.indexOf("chinese_structure")] || "",
+      description: row[headers.indexOf("chinese_description")] || "",
+    },
+  };
 
-    console.log("🔧 파싱 결과:", result);
-    console.log("📖 파싱된 explanation:", result.explanation);
-    console.log("📚 파싱된 example:", result.example);
+  // example 객체
+  pattern.example = {
+    korean: row[headers.indexOf("korean_example")] || "",
+    english: row[headers.indexOf("english_example")] || "",
+    japanese: row[headers.indexOf("japanese_example")] || "",
+    chinese: row[headers.indexOf("chinese_example")] || "",
+  };
 
-    return result;
-  } catch (error) {
-    console.error("❌ 문법 패턴 CSV 파싱 오류:", error);
-    console.error("❌ 파싱 실패 데이터:", row);
-    return null;
-  }
+  pattern.created_at = new Date().toISOString();
+
+  return pattern;
 }
 
 // 파일 내용 읽기 함수

@@ -246,7 +246,7 @@ async function uploadExamples(data) {
 }
 
 async function uploadGrammarPatterns(data) {
-  console.log("🔥 [분리모달] uploadGrammarPatterns 시작, 받은 데이터:", data);
+  console.log("🚀 [분리모달] 문법 패턴 업로드 시작");
 
   const patterns = Array.isArray(data) ? data : [data];
   console.log("📋 [분리모달] 처리할 패턴 개수:", patterns.length);
@@ -259,12 +259,18 @@ async function uploadGrammarPatterns(data) {
       console.log("📝 [분리모달] 원본 패턴 데이터:", patternData);
 
       const patternDoc = {
-        pattern_name: patternData.pattern_name || "기본 패턴",
-        structural_pattern: patternData.structural_pattern || "",
+        domain: patternData.domain || "daily",
+        category: patternData.category || "general",
+        pattern: patternData.pattern || patternData.structural_pattern || "",
         explanation: patternData.explanation || "",
         example: patternData.example || {},
         difficulty: patternData.difficulty || "basic",
-        tags: patternData.tags || [],
+        situation: Array.isArray(patternData.situation)
+          ? patternData.situation
+          : typeof patternData.situation === "string"
+          ? patternData.situation.split(",").map((s) => s.trim())
+          : ["casual"],
+        purpose: patternData.purpose || "description",
         created_at: patternData.created_at || new Date().toISOString(),
       };
 
@@ -274,7 +280,11 @@ async function uploadGrammarPatterns(data) {
 
       await collectionManager.createGrammarPattern(patternDoc);
       success++;
-      console.log("✅ [분리모달] 패턴 업로드 성공:", patternDoc.pattern_name);
+      console.log(
+        "✅ [분리모달] 패턴 업로드 성공:",
+        patternDoc.domain,
+        patternDoc.category
+      );
     } catch (error) {
       console.error("❌ [분리모달] 문법 패턴 업로드 오류:", error);
       console.error("❌ [분리모달] 실패한 데이터:", patternData);
@@ -489,29 +499,77 @@ function downloadGrammarCSVTemplate() {
   console.log("✅ 문법 CSV 템플릿 다운로드");
 
   const headers = [
-    "pattern_name",
-    "structural_pattern",
-    "explanation",
+    "domain",
+    "category",
+    "korean_title",
+    "korean_structure",
+    "korean_description",
+    "english_title",
+    "english_structure",
+    "english_description",
+    "japanese_title",
+    "japanese_structure",
+    "japanese_description",
+    "chinese_title",
+    "chinese_structure",
+    "chinese_description",
     "korean_example",
     "english_example",
     "japanese_example",
     "chinese_example",
     "difficulty",
-    "tags",
-    "created_at",
+    "situation",
+    "purpose",
   ];
 
   const rows = GRAMMAR_TEMPLATE.map((grammar) => [
-    grammar.pattern_name,
-    grammar.structural_pattern,
-    grammar.explanation,
+    grammar.domain,
+    grammar.category,
+    typeof grammar.pattern === "object"
+      ? grammar.pattern.korean?.title || ""
+      : "",
+    typeof grammar.pattern === "object"
+      ? grammar.pattern.korean?.structure || ""
+      : grammar.pattern || grammar.structural_pattern || "",
+    typeof grammar.pattern === "object"
+      ? grammar.pattern.korean?.description || ""
+      : "",
+    typeof grammar.pattern === "object"
+      ? grammar.pattern.english?.title || ""
+      : "",
+    typeof grammar.pattern === "object"
+      ? grammar.pattern.english?.structure || ""
+      : "",
+    typeof grammar.pattern === "object"
+      ? grammar.pattern.english?.description || ""
+      : "",
+    typeof grammar.pattern === "object"
+      ? grammar.pattern.japanese?.title || ""
+      : "",
+    typeof grammar.pattern === "object"
+      ? grammar.pattern.japanese?.structure || ""
+      : "",
+    typeof grammar.pattern === "object"
+      ? grammar.pattern.japanese?.description || ""
+      : "",
+    typeof grammar.pattern === "object"
+      ? grammar.pattern.chinese?.title || ""
+      : "",
+    typeof grammar.pattern === "object"
+      ? grammar.pattern.chinese?.structure || ""
+      : "",
+    typeof grammar.pattern === "object"
+      ? grammar.pattern.chinese?.description || ""
+      : "",
     grammar.example.korean,
     grammar.example.english,
     grammar.example.japanese,
     grammar.example.chinese,
     grammar.difficulty,
-    grammar.tags.join(","),
-    grammar.created_at,
+    Array.isArray(grammar.situation)
+      ? grammar.situation.join(",")
+      : grammar.situation || "casual",
+    grammar.purpose || "description",
   ]);
 
   downloadCSV([headers, ...rows], "grammar_template.csv");
@@ -614,21 +672,53 @@ function convertCSVToGrammar(item) {
     chinese: item.chinese_example || "",
   };
 
+  // 중첩 패턴 객체 생성 (새로운 구조)
+  let pattern;
+  if (item.korean_title || item.korean_structure || item.korean_description) {
+    pattern = {
+      korean: {
+        title: item.korean_title || "",
+        structure: item.korean_structure || "",
+        description: item.korean_description || "",
+      },
+      english: {
+        title: item.english_title || "",
+        structure: item.english_structure || "",
+        description: item.english_description || "",
+      },
+      japanese: {
+        title: item.japanese_title || "",
+        structure: item.japanese_structure || "",
+        description: item.japanese_description || "",
+      },
+      chinese: {
+        title: item.chinese_title || "",
+        structure: item.chinese_structure || "",
+        description: item.chinese_description || "",
+      },
+    };
+  } else {
+    // 기존 구조 지원 (하위 호환성)
+    pattern = item.pattern || item.structural_pattern || "";
+  }
+
   console.log("📝 [분리모달] 예문 생성:", example);
+  console.log("🔧 [분리모달] 패턴 생성:", pattern);
 
   const result = {
-    pattern_name: item.pattern_name || "기본 패턴",
-    structural_pattern: item.structural_pattern || "",
-    explanation: item.explanation || "",
+    domain: item.domain || "daily",
+    category: item.category || "general",
+    pattern: pattern,
     example: example,
     difficulty: item.difficulty || "basic",
-    tags: item.tags ? item.tags.split(",").map((t) => t.trim()) : [],
+    situation: item.situation
+      ? item.situation.split(",").map((s) => s.trim())
+      : ["casual"],
+    purpose: item.purpose || "description",
     created_at: item.created_at || new Date().toISOString(),
   };
 
   console.log("🔧 [분리모달] 변환 결과:", result);
-  console.log("📖 [분리모달] 변환된 explanation:", result.explanation);
-  console.log("📚 [분리모달] 변환된 example:", result.example);
 
   return result;
 }

@@ -1,0 +1,167 @@
+[
+  {
+    "grammar_id": "grammar_001",
+    "pattern_name": "현재 시제 기본형",
+    "structural_pattern": "주어 + 동사 + 목적어",
+    "domain": "daily",
+    "category": "basic_grammar",
+    "difficulty": "basic",
+    "situation": ["casual", "formal"],
+    "purpose": "description",
+    "grammar_explanation": {
+      "korean": {
+        "title": "현재 시제 기본형",
+        "description": "현재 상황이나 습관을 나타내는 기본 문장 구조입니다.",
+        "usage_notes": "일상적인 행동이나 현재 상태를 설명할 때 사용합니다.",
+        "pattern": "주어 + 동사 + 목적어"
+      },
+      "english": {
+        "title": "Present Tense Basic Form",
+        "description": "Basic sentence structure expressing current situations or habits.",
+        "usage_notes": "Used to describe daily actions or current states.",
+        "pattern": "Subject + Verb + Object"
+      }
+    },
+    "example_translations": {
+      "korean": "나는 사과를 먹어요.",
+      "english": "I eat an apple.",
+      "japanese": "私はりんごを食べます。",
+      "chinese": "我吃苹果。"
+    },
+    "grammar_tags": ["present_tense", "basic_sentence", "daily_use"],
+    "created_at": "2024-01-15T09:00:00Z",
+    "updated_at": "2024-01-15T09:00:00Z"
+  },
+  {
+    "grammar_id": "grammar_002",
+    "pattern_name": "과거 시제",
+    "structural_pattern": "주어 + 과거동사 + 목적어",
+    "domain": "daily",
+    "category": "basic_grammar",
+    "difficulty": "basic",
+    "situation": ["casual", "formal"],
+    "purpose": "description",
+    "grammar_explanation": {
+      "korean": {
+        "title": "과거 시제",
+        "description": "과거에 일어난 일이나 완료된 행동을 나타내는 문장 구조입니다.",
+        "usage_notes": "이미 끝난 일이나 과거의 경험을 말할 때 사용합니다.",
+        "pattern": "주어 + 과거동사 + 목적어"
+      },
+      "english": {
+        "title": "Past Tense",
+        "description": "Sentence structure expressing past events or completed actions.",
+        "usage_notes": "Used to talk about finished events or past experiences.",
+        "pattern": "Subject + Past Verb + Object"
+      }
+    },
+    "example_translations": {
+      "korean": "어제 영화를 봤어요.",
+      "english": "I watched a movie yesterday.",
+      "japanese": "昨日映画を見ました。",
+      "chinese": "昨天我看了电影。"
+    },
+    "grammar_tags": ["past_tense", "completed_action", "time_expression"],
+    "created_at": "2024-01-15T09:00:00Z",
+    "updated_at": "2024-01-15T09:00:00Z"
+  },
+  {
+    "grammar_id": "grammar_003",
+    "pattern_name": "정중한 요청",
+    "structural_pattern": "주어 + 동사 + 아/어 주세요",
+    "domain": "business",
+    "category": "politeness",
+    "difficulty": "intermediate",
+    "situation": ["formal", "work", "public"],
+    "purpose": "request",
+    "grammar_explanation": {
+      "korean": {
+        "title": "정중한 요청 표현",
+        "description": "다른 사람에게 정중하게 부탁할 때 사용하는 표현입니다.",
+        "usage_notes": "공식적인 상황이나 처음 만나는 사람에게 사용합니다.",
+        "pattern": "동사 어간 + 아/어 주세요"
+      },
+      "english": {
+        "title": "Polite Request Expression",
+        "description": "Expression used to make polite requests to others.",
+        "usage_notes": "Used in formal situations or with people you meet for the first time.",
+        "pattern": "Please + Verb"
+      }
+    },
+    "example_translations": {
+      "korean": "회의 자료를 준비해 주세요.",
+      "english": "Please prepare the meeting materials.",
+      "japanese": "会議資料を準備してください。",
+      "chinese": "请准备会议资料。"
+    },
+    "grammar_tags": ["polite_request", "formal_speech", "business_korean"],
+    "created_at": "2024-01-15T09:00:00Z",
+    "updated_at": "2024-01-15T09:00:00Z"
+  },
+  {
+    "grammar_id": "grammar_004",
+    "pattern_name": "질문 표현",
+    "structural_pattern": "의문사 + 주어 + 동사 + 까요?",
+    "domain": "education",
+    "category": "question",
+    "difficulty": "intermediate",
+    "situation": ["school", "formal"],
+    "purpose": "question",
+    "grammar_explanation": {
+      "korean": {
+        "title": "의문문 만들기",
+        "description": "정보를 묻거나 확인할 때 사용하는 질문 표현입니다.",
+        "usage_notes": "어떻게, 무엇을, 언제 등의 의문사와 함께 사용합니다.",
+        "pattern": "의문사 + 주어 + 동사 + 까요?"
+      },
+      "english": {
+        "title": "Question Formation",
+        "description": "Question expression used to ask for information or confirmation.",
+        "usage_notes": "Used with question words like how, what, when, etc.",
+        "pattern": "Question word + Subject + Verb + ?"
+      }
+    },
+    "example_translations": {
+      "korean": "이 문제를 어떻게 풀까요?",
+      "english": "How should we solve this problem?",
+      "japanese": "この問題をどう解きましょうか？",
+      "chinese": "这个问题应该怎么解决？"
+    },
+    "grammar_tags": ["question_form", "interrogative", "problem_solving"],
+    "created_at": "2024-01-15T09:00:00Z",
+    "updated_at": "2024-01-15T09:00:00Z"
+  },
+  {
+    "grammar_id": "grammar_005",
+    "pattern_name": "가능성 표현",
+    "structural_pattern": "주어 + 동사 + ㄹ/을 수 있다",
+    "domain": "daily",
+    "category": "ability",
+    "difficulty": "intermediate",
+    "situation": ["casual", "formal"],
+    "purpose": "description",
+    "grammar_explanation": {
+      "korean": {
+        "title": "가능성과 능력 표현",
+        "description": "어떤 일이 가능하거나 능력이 있음을 나타내는 표현입니다.",
+        "usage_notes": "할 수 있는 일이나 가능한 상황을 설명할 때 사용합니다.",
+        "pattern": "동사 어간 + ㄹ/을 수 있다"
+      },
+      "english": {
+        "title": "Possibility and Ability Expression",
+        "description": "Expression indicating that something is possible or showing ability.",
+        "usage_notes": "Used to describe things you can do or possible situations.",
+        "pattern": "can/be able to + Verb"
+      }
+    },
+    "example_translations": {
+      "korean": "한국어를 말할 수 있어요.",
+      "english": "I can speak Korean.",
+      "japanese": "韓国語を話すことができます。",
+      "chinese": "我会说韩语。"
+    },
+    "grammar_tags": ["possibility", "ability", "modal_expression"],
+    "created_at": "2024-01-15T09:00:00Z",
+    "updated_at": "2024-01-15T09:00:00Z"
+  }
+] 

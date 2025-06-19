@@ -494,8 +494,12 @@ const translations = {
     example_quick_desc: "문맥 이해 학습",
     flash_mode: "플래시 모드",
     flash_quick_desc: "빠른 독해 연습",
-    reading_example_learning: "예문 학습",
-    reading_flash_mode: "플래시 모드",
+
+    // 문법 학습 오류 메시지
+    structure_info_not_available: "Structure information not available",
+    explanation_info_not_available: "Explanation information not available",
+    reading_example_learning: "Example Learning",
+    reading_flash_mode: "Flash Mode",
 
     // 학습 특징 설명
     vocabulary_flashcard_features: "시각적 학습 • 즉시 피드백",
@@ -549,11 +553,12 @@ const translations = {
     // 상황 태그 번역
     formal: "격식",
     casual: "비격식",
-
+    polite: "정중한",
     urgent: "긴급한",
     work: "직장",
     school: "학교",
     social: "사교",
+    travel: "여행",
     shopping: "쇼핑",
     home: "가정",
     public: "공공장소",
@@ -1056,11 +1061,12 @@ const translations = {
     // 상황 태그 번역
     formal: "Formal",
     casual: "Casual",
-
+    polite: "Polite",
     urgent: "Urgent",
     work: "Work",
     school: "School",
     social: "Social",
+    travel: "Travel",
     shopping: "Shopping",
     home: "Home",
     public: "Public",
@@ -1250,8 +1256,7 @@ const translations = {
     grammar_pattern_upload: "Grammar Pattern Upload",
     example_upload: "Example Upload",
     upload_csv_json_concept: "Upload CSV or JSON files to add concepts.",
-    upload_csv_json_grammar:
-      "Upload CSV or JSON files to add grammar patterns.",
+    upload_csv_json_grammar: "Upload CSV or JSON files to add grammar patterns.",
     upload_csv_json_example: "Upload CSV or JSON files to add examples.",
     upload: "Upload",
     download_template: "Download Template",
@@ -1571,13 +1576,15 @@ const translations = {
     purpose: "目的",
     all_purpose: "全目的",
 
-    // 상황 태그 번역
+    // 상황 태그 번역 (일본어)
     formal: "フォーマル",
     casual: "カジュアル",
+    polite: "丁寧",
     urgent: "緊急",
     work: "職場",
     school: "学校",
     social: "社交",
+    travel: "旅行",
     shopping: "ショッピング",
     home: "家庭",
     public: "公共場所",
@@ -1925,13 +1932,15 @@ const translations = {
     purpose: "目的",
     all_purpose: "全部目的",
 
-    // 상황 태그 번역
+    // 상황 태그 번역 (중국어)
     formal: "正式",
     casual: "非正式",
+    polite: "礼貌",
     urgent: "紧急",
     work: "工作",
     school: "学校",
     social: "社交",
+    travel: "旅行",
     shopping: "购物",
     home: "家庭",
     public: "公共场所",

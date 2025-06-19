@@ -1635,12 +1635,17 @@ export class CollectionManager {
       const patternId = patternRef.id;
 
       const patternDoc = {
-        pattern_name: patternData.pattern_name || "기본 패턴",
-        structural_pattern: patternData.structural_pattern || "",
-        explanation: patternData.explanation || "",
+        domain: patternData.domain || "daily",
+        category: patternData.category || "general",
+        pattern: patternData.pattern || patternData.structural_pattern || "",
         example: patternData.example || {},
         difficulty: patternData.difficulty || "basic",
-        tags: patternData.tags || [],
+        situation: Array.isArray(patternData.situation)
+          ? patternData.situation
+          : typeof patternData.situation === "string"
+          ? patternData.situation.split(",").map((s) => s.trim())
+          : ["casual"],
+        purpose: patternData.purpose || "description",
         created_at: serverTimestamp(),
         updated_at: serverTimestamp(),
       };
