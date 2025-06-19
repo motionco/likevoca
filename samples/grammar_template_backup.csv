@@ -1,4 +1,0 @@
-pattern_name,structural_pattern,explanation,korean_example,english_example,japanese_example,chinese_example,difficulty,situation,purpose,grammar_tags,created_at
-기본 인사,안녕하세요,가장 기본적인 한국어 인사말로 누구에게나 사용할 수 있는 정중한 표현입니다,"안녕하세요, 처음 뵙겠습니다.","Hello, nice to meet you.","こんにちは、初めまして。","您好，初次见面。",basic,"formal,social",greeting,"polite_expression,daily_use",2024-01-01T00:00:00Z
-음식 주문,___을/를 주세요,음식점이나 상점에서 무언가를 주문하거나 요청할 때 사용하는 정중한 표현입니다,김치찌개를 주세요.,"Please give me kimchi stew.",キムチチゲをください。,请给我泡菜汤。,basic,"shopping,public",request,"polite_request,service",2024-01-01T00:00:00Z
-과거형 표현,___었/았어요,과거에 일어난 일을 표현할 때 사용하는 기본적인 과거형 어미입니다,어제 친구를 만났어요.,"I met a friend yesterday.",昨日友達に会いました。,昨天见了朋友。,intermediate,"casual,social",description,"past_tense,daily_conversation",2024-01-01T00:00:00Z 

@@ -1544,133 +1544,9 @@ export class CollectionManager {
   }
 
   /**
-   * 개별 개념 생성 (분리된 업로드용)
+   * 상황과 목적 기반 개념 검색
    */
-  async createConcept(conceptData) {
-    try {
-      const conceptRef = doc(collection(db, "concepts"));
-      const conceptId = conceptRef.id;
-
-      const conceptDoc = {
-        // concept_id 제거: Firestore document ID와 중복
-        concept_info: conceptData.concept_info || {
-          domain: conceptData.domain || "general",
-          category: conceptData.category || "uncategorized",
-          difficulty: conceptData.difficulty || "beginner",
-          tags: conceptData.tags || [],
-        },
-        expressions: conceptData.expressions || {},
-        representative_example: conceptData.representative_example || null,
-        // metadata 제거, created_at으로 통일
-        created_at: serverTimestamp(),
-      };
-
-      await setDoc(conceptRef, conceptDoc);
-      console.log(`✓ 개념 생성 완료: ${conceptId}`);
-      return conceptId;
-    } catch (error) {
-      console.error("개념 생성 오류:", error);
-      throw error;
-    }
-  }
-
-  /**
-   * 개별 예문 생성 (분리된 업로드용)
-   */
-  async createExample(exampleData) {
-    try {
-      const exampleRef = doc(collection(db, "examples"));
-      const exampleId = exampleRef.id;
-
-      // translations 속성을 간소화된 형태로 처리
-      const cleanTranslations = {};
-      if (exampleData.translations) {
-        Object.keys(exampleData.translations).forEach((lang) => {
-          const translation = exampleData.translations[lang];
-          // 이미 문자열 형태라면 그대로 사용, 객체 형태라면 text 속성 추출
-          cleanTranslations[lang] =
-            typeof translation === "string"
-              ? translation
-              : translation.text || "";
-        });
-      }
-
-      const exampleDoc = {
-        // example_id 속성 제거 - Firestore 자동 부여 ID만 사용
-        domain: exampleData.domain || "general",
-        category: exampleData.category || "common",
-        difficulty: exampleData.difficulty || "beginner",
-        situation: exampleData.situation
-          ? Array.isArray(exampleData.situation)
-            ? exampleData.situation
-            : typeof exampleData.situation === "string"
-            ? exampleData.situation.split(",").map((s) => s.trim())
-            : null
-          : null,
-        purpose: exampleData.purpose || null,
-        translations: cleanTranslations,
-        created_at: serverTimestamp(),
-      };
-
-      await setDoc(exampleRef, exampleDoc);
-      console.log(`✓ 예문 생성 완료: ${exampleId}`);
-      return exampleId;
-    } catch (error) {
-      console.error("예문 생성 오류:", error);
-      throw error;
-    }
-  }
-
-  /**
-   * 개별 문법 패턴 생성 (분리된 업로드용)
-   */
-  async createGrammarPattern(patternData) {
-    try {
-      console.log(
-        "🔥 [CollectionManager] createGrammarPattern 시작, 받은 데이터:",
-        patternData
-      );
-
-      const patternRef = doc(collection(db, "grammar"));
-      const patternId = patternRef.id;
-
-      const patternDoc = {
-        domain: patternData.domain || "daily",
-        category: patternData.category || "general",
-        pattern: patternData.pattern || patternData.structural_pattern || "",
-        example: patternData.example || {},
-        difficulty: patternData.difficulty || "basic",
-        situation: Array.isArray(patternData.situation)
-          ? patternData.situation
-          : typeof patternData.situation === "string"
-          ? patternData.situation.split(",").map((s) => s.trim())
-          : ["casual"],
-        purpose: patternData.purpose || "description",
-        created_at: serverTimestamp(),
-        updated_at: serverTimestamp(),
-      };
-
-      console.log("🔧 [CollectionManager] 저장할 문서:", patternDoc);
-      console.log(
-        "📖 [CollectionManager] explanation 값:",
-        patternDoc.explanation
-      );
-      console.log("📚 [CollectionManager] example 값:", patternDoc.example);
-
-      await setDoc(patternRef, patternDoc);
-      console.log(`✅ [CollectionManager] 문법 패턴 생성 완료: ${patternId}`);
-      return patternId;
-    } catch (error) {
-      console.error("❌ [CollectionManager] 문법 패턴 생성 오류:", error);
-      console.error("❌ [CollectionManager] 실패한 데이터:", patternData);
-      throw error;
-    }
-  }
-
-  /**
-   * 태그 기반 개념 검색
-   */
-  async getConceptsByTags(tags, limit = 20) {
+  async getConceptsBySituationAndPurpose(situations, purposes, limit = 20) {
     try {
       const conceptsRef = collection(db, "concepts");
       const q = query(conceptsRef, limit(limit));
@@ -1679,74 +1555,24 @@ export class CollectionManager {
       const concepts = [];
       snapshot.forEach((doc) => {
         const data = doc.data();
-        const conceptTags = data.concept_info?.tags || [];
+        const conceptSituations = data.concept_info?.situation || [];
+        const conceptPurpose = data.concept_info?.purpose || "";
 
-        // 태그 매칭 확인
-        const hasMatchingTag = tags.some((tag) => conceptTags.includes(tag));
-        if (hasMatchingTag) {
+        // 상황 또는 목적 매칭 확인
+        const hasSituationMatch =
+          situations.length === 0 ||
+          situations.some((situation) => conceptSituations.includes(situation));
+        const hasPurposeMatch =
+          purposes.length === 0 || purposes.includes(conceptPurpose);
+
+        if (hasSituationMatch && hasPurposeMatch) {
           concepts.push({ id: doc.id, ...data });
         }
       });
 
       return concepts;
     } catch (error) {
-      console.error("태그 기반 개념 검색 오류:", error);
-      return [];
-    }
-  }
-
-  /**
-   * 태그 기반 예문 검색
-   */
-  async getExamplesByTags(tags, limit = 20) {
-    try {
-      const examplesRef = collection(db, "examples");
-      const q = query(examplesRef, limit(limit));
-      const snapshot = await getDocs(q);
-
-      const examples = [];
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        const exampleTags = data.tags || [];
-
-        // 태그 매칭 확인
-        const hasMatchingTag = tags.some((tag) => exampleTags.includes(tag));
-        if (hasMatchingTag) {
-          examples.push({ id: doc.id, ...data });
-        }
-      });
-
-      return examples;
-    } catch (error) {
-      console.error("태그 기반 예문 검색 오류:", error);
-      return [];
-    }
-  }
-
-  /**
-   * 태그 기반 문법 패턴 검색
-   */
-  async getGrammarPatternsByTags(tags, limit = 20) {
-    try {
-      const patternsRef = collection(db, "grammar");
-      const q = query(patternsRef, limit(limit));
-      const snapshot = await getDocs(q);
-
-      const patterns = [];
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        const patternTags = data.tags || [];
-
-        // 태그 매칭 확인
-        const hasMatchingTag = tags.some((tag) => patternTags.includes(tag));
-        if (hasMatchingTag) {
-          patterns.push({ id: doc.id, ...data });
-        }
-      });
-
-      return patterns;
-    } catch (error) {
-      console.error("태그 기반 문법 패턴 검색 오류:", error);
+      console.error("상황/목적 기반 개념 검색 오류:", error);
       return [];
     }
   }
@@ -1790,6 +1616,38 @@ export class CollectionManager {
     } catch (error) {
       console.error("문법 패턴 조회 오류:", error);
       return [];
+    }
+  }
+
+  /**
+   * 개별 개념 생성 (분리된 업로드용)
+   */
+  async createConcept(conceptData) {
+    try {
+      const conceptRef = doc(collection(db, "concepts"));
+      const conceptId = conceptRef.id;
+
+      const conceptDoc = {
+        // concept_id 제거: Firestore document ID와 중복
+        concept_info: conceptData.concept_info || {
+          domain: conceptData.domain || "general",
+          category: conceptData.category || "uncategorized",
+          difficulty: conceptData.difficulty || "beginner",
+          situation: conceptData.situation || ["casual"],
+          purpose: conceptData.purpose || "description",
+        },
+        expressions: conceptData.expressions || {},
+        representative_example: conceptData.representative_example || null,
+        // metadata 제거, created_at으로 통일
+        created_at: serverTimestamp(),
+      };
+
+      await setDoc(conceptRef, conceptDoc);
+      console.log(`✓ 개념 생성 완료: ${conceptId}`);
+      return conceptId;
+    } catch (error) {
+      console.error("개념 생성 오류:", error);
+      throw error;
     }
   }
 }

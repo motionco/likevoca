@@ -49,7 +49,8 @@ export const CONCEPTS_TEMPLATE = [
       difficulty: "beginner",
       unicode_emoji: "🍎",
       color_theme: "#FF6B6B",
-      tags: ["food", "healthy", "common"],
+      situation: ["casual", "shopping"],
+      purpose: "description",
     },
     expressions: {
       korean: {
@@ -111,7 +112,8 @@ export const CONCEPTS_TEMPLATE = [
       difficulty: "beginner",
       unicode_emoji: "☕",
       color_theme: "#8B4513",
-      tags: ["drink", "daily", "cafe"],
+      situation: ["casual", "social"],
+      purpose: "description",
     },
     expressions: {
       korean: {
@@ -439,7 +441,8 @@ export function conceptsTemplateToCSV() {
     "difficulty",
     "unicode_emoji",
     "color_theme",
-    "tags",
+    "situation",
+    "purpose",
     "korean_word",
     "korean_pronunciation",
     "korean_definition",
@@ -485,7 +488,10 @@ export function conceptsTemplateToCSV() {
     concept.concept_info.difficulty,
     concept.concept_info.unicode_emoji,
     concept.concept_info.color_theme,
-    concept.concept_info.tags.join(","),
+    Array.isArray(concept.concept_info.situation)
+      ? concept.concept_info.situation.join(",")
+      : concept.concept_info.situation,
+    concept.concept_info.purpose,
     concept.expressions.korean.word,
     concept.expressions.korean.pronunciation,
     concept.expressions.korean.definition,

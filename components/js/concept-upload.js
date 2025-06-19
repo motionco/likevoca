@@ -135,7 +135,8 @@ function downloadConceptsJSONTemplate() {
         difficulty: "beginner",
         unicode_emoji: "🍎",
         color_theme: "#FF6B6B",
-        tags: ["food", "healthy", "common"],
+        situation: ["casual", "shopping"],
+        purpose: "description",
       },
       expressions: {
         korean: {
@@ -168,9 +169,9 @@ function downloadConceptsJSONTemplate() {
 }
 
 function downloadConceptsCSVTemplate() {
-  const csvContent = `domain,category,difficulty,tags,korean_word,korean_pronunciation,korean_definition,english_word,english_pronunciation,english_definition,example_korean,example_english
-daily,fruit,beginner,"food,healthy,common",사과,sa-gwa,둥글고 빨간 과일,apple,/ˈæpəl/,a round fruit with red or green skin,나는 빨간 사과를 좋아한다.,I like red apples.
-daily,animal,beginner,"pet,common",고양이,go-yang-i,털이 부드러운 애완동물,cat,/kæt/,a small domesticated carnivorous mammal,고양이가 소파에서 잠을 잔다.,The cat sleeps on the sofa.`;
+  const csvContent = `domain,category,difficulty,situation,purpose,korean_word,korean_pronunciation,korean_definition,english_word,english_pronunciation,english_definition,example_korean,example_english
+daily,fruit,beginner,"casual,shopping",description,사과,sa-gwa,둥글고 빨간 과일,apple,/ˈæpəl/,a round fruit with red or green skin,나는 빨간 사과를 좋아한다.,I like red apples.
+daily,animal,beginner,"casual,home",description,고양이,go-yang-i,털이 부드러운 애완동물,cat,/kæt/,a small domesticated carnivorous mammal,고양이가 소파에서 잠을 잔다.,The cat sleeps on the sofa.`;
 
   downloadCSV(csvContent, "concepts_template.csv");
 }

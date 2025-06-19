@@ -1,8 +1,0 @@
-domain,category,difficulty,situation,purpose,korean_text,english_text,japanese_text,chinese_text
-daily,routine,basic,"formal,social",greeting,안녕하세요! 처음 뵙겠습니다.,Hello! Nice to meet you for the first time.,こんにちは！初めてお会いします。,你好！初次见面。
-food,fruit,basic,shopping,request,사과 주스 하나 주세요.,Please give me one apple juice.,りんごジュースを一つください。,请给我一杯苹果汁。
-school,education,intermediate,school,question,이 문제를 어떻게 풀어야 하나요?,How should I solve this problem?,この問題をどう解けばいいですか？,这个问题应该怎么解决？
-travel,transportation,intermediate,"travel,public",instruction,공항까지 가는 길을 알려주세요.,Please tell me the way to the airport.,空港までの道を教えてください。,请告诉我去机场的路。
-health,medical,intermediate,medical,request,병원 예약을 하고 싶습니다.,I would like to make a hospital appointment.,病院の予約を取りたいです。,我想预约医院。
-work,business,intermediate,"work,online",request,회의 자료를 이메일로 보내주세요.,Please send me the meeting materials by email.,会議資料をメールで送ってください。,请通过邮件发送会议资料。
-daily,family,basic,home,conversation,저녁 뭐 먹을까요?,What should we have for dinner?,夕食は何にしましょうか？,晚餐吃什么？ 
