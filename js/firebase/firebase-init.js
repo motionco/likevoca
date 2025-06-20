@@ -139,7 +139,7 @@ async function initializeFirebase() {
       }
     }
 
-    console.log("✅ Firebase가 성공적으로 초기화되었습니다.");
+    console.log("✅ Firebase가 성공적으로 초기화 되었습니다.");
   } catch (error) {
     console.error("❌ Firebase 초기화 중 치명적 오류:", error);
     console.error("📍 오류 스택:", error.stack);
