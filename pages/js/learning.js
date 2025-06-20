@@ -1278,7 +1278,7 @@ function globalClickHandler(e) {
   }
 }
 
-function showAreaSelection() {
+async function showAreaSelection() {
   console.log("🏠 통합 학습 대시보드 표시");
   hideAllSections();
 
@@ -1352,7 +1352,7 @@ function showAreaSelection() {
   }
 
   // 최근 학습 기록 표시
-  updateRecentActivity();
+  await updateRecentActivity();
   updateLearningStreak();
 }
 
@@ -1375,7 +1375,7 @@ function showLoadingState(card) {
 }
 
 // 최근 활동 업데이트
-function updateRecentActivity() {
+async function updateRecentActivity() {
   const recentActivityEl = document.getElementById("recent-activity");
   const lastArea = sessionStorage.getItem("lastLearningArea");
   const lastMode = sessionStorage.getItem("lastLearningMode");
@@ -1398,20 +1398,77 @@ function updateRecentActivity() {
     if (quickContinueBtn) {
       quickContinueBtn.classList.remove("hidden");
     }
+  } else {
+    // 최근 학습 기록이 없는 경우 메시지 표시
+    recentActivityEl.innerHTML = `
+      <div class="text-sm text-gray-500">
+        <div>최근 학습 기록이 없습니다</div>
+        <div class="text-xs">새로운 학습을 시작해보세요!</div>
+      </div>
+    `;
   }
 
   // 추천 학습도 함께 업데이트
-  updateRecommendedLearning();
+  await updateRecommendedLearning();
 }
 
 // 추천 학습 업데이트 (실제 학습 패턴 기반)
-function updateRecommendedLearning() {
+async function updateRecommendedLearning() {
   const recommendedEl = document.getElementById("recommended-mode");
 
-  // 학습 기록에서 패턴 분석
-  const learningHistory = JSON.parse(
+  // 학습 기록에서 패턴 분석 (로컬 + Firebase 데이터 결합)
+  let learningHistory = JSON.parse(
     localStorage.getItem("learningHistory") || "[]"
   );
+
+  // Firebase에서 추가 학습 기록 가져오기 (로그인된 경우)
+  try {
+    if (
+      window.firebaseInit &&
+      window.firebaseInit.auth &&
+      window.firebaseInit.auth.currentUser
+    ) {
+      const user = window.firebaseInit.auth.currentUser;
+      const userRef = window.firebaseInit.doc(
+        window.firebaseInit.db,
+        "users",
+        user.email
+      );
+      const userDoc = await window.firebaseInit.getDoc(userRef);
+
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        const firebaseHistory = userData.learning_history || [];
+
+        // Firebase 데이터와 로컬 데이터 병합 (중복 제거)
+        const combinedHistory = [...learningHistory];
+        firebaseHistory.forEach((record) => {
+          const exists = combinedHistory.some(
+            (local) =>
+              local.timestamp === record.timestamp &&
+              local.area === record.area &&
+              local.mode === record.mode
+          );
+          if (!exists) {
+            combinedHistory.push(record);
+          }
+        });
+
+        // 시간순 정렬
+        learningHistory = combinedHistory.sort(
+          (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+        );
+
+        console.log(
+          "📊 Firebase 학습 기록과 병합 완료:",
+          learningHistory.length
+        );
+      }
+    }
+  } catch (error) {
+    console.warn("📊 Firebase 학습 기록 로드 실패:", error);
+  }
+
   const lastWeekHistory = learningHistory.filter((record) => {
     const recordDate = new Date(record.timestamp);
     const weekAgo = new Date();
@@ -2018,7 +2075,7 @@ window.startLearningMode = async function startLearningMode(area, mode) {
       date: new Date().toDateString(),
     };
 
-    // 최근 학습 기록 업데이트
+    // 최근 학습 기록 업데이트 (localStorage)
     let recentLearning = JSON.parse(
       localStorage.getItem("recentLearning") || "[]"
     );
@@ -2026,10 +2083,29 @@ window.startLearningMode = async function startLearningMode(area, mode) {
     recentLearning = recentLearning.slice(0, 5); // 최근 5개만 유지
     localStorage.setItem("recentLearning", JSON.stringify(recentLearning));
 
+    // sessionStorage에도 최근 학습 정보 저장 (최근 학습 활동 표시용)
+    sessionStorage.setItem("lastLearningArea", area);
+    sessionStorage.setItem("lastLearningMode", mode);
+    sessionStorage.setItem("lastLearningTime", new Date().toISOString());
+
+    // 학습 히스토리 업데이트 (추천 시스템용)
+    let learningHistory = JSON.parse(
+      localStorage.getItem("learningHistory") || "[]"
+    );
+    learningHistory.unshift(learningRecord);
+    learningHistory = learningHistory.slice(0, 100); // 최근 100개만 유지
+    localStorage.setItem("learningHistory", JSON.stringify(learningHistory));
+
+    // Firebase 사용자별 학습 기록 저장 (로그인된 경우)
+    await saveLearningRecordToFirebase(learningRecord);
+
     console.log("📊 학습 기록 저장:", learningRecord);
   } catch (error) {
     console.warn("학습 기록 저장 실패:", error);
   }
+
+  // 학습 스트릭 업데이트
+  updateLearningStreakOnStart();
 
   // 데이터 로드
   await loadLearningData(area);
@@ -4272,3 +4348,141 @@ function flipReadingCard() {
     console.error("❌ reading-flash-card 요소를 찾을 수 없습니다");
   }
 }
+
+// Firebase 사용자별 학습 기록 저장
+async function saveLearningRecordToFirebase(learningRecord) {
+  try {
+    // Firebase 인증 확인
+    if (!window.firebaseInit || !window.firebaseInit.auth) {
+      console.log("🔐 Firebase 인증이 초기화되지 않음");
+      return;
+    }
+
+    const user = window.firebaseInit.auth.currentUser;
+    if (!user) {
+      console.log("🔐 로그인되지 않은 사용자");
+      return;
+    }
+
+    // 사용자별 학습 기록 저장
+    const userRef = window.firebaseInit.doc(
+      window.firebaseInit.db,
+      "users",
+      user.email
+    );
+
+    // 기존 사용자 데이터 가져오기
+    const userDoc = await window.firebaseInit.getDoc(userRef);
+    const userData = userDoc.exists() ? userDoc.data() : {};
+
+    // 학습 기록 업데이트
+    const learningHistory = userData.learning_history || [];
+    learningHistory.unshift(learningRecord);
+    const trimmedHistory = learningHistory.slice(0, 100); // 최근 100개만 유지
+
+    // 학습 스트릭 계산
+    const today = new Date().toDateString();
+    const lastLearningDate = userData.last_learning_date;
+    let currentStreak = userData.learning_streak || 0;
+
+    if (lastLearningDate !== today) {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      if (lastLearningDate === yesterday.toDateString()) {
+        currentStreak += 1; // 연속 학습
+      } else if (!lastLearningDate) {
+        currentStreak = 1; // 첫 학습
+      } else {
+        currentStreak = 1; // 연속성 끊김
+      }
+    }
+
+    // Firebase에 업데이트
+    await window.firebaseInit.setDoc(
+      userRef,
+      {
+        learning_history: trimmedHistory,
+        last_learning_date: today,
+        learning_streak: currentStreak,
+        last_updated: new Date().toISOString(),
+      },
+      { merge: true }
+    );
+
+    // 로컬 스트릭도 Firebase와 동기화
+    localStorage.setItem("learningStreak", currentStreak.toString());
+    localStorage.setItem("lastLearningDate", today);
+
+    console.log("☁️ Firebase 학습 기록 저장 완료:", {
+      streak: currentStreak,
+      historyCount: trimmedHistory.length,
+    });
+  } catch (error) {
+    console.warn("☁️ Firebase 학습 기록 저장 실패:", error);
+  }
+}
+
+// Firebase에서 사용자 학습 데이터 동기화
+async function syncUserLearningData() {
+  try {
+    if (!window.firebaseInit || !window.firebaseInit.auth) {
+      return;
+    }
+
+    const user = window.firebaseInit.auth.currentUser;
+    if (!user) {
+      return;
+    }
+
+    const userRef = window.firebaseInit.doc(
+      window.firebaseInit.db,
+      "users",
+      user.email
+    );
+    const userDoc = await window.firebaseInit.getDoc(userRef);
+
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+
+      // 학습 스트릭 동기화
+      if (userData.learning_streak !== undefined) {
+        localStorage.setItem(
+          "learningStreak",
+          userData.learning_streak.toString()
+        );
+      }
+      if (userData.last_learning_date) {
+        localStorage.setItem("lastLearningDate", userData.last_learning_date);
+      }
+
+      // 학습 히스토리 동기화 (로컬이 비어있는 경우에만)
+      const localHistory = JSON.parse(
+        localStorage.getItem("learningHistory") || "[]"
+      );
+      if (localHistory.length === 0 && userData.learning_history) {
+        localStorage.setItem(
+          "learningHistory",
+          JSON.stringify(userData.learning_history)
+        );
+      }
+
+      console.log("🔄 사용자 학습 데이터 동기화 완료");
+    }
+  } catch (error) {
+    console.warn("🔄 사용자 학습 데이터 동기화 실패:", error);
+  }
+}
+
+// 페이지 로드 시 사용자 데이터 동기화
+window.addEventListener("load", async () => {
+  // Firebase 초기화 대기
+  await waitForFirebaseInit();
+
+  // 사용자 데이터 동기화
+  await syncUserLearningData();
+
+  // UI 업데이트
+  updateLearningStreak();
+  await updateRecentActivity();
+});

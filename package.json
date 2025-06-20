@@ -2,9 +2,12 @@
   "name": "actionlingo",
   "version": "1.0.0",
   "description": "Likevoca application",
+  "main": "index.js",
+  "type": "module",
   "scripts": {
     "build:css": "tailwindcss -i ./css/tailwind.css -o ./css/styles.css",
-    "watch:css": "tailwindcss -i ./css/tailwind.css -o ./css/styles.css --watch"
+    "watch:css": "tailwindcss -i ./css/tailwind.css -o ./css/styles.css --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "autoprefixer": "^10.4.17",

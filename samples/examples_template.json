@@ -1,0 +1,50 @@
+[
+  {
+    "domain": "daily",
+    "category": "routine",
+    "difficulty": "basic",
+    "situation": [
+      "polite",
+      "social"
+    ],
+    "purpose": "greeting",
+    "translations": {
+      "korean": "안녕하세요! 처음 뵙겠습니다.",
+      "english": "Hello! Nice to meet you for the first time.",
+      "japanese": "こんにちは！初めてお会いします。",
+      "chinese": "你好！初次见面。"
+    }
+  },
+  {
+    "domain": "food",
+    "category": "fruit",
+    "difficulty": "basic",
+    "situation": [
+      "shopping",
+      "public",
+      "polite"
+    ],
+    "purpose": "request",
+    "translations": {
+      "korean": "사과 주스 하나 주세요.",
+      "english": "Please give me one apple juice.",
+      "japanese": "りんごジュースを一つください。",
+      "chinese": "请给我一杯苹果汁。"
+    }
+  },
+  {
+    "domain": "school",
+    "category": "education",
+    "difficulty": "intermediate",
+    "situation": [
+      "school"
+    ],
+    "purpose": "question",
+    "translations": {
+      "korean": "이 문제를 어떻게 풀어야 하나요?",
+      "english": "How should I solve this problem?",
+      "japanese": "この問題をどう解けばいいですか？",
+      "chinese": "这个问题应该怎么解决？"
+    }
+  }
+]

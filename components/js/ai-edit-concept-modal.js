@@ -9,6 +9,7 @@ import {
   supportedLanguages,
 } from "../../js/firebase/firebase-init.js";
 import { getActiveLanguage } from "../../utils/language-utils.js";
+import { domainCategoryMapping } from "./domain-category-emoji.js";
 
 // 전역 변수
 let editConceptId = null;
@@ -38,11 +39,105 @@ export async function initialize() {
   // 언어탭 이벤트 설정
   setupLanguageTabs();
 
+  // 도메인/카테고리 연동 설정
+  setupDomainCategorySystem();
+
   // 버튼 이벤트 설정
   setupEventListeners();
 
   // AI 개념 데이터 로드
   await fetchAIConceptForEdit(editConceptId);
+}
+
+// 도메인/카테고리 연동 시스템 설정 (단어장 개념 수정 모달 방식 참고)
+function setupDomainCategorySystem() {
+  const domainSelect = document.getElementById("edit-concept-domain");
+  const categoryInput = document.getElementById("edit-concept-category");
+
+  if (domainSelect && categoryInput) {
+    // 카테고리 입력 필드를 선택 필드로 변경
+    const categorySelect = document.createElement("select");
+    categorySelect.id = "edit-concept-category";
+    categorySelect.className = "w-full p-2 border rounded";
+    categoryInput.parentNode.replaceChild(categorySelect, categoryInput);
+
+    // 클론 방식으로 기존 이벤트 리스너 완전 제거 후 새로 등록
+    const newDomainSelect = domainSelect.cloneNode(true);
+    domainSelect.parentNode.replaceChild(newDomainSelect, domainSelect);
+
+    const newCategorySelect = categorySelect.cloneNode(true);
+    categorySelect.parentNode.replaceChild(newCategorySelect, categorySelect);
+
+    // 새로운 이벤트 리스너 등록
+    newDomainSelect.addEventListener("change", handleAIEditDomainChange);
+    newCategorySelect.addEventListener("change", handleAIEditCategoryChange);
+
+    // 초기 카테고리 옵션 설정
+    updateCategoryOptions(newDomainSelect.value, newCategorySelect);
+  }
+}
+
+// AI 편집 모달 도메인 변경 핸들러
+function handleAIEditDomainChange(event) {
+  const categorySelect = document.getElementById("edit-concept-category");
+
+  console.log("🔄 AI 편집 모달 도메인 변경:", event.target.value);
+
+  // 카테고리 옵션 업데이트
+  if (typeof updateEditCategoryOptions === "function") {
+    updateEditCategoryOptions();
+  } else {
+    // 직접 업데이트
+    updateCategoryOptions(event.target.value, categorySelect);
+  }
+
+  // 카테고리 초기화 (첫 번째 옵션 선택) - 더 긴 지연 시간
+  setTimeout(() => {
+    if (categorySelect && categorySelect.options.length > 1) {
+      categorySelect.selectedIndex = 1; // 첫 번째 실제 옵션 선택
+      console.log("🎯 AI 편집 모달 카테고리 자동 선택:", categorySelect.value);
+
+      // 카테고리 변경 이벤트 트리거
+      categorySelect.dispatchEvent(new Event("change"));
+    }
+  }, 150);
+}
+
+// AI 편집 모달 카테고리 변경 핸들러
+function handleAIEditCategoryChange(event) {
+  // 이모지 옵션 업데이트
+  if (typeof updateEditEmojiOptions === "function") {
+    updateEditEmojiOptions();
+  }
+}
+
+// 카테고리 옵션 업데이트 (지연 로딩 지원)
+function updateCategoryOptions(domain, categorySelect) {
+  const categories = domainCategoryMapping[domain] || [];
+  if (!categorySelect) {
+    console.error("❌ categorySelect 요소가 없습니다.");
+    return;
+  }
+
+  categorySelect.innerHTML = "";
+
+  // 플레이스홀더 옵션 추가
+  const placeholderOption = document.createElement("option");
+  placeholderOption.value = "";
+  placeholderOption.textContent = "카테고리 선택";
+  placeholderOption.style.display = "none";
+  categorySelect.appendChild(placeholderOption);
+
+  categories.forEach((category) => {
+    const option = document.createElement("option");
+    option.value = category;
+    option.textContent = category;
+    categorySelect.appendChild(option);
+  });
+
+  console.log(
+    `✅ 카테고리 옵션 업데이트 완료: ${domain} -> ${categories.length}개`
+  );
 }
 
 // 언어탭 설정
@@ -195,13 +290,59 @@ function fillFormWithAIConceptData(conceptData) {
   const categoryField = document.getElementById("edit-concept-category");
   const emojiField = document.getElementById("edit-concept-emoji");
 
+  // 도메인 설정
+  const domainValue =
+    conceptData.concept_info?.domain || conceptData.domain || "daily";
   if (domainField) {
-    domainField.value =
-      conceptData.concept_info?.domain || conceptData.domain || "daily";
+    domainField.value = domainValue;
   }
+
+  // 도메인에 따른 카테고리 옵션 업데이트 후 카테고리 값 설정 (단어장 방식 참고)
   if (categoryField) {
-    categoryField.value =
-      conceptData.concept_info?.category || conceptData.category || "common";
+    const categoryValue =
+      conceptData.concept_info?.category || conceptData.category || "other";
+
+    console.log("🔍 AI 편집 모달 설정 값:", {
+      domainValue,
+      categoryValue,
+      conceptData: conceptData.concept_info || conceptData,
+    });
+
+    // 도메인 변경 이벤트 트리거 (카테고리 옵션 자동 생성)
+    if (domainField) {
+      domainField.dispatchEvent(new Event("change"));
+    }
+
+    // 카테고리 설정 (도메인 변경 후 충분한 지연)
+    setTimeout(() => {
+      categoryField.value = categoryValue;
+      console.log("🤖 카테고리 설정:", categoryValue);
+
+      // 카테고리 변경 이벤트 트리거 (이모지 옵션 자동 생성)
+      categoryField.dispatchEvent(new Event("change"));
+
+      // 이모지 설정 (카테고리 변경 후 충분한 지연)
+      setTimeout(() => {
+        if (emojiField) {
+          const dbEmoji =
+            conceptData.concept_info?.unicode_emoji ||
+            conceptData.concept_info?.emoji ||
+            conceptData.unicode_emoji ||
+            "🤖";
+          emojiField.value = dbEmoji;
+          console.log("🎨 AI 편집 모달 이모지 설정:", dbEmoji);
+
+          // 설정 확인 및 재시도
+          if (emojiField.value !== dbEmoji) {
+            console.warn("⚠️ AI 편집 모달 이모지 설정 실패, 재시도 중...");
+            setTimeout(() => {
+              emojiField.value = dbEmoji;
+              console.log("🔄 AI 편집 모달 이모지 재설정:", dbEmoji);
+            }, 100);
+          }
+        }
+      }, 200);
+    }, 200);
   }
   if (emojiField) {
     // 실제 저장된 이모지를 사용, 기본값으로 🤖 사용

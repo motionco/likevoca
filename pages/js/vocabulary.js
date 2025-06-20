@@ -367,6 +367,48 @@ function getTranslatedText(key) {
   return pageTranslations[currentLang][key] || pageTranslations.en[key] || key;
 }
 
+// 도메인 번역 함수
+function translateDomainKey(domainKey, lang = null) {
+  if (typeof window.translateDomainKey === "function") {
+    return window.translateDomainKey(domainKey, lang);
+  }
+
+  // Fallback
+  const currentLang =
+    lang || localStorage.getItem("preferredLanguage") || userLanguage || "ko";
+
+  if (
+    window.translations &&
+    window.translations[currentLang] &&
+    window.translations[currentLang][domainKey]
+  ) {
+    return window.translations[currentLang][domainKey];
+  }
+
+  return domainKey;
+}
+
+// 카테고리 번역 함수
+function translateCategoryKey(categoryKey, lang = null) {
+  if (typeof window.translateCategoryKey === "function") {
+    return window.translateCategoryKey(categoryKey, lang);
+  }
+
+  // Fallback
+  const currentLang =
+    lang || localStorage.getItem("preferredLanguage") || userLanguage || "ko";
+
+  if (
+    window.translations &&
+    window.translations[currentLang] &&
+    window.translations[currentLang][categoryKey]
+  ) {
+    return window.translations[currentLang][categoryKey];
+  }
+
+  return categoryKey;
+}
+
 // 문법 설명을 환경 언어로 번역하는 함수
 function translateGrammarNote(grammarNote) {
   if (!grammarNote || !userLanguage) return grammarNote;
@@ -569,7 +611,7 @@ function createConceptCard(concept) {
             <i class="fas fa-bookmark text-gray-400"></i>
           </button>
         <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-          ${getTranslatedText(conceptInfo.domain)}/${getTranslatedText(
+          ${translateDomainKey(conceptInfo.domain)}/${translateCategoryKey(
     conceptInfo.category
   )}
         </span>
@@ -674,14 +716,14 @@ function handleSearch(elements) {
   const searchValue = elements.searchInput.value.toLowerCase();
   const sourceLanguage = elements.sourceLanguage.value;
   const targetLanguage = elements.targetLanguage.value;
-  const categoryFilter = elements.categoryFilter.value;
+  const domainFilter = elements.domainFilter.value;
   const sortOption = elements.sortOption.value;
 
   console.log("검색 및 필터링 시작:", {
     searchValue,
     sourceLanguage,
     targetLanguage,
-    categoryFilter,
+    domainFilter,
     sortOption,
     totalConcepts: allConcepts.length,
   });
@@ -712,8 +754,8 @@ function handleSearch(elements) {
       category: concept.category || "일반",
     };
 
-    // 카테고리 필터
-    if (categoryFilter !== "all" && conceptInfo.category !== categoryFilter) {
+    // 도메인 필터
+    if (domainFilter !== "all" && conceptInfo.domain !== domainFilter) {
       return false;
     }
 
@@ -1029,7 +1071,7 @@ async function fetchAndDisplayConcepts() {
       searchInput: document.getElementById("search-input"),
       sourceLanguage: document.getElementById("source-language"),
       targetLanguage: document.getElementById("target-language"),
-      categoryFilter: document.getElementById("category-filter"),
+      domainFilter: document.getElementById("domain-filter"),
       sortOption: document.getElementById("sort-option"),
     };
 
@@ -1173,9 +1215,9 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
   if (domainCategoryElement) {
     const domain = conceptInfo.domain || conceptData.domain || "기타";
     const category = conceptInfo.category || conceptData.category || "일반";
-    domainCategoryElement.textContent = `${getTranslatedText(
+    domainCategoryElement.textContent = `${translateDomainKey(
       domain
-    )}/${getTranslatedText(category)}`;
+    )}/${translateCategoryKey(category)}`;
   }
 
   // 이모지와 색상 (개념 카드와 동일한 우선순위 적용)
@@ -2183,7 +2225,7 @@ function setupEventListeners() {
     searchInput: document.getElementById("search-input"),
     sourceLanguage: document.getElementById("source-language"),
     targetLanguage: document.getElementById("target-language"),
-    categoryFilter: document.getElementById("category-filter"),
+    domainFilter: document.getElementById("domain-filter"),
     sortOption: document.getElementById("sort-option"),
     swapButton: document.getElementById("swap-languages"),
     loadMoreButton: document.getElementById("load-more"),
@@ -2198,7 +2240,7 @@ function setupEventListeners() {
     searchInput: !!elements.searchInput,
     sourceLanguage: !!elements.sourceLanguage,
     targetLanguage: !!elements.targetLanguage,
-    categoryFilter: !!elements.categoryFilter,
+    domainFilter: !!elements.domainFilter,
     sortOption: !!elements.sortOption,
     swapButton: !!elements.swapButton,
     loadMoreButton: !!elements.loadMoreButton,
@@ -2223,9 +2265,9 @@ function setupEventListeners() {
     }
   });
 
-  // 카테고리 필터 이벤트
-  if (elements.categoryFilter) {
-    elements.categoryFilter.addEventListener("change", () => {
+  // 도메인 필터 이벤트
+  if (elements.domainFilter) {
+    elements.domainFilter.addEventListener("change", () => {
       handleSearch(elements);
     });
   }
@@ -2303,6 +2345,13 @@ function setupEventListeners() {
     console.log("📦 대량 개념 저장 이벤트 수신");
     fetchAndDisplayConcepts();
     updateUsageUI();
+  });
+
+  // 언어 변경 이벤트 리스너 추가 (새로고침 없이 도메인/카테고리 업데이트)
+  window.addEventListener("languageChanged", () => {
+    console.log("🌐 언어 변경 이벤트 수신 - 개념 카드 업데이트");
+    // 현재 표시된 개념들을 다시 렌더링
+    displayConceptList();
   });
 
   console.log("✅ setupEventListeners 함수 완료");

@@ -453,16 +453,21 @@ function applyFiltersAndSort() {
 
   // 정렬
   filteredConcepts.sort((a, b) => {
+    const toDate = (timestamp) =>
+      timestamp && typeof timestamp.toDate === "function"
+        ? timestamp.toDate()
+        : new Date(0);
+
     switch (sortOption) {
       case "latest":
         return (
-          new Date(b.createdAt || b.created_at || 0) -
-          new Date(a.createdAt || a.created_at || 0)
+          toDate(b.createdAt || b.created_at) -
+          toDate(a.createdAt || a.created_at)
         );
       case "oldest":
         return (
-          new Date(a.createdAt || a.created_at || 0) -
-          new Date(b.createdAt || b.created_at || 0)
+          toDate(a.createdAt || a.created_at) -
+          toDate(b.createdAt || b.created_at)
         );
       case "a-z":
         const aWord = a.expressions?.[targetLanguage]?.word || "";

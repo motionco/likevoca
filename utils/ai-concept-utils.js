@@ -1,6 +1,7 @@
 import {
   conceptUtils,
   supportedLanguages,
+  serverTimestamp,
 } from "../js/firebase/firebase-init.js";
 
 // 로컬 환경 감지
@@ -23,12 +24,29 @@ const PROMPTS = {
 언어: ${languages.join(", ")}
 
 위 조건에 맞는 학습하기 좋은 개념 하나를 추천해주세요. 
+다음 도메인-카테고리 매핑을 참고하여 적절한 도메인과 카테고리를 선택해주세요:
+
+**도메인 (13개)**:
+- daily: 일상생활 (household, family, routine, clothing, furniture, shopping, communication, personal_care, leisure, relationships, emotions, time, weather_talk)
+- food: 음식/요리 (fruit, vegetable, meat, drink, snack, grain, seafood, dairy, cooking, dining, restaurant, kitchen_utensils, spices, dessert)
+- travel: 여행 (transportation, accommodation, tourist_attraction, luggage, direction, booking, currency, emergency, documents, sightseeing, local_food, souvenir)
+- business: 비즈니스/업무 (meeting, finance, marketing, office, project, negotiation, presentation, teamwork, leadership, networking, sales, contract, startup)
+- academic: 학술/교육 (science, literature, history, mathematics, research, philosophy, psychology, sociology, linguistics, university, examination, thesis, library)
+- nature: 자연/환경 (animal, plant, weather, geography, environment, ecosystem, conservation, climate, natural_disaster, landscape, marine_life, forest, mountain)
+- technology: 기술/IT (computer, software, internet, mobile, ai, programming, cybersecurity, database, robotics, blockchain, cloud, social_media, gaming, innovation)
+- health: 건강/의료 (exercise, medicine, nutrition, mental_health, hospital, fitness, wellness, therapy, prevention, symptoms, treatment, pharmacy, rehabilitation, medical_equipment)
+- sports: 스포츠/운동 (football, basketball, swimming, running, equipment, olympics, tennis, baseball, golf, martial_arts, team_sports, individual_sports, coaching, competition)
+- entertainment: 엔터테인먼트 (movie, music, game, book, art, theater, concert, festival, celebrity, tv_show, comedy, drama, animation, photography)
+- culture: 문화/전통 (tradition, customs, language, religion, heritage, ceremony, ritual, folklore, mythology, arts_crafts, etiquette, national_identity)
+- education: 교육/학습 (teaching, learning, classroom, curriculum, assessment, pedagogy, skill_development, online_learning, training, certification, educational_technology, student_life, graduation)
+- other: 기타 (hobbies, finance_personal, legal, government, politics, media, community, volunteering, charity, social_issues, philosophy_life, spirituality, creativity, innovation)
+
 다음 JSON 형식으로 응답해주세요:
 
 {
   "concept_info": {
     "domain": "${topic || "daily"}",
-    "category": "${category || "daily"}",
+    "category": "${category || "other"}",
     "difficulty": "beginner",
     "tags": ["태그1", "태그2", "태그3"],
     "unicode_emoji": "적절한 이모지 1개",
@@ -73,12 +91,29 @@ Category: ${category || "daily"}
 Languages: ${languages.join(", ")}
 
 Please recommend one good concept to learn based on the above conditions.
+Please refer to the following domain-category mapping to select appropriate domain and category:
+
+**Domains (13)**:
+- daily: Daily life (household, family, routine, clothing, furniture, shopping, communication, personal_care, leisure, relationships, emotions, time, weather_talk)
+- food: Food/Cooking (fruit, vegetable, meat, drink, snack, grain, seafood, dairy, cooking, dining, restaurant, kitchen_utensils, spices, dessert)
+- travel: Travel (transportation, accommodation, tourist_attraction, luggage, direction, booking, currency, emergency, documents, sightseeing, local_food, souvenir)
+- business: Business/Work (meeting, finance, marketing, office, project, negotiation, presentation, teamwork, leadership, networking, sales, contract, startup)
+- academic: Academic/Education (science, literature, history, mathematics, research, philosophy, psychology, sociology, linguistics, university, examination, thesis, library)
+- nature: Nature/Environment (animal, plant, weather, geography, environment, ecosystem, conservation, climate, natural_disaster, landscape, marine_life, forest, mountain)
+- technology: Technology/IT (computer, software, internet, mobile, ai, programming, cybersecurity, database, robotics, blockchain, cloud, social_media, gaming, innovation)
+- health: Health/Medical (exercise, medicine, nutrition, mental_health, hospital, fitness, wellness, therapy, prevention, symptoms, treatment, pharmacy, rehabilitation, medical_equipment)
+- sports: Sports/Exercise (football, basketball, swimming, running, equipment, olympics, tennis, baseball, golf, martial_arts, team_sports, individual_sports, coaching, competition)
+- entertainment: Entertainment (movie, music, game, book, art, theater, concert, festival, celebrity, tv_show, comedy, drama, animation, photography)
+- culture: Culture/Tradition (tradition, customs, language, religion, heritage, ceremony, ritual, folklore, mythology, arts_crafts, etiquette, national_identity)
+- education: Education/Learning (teaching, learning, classroom, curriculum, assessment, pedagogy, skill_development, online_learning, training, certification, educational_technology, student_life, graduation)
+- other: Other (hobbies, finance_personal, legal, government, politics, media, community, volunteering, charity, social_issues, philosophy_life, spirituality, creativity, innovation)
+
 Respond in the following JSON format:
 
 {
   "concept_info": {
     "domain": "${topic || "daily"}",
-    "category": "${category || "daily"}",
+    "category": "${category || "other"}",
     "difficulty": "beginner",
     "tags": ["tag1", "tag2", "tag3"],
     "unicode_emoji": "appropriate emoji",
@@ -188,21 +223,6 @@ const TEST_CONCEPTS = [
       chinese: "请给我一杯苹果汁。",
       japanese: "りんごジュースを一つください。",
     },
-    // 추가 예문들 (다국어 단어장과 동일한 구조)
-    examples: [
-      {
-        korean: "이 사과는 정말 달아요.",
-        english: "This apple is really sweet.",
-        japanese: "このりんごはとても甘いです。",
-        chinese: "这个苹果真甜。",
-      },
-      {
-        korean: "사과를 깎아서 드세요.",
-        english: "Please peel and eat the apple.",
-        japanese: "りんごを剥いて食べてください。",
-        chinese: "请削苹果吃。",
-      },
-    ],
     // 최소 호환성 필드들
     domain: "food",
     category: "fruit",
@@ -270,26 +290,11 @@ const TEST_CONCEPTS = [
     },
     // 대표 예문 (다국어 단어장과 동일한 구조)
     representative_example: {
-      korean: "우리 집에는 귀여운 고양이가 있습니다.",
-      english: "We have a cute cat at home.",
-      chinese: "我们家有一只可爱的猫。",
-      japanese: "私たちの家にはかわいい猫がいます。",
+      korean: "그 고양이는 매우 귀엽습니다.",
+      english: "That cat is very cute.",
+      chinese: "那只猫很可爱。",
+      japanese: "その猫はとても可愛いです。",
     },
-    // 추가 예문들 (다국어 단어장과 동일한 구조)
-    examples: [
-      {
-        korean: "고양이가 야옹야옹 울고 있어요.",
-        english: "The cat is meowing.",
-        chinese: "猫在叫。",
-        japanese: "猫がニャーニャー鳴いています。",
-      },
-      {
-        korean: "고양이에게 먹이를 주세요.",
-        english: "Please feed the cat.",
-        chinese: "请喂猫。",
-        japanese: "猫にえさをあげてください。",
-      },
-    ],
     // 최소 호환성 필드들
     domain: "animal",
     category: "pet",
@@ -464,6 +469,9 @@ export async function handleAIConceptRecommendation(currentUser, db) {
 
       // 추가 예문들 (다국어 단어장과 완전히 동일한 구조)
       examples: conceptData.examples || [],
+
+      // 생성 시간
+      createdAt: serverTimestamp(),
     };
 
     console.log("🔧 변환된 개념 데이터:", transformedConceptData);

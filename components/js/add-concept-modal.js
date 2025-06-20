@@ -17,6 +17,10 @@ import {
 } from "../../js/firebase/firebase-init.js";
 import { getActiveLanguage } from "../../utils/language-utils.js";
 import {
+  domainCategoryMapping,
+  categoryEmojiMapping,
+} from "./domain-category-emoji.js";
+import {
   validateForm,
   collectFormData,
   resetForm,

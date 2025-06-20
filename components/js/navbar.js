@@ -143,9 +143,12 @@ function initializeNavbar() {
     }
 
     // UI 언어만 변경하고 학습 언어 선택은 그대로 유지
-    if (typeof displayConceptList === "function") {
-      displayConceptList(); // 언어 변경 시 카드 재표시 (UI 텍스트만 변경)
-    }
+    // 다른 페이지에서 언어 변경을 감지할 수 있도록 이벤트 발생
+    window.dispatchEvent(
+      new CustomEvent("languageChanged", {
+        detail: { language: userLanguage },
+      })
+    );
   });
 }
 

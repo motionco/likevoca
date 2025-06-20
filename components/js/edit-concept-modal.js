@@ -17,6 +17,10 @@ import {
 } from "../../js/firebase/firebase-init.js";
 import { getActiveLanguage } from "../../utils/language-utils.js";
 import {
+  domainCategoryMapping,
+  categoryEmojiMapping,
+} from "./domain-category-emoji.js";
+import {
   validateEditForm,
   collectEditFormData,
   resetEditForm,
@@ -162,41 +166,19 @@ async function fetchConceptForEdit(conceptId) {
 function fillFormWithConceptData(conceptData) {
   console.log("📝 폼 데이터 채우기 시작");
 
-  // 개념 정보 채우기
-  const domainField = document.getElementById("edit-concept-domain");
-  const categoryField = document.getElementById("edit-concept-category");
-  const emojiField = document.getElementById("edit-concept-emoji");
+  // 개념 정보 채우기 (직접 설정하지 않고 setEditModalCategoryAndEmoji에서 처리)
+  const emojiValue =
+    conceptData.concept_info?.unicode_emoji ||
+    conceptData.concept_info?.emoji ||
+    conceptData.unicode_emoji ||
+    "📝";
 
-  if (domainField) {
-    domainField.value =
-      conceptData.concept_info?.domain ||
-      conceptData.domain ||
-      conceptData.concept_info?.category ||
-      "general";
-  }
-  if (categoryField) {
-    categoryField.value =
-      conceptData.concept_info?.category || conceptData.category || "common";
-  }
-  if (emojiField) {
-    const emojiValue =
-      conceptData.concept_info?.unicode_emoji ||
-      conceptData.concept_info?.emoji ||
-      conceptData.unicode_emoji ||
-      "📝";
-
-    // 전역 저장소에 이모지 값 저장
-    window.editConceptEmojiValue = emojiValue;
-    console.log(
-      "💾 편집 모달 초기화 시 전역 저장소에 이모지 값 저장:",
-      emojiValue
-    );
-
-    // 이모지 직접 설정 시도
-    if (emojiField && emojiValue) {
-      emojiField.value = emojiValue;
-    }
-  }
+  // 전역 저장소에 이모지 값 저장
+  window.editConceptEmojiValue = emojiValue;
+  console.log(
+    "💾 편집 모달 초기화 시 전역 저장소에 이모지 값 저장:",
+    emojiValue
+  );
 
   // 언어별 표현 채우기
   if (conceptData.expressions) {
@@ -347,23 +329,56 @@ function setEditModalCategoryAndEmoji(conceptData) {
     window.editConceptEmojiValue = dbEmoji;
   }
 
+  // 도메인과 카테고리 값 확인
+  const domainValue =
+    conceptData.concept_info?.domain || conceptData.domain || "other";
+  const categoryValue =
+    conceptData.concept_info?.category || conceptData.category || "other";
+
+  console.log("🔍 편집 모달 설정 값:", {
+    domainValue,
+    categoryValue,
+    dbEmoji,
+    conceptData: conceptData.concept_info || conceptData,
+  });
+
   // 도메인 설정
   const domainField = document.getElementById("edit-concept-domain");
-  if (domainField && conceptData.domain) {
-    domainField.value = conceptData.domain;
+  if (domainField) {
+    domainField.value = domainValue;
 
     // 도메인 변경 이벤트 트리거 (카테고리 옵션 자동 생성)
     domainField.dispatchEvent(new Event("change"));
 
-    // 카테고리 설정 (도메인 변경 후 약간의 지연)
+    // 카테고리 설정 (도메인 변경 후 충분한 지연)
     setTimeout(() => {
       const categoryField = document.getElementById("edit-concept-category");
-      if (categoryField && conceptData.category) {
-        categoryField.value = conceptData.category;
+      if (categoryField) {
+        categoryField.value = categoryValue;
+        console.log("📝 카테고리 필드 설정:", categoryValue);
+
         // 카테고리 변경 이벤트 트리거 (이모지 옵션 자동 생성)
         categoryField.dispatchEvent(new Event("change"));
+
+        // 이모지 설정 (카테고리 변경 후 충분한 지연)
+        setTimeout(() => {
+          const emojiField = document.getElementById("edit-concept-emoji");
+          if (emojiField && dbEmoji) {
+            emojiField.value = dbEmoji;
+            console.log("🎨 이모지 필드 설정:", dbEmoji);
+
+            // 설정 확인 및 재시도
+            if (emojiField.value !== dbEmoji) {
+              console.warn("⚠️ 이모지 설정 실패, 재시도 중...");
+              setTimeout(() => {
+                emojiField.value = dbEmoji;
+                console.log("🔄 이모지 재설정:", dbEmoji);
+              }, 100);
+            }
+          }
+        }, 200);
       }
-    }, 100);
+    }, 200);
   }
 }
 

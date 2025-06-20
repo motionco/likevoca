@@ -747,6 +747,11 @@ const translations = {
     flashcard_recommended: "플래시카드",
     recommended: "추천",
     recommendation_reason: "최근 학습 패턴을 기반으로 추천됩니다",
+    // 뒤집기 버튼 번역
+    flip: "뒤집기",
+    language_filter: "언어 필터",
+    all_words: "모든 단어",
+    my_words: "내가 추가한 단어",
   },
   en: {
     home: "Home",
@@ -1256,7 +1261,8 @@ const translations = {
     grammar_pattern_upload: "Grammar Pattern Upload",
     example_upload: "Example Upload",
     upload_csv_json_concept: "Upload CSV or JSON files to add concepts.",
-    upload_csv_json_grammar: "Upload CSV or JSON files to add grammar patterns.",
+    upload_csv_json_grammar:
+      "Upload CSV or JSON files to add grammar patterns.",
     upload_csv_json_example: "Upload CSV or JSON files to add examples.",
     upload: "Upload",
     download_template: "Download Template",
@@ -1268,6 +1274,9 @@ const translations = {
 
     // 뒤집기 버튼 번역
     flip: "Flip",
+    language_filter: "Language Filter",
+    all_words: "All Words",
+    my_words: "My Words",
   },
   ja: {
     home: "ホーム",
@@ -1629,6 +1638,9 @@ const translations = {
 
     // 뒤집기 버튼 번역
     flip: "反転",
+    language_filter: "言語フィルター",
+    all_words: "すべての単語",
+    my_words: "私が追加した単語",
   },
   zh: {
     home: "首页",
@@ -2035,6 +2047,11 @@ const translations = {
     flashcard_recommended: "闪卡",
     recommended: "推荐",
     recommendation_reason: "基于最近学习模式推荐",
+    // 翻转按钮翻译
+    flip: "翻转",
+    language_filter: "语言筛选",
+    all_words: "所有单词",
+    my_words: "我添加的单词",
   },
 };
 
