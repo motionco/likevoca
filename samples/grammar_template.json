@@ -35,8 +35,7 @@
       "polite",
       "social"
     ],
-    "purpose": "greeting",
-    "created_at": "2024-01-01T00:00:00Z"
+    "purpose": "greeting"
   },
   {
     "domain": "food",
@@ -75,8 +74,7 @@
       "public",
       "polite"
     ],
-    "purpose": "request",
-    "created_at": "2024-01-01T00:00:00Z"
+    "purpose": "request"
   },
   {
     "domain": "daily",
@@ -113,8 +111,7 @@
     "situation": [
       "casual"
     ],
-    "purpose": "description",
-    "created_at": "2024-01-01T00:00:00Z"
+    "purpose": "description"
   },
   {
     "domain": "business",
@@ -152,8 +149,7 @@
       "work",
       "polite"
     ],
-    "purpose": "request",
-    "created_at": "2024-01-01T00:00:00Z"
+    "purpose": "request"
   },
   {
     "domain": "education",
@@ -190,8 +186,7 @@
     "situation": [
       "school"
     ],
-    "purpose": "question",
-    "created_at": "2024-01-01T00:00:00Z"
+    "purpose": "question"
   },
   {
     "domain": "daily",
@@ -224,12 +219,11 @@
       "japanese": "手伝ってください。",
       "chinese": "请帮助我。"
     },
-    "difficulty": "beginner",
+    "difficulty": "basic",
     "situation": [
       "polite",
       "social"
     ],
-    "purpose": "request",
-    "created_at": "2024-01-01T00:00:00Z"
+    "purpose": "request"
   }
 ]

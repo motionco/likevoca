@@ -46,7 +46,7 @@ export const CONCEPTS_TEMPLATE = [
     concept_info: {
       domain: "daily",
       category: "shopping",
-      difficulty: "beginner",
+      difficulty: "basic",
       unicode_emoji: "🛒",
       color_theme: "#FF6B6B",
       situation: ["casual", "shopping"],
@@ -396,7 +396,6 @@ export const GRAMMAR_TEMPLATE = [
     difficulty: "basic",
     situation: ["polite", "social"],
     purpose: "greeting",
-    created_at: "2024-01-01T00:00:00Z",
   },
   {
     domain: "food",
@@ -435,7 +434,6 @@ export const GRAMMAR_TEMPLATE = [
     difficulty: "basic",
     situation: ["shopping", "public", "polite"],
     purpose: "request",
-    created_at: "2024-01-01T00:00:00Z",
   },
   {
     domain: "daily",
@@ -474,7 +472,6 @@ export const GRAMMAR_TEMPLATE = [
     difficulty: "intermediate",
     situation: ["casual"],
     purpose: "description",
-    created_at: "2024-01-01T00:00:00Z",
   },
   {
     domain: "business",
@@ -510,7 +507,6 @@ export const GRAMMAR_TEMPLATE = [
     difficulty: "intermediate",
     situation: ["work", "polite"],
     purpose: "request",
-    created_at: "2024-01-01T00:00:00Z",
   },
   {
     domain: "education",
@@ -547,7 +543,6 @@ export const GRAMMAR_TEMPLATE = [
     difficulty: "intermediate",
     situation: ["school"],
     purpose: "question",
-    created_at: "2024-01-01T00:00:00Z",
   },
   {
     domain: "daily",
@@ -580,10 +575,9 @@ export const GRAMMAR_TEMPLATE = [
       japanese: "手伝ってください。",
       chinese: "请帮助我。",
     },
-    difficulty: "beginner",
+    difficulty: "basic",
     situation: ["polite", "social"],
     purpose: "request",
-    created_at: "2024-01-01T00:00:00Z",
   },
 ];
 
