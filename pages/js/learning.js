@@ -2585,6 +2585,7 @@ function showTypingMode() {
 }
 
 function updateTyping() {
+  const currentData = getCurrentData();
   if (!currentData || currentData.length === 0) return;
 
   const concept = currentData[currentIndex];
@@ -2641,6 +2642,31 @@ function updateTyping() {
     pronunciationElement.textContent = sourcePronunciation;
   }
 
+  // 카테고리/도메인 정보 표시
+  const categoryElement = document.getElementById("typing-category");
+  if (categoryElement) {
+    const category =
+      concept.category || concept.concept_info?.category || "일반";
+    const domain = concept.domain || concept.concept_info?.domain || "daily";
+    // 도메인을 한국어로 변환
+    const domainNames = {
+      daily: "일상",
+      business: "비즈니스",
+      academic: "학술",
+      travel: "여행",
+      food: "음식",
+      nature: "자연",
+      technology: "기술",
+      health: "건강",
+      sports: "스포츠",
+      entertainment: "엔터테인먼트",
+      other: "기타",
+    };
+    categoryElement.textContent = `${category} • ${
+      domainNames[domain] || domain
+    }`;
+  }
+
   // 정답 저장
   if (answerInput) {
     answerInput.dataset.correctAnswer = correctAnswer;
@@ -2660,6 +2686,31 @@ function updateTyping() {
   const progress = document.getElementById("typing-progress");
   if (progress) {
     progress.textContent = `${currentIndex + 1} / ${currentData.length}`;
+  }
+
+  // 정답 확인 버튼 이벤트 리스너 설정 (여러 ID 시도)
+  const checkButtonIds = [
+    "check-typing-answer",
+    "check-answer",
+    "check-typing-answer-btn",
+  ];
+  let checkButton = null;
+
+  for (const buttonId of checkButtonIds) {
+    checkButton = document.getElementById(buttonId);
+    if (checkButton) {
+      console.log(`✅ 정답 확인 버튼 발견: ${buttonId}`);
+      break;
+    }
+  }
+
+  if (checkButton) {
+    // 기존 이벤트 리스너 제거 후 새로 등록
+    checkButton.removeEventListener("click", checkTypingAnswer);
+    checkButton.addEventListener("click", checkTypingAnswer);
+    console.log("✅ 정답 확인 버튼 이벤트 리스너 등록 완료");
+  } else {
+    console.warn("⚠️ 정답 확인 버튼을 찾을 수 없음");
   }
 }
 
@@ -2948,6 +2999,7 @@ function showReadingFlashMode() {
 }
 
 function updateReadingExample() {
+  const currentData = getCurrentData();
   if (!currentData || currentData.length === 0) return;
 
   const example = currentData[currentIndex];
@@ -3021,6 +3073,7 @@ function updateReadingExample() {
 }
 
 function updateReadingFlash() {
+  const currentData = getCurrentData();
   if (!currentData || currentData.length === 0) return;
 
   const example = currentData[currentIndex];
