@@ -3,12 +3,16 @@
   "builds": [
     { "src": "api/*.js", "use": "@vercel/node" },
     { "src": "*.html", "use": "@vercel/static" },
-    { "src": "js/**", "use": "@vercel/static" },
-    { "src": "css/**", "use": "@vercel/static" },
+    { "src": "js/**/*.js", "use": "@vercel/static" },
+    { "src": "css/**/*.css", "use": "@vercel/static" },
     { "src": "assets/**", "use": "@vercel/static" },
-    { "src": "components/**", "use": "@vercel/static" },
-    { "src": "pages/**", "use": "@vercel/static" },
-    { "src": "utils/**", "use": "@vercel/static" }
+    { "src": "components/**/*.js", "use": "@vercel/static" },
+    { "src": "components/**/*.html", "use": "@vercel/static" },
+    { "src": "pages/**/*.js", "use": "@vercel/static" },
+    { "src": "pages/**/*.html", "use": "@vercel/static" },
+    { "src": "utils/**/*.js", "use": "@vercel/static" },
+    { "src": "samples/**/*.js", "use": "@vercel/static" },
+    { "src": "locales/**", "use": "@vercel/static" }
   ],
   "routes": [
     { "src": "/api/config", "dest": "/api/config.js" },
@@ -26,5 +30,34 @@
     { "src": "/ja/(.*)", "dest": "/$1" },
     { "src": "/zh/(.*)", "dest": "/$1" },
     { "src": "/(.*)", "dest": "/$1" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)\\.js",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript; charset=utf-8"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)\\.mjs",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript; charset=utf-8"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)\\.css",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/css; charset=utf-8"
+        }
+      ]
+    }
   ]
 } 
