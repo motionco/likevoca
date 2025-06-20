@@ -4,6 +4,9 @@ import {
   serverTimestamp,
 } from "../js/firebase/firebase-init.js";
 
+// 도메인-카테고리 매핑 import
+import { domainCategoryMapping } from "../components/js/domain-category-emoji.js";
+
 // 로컬 환경 감지
 const isLocalEnvironment =
   window.location.hostname === "localhost" ||
@@ -13,14 +16,14 @@ const isLocalEnvironment =
 // const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY"; // 실제 배포시 환경변수로 설정
 // const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
 
-// 다국어 프롬프트 템플릿
+// 다국어 프롬프트 템플릿 (통일된 구조에 맞게 수정)
 const PROMPTS = {
   korean: {
     system:
       "당신은 다국어 학습을 도와주는 AI 어시스턴트입니다. 사용자가 요청한 주제나 카테고리에 맞는 유용한 개념을 추천해주세요.",
-    user: (topic, category, languages) => `
-주제: ${topic || "일상생활"}
-카테고리: ${category || "daily"}
+    user: (domain, category, languages) => `
+주제: ${domain}
+카테고리: ${category}
 언어: ${languages.join(", ")}
 
 위 조건에 맞는 학습하기 좋은 개념 하나를 추천해주세요. 
@@ -45,8 +48,8 @@ const PROMPTS = {
 
 {
   "concept_info": {
-    "domain": "${topic || "daily"}",
-    "category": "${category || "other"}",
+    "domain": "${domain}",
+    "category": "${category}",
     "difficulty": "beginner",
     "tags": ["태그1", "태그2", "태그3"],
     "unicode_emoji": "적절한 이모지 1개",
@@ -85,9 +88,9 @@ const PROMPTS = {
   english: {
     system:
       "You are an AI assistant that helps with multilingual learning. Please recommend useful concepts that match the user's requested topic or category.",
-    user: (topic, category, languages) => `
-Topic: ${topic || "daily life"}
-Category: ${category || "daily"}
+    user: (domain, category, languages) => `
+Domain: ${domain}
+Category: ${category}
 Languages: ${languages.join(", ")}
 
 Please recommend one good concept to learn based on the above conditions.
@@ -112,8 +115,8 @@ Respond in the following JSON format:
 
 {
   "concept_info": {
-    "domain": "${topic || "daily"}",
-    "category": "${category || "other"}",
+    "domain": "${domain}",
+    "category": "${category}",
     "difficulty": "beginner",
     "tags": ["tag1", "tag2", "tag3"],
     "unicode_emoji": "appropriate emoji",
@@ -151,6 +154,227 @@ Respond in the following JSON format:
 
 Please provide accurate words and translations that are actually usable. Fill all arrays with appropriate values. Make sure the example sentence uses the main word naturally.`,
   },
+};
+
+// 도메인 한국어 번역
+const domainTranslations = {
+  daily: "일상생활",
+  food: "음식/요리",
+  travel: "여행",
+  business: "비즈니스/업무",
+  academic: "학술/교육",
+  nature: "자연/환경",
+  technology: "기술/IT",
+  health: "건강/의료",
+  sports: "스포츠/운동",
+  entertainment: "엔터테인먼트",
+  culture: "문화/전통",
+  education: "교육/학습",
+  other: "기타",
+};
+
+// 카테고리 한국어 번역
+const categoryTranslations = {
+  // daily
+  household: "가정용품",
+  family: "가족",
+  routine: "일상",
+  clothing: "의류",
+  furniture: "가구",
+  shopping: "쇼핑",
+  transportation: "교통",
+  communication: "소통",
+  personal_care: "개인관리",
+  leisure: "여가",
+  relationships: "인간관계",
+  emotions: "감정",
+  time: "시간",
+  weather_talk: "날씨대화",
+
+  // food
+  fruit: "과일",
+  vegetable: "채소",
+  meat: "고기",
+  drink: "음료",
+  snack: "간식",
+  grain: "곡물",
+  seafood: "해산물",
+  dairy: "유제품",
+  cooking: "요리",
+  dining: "식사",
+  restaurant: "레스토랑",
+  kitchen_utensils: "주방용품",
+  spices: "향신료",
+  dessert: "디저트",
+
+  // travel
+  accommodation: "숙박",
+  tourist_attraction: "관광지",
+  luggage: "짐",
+  direction: "방향",
+  booking: "예약",
+  currency: "화폐",
+  emergency: "응급상황",
+  documents: "서류",
+  sightseeing: "관광",
+  local_food: "현지음식",
+  souvenir: "기념품",
+
+  // business
+  meeting: "회의",
+  finance: "금융",
+  marketing: "마케팅",
+  office: "사무실",
+  project: "프로젝트",
+  negotiation: "협상",
+  presentation: "발표",
+  teamwork: "팀워크",
+  leadership: "리더십",
+  networking: "네트워킹",
+  sales: "영업",
+  contract: "계약",
+  startup: "스타트업",
+
+  // academic
+  science: "과학",
+  literature: "문학",
+  history: "역사",
+  mathematics: "수학",
+  research: "연구",
+  philosophy: "철학",
+  psychology: "심리학",
+  sociology: "사회학",
+  linguistics: "언어학",
+  university: "대학",
+  examination: "시험",
+  thesis: "논문",
+  library: "도서관",
+
+  // nature
+  animal: "동물",
+  plant: "식물",
+  weather: "날씨",
+  geography: "지리",
+  environment: "환경",
+  ecosystem: "생태계",
+  conservation: "보존",
+  climate: "기후",
+  natural_disaster: "자연재해",
+  landscape: "풍경",
+  marine_life: "해양생물",
+  forest: "숲",
+  mountain: "산",
+
+  // technology
+  computer: "컴퓨터",
+  software: "소프트웨어",
+  internet: "인터넷",
+  mobile: "모바일",
+  ai: "인공지능",
+  programming: "프로그래밍",
+  cybersecurity: "사이버보안",
+  database: "데이터베이스",
+  robotics: "로봇공학",
+  blockchain: "블록체인",
+  cloud: "클라우드",
+  social_media: "소셜미디어",
+  gaming: "게임",
+  innovation: "혁신",
+
+  // health
+  exercise: "운동",
+  medicine: "의학",
+  nutrition: "영양",
+  mental_health: "정신건강",
+  hospital: "병원",
+  fitness: "피트니스",
+  wellness: "웰니스",
+  therapy: "치료",
+  prevention: "예방",
+  symptoms: "증상",
+  treatment: "치료법",
+  pharmacy: "약국",
+  rehabilitation: "재활",
+  medical_equipment: "의료기기",
+
+  // sports
+  football: "축구",
+  basketball: "농구",
+  swimming: "수영",
+  running: "달리기",
+  equipment: "장비",
+  olympics: "올림픽",
+  tennis: "테니스",
+  baseball: "야구",
+  golf: "골프",
+  martial_arts: "무술",
+  team_sports: "팀스포츠",
+  individual_sports: "개인스포츠",
+  coaching: "코칭",
+  competition: "경쟁",
+
+  // entertainment
+  movie: "영화",
+  music: "음악",
+  game: "게임",
+  book: "책",
+  art: "예술",
+  theater: "연극",
+  concert: "콘서트",
+  festival: "축제",
+  celebrity: "연예인",
+  tv_show: "TV쇼",
+  comedy: "코미디",
+  drama: "드라마",
+  animation: "애니메이션",
+  photography: "사진",
+
+  // culture
+  tradition: "전통",
+  customs: "관습",
+  language: "언어",
+  religion: "종교",
+  heritage: "유산",
+  ceremony: "의식",
+  ritual: "의례",
+  folklore: "민속",
+  mythology: "신화",
+  arts_crafts: "공예",
+  etiquette: "예절",
+  national_identity: "국가정체성",
+
+  // education
+  teaching: "교육",
+  learning: "학습",
+  classroom: "교실",
+  curriculum: "교육과정",
+  assessment: "평가",
+  pedagogy: "교육학",
+  skill_development: "기술개발",
+  online_learning: "온라인학습",
+  training: "훈련",
+  certification: "자격증",
+  educational_technology: "교육기술",
+  student_life: "학생생활",
+  graduation: "졸업",
+
+  // other
+  hobbies: "취미",
+  finance_personal: "개인금융",
+  legal: "법률",
+  government: "정부",
+  politics: "정치",
+  media: "미디어",
+  community: "커뮤니티",
+  volunteering: "자원봉사",
+  charity: "자선",
+  social_issues: "사회문제",
+  philosophy_life: "인생철학",
+  spirituality: "영성",
+  creativity: "창의성",
+  innovation: "혁신",
+
+  other: "기타",
 };
 
 // 테스트 데이터 (로컬 환경용) - 다국어 단어장과 완전히 동일한 구조
@@ -320,41 +544,19 @@ export async function handleAIConceptRecommendation(currentUser, db) {
       return;
     }
 
-    // 사용자 입력 받기
-    const topic = prompt(
-      "어떤 주제의 개념을 추천받고 싶으신가요? (예: 음식, 동물, 여행 등)"
-    );
-    if (!topic) {
-      console.log("사용자가 주제 입력을 취소했습니다.");
+    // 개선된 모달을 사용하여 사용자 입력 받기
+    let userSelection;
+    try {
+      userSelection = await createAIConceptModal();
+    } catch (error) {
+      console.log("사용자가 모달을 취소했습니다:", error.message);
       return;
     }
-    console.log("선택된 주제:", topic);
 
-    const category =
-      prompt(
-        "카테고리를 입력해주세요 (fruit, food, animal, daily, travel, business 중 하나)"
-      ) || "daily";
+    const { domain, category, selectedLanguages } = userSelection;
+    console.log("선택된 도메인:", domain);
     console.log("선택된 카테고리:", category);
-
-    // 학습하고 싶은 언어 선택
-    console.log("지원되는 언어:", supportedLanguages);
-    const availableLanguages = Object.keys(supportedLanguages);
-    const selectedLanguages = [];
-
-    for (const lang of availableLanguages) {
-      const include = confirm(
-        `${supportedLanguages[lang].nameKo} 포함하시겠습니까?`
-      );
-      if (include) {
-        selectedLanguages.push(lang);
-      }
-    }
     console.log("선택된 언어들:", selectedLanguages);
-
-    if (selectedLanguages.length < 2) {
-      alert("최소 2개 언어를 선택해주세요.");
-      return;
-    }
 
     // 로딩 표시
     console.log("로딩 표시 생성 중...");
@@ -420,7 +622,7 @@ export async function handleAIConceptRecommendation(currentUser, db) {
       console.log("실제 환경에서 Gemini API 호출");
       // 실제 환경에서는 Gemini API 호출
       conceptData = await generateConceptWithGemini(
-        topic,
+        domain,
         category,
         selectedLanguages
       );
@@ -497,7 +699,20 @@ export async function handleAIConceptRecommendation(currentUser, db) {
   } catch (error) {
     console.error("AI 개념 추천 중 오류:", error);
     console.error("오류 스택:", error.stack);
-    alert("개념 생성 중 오류가 발생했습니다. 다시 시도해주세요.");
+
+    // 구체적인 오류 메시지 제공
+    let userMessage = "개념 생성 중 오류가 발생했습니다. 다시 시도해주세요.";
+    if (error.message.includes("서버에서 오류가 발생했습니다")) {
+      userMessage =
+        "현재 AI 서비스에 일시적인 문제가 있습니다. 잠시 후 다시 시도해주세요.";
+    } else if (error.message.includes("API 인증에 실패했습니다")) {
+      userMessage =
+        "AI 서비스 설정에 문제가 있습니다. 관리자에게 문의해주세요.";
+    } else if (error.message.includes("사용량 한도를 초과했습니다")) {
+      userMessage = "AI 사용량 한도를 초과했습니다. 잠시 후 다시 시도해주세요.";
+    }
+
+    alert(userMessage);
 
     // 로딩 제거 (오류 시)
     const loadingDiv = document.querySelector(".fixed.inset-0.bg-black");
@@ -511,7 +726,7 @@ export async function handleAIConceptRecommendation(currentUser, db) {
   }
 }
 
-async function generateConceptWithGemini(topic, category, languages) {
+async function generateConceptWithGemini(domain, category, languages) {
   try {
     // 사용자 언어 감지
     const userLang = navigator.language.toLowerCase().startsWith("ko")
@@ -529,7 +744,7 @@ async function generateConceptWithGemini(topic, category, languages) {
               text:
                 prompt.system +
                 "\n\n" +
-                prompt.user(topic, category, languages),
+                prompt.user(domain, category, languages),
             },
           ],
         },
@@ -556,7 +771,20 @@ async function generateConceptWithGemini(topic, category, languages) {
     if (!response.ok) {
       const errorText = await response.text();
       console.error(`API 오류 응답:`, response.status, errorText);
-      throw new Error(`Gemini API 오류: ${response.status}`);
+
+      // 구체적인 오류 메시지 제공
+      let errorMessage = `Gemini API 오류: ${response.status}`;
+      if (response.status === 500) {
+        errorMessage =
+          "서버에서 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+      } else if (response.status === 401) {
+        errorMessage = "API 인증에 실패했습니다. 관리자에게 문의해주세요.";
+      } else if (response.status === 429) {
+        errorMessage =
+          "API 사용량 한도를 초과했습니다. 잠시 후 다시 시도해주세요.";
+      }
+
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();
@@ -593,4 +821,155 @@ async function generateConceptWithGemini(topic, category, languages) {
     console.error("Gemini API 호출 중 오류:", error);
     throw error;
   }
+}
+
+// 개선된 UI 모달 생성 함수
+function createAIConceptModal() {
+  return new Promise((resolve, reject) => {
+    // 모달 HTML 생성
+    const modalHTML = `
+      <div id="ai-concept-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+          <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-xl font-bold">AI 개념 추천</h2>
+              <button id="close-ai-modal" class="text-gray-500 hover:text-gray-700">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+            
+            <!-- 도메인 선택 -->
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 mb-2">주제 선택</label>
+              <select id="domain-select" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <option value="">주제를 선택하세요</option>
+                ${Object.keys(domainCategoryMapping)
+                  .map(
+                    (domain) =>
+                      `<option value="${domain}">${
+                        domainTranslations[domain] || domain
+                      }</option>`
+                  )
+                  .join("")}
+              </select>
+            </div>
+            
+            <!-- 카테고리 선택 -->
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 mb-2">카테고리 선택</label>
+              <select id="category-select" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" disabled>
+                <option value="">먼저 주제를 선택하세요</option>
+              </select>
+            </div>
+            
+            <!-- 언어 선택 -->
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-gray-700 mb-2">포함할 언어 (최소 2개 선택)</label>
+              <div class="space-y-2">
+                ${Object.keys(supportedLanguages)
+                  .map(
+                    (lang) => `
+                  <label class="flex items-center">
+                    <input type="checkbox" value="${lang}" class="language-checkbox mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <span>${supportedLanguages[lang].nameKo}</span>
+                  </label>
+                `
+                  )
+                  .join("")}
+              </div>
+            </div>
+            
+            <!-- 버튼 -->
+            <div class="flex justify-end space-x-3">
+              <button id="cancel-ai-concept" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50">
+                취소
+              </button>
+              <button id="generate-ai-concept" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed" disabled>
+                AI 개념 생성
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // 모달을 DOM에 추가
+    document.body.insertAdjacentHTML("beforeend", modalHTML);
+
+    const modal = document.getElementById("ai-concept-modal");
+    const domainSelect = document.getElementById("domain-select");
+    const categorySelect = document.getElementById("category-select");
+    const generateBtn = document.getElementById("generate-ai-concept");
+    const closeBtn = document.getElementById("close-ai-modal");
+    const cancelBtn = document.getElementById("cancel-ai-concept");
+
+    // 도메인 변경 시 카테고리 업데이트
+    domainSelect.addEventListener("change", function () {
+      const selectedDomain = this.value;
+      categorySelect.innerHTML =
+        '<option value="">카테고리를 선택하세요</option>';
+
+      if (selectedDomain && domainCategoryMapping[selectedDomain]) {
+        categorySelect.disabled = false;
+        domainCategoryMapping[selectedDomain].forEach((category) => {
+          const option = document.createElement("option");
+          option.value = category;
+          option.textContent = categoryTranslations[category] || category;
+          categorySelect.appendChild(option);
+        });
+      } else {
+        categorySelect.disabled = true;
+      }
+
+      checkFormValidity();
+    });
+
+    // 폼 유효성 검사
+    function checkFormValidity() {
+      const domain = domainSelect.value;
+      const category = categorySelect.value;
+      const selectedLanguages = Array.from(
+        document.querySelectorAll(".language-checkbox:checked")
+      );
+
+      const isValid = domain && category && selectedLanguages.length >= 2;
+      generateBtn.disabled = !isValid;
+    }
+
+    // 이벤트 리스너 추가
+    categorySelect.addEventListener("change", checkFormValidity);
+    document.querySelectorAll(".language-checkbox").forEach((checkbox) => {
+      checkbox.addEventListener("change", checkFormValidity);
+    });
+
+    // 생성 버튼 클릭
+    generateBtn.addEventListener("click", function () {
+      const domain = domainSelect.value;
+      const category = categorySelect.value;
+      const selectedLanguages = Array.from(
+        document.querySelectorAll(".language-checkbox:checked")
+      ).map((checkbox) => checkbox.value);
+
+      modal.remove();
+      resolve({ domain, category, selectedLanguages });
+    });
+
+    // 모달 닫기
+    function closeModal() {
+      modal.remove();
+      reject(new Error("사용자가 취소했습니다."));
+    }
+
+    closeBtn.addEventListener("click", closeModal);
+    cancelBtn.addEventListener("click", closeModal);
+
+    // 배경 클릭 시 닫기
+    modal.addEventListener("click", function (e) {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+  });
 }
