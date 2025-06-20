@@ -2,38 +2,55 @@
 const fetch = require("node-fetch");
 
 module.exports = async (req, res) => {
-  // CORS 헤더 설정
-  res.setHeader("Access-Control-Allow-Credentials", true);
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST,OPTIONS");
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
-  );
-
-  // OPTIONS 요청 처리
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
-
-  // POST 요청이 아니면 405 반환
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method Not Allowed" });
-  }
-
   try {
     console.log("🔍 Gemini API 요청 시작");
-    console.log("📝 요청 바디:", JSON.stringify(req.body, null, 2));
+    console.log("📊 요청 메소드:", req.method);
+    console.log("📊 요청 URL:", req.url);
+
+    // CORS 헤더 설정
+    res.setHeader("Access-Control-Allow-Credentials", true);
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "POST,OPTIONS");
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
+    );
+
+    // OPTIONS 요청 처리
+    if (req.method === "OPTIONS") {
+      console.log("✅ OPTIONS 요청 처리");
+      return res.status(200).end();
+    }
+
+    // POST 요청이 아니면 405 반환
+    if (req.method !== "POST") {
+      console.log("❌ 잘못된 메소드:", req.method);
+      return res.status(405).json({ error: "Method Not Allowed" });
+    }
+
+    console.log("📝 요청 바디 존재:", !!req.body);
+    console.log("📝 요청 바디 타입:", typeof req.body);
+
+    // 요청 바디가 너무 크지 않을 때만 로그 출력
+    const bodyString = JSON.stringify(req.body);
+    if (bodyString.length < 1000) {
+      console.log("📝 요청 바디:", bodyString);
+    } else {
+      console.log("📝 요청 바디 크기:", bodyString.length, "bytes");
+    }
 
     const geminiApiKey = process.env.GEMINI_API_KEY;
     console.log("🔑 API 키 존재 여부:", !!geminiApiKey);
+    console.log("🔑 API 키 길이:", geminiApiKey ? geminiApiKey.length : 0);
 
     // API 키가 설정되어 있는지 확인
     if (!geminiApiKey) {
       console.error("❌ GEMINI_API_KEY 환경 변수가 설정되지 않았습니다");
       console.log(
         "🔍 사용 가능한 환경 변수:",
-        Object.keys(process.env).filter((key) => key.includes("API"))
+        Object.keys(process.env).filter(
+          (key) => key.includes("API") || key.includes("GEMINI")
+        )
       );
 
       // 개발/테스트 목적으로 임시 응답 제공
@@ -127,19 +144,21 @@ module.exports = async (req, res) => {
 
     // Gemini API 호출
     console.log("🚀 Gemini API 호출 중...");
-    const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": geminiApiKey,
-        },
-        body: JSON.stringify(req.body),
-      }
-    );
+    const apiUrl =
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+    console.log("📡 API URL:", apiUrl);
+
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": geminiApiKey,
+      },
+      body: JSON.stringify(req.body),
+    });
 
     console.log("📡 Gemini API 응답 상태:", response.status);
+    console.log("📡 Gemini API 응답 상태 텍스트:", response.statusText);
 
     // 응답 오류 확인
     if (!response.ok) {
@@ -150,6 +169,7 @@ module.exports = async (req, res) => {
         error: "Gemini API 오류",
         details: errorData,
         status: response.status,
+        statusText: response.statusText,
       });
     }
 
@@ -160,12 +180,21 @@ module.exports = async (req, res) => {
     return res.status(200).json(data);
   } catch (error) {
     // 오류 처리
-    console.error("💥 Gemini API 오류:", error);
+    console.error("💥 Gemini API 최상위 오류:", error);
     console.error("📍 오류 스택:", error.stack);
-    return res.status(500).json({
-      error: "서버 오류가 발생했습니다.",
-      details: error.message,
-      type: error.constructor.name,
-    });
+    console.error("📍 오류 이름:", error.name);
+    console.error("📍 오류 메시지:", error.message);
+
+    try {
+      return res.status(500).json({
+        error: "서버 오류가 발생했습니다.",
+        details: error.message,
+        type: error.constructor.name,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (jsonError) {
+      console.error("💥 JSON 응답 오류:", jsonError);
+      return res.status(500).end("Internal Server Error");
+    }
   }
 };

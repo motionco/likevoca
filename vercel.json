@@ -19,6 +19,7 @@
     { "src": "/api/gemini", "dest": "/api/gemini.js" },
     { "src": "/api/test-env", "dest": "/api/test-env.js" },
     { "src": "/api/log-auth-error", "dest": "/api/log-auth-error.js" },
+    { "src": "/samples/templates.js", "dest": "/samples/templates.js", "headers": { "Content-Type": "application/javascript; charset=utf-8" } },
     { "handle": "filesystem" },
     { "src": "^/(?!ko|en|ja|zh).*", "dest": "/index.html" },
     { "src": "/ko", "dest": "/ko/index.html" },
@@ -32,6 +33,19 @@
     { "src": "/(.*)", "dest": "/$1" }
   ],
   "headers": [
+    {
+      "source": "/samples/templates.js",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
     {
       "source": "/(.*)\\.js",
       "headers": [

@@ -69,19 +69,32 @@ async function initializeFirebase() {
       // 배포 환경에서는 API에서 설정 가져오기
       try {
         console.log("🌐 배포 환경에서 Firebase 설정 요청 중...");
-        const response = await fetch("/api/config");
+        console.log("📡 Config API URL:", "/api/config");
+
+        const response = await fetch("/api/config", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        console.log("📊 Config API 응답 상태:", response.status);
+        console.log("📊 Config API 응답 상태 텍스트:", response.statusText);
 
         if (!response.ok) {
+          const errorText = await response.text();
           console.warn(`⚠️ Config API 응답 오류: ${response.status}`);
-          throw new Error(`서버 응답 실패: ${response.status}`);
+          console.warn(`⚠️ Config API 오류 내용:`, errorText);
+          throw new Error(`서버 응답 실패: ${response.status} - ${errorText}`);
         }
 
         const data = await response.json();
-        console.log("📊 Config API 응답:", data);
+        console.log("📊 Config API 응답 성공:", data);
 
         if (data.firebase) {
           firebaseConfig = data.firebase;
           console.log("✅ 서버에서 Firebase 설정 가져오기 성공");
+          console.log("🔑 Firebase API 키 존재:", !!firebaseConfig.apiKey);
 
           // 기존 앱 초기화 취소 후 새로운 설정으로 초기화
           app = initializeApp(firebaseConfig);
@@ -91,6 +104,8 @@ async function initializeFirebase() {
           throw new Error("Firebase 설정이 응답에 없음");
         }
       } catch (configError) {
+        console.error("💥 Config API 호출 중 오류:", configError);
+        console.error("📍 Config API 오류 스택:", configError.stack);
         console.warn(
           "⚠️ Config API 실패, 기본 설정 사용:",
           configError.message
@@ -109,10 +124,18 @@ async function initializeFirebase() {
         };
 
         console.log("🔄 Fallback 설정으로 Firebase 재초기화");
-        app = initializeApp(fallbackConfig);
-        auth = getAuth(app);
-        db = getFirestore(app);
-        firebaseConfig = fallbackConfig;
+        console.log("🔑 Fallback API 키 존재:", !!fallbackConfig.apiKey);
+
+        try {
+          app = initializeApp(fallbackConfig);
+          auth = getAuth(app);
+          db = getFirestore(app);
+          firebaseConfig = fallbackConfig;
+          console.log("✅ Fallback 설정으로 Firebase 초기화 성공");
+        } catch (fallbackError) {
+          console.error("💥 Fallback 초기화도 실패:", fallbackError);
+          throw fallbackError;
+        }
       }
     }
 
