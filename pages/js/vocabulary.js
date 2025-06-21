@@ -53,8 +53,6 @@ let lastVisibleConcept = null;
 let firstVisibleConcept = null;
 let userLanguage = "ko";
 
-// 번역 함수들은 이제 translation-utils.js에서 import
-
 /*
 // 도메인 번역 매핑 (임시 - 호환성을 위해 유지) - 중복 선언으로 주석 처리
 const domainTranslations = {
@@ -1349,50 +1347,8 @@ function getTranslatedText(key) {
   return key;
 }
 
-// 도메인 번역 함수 (공통 모듈 사용)
-function translateDomainKey(domainKey, lang = null) {
-  return translateDomain(domainKey, lang);
-}
-
-// 카테고리 번역 함수 (개선됨)
-function translateCategoryKey(categoryKey, lang = null) {
-  const currentLang =
-    lang || localStorage.getItem("preferredLanguage") || userLanguage || "ko";
-
-  // 1. 로컬 카테고리 번역에서 확인
-  if (
-    categoryTranslations[categoryKey] &&
-    categoryTranslations[categoryKey][currentLang]
-  ) {
-    return categoryTranslations[categoryKey][currentLang];
-  }
-
-  // 2. 전역 번역 시스템 확인
-  if (typeof window.translateCategoryKey === "function") {
-    const result = window.translateCategoryKey(categoryKey, lang);
-    if (result !== categoryKey) return result;
-  }
-
-  // 3. 전역 번역 객체 확인
-  if (
-    window.translations &&
-    window.translations[currentLang] &&
-    window.translations[currentLang][categoryKey]
-  ) {
-    return window.translations[currentLang][categoryKey];
-  }
-
-  // 4. 영어 폴백
-  if (
-    categoryTranslations[categoryKey] &&
-    categoryTranslations[categoryKey].en
-  ) {
-    return categoryTranslations[categoryKey].en;
-  }
-
-  // 5. 원본 키 반환
-  return categoryKey;
-}
+// 번역 함수들은 공통 모듈에서 import하여 사용
+// translateDomain, translateCategory, translateDomainCategory 사용
 
 // 문법 설명을 환경 언어로 번역하는 함수
 function translateGrammarNote(grammarNote) {

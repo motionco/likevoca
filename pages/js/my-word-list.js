@@ -27,6 +27,12 @@ import {
   VocabularyFilterProcessor,
   setupVocabularyFilters,
 } from "../../utils/vocabulary-filter-shared.js";
+// 공통 번역 유틸리티 import
+import {
+  translateDomain,
+  translateCategory,
+  translateDomainCategory,
+} from "../../utils/translation-utils.js";
 
 let currentUser = null;
 let userBookmarks = [];
@@ -438,9 +444,11 @@ function createConceptCard(concept) {
             "bookmarked"
           )}"></i>
           <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-            ${translateDomainKey(conceptInfo.domain)}/${translateCategoryKey(
-    conceptInfo.category
-  )}
+            ${translateDomainCategory(
+              conceptInfo.domain,
+              conceptInfo.category,
+              userLanguage
+            )}
           </span>
         </div>
       </div>
