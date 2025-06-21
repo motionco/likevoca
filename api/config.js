@@ -1,5 +1,5 @@
 // Firebase 구성을 제공하는 서버리스 함수
-const dotenv = require("dotenv");
+import dotenv from "dotenv";
 
 // 환경 변수 로드
 dotenv.config();
@@ -16,7 +16,7 @@ const firebaseConfig = {
     "https://uploadfile-e6f81-default-rtdb.asia-southeast1.firebasedatabase.app",
 };
 
-module.exports = (req, res) => {
+export default (req, res) => {
   // CORS 헤더 설정
   res.setHeader("Access-Control-Allow-Credentials", true);
   res.setHeader("Access-Control-Allow-Origin", "*");

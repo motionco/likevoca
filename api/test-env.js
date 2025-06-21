@@ -1,5 +1,5 @@
 // 환경변수 테스트를 위한 서버리스 함수
-module.exports = async (req, res) => {
+export default async (req, res) => {
   // CORS 헤더 설정
   res.setHeader("Access-Control-Allow-Credentials", true);
   res.setHeader("Access-Control-Allow-Origin", "*");

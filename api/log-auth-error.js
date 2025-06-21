@@ -1,5 +1,5 @@
 // 인증 오류 로깅 서버리스 함수
-module.exports = (req, res) => {
+export default (req, res) => {
   // CORS 헤더 설정
   res.setHeader("Access-Control-Allow-Credentials", true);
   res.setHeader("Access-Control-Allow-Origin", "*");
