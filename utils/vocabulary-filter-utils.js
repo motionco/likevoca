@@ -158,14 +158,13 @@ export class VocabularyFilterBuilder {
       food: "음식",
       travel: "여행",
       business: "비즈니스",
-      academic: "학술",
+      academic: "교육",
       nature: "자연",
       technology: "기술",
       health: "건강",
       sports: "스포츠",
       entertainment: "엔터테인먼트",
       culture: "문화",
-      education: "교육",
       other: "기타",
     };
     return texts[domain] || domain;

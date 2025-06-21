@@ -2728,7 +2728,7 @@ function updateTyping() {
     const domainNames = {
       daily: "일상",
       business: "비즈니스",
-      academic: "학술",
+      academic: "교육",
       travel: "여행",
       food: "음식",
       nature: "자연",

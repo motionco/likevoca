@@ -1174,7 +1174,7 @@ export class EnhancedConceptModal {
 
         // 언어 사용역
         "register:universal": "범용",
-        "register:academic": "학술적",
+        "register:academic": "교육적",
         "register:conversational": "대화체",
         "register:business": "업무용",
         "register:literary": "문학적",
@@ -1278,7 +1278,7 @@ export class EnhancedConceptModal {
 
         // 언어 사용역
         "register:universal": "Universal",
-        "register:academic": "Academic",
+        "register:academic": "Education",
         "register:conversational": "Conversational",
         "register:business": "Business",
         "register:literary": "Literary",
@@ -1360,7 +1360,7 @@ export class EnhancedConceptModal {
         "formality:formal": "正式",
         "usage_context:greeting": "挨拶の文脈",
         "register:universal": "汎用",
-        "register:academic": "学術的",
+        "register:academic": "教育的",
 
         // 일본어 특수 태그
         "writing_system:hiragana": "ひらがな",
@@ -1383,7 +1383,7 @@ export class EnhancedConceptModal {
         "formality:formal": "正式",
         "usage_context:greeting": "问候语境",
         "register:universal": "通用",
-        "register:academic": "学术",
+        "register:academic": "教育",
 
         // 중국어 특수 태그
         "tone_pattern:tone1": "一声",

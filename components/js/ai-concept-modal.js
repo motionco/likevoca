@@ -54,7 +54,7 @@ const pageTranslations = {
     transportation: "교통",
     greeting: "인사",
     emotion: "감정",
-    education: "교육",
+
     nature: "자연",
     // 도메인 번역
     general: "일반",
@@ -96,7 +96,7 @@ const pageTranslations = {
     transportation: "Transportation",
     greeting: "Greeting",
     emotion: "Emotion",
-    education: "Education",
+
     nature: "Nature",
     // 도메인 번역
     general: "General",
@@ -138,7 +138,6 @@ const pageTranslations = {
     transportation: "交通",
     greeting: "挨拶",
     emotion: "感情",
-    education: "教育",
     nature: "自然",
     // 도메인 번역
     general: "一般",
@@ -180,7 +179,6 @@ const pageTranslations = {
     transportation: "交通",
     greeting: "问候",
     emotion: "情绪",
-    education: "教育",
     nature: "自然",
     // 도메인 번역
     general: "一般",
