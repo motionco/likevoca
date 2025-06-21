@@ -67,103 +67,26 @@ async function initializeFirebase() {
       };
     } else {
       // 배포 환경에서는 API에서 설정 가져오기
-      try {
-        console.log("🌐 배포 환경에서 Firebase 설정 요청 중...");
-        console.log("📡 Config API URL:", "/api/config");
-
-        const response = await fetch("/api/config", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        console.log("📊 Config API 응답 상태:", response.status);
-        console.log("📊 Config API 응답 상태 텍스트:", response.statusText);
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.warn(`⚠️ Config API 응답 오류: ${response.status}`);
-          console.warn(`⚠️ Config API 오류 내용:`, errorText);
-          throw new Error(`서버 응답 실패: ${response.status} - ${errorText}`);
-        }
-
-        const data = await response.json();
-        console.log("📊 Config API 응답 성공:", data);
-
-        if (data.firebase) {
-          firebaseConfig = data.firebase;
-          console.log("✅ 서버에서 Firebase 설정 가져오기 성공");
-          console.log("🔑 Firebase API 키 존재:", !!firebaseConfig.apiKey);
-
-          // 기존 앱 초기화 취소 후 새로운 설정으로 초기화
-          app = initializeApp(firebaseConfig);
-          auth = getAuth(app);
-          db = getFirestore(app);
-        } else {
-          throw new Error("Firebase 설정이 응답에 없음");
-        }
-      } catch (configError) {
-        console.error("💥 Config API 호출 중 오류:", configError);
-        console.error("📍 Config API 오류 스택:", configError.stack);
-        console.warn(
-          "⚠️ Config API 실패, 기본 설정 사용:",
-          configError.message
-        );
-
-        // Config API 실패 시 하드코딩된 설정 사용 (로컬 환경과 동일한 설정)
-        const fallbackConfig = {
-          apiKey: "AIzaSyCPQVYE7h7odTDCkoH6mrsEtT1giWk8yDM", // 로컬 환경과 동일한 Firebase API 키
-          authDomain: "uploadfile-e6f81.firebaseapp.com",
-          projectId: "uploadfile-e6f81",
-          storageBucket: "uploadfile-e6f81.appspot.com",
-          messagingSenderId: "663760434128",
-          appId: "1:663760434128:web:1ccbc92ab3e34670783fd5",
-          databaseURL:
-            "https://uploadfile-e6f81-default-rtdb.asia-southeast1.firebasedatabase.app",
-        };
-
-        console.log("🔄 Fallback 설정으로 Firebase 재초기화");
-        console.log("🔑 Fallback API 키 존재:", !!fallbackConfig.apiKey);
-
-        try {
-          app = initializeApp(fallbackConfig);
-          auth = getAuth(app);
-          db = getFirestore(app);
-          firebaseConfig = fallbackConfig;
-          console.log("✅ Fallback 설정으로 Firebase 초기화 성공");
-        } catch (fallbackError) {
-          console.error("💥 Fallback 초기화도 실패:", fallbackError);
-          throw fallbackError;
-        }
+      const response = await fetch("/api/config");
+      if (!response.ok) {
+        throw new Error("서버 응답 실패");
       }
-    }
+      const data = await response.json();
+      firebaseConfig = data.firebase;
 
-    console.log("✅ Firebase가 성공적으로 초기화되었습니다.");
-  } catch (error) {
-    console.error("❌ Firebase 초기화 중 치명적 오류:", error);
-    console.error("📍 오류 스택:", error.stack);
-
-    // 마지막 시도: 최소한의 기본 설정으로 초기화
-    try {
-      const emergencyConfig = {
-        apiKey: "emergency-fallback-key",
-        authDomain: "uploadfile-e6f81.firebaseapp.com",
-        projectId: "uploadfile-e6f81",
-        storageBucket: "uploadfile-e6f81.appspot.com",
-        messagingSenderId: "663760434128",
-        appId: "1:663760434128:web:1ccbc92ab3e34670783fd5",
-      };
-
-      app = initializeApp(emergencyConfig);
+      // 기존 앱 초기화 취소 후 새로운 설정으로 초기화
+      app = initializeApp(firebaseConfig);
       auth = getAuth(app);
       db = getFirestore(app);
-      firebaseConfig = emergencyConfig;
-
-      console.log("🆘 응급 설정으로 Firebase 초기화 완료");
-    } catch (emergencyError) {
-      console.error("💥 Firebase 응급 초기화도 실패:", emergencyError);
     }
+
+    console.log("Firebase가 성공적으로 초기화되었습니다.");
+  } catch (error) {
+    console.error(
+      "서버에서 Firebase 설정을 가져오지 못했습니다. 기본 설정을 사용합니다.",
+      error
+    );
+    // 오류가 발생해도 이미 defaultConfig로 초기화가 되어 있으므로 추가 작업 필요없음
   }
 }
 

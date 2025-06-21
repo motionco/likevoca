@@ -692,22 +692,7 @@ export async function handleAIConceptRecommendation(currentUser, db) {
     await conceptUtils.updateUsage(currentUser.uid, { aiUsed: aiUsed + 1 });
     console.log("AI 사용량 업데이트 완료");
 
-    // 성공 메시지 (환경 변수 설정 안내 포함)
-    let successMessage = "AI 개념이 성공적으로 추가되었습니다!";
-
-    // 배포 환경에서 테스트 응답을 받은 경우 안내 메시지 추가
-    if (
-      !isLocalEnvironment &&
-      conceptData &&
-      conceptData.expressions &&
-      conceptData.expressions.korean &&
-      conceptData.expressions.korean.word === "집"
-    ) {
-      successMessage +=
-        "\n\n💡 현재 테스트 모드로 실행 중입니다.\n실제 AI 기능을 사용하려면 Vercel 대시보드에서 GEMINI_API_KEY 환경 변수를 설정해주세요.";
-    }
-
-    alert(successMessage);
+    alert("AI 개념이 성공적으로 추가되었습니다!");
 
     // 페이지 새로고침
     window.location.reload();
