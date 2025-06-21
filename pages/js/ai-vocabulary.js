@@ -9,6 +9,12 @@ import { getActiveLanguage } from "../../utils/language-utils.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
 import { showConceptModal } from "../../components/js/ai-concept-modal.js";
 import { handleAIConceptRecommendation } from "../../utils/ai-concept-utils.js";
+// 필터 공유 모듈 import
+import {
+  VocabularyFilterManager,
+  VocabularyFilterProcessor,
+  setupVocabularyFilters,
+} from "../../utils/vocabulary-filter-shared.js";
 
 // 로컬 환경 감지
 const isLocalEnvironment =
@@ -44,6 +50,19 @@ const pageTranslations = {
     subject: "과목",
     // 도메인 번역
     general: "일반",
+    daily: "일상",
+    food: "음식",
+    travel: "여행",
+    business: "비즈니스",
+    academic: "학술",
+    nature: "자연",
+    technology: "기술",
+    health: "건강",
+    sports: "스포츠",
+    entertainment: "엔터테인먼트",
+    culture: "문화",
+    education: "교육",
+    other: "기타",
   },
   en: {
     meaning: "Meaning",
@@ -64,6 +83,19 @@ const pageTranslations = {
     subject: "Subject",
     // 도메인 번역
     general: "General",
+    daily: "Daily Life",
+    food: "Food",
+    travel: "Travel",
+    business: "Business",
+    academic: "Academic",
+    nature: "Nature",
+    technology: "Technology",
+    health: "Health",
+    sports: "Sports",
+    entertainment: "Entertainment",
+    culture: "Culture",
+    education: "Education",
+    other: "Other",
   },
   ja: {
     meaning: "意味",
@@ -84,6 +116,19 @@ const pageTranslations = {
     subject: "科目",
     // 도메인 번역
     general: "一般",
+    daily: "日常",
+    food: "食べ物",
+    travel: "旅行",
+    business: "ビジネス",
+    academic: "学術",
+    nature: "自然",
+    technology: "技術",
+    health: "健康",
+    sports: "スポーツ",
+    entertainment: "エンターテインメント",
+    culture: "文化",
+    education: "教育",
+    other: "その他",
   },
   zh: {
     meaning: "意思",
@@ -104,6 +149,19 @@ const pageTranslations = {
     subject: "学科",
     // 도메인 번역
     general: "一般",
+    daily: "日常",
+    food: "食物",
+    travel: "旅行",
+    business: "商务",
+    academic: "学术",
+    nature: "自然",
+    technology: "技术",
+    health: "健康",
+    sports: "体育",
+    entertainment: "娱乐",
+    culture: "文化",
+    education: "教育",
+    other: "其他",
   },
 };
 
@@ -273,33 +331,20 @@ function initializeEventListeners() {
     });
   }
 
-  // 언어 전환 버튼
+  // 언어 전환 버튼 (공유 모듈의 swapLanguages 사용)
   const swapLanguagesBtn = document.getElementById("swap-languages");
   if (swapLanguagesBtn) {
     swapLanguagesBtn.addEventListener("click", () => {
-      swapLanguages();
+      filterManager.swapLanguages();
+      applyFiltersAndSort();
     });
   }
 
-  // 검색 입력
-  const searchInput = document.getElementById("search-input");
-  if (searchInput) {
-    searchInput.addEventListener("input", debounce(handleSearch, 300));
-  }
-
-  // 언어 필터
-  const sourceLanguage = document.getElementById("source-language");
-  const targetLanguage = document.getElementById("target-language");
-  if (sourceLanguage) sourceLanguage.addEventListener("change", handleFilter);
-  if (targetLanguage) targetLanguage.addEventListener("change", handleFilter);
-
-  // 카테고리 필터
-  const categoryFilter = document.getElementById("category-filter");
-  if (categoryFilter) categoryFilter.addEventListener("change", handleFilter);
-
-  // 정렬 옵션
-  const sortOption = document.getElementById("sort-option");
-  if (sortOption) sortOption.addEventListener("change", handleSort);
+  // 필터 공유 모듈을 사용하여 이벤트 리스너 설정
+  const filterManager = setupVocabularyFilters(() => {
+    // 필터 변경 시 실행될 콜백 함수
+    applyFiltersAndSort();
+  });
 
   // 더 보기 버튼
   const loadMoreBtn = document.getElementById("load-more");
@@ -356,7 +401,7 @@ async function loadConcepts() {
 }
 
 function updateConceptCount() {
-  const countElement = document.getElementById("concept-count");
+  const countElement = document.getElementById("filtered-count");
   if (countElement) {
     countElement.textContent = allConcepts.length;
   }
@@ -394,95 +439,18 @@ async function updateUsageDisplay() {
   }
 }
 
-function handleSearch() {
-  applyFiltersAndSort();
-}
-
-function handleFilter() {
-  applyFiltersAndSort();
-}
-
-function handleSort() {
-  applyFiltersAndSort();
-}
+// 필터 관련 함수들은 공유 모듈로 대체됨
 
 function applyFiltersAndSort() {
-  const searchTerm =
-    document.getElementById("search-input")?.value.toLowerCase() || "";
-  const sourceLanguage =
-    document.getElementById("source-language")?.value || "korean";
-  const targetLanguage =
-    document.getElementById("target-language")?.value || "english";
-  const category = document.getElementById("category-filter")?.value || "all";
-  const sortOption = document.getElementById("sort-option")?.value || "latest";
+  // 필터 공유 모듈을 사용하여 현재 필터 값들 가져오기
+  const filterManager = new VocabularyFilterManager();
+  const filters = filterManager.getCurrentFilters();
 
-  // 필터링
-  filteredConcepts = allConcepts.filter((concept) => {
-    // 검색어 필터
-    if (searchTerm) {
-      const searchInExpressions = Object.values(concept.expressions || {}).some(
-        (expr) =>
-          expr.word?.toLowerCase().includes(searchTerm) ||
-          expr.definition?.toLowerCase().includes(searchTerm) ||
-          expr.pronunciation?.toLowerCase().includes(searchTerm)
-      );
-
-      const searchInCategory = concept.concept_info?.category
-        ?.toLowerCase()
-        .includes(searchTerm);
-      const searchInDomain = concept.concept_info?.domain
-        ?.toLowerCase()
-        .includes(searchTerm);
-
-      if (!searchInExpressions && !searchInCategory && !searchInDomain) {
-        return false;
-      }
-    }
-
-    // 카테고리 필터
-    if (category !== "all" && concept.concept_info?.category !== category) {
-      return false;
-    }
-
-    // 언어 필터 (원본 언어와 대상 언어에 해당하는 표현이 있는지 확인)
-    const hasSourceLang = concept.expressions?.[sourceLanguage]?.word;
-    const hasTargetLang = concept.expressions?.[targetLanguage]?.word;
-
-    return hasSourceLang && hasTargetLang;
-  });
-
-  // 정렬
-  filteredConcepts.sort((a, b) => {
-    const toDate = (timestamp) =>
-      timestamp && typeof timestamp.toDate === "function"
-        ? timestamp.toDate()
-        : new Date(0);
-
-    switch (sortOption) {
-      case "latest":
-        return (
-          toDate(b.createdAt || b.created_at) -
-          toDate(a.createdAt || a.created_at)
-        );
-      case "oldest":
-        return (
-          toDate(a.createdAt || a.created_at) -
-          toDate(b.createdAt || b.created_at)
-        );
-      case "a-z":
-        const aWord = a.expressions?.[targetLanguage]?.word || "";
-        const bWord = b.expressions?.[targetLanguage]?.word || "";
-        return aWord.localeCompare(bWord);
-      case "z-a":
-        const targetLanguageRev =
-          document.getElementById("target-language")?.value || "english";
-        const aWordRev = a.expressions?.[targetLanguageRev]?.word || "";
-        const bWordRev = b.expressions?.[targetLanguageRev]?.word || "";
-        return bWordRev.localeCompare(aWordRev);
-      default:
-        return 0;
-    }
-  });
+  // 필터 공유 모듈을 사용하여 필터링 및 정렬 수행
+  filteredConcepts = VocabularyFilterProcessor.processFilters(
+    allConcepts,
+    filters
+  );
 
   // 필터된 개념 수 업데이트
   const filteredCountElement = document.getElementById("filtered-count");
@@ -688,45 +656,4 @@ function debounce(func, wait) {
   };
 }
 
-// 언어 전환 함수
-function swapLanguages() {
-  const sourceLanguageElement = document.getElementById("source-language");
-  const targetLanguageElement = document.getElementById("target-language");
-  const swapButton = document.getElementById("swap-languages");
-
-  if (!sourceLanguageElement || !targetLanguageElement || !swapButton) {
-    console.error("언어 전환 요소를 찾을 수 없습니다.");
-    return;
-  }
-
-  const sourceLanguage = sourceLanguageElement.value;
-  const targetLanguage = targetLanguageElement.value;
-
-  // 같은 언어인 경우 전환하지 않음
-  if (sourceLanguage === targetLanguage) {
-    return;
-  }
-
-  // 버튼 애니메이션 효과
-  const icon = swapButton.querySelector("i");
-
-  // 회전 애니메이션 추가
-  icon.style.transform = "rotate(180deg)";
-  icon.style.transition = "transform 0.3s ease";
-
-  // 언어 순서 변경
-  sourceLanguageElement.value = targetLanguage;
-  targetLanguageElement.value = sourceLanguage;
-
-  // 버튼 색상 변경으로 피드백 제공
-  swapButton.classList.add("text-[#4B63AC]", "bg-gray-100");
-
-  // 필터 및 정렬 다시 적용
-  applyFiltersAndSort();
-
-  // 애니메이션 후 원래 상태로 복원
-  setTimeout(() => {
-    icon.style.transform = "rotate(0deg)";
-    swapButton.classList.remove("text-[#4B63AC]", "bg-gray-100");
-  }, 300);
-}
+// 언어 전환 함수는 공유 모듈로 대체됨

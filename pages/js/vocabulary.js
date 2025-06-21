@@ -29,6 +29,12 @@ import {
   getActiveLanguage,
   updateMetadata,
 } from "../../utils/language-utils.js";
+// 필터 공유 모듈 import
+import {
+  VocabularyFilterManager,
+  VocabularyFilterProcessor,
+  setupVocabularyFilters,
+} from "../../utils/vocabulary-filter-shared.js";
 
 let currentUser = null;
 let allConcepts = [];
@@ -655,39 +661,7 @@ function createConceptCard(concept) {
 }
 
 // 언어 전환 함수
-function swapLanguages(elements) {
-  const sourceLanguage = elements.sourceLanguage.value;
-  const targetLanguage = elements.targetLanguage.value;
-
-  // 같은 언어인 경우 전환하지 않음
-  if (sourceLanguage === targetLanguage) {
-    return;
-  }
-
-  // 버튼 애니메이션 효과
-  const swapButton = elements.swapButton;
-  const icon = swapButton.querySelector("i");
-
-  // 회전 애니메이션 추가
-  icon.style.transform = "rotate(180deg)";
-  icon.style.transition = "transform 0.3s ease";
-
-  // 언어 순서 변경
-  elements.sourceLanguage.value = targetLanguage;
-  elements.targetLanguage.value = sourceLanguage;
-
-  // 버튼 색상 변경으로 피드백 제공
-  swapButton.classList.add("text-[#4B63AC]", "bg-gray-100");
-
-  // 검색 및 화면 업데이트
-  handleSearch(elements);
-
-  // 애니메이션 후 원래 상태로 복원
-  setTimeout(() => {
-    icon.style.transform = "rotate(0deg)";
-    swapButton.classList.remove("text-[#4B63AC]", "bg-gray-100");
-  }, 300);
-}
+// 언어 순서 바꾸기 함수는 공유 모듈로 대체됨
 
 // 날짜 포맷팅 함수
 function formatDate(timestamp) {
@@ -707,156 +681,36 @@ function formatDate(timestamp) {
   });
 }
 
-// 검색 및 필터링 함수 (확장된 구조 지원 및 디버깅 개선)
+// 검색 및 필터링 함수 (공유 모듈 사용)
 function handleSearch(elements) {
   displayCount = 12;
   lastVisibleConcept = null;
   firstVisibleConcept = null;
 
-  const searchValue = elements.searchInput.value.toLowerCase();
-  const sourceLanguage = elements.sourceLanguage.value;
-  const targetLanguage = elements.targetLanguage.value;
-  const domainFilter = elements.domainFilter.value;
-  const sortOption = elements.sortOption.value;
+  // 필터 공유 모듈을 사용하여 현재 필터 값들 가져오기
+  const filterManager = new VocabularyFilterManager();
+  const filters = filterManager.getCurrentFilters();
 
   console.log("검색 및 필터링 시작:", {
-    searchValue,
-    sourceLanguage,
-    targetLanguage,
-    domainFilter,
-    sortOption,
+    filters,
     totalConcepts: allConcepts.length,
   });
 
-  // 필터링 로직 (새 구조와 기존 구조 모두 지원)
-  filteredConcepts = allConcepts.filter((concept) => {
-    // 표현 확인 (더 유연한 조건)
-    const sourceExpression = concept.expressions?.[sourceLanguage];
-    const targetExpression = concept.expressions?.[targetLanguage];
+  // 필터 공유 모듈을 사용하여 필터링 및 정렬 수행
+  filteredConcepts = VocabularyFilterProcessor.processFilters(
+    allConcepts,
+    filters
+  );
 
-    // 적어도 하나의 언어에는 단어가 있어야 함 (두 언어 모두 필수는 아님)
-    const hasAnyExpression = Object.values(concept.expressions || {}).some(
-      (expr) => expr.word
-    );
-
-    if (!hasAnyExpression) {
-      return false;
-    }
-
-    // 현재 선택된 언어 조합에서 적어도 하나는 있어야 함
-    if (!sourceExpression?.word && !targetExpression?.word) {
-      return false;
-    }
-
-    // concept_info 가져오기 (새 구조 우선, 기존 구조 fallback)
-    const conceptInfo = concept.concept_info || {
-      domain: concept.domain || "기타",
-      category: concept.category || "일반",
-    };
-
-    // 도메인 필터
-    if (domainFilter !== "all" && conceptInfo.domain !== domainFilter) {
-      return false;
-    }
-
-    // 검색어 필터
-    if (searchValue) {
-      const sourceWord = sourceExpression?.word?.toLowerCase() || "";
-      const targetWord = targetExpression?.word?.toLowerCase() || "";
-      const sourceDefinition =
-        sourceExpression?.definition?.toLowerCase() || "";
-      const targetDefinition =
-        targetExpression?.definition?.toLowerCase() || "";
-
-      // 태그도 검색에 포함 (새 구조)
-      const tags = conceptInfo.tags
-        ? conceptInfo.tags.join(" ").toLowerCase()
-        : "";
-
-      // 도메인과 카테고리도 검색에 포함
-      const domain = conceptInfo.domain?.toLowerCase() || "";
-      const category = conceptInfo.category?.toLowerCase() || "";
-
-      const matchesSearch =
-        sourceWord.includes(searchValue) ||
-        targetWord.includes(searchValue) ||
-        sourceDefinition.includes(searchValue) ||
-        targetDefinition.includes(searchValue) ||
-        tags.includes(searchValue) ||
-        domain.includes(searchValue) ||
-        category.includes(searchValue);
-
-      if (!matchesSearch) {
-        return false;
-      }
-    }
-
-    return true;
+  console.log("필터링 완료:", {
+    filteredCount: filteredConcepts.length,
   });
-
-  // 정렬
-  sortFilteredConcepts(sortOption);
 
   // 표시
   displayConceptList();
 }
 
-// 정렬 함수 (확장된 구조 지원)
-function sortFilteredConcepts(sortOption) {
-  const getConceptTime = (concept) => {
-    // 최상위 레벨 created_at만 처리
-    if (concept.created_at instanceof Timestamp) {
-      return concept.created_at.toMillis();
-    }
-    if (concept.created_at) {
-      return new Date(concept.created_at).getTime();
-    }
-
-    // timestamp 확인 (더 오래된 데이터)
-    if (concept.timestamp instanceof Timestamp) {
-      return concept.timestamp.toMillis();
-    }
-    if (concept.timestamp) {
-      return new Date(concept.timestamp).getTime();
-    }
-
-    // 시간 정보가 없으면 현재 시간으로 간주
-    return Date.now();
-  };
-
-  switch (sortOption) {
-    case "latest":
-      filteredConcepts.sort((a, b) => {
-        return getConceptTime(b) - getConceptTime(a);
-      });
-      break;
-    case "oldest":
-      filteredConcepts.sort((a, b) => {
-        return getConceptTime(a) - getConceptTime(b);
-      });
-      break;
-    case "a-z":
-      filteredConcepts.sort((a, b) => {
-        const targetLanguage = document.getElementById("target-language").value;
-        const wordA =
-          a.expressions?.[targetLanguage]?.word?.toLowerCase() || "";
-        const wordB =
-          b.expressions?.[targetLanguage]?.word?.toLowerCase() || "";
-        return wordA.localeCompare(wordB);
-      });
-      break;
-    case "z-a":
-      filteredConcepts.sort((a, b) => {
-        const targetLanguage = document.getElementById("target-language").value;
-        const wordA =
-          a.expressions?.[targetLanguage]?.word?.toLowerCase() || "";
-        const wordB =
-          b.expressions?.[targetLanguage]?.word?.toLowerCase() || "";
-        return wordB.localeCompare(wordA);
-      });
-      break;
-  }
-}
+// 정렬 함수는 공유 모듈로 대체됨
 
 // 개념 목록 표시 함수 (디버깅 개선)
 function displayConceptList() {
@@ -2246,17 +2100,13 @@ function setupEventListeners() {
     loadMoreButton: !!elements.loadMoreButton,
   });
 
-  // 검색 이벤트
-  if (elements.searchInput) {
-    elements.searchInput.addEventListener("input", () =>
-      handleSearch(elements)
-    );
-    console.log("✅ 검색 이벤트 리스너 등록됨");
-  } else {
-    console.error("❌ search-input 요소를 찾을 수 없습니다");
-  }
+  // 필터 공유 모듈을 사용하여 이벤트 리스너 설정
+  const filterManager = setupVocabularyFilters(() => {
+    // 필터 변경 시 실행될 콜백 함수
+    handleSearch(elements);
+  });
 
-  // 언어 변경 이벤트
+  // 언어 변경 이벤트 (데이터 다시 로드 필요)
   [elements.sourceLanguage, elements.targetLanguage].forEach((select) => {
     if (select) {
       select.addEventListener("change", () => {
@@ -2265,26 +2115,12 @@ function setupEventListeners() {
     }
   });
 
-  // 도메인 필터 이벤트
-  if (elements.domainFilter) {
-    elements.domainFilter.addEventListener("change", () => {
+  // 언어 순서 바꾸기 이벤트 (공유 모듈 사용)
+  if (elements.swapButton) {
+    elements.swapButton.addEventListener("click", () => {
+      filterManager.swapLanguages();
       handleSearch(elements);
     });
-  }
-
-  // 정렬 옵션 이벤트
-  if (elements.sortOption) {
-    elements.sortOption.addEventListener("change", () => {
-      sortFilteredConcepts(elements.sortOption.value);
-      displayConceptList();
-    });
-  }
-
-  // 언어 순서 바꾸기 이벤트
-  if (elements.swapButton) {
-    elements.swapButton.addEventListener("click", () =>
-      swapLanguages(elements)
-    );
   }
 
   // 더 보기 버튼 이벤트

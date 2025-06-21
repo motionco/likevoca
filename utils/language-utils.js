@@ -340,6 +340,8 @@ const translations = {
     domain_health: "건강",
     domain_sports: "스포츠",
     domain_entertainment: "엔터테인먼트",
+    domain_culture: "문화",
+    domain_education: "교육",
     domain_other: "기타",
     // 로그인 페이지 번역
     login_with_google: "Google로 로그인",
@@ -847,6 +849,8 @@ const translations = {
     domain_health: "Health",
     domain_sports: "Sports",
     domain_entertainment: "Entertainment",
+    domain_culture: "Culture",
+    domain_education: "Education",
     domain_other: "Other",
     // 로그인 페이지 번역
     login_with_google: "Login with Google",
@@ -1377,6 +1381,8 @@ const translations = {
     domain_health: "健康",
     domain_sports: "スポーツ",
     domain_entertainment: "エンターテインメント",
+    domain_culture: "文化",
+    domain_education: "教育",
     domain_other: "その他",
     // 로그인 페이지 번역
     login_with_google: "Googleでログイン",
@@ -1737,6 +1743,8 @@ const translations = {
     domain_health: "健康",
     domain_sports: "体育",
     domain_entertainment: "娱乐",
+    domain_culture: "文化",
+    domain_education: "教育",
     domain_other: "其他",
     // 登录页面翻译
     login_with_google: "使用Google登录",

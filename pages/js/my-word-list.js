@@ -21,6 +21,12 @@ import {
   translateDomainKey,
   translateCategoryKey,
 } from "../../js/i18n.js";
+// 필터 공유 모듈 import
+import {
+  VocabularyFilterManager,
+  VocabularyFilterProcessor,
+  setupVocabularyFilters,
+} from "../../utils/vocabulary-filter-shared.js";
 
 let currentUser = null;
 let userBookmarks = [];
@@ -524,18 +530,12 @@ function formatDate(timestamp) {
 
 // 이벤트 리스너 설정
 function setupEventListeners() {
-  const searchInput = document.getElementById("search-input");
   const sourceLanguageSelect = document.getElementById("source-language");
   const targetLanguageSelect = document.getElementById("target-language");
-  const swapButton = document.getElementById("swap-languages");
-  const categoryFilter = document.getElementById("category-filter");
-  const sortOption = document.getElementById("sort-option");
   const loadMoreBtn = document.getElementById("load-more");
 
-  // 검색 기능
-  if (searchInput) {
-    searchInput.addEventListener("input", handleSearch);
-  }
+  // 필터 공유 모듈을 사용하여 이벤트 리스너 설정
+  const filterManager = setupVocabularyFilters(handleSearch);
 
   // 언어 선택 변경
   if (sourceLanguageSelect) {
@@ -545,19 +545,13 @@ function setupEventListeners() {
     targetLanguageSelect.addEventListener("change", handleLanguageChange);
   }
 
-  // 언어 순서 바꾸기
+  // 언어 순서 바꾸기 (공유 모듈 사용)
+  const swapButton = document.getElementById("swap-languages");
   if (swapButton) {
-    swapButton.addEventListener("click", swapLanguages);
-  }
-
-  // 카테고리 필터
-  if (categoryFilter) {
-    categoryFilter.addEventListener("change", handleSearch);
-  }
-
-  // 정렬 옵션
-  if (sortOption) {
-    sortOption.addEventListener("change", handleSortChange);
+    swapButton.addEventListener("click", () => {
+      filterManager.swapLanguages();
+      handleSearch();
+    });
   }
 
   // 더 보기 버튼
@@ -569,51 +563,17 @@ function setupEventListeners() {
   }
 }
 
-// 검색 처리
+// 검색 처리 (공유 모듈 사용)
 function handleSearch() {
-  const searchInput = document.getElementById("search-input");
-  const categoryFilter = document.getElementById("category-filter");
+  // 필터 공유 모듈을 사용하여 현재 필터 값들 가져오기
+  const filterManager = new VocabularyFilterManager();
+  const filters = filterManager.getCurrentFilters();
 
-  if (!searchInput || !categoryFilter) return;
-
-  const searchTerm = searchInput.value.toLowerCase().trim();
-  const selectedCategory = categoryFilter.value;
-
-  filteredConcepts = bookmarkedConcepts.filter((concept) => {
-    const expressions = concept.expressions || {};
-    const conceptInfo = concept.concept_info || {};
-
-    // 카테고리 필터
-    if (
-      selectedCategory !== "all" &&
-      conceptInfo.category !== selectedCategory
-    ) {
-      return false;
-    }
-
-    // 검색어 필터
-    if (!searchTerm) {
-      return true;
-    }
-
-    // 모든 언어의 표현에서 검색
-    return Object.values(expressions).some((expr) => {
-      if (!expr) return false;
-
-      return (
-        (expr.word && expr.word.toLowerCase().includes(searchTerm)) ||
-        (expr.definition &&
-          expr.definition.toLowerCase().includes(searchTerm)) ||
-        (expr.pronunciation &&
-          expr.pronunciation.toLowerCase().includes(searchTerm)) ||
-        (expr.romanization &&
-          expr.romanization.toLowerCase().includes(searchTerm))
-      );
-    });
-  });
-
-  // 정렬 적용
-  applySorting();
+  // 필터 공유 모듈을 사용하여 필터링 및 정렬 수행
+  filteredConcepts = VocabularyFilterProcessor.processFilters(
+    bookmarkedConcepts,
+    filters
+  );
 
   // 표시 카운트 초기화
   displayCount = 12;
@@ -635,92 +595,7 @@ function handleLanguageChange() {
   }
 }
 
-// 언어 순서 바꾸기
-function swapLanguages() {
-  const sourceLanguageSelect = document.getElementById("source-language");
-  const targetLanguageSelect = document.getElementById("target-language");
-
-  if (sourceLanguageSelect && targetLanguageSelect) {
-    const tempSource = sourceLanguageSelect.value;
-    const tempTarget = targetLanguageSelect.value;
-
-    // 같은 언어인 경우 전환하지 않음
-    if (tempSource === tempTarget) {
-      return;
-    }
-
-    sourceLanguageSelect.value = tempTarget;
-    targetLanguageSelect.value = tempSource;
-
-    sourceLanguage = tempTarget;
-    targetLanguage = tempSource;
-
-    // 버튼 애니메이션 효과
-    const swapButton = document.getElementById("swap-languages");
-    const icon = swapButton.querySelector("i");
-
-    // 회전 애니메이션 추가
-    icon.style.transform = "rotate(180deg)";
-    icon.style.transition = "transform 0.3s ease";
-
-    // 버튼 색상 변경으로 피드백 제공
-    swapButton.classList.add("text-[#4B63AC]", "bg-gray-100");
-
-    // 카드 목록 새로고침
-    displayConceptList();
-
-    // 애니메이션 후 원래 상태로 복원
-    setTimeout(() => {
-      icon.style.transform = "rotate(0deg)";
-      swapButton.classList.remove("text-[#4B63AC]", "bg-gray-100");
-    }, 300);
-  }
-}
-
-// 정렬 변경 처리
-function handleSortChange() {
-  applySorting();
-  displayConceptList();
-}
-
-// 정렬 적용
-function applySorting() {
-  const sortOption = document.getElementById("sort-option");
-  if (!sortOption) return;
-
-  const sortValue = sortOption.value;
-
-  filteredConcepts.sort((a, b) => {
-    switch (sortValue) {
-      case "latest":
-        // 북마크 순서 기준 (최신 북마크가 위로)
-        const aIndex = userBookmarks.indexOf(a.id);
-        const bIndex = userBookmarks.indexOf(b.id);
-        return bIndex - aIndex;
-
-      case "oldest":
-        // 북마크 순서 기준 (오래된 북마크가 위로)
-        const aIndexOld = userBookmarks.indexOf(a.id);
-        const bIndexOld = userBookmarks.indexOf(b.id);
-        return aIndexOld - bIndexOld;
-
-      case "a-z":
-        // 알파벳순 (원본 언어 기준)
-        const aWord = a.expressions?.[sourceLanguage]?.word || "";
-        const bWord = b.expressions?.[sourceLanguage]?.word || "";
-        return aWord.localeCompare(bWord);
-
-      case "z-a":
-        // 역알파벳순 (원본 언어 기준)
-        const aWordRev = a.expressions?.[sourceLanguage]?.word || "";
-        const bWordRev = b.expressions?.[sourceLanguage]?.word || "";
-        return bWordRev.localeCompare(aWordRev);
-
-      default:
-        return 0;
-    }
-  });
-}
+// 언어 순서 바꾸기, 정렬 함수들은 공유 모듈로 대체됨
 
 // 개념 상세보기 모달 열기
 window.openConceptViewModal = function (conceptId) {

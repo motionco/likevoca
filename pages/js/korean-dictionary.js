@@ -21,6 +21,12 @@ import {
 } from "../../components/js/korean-word-modal.js";
 import { initialize as initializeAddWordModal } from "../../components/js/add-korean-word-modal.js";
 import { initialize as initializeBulkAddModal } from "../../components/js/bulk-add-korean-words-modal.js";
+// 필터 공유 모듈 import
+import {
+  VocabularyFilterManager,
+  VocabularyFilterProcessor,
+  setupVocabularyFilters,
+} from "../../utils/vocabulary-filter-shared.js";
 
 let currentUser = null;
 let allWords = [];
@@ -85,14 +91,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
     }
 
-    // 검색 이벤트 리스너 등록
-    if (elements.searchInput) {
-      elements.searchInput.addEventListener("input", () =>
-        handleSearch(elements)
-      );
-    }
+    // 필터 공유 모듈을 사용하여 이벤트 리스너 설정
+    const filterManager = setupVocabularyFilters(() => {
+      handleSearch(elements);
+    });
 
-    // 필터 및 정렬 변경 이벤트 리스너 등록
+    // 한국어 사전 전용 필터들
     if (elements.searchDirection) {
       elements.searchDirection.addEventListener("change", () =>
         handleSearch(elements)
@@ -113,12 +117,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (elements.levelFilter) {
       elements.levelFilter.addEventListener("change", () =>
-        handleSearch(elements)
-      );
-    }
-
-    if (elements.sortOption) {
-      elements.sortOption.addEventListener("change", () =>
         handleSearch(elements)
       );
     }

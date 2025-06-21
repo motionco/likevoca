@@ -18,9 +18,9 @@ const PROMPTS = {
   korean: {
     system:
       "당신은 다국어 학습을 도와주는 AI 어시스턴트입니다. 사용자가 요청한 주제나 카테고리에 맞는 유용한 개념을 추천해주세요.",
-    user: (topic, category, languages) => `
+    user: (topic, domain, languages) => `
 주제: ${topic || "일상생활"}
-카테고리: ${category || "daily"}
+도메인: ${domain || "daily"}
 언어: ${languages.join(", ")}
 
 위 조건에 맞는 학습하기 좋은 개념 하나를 추천해주세요. 
@@ -45,8 +45,8 @@ const PROMPTS = {
 
 {
   "concept_info": {
-    "domain": "${topic || "daily"}",
-    "category": "${category || "other"}",
+    "domain": "${domain || "daily"}",
+    "category": "other",
     "difficulty": "beginner",
     "tags": ["태그1", "태그2", "태그3"],
     "unicode_emoji": "적절한 이모지 1개",
@@ -85,9 +85,9 @@ const PROMPTS = {
   english: {
     system:
       "You are an AI assistant that helps with multilingual learning. Please recommend useful concepts that match the user's requested topic or category.",
-    user: (topic, category, languages) => `
+    user: (topic, domain, languages) => `
 Topic: ${topic || "daily life"}
-Category: ${category || "daily"}
+Domain: ${domain || "daily"}
 Languages: ${languages.join(", ")}
 
 Please recommend one good concept to learn based on the above conditions.
@@ -112,8 +112,8 @@ Respond in the following JSON format:
 
 {
   "concept_info": {
-    "domain": "${topic || "daily"}",
-    "category": "${category || "other"}",
+    "domain": "${domain || "daily"}",
+    "category": "other",
     "difficulty": "beginner",
     "tags": ["tag1", "tag2", "tag3"],
     "unicode_emoji": "appropriate emoji",
@@ -330,11 +330,11 @@ export async function handleAIConceptRecommendation(currentUser, db) {
     }
     console.log("선택된 주제:", topic);
 
-    const category =
+    const domain =
       prompt(
-        "카테고리를 입력해주세요 (fruit, food, animal, daily, travel, business 중 하나)"
+        "도메인을 입력해주세요 (daily, food, travel, business, academic, nature, technology, health, sports, entertainment, culture, education, other 중 하나)"
       ) || "daily";
-    console.log("선택된 카테고리:", category);
+    console.log("선택된 도메인:", domain);
 
     // 학습하고 싶은 언어 선택
     console.log("지원되는 언어:", supportedLanguages);
@@ -421,7 +421,7 @@ export async function handleAIConceptRecommendation(currentUser, db) {
       // 실제 환경에서는 Gemini API 호출
       conceptData = await generateConceptWithGemini(
         topic,
-        category,
+        domain,
         selectedLanguages
       );
     }
@@ -443,10 +443,7 @@ export async function handleAIConceptRecommendation(currentUser, db) {
         domain:
           conceptData.concept_info?.domain || conceptData.domain || "general",
         category:
-          conceptData.concept_info?.category ||
-          conceptData.category ||
-          category ||
-          "common",
+          conceptData.concept_info?.category || conceptData.category || "other",
         difficulty: conceptData.concept_info?.difficulty || "beginner",
         unicode_emoji:
           conceptData.concept_info?.unicode_emoji ||
@@ -511,7 +508,7 @@ export async function handleAIConceptRecommendation(currentUser, db) {
   }
 }
 
-async function generateConceptWithGemini(topic, category, languages) {
+async function generateConceptWithGemini(topic, domain, languages) {
   try {
     // 사용자 언어 감지
     const userLang = navigator.language.toLowerCase().startsWith("ko")
@@ -527,9 +524,7 @@ async function generateConceptWithGemini(topic, category, languages) {
           parts: [
             {
               text:
-                prompt.system +
-                "\n\n" +
-                prompt.user(topic, category, languages),
+                prompt.system + "\n\n" + prompt.user(topic, domain, languages),
             },
           ],
         },
