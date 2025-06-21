@@ -8,7 +8,9 @@
     { "src": "assets/**", "use": "@vercel/static" },
     { "src": "components/**", "use": "@vercel/static" },
     { "src": "pages/**", "use": "@vercel/static" },
-    { "src": "utils/**", "use": "@vercel/static" }
+    { "src": "utils/**", "use": "@vercel/static" },
+    { "src": "samples/**", "use": "@vercel/static" },
+    { "src": "locales/**", "use": "@vercel/static" }
   ],
   "routes": [
     { "src": "/api/config", "dest": "/api/config.js" },
