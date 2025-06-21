@@ -1,3 +1,10 @@
+// 공통 번역 유틸리티 import
+import {
+  translateDomain,
+  translateCategory,
+  translateDomainCategory,
+} from "../../utils/translation-utils.js";
+
 // 도메인별 카테고리 매핑
 export const domainCategoryMapping = {
   daily: [
@@ -2715,9 +2722,17 @@ function getTranslation(key, lang = null) {
   return key;
 }
 
-// 카테고리 키를 현재 언어로 번역
+// 카테고리 키를 현재 언어로 번역 (공통 모듈 사용)
 function translateCategoryKey(categoryKey, lang = null) {
   const currentLang = lang || localStorage.getItem("preferredLanguage") || "ko";
+
+  // 공통 번역 모듈 사용
+  const result = translateCategory(categoryKey, currentLang);
+  if (result !== categoryKey) {
+    return result;
+  }
+
+  // 기존 로컬 번역 매핑 (fallback)
 
   // 카테고리 번역 매핑 (확실한 번역을 위해)
   const categoryTranslations = {
@@ -3279,9 +3294,17 @@ function translateCategoryKey(categoryKey, lang = null) {
   return categoryKey;
 }
 
-// 도메인 키를 현재 언어로 번역하는 함수
+// 도메인 키를 현재 언어로 번역하는 함수 (공통 모듈 사용)
 function translateDomainKey(domainKey, lang = null) {
   const currentLang = lang || localStorage.getItem("preferredLanguage") || "ko";
+
+  // 공통 번역 모듈 사용
+  const result = translateDomain(domainKey, currentLang);
+  if (result !== domainKey) {
+    return result;
+  }
+
+  // 기존 로컬 번역 매핑 (fallback)
 
   // 도메인 번역 매핑
   const domainTranslations = {

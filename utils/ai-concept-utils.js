@@ -151,6 +151,13 @@ Please provide accurate words and translations that are actually usable. Fill al
   },
 };
 
+// 공통 번역 유틸리티 import
+import {
+  translateDomain,
+  translateCategory,
+  translateDomainCategory,
+} from "./translation-utils.js";
+
 // 테스트 데이터 (로컬 환경용) - 다국어 단어장과 완전히 동일한 구조
 const TEST_CONCEPTS = [
   {
@@ -729,27 +736,67 @@ async function showAIConceptSelectionModal() {
             
             <!-- 도메인 선택 -->
             <div class="mb-6">
-              <label class="block text-sm font-medium text-gray-700 mb-2">${texts.step1}</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">${
+                texts.step1
+              }</label>
               <select id="ai-domain-select" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 <option value="">${texts.selectDomain}</option>
-                <option value="daily">${domainTranslations.daily[currentLang]}</option>
-                <option value="food">${domainTranslations.food[currentLang]}</option>
-                <option value="travel">${domainTranslations.travel[currentLang]}</option>
-                <option value="business">${domainTranslations.business[currentLang]}</option>
-                <option value="education">${domainTranslations.education[currentLang]}</option>
-                <option value="nature">${domainTranslations.nature[currentLang]}</option>
-                <option value="technology">${domainTranslations.technology[currentLang]}</option>
-                <option value="health">${domainTranslations.health[currentLang]}</option>
-                <option value="sports">${domainTranslations.sports[currentLang]}</option>
-                <option value="entertainment">${domainTranslations.entertainment[currentLang]}</option>
-                <option value="culture">${domainTranslations.culture[currentLang]}</option>
-                <option value="other">${domainTranslations.other[currentLang]}</option>
+                <option value="daily">${translateDomain(
+                  "daily",
+                  currentLang
+                )}</option>
+                <option value="food">${translateDomain(
+                  "food",
+                  currentLang
+                )}</option>
+                <option value="travel">${translateDomain(
+                  "travel",
+                  currentLang
+                )}</option>
+                <option value="business">${translateDomain(
+                  "business",
+                  currentLang
+                )}</option>
+                <option value="education">${translateDomain(
+                  "education",
+                  currentLang
+                )}</option>
+                <option value="nature">${translateDomain(
+                  "nature",
+                  currentLang
+                )}</option>
+                <option value="technology">${translateDomain(
+                  "technology",
+                  currentLang
+                )}</option>
+                <option value="health">${translateDomain(
+                  "health",
+                  currentLang
+                )}</option>
+                <option value="sports">${translateDomain(
+                  "sports",
+                  currentLang
+                )}</option>
+                <option value="entertainment">${translateDomain(
+                  "entertainment",
+                  currentLang
+                )}</option>
+                <option value="culture">${translateDomain(
+                  "culture",
+                  currentLang
+                )}</option>
+                <option value="other">${translateDomain(
+                  "other",
+                  currentLang
+                )}</option>
               </select>
             </div>
             
             <!-- 카테고리 선택 -->
             <div class="mb-6">
-              <label class="block text-sm font-medium text-gray-700 mb-2">${texts.step2}</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">${
+                texts.step2
+              }</label>
               <select id="ai-category-select" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" disabled>
                 <option value="">${texts.selectDomainFirst}</option>
               </select>
@@ -757,7 +804,9 @@ async function showAIConceptSelectionModal() {
             
             <!-- 언어 선택 -->
             <div class="mb-6">
-              <label class="block text-sm font-medium text-gray-700 mb-2">${texts.step3}</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">${
+                texts.step3
+              }</label>
               <div class="grid grid-cols-2 gap-3">
                 <label class="flex items-center space-x-2 p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
                   <input type="checkbox" id="lang-korean" value="korean" class="form-checkbox">
@@ -1523,11 +1572,7 @@ async function showAIConceptSelectionModal() {
         categoryMapping[selectedDomain].forEach((category) => {
           const option = document.createElement("option");
           option.value = category;
-          option.textContent = categoryTranslations[category]
-            ? categoryTranslations[category][currentLang] ||
-              categoryTranslations[category].ko ||
-              category
-            : category;
+          option.textContent = translateCategory(category, currentLang);
           categorySelect.appendChild(option);
         });
       } else {

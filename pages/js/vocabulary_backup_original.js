@@ -54,10 +54,6 @@ let firstVisibleConcept = null;
 let userLanguage = "ko";
 
 // 번역 함수들은 이제 translation-utils.js에서 import
-
-/*
-// 도메인 번역 매핑 (임시 - 호환성을 위해 유지) - 중복 선언으로 주석 처리
-const domainTranslations = {
   daily: { ko: "일상생활", en: "Daily Life", ja: "日常生活", zh: "日常生活" },
   food: {
     ko: "음식/요리",
@@ -1596,11 +1592,9 @@ function createConceptCard(concept) {
             <i class="fas fa-bookmark text-gray-400"></i>
           </button>
         <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-          ${translateDomainCategory(
-            conceptInfo.domain,
-            conceptInfo.category,
-            userLanguage
-          )}
+          ${translateDomainKey(conceptInfo.domain)}/${translateCategoryKey(
+    conceptInfo.category
+  )}
         </span>
         </div>
       </div>
@@ -2050,11 +2044,9 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
   if (domainCategoryElement) {
     const domain = conceptInfo.domain || conceptData.domain || "기타";
     const category = conceptInfo.category || conceptData.category || "일반";
-    domainCategoryElement.textContent = translateDomainCategory(
-      domain,
-      category,
-      userLanguage
-    );
+    domainCategoryElement.textContent = `${translateDomainKey(
+      domain
+    )}/${translateCategoryKey(category)}`;
   }
 
   // 이모지와 색상 (개념 카드와 동일한 우선순위 적용)

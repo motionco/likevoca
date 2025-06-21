@@ -53,18 +53,123 @@ let lastVisibleConcept = null;
 let firstVisibleConcept = null;
 let userLanguage = "ko";
 
-// 번역 함수들은 이제 translation-utils.js에서 import
-
-/*
-// 도메인 번역 매핑 (임시 - 호환성을 위해 유지) - 중복 선언으로 주석 처리
-const domainTranslations = {
-  daily: { ko: "일상생활", en: "Daily Life", ja: "日常生活", zh: "日常生活" },
-  food: {
-    ko: "음식/요리",
-    en: "Food/Cooking",
-    ja: "食べ物/料理",
-    zh: "食物/烹饪",
+// 다국어 번역 텍스트
+const pageTranslations = {
+  ko: {
+    no_concepts: "개념이 없습니다.",
+    loading: "로딩 중...",
+    error: "오류가 발생했습니다.",
+    add_concept: "개념 추가",
+    bulk_import: "일괄 가져오기",
+    search_placeholder: "검색어를 입력하세요...",
+    view_details: "자세히 보기",
+    edit: "편집",
+    delete: "삭제",
+    error_title: "오류 발생!",
+    error_message: "페이지를 로드하는 중 문제가 발생했습니다.",
+    error_details: "세부 정보:",
+    login_required: "로그인이 필요합니다.",
   },
+  en: {
+    no_concepts: "No concepts found.",
+    loading: "Loading...",
+    error: "An error occurred.",
+    add_concept: "Add Concept",
+    bulk_import: "Bulk Import",
+    search_placeholder: "Enter search term...",
+    view_details: "View Details",
+    edit: "Edit",
+    delete: "Delete",
+    error_title: "Error Occurred!",
+    error_message: "There was a problem loading the page.",
+    error_details: "Details:",
+    login_required: "Login required.",
+  },
+  ja: {
+    no_concepts: "コンセプトが見つかりません。",
+    loading: "読み込み中...",
+    error: "エラーが発生しました。",
+    add_concept: "コンセプト追加",
+    bulk_import: "一括インポート",
+    search_placeholder: "検索語を入力してください...",
+    view_details: "詳細を見る",
+    edit: "編集",
+    delete: "削除",
+    error_title: "エラーが発生しました！",
+    error_message: "ページの読み込み中に問題が発生しました。",
+    error_details: "詳細:",
+    login_required: "ログインが必要です。",
+  },
+  zh: {
+    no_concepts: "未找到概念。",
+    loading: "加载中...",
+    error: "发生错误。",
+    add_concept: "添加概念",
+    bulk_import: "批量导入",
+    search_placeholder: "请输入搜索词...",
+    view_details: "查看详情",
+    edit: "编辑",
+    delete: "删除",
+    error_title: "发生错误!",
+    error_message: "加载页面时出现问题。",
+    error_details: "详细信息:",
+    login_required: "需要登录。",
+  },
+};
+
+// 문법 번역 매핑
+const grammarTranslations = {
+  ko: {
+    "noun": "명사",
+    "verb": "동사", 
+    "adjective": "형용사",
+    "adverb": "부사",
+    "preposition": "전치사",
+    "conjunction": "접속사",
+    "pronoun": "대명사",
+    "interjection": "감탄사",
+    "article": "관사",
+    "determiner": "한정사"
+  },
+  en: {
+    "명사": "noun",
+    "동사": "verb",
+    "형용사": "adjective", 
+    "부사": "adverb",
+    "전치사": "preposition",
+    "접속사": "conjunction",
+    "대명사": "pronoun",
+    "감탄사": "interjection",
+    "관사": "article",
+    "한정사": "determiner"
+  },
+  ja: {
+    "noun": "名詞",
+    "verb": "動詞",
+    "adjective": "形容詞",
+    "adverb": "副詞", 
+    "preposition": "前置詞",
+    "conjunction": "接続詞",
+    "pronoun": "代名詞",
+    "interjection": "感嘆詞",
+    "article": "冠詞",
+    "determiner": "限定詞"
+  },
+  zh: {
+    "noun": "名词",
+    "verb": "动词",
+    "adjective": "形容词",
+    "adverb": "副词",
+    "preposition": "介词", 
+    "conjunction": "连词",
+    "pronoun": "代词",
+    "interjection": "感叹词",
+    "article": "冠词",
+    "determiner": "限定词"
+  }
+};
+
+// 다국어 번역 텍스트 가져오기 함수 (공통 모듈 사용)
   travel: { ko: "여행", en: "Travel", ja: "旅行", zh: "旅行" },
   business: {
     ko: "비즈니스/업무",
@@ -1596,11 +1701,9 @@ function createConceptCard(concept) {
             <i class="fas fa-bookmark text-gray-400"></i>
           </button>
         <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-          ${translateDomainCategory(
-            conceptInfo.domain,
-            conceptInfo.category,
-            userLanguage
-          )}
+          ${translateDomainKey(conceptInfo.domain)}/${translateCategoryKey(
+    conceptInfo.category
+  )}
         </span>
         </div>
       </div>
@@ -2050,11 +2153,9 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
   if (domainCategoryElement) {
     const domain = conceptInfo.domain || conceptData.domain || "기타";
     const category = conceptInfo.category || conceptData.category || "일반";
-    domainCategoryElement.textContent = translateDomainCategory(
-      domain,
-      category,
-      userLanguage
-    );
+    domainCategoryElement.textContent = `${translateDomainKey(
+      domain
+    )}/${translateCategoryKey(category)}`;
   }
 
   // 이모지와 색상 (개념 카드와 동일한 우선순위 적용)

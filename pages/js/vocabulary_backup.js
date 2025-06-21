@@ -35,12 +35,6 @@ import {
   VocabularyFilterProcessor,
   setupVocabularyFilters,
 } from "../../utils/vocabulary-filter-shared.js";
-// 공통 번역 유틸리티 import
-import {
-  translateDomain,
-  translateCategory,
-  translateDomainCategory,
-} from "../../utils/translation-utils.js";
 
 let currentUser = null;
 let allConcepts = [];
@@ -53,10 +47,7 @@ let lastVisibleConcept = null;
 let firstVisibleConcept = null;
 let userLanguage = "ko";
 
-// 번역 함수들은 이제 translation-utils.js에서 import
-
-/*
-// 도메인 번역 매핑 (임시 - 호환성을 위해 유지) - 중복 선언으로 주석 처리
+// 도메인 번역 매핑 (ai-concept-utils.js와 동일)
 const domainTranslations = {
   daily: { ko: "일상생활", en: "Daily Life", ja: "日常生活", zh: "日常生活" },
   food: {
@@ -554,7 +545,6 @@ const categoryTranslations = {
   greeting: { ko: "인사", en: "Greeting", ja: "挨拶", zh: "问候" },
   emotion: { ko: "감정", en: "Emotion", ja: "感情", zh: "情绪" },
 };
-*/
 
 // 페이지별 번역 키
 const pageTranslations = {
@@ -1349,9 +1339,41 @@ function getTranslatedText(key) {
   return key;
 }
 
-// 도메인 번역 함수 (공통 모듈 사용)
+// 도메인 번역 함수 (개선됨)
 function translateDomainKey(domainKey, lang = null) {
-  return translateDomain(domainKey, lang);
+  const currentLang =
+    lang || localStorage.getItem("preferredLanguage") || userLanguage || "ko";
+
+  // 1. 로컬 도메인 번역에서 확인
+  if (
+    domainTranslations[domainKey] &&
+    domainTranslations[domainKey][currentLang]
+  ) {
+    return domainTranslations[domainKey][currentLang];
+  }
+
+  // 2. 전역 번역 시스템 확인
+  if (typeof window.translateDomainKey === "function") {
+    const result = window.translateDomainKey(domainKey, lang);
+    if (result !== domainKey) return result;
+  }
+
+  // 3. 전역 번역 객체 확인
+  if (
+    window.translations &&
+    window.translations[currentLang] &&
+    window.translations[currentLang][domainKey]
+  ) {
+    return window.translations[currentLang][domainKey];
+  }
+
+  // 4. 영어 폴백
+  if (domainTranslations[domainKey] && domainTranslations[domainKey].en) {
+    return domainTranslations[domainKey].en;
+  }
+
+  // 5. 원본 키 반환
+  return domainKey;
 }
 
 // 카테고리 번역 함수 (개선됨)
@@ -1596,11 +1618,9 @@ function createConceptCard(concept) {
             <i class="fas fa-bookmark text-gray-400"></i>
           </button>
         <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-          ${translateDomainCategory(
-            conceptInfo.domain,
-            conceptInfo.category,
-            userLanguage
-          )}
+          ${translateDomainKey(conceptInfo.domain)}/${translateCategoryKey(
+    conceptInfo.category
+  )}
         </span>
         </div>
       </div>
@@ -2050,11 +2070,9 @@ function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
   if (domainCategoryElement) {
     const domain = conceptInfo.domain || conceptData.domain || "기타";
     const category = conceptInfo.category || conceptData.category || "일반";
-    domainCategoryElement.textContent = translateDomainCategory(
-      domain,
-      category,
-      userLanguage
-    );
+    domainCategoryElement.textContent = `${translateDomainKey(
+      domain
+    )}/${translateCategoryKey(category)}`;
   }
 
   // 이모지와 색상 (개념 카드와 동일한 우선순위 적용)
