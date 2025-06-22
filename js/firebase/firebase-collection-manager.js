@@ -1650,6 +1650,51 @@ export class CollectionManager {
       throw error;
     }
   }
+
+  /**
+   * 개별 문법 패턴 생성 (분리된 업로드용)
+   */
+  async createGrammarPattern(patternData) {
+    try {
+      const patternRef = doc(collection(db, "grammar"));
+      const patternId = patternRef.id;
+
+      const patternDoc = {
+        ...patternData,
+        created_at: serverTimestamp(),
+        updated_at: serverTimestamp(),
+      };
+
+      await setDoc(patternRef, patternDoc);
+      console.log(`✓ 문법 패턴 생성 완료: ${patternId}`);
+      return patternId;
+    } catch (error) {
+      console.error("문법 패턴 생성 오류:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * 개별 예문 생성 (분리된 업로드용)
+   */
+  async createExample(exampleData) {
+    try {
+      const exampleRef = doc(collection(db, "examples"));
+      const exampleId = exampleRef.id;
+
+      const exampleDoc = {
+        ...exampleData,
+        created_at: serverTimestamp(),
+      };
+
+      await setDoc(exampleRef, exampleDoc);
+      console.log(`✓ 예문 생성 완료: ${exampleId}`);
+      return exampleId;
+    } catch (error) {
+      console.error("예문 생성 오류:", error);
+      throw error;
+    }
+  }
 }
 
 // 싱글톤 인스턴스
