@@ -188,7 +188,6 @@ export class CollectionManager {
                 ...grammarPatternData,
                 pattern_id: uniquePatternId, // 고유 ID로 업데이트
                 created_at: serverTimestamp(),
-                updated_at: serverTimestamp(),
               });
               grammarPatternIds.push(uniquePatternId);
               console.log(`✓ grammar 컬렉션에 저장 완료: ${uniquePatternId}`);
@@ -1662,7 +1661,6 @@ export class CollectionManager {
       const patternDoc = {
         ...patternData,
         created_at: serverTimestamp(),
-        updated_at: serverTimestamp(),
       };
 
       await setDoc(patternRef, patternDoc);

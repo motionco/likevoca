@@ -31,20 +31,5 @@
       "japanese": "りんごジュースを一つください。",
       "chinese": "请给我一杯苹果汁。"
     }
-  },
-  {
-    "domain": "school",
-    "category": "education",
-    "difficulty": "intermediate",
-    "situation": [
-      "school"
-    ],
-    "purpose": "question",
-    "translations": {
-      "korean": "이 문제를 어떻게 풀어야 하나요?",
-      "english": "How should I solve this problem?",
-      "japanese": "この問題をどう解けばいいですか？",
-      "chinese": "这个问题应该怎么解决？"
-    }
   }
 ]

@@ -18,6 +18,9 @@ import {
   EXAMPLES_TEMPLATE,
   CONCEPTS_TEMPLATE,
   GRAMMAR_TEMPLATE,
+  EXAMPLES_TEMPLATE_CSV,
+  CONCEPTS_TEMPLATE_CSV,
+  GRAMMAR_TEMPLATE_CSV,
   examplesTemplateToCSV,
   conceptsTemplateToCSV,
   grammarTemplateToCSV,
@@ -267,16 +270,9 @@ async function uploadConcepts(data) {
           color_theme: conceptData.color_theme || "#9C27B0",
           situation: conceptData.situation || ["casual"],
           purpose: conceptData.purpose || "description",
-          updated_at: new Date(),
         },
         expressions: conceptData.expressions || {},
         representative_example: conceptData.representative_example || null,
-        learning_metadata: {
-          created_from: "separated_import",
-          import_date: new Date(),
-          version: "3.0",
-          structure_type: "separated_collections",
-        },
         created_at: serverTimestamp(),
       };
 
@@ -305,9 +301,6 @@ async function uploadExamples(data) {
   for (const exampleData of examples) {
     try {
       const exampleDoc = {
-        example_id:
-          exampleData.example_id ||
-          `example_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         domain: exampleData.domain || "general",
         category: exampleData.category || "common",
         difficulty: exampleData.difficulty || "beginner",
@@ -315,15 +308,9 @@ async function uploadExamples(data) {
           ? exampleData.situation
           : typeof exampleData.situation === "string"
           ? exampleData.situation.split(",").map((s) => s.trim())
-          : [],
+          : ["casual"],
         purpose: exampleData.purpose || null,
-        tags: exampleData.tags || [],
         translations: exampleData.translations || {},
-        metadata: {
-          created_from: "separated_import",
-          import_date: new Date(),
-          version: "3.0",
-        },
         created_at: serverTimestamp(),
       };
 
@@ -352,10 +339,8 @@ async function uploadGrammarPatterns(data) {
       console.log("📝 원본 패턴 데이터:", patternData);
 
       const patternDoc = {
-        pattern_name: patternData.pattern_name || "기본 패턴",
-        pattern: patternData.pattern || patternData.structural_pattern || "",
-        explanation: patternData.explanation || "",
-        example: patternData.example || {},
+        domain: patternData.domain || "daily",
+        category: patternData.category || "general",
         difficulty: patternData.difficulty || "basic",
         situation: Array.isArray(patternData.situation)
           ? patternData.situation
@@ -363,16 +348,16 @@ async function uploadGrammarPatterns(data) {
           ? patternData.situation.split(",").map((s) => s.trim())
           : ["casual"],
         purpose: patternData.purpose || "description",
+        pattern: patternData.pattern || {},
+        example: patternData.example || {},
         created_at: patternData.created_at || new Date().toISOString(),
       };
 
       console.log("🔧 변환된 패턴 문서:", patternDoc);
-      console.log("📖 explanation 값:", patternDoc.explanation);
-      console.log("📚 example 값:", patternDoc.example);
 
       await collectionManager.createGrammarPattern(patternDoc);
       success++;
-      console.log("✅ 패턴 업로드 성공:", patternDoc.pattern_name);
+      console.log("✅ 패턴 업로드 성공");
     } catch (error) {
       console.error("❌ 문법 패턴 업로드 오류:", error);
       console.error("❌ 실패한 데이터:", patternData);
@@ -420,113 +405,7 @@ function downloadConceptsJSONTemplate() {
 
 function downloadConceptsCSVTemplate() {
   console.log("✅ 개념 CSV 템플릿 다운로드");
-
-  const headers = [
-    "domain",
-    "category",
-    "difficulty",
-    "unicode_emoji",
-    "color_theme",
-    "tags",
-    "korean_word",
-    "korean_pronunciation",
-    "korean_definition",
-    "korean_part_of_speech",
-    "korean_level",
-    "korean_synonyms",
-    "korean_word_family",
-    "korean_compound_words",
-    "korean_collocations",
-    "english_word",
-    "english_pronunciation",
-    "english_definition",
-    "english_part_of_speech",
-    "english_level",
-    "english_synonyms",
-    "english_word_family",
-    "english_compound_words",
-    "english_collocations",
-    "chinese_word",
-    "chinese_pronunciation",
-    "chinese_definition",
-    "chinese_part_of_speech",
-    "chinese_level",
-    "chinese_synonyms",
-    "chinese_word_family",
-    "chinese_compound_words",
-    "chinese_collocations",
-    "japanese_word",
-    "japanese_pronunciation",
-    "japanese_definition",
-    "japanese_part_of_speech",
-    "japanese_level",
-    "japanese_synonyms",
-    "japanese_word_family",
-    "japanese_compound_words",
-    "japanese_collocations",
-    "example_korean",
-    "example_english",
-    "example_chinese",
-    "example_japanese",
-    "example_context",
-    "example_difficulty",
-  ];
-
-  const rows = CONCEPTS_TEMPLATE.map((concept) => [
-    concept.concept_info.domain,
-    concept.concept_info.category,
-    concept.concept_info.difficulty,
-    concept.concept_info.unicode_emoji,
-    concept.concept_info.color_theme,
-    concept.concept_info.tags.join(","),
-    concept.expressions.korean.word,
-    concept.expressions.korean.pronunciation,
-    concept.expressions.korean.definition,
-    concept.expressions.korean.part_of_speech,
-    concept.expressions.korean.level,
-    concept.expressions.korean.synonyms.join(","),
-    concept.expressions.korean.word_family.join(","),
-    concept.expressions.korean.compound_words.join(","),
-    concept.expressions.korean.collocations.join(","),
-    concept.expressions.english.word,
-    concept.expressions.english.pronunciation,
-    concept.expressions.english.definition,
-    concept.expressions.english.part_of_speech,
-    concept.expressions.english.level,
-    concept.expressions.english.synonyms.join(","),
-    concept.expressions.english.word_family.join(","),
-    concept.expressions.english.compound_words.join(","),
-    concept.expressions.english.collocations.join(","),
-    concept.expressions.chinese.word,
-    concept.expressions.chinese.pronunciation,
-    concept.expressions.chinese.definition,
-    concept.expressions.chinese.part_of_speech,
-    concept.expressions.chinese.level,
-    concept.expressions.chinese.synonyms.join(","),
-    concept.expressions.chinese.word_family.join(","),
-    concept.expressions.chinese.compound_words.join(","),
-    concept.expressions.chinese.collocations.join(","),
-    concept.expressions.japanese.word,
-    concept.expressions.japanese.pronunciation,
-    concept.expressions.japanese.definition,
-    concept.expressions.japanese.part_of_speech,
-    concept.expressions.japanese.level,
-    concept.expressions.japanese.synonyms.join(","),
-    concept.expressions.japanese.word_family.join(","),
-    concept.expressions.japanese.compound_words.join(","),
-    concept.expressions.japanese.collocations.join(","),
-    concept.representative_example.translations.korean,
-    concept.representative_example.translations.english,
-    concept.representative_example.translations.chinese,
-    concept.representative_example.translations.japanese,
-    concept.representative_example.context,
-    concept.representative_example.difficulty,
-  ]);
-
-  downloadCSV(
-    [headers, ...rows].map((row) => row.join(",")).join("\n"),
-    "concepts_template.csv"
-  );
+  downloadCSV(CONCEPTS_TEMPLATE_CSV, "concepts_template.csv");
 }
 
 function downloadExamplesJSONTemplate() {
@@ -536,34 +415,7 @@ function downloadExamplesJSONTemplate() {
 
 function downloadExamplesCSVTemplate() {
   console.log("✅ 예문 CSV 템플릿 다운로드");
-
-  const headers = [
-    "domain",
-    "category",
-    "difficulty",
-    "situation",
-    "purpose",
-    "korean_text",
-    "english_text",
-    "japanese_text",
-    "chinese_text",
-  ];
-  const rows = EXAMPLES_TEMPLATE.map((item) => [
-    item.domain,
-    item.category,
-    item.difficulty,
-    Array.isArray(item.situation) ? item.situation.join(",") : item.situation,
-    item.purpose,
-    item.translations.korean,
-    item.translations.english,
-    item.translations.japanese,
-    item.translations.chinese,
-  ]);
-
-  downloadCSV(
-    [headers, ...rows].map((row) => row.join(",")).join("\n"),
-    "examples_template.csv"
-  );
+  downloadCSV(EXAMPLES_TEMPLATE_CSV, "examples_template.csv");
 }
 
 function downloadGrammarJSONTemplate() {
@@ -572,77 +424,8 @@ function downloadGrammarJSONTemplate() {
 }
 
 function downloadGrammarCSVTemplate() {
-  const headers = [
-    "domain",
-    "category",
-    "korean_title",
-    "korean_structure",
-    "korean_description",
-    "english_title",
-    "english_structure",
-    "english_description",
-    "japanese_title",
-    "japanese_structure",
-    "japanese_description",
-    "chinese_title",
-    "chinese_structure",
-    "chinese_description",
-    "korean_example",
-    "english_example",
-    "japanese_example",
-    "chinese_example",
-    "difficulty",
-    "situation",
-    "purpose",
-  ];
-
-  const sampleData = [
-    [
-      "daily",
-      "greeting",
-      "기본 인사",
-      "안녕하세요",
-      "가장 기본적인 한국어 인사말로, 누구에게나 사용할 수 있는 정중한 표현입니다.",
-      "Basic Greeting",
-      "Hello",
-      "The most basic Korean greeting that can be used with anyone politely.",
-      "基本的な挨拶",
-      "こんにちは",
-      "誰にでも丁寧に使える最も基本的な韓国語の挨拶です。",
-      "基本问候",
-      "您好",
-      "最基本的韩语问候语，可以礼貌地对任何人使用。",
-      "안녕하세요, 처음 뵙겠습니다.",
-      "Hello, nice to meet you.",
-      "こんにちは、初めまして。",
-      "您好，初次见面。",
-      "basic",
-      "formal,social",
-      "greeting",
-    ],
-  ];
-
-  const csvContent = [headers, ...sampleData]
-    .map((row) =>
-      row
-        .map((cell) =>
-          typeof cell === "string" && (cell.includes(",") || cell.includes('"'))
-            ? `"${cell.replace(/"/g, '""')}"`
-            : cell
-        )
-        .join(",")
-    )
-    .join("\n");
-
-  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-  const link = document.createElement("a");
-  const url = URL.createObjectURL(blob);
-  link.setAttribute("href", url);
-  link.setAttribute("download", "grammar_template.csv");
-  link.style.visibility = "hidden";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  console.log("✅ 문법 CSV 템플릿 다운로드");
+  downloadCSV(GRAMMAR_TEMPLATE_CSV, "grammar_template.csv");
 }
 
 function downloadJSON(data, filename) {
@@ -747,9 +530,12 @@ function parseConceptFromCSV(row) {
         difficulty: row.difficulty || "beginner",
         unicode_emoji: row.unicode_emoji || "",
         color_theme: row.color_theme || "#9C27B0",
-        situation: row.situation || ["casual"],
+        situation: row.situation
+          ? typeof row.situation === "string"
+            ? row.situation.split(",").map((s) => s.trim())
+            : row.situation
+          : ["casual"],
         purpose: row.purpose || "description",
-        updated_at: new Date(),
       },
       expressions: {
         korean: {
@@ -757,11 +543,12 @@ function parseConceptFromCSV(row) {
           pronunciation: row.korean_pronunciation || "",
           definition: row.korean_definition || "",
           part_of_speech: row.korean_part_of_speech || "명사",
-          level: row.korean_level || "beginner",
           synonyms: row.korean_synonyms
             ? row.korean_synonyms.split(",").map((s) => s.trim())
             : [],
-          antonyms: [],
+          antonyms: row.korean_antonyms
+            ? row.korean_antonyms.split(",").map((s) => s.trim())
+            : [],
           word_family: row.korean_word_family
             ? row.korean_word_family.split(",").map((w) => w.trim())
             : [],
@@ -777,11 +564,12 @@ function parseConceptFromCSV(row) {
           pronunciation: row.english_pronunciation || "",
           definition: row.english_definition || "",
           part_of_speech: row.english_part_of_speech || "noun",
-          level: row.english_level || "beginner",
           synonyms: row.english_synonyms
             ? row.english_synonyms.split(",").map((s) => s.trim())
             : [],
-          antonyms: [],
+          antonyms: row.english_antonyms
+            ? row.english_antonyms.split(",").map((s) => s.trim())
+            : [],
           word_family: row.english_word_family
             ? row.english_word_family.split(",").map((w) => w.trim())
             : [],
@@ -797,11 +585,12 @@ function parseConceptFromCSV(row) {
           pronunciation: row.chinese_pronunciation || "",
           definition: row.chinese_definition || "",
           part_of_speech: row.chinese_part_of_speech || "名词",
-          level: row.chinese_level || "beginner",
           synonyms: row.chinese_synonyms
             ? row.chinese_synonyms.split(",").map((s) => s.trim())
             : [],
-          antonyms: [],
+          antonyms: row.chinese_antonyms
+            ? row.chinese_antonyms.split(",").map((s) => s.trim())
+            : [],
           word_family: row.chinese_word_family
             ? row.chinese_word_family.split(",").map((w) => w.trim())
             : [],
@@ -817,11 +606,12 @@ function parseConceptFromCSV(row) {
           pronunciation: row.japanese_pronunciation || "",
           definition: row.japanese_definition || "",
           part_of_speech: row.japanese_part_of_speech || "名詞",
-          level: row.japanese_level || "beginner",
           synonyms: row.japanese_synonyms
             ? row.japanese_synonyms.split(",").map((s) => s.trim())
             : [],
-          antonyms: [],
+          antonyms: row.japanese_antonyms
+            ? row.japanese_antonyms.split(",").map((s) => s.trim())
+            : [],
           word_family: row.japanese_word_family
             ? row.japanese_word_family.split(",").map((w) => w.trim())
             : [],
@@ -834,16 +624,12 @@ function parseConceptFromCSV(row) {
         },
       },
       representative_example:
-        row.example_korean && row.example_english
+        row.representative_korean && row.representative_english
           ? {
-              translations: {
-                korean: row.example_korean,
-                english: row.example_english,
-                chinese: row.example_chinese || "",
-                japanese: row.example_japanese || "",
-              },
-              context: row.example_context || "daily_conversation",
-              difficulty: row.example_difficulty || "beginner",
+              korean: row.representative_korean,
+              english: row.representative_english,
+              chinese: row.representative_chinese || "",
+              japanese: row.representative_japanese || "",
             }
           : null,
     };
@@ -865,10 +651,10 @@ function parseExampleFromCSV(row) {
         : ["casual"],
       purpose: row.purpose || null,
       translations: {
-        korean: row.korean_text || "",
-        english: row.english_text || "",
-        japanese: row.japanese_text || "",
-        chinese: row.chinese_text || "",
+        korean: row.korean || "",
+        english: row.english || "",
+        japanese: row.japanese || "",
+        chinese: row.chinese || "",
       },
     };
   } catch (error) {
@@ -879,55 +665,138 @@ function parseExampleFromCSV(row) {
 
 // 문법 패턴 CSV 파싱
 function parseGrammarPatternFromCSV(row, headers) {
+  console.log("🔍 [parseGrammarPatternFromCSV] 시작 - row:", row);
+  console.log("🔍 [parseGrammarPatternFromCSV] headers:", headers);
+
   const pattern = {};
 
-  // 기본 속성들
-  pattern.domain = row[headers.indexOf("domain")] || "daily";
-  pattern.category = row[headers.indexOf("category")] || "general";
-  pattern.difficulty = row[headers.indexOf("difficulty")] || "basic";
-  pattern.purpose = row[headers.indexOf("purpose")] || "description";
+  // 기본 속성들 - row 객체에서 직접 접근
+  pattern.domain = row.domain || "daily";
+  pattern.category = row.category || "general";
+  pattern.difficulty = row.difficulty || "basic";
+  pattern.purpose = row.purpose || "description";
+
+  console.log("📝 [parseGrammarPatternFromCSV] 기본 속성들:", {
+    domain: pattern.domain,
+    category: pattern.category,
+    difficulty: pattern.difficulty,
+    purpose: pattern.purpose,
+  });
 
   // situation 처리 (배열로 변환)
-  const situationValue = row[headers.indexOf("situation")] || "casual";
+  const situationValue = row.situation || "casual";
   pattern.situation =
     typeof situationValue === "string"
       ? situationValue.split(",").map((s) => s.trim())
       : situationValue;
 
-  // pattern 중첩 객체 구조
+  console.log("📝 [parseGrammarPatternFromCSV] situation:", pattern.situation);
+
+  // pattern 중첩 객체 구조 - 빈 값이 아닌 경우에만 저장
   pattern.pattern = {
-    korean: {
-      title: row[headers.indexOf("korean_title")] || "",
-      structure: row[headers.indexOf("korean_structure")] || "",
-      description: row[headers.indexOf("korean_description")] || "",
-    },
-    english: {
-      title: row[headers.indexOf("english_title")] || "",
-      structure: row[headers.indexOf("english_structure")] || "",
-      description: row[headers.indexOf("english_description")] || "",
-    },
-    japanese: {
-      title: row[headers.indexOf("japanese_title")] || "",
-      structure: row[headers.indexOf("japanese_structure")] || "",
-      description: row[headers.indexOf("japanese_description")] || "",
-    },
-    chinese: {
-      title: row[headers.indexOf("chinese_title")] || "",
-      structure: row[headers.indexOf("chinese_structure")] || "",
-      description: row[headers.indexOf("chinese_description")] || "",
-    },
+    korean: {},
+    english: {},
+    japanese: {},
+    chinese: {},
   };
 
-  // example 객체
-  pattern.example = {
-    korean: row[headers.indexOf("korean_example")] || "",
-    english: row[headers.indexOf("english_example")] || "",
-    japanese: row[headers.indexOf("japanese_example")] || "",
-    chinese: row[headers.indexOf("chinese_example")] || "",
-  };
+  // Korean pattern - row 객체에서 직접 접근
+  const koreanTitle = row.korean_title || "";
+  const koreanStructure = row.korean_structure || "";
+  const koreanDescription = row.korean_description || "";
 
+  console.log("🔍 [parseGrammarPatternFromCSV] Korean 원본 값들:", {
+    koreanTitle,
+    koreanStructure,
+    koreanDescription,
+  });
+
+  if (koreanTitle) pattern.pattern.korean.title = koreanTitle;
+  if (koreanStructure) pattern.pattern.korean.structure = koreanStructure;
+  if (koreanDescription) pattern.pattern.korean.description = koreanDescription;
+
+  // English pattern - row 객체에서 직접 접근
+  const englishTitle = row.english_title || "";
+  const englishStructure = row.english_structure || "";
+  const englishDescription = row.english_description || "";
+
+  console.log("🔍 [parseGrammarPatternFromCSV] English 원본 값들:", {
+    englishTitle,
+    englishStructure,
+    englishDescription,
+  });
+
+  if (englishTitle) pattern.pattern.english.title = englishTitle;
+  if (englishStructure) pattern.pattern.english.structure = englishStructure;
+  if (englishDescription)
+    pattern.pattern.english.description = englishDescription;
+
+  // Japanese pattern - row 객체에서 직접 접근
+  const japaneseTitle = row.japanese_title || "";
+  const japaneseStructure = row.japanese_structure || "";
+  const japaneseDescription = row.japanese_description || "";
+
+  console.log("🔍 [parseGrammarPatternFromCSV] Japanese 원본 값들:", {
+    japaneseTitle,
+    japaneseStructure,
+    japaneseDescription,
+  });
+
+  if (japaneseTitle) pattern.pattern.japanese.title = japaneseTitle;
+  if (japaneseStructure) pattern.pattern.japanese.structure = japaneseStructure;
+  if (japaneseDescription)
+    pattern.pattern.japanese.description = japaneseDescription;
+
+  // Chinese pattern - row 객체에서 직접 접근
+  const chineseTitle = row.chinese_title || "";
+  const chineseStructure = row.chinese_structure || "";
+  const chineseDescription = row.chinese_description || "";
+
+  console.log("🔍 [parseGrammarPatternFromCSV] Chinese 원본 값들:", {
+    chineseTitle,
+    chineseStructure,
+    chineseDescription,
+  });
+
+  if (chineseTitle) pattern.pattern.chinese.title = chineseTitle;
+  if (chineseStructure) pattern.pattern.chinese.structure = chineseStructure;
+  if (chineseDescription)
+    pattern.pattern.chinese.description = chineseDescription;
+
+  console.log(
+    "🔧 [parseGrammarPatternFromCSV] 완성된 pattern 객체:",
+    pattern.pattern
+  );
+
+  // example 객체 - row 객체에서 직접 접근
+  pattern.example = {};
+
+  const koreanExample = row.korean_example || "";
+  const englishExample = row.english_example || "";
+  const japaneseExample = row.japanese_example || "";
+  const chineseExample = row.chinese_example || "";
+
+  console.log("🔍 [parseGrammarPatternFromCSV] Example 원본 값들:", {
+    koreanExample,
+    englishExample,
+    japaneseExample,
+    chineseExample,
+  });
+
+  if (koreanExample) pattern.example.korean = koreanExample;
+  if (englishExample) pattern.example.english = englishExample;
+  if (japaneseExample) pattern.example.japanese = japaneseExample;
+  if (chineseExample) pattern.example.chinese = chineseExample;
+
+  console.log(
+    "🔧 [parseGrammarPatternFromCSV] 완성된 example 객체:",
+    pattern.example
+  );
+
+  // created_at만 추가 (updated_at 제거)
   pattern.created_at = new Date().toISOString();
 
+  console.log("✅ [parseGrammarPatternFromCSV] 최종 결과:", pattern);
   return pattern;
 }
 

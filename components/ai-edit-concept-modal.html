@@ -1,9 +1,17 @@
 <!-- AI 개념 편집 모달 -->
-<div id="edit-concept-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
-  <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-4xl max-h-[90vh] overflow-y-auto">
+<div
+  id="edit-concept-modal"
+  class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50"
+>
+  <div
+    class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-4xl max-h-[90vh] overflow-y-auto"
+  >
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl font-bold text-gray-800">🤖 AI 개념 수정</h2>
-      <button id="close-edit-concept-modal" class="text-gray-500 hover:text-gray-700">
+      <button
+        id="close-edit-concept-modal"
+        class="text-gray-500 hover:text-gray-700"
+      >
         <i class="fas fa-times text-xl"></i>
       </button>
     </div>
@@ -12,7 +20,9 @@
       <!-- 기본 정보 -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">도메인</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >도메인</label
+          >
           <select id="edit-concept-domain" class="w-full p-2 border rounded">
             <option value="daily">일상</option>
             <option value="food">음식</option>
@@ -29,32 +39,63 @@
           </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">카테고리</label>
-          <input type="text" id="edit-concept-category" class="w-full p-2 border rounded" placeholder="예: fruit, animal">
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >카테고리</label
+          >
+          <input
+            type="text"
+            id="edit-concept-category"
+            class="w-full p-2 border rounded"
+            placeholder="예: fruit, animal"
+          />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">이모지</label>
-          <input type="text" id="edit-concept-emoji" class="w-full p-2 border rounded" placeholder="🤖" maxlength="10">
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >이모지</label
+          >
+          <input
+            type="text"
+            id="edit-concept-emoji"
+            class="w-full p-2 border rounded"
+            placeholder="🤖"
+            maxlength="10"
+          />
         </div>
       </div>
 
       <!-- 언어별 표현 -->
       <div class="mb-6">
         <h3 class="text-lg font-semibold mb-3">언어별 표현</h3>
-        
+
         <!-- 언어 탭 -->
         <div id="edit-language-tabs" class="border-b mb-4">
           <nav class="flex space-x-8">
-            <button type="button" class="edit-language-tab pb-2 px-1 border-b-2 font-medium text-sm border-blue-500 text-blue-600" data-language="korean">
+            <button
+              type="button"
+              class="edit-language-tab pb-2 px-1 border-b-2 font-medium text-sm border-blue-500 text-blue-600"
+              data-language="korean"
+            >
               <span class="flag-icon">🇰🇷</span> 한국어
             </button>
-            <button type="button" class="edit-language-tab pb-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" data-language="english">
+            <button
+              type="button"
+              class="edit-language-tab pb-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              data-language="english"
+            >
               <span class="flag-icon">🇺🇸</span> 영어
             </button>
-            <button type="button" class="edit-language-tab pb-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" data-language="japanese">
+            <button
+              type="button"
+              class="edit-language-tab pb-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              data-language="japanese"
+            >
               <span class="flag-icon">🇯🇵</span> 일본어
             </button>
-            <button type="button" class="edit-language-tab pb-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" data-language="chinese">
+            <button
+              type="button"
+              class="edit-language-tab pb-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              data-language="chinese"
+            >
               <span class="flag-icon">🇨🇳</span> 중국어
             </button>
           </nav>
@@ -67,15 +108,30 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
               <div>
                 <label class="block text-sm text-gray-600">단어</label>
-                <input type="text" id="edit-korean-word" class="w-full p-2 border rounded" placeholder="사과">
+                <input
+                  type="text"
+                  id="edit-korean-word"
+                  class="w-full p-2 border rounded"
+                  placeholder="사과"
+                />
               </div>
               <div>
                 <label class="block text-sm text-gray-600">발음</label>
-                <input type="text" id="edit-korean-pronunciation" class="w-full p-2 border rounded" placeholder="sa-gwa">
+                <input
+                  type="text"
+                  id="edit-korean-pronunciation"
+                  class="w-full p-2 border rounded"
+                  placeholder="sa-gwa"
+                />
               </div>
               <div class="md:col-span-2">
                 <label class="block text-sm text-gray-600">정의</label>
-                <input type="text" id="edit-korean-definition" class="w-full p-2 border rounded" placeholder="둥글고 빨간 과일">
+                <input
+                  type="text"
+                  id="edit-korean-definition"
+                  class="w-full p-2 border rounded"
+                  placeholder="둥글고 빨간 과일"
+                />
               </div>
               <div>
                 <label class="block text-sm text-gray-600">품사</label>
@@ -90,20 +146,48 @@
             <!-- 고급 필드들 -->
             <div class="space-y-3">
               <div>
-                <label class="block text-sm text-gray-600">유사어 (쉼표로 구분)</label>
-                <input type="text" id="edit-korean-synonyms" class="w-full p-2 border rounded" placeholder="과일, 열매">
+                <label class="block text-sm text-gray-600"
+                  >유사어 (쉼표로 구분)</label
+                >
+                <input
+                  type="text"
+                  id="edit-korean-synonyms"
+                  class="w-full p-2 border rounded"
+                  placeholder="과일, 열매"
+                />
               </div>
               <div>
-                <label class="block text-sm text-gray-600">반의어 (쉼표로 구분)</label>
-                <input type="text" id="edit-korean-antonyms" class="w-full p-2 border rounded" placeholder="">
+                <label class="block text-sm text-gray-600"
+                  >반의어 (쉼표로 구분)</label
+                >
+                <input
+                  type="text"
+                  id="edit-korean-antonyms"
+                  class="w-full p-2 border rounded"
+                  placeholder=""
+                />
               </div>
               <div>
-                <label class="block text-sm text-gray-600">연어 (쉼표로 구분)</label>
-                <input type="text" id="edit-korean-collocations" class="w-full p-2 border rounded" placeholder="빨간 사과, 신선한 사과">
+                <label class="block text-sm text-gray-600"
+                  >연어 (쉼표로 구분)</label
+                >
+                <input
+                  type="text"
+                  id="edit-korean-collocations"
+                  class="w-full p-2 border rounded"
+                  placeholder="빨간 사과, 신선한 사과"
+                />
               </div>
               <div>
-                <label class="block text-sm text-gray-600">복합어 (쉼표로 구분)</label>
-                <input type="text" id="edit-korean-compound-words" class="w-full p-2 border rounded" placeholder="사과나무, 사과주스">
+                <label class="block text-sm text-gray-600"
+                  >복합어 (쉼표로 구분)</label
+                >
+                <input
+                  type="text"
+                  id="edit-korean-compound-words"
+                  class="w-full p-2 border rounded"
+                  placeholder="사과나무, 사과주스"
+                />
               </div>
             </div>
           </div>
@@ -113,15 +197,30 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
               <div>
                 <label class="block text-sm text-gray-600">단어</label>
-                <input type="text" id="edit-english-word" class="w-full p-2 border rounded" placeholder="apple">
+                <input
+                  type="text"
+                  id="edit-english-word"
+                  class="w-full p-2 border rounded"
+                  placeholder="apple"
+                />
               </div>
               <div>
                 <label class="block text-sm text-gray-600">발음</label>
-                <input type="text" id="edit-english-pronunciation" class="w-full p-2 border rounded" placeholder="/ˈæpəl/">
+                <input
+                  type="text"
+                  id="edit-english-pronunciation"
+                  class="w-full p-2 border rounded"
+                  placeholder="/ˈæpəl/"
+                />
               </div>
               <div class="md:col-span-2">
                 <label class="block text-sm text-gray-600">정의</label>
-                <input type="text" id="edit-english-definition" class="w-full p-2 border rounded" placeholder="a round fruit with red or green skin">
+                <input
+                  type="text"
+                  id="edit-english-definition"
+                  class="w-full p-2 border rounded"
+                  placeholder="a round fruit with red or green skin"
+                />
               </div>
               <div>
                 <label class="block text-sm text-gray-600">품사</label>
@@ -136,20 +235,48 @@
             <!-- 고급 필드들 -->
             <div class="space-y-3">
               <div>
-                <label class="block text-sm text-gray-600">유사어 (쉼표로 구분)</label>
-                <input type="text" id="edit-english-synonyms" class="w-full p-2 border rounded" placeholder="fruit, produce">
+                <label class="block text-sm text-gray-600"
+                  >유사어 (쉼표로 구분)</label
+                >
+                <input
+                  type="text"
+                  id="edit-english-synonyms"
+                  class="w-full p-2 border rounded"
+                  placeholder="fruit, produce"
+                />
               </div>
               <div>
-                <label class="block text-sm text-gray-600">반의어 (쉼표로 구분)</label>
-                <input type="text" id="edit-english-antonyms" class="w-full p-2 border rounded" placeholder="">
+                <label class="block text-sm text-gray-600"
+                  >반의어 (쉼표로 구분)</label
+                >
+                <input
+                  type="text"
+                  id="edit-english-antonyms"
+                  class="w-full p-2 border rounded"
+                  placeholder=""
+                />
               </div>
               <div>
-                <label class="block text-sm text-gray-600">연어 (쉼표로 구분)</label>
-                <input type="text" id="edit-english-collocations" class="w-full p-2 border rounded" placeholder="red apple, fresh apple">
+                <label class="block text-sm text-gray-600"
+                  >연어 (쉼표로 구분)</label
+                >
+                <input
+                  type="text"
+                  id="edit-english-collocations"
+                  class="w-full p-2 border rounded"
+                  placeholder="red apple, fresh apple"
+                />
               </div>
               <div>
-                <label class="block text-sm text-gray-600">복합어 (쉼표로 구분)</label>
-                <input type="text" id="edit-english-compound-words" class="w-full p-2 border rounded" placeholder="apple tree, apple juice">
+                <label class="block text-sm text-gray-600"
+                  >복합어 (쉼표로 구분)</label
+                >
+                <input
+                  type="text"
+                  id="edit-english-compound-words"
+                  class="w-full p-2 border rounded"
+                  placeholder="apple tree, apple juice"
+                />
               </div>
             </div>
           </div>
@@ -159,19 +286,37 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
               <div>
                 <label class="block text-sm text-gray-600">단어</label>
-                <input type="text" id="edit-japanese-word" class="w-full p-2 border rounded" placeholder="りんご">
+                <input
+                  type="text"
+                  id="edit-japanese-word"
+                  class="w-full p-2 border rounded"
+                  placeholder="りんご"
+                />
               </div>
               <div>
                 <label class="block text-sm text-gray-600">발음</label>
-                <input type="text" id="edit-japanese-pronunciation" class="w-full p-2 border rounded" placeholder="ringo">
+                <input
+                  type="text"
+                  id="edit-japanese-pronunciation"
+                  class="w-full p-2 border rounded"
+                  placeholder="ringo"
+                />
               </div>
               <div class="md:col-span-2">
                 <label class="block text-sm text-gray-600">정의</label>
-                <input type="text" id="edit-japanese-definition" class="w-full p-2 border rounded" placeholder="丸くて赤い果物">
+                <input
+                  type="text"
+                  id="edit-japanese-definition"
+                  class="w-full p-2 border rounded"
+                  placeholder="丸くて赤い果物"
+                />
               </div>
               <div>
                 <label class="block text-sm text-gray-600">품사</label>
-                <select id="edit-japanese-pos" class="w-full p-2 border rounded">
+                <select
+                  id="edit-japanese-pos"
+                  class="w-full p-2 border rounded"
+                >
                   <option value="명사">명사</option>
                   <option value="동사">동사</option>
                   <option value="형용사">형용사</option>
@@ -182,20 +327,48 @@
             <!-- 고급 필드들 -->
             <div class="space-y-3">
               <div>
-                <label class="block text-sm text-gray-600">유사어 (쉼표로 구분)</label>
-                <input type="text" id="edit-japanese-synonyms" class="w-full p-2 border rounded" placeholder="果物、フルーツ">
+                <label class="block text-sm text-gray-600"
+                  >유사어 (쉼표로 구분)</label
+                >
+                <input
+                  type="text"
+                  id="edit-japanese-synonyms"
+                  class="w-full p-2 border rounded"
+                  placeholder="果物、フルーツ"
+                />
               </div>
               <div>
-                <label class="block text-sm text-gray-600">반의어 (쉼표로 구분)</label>
-                <input type="text" id="edit-japanese-antonyms" class="w-full p-2 border rounded" placeholder="">
+                <label class="block text-sm text-gray-600"
+                  >반의어 (쉼표로 구분)</label
+                >
+                <input
+                  type="text"
+                  id="edit-japanese-antonyms"
+                  class="w-full p-2 border rounded"
+                  placeholder=""
+                />
               </div>
               <div>
-                <label class="block text-sm text-gray-600">연어 (쉼표로 구분)</label>
-                <input type="text" id="edit-japanese-collocations" class="w-full p-2 border rounded" placeholder="赤いりんご、新鮮なりんご">
+                <label class="block text-sm text-gray-600"
+                  >연어 (쉼표로 구분)</label
+                >
+                <input
+                  type="text"
+                  id="edit-japanese-collocations"
+                  class="w-full p-2 border rounded"
+                  placeholder="赤いりんご、新鮮なりんご"
+                />
               </div>
               <div>
-                <label class="block text-sm text-gray-600">복합어 (쉼표로 구분)</label>
-                <input type="text" id="edit-japanese-compound-words" class="w-full p-2 border rounded" placeholder="りんごの木、りんごジュース">
+                <label class="block text-sm text-gray-600"
+                  >복합어 (쉼표로 구분)</label
+                >
+                <input
+                  type="text"
+                  id="edit-japanese-compound-words"
+                  class="w-full p-2 border rounded"
+                  placeholder="りんごの木、りんごジュース"
+                />
               </div>
             </div>
           </div>
@@ -205,15 +378,30 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
               <div>
                 <label class="block text-sm text-gray-600">단어</label>
-                <input type="text" id="edit-chinese-word" class="w-full p-2 border rounded" placeholder="苹果">
+                <input
+                  type="text"
+                  id="edit-chinese-word"
+                  class="w-full p-2 border rounded"
+                  placeholder="苹果"
+                />
               </div>
               <div>
                 <label class="block text-sm text-gray-600">발음</label>
-                <input type="text" id="edit-chinese-pronunciation" class="w-full p-2 border rounded" placeholder="píngguǒ">
+                <input
+                  type="text"
+                  id="edit-chinese-pronunciation"
+                  class="w-full p-2 border rounded"
+                  placeholder="píngguǒ"
+                />
               </div>
               <div class="md:col-span-2">
                 <label class="block text-sm text-gray-600">정의</label>
-                <input type="text" id="edit-chinese-definition" class="w-full p-2 border rounded" placeholder="圆形红色水果">
+                <input
+                  type="text"
+                  id="edit-chinese-definition"
+                  class="w-full p-2 border rounded"
+                  placeholder="圆形红色水果"
+                />
               </div>
               <div>
                 <label class="block text-sm text-gray-600">품사</label>
@@ -228,20 +416,48 @@
             <!-- 고급 필드들 -->
             <div class="space-y-3">
               <div>
-                <label class="block text-sm text-gray-600">유사어 (쉼표로 구분)</label>
-                <input type="text" id="edit-chinese-synonyms" class="w-full p-2 border rounded" placeholder="水果、果实">
+                <label class="block text-sm text-gray-600"
+                  >유사어 (쉼표로 구분)</label
+                >
+                <input
+                  type="text"
+                  id="edit-chinese-synonyms"
+                  class="w-full p-2 border rounded"
+                  placeholder="水果、果实"
+                />
               </div>
               <div>
-                <label class="block text-sm text-gray-600">반의어 (쉼표로 구분)</label>
-                <input type="text" id="edit-chinese-antonyms" class="w-full p-2 border rounded" placeholder="">
+                <label class="block text-sm text-gray-600"
+                  >반의어 (쉼표로 구분)</label
+                >
+                <input
+                  type="text"
+                  id="edit-chinese-antonyms"
+                  class="w-full p-2 border rounded"
+                  placeholder=""
+                />
               </div>
               <div>
-                <label class="block text-sm text-gray-600">연어 (쉼표로 구분)</label>
-                <input type="text" id="edit-chinese-collocations" class="w-full p-2 border rounded" placeholder="红苹果、新鲜苹果">
+                <label class="block text-sm text-gray-600"
+                  >연어 (쉼표로 구분)</label
+                >
+                <input
+                  type="text"
+                  id="edit-chinese-collocations"
+                  class="w-full p-2 border rounded"
+                  placeholder="红苹果、新鲜苹果"
+                />
               </div>
               <div>
-                <label class="block text-sm text-gray-600">복합어 (쉼표로 구분)</label>
-                <input type="text" id="edit-chinese-compound-words" class="w-full p-2 border rounded" placeholder="苹果树、苹果汁">
+                <label class="block text-sm text-gray-600"
+                  >복합어 (쉼표로 구분)</label
+                >
+                <input
+                  type="text"
+                  id="edit-chinese-compound-words"
+                  class="w-full p-2 border rounded"
+                  placeholder="苹果树、苹果汁"
+                />
               </div>
             </div>
           </div>
@@ -252,7 +468,11 @@
       <div class="mb-6">
         <div class="flex justify-between items-center mb-3">
           <h3 class="text-lg font-semibold">예문</h3>
-          <button type="button" id="edit-add-example" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm">
+          <button
+            type="button"
+            id="edit-add-example"
+            class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm"
+          >
             <i class="fas fa-plus mr-1"></i>예문 추가
           </button>
         </div>
@@ -263,13 +483,21 @@
 
       <!-- 버튼들 -->
       <div class="flex justify-end space-x-3">
-        <button type="button" id="cancel-edit-concept" class="px-4 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-50">
+        <button
+          type="button"
+          id="cancel-edit-concept"
+          class="px-4 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-50"
+        >
           취소
         </button>
-        <button type="submit" id="save-edit-concept" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+        <button
+          type="submit"
+          id="save-edit-concept"
+          class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
           <i class="fas fa-save mr-1"></i>수정하기
         </button>
       </div>
     </form>
   </div>
-</div> 
+</div>

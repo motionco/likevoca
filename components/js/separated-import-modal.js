@@ -185,7 +185,7 @@ async function uploadConcepts(data) {
   for (const conceptData of concepts) {
     try {
       const conceptDoc = {
-        concept_info: conceptData.concept_info || {
+        concept_info: {
           domain: conceptData.domain || "general",
           category: conceptData.category || "uncategorized",
           difficulty: conceptData.difficulty || "beginner",
@@ -193,7 +193,6 @@ async function uploadConcepts(data) {
           color_theme: conceptData.color_theme || "#9C27B0",
           situation: conceptData.situation || ["casual"],
           purpose: conceptData.purpose || "description",
-          updated_at: new Date(),
         },
         expressions: conceptData.expressions || {},
         representative_example: conceptData.representative_example || null,
@@ -460,10 +459,10 @@ function downloadExamplesCSVTemplate() {
     "difficulty",
     "situation",
     "purpose",
-    "korean_text",
-    "english_text",
-    "japanese_text",
-    "chinese_text",
+    "korean",
+    "english",
+    "japanese",
+    "chinese",
   ];
   const rows = EXAMPLES_TEMPLATE.map((item) => [
     item.domain,
@@ -654,10 +653,10 @@ function convertCSVToExample(item) {
         : null,
     purpose: item.purpose || null,
     translations: {
-      korean: item.korean_text || "",
-      english: item.english_text || "",
-      japanese: item.japanese_text || "",
-      chinese: item.chinese_text || "",
+      korean: item.korean || "",
+      english: item.english || "",
+      japanese: item.japanese || "",
+      chinese: item.chinese || "",
     },
   };
 }
@@ -665,39 +664,63 @@ function convertCSVToExample(item) {
 function convertCSVToGrammar(item) {
   console.log("🔍 [분리모달] CSV 변환 시작, 원본 item:", item);
 
-  // 단일 예문 객체 생성
-  const example = {
-    korean: item.korean_example || "",
-    english: item.english_example || "",
-    japanese: item.japanese_example || "",
-    chinese: item.chinese_example || "",
-  };
+  // 단일 예문 객체 생성 - 빈 값이 아닌 경우에만 저장
+  const example = {};
 
-  // 중첩 패턴 객체 생성 (새로운 구조)
+  if (item.korean_example) example.korean = item.korean_example;
+  if (item.english_example) example.english = item.english_example;
+  if (item.japanese_example) example.japanese = item.japanese_example;
+  if (item.chinese_example) example.chinese = item.chinese_example;
+
+  // 중첩 패턴 객체 생성 (새로운 구조) - 빈 값이 아닌 경우에만 저장
   let pattern;
-  if (item.korean_title || item.korean_structure || item.korean_description) {
+  if (
+    item.korean_title ||
+    item.korean_structure ||
+    item.korean_description ||
+    item.english_title ||
+    item.english_structure ||
+    item.english_description ||
+    item.japanese_title ||
+    item.japanese_structure ||
+    item.japanese_description ||
+    item.chinese_title ||
+    item.chinese_structure ||
+    item.chinese_description
+  ) {
     pattern = {
-      korean: {
-        title: item.korean_title || "",
-        structure: item.korean_structure || "",
-        description: item.korean_description || "",
-      },
-      english: {
-        title: item.english_title || "",
-        structure: item.english_structure || "",
-        description: item.english_description || "",
-      },
-      japanese: {
-        title: item.japanese_title || "",
-        structure: item.japanese_structure || "",
-        description: item.japanese_description || "",
-      },
-      chinese: {
-        title: item.chinese_title || "",
-        structure: item.chinese_structure || "",
-        description: item.chinese_description || "",
-      },
+      korean: {},
+      english: {},
+      japanese: {},
+      chinese: {},
     };
+
+    // Korean pattern
+    if (item.korean_title) pattern.korean.title = item.korean_title;
+    if (item.korean_structure) pattern.korean.structure = item.korean_structure;
+    if (item.korean_description)
+      pattern.korean.description = item.korean_description;
+
+    // English pattern
+    if (item.english_title) pattern.english.title = item.english_title;
+    if (item.english_structure)
+      pattern.english.structure = item.english_structure;
+    if (item.english_description)
+      pattern.english.description = item.english_description;
+
+    // Japanese pattern
+    if (item.japanese_title) pattern.japanese.title = item.japanese_title;
+    if (item.japanese_structure)
+      pattern.japanese.structure = item.japanese_structure;
+    if (item.japanese_description)
+      pattern.japanese.description = item.japanese_description;
+
+    // Chinese pattern
+    if (item.chinese_title) pattern.chinese.title = item.chinese_title;
+    if (item.chinese_structure)
+      pattern.chinese.structure = item.chinese_structure;
+    if (item.chinese_description)
+      pattern.chinese.description = item.chinese_description;
   } else {
     // 기존 구조 지원 (하위 호환성)
     pattern = item.pattern || item.structural_pattern || "";
