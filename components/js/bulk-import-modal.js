@@ -523,13 +523,15 @@ function parseCSVLine(line) {
 // 개념 CSV 파싱
 function parseConceptFromCSV(row) {
   try {
-    return {
+    console.log("🔍 [parseConceptFromCSV] 파싱 시작 - row:", row);
+
+    const conceptData = {
       concept_info: {
         domain: row.domain || "general",
         category: row.category || "uncategorized",
         difficulty: row.difficulty || "beginner",
-        unicode_emoji: row.unicode_emoji || "",
-        color_theme: row.color_theme || "#9C27B0",
+        unicode_emoji: row.emoji || row.unicode_emoji || "",
+        color_theme: row.color || row.color_theme || "#9C27B0",
         situation: row.situation
           ? typeof row.situation === "string"
             ? row.situation.split(",").map((s) => s.trim())
@@ -542,7 +544,7 @@ function parseConceptFromCSV(row) {
           word: row.korean_word || "",
           pronunciation: row.korean_pronunciation || "",
           definition: row.korean_definition || "",
-          part_of_speech: row.korean_part_of_speech || "명사",
+          part_of_speech: row.korean_part_of_speech || row.korean_pos || "명사",
           synonyms: row.korean_synonyms
             ? row.korean_synonyms.split(",").map((s) => s.trim())
             : [],
@@ -563,7 +565,8 @@ function parseConceptFromCSV(row) {
           word: row.english_word || "",
           pronunciation: row.english_pronunciation || "",
           definition: row.english_definition || "",
-          part_of_speech: row.english_part_of_speech || "noun",
+          part_of_speech:
+            row.english_part_of_speech || row.english_pos || "noun",
           synonyms: row.english_synonyms
             ? row.english_synonyms.split(",").map((s) => s.trim())
             : [],
@@ -584,7 +587,8 @@ function parseConceptFromCSV(row) {
           word: row.chinese_word || "",
           pronunciation: row.chinese_pronunciation || "",
           definition: row.chinese_definition || "",
-          part_of_speech: row.chinese_part_of_speech || "名词",
+          part_of_speech:
+            row.chinese_part_of_speech || row.chinese_pos || "名词",
           synonyms: row.chinese_synonyms
             ? row.chinese_synonyms.split(",").map((s) => s.trim())
             : [],
@@ -605,7 +609,8 @@ function parseConceptFromCSV(row) {
           word: row.japanese_word || "",
           pronunciation: row.japanese_pronunciation || "",
           definition: row.japanese_definition || "",
-          part_of_speech: row.japanese_part_of_speech || "名詞",
+          part_of_speech:
+            row.japanese_part_of_speech || row.japanese_pos || "名詞",
           synonyms: row.japanese_synonyms
             ? row.japanese_synonyms.split(",").map((s) => s.trim())
             : [],
@@ -624,15 +629,26 @@ function parseConceptFromCSV(row) {
         },
       },
       representative_example:
-        row.representative_korean && row.representative_english
+        (row.korean_example || row.representative_korean) &&
+        (row.english_example || row.representative_english)
           ? {
-              korean: row.representative_korean,
-              english: row.representative_english,
-              chinese: row.representative_chinese || "",
-              japanese: row.representative_japanese || "",
+              korean: row.korean_example || row.representative_korean || "",
+              english: row.english_example || row.representative_english || "",
+              chinese: row.chinese_example || row.representative_chinese || "",
+              japanese:
+                row.japanese_example || row.representative_japanese || "",
             }
           : null,
     };
+
+    console.log(
+      "✅ [parseConceptFromCSV] 파싱 완료 - 이모지:",
+      conceptData.concept_info.unicode_emoji,
+      "대표 예문:",
+      conceptData.representative_example
+    );
+
+    return conceptData;
   } catch (error) {
     console.error("개념 CSV 파싱 오류:", error);
     return null;
