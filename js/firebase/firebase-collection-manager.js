@@ -1626,21 +1626,33 @@ export class CollectionManager {
       const conceptRef = doc(collection(db, "concepts"));
       const conceptId = conceptRef.id;
 
-      const conceptDoc = {
-        // concept_id 제거: Firestore document ID와 중복
-        concept_info: conceptData.concept_info || {
+      // concept_info가 이미 있으면 그대로 사용, 없으면 기본값 생성
+      let conceptInfo = conceptData.concept_info;
+      if (!conceptInfo) {
+        conceptInfo = {
           domain: conceptData.domain || "general",
           category: conceptData.category || "uncategorized",
-          difficulty: conceptData.difficulty || "beginner",
+          difficulty: conceptData.difficulty || "basic",
+          unicode_emoji: conceptData.unicode_emoji || conceptData.emoji || "",
+          color_theme: conceptData.color_theme || "#FF6B6B",
           situation: conceptData.situation || ["casual"],
           purpose: conceptData.purpose || "description",
-        },
+        };
+      }
+
+      const conceptDoc = {
+        concept_info: conceptInfo,
         expressions: conceptData.expressions || {},
         representative_example: conceptData.representative_example || null,
-        // metadata 제거, created_at으로 통일
         created_at: serverTimestamp(),
       };
 
+      // 추가 예문이 있는 경우에만 examples 필드 추가
+      if (conceptData.examples && conceptData.examples.length > 0) {
+        conceptDoc.examples = conceptData.examples;
+      }
+
+      console.log("💾 Firebase에 저장될 데이터:", conceptDoc);
       await setDoc(conceptRef, conceptDoc);
       console.log(`✓ 개념 생성 완료: ${conceptId}`);
       return conceptId;

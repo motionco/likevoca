@@ -43,6 +43,87 @@
         </div>
       </div>
 
+      <!-- 목적과 상황 정보 -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="purpose">목적</label>
+          <select id="edit-concept-purpose" class="w-full p-2 border rounded bg-white" required>
+            <option value="" style="display: none;" data-i18n="select_purpose">목적 선택</option>
+            <option value="greeting" data-i18n="purpose_greeting">인사</option>
+            <option value="thanking" data-i18n="purpose_thanking">감사</option>
+            <option value="request" data-i18n="purpose_request">요청</option>
+            <option value="question" data-i18n="purpose_question">질문</option>
+            <option value="opinion" data-i18n="purpose_opinion">의견</option>
+            <option value="agreement" data-i18n="purpose_agreement">동의</option>
+            <option value="refusal" data-i18n="purpose_refusal">거절</option>
+            <option value="apology" data-i18n="purpose_apology">사과</option>
+            <option value="instruction" data-i18n="purpose_instruction">지시</option>
+            <option value="description" data-i18n="purpose_description">설명</option>
+            <option value="suggestion" data-i18n="purpose_suggestion">제안</option>
+            <option value="emotion" data-i18n="purpose_emotion">감정표현</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="situation">상황 (다중 선택 가능)</label>
+          <div class="border rounded p-3 bg-gray-50 max-h-32 overflow-y-auto">
+            <div class="grid grid-cols-2 gap-2">
+              <label class="flex items-center text-sm">
+                <input type="checkbox" name="edit-concept-situation" value="formal" class="mr-2">
+                <span data-i18n="situation_formal">격식</span>
+              </label>
+              <label class="flex items-center text-sm">
+                <input type="checkbox" name="edit-concept-situation" value="casual" class="mr-2">
+                <span data-i18n="situation_casual">비격식</span>
+              </label>
+              <label class="flex items-center text-sm">
+                <input type="checkbox" name="edit-concept-situation" value="polite" class="mr-2">
+                <span data-i18n="situation_polite">정중한</span>
+              </label>
+              <label class="flex items-center text-sm">
+                <input type="checkbox" name="edit-concept-situation" value="urgent" class="mr-2">
+                <span data-i18n="situation_urgent">긴급한</span>
+              </label>
+              <label class="flex items-center text-sm">
+                <input type="checkbox" name="edit-concept-situation" value="work" class="mr-2">
+                <span data-i18n="situation_work">직장</span>
+              </label>
+              <label class="flex items-center text-sm">
+                <input type="checkbox" name="edit-concept-situation" value="school" class="mr-2">
+                <span data-i18n="situation_school">학교</span>
+              </label>
+              <label class="flex items-center text-sm">
+                <input type="checkbox" name="edit-concept-situation" value="social" class="mr-2">
+                <span data-i18n="situation_social">사교</span>
+              </label>
+              <label class="flex items-center text-sm">
+                <input type="checkbox" name="edit-concept-situation" value="travel" class="mr-2">
+                <span data-i18n="situation_travel">여행</span>
+              </label>
+              <label class="flex items-center text-sm">
+                <input type="checkbox" name="edit-concept-situation" value="shopping" class="mr-2">
+                <span data-i18n="situation_shopping">쇼핑</span>
+              </label>
+              <label class="flex items-center text-sm">
+                <input type="checkbox" name="edit-concept-situation" value="home" class="mr-2">
+                <span data-i18n="situation_home">가정</span>
+              </label>
+              <label class="flex items-center text-sm">
+                <input type="checkbox" name="edit-concept-situation" value="public" class="mr-2">
+                <span data-i18n="situation_public">공공장소</span>
+              </label>
+              <label class="flex items-center text-sm">
+                <input type="checkbox" name="edit-concept-situation" value="online" class="mr-2">
+                <span data-i18n="situation_online">온라인</span>
+              </label>
+              <label class="flex items-center text-sm">
+                <input type="checkbox" name="edit-concept-situation" value="medical" class="mr-2">
+                <span data-i18n="situation_medical">의료</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- 언어별 표현 -->
       <div class="mb-6">
         <h3 class="text-lg font-semibold mb-3" data-i18n="language_expressions">언어별 표현</h3>
@@ -290,9 +371,13 @@
           </button>
         </div>
         <div id="edit-examples-container">
-          <!-- 대표 예문 -->
-          <div class="example-item border p-4 rounded mb-4">
-            
+          <!-- 대표 예문 (첫 번째 예문) -->
+          <div class="example-item border-2 border-blue-200 bg-blue-50 p-4 rounded mb-4">
+            <div class="flex items-center mb-2">
+              <i class="fas fa-star text-blue-500 mr-2"></i>
+              <span class="font-semibold text-blue-700" data-i18n="representative_example">대표 예문</span>
+              <span class="text-sm text-blue-600 ml-2" data-i18n="representative_example_desc">(필수: 첫 번째 예문이 대표 예문이 됩니다)</span>
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm text-gray-600 mb-1" data-i18n="korean_example">한국어 예문</label>
@@ -313,12 +398,6 @@
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- 태그 -->
-      <div class="mb-6">
-        <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="tags">태그 (쉼표로 구분)</label>
-        <input type="text" id="edit-concept-tags" class="w-full p-2 border rounded" placeholder="food, healthy, common">
       </div>
 
       <!-- 버튼 -->

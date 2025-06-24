@@ -180,6 +180,36 @@ function fillFormWithConceptData(conceptData) {
     emojiValue
   );
 
+  // 목적 필드 채우기
+  const purposeField = document.getElementById("edit-concept-purpose");
+  if (purposeField) {
+    const purpose = conceptData.concept_info?.purpose || "description";
+    purposeField.value = purpose;
+    console.log("🎯 목적 필드 설정:", purpose);
+  }
+
+  // 상황 체크박스들 채우기
+  const situations = conceptData.concept_info?.situation || ["casual"];
+  const situationCheckboxes = document.querySelectorAll(
+    'input[name="edit-concept-situation"]'
+  );
+
+  // 모든 체크박스 초기화
+  situationCheckboxes.forEach((checkbox) => {
+    checkbox.checked = false;
+  });
+
+  // 해당하는 상황들 체크
+  situations.forEach((situation) => {
+    const checkbox = document.querySelector(
+      `input[name="edit-concept-situation"][value="${situation}"]`
+    );
+    if (checkbox) {
+      checkbox.checked = true;
+    }
+  });
+  console.log("🏢 상황 필드 설정:", situations);
+
   // 언어별 표현 채우기
   if (conceptData.expressions) {
     for (const [lang, expression] of Object.entries(conceptData.expressions)) {

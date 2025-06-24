@@ -43,6 +43,85 @@
         </div>
       </div>
 
+      <!-- 추가 정보 -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="purpose">목적</label>
+          <select id="concept-purpose" class="w-full p-2 border rounded">
+            <option value="" style="display: none;" data-i18n="select_purpose">목적 선택</option>
+            <option value="greeting" data-i18n="greeting">인사</option>
+            <option value="thanking" data-i18n="thanking">감사</option>
+            <option value="request" data-i18n="request">요청</option>
+            <option value="question" data-i18n="question">질문</option>
+            <option value="opinion" data-i18n="opinion">의견</option>
+            <option value="agreement" data-i18n="agreement">동의</option>
+            <option value="refusal" data-i18n="refusal">거절</option>
+            <option value="apology" data-i18n="apology">사과</option>
+            <option value="instruction" data-i18n="instruction">지시</option>
+            <option value="description" data-i18n="description">설명</option>
+            <option value="suggestion" data-i18n="suggestion">제안</option>
+            <option value="emotion" data-i18n="emotion">감정표현</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="situation">상황 (다중 선택 가능)</label>
+          <div class="grid grid-cols-2 gap-2 border rounded p-2 max-h-32 overflow-y-auto">
+            <label class="flex items-center">
+              <input type="checkbox" name="situation" value="formal" class="mr-2">
+              <span data-i18n="formal">격식</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" name="situation" value="casual" class="mr-2">
+              <span data-i18n="casual">비격식</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" name="situation" value="polite" class="mr-2">
+              <span data-i18n="polite">정중한</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" name="situation" value="urgent" class="mr-2">
+              <span data-i18n="urgent">긴급한</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" name="situation" value="work" class="mr-2">
+              <span data-i18n="work">직장</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" name="situation" value="school" class="mr-2">
+              <span data-i18n="school">학교</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" name="situation" value="social" class="mr-2">
+              <span data-i18n="social">사교</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" name="situation" value="travel" class="mr-2">
+              <span data-i18n="travel">여행</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" name="situation" value="shopping" class="mr-2">
+              <span data-i18n="shopping">쇼핑</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" name="situation" value="home" class="mr-2">
+              <span data-i18n="home">가정</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" name="situation" value="public" class="mr-2">
+              <span data-i18n="public">공공장소</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" name="situation" value="online" class="mr-2">
+              <span data-i18n="online">온라인</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" name="situation" value="medical" class="mr-2">
+              <span data-i18n="medical">의료</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
       <!-- 언어별 표현 -->
       <div class="mb-6">
         <h3 class="text-lg font-semibold mb-3" data-i18n="language_expressions">언어별 표현</h3>
@@ -291,8 +370,12 @@
         </div>
         <div id="examples-container">
           <!-- 대표 예문 -->
-          <div class="example-item border p-4 rounded mb-4">
-            
+          <div class="example-item border-2 border-blue-300 bg-blue-50 p-4 rounded mb-4">
+            <div class="flex items-center mb-3">
+              <i class="fas fa-star text-yellow-500 mr-2"></i>
+              <span class="font-semibold text-blue-700" data-i18n="representative_example">대표 예문</span>
+              <span class="text-sm text-gray-600 ml-2" data-i18n="representative_example_desc">(필수 - 개념을 가장 잘 보여주는 예문)</span>
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm text-gray-600 mb-1" data-i18n="korean_example">한국어 예문</label>
@@ -313,12 +396,6 @@
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- 태그 -->
-      <div class="mb-6">
-        <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="tags">태그 (쉼표로 구분)</label>
-        <input type="text" id="concept-tags" class="w-full p-2 border rounded" placeholder="food, healthy, common">
       </div>
 
       <!-- 버튼 -->

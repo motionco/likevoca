@@ -118,14 +118,15 @@ export const conceptUtils = {
             conceptData.concept_info?.category ||
             conceptData.category ||
             "common",
-          difficulty: conceptData.concept_info?.difficulty || "beginner",
+          difficulty: conceptData.concept_info?.difficulty || "basic",
           unicode_emoji:
             conceptData.concept_info?.unicode_emoji ||
             conceptData.concept_info?.emoji ||
             "📚",
-          color_theme: conceptData.concept_info?.color_theme || "#9C27B0",
-          tags: conceptData.concept_info?.tags || [],
-          updated_at: new Date(),
+          color_theme: conceptData.concept_info?.color_theme || "#FF6B6B",
+          situation: conceptData.concept_info?.situation || ["casual"],
+          purpose: conceptData.concept_info?.purpose || "description",
+          // updated_at은 새 개념 생성 시 불필요하므로 제거
         },
         expressions: conceptData.expressions || {},
         representative_example: conceptData.representative_example || null,
@@ -136,6 +137,11 @@ export const conceptUtils = {
           structure_type: "separated_collections",
         },
       };
+
+      // 추가 예문이 있는 경우에만 examples 필드 추가
+      if (conceptData.examples && conceptData.examples.length > 0) {
+        separatedConceptData.examples = conceptData.examples;
+      }
 
       const result = await collectionManager.createConcept(
         separatedConceptData
@@ -530,7 +536,7 @@ export const conceptUtils = {
         }
       }
 
-      // 개념 문서 업데이트 - unicode_emoji 우선 사용
+      // 개념 문서 업데이트 - concept_info 내부의 updated_at 제거하고 최상위 레벨에 추가
       const updateData = {
         ...newData,
         concept_info: {
@@ -541,13 +547,20 @@ export const conceptUtils = {
             newData.concept_info?.unicode_emoji ||
             oldData.concept_info?.unicode_emoji ||
             oldData.concept_info?.emoji,
-          updated_at: new Date(),
+          // concept_info 내부의 updated_at 제거 (최상위 레벨에서만 관리)
         },
+        // 최상위 레벨에서 서버 타임스탬프 사용
+        updated_at: serverTimestamp(),
       };
 
       // 기존 emoji 속성 제거 (unicode_emoji로 통일)
       if (updateData.concept_info.emoji) {
         delete updateData.concept_info.emoji;
+      }
+
+      // concept_info에서 updated_at 제거 (중복 방지)
+      if (updateData.concept_info.updated_at) {
+        delete updateData.concept_info.updated_at;
       }
 
       await updateDoc(conceptRef, updateData);

@@ -98,12 +98,22 @@ export function collectFormData() {
   const domainField = document.getElementById("concept-domain");
   const categoryField = document.getElementById("concept-category");
   const emojiField = document.getElementById("concept-emoji");
+  const purposeField = document.getElementById("concept-purpose");
+
+  // 상황 체크박스들 수집
+  const situationCheckboxes = document.querySelectorAll(
+    'input[name="situation"]:checked'
+  );
+  const situations = Array.from(situationCheckboxes).map((cb) => cb.value);
 
   const conceptInfo = {
     domain: domainField ? domainField.value.trim() : "",
     category: categoryField ? categoryField.value.trim() : "",
-    unicode_emoji: emojiField ? emojiField.value.trim() : "", // emoji → unicode_emoji로 변경
-    images: [],
+    difficulty: "basic", // 기본값 설정
+    unicode_emoji: emojiField ? emojiField.value.trim() : "",
+    color_theme: "#FF6B6B", // 기본 색상 테마
+    situation: situations.length > 0 ? situations : ["casual"], // 기본값 설정
+    purpose: purposeField ? purposeField.value.trim() : "description", // 기본값 설정
   };
 
   console.log("🏷️ 개념 정보 수집:", conceptInfo);
@@ -150,9 +160,9 @@ export function collectFormData() {
                 .map((s) => s.trim())
                 .filter((s) => s)
             : [],
-        collocations:
-          collocationsField && collocationsField.value.trim()
-            ? collocationsField.value
+        word_family:
+          synonymsField && synonymsField.value.trim()
+            ? synonymsField.value
                 .split(",")
                 .map((s) => s.trim())
                 .filter((s) => s)
@@ -160,6 +170,13 @@ export function collectFormData() {
         compound_words:
           compoundWordsField && compoundWordsField.value.trim()
             ? compoundWordsField.value
+                .split(",")
+                .map((s) => s.trim())
+                .filter((s) => s)
+            : [],
+        collocations:
+          collocationsField && collocationsField.value.trim()
+            ? collocationsField.value
                 .split(",")
                 .map((s) => s.trim())
                 .filter((s) => s)
@@ -172,16 +189,14 @@ export function collectFormData() {
 
   // 예제 수집 (대표 예문과 일반 예문 구분)
   const examples = [];
-  let representativeExample = null;
+  let representativeExample = {};
 
-  document.querySelectorAll(".example-item").forEach((item) => {
+  document.querySelectorAll(".example-item").forEach((item, index) => {
     const example = {};
     let hasContent = false;
 
-    // 대표 예문인지 확인
-    const spanElement = item.querySelector("span");
-    const isRepresentative =
-      spanElement && spanElement.textContent.includes("대표 예문");
+    // 첫 번째 예문은 항상 대표 예문으로 처리 (UI에서 대표 예문으로 표시됨)
+    const isRepresentative = index === 0;
 
     // 각 언어별 예제 수집
     for (const langCode of Object.keys(supportedLangs)) {
@@ -195,7 +210,7 @@ export function collectFormData() {
     // 내용이 있는 예제 처리
     if (hasContent) {
       if (isRepresentative) {
-        representativeExample = { translations: example };
+        representativeExample = example; // 직접 언어별 예문 객체로 저장
         console.log("📝 대표 예문 수집:", representativeExample);
       } else {
         examples.push(example);
@@ -204,28 +219,19 @@ export function collectFormData() {
     }
   });
 
+  // 새로운 템플릿 구조에 맞는 데이터 생성
   const result = {
-    concept_info: {
-      domain: conceptInfo.domain,
-      category: conceptInfo.category,
-      unicode_emoji: conceptInfo.unicode_emoji, // 명시적으로 unicode_emoji 사용
-      images: conceptInfo.images || [],
-      created_at: new Date(),
-      updated_at: new Date(),
-    },
+    concept_info: conceptInfo,
     expressions: expressions,
-    examples: examples,
-    // 기존 시스템과의 호환성을 위한 추가 필드들
-    domain: conceptInfo.domain,
-    category: conceptInfo.category,
-    featured_examples: examples.length > 0 ? examples : [],
-    created_at: new Date(),
-    updated_at: new Date(),
+    representative_example:
+      Object.keys(representativeExample).length > 0
+        ? representativeExample
+        : null,
   };
 
-  // 대표 예문이 있으면 추가
-  if (representativeExample) {
-    result.representative_example = representativeExample;
+  // 추가 예문이 있는 경우에만 examples 필드 추가
+  if (examples.length > 0) {
+    result.examples = examples;
   }
 
   console.log("📋 최종 수집된 데이터:", result);
@@ -245,10 +251,20 @@ export function resetForm() {
   const domainField = document.getElementById("concept-domain");
   const categoryField = document.getElementById("concept-category");
   const emojiField = document.getElementById("concept-emoji");
+  const purposeField = document.getElementById("concept-purpose");
 
   if (domainField) domainField.value = "";
   if (categoryField) categoryField.value = "";
   if (emojiField) emojiField.value = "";
+  if (purposeField) purposeField.value = "";
+
+  // 상황 체크박스들 초기화
+  const situationCheckboxes = document.querySelectorAll(
+    'input[name="situation"]'
+  );
+  situationCheckboxes.forEach((checkbox) => {
+    checkbox.checked = false;
+  });
 
   // 언어별 필드 초기화
   for (const langCode of Object.keys(supportedLangs)) {
@@ -285,8 +301,35 @@ export function resetForm() {
   const examplesContainer = document.getElementById("examples-container");
   if (examplesContainer) {
     examplesContainer.innerHTML = "";
-    // 기본 대표 예문 필드 추가
-    addExampleFields(null, true);
+    // 기본 대표 예문 필드를 HTML로 직접 추가
+    const representativeExampleHTML = `
+      <div class="example-item border-2 border-blue-300 bg-blue-50 p-4 rounded mb-4">
+        <div class="flex items-center mb-3">
+          <i class="fas fa-star text-yellow-500 mr-2"></i>
+          <span class="font-semibold text-blue-700" data-i18n="representative_example">대표 예문</span>
+          <span class="text-sm text-gray-600 ml-2" data-i18n="representative_example_desc">(필수 - 개념을 가장 잘 보여주는 예문)</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm text-gray-600 mb-1" data-i18n="korean_example">한국어 예문</label>
+            <textarea class="korean-example w-full p-2 border rounded h-20" placeholder="나는 빨간 사과를 좋아한다."></textarea>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-600 mb-1" data-i18n="english_example">영어 예문</label>
+            <textarea class="english-example w-full p-2 border rounded h-20" placeholder="I like red apples."></textarea>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-600 mb-1" data-i18n="japanese_example">일본어 예문</label>
+            <textarea class="japanese-example w-full p-2 border rounded h-20" placeholder="私は赤いりんごが好きです。"></textarea>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-600 mb-1" data-i18n="chinese_example">중국어 예문</label>
+            <textarea class="chinese-example w-full p-2 border rounded h-20" placeholder="我喜欢红苹果。"></textarea>
+          </div>
+        </div>
+      </div>
+    `;
+    examplesContainer.innerHTML = representativeExampleHTML;
   }
 }
 
@@ -735,12 +778,22 @@ export function collectEditFormData() {
   const domainField = document.getElementById("edit-concept-domain");
   const categoryField = document.getElementById("edit-concept-category");
   const emojiField = document.getElementById("edit-concept-emoji");
+  const purposeField = document.getElementById("edit-concept-purpose");
+
+  // 상황 체크박스들 수집
+  const situationCheckboxes = document.querySelectorAll(
+    'input[name="edit-concept-situation"]:checked'
+  );
+  const situations = Array.from(situationCheckboxes).map((cb) => cb.value);
 
   const conceptInfo = {
     domain: domainField ? domainField.value.trim() : "",
     category: categoryField ? categoryField.value.trim() : "",
-    unicode_emoji: emojiField ? emojiField.value.trim() : "", // emoji → unicode_emoji로 변경
-    images: [], // 이미지는 나중에 구현
+    difficulty: "basic", // 기본값 설정
+    unicode_emoji: emojiField ? emojiField.value.trim() : "",
+    color_theme: "#FF6B6B", // 기본 색상 테마
+    situation: situations.length > 0 ? situations : ["casual"], // 기본값 설정
+    purpose: purposeField ? purposeField.value.trim() : "description", // 기본값 설정
   };
 
   console.log("🏷️ 편집 개념 정보 수집:", conceptInfo);
@@ -779,7 +832,6 @@ export function collectEditFormData() {
           : "",
         definition: definitionField ? definitionField.value.trim() : "",
         part_of_speech: posField && posField.value ? posField.value : "",
-        // 고급 필드들 추가
         synonyms:
           synonymsField && synonymsField.value.trim()
             ? synonymsField.value
@@ -794,9 +846,9 @@ export function collectEditFormData() {
                 .map((s) => s.trim())
                 .filter((s) => s)
             : [],
-        collocations:
-          collocationsField && collocationsField.value.trim()
-            ? collocationsField.value
+        word_family:
+          synonymsField && synonymsField.value.trim()
+            ? synonymsField.value
                 .split(",")
                 .map((s) => s.trim())
                 .filter((s) => s)
@@ -804,6 +856,13 @@ export function collectEditFormData() {
         compound_words:
           compoundWordsField && compoundWordsField.value.trim()
             ? compoundWordsField.value
+                .split(",")
+                .map((s) => s.trim())
+                .filter((s) => s)
+            : [],
+        collocations:
+          collocationsField && collocationsField.value.trim()
+            ? collocationsField.value
                 .split(",")
                 .map((s) => s.trim())
                 .filter((s) => s)
@@ -816,18 +875,16 @@ export function collectEditFormData() {
 
   // 예제 수집 (편집 모달용)
   const examples = [];
-  let representativeExample = null;
+  let representativeExample = {};
 
   document
     .querySelectorAll("#edit-examples-container .example-item")
-    .forEach((item) => {
+    .forEach((item, index) => {
       const example = {};
       let hasContent = false;
 
-      // 대표 예문인지 확인
-      const spanElement = item.querySelector("span");
-      const isRepresentative =
-        spanElement && spanElement.textContent.includes("대표 예문");
+      // 첫 번째 예문은 항상 대표 예문으로 처리 (UI에서 대표 예문으로 표시됨)
+      const isRepresentative = index === 0;
 
       // 각 언어별 예제 수집
       for (const langCode of Object.keys(supportedLangs)) {
@@ -853,26 +910,18 @@ export function collectEditFormData() {
     });
 
   const result = {
-    concept_info: {
-      domain: conceptInfo.domain,
-      category: conceptInfo.category,
-      unicode_emoji: conceptInfo.unicode_emoji, // 명시적으로 unicode_emoji 사용
-      images: conceptInfo.images || [],
-      updated_at: new Date(),
-    },
+    concept_info: conceptInfo,
     expressions: expressions,
-    examples: examples,
+    examples: examples.length > 0 ? examples : [],
+    representative_example:
+      Object.keys(representativeExample).length > 0
+        ? representativeExample
+        : null,
     // 기존 시스템과의 호환성을 위한 추가 필드들
     domain: conceptInfo.domain,
     category: conceptInfo.category,
-    featured_examples: examples.length > 0 ? examples : [],
-    updated_at: new Date(),
+    // updated_at은 Firebase에서 서버 타임스탬프로 처리
   };
-
-  // 대표 예문이 있으면 추가
-  if (representativeExample) {
-    result.representative_example = representativeExample;
-  }
 
   console.log("📋 편집 폼 최종 수집된 데이터:", result);
   return result;
@@ -884,10 +933,20 @@ export function resetEditForm() {
   const domainField = document.getElementById("edit-concept-domain");
   const categoryField = document.getElementById("edit-concept-category");
   const emojiField = document.getElementById("edit-concept-emoji");
+  const purposeField = document.getElementById("edit-concept-purpose");
 
   if (domainField) domainField.value = "";
   if (categoryField) categoryField.value = "";
   if (emojiField) emojiField.value = "";
+  if (purposeField) purposeField.value = "";
+
+  // 상황 체크박스들 초기화
+  const situationCheckboxes = document.querySelectorAll(
+    'input[name="edit-concept-situation"]'
+  );
+  situationCheckboxes.forEach((checkbox) => {
+    checkbox.checked = false;
+  });
 
   // 언어별 필드 초기화
   for (const langCode of Object.keys(supportedLangs)) {
