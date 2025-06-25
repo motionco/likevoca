@@ -1,0 +1,11 @@
+domain,category,difficulty,situation,purpose,korean,english,japanese,chinese
+daily,routine,basic,"polite,social",greeting,안녕하세요! 처음 뵙겠습니다.,Hello! Nice to meet you for the first time.,こんにちは！初めてお会いします。,你好！初次见面。
+food,fruit,basic,"shopping,public,polite",request,사과 주스 하나 주세요.,Please give me one apple juice.,りんごジュースを一つください。,请给我一杯苹果汁。
+daily,time,basic,"casual,daily",question,지금 몇 시예요?,What time is it now?,今何時ですか？,现在几点了？
+travel,transportation,basic,"casual,travel",instruction,지하철역이 어디예요?,Where is the subway station?,地下鉄の駅はどこですか？,地铁站在哪里？
+business,meeting,intermediate,"formal,work",report,회의가 3시에 시작됩니다.,The meeting starts at 3 o'clock.,会議は3時に始まります。,会议3点开始。
+education,learning,basic,"casual,school",description,한국어를 배우고 있어요.,I'm learning Korean.,韓国語を習っています。,我在学习韩语。
+health,medical,intermediate,"formal,medical",request,병원 예약을 하고 싶어요.,I'd like to make a hospital appointment.,病院の予約をしたいです。,我想预约医院。
+entertainment,movie,basic,"casual,social",opinion,그 영화 정말 재미있었어요.,That movie was really interesting.,その映画はとても面白かったです。,那部电影真的很有趣。
+technology,phone,basic,"casual,daily",instruction,핸드폰 번호를 알려 주세요.,Please tell me your phone number.,携帯電話の番号を教えてください。,请告诉我你的手机号码。
+culture,tradition,intermediate,"formal,cultural",explanation,한국의 전통 음식을 좋아해요.,I like Korean traditional food.,韓国の伝統料理が好きです。,我喜欢韩国传统食物。 
