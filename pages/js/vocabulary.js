@@ -2385,8 +2385,10 @@ function setupEventListeners() {
   });
 
   // 언어 변경 이벤트 리스너 추가 (새로고침 없이 도메인/카테고리 업데이트)
-  window.addEventListener("languageChanged", () => {
-    console.log("🌐 언어 변경 이벤트 수신 - 개념 카드 업데이트");
+  window.addEventListener("languageChanged", async () => {
+    console.log("🌐 언어 변경 이벤트 수신 - 개념 카드 및 도메인 필터 업데이트");
+    // 도메인 필터 언어 업데이트
+    await updateDomainFilterLanguage();
     // 현재 표시된 개념들을 다시 렌더링
     displayConceptList();
   });
@@ -2523,17 +2525,64 @@ function generateDomainSortFilters() {
     return;
   }
 
-  // VocabularyFilterBuilder를 사용하여 도메인 및 정렬 필터 생성
-  const filterBuilder = new VocabularyFilterBuilder({
-    showSearch: false,
-    showLanguage: false,
-    showDomain: true,
-    showSort: true,
-  });
+  // 도메인 목록 정의
+  const domainList = [
+    "all",
+    "daily",
+    "food",
+    "travel",
+    "business",
+    "education",
+    "nature",
+    "technology",
+    "health",
+    "sports",
+    "entertainment",
+    "culture",
+    "other",
+  ];
 
-  // 도메인과 정렬 필터 HTML 생성
-  const domainFilterHTML = filterBuilder.createDomainFilter();
-  const sortFilterHTML = filterBuilder.createSortFilter();
+  // 도메인 번역 키 매핑
+  const domainTranslationKeys = {
+    all: "all_domains",
+    daily: "domain_daily",
+    food: "domain_food",
+    travel: "domain_travel",
+    business: "domain_business",
+    education: "domain_education",
+    nature: "domain_nature",
+    technology: "domain_technology",
+    health: "domain_health",
+    sports: "domain_sports",
+    entertainment: "domain_entertainment",
+    culture: "domain_culture",
+    other: "domain_other",
+  };
+
+  // 도메인 필터 HTML 생성 (동적으로 옵션 생성)
+  const domainOptions = domainList
+    .map(
+      (domain) =>
+        `<option value="${domain}" data-i18n="${domainTranslationKeys[domain]}"></option>`
+    )
+    .join("");
+
+  const domainFilterHTML = `
+    <label for="domain-filter" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="domain">도메인</label>
+    <select id="domain-filter" class="w-full p-2 border rounded h-10 text-sm">
+      ${domainOptions}
+    </select>
+  `;
+
+  const sortFilterHTML = `
+    <label for="sort-filter" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="sort">정렬</label>
+    <select id="sort-filter" class="w-full p-2 border rounded h-10 text-sm">
+      <option value="latest" data-i18n="latest">최신순</option>
+      <option value="oldest" data-i18n="oldest">오래된순</option>
+      <option value="alphabetical" data-i18n="alphabetical">가나다순</option>
+      <option value="reverse_alphabetical" data-i18n="reverse_alphabetical">역가나다순</option>
+    </select>
+  `;
 
   container.innerHTML = `
     <div class="grid grid-cols-2 gap-2">
@@ -2544,3 +2593,53 @@ function generateDomainSortFilters() {
 
   console.log("✅ 도메인 및 정렬 필터 동적 생성 완료");
 }
+
+// 도메인 필터 언어 업데이트 함수 (학습 페이지와 동일한 방식)
+async function updateDomainFilterLanguage() {
+  try {
+    console.log("🌐 도메인 필터 언어 업데이트 중...");
+
+    // 현재 언어 가져오기
+    const currentLang = await getActiveLanguage();
+    console.log("현재 언어:", currentLang);
+
+    // 도메인 필터 옵션들 찾기
+    const domainFilter = document.getElementById("domain-filter");
+    if (domainFilter) {
+      const options = domainFilter.querySelectorAll("option[data-i18n]");
+      options.forEach((option) => {
+        const key = option.getAttribute("data-i18n");
+        if (
+          window.translations &&
+          window.translations[currentLang] &&
+          window.translations[currentLang][key]
+        ) {
+          option.textContent = window.translations[currentLang][key];
+        }
+      });
+      console.log("✅ 도메인 필터 언어 업데이트 완료");
+    }
+
+    // 정렬 필터 옵션들도 업데이트
+    const sortFilter = document.getElementById("sort-filter");
+    if (sortFilter) {
+      const options = sortFilter.querySelectorAll("option[data-i18n]");
+      options.forEach((option) => {
+        const key = option.getAttribute("data-i18n");
+        if (
+          window.translations &&
+          window.translations[currentLang] &&
+          window.translations[currentLang][key]
+        ) {
+          option.textContent = window.translations[currentLang][key];
+        }
+      });
+      console.log("✅ 정렬 필터 언어 업데이트 완료");
+    }
+  } catch (error) {
+    console.error("❌ 도메인 필터 언어 업데이트 실패:", error);
+  }
+}
+
+// 전역 함수로 등록 (language-utils.js에서 호출할 수 있도록)
+window.updateVocabularyDomainFilterLanguage = updateDomainFilterLanguage;

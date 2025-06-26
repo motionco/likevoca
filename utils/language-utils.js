@@ -2359,6 +2359,16 @@ async function applyLanguage() {
       window.updateDomainFilterLanguage();
     }
 
+    // vocabulary 페이지의 도메인 필터 업데이트 (있는 경우만)
+    if (typeof window.updateVocabularyDomainFilterLanguage === "function") {
+      window.updateVocabularyDomainFilterLanguage();
+    }
+
+    // AI vocabulary 페이지의 도메인 필터 업데이트 (있는 경우만)
+    if (typeof window.updateAIDomainFilterLanguage === "function") {
+      window.updateAIDomainFilterLanguage();
+    }
+
     // 이벤트 발생 - 언어 변경을 알림
     document.dispatchEvent(
       new CustomEvent("languageChanged", { detail: { language: langCode } })
