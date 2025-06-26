@@ -23,6 +23,7 @@ import {
 } from "../../js/i18n.js";
 // 필터 공유 모듈 import
 import {
+  VocabularyFilterBuilder,
   VocabularyFilterManager,
   VocabularyFilterProcessor,
   setupVocabularyFilters,
@@ -110,6 +111,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // 네비게이션바 로드
   await loadNavbar();
+
+  // 도메인 및 정렬 필터 동적 생성
+  generateDomainSortFilters();
 
   // 언어 변경 리스너 설정 (네비게이션바 로드 후)
   setupLanguageChangeListener();
@@ -1656,4 +1660,38 @@ function createLanguageContent(language, expression, envLanguage) {
 
   content += `</div>`;
   return content;
+}
+
+// 도메인 및 정렬 필터 동적 생성 함수
+function generateDomainSortFilters() {
+  const container = document.getElementById("domain-sort-filters");
+  if (!container) {
+    console.error("❌ domain-sort-filters 컨테이너를 찾을 수 없습니다.");
+    return;
+  }
+
+  // VocabularyFilterBuilder를 사용하여 도메인 및 정렬 필터 생성
+  const filterBuilder = new VocabularyFilterBuilder({
+    showSearch: false,
+    showLanguage: false,
+    showDomain: true,
+    showSort: true,
+  });
+
+  // 도메인과 정렬 필터 HTML 생성
+  const domainFilterHTML = filterBuilder.createDomainFilter();
+  const sortFilterHTML = filterBuilder.createSortFilter();
+
+  container.innerHTML = `
+    <div class="grid grid-cols-2 gap-2">
+      <div class="flex flex-col">
+        ${domainFilterHTML}
+      </div>
+      <div class="flex flex-col">
+        ${sortFilterHTML}
+      </div>
+    </div>
+  `;
+
+  console.log("✅ 나만의 단어장 도메인 및 정렬 필터 동적 생성 완료");
 }

@@ -21,6 +21,145 @@ export const SORT_OPTIONS = [
   { value: "z-a", key: "reverse_alphabetical" },
 ];
 
+// 필터 HTML 생성기
+export class VocabularyFilterBuilder {
+  constructor(options = {}) {
+    this.showSearch = options.showSearch !== false;
+    this.showLanguage = options.showLanguage !== false;
+    this.showDomain = options.showDomain !== false;
+    this.showSort = options.showSort !== false;
+    this.gridCols = options.gridCols || 3;
+  }
+
+  // 검색 필터 HTML
+  createSearchFilter() {
+    if (!this.showSearch) return "";
+    return `
+      <div class="w-full">
+        <label for="search-input" class="hidden md:block text-sm font-medium mb-1 text-gray-700" data-i18n="search">검색</label>
+        <div class="relative">
+          <input type="text" id="search-input" class="w-full p-2 border rounded pl-8 h-10" placeholder="검색어 입력..." data-i18n-placeholder="search_placeholder" />
+          <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+        </div>
+      </div>
+    `;
+  }
+
+  // 언어 필터 HTML
+  createLanguageFilter() {
+    if (!this.showLanguage) return "";
+    const languageOptions = SUPPORTED_LANGUAGES.map(
+      (lang) =>
+        `<option value="${lang.value}" data-i18n="${
+          lang.key
+        }">${this.getDefaultLanguageText(lang.value)}</option>`
+    ).join("");
+
+    return `
+      <div class="w-full">
+        <label class="block text-sm font-medium mb-1 text-gray-700" data-i18n="language_filter">언어 필터</label>
+        <div class="grid grid-cols-5 gap-1 h-10">
+          <select id="source-language" class="col-span-2 p-2 border rounded text-sm">
+            ${languageOptions}
+          </select>
+          <button id="swap-languages" class="w-full h-full text-gray-600 hover:text-[#4B63AC] hover:bg-gray-100 rounded-lg transition duration-200 border border-gray-300 hover:border-[#4B63AC] flex items-center justify-center" title="언어 순서 바꾸기" data-i18n-title="swap_languages">
+            <i class="fas fa-exchange-alt text-sm"></i>
+          </button>
+          <select id="target-language" class="col-span-2 p-2 border rounded text-sm">
+            <option value="english" data-i18n="english">영어</option>
+            <option value="korean" data-i18n="korean">한국어</option>
+            <option value="japanese" data-i18n="japanese">일본어</option>
+            <option value="chinese" data-i18n="chinese">중국어</option>
+          </select>
+        </div>
+      </div>
+    `;
+  }
+
+  // 도메인 필터 HTML - 일관된 방식으로 생성
+  createDomainFilter() {
+    if (!this.showDomain) return "";
+    const domainOptions = DOMAIN_LIST.map(
+      (domain) =>
+        `<option value="${domain}" data-i18n="${DOMAIN_TRANSLATION_KEYS[domain]}"></option>`
+    ).join("");
+
+    return `
+      <label for="domain-filter" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="domain">도메인</label>
+      <select id="domain-filter" class="w-full p-2 border rounded h-10 text-sm">
+        ${domainOptions}
+      </select>
+    `;
+  }
+
+  // 정렬 필터 HTML
+  createSortFilter() {
+    if (!this.showSort) return "";
+    const sortOptions = SORT_OPTIONS.map(
+      (option) =>
+        `<option value="${option.value}" data-i18n="${
+          option.key
+        }">${this.getDefaultSortText(option.value)}</option>`
+    ).join("");
+
+    return `
+      <label for="sort-option" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="sort">정렬</label>
+      <select id="sort-option" class="w-full p-2 border rounded h-10 text-sm">
+        ${sortOptions}
+      </select>
+    `;
+  }
+
+  // 전체 필터 HTML 생성
+  createFilterHTML() {
+    const filters = [];
+
+    if (this.showSearch) filters.push(this.createSearchFilter());
+    if (this.showLanguage) filters.push(this.createLanguageFilter());
+
+    // 도메인과 정렬을 함께 표시
+    if (this.showDomain || this.showSort) {
+      const domainSort = `
+        <div class="w-full">
+          <div class="grid grid-cols-2 gap-2">
+            ${this.showDomain ? `<div>${this.createDomainFilter()}</div>` : ""}
+            ${this.showSort ? `<div>${this.createSortFilter()}</div>` : ""}
+          </div>
+        </div>
+      `;
+      filters.push(domainSort);
+    }
+
+    return `
+      <div class="grid grid-cols-1 md:grid-cols-${this.gridCols} gap-4 mb-4">
+        ${filters.join("")}
+      </div>
+    `;
+  }
+
+  // 기본 언어 텍스트
+  getDefaultLanguageText(lang) {
+    const texts = {
+      korean: "한국어",
+      english: "영어",
+      japanese: "일본어",
+      chinese: "중국어",
+    };
+    return texts[lang] || lang;
+  }
+
+  // 기본 정렬 텍스트
+  getDefaultSortText(sort) {
+    const texts = {
+      latest: "최신순",
+      oldest: "오래된순",
+      "a-z": "가나다순",
+      "z-a": "역가나다순",
+    };
+    return texts[sort] || sort;
+  }
+}
+
 // 필터 관리자 클래스
 export class VocabularyFilterManager {
   constructor(callbacks = {}) {

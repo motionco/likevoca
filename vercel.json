@@ -9,8 +9,7 @@
     { "src": "components/**", "use": "@vercel/static" },
     { "src": "pages/**", "use": "@vercel/static" },
     { "src": "utils/**", "use": "@vercel/static" },
-    { "src": "samples/**", "use": "@vercel/static" },
-    { "src": "locales/**", "use": "@vercel/static" }
+    { "src": "samples/**", "use": "@vercel/static" }
   ],
   "routes": [
     { "src": "/api/config", "dest": "/api/config.js" },
@@ -18,15 +17,14 @@
     { "src": "/api/test-env", "dest": "/api/test-env.js" },
     { "src": "/api/log-auth-error", "dest": "/api/log-auth-error.js" },
     { "handle": "filesystem" },
-    { "src": "^/(?!ko|en|ja|zh).*", "dest": "/index.html" },
-    { "src": "/ko", "dest": "/ko/index.html" },
-    { "src": "/en", "dest": "/en/index.html" },
-    { "src": "/ja", "dest": "/ja/index.html" },
-    { "src": "/zh", "dest": "/zh/index.html" },
-    { "src": "/ko/(.*)", "dest": "/$1" },
-    { "src": "/en/(.*)", "dest": "/$1" },
-    { "src": "/ja/(.*)", "dest": "/$1" },
-    { "src": "/zh/(.*)", "dest": "/$1" },
+    { "src": "/ko/(.*)", "dest": "/$1?lang=ko" },
+    { "src": "/en/(.*)", "dest": "/$1?lang=en" },
+    { "src": "/ja/(.*)", "dest": "/$1?lang=ja" },
+    { "src": "/zh/(.*)", "dest": "/$1?lang=zh" },
+    { "src": "/ko", "dest": "/index.html?lang=ko" },
+    { "src": "/en", "dest": "/index.html?lang=en" },
+    { "src": "/ja", "dest": "/index.html?lang=ja" },
+    { "src": "/zh", "dest": "/index.html?lang=zh" },
     { "src": "/(.*)", "dest": "/$1" }
   ]
 } 

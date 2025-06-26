@@ -481,7 +481,7 @@ function handleEditModalClose(e) {
 
 // 편집 모달 예문 추가 버튼 이벤트 설정 (중복 방지)
 function setupEditModalAddExampleButton() {
-  const addExampleBtn = document.getElementById("edit-add-example");
+  const addExampleBtn = document.getElementById("add-edit-example");
   if (addExampleBtn) {
     // 기존 이벤트 리스너 제거 (클론으로 완전 제거)
     const newAddExampleBtn = addExampleBtn.cloneNode(true);

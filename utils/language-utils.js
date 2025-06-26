@@ -328,10 +328,13 @@ const translations = {
     situation: "상황",
     // 도메인 번역
     academic: "교육",
+    education: "교육",
+    nature: "자연",
     technology: "기술",
     health: "건강",
     sports: "스포츠",
     entertainment: "엔터테인먼트",
+    culture: "문화",
     // 도메인 필터 번역
     domain_filter: "도메인",
     all_domains: "전체 도메인",
@@ -859,11 +862,13 @@ const translations = {
     situation_medical: "Medical",
     // Domain translations
     academic: "Education",
+    education: "Education",
     nature: "Nature",
     technology: "Technology",
     health: "Health",
     sports: "Sports",
     entertainment: "Entertainment",
+    culture: "Culture",
     // Domain filter translations
     domain_filter: "Area",
     all_domains: "All Areas",
@@ -1415,17 +1420,19 @@ const translations = {
     situation_medical: "医療",
     // Domain translations
     academic: "教育",
+    education: "教育",
     nature: "自然",
     technology: "技術",
     health: "健康",
     sports: "スポーツ",
     entertainment: "エンターテインメント",
+    culture: "文化",
     // Domain filter translations
     domain_filter: "領域",
     all_domains: "全領域",
     domain_daily: "日常",
     domain_business: "ビジネス",
-    domain_academic: "教育",
+    domain_education: "教育",
     domain_travel: "旅行",
     domain_food: "食品",
     domain_nature: "自然",
@@ -1674,7 +1681,7 @@ const translations = {
     all_domains: "全ドメイン",
     domain_daily: "日常",
     domain_business: "ビジネス",
-    domain_academic: "教育",
+    domain_education: "教育",
     domain_travel: "旅行",
     domain_food: "食べ物",
     domain_nature: "自然",
@@ -1682,6 +1689,7 @@ const translations = {
     domain_health: "健康",
     domain_sports: "スポーツ",
     domain_entertainment: "エンターテインメント",
+    domain_culture: "文化",
     domain_other: "その他",
 
     // 플래시카드 모드 번역
@@ -1777,16 +1785,19 @@ const translations = {
     tags: "标签（逗号分隔）",
     // 领域翻译
     academic: "教育",
+    education: "教育",
+    nature: "自然",
     technology: "技术",
     health: "健康",
     sports: "体育",
     entertainment: "娱乐",
+    culture: "文化",
     // 领域过滤器翻译
     domain_filter: "领域",
     all_domains: "全部领域",
     domain_daily: "日常",
     domain_business: "商务",
-    domain_academic: "教育",
+    domain_education: "教育",
     domain_travel: "旅行",
     domain_food: "食物",
     domain_nature: "自然",
@@ -2133,6 +2144,29 @@ function detectBrowserLanguage() {
   return SUPPORTED_LANGUAGES[shortLang] ? shortLang : "en"; // 지원되지 않으면 영어가 기본
 }
 
+// URL 파라미터에서 언어 감지
+function detectLanguageFromURL() {
+  // URL 파라미터에서 lang 확인
+  const urlParams = new URLSearchParams(window.location.search);
+  const langParam = urlParams.get("lang");
+
+  if (langParam && SUPPORTED_LANGUAGES[langParam]) {
+    console.log("URL 파라미터에서 언어 감지:", langParam);
+    return langParam;
+  }
+
+  // URL 경로에서 언어 코드 확인 (/ko/pages/vocabulary.html 형태)
+  const pathParts = window.location.pathname.split("/");
+  const pathLang = pathParts[1]; // 첫 번째 경로 부분
+
+  if (pathLang && SUPPORTED_LANGUAGES[pathLang]) {
+    console.log("URL 경로에서 언어 감지:", pathLang);
+    return pathLang;
+  }
+
+  return null;
+}
+
 // 사용자의 위치 정보로 언어 추측
 async function detectLanguageFromLocation() {
   try {
@@ -2184,7 +2218,18 @@ async function getActiveLanguage() {
   languageDetectionInProgress = true;
 
   try {
-    // 1. 먼저 localStorage에서 사용자가 직접 설정한 언어 확인
+    // 1. 먼저 URL에서 언어 확인 (최우선)
+    const urlLang = detectLanguageFromURL();
+    if (urlLang) {
+      console.log("URL에서 언어 감지:", urlLang);
+      cachedLanguage = urlLang;
+      localStorage.setItem("preferredLanguage", urlLang);
+      // URL에서 감지된 언어는 사용자 설정으로도 저장
+      localStorage.setItem("userLanguage", urlLang);
+      return urlLang;
+    }
+
+    // 2. localStorage에서 사용자가 직접 설정한 언어 확인
     const savedLang = localStorage.getItem("userLanguage");
 
     if (savedLang && savedLang !== "auto" && SUPPORTED_LANGUAGES[savedLang]) {
@@ -2194,7 +2239,7 @@ async function getActiveLanguage() {
       return savedLang;
     }
 
-    // 2. 자동 설정이거나 저장된 언어가 없는 경우
+    // 3. 자동 설정이거나 저장된 언어가 없는 경우
     console.log("자동 언어 감지 시도...");
 
     // 먼저 브라우저 언어 시도
@@ -2307,6 +2352,11 @@ async function applyLanguage() {
     // 학습 페이지의 필터 옵션 업데이트 (있는 경우만)
     if (typeof window.updateFilterOptionsLanguage === "function") {
       window.updateFilterOptionsLanguage();
+    }
+
+    // 도메인 필터 옵션 업데이트 (있는 경우만)
+    if (typeof window.updateDomainFilterLanguage === "function") {
+      window.updateDomainFilterLanguage();
     }
 
     // 이벤트 발생 - 언어 변경을 알림

@@ -34,9 +34,6 @@ export async function loadNavbar() {
     if (currentPath.includes("/pages/")) {
       // pages 폴더 내의 페이지인 경우
       navbarPath = "../components/navbar.html";
-    } else if (currentPath.includes("/locales/")) {
-      // locales 폴더 내의 페이지인 경우
-      navbarPath = "../../components/navbar.html";
     } else {
       // 루트 폴더의 페이지인 경우
       navbarPath = "components/navbar.html";
