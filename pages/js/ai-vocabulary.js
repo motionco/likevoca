@@ -1,4 +1,3 @@
-import { loadNavbar } from "../../components/js/navbar.js";
 import {
   auth,
   db,
@@ -101,7 +100,17 @@ window.showConceptModal = showConceptModal;
 // 모달 로드 함수
 async function loadConceptViewModal() {
   try {
-    const response = await fetch("../components/concept-view-modal.html");
+    // 현재 경로에 따라 상대 경로 조정
+    const currentPath = window.location.pathname;
+    let modalPath = "../components/concept-view-modal.html";
+
+    // locales 내에서 실행되는 경우 경로 조정
+    if (currentPath.includes("/locales/")) {
+      modalPath = "../../components/concept-view-modal.html";
+    }
+
+    console.log("개념 보기 모달 로드 경로:", modalPath);
+    const response = await fetch(modalPath);
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
@@ -144,7 +153,19 @@ async function loadConceptViewModal() {
 // AI 개념 편집 모달 로드 (AI 전용 JS 사용)
 async function loadEditConceptModal() {
   try {
-    const response = await fetch("../components/ai-edit-concept-modal.html");
+    // 현재 경로에 따라 상대 경로 조정
+    const currentPath = window.location.pathname;
+    let modalPath = "../components/ai-edit-concept-modal.html";
+    let scriptPath = "../components/js/ai-edit-concept-modal.js";
+
+    // locales 내에서 실행되는 경우 경로 조정
+    if (currentPath.includes("/locales/")) {
+      modalPath = "../../components/ai-edit-concept-modal.html";
+      scriptPath = "../../components/js/ai-edit-concept-modal.js";
+    }
+
+    console.log("AI 개념 편집 모달 로드 경로:", modalPath);
+    const response = await fetch(modalPath);
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
@@ -165,8 +186,10 @@ async function loadEditConceptModal() {
     // AI 전용 편집 모달 스크립트 로드
     const editModalScript = document.createElement("script");
     editModalScript.type = "module";
-    editModalScript.src = "../components/js/ai-edit-concept-modal.js";
-    editModalScript.onload = () => {};
+    editModalScript.src = scriptPath;
+    editModalScript.onload = () => {
+      console.log("✅ AI 편집 모달 스크립트 로드 완료");
+    };
     editModalScript.onerror = (error) => {
       console.error("❌ AI 전용 개념 편집 모달 스크립트 로드 실패:", error);
     };
@@ -186,7 +209,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       userLanguage = "ko";
     }
 
-    await loadNavbar();
+    // 네비게이션 바는 navbar.js에서 자동 처리됨
 
     // 모달들 직접 로드
     await loadConceptViewModal();

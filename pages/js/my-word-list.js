@@ -1,4 +1,3 @@
-import { loadNavbar } from "../../components/js/navbar.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
 import { auth, db } from "../../js/firebase/firebase-init.js";
 import {
@@ -105,8 +104,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     targetLanguage = "english";
   }
 
-  // 네비게이션바 로드
-  await loadNavbar();
+  // 네비게이션바는 navbar.js에서 자동 처리됨
 
   // 도메인 및 정렬 필터 동적 생성
   generateDomainSortFilters();

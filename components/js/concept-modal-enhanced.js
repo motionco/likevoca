@@ -35,114 +35,106 @@ export class EnhancedConceptModal {
    */
   createModal() {
     const modalHtml = `
-      <div id="enhanced-concept-modal" class="modal fade" tabindex="-1">
-        <div class="modal-dialog modal-xl">
-          <div class="modal-content">
-            <div class="modal-header">
-              <div class="d-flex justify-content-between align-items-center w-100">
-                <h5 class="modal-title" data-i18n="concept_details">개념 상세</h5>
-                <div class="language-tabs">
-                  <button class="btn btn-sm btn-outline-primary me-1" data-lang="korean">한국어</button>
-                  <button class="btn btn-sm btn-outline-primary me-1" data-lang="english">English</button>
-                  <button class="btn btn-sm btn-outline-primary me-1" data-lang="japanese">日本語</button>
-                  <button class="btn btn-sm btn-outline-primary" data-lang="chinese">中文</button>
+      <div id="enhanced-concept-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 max-w-6xl shadow-lg rounded-md bg-white">
+          <div class="mt-3">
+            <div class="flex justify-between items-center pb-3 border-b">
+              <div class="flex justify-between items-center w-full">
+                <h3 class="text-lg font-bold text-gray-900" data-i18n="concept_details">개념 상세</h3>
+                <div class="flex space-x-2">
+                  <button class="px-3 py-1 text-sm border border-blue-500 text-blue-500 rounded hover:bg-blue-50" data-lang="korean">한국어</button>
+                  <button class="px-3 py-1 text-sm border border-blue-500 text-blue-500 rounded hover:bg-blue-50" data-lang="english">English</button>
+                  <button class="px-3 py-1 text-sm border border-blue-500 text-blue-500 rounded hover:bg-blue-50" data-lang="japanese">日本語</button>
+                  <button class="px-3 py-1 text-sm border border-blue-500 text-blue-500 rounded hover:bg-blue-50" data-lang="chinese">中文</button>
                 </div>
               </div>
-              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" id="close-modal-btn">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                </svg>
+              </button>
             </div>
-            <div class="modal-body">
+            
+            <div class="mt-4">
               <!-- 기본 정보 섹션 -->
-              <div id="basic-info-section" class="mb-4">
-                <div class="row">
-                  <div class="col-md-8">
-                    <h3 id="word-display" class="text-primary mb-2"></h3>
-                    <div id="pronunciation-display" class="text-muted mb-2"></div>
+              <div id="basic-info-section" class="mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div class="md:col-span-2">
+                    <h3 id="word-display" class="text-2xl font-bold text-blue-600 mb-2"></h3>
+                    <div id="pronunciation-display" class="text-gray-600 mb-2"></div>
                     <div id="definition-display" class="mb-3"></div>
                   </div>
-                  <div class="col-md-4 text-end">
-                    <span id="emoji-display" class="fs-1"></span>
-                    <div id="pos-badge" class="badge bg-secondary mt-2"></div>
+                  <div class="text-center md:text-right">
+                    <span id="emoji-display" class="text-6xl"></span>
+                    <div id="pos-badge" class="inline-block px-2 py-1 text-xs font-semibold text-white bg-gray-500 rounded mt-2"></div>
                   </div>
                 </div>
               </div>
 
               <!-- 하이브리드 문법 설명 섹션 -->
-              <div id="grammar-section" class="mb-4">
-                <h5 data-i18n="grammar_information">문법 정보</h5>
+              <div id="grammar-section" class="mb-6 hidden">
+                <h5 class="text-lg font-semibold mb-3" data-i18n="grammar_information">문법 정보</h5>
                 
                 <!-- 자연어 문법 설명 -->
-                <div id="natural-grammar" class="card mb-3">
-                  <div class="card-body">
-                    <h6 class="card-title" data-i18n="grammar_explanation">문법 설명</h6>
-                    <div id="basic-grammar-desc" class="mb-2"></div>
-                    <div id="detailed-grammar-desc" class="text-muted small"></div>
-                  </div>
+                <div id="natural-grammar" class="bg-gray-50 rounded-lg p-4 mb-4">
+                  <h6 class="font-semibold mb-2" data-i18n="grammar_explanation">문법 설명</h6>
+                  <div id="basic-grammar-desc" class="mb-2"></div>
+                  <div id="detailed-grammar-desc" class="text-gray-600 text-sm"></div>
                 </div>
 
                 <!-- 구조화된 문법 태그 -->
-                <div id="structured-grammar" class="card mb-3">
-                  <div class="card-body">
-                    <h6 class="card-title" data-i18n="grammar_tags">문법 태그</h6>
-                    <div id="grammar-tags-display" class="d-flex flex-wrap gap-2"></div>
-                  </div>
+                <div id="structured-grammar" class="bg-gray-50 rounded-lg p-4 mb-4">
+                  <h6 class="font-semibold mb-2" data-i18n="grammar_tags">문법 태그</h6>
+                  <div id="grammar-tags-display" class="flex flex-wrap gap-2"></div>
                 </div>
 
                 <!-- 학습 메타데이터 -->
-                <div id="learning-metadata" class="card">
-                  <div class="card-body">
-                    <h6 class="card-title" data-i18n="learning_info">학습 정보</h6>
-                    <div class="row">
-                      <div class="col-md-6">
-                        <small class="text-muted" data-i18n="difficulty">난이도</small>
-                        <div id="difficulty-score" class="progress mb-2">
-                          <div class="progress-bar" role="progressbar"></div>
-                        </div>
-                      </div>
-                      <div class="col-md-6">
-                        <small class="text-muted" data-i18n="quiz_suitability">퀴즈 적합도</small>
-                        <div id="quiz-score" class="progress mb-2">
-                          <div class="progress-bar bg-success" role="progressbar"></div>
-                        </div>
+                <div id="learning-metadata" class="bg-gray-50 rounded-lg p-4">
+                  <h6 class="font-semibold mb-2" data-i18n="learning_info">학습 정보</h6>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <small class="text-gray-600" data-i18n="difficulty">난이도</small>
+                      <div id="difficulty-score" class="w-full bg-gray-200 rounded-full h-2 mb-2">
+                        <div class="bg-blue-600 h-2 rounded-full" style="width: 0%"></div>
                       </div>
                     </div>
-                    <div id="practice-points" class="mt-2">
-                      <small class="text-muted" data-i18n="practice_points">연습 포인트:</small>
-                      <div id="practice-list" class="mt-1"></div>
+                    <div>
+                      <small class="text-gray-600" data-i18n="quiz_suitability">퀴즈 적합도</small>
+                      <div id="quiz-score" class="w-full bg-gray-200 rounded-full h-2 mb-2">
+                        <div class="bg-green-600 h-2 rounded-full" style="width: 0%"></div>
+                      </div>
                     </div>
+                  </div>
+                  <div id="practice-points" class="mt-2">
+                    <small class="text-gray-600" data-i18n="practice_points">연습 포인트:</small>
+                    <div id="practice-list" class="mt-1"></div>
                   </div>
                 </div>
               </div>
 
               <!-- 관련 정보 섹션 -->
               <div id="related-info-section">
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="card">
-                      <div class="card-body">
-                        <h6 class="card-title" data-i18n="synonyms">동의어</h6>
-                        <div id="synonyms-list"></div>
-                      </div>
-                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="bg-gray-50 rounded-lg p-4">
+                    <h6 class="font-semibold mb-2" data-i18n="synonyms">유사어 (쉼표로 구분)</h6>
+                    <div id="synonyms-list"></div>
                   </div>
-                  <div class="col-md-6">
-                    <div class="card">
-                      <div class="card-body">
-                        <h6 class="card-title" data-i18n="collocations">연어</h6>
-                        <div id="collocations-list"></div>
-                      </div>
-                    </div>
+                  <div class="bg-gray-50 rounded-lg p-4">
+                    <h6 class="font-semibold mb-2" data-i18n="collocations">연어 (쉼표로 구분)</h6>
+                    <div id="collocations-list"></div>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-primary" id="start-quiz-btn" data-i18n="start_quiz">
+            
+            <div class="flex justify-end space-x-3 pt-4 border-t mt-6">
+              <button type="button" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 hidden" id="start-quiz-btn" data-i18n="start_quiz">
                 퀴즈 시작
               </button>
-              <button type="button" class="btn btn-success" id="start-game-btn" data-i18n="start_game">
+              <button type="button" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 hidden" id="start-game-btn" data-i18n="start_game">
                 게임 시작  
               </button>
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="close">
+              <button type="button" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600" id="close-modal-btn-2" data-i18n="close">
                 닫기
               </button>
             </div>
@@ -154,26 +146,43 @@ export class EnhancedConceptModal {
     // DOM에 모달 추가
     document.body.insertAdjacentHTML("beforeend", modalHtml);
 
-    // Bootstrap 대신 직접 모달 제어
+    // Tailwind CSS 기반 모달 제어
     this.modalElement = document.getElementById("enhanced-concept-modal");
     this.modal = {
       show: () => {
         this.modalElement.classList.remove("hidden");
-        this.modalElement.style.display = "block";
+        document.body.style.overflow = "hidden";
       },
       hide: () => {
         this.modalElement.classList.add("hidden");
-        this.modalElement.style.display = "none";
+        document.body.style.overflow = "auto";
       },
     };
+
+    // 닫기 버튼 이벤트 추가
+    document.getElementById("close-modal-btn").addEventListener("click", () => {
+      this.modal.hide();
+    });
+    document
+      .getElementById("close-modal-btn-2")
+      .addEventListener("click", () => {
+        this.modal.hide();
+      });
+
+    // 배경 클릭 시 모달 닫기
+    this.modalElement.addEventListener("click", (e) => {
+      if (e.target === this.modalElement) {
+        this.modal.hide();
+      }
+    });
   }
 
   /**
    * 이벤트 바인딩
    */
   bindEvents() {
-    // 언어 탭 클릭
-    document.querySelectorAll(".language-tabs button").forEach((btn) => {
+    // 언어 탭 클릭 - 새로운 구조에 맞게 수정
+    document.querySelectorAll("[data-lang]").forEach((btn) => {
       btn.addEventListener("click", (e) => {
         this.switchLanguage(e.target.dataset.lang);
       });
@@ -189,13 +198,20 @@ export class EnhancedConceptModal {
     });
 
     // 퀴즈/게임 시작 버튼
-    document.getElementById("start-quiz-btn").addEventListener("click", () => {
-      this.startQuiz();
-    });
+    const quizBtn = document.getElementById("start-quiz-btn");
+    const gameBtn = document.getElementById("start-game-btn");
 
-    document.getElementById("start-game-btn").addEventListener("click", () => {
-      this.startGame();
-    });
+    if (quizBtn) {
+      quizBtn.addEventListener("click", () => {
+        this.startQuiz();
+      });
+    }
+
+    if (gameBtn) {
+      gameBtn.addEventListener("click", () => {
+        this.startGame();
+      });
+    }
   }
 
   /**
@@ -215,9 +231,23 @@ export class EnhancedConceptModal {
   async switchLanguage(language) {
     this.currentLanguage = language;
 
-    // 활성 탭 업데이트
-    document.querySelectorAll(".language-tabs button").forEach((btn) => {
-      btn.classList.toggle("active", btn.dataset.lang === language);
+    // 활성 탭 업데이트 - Tailwind CSS 스타일로 변경
+    document.querySelectorAll("[data-lang]").forEach((btn) => {
+      if (btn.dataset.lang === language) {
+        btn.classList.remove(
+          "border-blue-500",
+          "text-blue-500",
+          "hover:bg-blue-50"
+        );
+        btn.classList.add("bg-blue-500", "text-white", "border-blue-500");
+      } else {
+        btn.classList.remove("bg-blue-500", "text-white");
+        btn.classList.add(
+          "border-blue-500",
+          "text-blue-500",
+          "hover:bg-blue-50"
+        );
+      }
     });
 
     await this.updateDisplay();
@@ -259,7 +289,9 @@ export class EnhancedConceptModal {
     const posText = await this.translatePOS(expression.part_of_speech);
     const posBadge = document.getElementById("pos-badge");
     posBadge.textContent = posText;
-    posBadge.className = `badge ${this.getPOSColor(expression.part_of_speech)}`;
+    posBadge.className = `inline-block px-2 py-1 text-xs font-semibold text-white rounded mt-2 ${this.getPOSColor(
+      expression.part_of_speech
+    )}`;
   }
 
   /**
@@ -1441,17 +1473,17 @@ export class EnhancedConceptModal {
   }
 
   /**
-   * 품사별 색상
+   * 품사별 색상 - Tailwind CSS 클래스
    */
   getPOSColor(pos) {
     const colors = {
-      noun: "bg-primary",
-      verb: "bg-success",
-      adjective: "bg-warning",
-      adverb: "bg-info",
-      interjection: "bg-secondary",
+      noun: "bg-blue-500",
+      verb: "bg-green-500",
+      adjective: "bg-yellow-500",
+      adverb: "bg-cyan-500",
+      interjection: "bg-gray-500",
     };
-    return colors[pos] || "bg-light";
+    return colors[pos] || "bg-gray-400";
   }
 
   /**

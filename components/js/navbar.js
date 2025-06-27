@@ -222,11 +222,13 @@ function checkAuthStatus() {
     // Firebase가 아직 로드되지 않았거나 사용할 수 없는 경우
     updateUIBasedOnAuth(false);
 
-    // Firebase 로드를 기다려서 다시 시도 (최대 5초)
+    // Firebase 로드를 기다려서 다시 시도 (최대 10초)
     let attempts = 0;
-    const maxAttempts = 10;
+    const maxAttempts = 20; // 10초로 증가
     const checkInterval = setInterval(() => {
       attempts++;
+      console.log(`Firebase 로드 확인 시도 ${attempts}/${maxAttempts}`);
+
       if (
         typeof window.firebaseInit !== "undefined" &&
         window.firebaseInit.auth
@@ -255,25 +257,95 @@ function checkAuthStatus() {
 }
 
 function updateUIBasedOnAuth(isLoggedIn) {
-  console.log("UI 업데이트:", isLoggedIn ? "로그인됨" : "로그아웃됨");
+  console.log("🔄 UI 업데이트:", isLoggedIn ? "로그인됨" : "로그아웃됨");
 
   const desktopLoginSection = document.getElementById("desktop-login-section");
   const desktopUserSection = document.getElementById("desktop-user-section");
   const mobileLoginButtons = document.getElementById("mobile-login-buttons");
 
-  if (isLoggedIn) {
-    // 로그인된 상태
-    if (desktopLoginSection) desktopLoginSection.classList.add("hidden");
-    if (desktopUserSection) desktopUserSection.classList.remove("hidden");
-    if (mobileLoginButtons) mobileLoginButtons.classList.add("hidden");
-  } else {
-    // 로그인되지 않은 상태
-    if (desktopLoginSection) desktopLoginSection.classList.remove("hidden");
-    if (desktopUserSection) desktopUserSection.classList.add("hidden");
-    if (mobileLoginButtons) mobileLoginButtons.classList.remove("hidden");
+  console.log("🔍 UI 요소 확인:", {
+    desktopLoginSection: !!desktopLoginSection,
+    desktopUserSection: !!desktopUserSection,
+    mobileLoginButtons: !!mobileLoginButtons,
+  });
+
+  // 모든 요소의 현재 클래스 상태 확인
+  if (desktopLoginSection) {
+    console.log(
+      "📋 데스크톱 로그인 섹션 현재 클래스:",
+      desktopLoginSection.className
+    );
+  }
+  if (desktopUserSection) {
+    console.log(
+      "📋 데스크톱 유저 섹션 현재 클래스:",
+      desktopUserSection.className
+    );
+  }
+  if (mobileLoginButtons) {
+    console.log(
+      "📋 모바일 로그인 버튼 현재 클래스:",
+      mobileLoginButtons.className
+    );
   }
 
-  console.log("UI 업데이트 완료, 로그인 상태:", isLoggedIn);
+  if (isLoggedIn) {
+    // 로그인된 상태: 로그인 버튼 숨기고 유저 프로필 표시
+    if (desktopLoginSection) {
+      desktopLoginSection.classList.add("hidden");
+      desktopLoginSection.classList.remove("flex");
+      console.log("✅ 데스크톱 로그인 섹션 숨김");
+    }
+    if (desktopUserSection) {
+      desktopUserSection.classList.remove("hidden");
+      desktopUserSection.classList.add("flex", "items-center", "lg:flex");
+      console.log("✅ 데스크톱 유저 섹션 표시");
+    }
+    if (mobileLoginButtons) {
+      mobileLoginButtons.classList.add("hidden");
+      mobileLoginButtons.classList.remove("flex");
+      console.log("✅ 모바일 로그인 버튼 숨김");
+    }
+  } else {
+    // 로그인되지 않은 상태: 유저 프로필 숨기고 로그인 버튼 표시
+    if (desktopLoginSection) {
+      desktopLoginSection.classList.remove("hidden");
+      desktopLoginSection.classList.add("flex", "lg:flex", "space-x-2");
+      console.log("✅ 데스크톱 로그인 섹션 표시");
+    }
+    if (desktopUserSection) {
+      desktopUserSection.classList.add("hidden");
+      desktopUserSection.classList.remove("flex", "items-center", "lg:flex");
+      console.log("✅ 데스크톱 유저 섹션 숨김");
+    }
+    if (mobileLoginButtons) {
+      mobileLoginButtons.classList.remove("hidden");
+      mobileLoginButtons.classList.add("flex", "space-x-3");
+      console.log("✅ 모바일 로그인 버튼 표시");
+    }
+  }
+
+  // 업데이트 후 클래스 상태 확인
+  if (desktopLoginSection) {
+    console.log(
+      "📋 업데이트 후 데스크톱 로그인 섹션 클래스:",
+      desktopLoginSection.className
+    );
+  }
+  if (desktopUserSection) {
+    console.log(
+      "📋 업데이트 후 데스크톱 유저 섹션 클래스:",
+      desktopUserSection.className
+    );
+  }
+  if (mobileLoginButtons) {
+    console.log(
+      "📋 업데이트 후 모바일 로그인 버튼 클래스:",
+      mobileLoginButtons.className
+    );
+  }
+
+  console.log("🎯 UI 업데이트 완료, 로그인 상태:", isLoggedIn);
 }
 
 // 전역에서 접근 가능하도록 함수들을 window 객체에 추가
