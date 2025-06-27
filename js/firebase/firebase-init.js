@@ -2301,4 +2301,10 @@ window.firebaseInit = {
   grammarPatternUtils,
 };
 
+// 모듈 방식 전역 객체도 설정 (navbar.js 호환성을 위해)
+window.auth = auth;
+window.onAuthStateChanged = onAuthStateChanged;
+window.db = db;
+
 console.log("🔥 Firebase 전역 객체 설정 완료:", window.firebaseInit);
+console.log("🔥 Firebase 모듈 방식 전역 객체 설정 완료");

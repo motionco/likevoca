@@ -7,8 +7,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   console.log("현재 경로:", currentPath);
 
-  // 현재 언어 감지
+  // 현재 언어 감지 (배포 환경 대응)
   if (currentPath.includes("/locales/")) {
+    // 개발 환경: /locales/ko/index.html 형태
     const pathParts = currentPath.split("/");
     const localesIndex = pathParts.indexOf("locales");
     if (localesIndex !== -1 && localesIndex + 1 < pathParts.length) {
@@ -16,10 +17,26 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     // 언어별 navbar 경로 설정
     navbarPath = `navbar.html`;
-    console.log("언어별 navbar 사용:", navbarPath, "언어:", currentLanguage);
+    console.log(
+      "개발환경 언어별 navbar 사용:",
+      navbarPath,
+      "언어:",
+      currentLanguage
+    );
+  } else if (currentPath.match(/^\/(ko|en|ja|zh)\//)) {
+    // 배포 환경: /ko/index.html 형태
+    const pathParts = currentPath.split("/");
+    currentLanguage = pathParts[1]; // 첫 번째 경로 부분이 언어 코드
+    navbarPath = `/components/navbar.html`;
+    console.log(
+      "배포환경 언어별 navbar 사용:",
+      navbarPath,
+      "언어:",
+      currentLanguage
+    );
   } else {
-    // 루트 경로에서는 기본 navbar 사용
-    navbarPath = "components/navbar.html";
+    // 루트 경로에서는 기본 navbar 사용 (절대 경로로 수정)
+    navbarPath = "/components/navbar.html";
     console.log("기본 navbar 사용:", navbarPath);
   }
 
@@ -169,9 +186,14 @@ function changeLanguage(newLanguage) {
   // 현재 페이지 정보 추출
   const currentPath = window.location.pathname;
   let targetPath = "";
+  
+  // 개발 환경 감지
+  const isDevelopment = window.location.hostname === 'localhost' || 
+                       window.location.hostname === '127.0.0.1' ||
+                       window.location.port === '5500';
 
   if (currentPath.includes("/locales/")) {
-    // 현재 locales 내의 페이지인 경우
+    // 개발 환경: 현재 locales 내의 페이지인 경우
     const pathParts = currentPath.split("/");
     const localesIndex = pathParts.indexOf("locales");
 
@@ -183,9 +205,24 @@ function changeLanguage(newLanguage) {
       // index.html로 이동
       targetPath = `/locales/${newLanguage}/index.html`;
     }
+  } else if (currentPath.match(/^\/(ko|en|ja|zh)\//)) {
+    // 배포 환경: 언어별 경로에서 다른 언어로 변경
+    const pathParts = currentPath.split("/");
+    const currentLang = pathParts[1];
+    const remainingPath = pathParts.slice(2).join("/");
+    
+    if (remainingPath) {
+      targetPath = `/${newLanguage}/${remainingPath}`;
+    } else {
+      targetPath = `/${newLanguage}/index.html`;
+    }
   } else {
-    // 루트 페이지에서는 해당 언어의 index.html로 이동
-    targetPath = `/locales/${newLanguage}/index.html`;
+    // 루트 경로에서는 환경에 따라 적절한 경로로 이동
+    if (isDevelopment) {
+      targetPath = `/locales/${newLanguage}/index.html`;
+    } else {
+      targetPath = `/${newLanguage}/index.html`;
+    }
   }
 
   console.log("이동할 경로:", targetPath);
@@ -205,15 +242,34 @@ function checkAuthStatus() {
   // Firebase 인증 상태 확인
   console.log("Firebase 인증 상태 확인 시작");
 
-  // Firebase 전역 객체 확인 (firebase-init.js에서 설정)
-  if (typeof window.firebaseInit !== "undefined" && window.firebaseInit.auth) {
-    console.log("Firebase 인증 사용 가능");
+  // Firebase 모듈 방식으로 확인 (firebase-init.js에서 설정)
+  if (
+    typeof window.auth !== "undefined" &&
+    typeof window.onAuthStateChanged !== "undefined"
+  ) {
+    console.log("Firebase 인증 사용 가능 (모듈 방식)");
+
+    // Firebase 인증 상태 리스너 설정
+    window.onAuthStateChanged(window.auth, (user) => {
+      console.log("Firebase 인증 상태 변경:", user ? "로그인됨" : "로그아웃됨");
+      if (user) {
+        console.log("로그인된 사용자:", user.email, user.photoURL);
+        updateUserProfile(user);
+      }
+      updateUIBasedOnAuth(!!user);
+    });
+  } else if (
+    typeof window.firebaseInit !== "undefined" &&
+    window.firebaseInit.auth
+  ) {
+    console.log("Firebase 인증 사용 가능 (기존 방식)");
 
     // Firebase 인증 상태 리스너 설정
     window.firebaseInit.onAuthStateChanged(window.firebaseInit.auth, (user) => {
       console.log("Firebase 인증 상태 변경:", user ? "로그인됨" : "로그아웃됨");
       if (user) {
-        console.log("로그인된 사용자:", user.email);
+        console.log("로그인된 사용자:", user.email, user.photoURL);
+        updateUserProfile(user);
       }
       updateUIBasedOnAuth(!!user);
     });
@@ -230,10 +286,27 @@ function checkAuthStatus() {
       console.log(`Firebase 로드 확인 시도 ${attempts}/${maxAttempts}`);
 
       if (
+        typeof window.auth !== "undefined" &&
+        typeof window.onAuthStateChanged !== "undefined"
+      ) {
+        console.log("Firebase 지연 로드 완료 (모듈 방식), 인증 상태 재확인");
+        clearInterval(checkInterval);
+        window.onAuthStateChanged(window.auth, (user) => {
+          console.log(
+            "Firebase 인증 상태 변경 (지연):",
+            user ? "로그인됨" : "로그아웃됨"
+          );
+          if (user) {
+            console.log("로그인된 사용자 (지연):", user.email, user.photoURL);
+            updateUserProfile(user);
+          }
+          updateUIBasedOnAuth(!!user);
+        });
+      } else if (
         typeof window.firebaseInit !== "undefined" &&
         window.firebaseInit.auth
       ) {
-        console.log("Firebase 지연 로드 완료, 인증 상태 재확인");
+        console.log("Firebase 지연 로드 완료 (기존 방식), 인증 상태 재확인");
         clearInterval(checkInterval);
         window.firebaseInit.onAuthStateChanged(
           window.firebaseInit.auth,
@@ -243,7 +316,8 @@ function checkAuthStatus() {
               user ? "로그인됨" : "로그아웃됨"
             );
             if (user) {
-              console.log("로그인된 사용자 (지연):", user.email);
+              console.log("로그인된 사용자 (지연):", user.email, user.photoURL);
+              updateUserProfile(user);
             }
             updateUIBasedOnAuth(!!user);
           }
@@ -253,6 +327,31 @@ function checkAuthStatus() {
         clearInterval(checkInterval);
       }
     }, 500);
+  }
+}
+
+function updateUserProfile(user) {
+  console.log("👤 사용자 프로필 업데이트:", user);
+
+  // 프로필 이미지 업데이트
+  const avatarImg = document.getElementById("avatar-img");
+  if (avatarImg && user.photoURL) {
+    avatarImg.src = user.photoURL;
+    avatarImg.alt = user.displayName || user.email;
+    console.log("✅ 프로필 이미지 설정:", user.photoURL);
+  } else if (avatarImg) {
+    // 기본 프로필 이미지 설정
+    avatarImg.src =
+      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'/%3E%3C/svg%3E";
+    avatarImg.alt = "기본 프로필";
+    console.log("✅ 기본 프로필 이미지 설정");
+  }
+
+  // 사용자 이름 업데이트
+  const userName = document.getElementById("user-name");
+  if (userName) {
+    userName.textContent = user.displayName || user.email;
+    console.log("✅ 사용자 이름 설정:", user.displayName || user.email);
   }
 }
 

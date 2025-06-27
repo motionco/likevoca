@@ -261,19 +261,22 @@ async function loadTranslations() {
 
     console.log("🌐 번역 파일 로드 시작, 기본 경로:", basePath);
 
+    // 절대 경로로 번역 파일 로드 (Vercel 배포 환경 대응)
+    const rootPath = window.location.origin;
+
     // 각 언어별 번역 파일 로드
     const [koTranslations, enTranslations, jaTranslations, zhTranslations] =
       await Promise.all([
-        fetch(`${basePath}/locales/ko/translations.json`).then((res) =>
+        fetch(`${rootPath}/locales/ko/translations.json`).then((res) =>
           res.json()
         ),
-        fetch(`${basePath}/locales/en/translations.json`).then((res) =>
+        fetch(`${rootPath}/locales/en/translations.json`).then((res) =>
           res.json()
         ),
-        fetch(`${basePath}/locales/ja/translations.json`).then((res) =>
+        fetch(`${rootPath}/locales/ja/translations.json`).then((res) =>
           res.json()
         ),
-        fetch(`${basePath}/locales/zh/translations.json`).then((res) =>
+        fetch(`${rootPath}/locales/zh/translations.json`).then((res) =>
           res.json()
         ),
       ]);
