@@ -5,52 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LikeVoca - Redirecting...</title>
     <script>
-      // 이미 리다이렉트가 실행되었는지 확인
-      if (!sessionStorage.getItem('redirected')) {
-        // 브라우저 언어 감지
-        function detectBrowserLanguage() {
-          const browserLang = navigator.language || navigator.userLanguage;
-          const langCode = browserLang.split('-')[0];
-          
-          // 지원하는 언어 목록
-          const supportedLanguages = ['ko', 'en', 'ja', 'zh'];
-          
-          return supportedLanguages.includes(langCode) ? langCode : 'ko';
+      console.log("루트 index.html 로드됨");
+      
+      // 브라우저 언어 감지
+      function detectBrowserLanguage() {
+        // localStorage에서 저장된 언어 확인
+        const savedLang = localStorage.getItem('userLanguage');
+        if (savedLang) {
+          console.log("저장된 언어 사용:", savedLang);
+          return savedLang;
         }
         
-        // 개발 환경 감지
-        function isDevelopment() {
-          return window.location.hostname === 'localhost' || 
-                 window.location.hostname === '127.0.0.1' ||
-                 window.location.port === '5500';
-        }
+        // 브라우저 언어 감지
+        const browserLang = navigator.language || navigator.userLanguage;
+        const langCode = browserLang.split('-')[0];
+        
+        // 지원하는 언어 목록
+        const supportedLanguages = ['ko', 'en', 'ja', 'zh'];
+        const detectedLang = supportedLanguages.includes(langCode) ? langCode : 'ko';
+        
+        console.log("브라우저 언어 감지:", browserLang, "→", detectedLang);
+        return detectedLang;
+      }
+      
+      // 개발 환경 감지
+      function isDevelopment() {
+        return window.location.hostname === 'localhost' || 
+               window.location.hostname === '127.0.0.1' ||
+               window.location.port === '5500' ||
+               window.location.hostname.includes('127.0.0.1');
+      }
+      
+      // 즉시 실행 함수로 리다이렉트
+      (function() {
+        const currentPath = window.location.pathname;
+        console.log("현재 경로:", currentPath);
         
         // 현재 경로가 이미 언어별 경로인지 확인
-        const currentPath = window.location.pathname;
         const isAlreadyLanguagePath = currentPath.match(/^\/(ko|en|ja|zh)\//) || 
                                     currentPath.match(/^\/locales\/(ko|en|ja|zh)\//);
         
-        // 이미 언어별 경로가 아닌 경우에만 리다이렉트
-        if (!isAlreadyLanguagePath && (currentPath === '/' || currentPath === '/index.html')) {
-          // 리다이렉트 실행됨을 표시
-          sessionStorage.setItem('redirected', 'true');
-          
+        console.log("이미 언어별 경로인가?", isAlreadyLanguagePath);
+        
+        // 루트 경로에서만 리다이렉트 실행
+        if (!isAlreadyLanguagePath && (currentPath === '/' || currentPath === '/index.html' || currentPath === '')) {
           const targetLang = detectBrowserLanguage();
+          let targetPath;
           
           if (isDevelopment()) {
             // 개발 환경: locales 폴더 경로 사용
-            window.location.replace(`/locales/${targetLang}/index.html`);
+            targetPath = `/locales/${targetLang}/index.html`;
           } else {
             // 배포 환경: 언어별 경로 사용
-            window.location.replace(`/${targetLang}/index.html`);
+            targetPath = `/${targetLang}/index.html`;
           }
+          
+          console.log("리다이렉트 실행:", targetPath);
+          
+          // 즉시 리다이렉트
+          window.location.replace(targetPath);
+        } else {
+          console.log("리다이렉트 불필요");
         }
-      }
-      
-      // 3초 후 세션 스토리지 정리 (다음 방문을 위해)
-      setTimeout(() => {
-        sessionStorage.removeItem('redirected');
-      }, 3000);
+      })();
     </script>
   </head>
   <body>
@@ -62,7 +79,7 @@
         <p style="margin-top: 20px; font-size: 14px; color: #666;">
           자동으로 이동하지 않으면 <a href="/locales/ko/index.html" style="color: #4B63AC;">여기를 클릭하세요</a>
         </p>
+        </div>
       </div>
-    </div>
   </body>
 </html>

@@ -1772,11 +1772,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // 모달 초기화
     console.log("🔧 모달 초기화 시작");
+
+    // 현재 경로에 따라 모달 경로 결정
+    const currentPath = window.location.pathname;
+    const modalBasePath = currentPath.includes("/locales/")
+      ? "../../components/"
+      : "../components/";
+
     await loadModals([
-      "../components/add-concept-modal.html",
-      "../components/edit-concept-modal.html",
-      "../components/concept-view-modal.html",
-      "../components/bulk-import-modal.html",
+      `${modalBasePath}add-concept-modal.html`,
+      `${modalBasePath}edit-concept-modal.html`,
+      `${modalBasePath}concept-view-modal.html`,
+      `${modalBasePath}bulk-import-modal.html`,
     ]);
     console.log("✅ 모달 초기화 완료");
 

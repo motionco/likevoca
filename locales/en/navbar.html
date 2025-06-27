@@ -2,16 +2,15 @@
   <div class="container mx-auto flex justify-between items-center max-w-6xl">
     <!-- 왼쪽: 햄버거 메뉴 (모바일) + 로고 -->
     <div class="flex items-center">
-    <button
-      id="menu-toggle"
+      <button
+        id="menu-toggle"
         class="text-white text-2xl lg:hidden mr-3"
-    >
-      <i class="fa-solid fa-bars"></i>
-    </button>
+      >
+        <i class="fa-solid fa-bars"></i>
+      </button>
 
       <a
-        href="#"
-        onclick="goToHome()"
+        href="index.html"
         class="text-white text-xl md:text-2xl lg:text-3xl font-bold"
         >LikeVoca</a
       >
@@ -20,29 +19,25 @@
     <!-- 중앙: 네비게이션 메뉴 (데스크톱만) -->
     <ul id="nav-menu" class="hidden lg:flex space-x-10 items-center">
       <li>
-        <a href="#" onclick="goToPage('vocabulary.html')" class="text-xl text-white hover:text-yellow-400" data-i18n="vocabulary"
-          >단어장</a
-        >
+        <a href="vocabulary.html" class="text-xl text-white hover:text-yellow-400" data-i18n="vocabulary">Vocabulary</a>
       </li>
       <li>
-        <a href="#" onclick="goToPage('ai-vocabulary.html')" class="text-xl text-white hover:text-yellow-400" data-i18n="ai_vocabulary">AI 단어장</a>
+        <a href="ai-vocabulary.html" class="text-xl text-white hover:text-yellow-400" data-i18n="ai_vocabulary">AI Vocabulary</a>
       </li>
       <li>
-        <a href="#" onclick="goToPage('quiz.html')" class="text-xl text-white hover:text-yellow-400" data-i18n="quiz">퀴즈</a>
+        <a href="quiz.html" class="text-xl text-white hover:text-yellow-400" data-i18n="quiz">Quiz</a>
       </li>
       <li>
-        <a href="#" onclick="goToPage('games.html')" class="text-xl text-white hover:text-yellow-400" data-i18n="games">게임</a>
+        <a href="games.html" class="text-xl text-white hover:text-yellow-400" data-i18n="games">Games</a>
       </li>
       <li>
-        <a href="#" onclick="goToPage('learning.html')" class="text-xl text-white hover:text-yellow-400" data-i18n="learning_title">학습</a>
+        <a href="learning.html" class="text-xl text-white hover:text-yellow-400" data-i18n="learning_title">Learning</a>
       </li>
       <li>
-        <a href="#" onclick="goToPage('progress.html')" class="text-xl text-white hover:text-yellow-400" data-i18n="progress">진도</a>
+        <a href="progress.html" class="text-xl text-white hover:text-yellow-400" data-i18n="progress">Progress</a>
       </li>
       <li>
-        <a href="#" onclick="goToPage('inquiry.html')" class="text-xl text-white hover:text-yellow-400" data-i18n="inquiry"
-          >문의하기</a
-        >
+        <a href="inquiry.html" class="text-xl text-white hover:text-yellow-400" data-i18n="inquiry">Contact</a>
       </li>
     </ul>
 
@@ -60,64 +55,68 @@
         "
       >
         <i class="fas fa-globe lg:mr-1"></i>
-        <span class="hidden lg:inline lg:ml-1">KR</span>
+        <span class="hidden lg:inline lg:ml-1">EN</span>
       </button>
 
       <!-- Desktop: 로그인/회원가입 버튼 (로그인 전) -->
       <div id="desktop-login-section" class="hidden lg:flex space-x-2">
         <a
-          href="#"
-          onclick="goToRoot('login.html')"
+          href="../../login.html"
           id="login-button"
           class="border-2 border-white bg-[#4B63AC] text-white font-semibold px-4 py-1.5 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
           data-i18n="login"
-          >로그인</a
+          >Login</a
         >
-    </div>
+        <a
+          href="../../signup.html"
+          id="signup-button"
+          class="border-2 border-white bg-white text-[#4B63AC] font-semibold px-4 py-1.5 text-sm rounded-lg hover:bg-[#4B63AC] hover:text-white transition duration-300"
+          data-i18n="signup"
+          >Sign Up</a
+        >
+      </div>
 
       <!-- 유저 프로필 (반응형) -->
       <div id="desktop-user-section" class="hidden items-center lg:flex">
-    <div
-      id="user-profile"
-          class="relative flex items-center text-white"
-    >
-          <div id="avatar-container" class="cursor-pointer">
         <div
-          id="avatar"
+          id="user-profile"
+          class="relative flex items-center text-white"
+        >
+          <div id="avatar-container" class="cursor-pointer">
+            <div
+              id="avatar"
               class="w-8 h-8 lg:w-10 lg:h-10 rounded-full overflow-hidden border-2 border-white"
-        ></div>
-      </div>
+            ></div>
+          </div>
 
-      <div
-        id="profile-dropdown"
+          <div
+            id="profile-dropdown"
             class="hidden absolute top-12 right-0 bg-white shadow-lg rounded-lg py-2 w-48 text-gray-900 z-50"
-      >
-        <div class="px-4 py-2 font-semibold border-b border-gray-200">
-          <span id="user-name"></span>
-        </div>
+          >
+            <div class="px-4 py-2 font-semibold border-b border-gray-200">
+              <span id="user-name"></span>
+            </div>
             <a
-              href="#"
-              onclick="goToPage('my-word-list.html')"
+              href="my-word-list.html"
               class="block w-full text-left px-4 py-2 hover:bg-gray-100"
               data-i18n="wordbook"
             >
-              단어장
+              My Word List
             </a>
             <a
-              href="#"
-              onclick="goToRoot('profile.html')"
+              href="../../profile.html"
               class="block w-full text-left px-4 py-2 hover:bg-gray-100"
               data-i18n="profile"
-        >
-              프로필
+            >
+              Profile
             </a>
-        <button
-          id="logout-button"
-          class="block w-full text-left px-4 py-2 hover:bg-gray-100"
-          data-i18n="logout"
-        >
-          로그아웃
-        </button>
+            <button
+              id="logout-button"
+              class="block w-full text-left px-4 py-2 hover:bg-gray-100"
+              data-i18n="logout"
+            >
+              Logout
+            </button>
           </div>
         </div>
       </div>
@@ -128,31 +127,28 @@
     id="mobile-menu"
     class="hidden flex flex-col items-center space-y-4 bg-[#4B63AC] text-white p-3 lg:hidden"
   >
-    <a href="#" onclick="goToPage('vocabulary.html')" class="text-lg hover:text-yellow-400" data-i18n="vocabulary">단어장</a>
-    <a href="#" onclick="goToPage('ai-vocabulary.html')" class="text-lg hover:text-yellow-400" data-i18n="ai_vocabulary">AI 단어장</a>
-    <a href="#" onclick="goToPage('quiz.html')" class="text-lg hover:text-yellow-400" data-i18n="quiz">퀴즈</a>
-    <a href="#" onclick="goToPage('games.html')" class="text-lg hover:text-yellow-400" data-i18n="games">게임</a>
-    <a href="#" onclick="goToPage('learning.html')" class="text-lg hover:text-yellow-400" data-i18n="learning_title">학습</a>
-    <a href="#" onclick="goToPage('progress.html')" class="text-lg hover:text-yellow-400" data-i18n="progress">진도</a>
-    <a href="#" onclick="goToPage('inquiry.html')" class="text-lg hover:text-yellow-400" data-i18n="inquiry">문의하기</a>
+    <a href="vocabulary.html" class="text-lg hover:text-yellow-400" data-i18n="vocabulary">Vocabulary</a>
+    <a href="ai-vocabulary.html" class="text-lg hover:text-yellow-400" data-i18n="ai_vocabulary">AI Vocabulary</a>
+    <a href="quiz.html" class="text-lg hover:text-yellow-400" data-i18n="quiz">Quiz</a>
+    <a href="games.html" class="text-lg hover:text-yellow-400" data-i18n="games">Games</a>
+    <a href="learning.html" class="text-lg hover:text-yellow-400" data-i18n="learning_title">Learning</a>
+    <a href="progress.html" class="text-lg hover:text-yellow-400" data-i18n="progress">Progress</a>
+    <a href="inquiry.html" class="text-lg hover:text-yellow-400" data-i18n="inquiry">Contact</a>
 
-    <div id="mobile-login-buttons" class="hidden flex space-x-3">
+    <div id="mobile-login-buttons" class="flex space-x-3">
       <a
-        href="#"
-        onclick="goToRoot('login.html')"
+        href="../../login.html"
         class="border-2 border-white bg-[#4B63AC] text-white font-semibold px-5 py-2 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
         data-i18n="login"
-        >로그인</a
+        >Login</a
       >
       <a
-        href="#"
-        onclick="goToRoot('signup.html')"
+        href="../../signup.html"
         class="border-2 border-white bg-[#4B63AC] text-white font-semibold px-5 py-2 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
         data-i18n="signup"
-        >회원가입</a
+        >Sign Up</a
       >
     </div>
-
   </div>
 </nav>
 

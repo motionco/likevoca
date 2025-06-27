@@ -1,5 +1,15 @@
 import { hybridGrammarSystem } from "../../js/hybrid-grammar-system.js";
-import { getCurrentUILanguage, getI18nText } from "../../js/i18n.js";
+import { getActiveLanguage } from "../../utils/language-utils.js";
+
+// i18n.js 대신 language-utils.js 사용
+function getCurrentUILanguage() {
+  return getActiveLanguage();
+}
+
+function getI18nText(key) {
+  const lang = localStorage.getItem("userLanguage") || "ko";
+  return window.translations?.[lang]?.[key] || key;
+}
 
 /**
  * 향상된 개념 모달 시스템

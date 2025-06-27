@@ -20,7 +20,7 @@ import {
   setupI18nListener,
   translateDomainKey,
   translateCategoryKey,
-} from "../../js/i18n.js";
+} from "../../utils/language-utils.js";
 // 필터 공유 모듈 import
 import {
   VocabularyFilterBuilder,

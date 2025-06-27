@@ -15,6 +15,7 @@
   "user_suffix": "さん",
   "get_started_free": "無料で始める",
   "learn_languages": "様々な言語を簡単に楽しく学びましょう",
+  "learn_languages_part2": "LikeVocaと一緒に",
   "effective_learning": "体系的なカリキュラムと直感的な学習システムで、あなたの語学学習をより効果的にします。",
   "wordbook_desc": "学習する単語を入力して、自分だけの多言語単語帳を作りましょう。",
   "ai_wordbook_desc": "Google Gemini AIからカスタム単語のおすすめを受け取り、語学力を向上させましょう。",
@@ -172,5 +173,9 @@
   "concept_deleted_success": "概念が正常に削除されました。",
   "concept_delete_error": "概念削除中にエラーが発生しました",
   "registration_time": "登録時間",
-  "domain_placeholder": "例: daily, food, business"
+  "domain_placeholder": "例: daily, food, business",
+  "language_learning": "言語学習",
+  "language_learning_desc": "体系的な学習システムで語学力を向上させましょう。",
+  "language_games": "言語ゲーム",
+  "language_games_desc": "楽しいゲームを通じて言語を学習しましょう。"
 } 

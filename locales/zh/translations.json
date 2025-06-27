@@ -15,6 +15,7 @@
   "user_suffix": "",
   "get_started_free": "免费开始",
   "learn_languages": "轻松有趣地学习各种语言",
+  "learn_languages_part2": "与LikeVoca一起",
   "effective_learning": "通过系统化的课程和直观的学习系统，让您的语言学习更加有效。",
   "wordbook_desc": "输入要学习的单词，创建您自己的多语言单词本。",
   "ai_wordbook_desc": "从Google Gemini AI获得定制单词推荐，提高您的语言技能。",
@@ -172,5 +173,9 @@
   "concept_deleted_success": "概念已成功删除。",
   "concept_delete_error": "删除概念时发生错误",
   "registration_time": "注册时间",
-  "domain_placeholder": "例如：daily, food, business"
+  "domain_placeholder": "例如：daily, food, business",
+  "language_learning": "语言学习",
+  "language_learning_desc": "通过系统化的学习系统提高您的语言技能。",
+  "language_games": "语言游戏",
+  "language_games_desc": "通过有趣的游戏学习语言。"
 } 
