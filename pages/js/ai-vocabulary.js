@@ -220,6 +220,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       window.initializeVocabularyFilterLanguage();
     }
 
+    // 필터 언어 즉시 업데이트
+    setTimeout(() => {
+      if (typeof window.updateVocabularyFilterLanguage === "function") {
+        window.updateVocabularyFilterLanguage();
+      }
+    }, 500);
+
     // 로컬 환경인지 확인
     if (isLocalEnvironment) {
       // 로컬 환경 알림 메시지 추가
@@ -295,6 +302,10 @@ function initializeEventListeners() {
     } catch (error) {
       console.error("언어 변경 시 초기화 실패:", error);
       userLanguage = "ko";
+    }
+    // 필터 언어 업데이트
+    if (typeof window.updateVocabularyFilterLanguage === "function") {
+      window.updateVocabularyFilterLanguage();
     }
     // 카드 재렌더링
     applyFiltersAndSort();
@@ -518,16 +529,11 @@ function createConceptCard(concept, sourceLanguage, targetLanguage) {
     formattedDate = "";
   }
 
-  // 도메인/카테고리 번역
-  const domainKey = `domain_${domain}`;
-  const categoryKey = `category_${category}`;
-  const translations =
-    window.translations && window.translations[userLanguage]
-      ? window.translations[userLanguage]
-      : {};
-  const domainText = translations[domainKey] || domain;
-  const categoryText = translations[categoryKey] || category;
-  const domainCategoryText = `${domainText} > ${categoryText}`;
+  // 도메인/카테고리 번역 (window.translateDomainCategory 사용)
+  const domainCategoryText =
+    typeof window.translateDomainCategory === "function"
+      ? window.translateDomainCategory(domain, category, userLanguage)
+      : `${domain} > ${category}`;
 
   card.innerHTML = `
     <div class="flex items-start justify-between mb-4" style="border-left: 4px solid ${colorTheme}">

@@ -82,6 +82,9 @@ function initializeNavbar(currentLanguage) {
   // 언어 변경 버튼
   const languageButton = document.getElementById("language-button");
   if (languageButton) {
+    // 현재 언어에 맞게 버튼 텍스트 업데이트
+    updateLanguageButton(currentLanguage);
+
     languageButton.addEventListener("click", function () {
       showLanguageModal(currentLanguage);
     });
@@ -186,11 +189,12 @@ function changeLanguage(newLanguage) {
   // 현재 페이지 정보 추출
   const currentPath = window.location.pathname;
   let targetPath = "";
-  
+
   // 개발 환경 감지
-  const isDevelopment = window.location.hostname === 'localhost' || 
-                       window.location.hostname === '127.0.0.1' ||
-                       window.location.port === '5500';
+  const isDevelopment =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1" ||
+    window.location.port === "5500";
 
   if (currentPath.includes("/locales/")) {
     // 개발 환경: 현재 locales 내의 페이지인 경우
@@ -210,7 +214,7 @@ function changeLanguage(newLanguage) {
     const pathParts = currentPath.split("/");
     const currentLang = pathParts[1];
     const remainingPath = pathParts.slice(2).join("/");
-    
+
     if (remainingPath) {
       targetPath = `/${newLanguage}/${remainingPath}`;
     } else {
@@ -235,6 +239,25 @@ function closeLanguageModal() {
   const modal = document.getElementById("language-modal");
   if (modal) {
     modal.remove();
+  }
+}
+
+function updateLanguageButton(currentLanguage) {
+  const languageButton = document.getElementById("language-button");
+  if (languageButton) {
+    const languageSpan = languageButton.querySelector("span");
+    if (languageSpan) {
+      const languageMap = {
+        ko: "KR",
+        en: "EN",
+        ja: "JA",
+        zh: "ZH",
+      };
+      languageSpan.textContent = languageMap[currentLanguage] || "KR";
+      console.log(
+        `언어 버튼 업데이트: ${languageMap[currentLanguage] || "KR"}`
+      );
+    }
   }
 }
 

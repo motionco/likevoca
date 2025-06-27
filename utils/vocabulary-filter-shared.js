@@ -101,10 +101,18 @@ export class VocabularyFilterBuilder {
             <i class="fas fa-exchange-alt text-sm"></i>
           </button>
           <select id="target-language" class="col-span-2 p-2 border rounded text-sm">
-            <option value="english" data-i18n="english">영어</option>
-            <option value="korean" data-i18n="korean">한국어</option>
-            <option value="japanese" data-i18n="japanese">일본어</option>
-            <option value="chinese" data-i18n="chinese">중국어</option>
+            <option value="english" data-i18n="english">${this.getDefaultLanguageText(
+              "english"
+            )}</option>
+            <option value="korean" data-i18n="korean">${this.getDefaultLanguageText(
+              "korean"
+            )}</option>
+            <option value="japanese" data-i18n="japanese">${this.getDefaultLanguageText(
+              "japanese"
+            )}</option>
+            <option value="chinese" data-i18n="chinese">${this.getDefaultLanguageText(
+              "chinese"
+            )}</option>
           </select>
         </div>
       </div>
@@ -416,7 +424,7 @@ export class VocabularyFilterProcessor {
   }
 }
 
-// 도메인 필터 언어 업데이트 함수
+// 필터 언어 업데이트 함수 (도메인 + 언어 필터)
 export async function updateVocabularyFilterLanguage() {
   try {
     // 현재 언어 가져오기
@@ -437,12 +445,12 @@ export async function updateVocabularyFilterLanguage() {
 
     console.log("필터 언어 업데이트:", currentLang);
 
-    // 도메인 필터 select 요소 찾기 (모든 페이지의 domain-filter)
-    const domainSelects = document.querySelectorAll(
-      'select[id="domain-filter"], select[id*="domain-filter"]'
+    // 모든 필터 select 요소들 업데이트
+    const allSelects = document.querySelectorAll(
+      'select[id="domain-filter"], select[id*="domain-filter"], select[id="concept-domain"], select[id="source-language"], select[id="target-language"], select[id="sort-option"]'
     );
 
-    domainSelects.forEach((select) => {
+    allSelects.forEach((select) => {
       const currentValue = select.value;
 
       // 각 옵션의 텍스트를 현재 언어로 업데이트
@@ -464,28 +472,16 @@ export async function updateVocabularyFilterLanguage() {
       select.value = currentValue;
     });
 
-    // 모달의 도메인 필터도 업데이트 (concept-domain)
-    const modalDomainSelects = document.querySelectorAll(
-      'select[id="concept-domain"]'
-    );
-    modalDomainSelects.forEach((select) => {
-      const currentValue = select.value;
-
-      Array.from(select.options).forEach((option) => {
-        const i18nKey = option.getAttribute("data-i18n");
-        if (
-          i18nKey &&
-          window.translations &&
-          window.translations[currentLang]
-        ) {
-          const translation = window.translations[currentLang][i18nKey];
-          if (translation) {
-            option.textContent = translation;
-          }
+    // 필터 레이블들도 업데이트
+    const filterLabels = document.querySelectorAll("label[data-i18n]");
+    filterLabels.forEach((label) => {
+      const i18nKey = label.getAttribute("data-i18n");
+      if (i18nKey && window.translations && window.translations[currentLang]) {
+        const translation = window.translations[currentLang][i18nKey];
+        if (translation) {
+          label.textContent = translation;
         }
-      });
-
-      select.value = currentValue;
+      }
     });
 
     console.log("필터 언어 업데이트 완료");

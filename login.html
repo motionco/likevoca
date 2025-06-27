@@ -116,8 +116,31 @@
       
       // 네비게이션바 로드
       document.addEventListener('DOMContentLoaded', async () => {
-        // 네비게이션바 로드 (언어 설정은 네비게이션바에서 처리)
+        // 네비게이션바 로드
         await loadNavbar();
+        
+        // 네비게이션바 로드 후 링크들을 언어별 경로로 수정
+        const currentLang = localStorage.getItem('userLanguage') || 'ko';
+        
+        // 네비게이션바 로드 후 링크 수정
+        setTimeout(() => {
+          const navLinks = document.querySelectorAll('#nav-menu a, #mobile-menu a');
+          navLinks.forEach(link => {
+            const href = link.getAttribute('href');
+            if (href && !href.startsWith('http') && !href.startsWith('/')) {
+              // 개발환경과 배포환경 구분
+              const isDev = window.location.hostname === 'localhost' || 
+                           window.location.hostname === '127.0.0.1' ||
+                           window.location.port === '5500';
+              
+              if (isDev) {
+                link.href = `/locales/${currentLang}/${href}`;
+              } else {
+                link.href = `/${currentLang}/${href}`;
+              }
+            }
+          });
+        }, 100);
       });
     </script>
   </body>

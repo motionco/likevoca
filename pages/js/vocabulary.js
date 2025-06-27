@@ -347,10 +347,15 @@ function createConceptCard(concept) {
             <i class="fas fa-bookmark text-gray-400"></i>
           </button>
         <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-          ${getTranslatedDomainCategory(
-            conceptInfo.domain,
-            conceptInfo.category
-          )}
+          ${
+            typeof window.translateDomainCategory === "function"
+              ? window.translateDomainCategory(
+                  conceptInfo.domain,
+                  conceptInfo.category,
+                  userLanguage
+                )
+              : `${conceptInfo.domain} > ${conceptInfo.category}`
+          }
         </span>
         </div>
       </div>
@@ -1800,12 +1805,20 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (typeof window.applyLanguage === "function") {
         window.applyLanguage();
       }
+      // 필터 언어도 업데이트
+      if (typeof window.updateVocabularyFilterLanguage === "function") {
+        window.updateVocabularyFilterLanguage();
+      }
     }, 100);
 
     // 언어 변경 이벤트 발생 시 번역 적용
     window.addEventListener("languageChanged", () => {
       if (typeof window.applyLanguage === "function") {
         window.applyLanguage();
+      }
+      // 필터 언어도 업데이트
+      if (typeof window.updateVocabularyFilterLanguage === "function") {
+        window.updateVocabularyFilterLanguage();
       }
     });
   } catch (error) {
