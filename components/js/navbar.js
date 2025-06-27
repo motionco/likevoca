@@ -202,8 +202,60 @@ function closeLanguageModal() {
 }
 
 function checkAuthStatus() {
-  // 로그인 상태 확인 (추후 Firebase 연동)
-  const isLoggedIn = false; // 임시값
+  // Firebase 인증 상태 확인
+  console.log("Firebase 인증 상태 확인 시작");
+
+  // Firebase 전역 객체 확인 (firebase-init.js에서 설정)
+  if (typeof window.firebaseInit !== "undefined" && window.firebaseInit.auth) {
+    console.log("Firebase 인증 사용 가능");
+
+    // Firebase 인증 상태 리스너 설정
+    window.firebaseInit.onAuthStateChanged(window.firebaseInit.auth, (user) => {
+      console.log("Firebase 인증 상태 변경:", user ? "로그인됨" : "로그아웃됨");
+      if (user) {
+        console.log("로그인된 사용자:", user.email);
+      }
+      updateUIBasedOnAuth(!!user);
+    });
+  } else {
+    console.log("Firebase 인증 사용 불가, 기본 상태로 설정");
+    // Firebase가 아직 로드되지 않았거나 사용할 수 없는 경우
+    updateUIBasedOnAuth(false);
+
+    // Firebase 로드를 기다려서 다시 시도 (최대 5초)
+    let attempts = 0;
+    const maxAttempts = 10;
+    const checkInterval = setInterval(() => {
+      attempts++;
+      if (
+        typeof window.firebaseInit !== "undefined" &&
+        window.firebaseInit.auth
+      ) {
+        console.log("Firebase 지연 로드 완료, 인증 상태 재확인");
+        clearInterval(checkInterval);
+        window.firebaseInit.onAuthStateChanged(
+          window.firebaseInit.auth,
+          (user) => {
+            console.log(
+              "Firebase 인증 상태 변경 (지연):",
+              user ? "로그인됨" : "로그아웃됨"
+            );
+            if (user) {
+              console.log("로그인된 사용자 (지연):", user.email);
+            }
+            updateUIBasedOnAuth(!!user);
+          }
+        );
+      } else if (attempts >= maxAttempts) {
+        console.log("Firebase 로드 타임아웃, 로그아웃 상태로 유지");
+        clearInterval(checkInterval);
+      }
+    }, 500);
+  }
+}
+
+function updateUIBasedOnAuth(isLoggedIn) {
+  console.log("UI 업데이트:", isLoggedIn ? "로그인됨" : "로그아웃됨");
 
   const desktopLoginSection = document.getElementById("desktop-login-section");
   const desktopUserSection = document.getElementById("desktop-user-section");
@@ -221,7 +273,7 @@ function checkAuthStatus() {
     if (mobileLoginButtons) mobileLoginButtons.classList.remove("hidden");
   }
 
-  console.log("인증 상태 확인 완료, 로그인 상태:", isLoggedIn);
+  console.log("UI 업데이트 완료, 로그인 상태:", isLoggedIn);
 }
 
 // 전역에서 접근 가능하도록 함수들을 window 객체에 추가

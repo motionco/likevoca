@@ -153,9 +153,19 @@ export class EnhancedConceptModal {
 
     // DOM에 모달 추가
     document.body.insertAdjacentHTML("beforeend", modalHtml);
-    this.modal = new bootstrap.Modal(
-      document.getElementById("enhanced-concept-modal")
-    );
+
+    // Bootstrap 대신 직접 모달 제어
+    this.modalElement = document.getElementById("enhanced-concept-modal");
+    this.modal = {
+      show: () => {
+        this.modalElement.classList.remove("hidden");
+        this.modalElement.style.display = "block";
+      },
+      hide: () => {
+        this.modalElement.classList.add("hidden");
+        this.modalElement.style.display = "none";
+      },
+    };
   }
 
   /**

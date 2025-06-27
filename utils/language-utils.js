@@ -247,13 +247,35 @@ let translations = {};
 // 번역 파일들을 동적으로 로드하는 함수
 async function loadTranslations() {
   try {
+    // 현재 경로에 따라 상대 경로 조정
+    const currentPath = window.location.pathname;
+    let basePath = "";
+
+    if (currentPath.includes("/locales/")) {
+      // locales 내부에서 실행되는 경우 (예: /locales/ko/index.html)
+      basePath = "../..";
+    } else {
+      // 루트에서 실행되는 경우
+      basePath = ".";
+    }
+
+    console.log("🌐 번역 파일 로드 시작, 기본 경로:", basePath);
+
     // 각 언어별 번역 파일 로드
     const [koTranslations, enTranslations, jaTranslations, zhTranslations] =
       await Promise.all([
-        fetch("/locales/ko/translations.json").then((res) => res.json()),
-        fetch("/locales/en/translations.json").then((res) => res.json()),
-        fetch("/locales/ja/translations.json").then((res) => res.json()),
-        fetch("/locales/zh/translations.json").then((res) => res.json()),
+        fetch(`${basePath}/locales/ko/translations.json`).then((res) =>
+          res.json()
+        ),
+        fetch(`${basePath}/locales/en/translations.json`).then((res) =>
+          res.json()
+        ),
+        fetch(`${basePath}/locales/ja/translations.json`).then((res) =>
+          res.json()
+        ),
+        fetch(`${basePath}/locales/zh/translations.json`).then((res) =>
+          res.json()
+        ),
       ]);
 
     translations = {
@@ -267,17 +289,47 @@ async function loadTranslations() {
     window.translations = translations;
 
     console.log("✅ 번역 파일 로드 완료:", Object.keys(translations));
+    console.log("🔍 한국어 번역 샘플:", {
+      learn_languages: translations.ko?.learn_languages,
+      wordbook: translations.ko?.wordbook,
+      start: translations.ko?.start,
+    });
   } catch (error) {
     console.error("❌ 번역 파일 로드 실패:", error);
 
     // fallback: 기본 번역 데이터 사용
     translations = {
-      ko: { home: "홈", vocabulary: "단어장" },
-      en: { home: "Home", vocabulary: "Vocabulary" },
-      ja: { home: "ホーム", vocabulary: "単語帳" },
-      zh: { home: "首页", vocabulary: "单词本" },
+      ko: {
+        home: "홈",
+        vocabulary: "단어장",
+        learn_languages: "다양한 언어를 쉽고 재미있게 배워보세요",
+        wordbook: "단어장",
+        start: "시작하기",
+      },
+      en: {
+        home: "Home",
+        vocabulary: "Vocabulary",
+        learn_languages: "Learn various languages easily and enjoyably",
+        wordbook: "Wordbook",
+        start: "Start",
+      },
+      ja: {
+        home: "ホーム",
+        vocabulary: "単語帳",
+        learn_languages: "様々な言語を簡単で楽しく学びましょう",
+        wordbook: "単語帳",
+        start: "開始",
+      },
+      zh: {
+        home: "首页",
+        vocabulary: "单词本",
+        learn_languages: "轻松愉快地学习各种语言",
+        wordbook: "单词本",
+        start: "开始",
+      },
     };
     window.translations = translations;
+    console.log("🆘 fallback 번역 데이터 사용");
   }
 }
 
@@ -548,19 +600,51 @@ function redirectToLanguagePage(langCode) {
 async function applyLanguage() {
   try {
     const langCode = await getActiveLanguage();
+    console.log("🌐 번역 적용 시작, 언어:", langCode);
 
     // HTML lang 속성 변경
     document.documentElement.lang = langCode;
 
     // 번역 적용 (리다이렉트 없이)
     await loadTranslations();
+    console.log("📚 번역 파일 로드 완료");
+
+    // 현재 번역 객체 확인
+    console.log("🔍 현재 번역 객체:", translations);
+    console.log("🔍 번역 객체 키들:", Object.keys(translations));
+    console.log("🔍 현재 언어 번역 데이터:", translations[langCode]);
+
+    // 실제 번역 데이터 확인
+    const currentTranslations = translations[langCode];
+    if (currentTranslations) {
+      console.log(
+        "🔍 learn_languages 번역:",
+        currentTranslations["learn_languages"]
+      );
+      console.log("🔍 wordbook 번역:", currentTranslations["wordbook"]);
+    } else {
+      console.error("❌ 현재 언어의 번역 데이터가 없습니다:", langCode);
+    }
 
     // 페이지의 모든 번역 요소 업데이트
     const elements = document.querySelectorAll("[data-i18n]");
-    elements.forEach((element) => {
+    console.log("📝 번역 요소 개수:", elements.length);
+
+    elements.forEach((element, index) => {
       const key = element.getAttribute("data-i18n");
-      if (translations[key]) {
-        element.textContent = translations[key];
+      // 올바른 번역 데이터 접근
+      const translationText = currentTranslations
+        ? currentTranslations[key]
+        : null;
+
+      if (translationText) {
+        const oldText = element.textContent;
+        element.textContent = translationText;
+        console.log(
+          `✅ 번역 적용 [${index}]: ${key} -> "${translationText}" (이전: "${oldText}")`
+        );
+      } else {
+        console.warn(`❌ 번역 키 없음 [${index}]: ${key}`);
       }
     });
 
@@ -570,8 +654,11 @@ async function applyLanguage() {
     );
     placeholderElements.forEach((element) => {
       const key = element.getAttribute("data-i18n-placeholder");
-      if (translations[key]) {
-        element.placeholder = translations[key];
+      const translationText = currentTranslations
+        ? currentTranslations[key]
+        : null;
+      if (translationText) {
+        element.placeholder = translationText;
       }
     });
 

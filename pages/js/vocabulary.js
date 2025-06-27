@@ -1,4 +1,3 @@
-import { loadNavbar } from "../../components/js/navbar.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
 import {
   auth,
@@ -1741,34 +1740,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       userLanguage = "ko";
     }
 
-    await loadNavbar();
-
     // 도메인 필터 언어 초기화는 vocabulary-filter-shared.js에서 처리됨
     if (window.initializeVocabularyFilterLanguage) {
       window.initializeVocabularyFilterLanguage();
     }
 
-    // 네비게이션바 로드
-    console.log("📋 네비게이션바 로드 시작");
-    const navbarContainer = document.getElementById("navbar-container");
-    console.log("📋 네비게이션 바 컨테이너:", navbarContainer);
-
-    if (!navbarContainer) {
-      console.error("❌ navbar-container를 찾을 수 없습니다!");
-      throw new Error("navbar-container 요소가 없습니다.");
-    }
-
-    await loadNavbar(navbarContainer);
-    console.log("✅ 네비게이션바 로드 완료");
-
-    // 네비게이션바가 실제로 로드되었는지 확인
-    setTimeout(() => {
-      const loadedNavbar = document.querySelector("#navbar-container nav");
-      console.log("🔍 로드된 네비게이션바:", loadedNavbar);
-      if (!loadedNavbar) {
-        console.error("❌ 네비게이션바가 제대로 로드되지 않았습니다!");
-      }
-    }, 1000);
+    // 네비게이션바는 이미 navbar.js에서 자동으로 로드됨
+    console.log("✅ 네비게이션바는 navbar.js에서 처리됨");
 
     // 모달 초기화
     console.log("🔧 모달 초기화 시작");
@@ -1818,14 +1796,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     // 네비게이션 바가 동적으로 로드된 후 번역 적용
-    if (navbarContainer) {
-      // 네비게이션 바가 로드된 후 번역 적용
-      setTimeout(() => {
-        if (typeof window.applyLanguage === "function") {
-          window.applyLanguage();
-        }
-      }, 100);
-    }
+    setTimeout(() => {
+      if (typeof window.applyLanguage === "function") {
+        window.applyLanguage();
+      }
+    }, 100);
 
     // 언어 변경 이벤트 발생 시 번역 적용
     window.addEventListener("languageChanged", () => {
