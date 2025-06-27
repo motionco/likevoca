@@ -1,30 +1,30 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>단어장 - LikeVoca</title>
+    <title>Vocabulary - LikeVoca</title>
 
     <!-- 기본 메타 태그 -->
-    <meta name="description" content="나만의 단어장을 만들고 효과적으로 학습하세요." />
-    <meta name="keywords" content="단어장, 영어 단어장, 일본어 단어장, 중국어 단어장, 언어 학습" />
+    <meta name="description" content="Create your own vocabulary and learn effectively." />
+    <meta name="keywords" content="vocabulary, English vocabulary, Japanese vocabulary, Chinese vocabulary, language learning" />
     
     <!-- Open Graph / 소셜 미디어 메타 태그 -->
-    <meta property="og:title" content="LikeVoca - 단어장" />
-    <meta property="og:description" content="나만의 단어장을 만들고 효과적으로 학습하세요." />
+    <meta property="og:title" content="LikeVoca - Vocabulary" />
+    <meta property="og:description" content="Create your own vocabulary and learn effectively." />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://likevoca.com/pages/vocabulary.html" />
+    <meta property="og:url" content="https://likevoca.com/vocabulary.html" />
     <meta property="og:locale" content="ko" />
     
     <!-- 표준 링크 -->
-    <link rel="canonical" href="https://likevoca.com/ko/pages/vocabulary.html" />
+    <link rel="canonical" href="https://likevoca.com/ko/vocabulary.html" />
     
     <!-- 대체 언어 링크 (초기값) -->
-    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/pages/vocabulary.html" />
-    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/pages/vocabulary.html" />
-    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/pages/vocabulary.html" />
-    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/pages/vocabulary.html" />
-    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/pages/vocabulary.html" />
+    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/vocabulary.html" />
+    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/vocabulary.html" />
+    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/vocabulary.html" />
+    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/vocabulary.html" />
+    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/vocabulary.html" />
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link
@@ -56,21 +56,21 @@
 
     <main class="container mx-auto max-w-7xl px-4 py-8">
       <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800" data-i18n="vocabulary">단어장</h1>
+        <h1 class="text-3xl font-bold text-gray-800" data-i18n="vocabulary">Vocabulary</h1>
         <div class="flex space-x-2">
           <button
             id="add-concept"
             class="bg-[#4B63AC] text-white px-4 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300 flex items-center"
             data-i18n="add_new_concept"
           >
-            <i class="fas fa-plus mr-2"></i> 새 개념 추가
+            <i class="fas fa-plus mr-2"></i> Add New Concept
           </button>
           <button
             id="bulk-add-concept"
             class="bg-[#4B63AC] text-white px-4 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300 flex items-center"
             data-i18n="bulk_add_concept"
           >
-            <i class="fas fa-file-import mr-2"></i> 대량 개념 추가
+            <i class="fas fa-file-import mr-2"></i> Bulk Add Concepts
           </button>
         </div>
       </div>
@@ -79,13 +79,13 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <!-- 검색 필터 -->
           <div class="w-full">
-            <label for="search-input" class="hidden md:block text-sm font-medium mb-1 text-gray-700" data-i18n="search">검색</label>
+            <label for="search-input" class="hidden md:block text-sm font-medium mb-1 text-gray-700" data-i18n="search">Search</label>
             <div class="relative">
               <input
                 type="text"
                 id="search-input"
                 class="w-full p-2 border rounded pl-8 h-10"
-                placeholder="검색어 입력..."
+                placeholder="Enter search term..."
                 data-i18n-placeholder="search_placeholder"
               />
               <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
@@ -98,48 +98,76 @@
               for="language-filter"
               class="text-sm font-medium text-gray-700"
               data-i18n="language_filter"
-              >언어 필터</label
+              >Language Filter</label
             >
             <div class="grid grid-cols-5 gap-1 h-10">
               <select id="source-language" class="col-span-2 p-2 border rounded text-sm">
-              <option value="korean" data-i18n="korean">한국어</option>
-              <option value="english" data-i18n="english">영어</option>
-              <option value="japanese" data-i18n="japanese">일본어</option>
-              <option value="chinese" data-i18n="chinese">중국어</option>
+              <option value="korean" data-i18n="korean">Korean</option>
+              <option value="english" data-i18n="english">English</option>
+              <option value="japanese" data-i18n="japanese">Japanese</option>
+              <option value="chinese" data-i18n="chinese">Chinese</option>
             </select>
 
             <button
               id="swap-languages"
                 class="w-full h-full text-gray-600 hover:text-[#4B63AC] hover:bg-gray-100 rounded-lg transition duration-200 border border-gray-300 hover:border-[#4B63AC] flex items-center justify-center"
-              title="언어 순서 바꾸기"
+              title="Swap Languages"
               data-i18n-title="swap_languages"
             >
               <i class="fas fa-exchange-alt text-sm"></i>
             </button>
               
               <select id="target-language" class="col-span-2 p-2 border rounded text-sm">
-              <option value="english" data-i18n="english">영어</option>
-              <option value="korean" data-i18n="korean">한국어</option>
-              <option value="japanese" data-i18n="japanese">일본어</option>
-              <option value="chinese" data-i18n="chinese">중국어</option>
+              <option value="english" data-i18n="english">English</option>
+              <option value="korean" data-i18n="korean">Korean</option>
+              <option value="japanese" data-i18n="japanese">Japanese</option>
+              <option value="chinese" data-i18n="chinese">Chinese</option>
             </select>
             </div>
           </div>
 
           <!-- 도메인 및 정렬 필터 (동적 생성) -->
-          <div id="domain-sort-filters" class="w-full">
-            <!-- JavaScript로 동적 생성됨 -->
-          </div>
+                      <div class="w-full">
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label for="domain-filter" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="domain">Domain</label>
+                  <select id="domain-filter" class="w-full p-2 border rounded h-10 text-sm">
+                    <option value="all" data-i18n="all_domains">All Domains</option>
+                    <option value="daily" data-i18n="domain_daily">Daily Life</option>
+                    <option value="food" data-i18n="domain_food">Food</option>
+                    <option value="travel" data-i18n="domain_travel">Travel</option>
+                    <option value="business" data-i18n="domain_business">Business</option>
+                    <option value="education" data-i18n="domain_education">Education</option>
+                    <option value="nature" data-i18n="domain_nature">Nature</option>
+                    <option value="technology" data-i18n="domain_technology">Technology</option>
+                    <option value="health" data-i18n="domain_health">Health</option>
+                    <option value="sports" data-i18n="domain_sports">Sports</option>
+                    <option value="entertainment" data-i18n="domain_entertainment">Entertainment</option>
+                    <option value="culture" data-i18n="domain_culture">Culture</option>
+                    <option value="other" data-i18n="domain_other">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="sort-filter" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="sort">Sort</label>
+                  <select id="sort-filter" class="w-full p-2 border rounded h-10 text-sm">
+                    <option value="latest" data-i18n="latest">Latest</option>
+                    <option value="oldest" data-i18n="oldest">Oldest</option>
+                    <option value="alphabetical" data-i18n="alphabetical">Alphabetical</option>
+                    <option value="reverse_alphabetical" data-i18n="reverse_alphabetical">Reverse Alphabetical</option>
+                  </select>
+                </div>
+              </div>
+                         </div>
         </div>
 
         <!-- 개념 수 및 사용량 표시 -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div class="text-sm text-gray-600">
-            <span id="concept-count">0</span><span data-i18n="concept_count">개의 개념</span>
+            <span id="concept-count">0</span><span data-i18n="concept_count"> concepts</span>
           </div>
 
           <div class="flex items-center gap-4 w-full md:w-auto">
-            <span class="text-sm font-medium text-gray-700 whitespace-nowrap" data-i18n="concept_usage">개념 사용량:</span>
+            <span class="text-sm font-medium text-gray-700 whitespace-nowrap" data-i18n="concept_usage">Concept Usage:</span>
             <div class="flex items-center gap-2 min-w-[200px]">
               <div class="flex-1 bg-gray-200 rounded-full h-2.5">
           <div id="concept-usage-bar" class="bg-[#4B63AC] h-2.5 rounded-full" style="width: 0%"></div>
@@ -160,7 +188,7 @@
           class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-6 rounded-lg transition duration-300 hidden"
           data-i18n="load_more"
         >
-          더 보기 <i class="fas fa-chevron-down ml-1"></i>
+          Load More <i class="fas fa-chevron-down ml-1"></i>
         </button>
       </div>
     </main>
@@ -169,6 +197,8 @@
 
     <!-- Firebase -->
     <script type="module" src="../../js/firebase/firebase-init.js"></script>
+    <script type="module" ></script>
+    <script type="module" src="../../utils/language-utils.js"></script>
     <script type="module" src="../../components/js/navbar.js"></script>
     <script type="module" src="../../pages/js/vocabulary.js"></script>
     
@@ -177,20 +207,8 @@
     <script type="module" src="../../components/js/add-concept-modal.js"></script>
     <script type="module" src="../../components/js/edit-concept-modal.js"></script>
     <script src="../../components/js/domain-category-emoji.js" type="module"></script>
-    
-    <script type="module">
-      import { setLanguage, applyLanguage } from '../../utils/language-utils.js';
-      
-      document.addEventListener('DOMContentLoaded', async () => {
-        try {
-          // 영어로 설정
-          setLanguage('en');
-          await applyLanguage();
-        } catch (error) {
-          console.error('언어 설정 적용 중 오류:', error);
-        }
-      });
-    </script>
 
   </body>
 </html> 
+
+

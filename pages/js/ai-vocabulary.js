@@ -17,13 +17,8 @@ import {
   setupVocabularyFilters,
 } from "../../utils/vocabulary-filter-shared.js";
 // 공통 번역 유틸리티 import
-import {
-  translateDomain,
-  translateCategory,
-  translateDomainCategory,
-} from "../../utils/translation-utils.js";
-// 도메인 필터 언어 초기화 import
-import { initializeDomainFilterLanguage } from "../../utils/domain-filter-utils.js";
+// translation-utils.js 제거됨 - language-utils.js의 번역 시스템 사용
+// 도메인 필터 언어 초기화는 vocabulary-filter-shared.js에서 처리됨
 
 // 로컬 환경 감지
 const isLocalEnvironment =
@@ -197,11 +192,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadConceptViewModal();
     await loadEditConceptModal();
 
-    // 도메인 및 정렬 필터 동적 생성
-    generateDomainSortFilters();
-
-    // 도메인 필터 언어 초기화
-    await initializeDomainFilterLanguage();
+    // 도메인 필터 언어 초기화는 vocabulary-filter-shared.js에서 처리됨
+    if (window.initializeVocabularyFilterLanguage) {
+      window.initializeVocabularyFilterLanguage();
+    }
 
     // 로컬 환경인지 확인
     if (isLocalEnvironment) {
@@ -432,50 +426,51 @@ function renderConcepts() {
 function createConceptCard(concept, sourceLanguage, targetLanguage) {
   const card = document.createElement("div");
   card.className =
-    "bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-transform duration-300 border border-gray-200 cursor-pointer word-card";
+    "bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300 cursor-pointer border border-gray-200";
 
+  // 개념 정보 추출
+  const conceptInfo = concept.concept_info || {};
+  const domain = conceptInfo.domain || "other";
+  const category = conceptInfo.category || "other";
+  const emoji = conceptInfo.unicode_emoji || conceptInfo.emoji || "📝";
+
+  // 언어별 표현 추출
   const sourceExpr = concept.expressions?.[sourceLanguage] || {};
   const targetExpr = concept.expressions?.[targetLanguage] || {};
 
-  // 새로운 구조에서 이모지와 정보 가져오기
-  const emoji =
-    concept.concept_info?.unicode_emoji || concept.concept_info?.emoji || "📝";
-  const category = concept.concept_info?.category || "기타";
-  const domain = concept.concept_info?.domain || "";
-  const colorTheme = concept.concept_info?.color_theme || "#9C27B0";
-
-  // 예문 찾기 (다국어 단어장과 동일한 구조)
+  // 예시 문장 추출 (대표 예문 우선, 없으면 일반 예문)
   let example = null;
 
-  // 1. 대표 예문 확인 (다국어 단어장 구조)
-  if (concept.representative_example?.translations) {
+  // 먼저 representative_example에서 찾기
+  if (concept.representative_example) {
+    const repExample = concept.representative_example;
     example = {
-      source: concept.representative_example.translations[sourceLanguage] || "",
-      target: concept.representative_example.translations[targetLanguage] || "",
-    };
-  }
-  // 2. 기존 구조 호환성 (분리된 컬렉션 구조)
-  else if (concept.representative_example) {
-    example = {
-      source: concept.representative_example[sourceLanguage] || "",
-      target: concept.representative_example[targetLanguage] || "",
-    };
-  }
-  // 3. 추가 예문들 확인
-  else if (concept.examples && concept.examples.length > 0) {
-    const firstExample = concept.examples[0];
-    example = {
-      source: firstExample[sourceLanguage] || "",
-      target: firstExample[targetLanguage] || "",
+      source: repExample[sourceLanguage] || "",
+      target: repExample[targetLanguage] || "",
     };
   }
 
-  // 날짜 포맷팅 개선
+  // representative_example이 없으면 일반 examples에서 찾기
+  if (!example || (!example.source && !example.target)) {
+    const examples = concept.examples || [];
+    if (examples.length > 0) {
+      example = examples[0];
+    }
+  }
+
+  // 사용자 언어 가져오기
+  const userLanguage = localStorage.getItem("userLanguage") || "ko";
+
+  // 색상 테마 설정
+  const colorTheme = getDomainColor(domain);
+
+  // 날짜 포맷팅
   let formattedDate = "";
   try {
-    const dateValue = concept.created_at || concept.createdAt;
-    if (dateValue) {
+    if (concept.created_at) {
       let date;
+      const dateValue = concept.created_at;
+
       if (dateValue.toDate && typeof dateValue.toDate === "function") {
         // Firestore Timestamp 객체인 경우
         date = dateValue.toDate();
@@ -500,6 +495,17 @@ function createConceptCard(concept, sourceLanguage, targetLanguage) {
     formattedDate = "";
   }
 
+  // 도메인/카테고리 번역
+  const domainKey = `domain_${domain}`;
+  const categoryKey = `category_${category}`;
+  const translations =
+    window.translations && window.translations[userLanguage]
+      ? window.translations[userLanguage]
+      : {};
+  const domainText = translations[domainKey] || domain;
+  const categoryText = translations[categoryKey] || category;
+  const domainCategoryText = `${domainText} > ${categoryText}`;
+
   card.innerHTML = `
     <div class="flex items-start justify-between mb-4" style="border-left: 4px solid ${colorTheme}">
       <div class="flex items-center space-x-3 pl-3">
@@ -514,7 +520,7 @@ function createConceptCard(concept, sourceLanguage, targetLanguage) {
         </div>
       </div>
       <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-        ${translateDomainCategory(domain, category, userLanguage)}
+        ${domainCategoryText}
       </span>
     </div>
     
@@ -538,9 +544,7 @@ function createConceptCard(concept, sourceLanguage, targetLanguage) {
     
     <div class="flex justify-between text-xs text-gray-500 mt-3">
       <span class="flex items-center">
-        <i class="fas fa-robot mr-1 text-blue-500"></i> ${getTranslatedText(
-          "ai_generated"
-        )}
+        <i class="fas fa-robot mr-1 text-blue-500"></i> AI
       </span>
       <span class="flex items-center">
         <i class="fas fa-clock mr-1"></i> ${formattedDate}
@@ -572,131 +576,27 @@ function debounce(func, wait) {
   };
 }
 
-// 도메인 및 정렬 필터 동적 생성 함수
-function generateDomainSortFilters() {
-  const container = document.getElementById("domain-sort-filters");
-  if (!container) {
-    console.error("❌ domain-sort-filters 컨테이너를 찾을 수 없습니다.");
-    return;
-  }
+// 도메인 및 정렬 필터는 HTML에서 직접 정의됨 (중복 제거)
 
-  // 도메인 목록 정의
-  const domainList = [
-    "all",
-    "daily",
-    "food",
-    "travel",
-    "business",
-    "education",
-    "nature",
-    "technology",
-    "health",
-    "sports",
-    "entertainment",
-    "culture",
-    "other",
-  ];
-
-  // 도메인 번역 키 매핑
-  const domainTranslationKeys = {
-    all: "all_domains",
-    daily: "domain_daily",
-    food: "domain_food",
-    travel: "domain_travel",
-    business: "domain_business",
-    education: "domain_education",
-    nature: "domain_nature",
-    technology: "domain_technology",
-    health: "domain_health",
-    sports: "domain_sports",
-    entertainment: "domain_entertainment",
-    culture: "domain_culture",
-    other: "domain_other",
+// 도메인별 색상 테마 가져오기
+function getDomainColor(domain) {
+  const colorMap = {
+    daily: "#4B63AC",
+    food: "#FF6B6B",
+    travel: "#4ECDC4",
+    business: "#45B7D1",
+    education: "#96CEB4",
+    nature: "#FECA57",
+    technology: "#9C27B0",
+    health: "#FF9FF3",
+    sports: "#54A0FF",
+    entertainment: "#5F27CD",
+    culture: "#00D2D3",
+    other: "#747D8C",
   };
-
-  // 도메인 필터 HTML 생성 (동적으로 옵션 생성)
-  const domainOptions = domainList
-    .map(
-      (domain) =>
-        `<option value="${domain}" data-i18n="${domainTranslationKeys[domain]}"></option>`
-    )
-    .join("");
-
-  const domainFilterHTML = `
-    <label for="domain-filter" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="domain">도메인</label>
-    <select id="domain-filter" class="w-full p-2 border rounded h-10 text-sm">
-      ${domainOptions}
-    </select>
-  `;
-
-  const sortFilterHTML = `
-    <label for="sort-filter" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="sort">정렬</label>
-    <select id="sort-filter" class="w-full p-2 border rounded h-10 text-sm">
-      <option value="latest" data-i18n="latest">최신순</option>
-      <option value="oldest" data-i18n="oldest">오래된순</option>
-      <option value="alphabetical" data-i18n="alphabetical">가나다순</option>
-      <option value="reverse_alphabetical" data-i18n="reverse_alphabetical">역가나다순</option>
-    </select>
-  `;
-
-  container.innerHTML = `
-    <div class="grid grid-cols-2 gap-2">
-      <div>${domainFilterHTML}</div>
-      <div>${sortFilterHTML}</div>
-    </div>
-  `;
-
-  console.log("✅ AI 단어장 도메인 및 정렬 필터 동적 생성 완료");
+  return colorMap[domain] || "#747D8C";
 }
 
-// 도메인 필터 언어 업데이트 함수 (vocabulary.js와 동일한 방식)
-async function updateAIDomainFilterLanguage() {
-  try {
-    console.log("🌐 AI 단어장 도메인 필터 언어 업데이트 중...");
-
-    // 현재 언어 가져오기
-    const currentLang = await getActiveLanguage();
-    console.log("현재 언어:", currentLang);
-
-    // 도메인 필터 옵션들 찾기
-    const domainFilter = document.getElementById("domain-filter");
-    if (domainFilter) {
-      const options = domainFilter.querySelectorAll("option[data-i18n]");
-      options.forEach((option) => {
-        const key = option.getAttribute("data-i18n");
-        if (
-          window.translations &&
-          window.translations[currentLang] &&
-          window.translations[currentLang][key]
-        ) {
-          option.textContent = window.translations[currentLang][key];
-        }
-      });
-      console.log("✅ AI 도메인 필터 언어 업데이트 완료");
-    }
-
-    // 정렬 필터 옵션들도 업데이트
-    const sortFilter = document.getElementById("sort-filter");
-    if (sortFilter) {
-      const options = sortFilter.querySelectorAll("option[data-i18n]");
-      options.forEach((option) => {
-        const key = option.getAttribute("data-i18n");
-        if (
-          window.translations &&
-          window.translations[currentLang] &&
-          window.translations[currentLang][key]
-        ) {
-          option.textContent = window.translations[currentLang][key];
-        }
-      });
-      console.log("✅ AI 정렬 필터 언어 업데이트 완료");
-    }
-  } catch (error) {
-    console.error("❌ AI 도메인 필터 언어 업데이트 실패:", error);
-  }
-}
-
-// 전역 함수로 등록 (language-utils.js에서 호출할 수 있도록)
-window.updateAIDomainFilterLanguage = updateAIDomainFilterLanguage;
+// 도메인 필터 언어 업데이트는 vocabulary-filter-shared.js에서 처리됨
 
 // 언어 전환 함수는 공유 모듈로 대체됨

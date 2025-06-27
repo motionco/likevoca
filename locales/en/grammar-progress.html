@@ -1,0 +1,270 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>학습 진도 - LikeVoca</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Firebase -->
+    <script type="module" src="../../js/firebase/firebase-init.js"></script>
+    <script type="module" src="../../utils/language-utils.js"></script>
+    <script type="module" src="../../js/language-init.js"></script>
+    
+    <style>
+      .stat-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      }
+      .progress-ring {
+        transition: stroke-dasharray 0.6s ease-in-out;
+      }
+    </style>
+  </head>
+
+  <body class="bg-gray-50 min-h-screen">
+    <!-- 네비게이션바 -->
+    <div id="navbar-container"></div>
+
+    <!-- 메인 콘텐츠 -->
+    <main class="container mx-auto px-4 py-8 max-w-7xl">
+      <!-- 페이지 헤더 -->
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2" data-i18n="learning_progress_title">
+              학습 진도
+            </h1>
+            <p class="text-gray-600" data-i18n="learning_progress_subtitle">
+              개인 학습 성과와 진도를 추적하고 분석하세요
+            </p>
+          </div>
+          <div class="flex items-center space-x-3">
+            <select id="time-period" class="p-2 border rounded-lg">
+              <option value="week">최근 1주</option>
+              <option value="month">최근 1개월</option>
+              <option value="quarter">최근 3개월</option>
+              <option value="year">최근 1년</option>
+            </select>
+            <button
+              id="refresh-data"
+              class="bg-[#4B63AC] text-white px-4 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300"
+            >
+              <i class="fas fa-sync-alt mr-2"></i>
+              <span data-i18n="refresh">새로고침</span>
+            </button>
+            <button
+              id="export-progress"
+              class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-300"
+            >
+              <i class="fas fa-download mr-2"></i>
+              <span data-i18n="export">내보내기</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 전체 통계 카드 -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <!-- 총 개념 수 -->
+        <div class="stat-card bg-white rounded-lg shadow-md p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide" data-i18n="total_concepts">
+                총 개념 수
+              </h3>
+              <p id="total-concepts-count" class="text-3xl font-bold text-gray-900">
+                0
+              </p>
+            </div>
+            <div class="p-3 bg-blue-100 rounded-full">
+              <i class="fas fa-book text-2xl text-blue-600"></i>
+            </div>
+          </div>
+          <div class="mt-4">
+            <span class="text-sm text-gray-500" data-i18n="concepts_breakdown">카테고리별 분포</span>
+            <div id="concepts-breakdown" class="mt-2 space-y-1">
+              <!-- 동적으로 채워짐 -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 학습 진도 -->
+        <div class="stat-card bg-white rounded-lg shadow-md p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide" data-i18n="learning_progress">
+                학습 진도
+              </h3>
+              <p id="overall-progress" class="text-3xl font-bold text-gray-900">
+                0%
+              </p>
+            </div>
+            <div class="p-3 bg-green-100 rounded-full">
+              <i class="fas fa-chart-line text-2xl text-green-600"></i>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div
+                id="progress-bar"
+                class="bg-green-600 h-2 rounded-full transition-all duration-500"
+                style="width: 0%"
+              ></div>
+            </div>
+            <span id="progress-detail" class="text-sm text-gray-500 mt-2 block">
+              0개 개념 완료
+            </span>
+          </div>
+        </div>
+
+        <!-- 퀴즈 성과 -->
+        <div class="stat-card bg-white rounded-lg shadow-md p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide" data-i18n="quiz_performance">
+                퀴즈 성과
+              </h3>
+              <p id="quiz-accuracy" class="text-3xl font-bold text-gray-900">
+                0%
+              </p>
+            </div>
+            <div class="p-3 bg-purple-100 rounded-full">
+              <i class="fas fa-question-circle text-2xl text-purple-600"></i>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-500" data-i18n="attempts">시도:</span>
+              <span id="quiz-attempts">0회</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-500" data-i18n="correct">정답:</span>
+              <span id="quiz-correct">0회</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 게임 성과 -->
+        <div class="stat-card bg-white rounded-lg shadow-md p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide" data-i18n="game_performance">
+                게임 성과
+              </h3>
+              <p id="game-score" class="text-3xl font-bold text-gray-900">
+                0점
+              </p>
+            </div>
+            <div class="p-3 bg-orange-100 rounded-full">
+              <i class="fas fa-gamepad text-2xl text-orange-600"></i>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-500" data-i18n="games_played">게임:</span>
+              <span id="games-played">0회</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-500" data-i18n="wins">승리:</span>
+              <span id="games-won">0회</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 차트 섹션 -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <!-- 언어별 진도 차트 -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4" data-i18n="language_progress">
+            언어별 학습 진도
+          </h3>
+          <div class="relative h-64">
+            <canvas id="language-progress-chart"></canvas>
+          </div>
+        </div>
+
+        <!-- 카테고리별 분포 차트 -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4" data-i18n="category_distribution">
+            카테고리별 분포
+          </h3>
+          <div class="relative h-64">
+            <canvas id="category-distribution-chart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- 학습 스트릭 및 목표 -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <!-- 학습 스트릭 -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4" data-i18n="learning_streak">
+            학습 스트릭
+          </h3>
+          <div id="streak-content">
+            <div class="text-center py-8 text-gray-500">
+              <i class="fas fa-fire text-4xl text-orange-500 mb-4"></i>
+              <p id="current-streak" class="text-2xl font-bold text-gray-800">0일</p>
+              <p class="text-sm text-gray-600">연속 학습 기록</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 학습 목표 -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4" data-i18n="learning_goals">
+            학습 목표
+          </h3>
+          <div id="goals-content">
+            <div class="space-y-4">
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-medium">일일 학습 목표</span>
+                <span id="daily-goal-progress" class="text-sm text-gray-600">0/5 개념</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div id="daily-goal-bar" class="bg-blue-600 h-2 rounded-full" style="width: 0%"></div>
+              </div>
+              
+              <div class="flex items-center justify-between mt-4">
+                <span class="text-sm font-medium">주간 퀴즈 목표</span>
+                <span id="weekly-quiz-progress" class="text-sm text-gray-600">0/10 회</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div id="weekly-quiz-bar" class="bg-purple-600 h-2 rounded-full" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 최근 학습 활동 -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4" data-i18n="recent_activity">
+          최근 학습 활동
+        </h3>
+        <div id="recent-activity-content">
+          <div class="text-center py-8 text-gray-500">
+            <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+            <p data-i18n="loading">로딩 중...</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Navbar -->
+    <script type="module" src="../../components/js/navbar.js"></script>
+    
+    <!-- 페이지별 스크립트 -->
+    <script type="module" src="js/grammar-progress.js"></script>
+  </body>
+</html> 

@@ -1,9 +1,5 @@
 // 공통 번역 유틸리티 import
-import {
-  translateDomain,
-  translateCategory,
-  translateDomainCategory,
-} from "../../utils/translation-utils.js";
+// translation-utils.js 제거됨 - language-utils.js의 번역 시스템 사용
 
 // 도메인별 카테고리 매핑
 export const domainCategoryMapping = {
@@ -2726,10 +2722,12 @@ function getTranslation(key, lang = null) {
 function translateCategoryKey(categoryKey, lang = null) {
   const currentLang = lang || localStorage.getItem("preferredLanguage") || "ko";
 
-  // 공통 번역 모듈 사용
-  const result = translateCategory(categoryKey, currentLang);
-  if (result !== categoryKey) {
-    return result;
+  // window.getI18nText 사용 (우선순위)
+  if (window.getI18nText) {
+    const result = window.getI18nText(categoryKey, currentLang);
+    if (result && result !== categoryKey) {
+      return result;
+    }
   }
 
   // 기존 로컬 번역 매핑 (fallback)
@@ -3298,10 +3296,13 @@ function translateCategoryKey(categoryKey, lang = null) {
 function translateDomainKey(domainKey, lang = null) {
   const currentLang = lang || localStorage.getItem("preferredLanguage") || "ko";
 
-  // 공통 번역 모듈 사용
-  const result = translateDomain(domainKey, currentLang);
-  if (result !== domainKey) {
-    return result;
+  // window.getI18nText 사용 (우선순위)
+  const domainI18nKey = `domain_${domainKey}`;
+  if (window.getI18nText) {
+    const result = window.getI18nText(domainI18nKey, currentLang);
+    if (result && result !== domainI18nKey) {
+      return result;
+    }
   }
 
   // 기존 로컬 번역 매핑 (fallback)

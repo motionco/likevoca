@@ -152,11 +152,7 @@ Please provide accurate words and translations that are actually usable. Fill al
 };
 
 // 공통 번역 유틸리티 import
-import {
-  translateDomain,
-  translateCategory,
-  translateDomainCategory,
-} from "./translation-utils.js";
+// translation-utils.js 제거됨 - language-utils.js의 번역 시스템 사용
 
 // 테스트 데이터 (로컬 환경용) - 다국어 단어장과 완전히 동일한 구조
 const TEST_CONCEPTS = [
@@ -741,51 +737,51 @@ async function showAIConceptSelectionModal() {
               }</label>
               <select id="ai-domain-select" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 <option value="">${texts.selectDomain}</option>
-                <option value="daily">${translateDomain(
+                <option value="daily">${getDomainTranslation(
                   "daily",
                   currentLang
                 )}</option>
-                <option value="food">${translateDomain(
+                <option value="food">${getDomainTranslation(
                   "food",
                   currentLang
                 )}</option>
-                <option value="travel">${translateDomain(
+                <option value="travel">${getDomainTranslation(
                   "travel",
                   currentLang
                 )}</option>
-                <option value="business">${translateDomain(
+                <option value="business">${getDomainTranslation(
                   "business",
                   currentLang
                 )}</option>
-                <option value="education">${translateDomain(
+                <option value="education">${getDomainTranslation(
                   "education",
                   currentLang
                 )}</option>
-                <option value="nature">${translateDomain(
+                <option value="nature">${getDomainTranslation(
                   "nature",
                   currentLang
                 )}</option>
-                <option value="technology">${translateDomain(
+                <option value="technology">${getDomainTranslation(
                   "technology",
                   currentLang
                 )}</option>
-                <option value="health">${translateDomain(
+                <option value="health">${getDomainTranslation(
                   "health",
                   currentLang
                 )}</option>
-                <option value="sports">${translateDomain(
+                <option value="sports">${getDomainTranslation(
                   "sports",
                   currentLang
                 )}</option>
-                <option value="entertainment">${translateDomain(
+                <option value="entertainment">${getDomainTranslation(
                   "entertainment",
                   currentLang
                 )}</option>
-                <option value="culture">${translateDomain(
+                <option value="culture">${getDomainTranslation(
                   "culture",
                   currentLang
                 )}</option>
-                <option value="other">${translateDomain(
+                <option value="other">${getDomainTranslation(
                   "other",
                   currentLang
                 )}</option>
@@ -1572,7 +1568,7 @@ async function showAIConceptSelectionModal() {
         categoryMapping[selectedDomain].forEach((category) => {
           const option = document.createElement("option");
           option.value = category;
-          option.textContent = translateCategory(category, currentLang);
+          option.textContent = getCategoryTranslation(category, currentLang);
           categorySelect.appendChild(option);
         });
       } else {
@@ -1634,4 +1630,83 @@ async function showAIConceptSelectionModal() {
       }
     });
   });
+}
+
+// 도메인 번역 헬퍼 함수
+function getDomainTranslation(domain, lang) {
+  const domainKey = `domain_${domain}`;
+  if (window.getI18nText) {
+    return window.getI18nText(domainKey, lang) || domain;
+  }
+  return domain;
+}
+
+// 카테고리 번역 헬퍼 함수 (간단한 매핑 사용)
+function getCategoryTranslation(category, lang) {
+  // 기본적으로 카테고리는 영어 그대로 사용하거나 간단한 번역
+  const categoryTranslations = {
+    household: {
+      ko: "가정용품",
+      en: "Household",
+      ja: "家庭用品",
+      zh: "家庭用品",
+    },
+    family: { ko: "가족", en: "Family", ja: "家族", zh: "家庭" },
+    routine: {
+      ko: "일상 루틴",
+      en: "Routine",
+      ja: "日常ルーチン",
+      zh: "日常例行",
+    },
+    clothing: { ko: "의류", en: "Clothing", ja: "衣類", zh: "服装" },
+    furniture: { ko: "가구", en: "Furniture", ja: "家具", zh: "家具" },
+    fruit: { ko: "과일", en: "Fruit", ja: "果物", zh: "水果" },
+    vegetable: { ko: "채소", en: "Vegetable", ja: "野菜", zh: "蔬菜" },
+    meat: { ko: "고기", en: "Meat", ja: "肉", zh: "肉类" },
+    drink: { ko: "음료", en: "Drink", ja: "飲み物", zh: "饮料" },
+    transportation: {
+      ko: "교통",
+      en: "Transportation",
+      ja: "交通",
+      zh: "交通",
+    },
+    accommodation: { ko: "숙박", en: "Accommodation", ja: "宿泊", zh: "住宿" },
+    meeting: { ko: "회의", en: "Meeting", ja: "会議", zh: "会议" },
+    finance: { ko: "금융", en: "Finance", ja: "金融", zh: "金融" },
+    teaching: { ko: "교수법", en: "Teaching", ja: "教授法", zh: "教学" },
+    learning: { ko: "학습", en: "Learning", ja: "学習", zh: "学习" },
+    animal: { ko: "동물", en: "Animal", ja: "動物", zh: "动物" },
+    plant: { ko: "식물", en: "Plant", ja: "植物", zh: "植物" },
+    computer: {
+      ko: "컴퓨터",
+      en: "Computer",
+      ja: "コンピュータ",
+      zh: "计算机",
+    },
+    software: {
+      ko: "소프트웨어",
+      en: "Software",
+      ja: "ソフトウェア",
+      zh: "软件",
+    },
+    exercise: { ko: "운동", en: "Exercise", ja: "運動", zh: "运动" },
+    medicine: { ko: "의학", en: "Medicine", ja: "医学", zh: "医学" },
+    football: { ko: "축구", en: "Football", ja: "サッカー", zh: "足球" },
+    basketball: {
+      ko: "농구",
+      en: "Basketball",
+      ja: "バスケットボール",
+      zh: "篮球",
+    },
+    movie: { ko: "영화", en: "Movie", ja: "映画", zh: "电影" },
+    music: { ko: "음악", en: "Music", ja: "音楽", zh: "音乐" },
+    tradition: { ko: "전통", en: "Tradition", ja: "伝統", zh: "传统" },
+    customs: { ko: "관습", en: "Customs", ja: "習慣", zh: "习俗" },
+    other: { ko: "기타", en: "Other", ja: "その他", zh: "其他" },
+  };
+
+  if (categoryTranslations[category] && categoryTranslations[category][lang]) {
+    return categoryTranslations[category][lang];
+  }
+  return category; // 번역이 없으면 원본 반환
 }

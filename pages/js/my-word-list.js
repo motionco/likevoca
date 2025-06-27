@@ -29,11 +29,7 @@ import {
   setupVocabularyFilters,
 } from "../../utils/vocabulary-filter-shared.js";
 // 공통 번역 유틸리티 import
-import {
-  translateDomain,
-  translateCategory,
-  translateDomainCategory,
-} from "../../utils/translation-utils.js";
+// translation-utils.js 제거됨 - language-utils.js의 번역 시스템 사용
 
 let currentUser = null;
 let userBookmarks = [];

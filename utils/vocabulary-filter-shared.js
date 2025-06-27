@@ -3,7 +3,8 @@
  * 단어장과 AI 단어장에서 공통으로 사용하는 모든 필터 관련 기능
  */
 
-import { DOMAIN_LIST, DOMAIN_TRANSLATION_KEYS } from "./domain-filter-utils.js";
+// 도메인 관련 기능들을 직접 포함
+import { domainCategoryMapping } from "../components/js/domain-category-emoji.js";
 
 // 지원 언어 목록
 export const SUPPORTED_LANGUAGES = [
@@ -12,6 +13,40 @@ export const SUPPORTED_LANGUAGES = [
   { value: "japanese", key: "japanese" },
   { value: "chinese", key: "chinese" },
 ];
+
+// 도메인 목록 정의
+export const DOMAIN_LIST = [
+  "all",
+  "daily",
+  "food",
+  "travel",
+  "business",
+  "education",
+  "nature",
+  "technology",
+  "health",
+  "sports",
+  "entertainment",
+  "culture",
+  "other",
+];
+
+// 도메인 번역 키 매핑
+export const DOMAIN_TRANSLATION_KEYS = {
+  all: "all_domains",
+  daily: "domain_daily",
+  food: "domain_food",
+  travel: "domain_travel",
+  business: "domain_business",
+  education: "domain_education",
+  nature: "domain_nature",
+  technology: "domain_technology",
+  health: "domain_health",
+  sports: "domain_sports",
+  entertainment: "domain_entertainment",
+  culture: "domain_culture",
+  other: "domain_other",
+};
 
 // 정렬 옵션 목록
 export const SORT_OPTIONS = [
@@ -76,18 +111,19 @@ export class VocabularyFilterBuilder {
     `;
   }
 
-  // 도메인 필터 HTML - 일관된 방식으로 생성
+  // 도메인 필터 HTML
   createDomainFilter() {
     if (!this.showDomain) return "";
-    const domainOptions = DOMAIN_LIST.map(
-      (domain) =>
-        `<option value="${domain}" data-i18n="${DOMAIN_TRANSLATION_KEYS[domain]}"></option>`
-    ).join("");
-
     return `
       <label for="domain-filter" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="domain">도메인</label>
       <select id="domain-filter" class="w-full p-2 border rounded h-10 text-sm">
-        ${domainOptions}
+        ${DOMAIN_LIST.map(
+          (domain) => `
+          <option value="${domain}" data-i18n="${
+            DOMAIN_TRANSLATION_KEYS[domain]
+          }">${this.getDefaultDomainText(domain)}</option>
+        `
+        ).join("")}
       </select>
     `;
   }
@@ -157,6 +193,26 @@ export class VocabularyFilterBuilder {
       "z-a": "역가나다순",
     };
     return texts[sort] || sort;
+  }
+
+  // 기본 도메인 텍스트
+  getDefaultDomainText(domain) {
+    const texts = {
+      all: "전체 영역",
+      daily: "일상생활",
+      food: "음식",
+      travel: "여행",
+      business: "비즈니스",
+      education: "교육",
+      nature: "자연",
+      technology: "기술",
+      health: "건강",
+      sports: "스포츠",
+      entertainment: "엔터테인먼트",
+      culture: "문화",
+      other: "기타",
+    };
+    return texts[domain] || domain;
   }
 }
 
@@ -360,6 +416,84 @@ export class VocabularyFilterProcessor {
   }
 }
 
+// 도메인 필터 언어 업데이트 함수
+export async function updateVocabularyFilterLanguage() {
+  try {
+    // 현재 언어 가져오기
+    let currentLang = "ko";
+
+    // localStorage에서 직접 가져오기
+    const userLang = localStorage.getItem("userLanguage");
+    if (userLang && userLang !== "auto") {
+      currentLang = userLang;
+    } else if (userLang === "auto") {
+      // 브라우저 언어 감지
+      const browserLang = navigator.language || navigator.userLanguage;
+      const shortLang = browserLang.split("-")[0];
+      if (["ko", "en", "ja", "zh"].includes(shortLang)) {
+        currentLang = shortLang;
+      }
+    }
+
+    console.log("필터 언어 업데이트:", currentLang);
+
+    // 도메인 필터 select 요소 찾기 (모든 페이지의 domain-filter)
+    const domainSelects = document.querySelectorAll(
+      'select[id="domain-filter"], select[id*="domain-filter"]'
+    );
+
+    domainSelects.forEach((select) => {
+      const currentValue = select.value;
+
+      // 각 옵션의 텍스트를 현재 언어로 업데이트
+      Array.from(select.options).forEach((option) => {
+        const i18nKey = option.getAttribute("data-i18n");
+        if (
+          i18nKey &&
+          window.translations &&
+          window.translations[currentLang]
+        ) {
+          const translation = window.translations[currentLang][i18nKey];
+          if (translation) {
+            option.textContent = translation;
+          }
+        }
+      });
+
+      // 선택된 값 유지
+      select.value = currentValue;
+    });
+
+    // 모달의 도메인 필터도 업데이트 (concept-domain)
+    const modalDomainSelects = document.querySelectorAll(
+      'select[id="concept-domain"]'
+    );
+    modalDomainSelects.forEach((select) => {
+      const currentValue = select.value;
+
+      Array.from(select.options).forEach((option) => {
+        const i18nKey = option.getAttribute("data-i18n");
+        if (
+          i18nKey &&
+          window.translations &&
+          window.translations[currentLang]
+        ) {
+          const translation = window.translations[currentLang][i18nKey];
+          if (translation) {
+            option.textContent = translation;
+          }
+        }
+      });
+
+      select.value = currentValue;
+    });
+
+    console.log("필터 언어 업데이트 완료");
+  } catch (error) {
+    console.error("필터 언어 업데이트 중 오류:", error);
+  }
+}
+
 // 공통 필터 설정 함수
 export function setupVocabularyFilters(onFilterChange) {
   const filterManager = new VocabularyFilterManager({
@@ -375,4 +509,19 @@ export function setupVocabularyFilters(onFilterChange) {
 
   filterManager.setupEventListeners();
   return filterManager;
+}
+
+// 페이지 로드 시 필터 언어 초기화
+export function initializeVocabularyFilterLanguage() {
+  // 페이지 로드 후 잠시 대기하여 번역 시스템이 준비될 때까지 기다림
+  setTimeout(async () => {
+    await updateVocabularyFilterLanguage();
+  }, 1000);
+}
+
+// 전역에서 접근 가능하도록 설정
+if (typeof window !== "undefined") {
+  window.updateVocabularyFilterLanguage = updateVocabularyFilterLanguage;
+  window.initializeVocabularyFilterLanguage =
+    initializeVocabularyFilterLanguage;
 }

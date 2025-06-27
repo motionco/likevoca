@@ -1,4 +1,4 @@
-<nav class="bg-[#4B63AC] p-4 shadow-md">
+﻿<nav class="bg-[#4B63AC] p-4 shadow-md">
   <div class="container mx-auto flex justify-between items-center max-w-6xl">
     <!-- 왼쪽: 햄버거 메뉴 (모바일) + 로고 -->
     <div class="flex items-center">
@@ -10,7 +10,8 @@
     </button>
 
       <a
-        href="/"
+        href="#"
+        onclick="goToHome()"
         class="text-white text-xl md:text-2xl lg:text-3xl font-bold"
         >LikeVoca</a
       >
@@ -19,27 +20,27 @@
     <!-- 중앙: 네비게이션 메뉴 (데스크톱만) -->
     <ul id="nav-menu" class="hidden lg:flex space-x-10 items-center">
       <li>
-        <a href="/pages/vocabulary.html" class="text-xl text-white hover:text-yellow-400" data-i18n="vocabulary" data-i18n-link="vocabulary.html"
+        <a href="#" onclick="goToPage('vocabulary.html')" class="text-xl text-white hover:text-yellow-400" data-i18n="vocabulary"
           >단어장</a
         >
       </li>
       <li>
-        <a href="/pages/ai-vocabulary.html" class="text-xl text-white hover:text-yellow-400" data-i18n="ai_vocabulary" data-i18n-link="ai-vocabulary.html">AI 단어장</a>
+        <a href="#" onclick="goToPage('ai-vocabulary.html')" class="text-xl text-white hover:text-yellow-400" data-i18n="ai_vocabulary">AI 단어장</a>
       </li>
       <li>
-        <a href="/pages/quiz.html" class="text-xl text-white hover:text-yellow-400" data-i18n="quiz" data-i18n-link="quiz.html">퀴즈</a>
+        <a href="#" onclick="goToPage('quiz.html')" class="text-xl text-white hover:text-yellow-400" data-i18n="quiz">퀴즈</a>
       </li>
       <li>
-        <a href="/pages/games.html" class="text-xl text-white hover:text-yellow-400" data-i18n="games" data-i18n-link="games.html">게임</a>
+        <a href="#" onclick="goToPage('games.html')" class="text-xl text-white hover:text-yellow-400" data-i18n="games">게임</a>
       </li>
       <li>
-        <a href="/pages/learning.html" class="text-xl text-white hover:text-yellow-400" data-i18n="learning_title" data-i18n-link="learning.html">학습</a>
+        <a href="#" onclick="goToPage('learning.html')" class="text-xl text-white hover:text-yellow-400" data-i18n="learning_title">학습</a>
       </li>
       <li>
-        <a href="/pages/progress.html" class="text-xl text-white hover:text-yellow-400" data-i18n="progress" data-i18n-link="progress.html">진도</a>
+        <a href="#" onclick="goToPage('progress.html')" class="text-xl text-white hover:text-yellow-400" data-i18n="progress">진도</a>
       </li>
       <li>
-        <a href="/pages/inquiry.html" class="text-xl text-white hover:text-yellow-400" data-i18n="inquiry" data-i18n-link="inquiry.html"
+        <a href="#" onclick="goToPage('inquiry.html')" class="text-xl text-white hover:text-yellow-400" data-i18n="inquiry"
           >문의하기</a
         >
       </li>
@@ -65,7 +66,8 @@
       <!-- Desktop: 로그인/회원가입 버튼 (로그인 전) -->
       <div id="desktop-login-section" class="hidden lg:flex space-x-2">
         <a
-          href="login.html"
+          href="#"
+          onclick="goToRoot('login.html')"
           id="login-button"
           class="border-2 border-white bg-[#4B63AC] text-white font-semibold px-4 py-1.5 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
           data-i18n="login"
@@ -94,18 +96,18 @@
           <span id="user-name"></span>
         </div>
             <a
-              href="/pages/my-word-list.html"
+              href="#"
+              onclick="goToPage('my-word-list.html')"
               class="block w-full text-left px-4 py-2 hover:bg-gray-100"
               data-i18n="wordbook"
-              data-i18n-link="my-word-list.html"
             >
               단어장
             </a>
             <a
-              href="/profile.html"
+              href="#"
+              onclick="goToRoot('profile.html')"
               class="block w-full text-left px-4 py-2 hover:bg-gray-100"
               data-i18n="profile"
-              data-i18n-link="profile.html"
         >
               프로필
             </a>
@@ -126,23 +128,25 @@
     id="mobile-menu"
     class="hidden flex flex-col items-center space-y-4 bg-[#4B63AC] text-white p-3 lg:hidden"
   >
-    <a href="/pages/vocabulary.html" class="text-lg hover:text-yellow-400" data-i18n="vocabulary" data-i18n-link="vocabulary.html">단어장</a>
-    <a href="/pages/ai-vocabulary.html" class="text-lg hover:text-yellow-400" data-i18n="ai_vocabulary" data-i18n-link="ai-vocabulary.html">AI 단어장</a>
-    <a href="/pages/quiz.html" class="text-lg hover:text-yellow-400" data-i18n="quiz" data-i18n-link="quiz.html">퀴즈</a>
-    <a href="/pages/games.html" class="text-lg hover:text-yellow-400" data-i18n="games" data-i18n-link="games.html">게임</a>
-    <a href="/pages/learning.html" class="text-lg hover:text-yellow-400" data-i18n="learning_title" data-i18n-link="learning.html">학습</a>
-    <a href="/pages/progress.html" class="text-lg hover:text-yellow-400" data-i18n="progress" data-i18n-link="progress.html">진도</a>
-    <a href="/pages/inquiry.html" class="text-lg hover:text-yellow-400" data-i18n="inquiry" data-i18n-link="inquiry.html">문의하기</a>
+    <a href="#" onclick="goToPage('vocabulary.html')" class="text-lg hover:text-yellow-400" data-i18n="vocabulary">단어장</a>
+    <a href="#" onclick="goToPage('ai-vocabulary.html')" class="text-lg hover:text-yellow-400" data-i18n="ai_vocabulary">AI 단어장</a>
+    <a href="#" onclick="goToPage('quiz.html')" class="text-lg hover:text-yellow-400" data-i18n="quiz">퀴즈</a>
+    <a href="#" onclick="goToPage('games.html')" class="text-lg hover:text-yellow-400" data-i18n="games">게임</a>
+    <a href="#" onclick="goToPage('learning.html')" class="text-lg hover:text-yellow-400" data-i18n="learning_title">학습</a>
+    <a href="#" onclick="goToPage('progress.html')" class="text-lg hover:text-yellow-400" data-i18n="progress">진도</a>
+    <a href="#" onclick="goToPage('inquiry.html')" class="text-lg hover:text-yellow-400" data-i18n="inquiry">문의하기</a>
 
     <div id="mobile-login-buttons" class="hidden flex space-x-3">
       <a
-        href="login.html"
+        href="#"
+        onclick="goToRoot('login.html')"
         class="border-2 border-white bg-[#4B63AC] text-white font-semibold px-5 py-2 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
         data-i18n="login"
         >로그인</a
       >
       <a
-        href="signup.html"
+        href="#"
+        onclick="goToRoot('signup.html')"
         class="border-2 border-white bg-[#4B63AC] text-white font-semibold px-5 py-2 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
         data-i18n="signup"
         >회원가입</a
@@ -151,3 +155,47 @@
 
   </div>
 </nav>
+
+<script>
+// 개발 환경 감지
+function isDevelopment() {
+    return window.location.hostname === 'localhost' || 
+           window.location.hostname === '127.0.0.1' ||
+           window.location.port === '5500';
+}
+
+// 현재 언어 감지
+function getCurrentLanguage() {
+    const path = window.location.pathname;
+    const langMatch = path.match(/\/(ko|en|ja|zh)\//);
+    return langMatch ? langMatch[1] : 'ko';
+}
+
+// 페이지 이동 함수
+function goToPage(filename) {
+    const currentLang = getCurrentLanguage();
+    
+    if (isDevelopment()) {
+        window.location.href = `/locales/${currentLang}/${filename}`;
+    } else {
+        window.location.href = `/${currentLang}/${filename}`;
+    }
+}
+
+// 홈으로 이동
+function goToHome() {
+    const currentLang = getCurrentLanguage();
+    
+    if (isDevelopment()) {
+        window.location.href = `/locales/${currentLang}/index.html`;
+    } else {
+        window.location.href = `/${currentLang}/index.html`;
+    }
+}
+
+// 루트 파일로 이동 (로그인, 회원가입, 프로필)
+function goToRoot(filename) {
+    window.location.href = `/${filename}`;
+}
+</script>
+

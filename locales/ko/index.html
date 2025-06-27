@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
@@ -13,18 +13,18 @@
     <meta property="og:title" content="LikeVoca - 다국어 학습 플랫폼" />
     <meta property="og:description" content="체계적인 커리큘럼과 직관적인 학습 시스템으로 언어 학습을 더욱 효과적으로 만들어드립니다." />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://likevoca.com/ko" />
+    <meta property="og:url" content="https://likevoca.com" />
     <meta property="og:locale" content="ko" />
     
     <!-- 표준 링크 -->
-    <link rel="canonical" href="https://likevoca.com/ko" />
+    <link rel="canonical" href="https://likevoca.com" />
     
-    <!-- 대체 언어 링크 -->
+    <!-- 대체 언어 링크 (초기값) -->
     <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko" />
     <link rel="alternate" hreflang="en" href="https://likevoca.com/en" />
     <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja" />
     <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh" />
-    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/ko" />
+    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en" />
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="../../js/index.js" type="module"></script>
@@ -48,20 +48,18 @@
           <h1
             class="text-3xl md:text-4xl lg:text-6xl font-bold text-gray-800 mb-4 md:mb-6"
           >
-            <span data-i18n="learn_languages">다양한 언어를 쉽고 재미있게 배워보세요</span><br />
-            <span class="text-[#4B63AC]" data-i18n="learn_languages_part2">효과적으로</span>
+            <span data-i18n="learn_languages"></span><br />
+            <span class="text-[#4B63AC]" data-i18n="learn_languages_part2"></span>
           </h1>
           <p
             class="text-base md:text-lg text-gray-600 mb-6 md:mb-8 px-4 lg:px-0"
             data-i18n="effective_learning"
           >
-            체계적인 커리큘럼과 직관적인 학습 시스템으로 언어 학습을 더욱 효과적으로 만들어드립니다.
           </p>
           <button
             class="w-full md:w-auto bg-[#4B63AC] text-white px-6 md:px-8 py-3 rounded-lg hover:bg-[#3A4F8B] transition duration-300 text-base md:text-lg font-semibold"
             data-i18n="get_started_free"
           >
-            무료로 시작하기
           </button>
         </div>
         <div class="lg:w-1/2 mt-8 lg:mt-0 w-full px-4 lg:px-0">
@@ -84,10 +82,8 @@
           <div class="h-auto md:h-48 flex flex-col justify-between space-y-4">
             <div>
               <h3 class="text-2xl font-bold text-[#4B63AC] mb-4" data-i18n="wordbook">
-                단어장
               </h3>
               <p class="text-gray-700 text-sm lg:text-lg" data-i18n="wordbook_desc">
-                학습할 단어를 입력하여 나만의 다국어 단어장을 만들어보세요.
               </p>
             </div>
             <a href="my-word-list.html" class="self-end">
@@ -95,7 +91,6 @@
                 class="self-end bg-[#4B63AC] text-white px-6 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300"
                 data-i18n="start"
               >
-                시작하기
               </button>
             </a>
           </div>
@@ -106,10 +101,8 @@
           <div class="h-auto md:h-48 flex flex-col justify-between space-y-4">
             <div>
               <h3 class="text-2xl font-bold text-[#2E7D32] mb-4" data-i18n="ai_vocabulary">
-                AI 단어장
               </h3>
               <p class="text-gray-700 text-sm lg:text-lg" data-i18n="ai_vocabulary_desc">
-                AI가 추천하는 다국어 개념을 학습하여 언어 실력을 향상시키세요.
               </p>
             </div>
             <a href="ai-vocabulary.html" class="self-end">
@@ -117,7 +110,6 @@
                 class="self-end bg-[#2E7D32] text-white px-6 py-2 rounded-lg hover:bg-[#1B5E20] transition duration-300"
                 data-i18n="start"
               >
-                시작하기
               </button>
             </a>
           </div>
@@ -127,9 +119,8 @@
         >
           <div class="h-auto md:h-48 flex flex-col justify-between space-y-4">
             <div>
-              <h3 class="text-2xl font-bold text-[#1565CD] mb-4" data-i18n="inquiry">문의</h3>
+              <h3 class="text-2xl font-bold text-[#1565CD] mb-4" data-i18n="inquiry"></h3>
               <p class="text-gray-700 text-sm lg:text-lg" data-i18n="inquiry_desc">
-                궁금한 점이 있거나 도움이 필요하시면 언제든지 문의해주세요.
               </p>
             </div>
             <a href="inquiry.html" class="self-end">
@@ -137,7 +128,6 @@
                 class="self-end bg-[#1565CD] text-white px-6 py-2 rounded-lg hover:bg-[#0D47A1] transition duration-300"
                 data-i18n="inquiry"
               >
-                문의
               </button>
             </a>
           </div>
@@ -147,9 +137,8 @@
         >
           <div class="h-auto md:h-48 flex flex-col justify-between space-y-4">
             <div>
-              <h3 class="text-2xl font-bold text-[#E65100] mb-4" data-i18n="multilingual_dictionary">다국어 단어장</h3>
+              <h3 class="text-2xl font-bold text-[#E65100] mb-4" data-i18n="multilingual_dictionary"></h3>
               <p class="text-gray-700 text-sm lg:text-lg" data-i18n="wordbook_desc">
-                학습할 단어를 입력하여 나만의 다국어 단어장을 만들어보세요.
               </p>
             </div>
             <a href="vocabulary.html" class="self-end">
@@ -157,7 +146,6 @@
                 class="self-end bg-[#E65100] text-white px-6 py-2 rounded-lg hover:bg-[#BF360C] transition duration-300"
                 data-i18n="start"
               >
-                시작하기
               </button>
             </a>
           </div>
@@ -167,15 +155,14 @@
         >
           <div class="h-auto md:h-48 flex flex-col justify-between space-y-4">
             <div>
-              <h3 class="text-2xl font-bold text-[#0097A7] mb-4" data-i18n="language_learning">다국어 학습</h3>
-              <p class="text-gray-700 text-sm lg:text-lg" data-i18n="language_learning_desc">플래시카드, 퀴즈, 타이핑 등 다양한 방식으로 언어를 학습하세요.</p>
+              <h3 class="text-2xl font-bold text-[#0097A7] mb-4" data-i18n="language_learning"></h3>
+              <p class="text-gray-700 text-sm lg:text-lg" data-i18n="language_learning_desc"></p>
             </div>
             <a href="learning.html" class="self-end">
               <button
                 class="self-end bg-[#0097A7] text-white px-6 py-2 rounded-lg hover:bg-[#00838F] transition duration-300"
                 data-i18n="start"
               >
-                시작하기
               </button>
             </a>
           </div>
@@ -185,9 +172,8 @@
         >
           <div class="h-auto md:h-48 flex flex-col justify-between space-y-4">
             <div>
-              <h3 class="text-2xl font-bold text-[#9C27B0] mb-4" data-i18n="language_games">다국어 게임</h3>
+              <h3 class="text-2xl font-bold text-[#9C27B0] mb-4" data-i18n="language_games"></h3>
               <p class="text-gray-700 text-sm lg:text-lg" data-i18n="language_games_desc">
-                재미있는 게임을 통해 다양한 언어를 즐겁게 배워보세요.
               </p>
             </div>
             <a href="games.html" class="self-end">
@@ -195,7 +181,6 @@
                 class="self-end bg-[#9C27B0] text-white px-6 py-2 rounded-lg hover:bg-[#7B1FA2] transition duration-300"
                 data-i18n="start"
               >
-                시작하기
               </button>
             </a>
           </div>
@@ -203,12 +188,11 @@
       </div>
     </main>
     <script type="module">
-      import { applyLanguage, updateMetadata, setLanguage } from '../../utils/language-utils.js';
+      import { applyLanguage, updateMetadata, getActiveLanguage } from '../../utils/language-utils.js';
       
       document.addEventListener('DOMContentLoaded', async () => {
         try {
-          // URL에서 언어 감지 및 설정
-          setLanguage('ko');
+          const currentLang = await getActiveLanguage();
           await applyLanguage();
           await updateMetadata('home');
         } catch (error) {
@@ -217,4 +201,4 @@
       });
     </script>
   </body>
-</html> 
+</html>

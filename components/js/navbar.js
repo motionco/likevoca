@@ -27,12 +27,15 @@ const dbToUiLanguageMap = {
 
 export async function loadNavbar() {
   try {
-    // 현재 페이지 위치에 따라 경로 결정
+    // 현재 페이지 위치에 따라 경로 결정 (locales 구조)
     const currentPath = window.location.pathname;
     let navbarPath;
 
-    if (currentPath.includes("/pages/")) {
-      // pages 폴더 내의 페이지인 경우
+    if (currentPath.match(/^\/[a-z]{2}\//)) {
+      // locales 폴더 내의 페이지인 경우 (예: /ko/vocabulary.html)
+      navbarPath = "navbar.html";
+    } else if (currentPath.includes("/pages/")) {
+      // pages 폴더 내의 페이지인 경우 (개발 환경)
       navbarPath = "../components/navbar.html";
     } else {
       // 루트 폴더의 페이지인 경우
@@ -42,6 +45,11 @@ export async function loadNavbar() {
     const response = await fetch(navbarPath);
     const html = await response.text();
     document.getElementById("navbar-container").innerHTML = html;
+
+    // 네비게이션 바 렌더 후 번역 적용
+    if (typeof window.applyLanguage === "function") {
+      window.applyLanguage();
+    }
 
     // 초기 UI 상태 설정 (모든 요소 숨김으로 시작)
     setInitialUIState();
@@ -123,29 +131,12 @@ function initializeNavbar() {
     languageButton.addEventListener("click", showLanguageSettingsModal);
   }
 
-  // 언어 변경 이벤트 리스너
+  // 언어 변경 이벤트 리스너 (간소화)
   document.addEventListener("languageChanged", async (event) => {
     const userLanguage = event.detail.language;
 
     // 언어 버튼 표시 업데이트
     await updateLanguageDisplay();
-
-    // 사용자 이름 접미사 업데이트 (로그인 상태인 경우)
-    const userNameElement = document.getElementById("user-name");
-    if (userNameElement && auth?.currentUser) {
-      const userName = auth.currentUser.displayName || "사용자";
-      const userSuffix =
-        window.translations?.[userLanguage]?.user_suffix || "님";
-      userNameElement.textContent = `${userName}${userSuffix}`;
-    }
-
-    // UI 언어만 변경하고 학습 언어 선택은 그대로 유지
-    // 다른 페이지에서 언어 변경을 감지할 수 있도록 이벤트 발생
-    window.dispatchEvent(
-      new CustomEvent("languageChanged", {
-        detail: { language: userLanguage },
-      })
-    );
   });
 }
 

@@ -1,0 +1,111 @@
+﻿<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Likevoca - 문의하기</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../../pages/js/inquiry.js" type="module"></script>
+    <script type="module" src="../../js/language-init.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body class="bg-gray-100">
+    <div id="navbar-container"></div>
+
+    <div class="container mx-auto px-4 py-12">
+      <div
+        class="flex flex-col lg:flex-row bg-white rounded-lg shadow-lg overflow-hidden"
+      >
+        <div class="w-full lg:w-1/2 p-8 flex items-center">
+          <div class="w-full">
+            <h1 class="text-4xl font-bold text-gray-800 mb-6 text-center" data-i18n="contact_us">
+              문의하기
+            </h1>
+
+            <form id="inquiry-form" class="space-y-6">
+              <div>
+                <label
+                  for="name"
+                  class="block text-lg font-medium text-gray-700 mb-1"
+                  data-i18n="email"
+                >
+                  문의자 이메일
+                </label>
+                <input
+                  type="email"
+                  id="name"
+                  name="name"
+                  required
+                  class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-200 text-gray-500 cursor-not-allowed"
+                  disabled
+                />
+              </div>
+              <div>
+                <label
+                  for="title"
+                  class="block text-lg font-medium text-gray-700 mb-1"
+                  data-i18n="subject"
+                >
+                  문의 제목
+                </label>
+                <input
+                  type="text"
+                  id="title"
+                  name="title"
+                  required
+                  data-i18n-placeholder="subject_placeholder"
+                  placeholder="문의 제목을 입력하세요"
+                  class="w-full px-4 py-2 border rounded-md transition-all duration-300"
+                />
+              </div>
+              <div>
+                <label
+                  for="message"
+                  class="block text-lg font-medium text-gray-700 mb-1"
+                  data-i18n="message"
+                >
+                  문의 내용
+                </label>
+                <textarea
+                  id="message"
+                  name="message"
+                  rows="6"
+                  required
+                  data-i18n-placeholder="message_placeholder"
+                  placeholder="문의 내용을 입력하세요"
+                  class="w-full px-4 py-3 border rounded-md transition-all duration-300"
+                >
+                </textarea>
+              </div>
+              <div class="text-center">
+                <button
+                  type="submit"
+                  class="bg-[#4B63AC] text-white px-8 py-3 rounded-md hover:bg-[#3A4F8B] transition-colors duration-300 shadow-md"
+                  data-i18n="send"
+                >
+                  문의하기
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="w-full lg:w-1/2">
+          <img
+            src="../../assets/inquiry.webp"
+            alt="문의하기 이미지"
+            class="w-full h-full object-cover"
+          />
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+
+

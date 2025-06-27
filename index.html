@@ -3,203 +3,66 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LikeVoca - 다국어 학습 플랫폼</title>
-    
-    <!-- 기본 메타 태그 -->
-    <meta name="description" content="체계적인 커리큘럼과 직관적인 학습 시스템으로 언어 학습을 더욱 효과적으로 만들어드립니다." />
-    <meta name="keywords" content="언어 학습, 다국어, 단어장, AI 단어장, 영어, 일본어, 중국어, 한국어" />
-    
-    <!-- Open Graph / 소셜 미디어 메타 태그 -->
-    <meta property="og:title" content="LikeVoca - 다국어 학습 플랫폼" />
-    <meta property="og:description" content="체계적인 커리큘럼과 직관적인 학습 시스템으로 언어 학습을 더욱 효과적으로 만들어드립니다." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://likevoca.com" />
-    <meta property="og:locale" content="ko" />
-    
-    <!-- 표준 링크 -->
-    <link rel="canonical" href="https://likevoca.com" />
-    
-    <!-- 대체 언어 링크 (초기값) -->
-    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko" />
-    <link rel="alternate" hreflang="en" href="https://likevoca.com/en" />
-    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja" />
-    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh" />
-    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en" />
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="js/hangul-writer.js"></script>
-    <script src="js/index.js" type="module"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-    />
-
-    <link rel="stylesheet" href="css/style.css" />
-  </head>
-  <body class="bg-gray-100">
-    <div id="navbar-container"></div>
-
-    <main
-      class="container mx-auto max-w-7xl px-4 md:px-6 lg:px-8 py-8 md:py-12 lg:py-16"
-    >
-      <div
-        class="flex flex-col lg:flex-row items-center justify-between mb-8 md:mb-16 mt-4 md:mt-8"
-      >
-        <div class="lg:w-1/2 lg:pr-12 text-center lg:text-left">
-          <h1
-            class="text-3xl md:text-4xl lg:text-6xl font-bold text-gray-800 mb-4 md:mb-6"
-          >
-            <span data-i18n="learn_languages"></span><br />
-            <span class="text-[#4B63AC]" data-i18n="learn_languages_part2"></span>
-          </h1>
-          <p
-            class="text-base md:text-lg text-gray-600 mb-6 md:mb-8 px-4 lg:px-0"
-            data-i18n="effective_learning"
-          >
-          </p>
-          <button
-            class="w-full md:w-auto bg-[#4B63AC] text-white px-6 md:px-8 py-3 rounded-lg hover:bg-[#3A4F8B] transition duration-300 text-base md:text-lg font-semibold"
-            data-i18n="get_started_free"
-          >
-          </button>
-        </div>
-        <div class="lg:w-1/2 mt-8 lg:mt-0 w-full px-4 lg:px-0">
-          <div class="h-64 md:h-80 lg:h-96 rounded-xl overflow-hidden">
-            <img
-              src="/assets/hero.webp"
-              class="w-full h-full object-cover rounded-xl"
-              alt="Hero Image"
-            />
-          </div>
-        </div>
-      </div>
-
-      <div
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 lg:gap-8 md:mb-16"
-      >
-        <div
-          class="bg-[#E6F0FF] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
-        >
-          <div class="h-auto md:h-48 flex flex-col justify-between space-y-4">
-            <div>
-              <h3 class="text-2xl font-bold text-[#4B63AC] mb-4" data-i18n="wordbook">
-              </h3>
-              <p class="text-gray-700 text-sm lg:text-lg" data-i18n="wordbook_desc">
-              </p>
-            </div>
-            <a href="/pages/my-word-list.html" class="self-end">
-              <button
-                class="self-end bg-[#4B63AC] text-white px-6 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300"
-                data-i18n="start"
-              >
-              </button>
-            </a>
-          </div>
-        </div>
-        <div
-          class="bg-[#E8F5E9] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
-        >
-          <div class="h-auto md:h-48 flex flex-col justify-between space-y-4">
-            <div>
-              <h3 class="text-2xl font-bold text-[#2E7D32] mb-4" data-i18n="ai_vocabulary">
-              </h3>
-              <p class="text-gray-700 text-sm lg:text-lg" data-i18n="ai_vocabulary_desc">
-              </p>
-            </div>
-            <a href="/pages/ai-vocabulary.html" class="self-end">
-              <button
-                class="self-end bg-[#2E7D32] text-white px-6 py-2 rounded-lg hover:bg-[#1B5E20] transition duration-300"
-                data-i18n="start"
-              >
-              </button>
-            </a>
-          </div>
-        </div>
-        <div
-          class="bg-[#E3F2FD] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
-        >
-          <div class="h-auto md:h-48 flex flex-col justify-between space-y-4">
-            <div>
-              <h3 class="text-2xl font-bold text-[#1565CD] mb-4" data-i18n="inquiry"></h3>
-              <p class="text-gray-700 text-sm lg:text-lg" data-i18n="inquiry_desc">
-              </p>
-            </div>
-            <a href="/pages/inquiry.html" class="self-end">
-              <button
-                class="self-end bg-[#1565CD] text-white px-6 py-2 rounded-lg hover:bg-[#0D47A1] transition duration-300"
-                data-i18n="inquiry"
-              >
-              </button>
-            </a>
-          </div>
-        </div>
-        <div
-          class="bg-[#FFF3E0] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
-        >
-          <div class="h-auto md:h-48 flex flex-col justify-between space-y-4">
-            <div>
-              <h3 class="text-2xl font-bold text-[#E65100] mb-4" data-i18n="multilingual_dictionary"></h3>
-              <p class="text-gray-700 text-sm lg:text-lg" data-i18n="wordbook_desc">
-              </p>
-            </div>
-            <a href="/pages/vocabulary.html" class="self-end">
-              <button
-                class="self-end bg-[#E65100] text-white px-6 py-2 rounded-lg hover:bg-[#BF360C] transition duration-300"
-                data-i18n="start"
-              >
-              </button>
-            </a>
-          </div>
-        </div>
-        <div
-          class="bg-[#E0F7FA] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
-        >
-          <div class="h-auto md:h-48 flex flex-col justify-between space-y-4">
-            <div>
-              <h3 class="text-2xl font-bold text-[#0097A7] mb-4" data-i18n="language_learning"></h3>
-              <p class="text-gray-700 text-sm lg:text-lg" data-i18n="language_learning_desc"></p>
-            </div>
-            <a href="/pages/language-learning.html" class="self-end">
-              <button
-                class="self-end bg-[#0097A7] text-white px-6 py-2 rounded-lg hover:bg-[#00838F] transition duration-300"
-                data-i18n="start"
-              >
-              </button>
-            </a>
-          </div>
-        </div>
-        <div
-          class="bg-[#F3E5F5] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
-        >
-          <div class="h-auto md:h-48 flex flex-col justify-between space-y-4">
-            <div>
-              <h3 class="text-2xl font-bold text-[#9C27B0] mb-4" data-i18n="language_games"></h3>
-              <p class="text-gray-700 text-sm lg:text-lg" data-i18n="language_games_desc">
-              </p>
-            </div>
-            <a href="/pages/games.html" class="self-end">
-              <button
-                class="self-end bg-[#9C27B0] text-white px-6 py-2 rounded-lg hover:bg-[#7B1FA2] transition duration-300"
-                data-i18n="start"
-              >
-              </button>
-            </a>
-          </div>
-        </div>
-      </div>
-    </main>
-    <script type="module">
-      import { applyLanguage, updateMetadata, getActiveLanguage } from './utils/language-utils.js';
-      
-      document.addEventListener('DOMContentLoaded', async () => {
-        try {
-          const currentLang = await getActiveLanguage();
-          await applyLanguage();
-          await updateMetadata('home');
-        } catch (error) {
-          console.error('언어 설정 적용 중 오류:', error);
+    <title>LikeVoca - Redirecting...</title>
+    <script>
+      // 이미 리다이렉트가 실행되었는지 확인
+      if (!sessionStorage.getItem('redirected')) {
+        // 브라우저 언어 감지
+        function detectBrowserLanguage() {
+          const browserLang = navigator.language || navigator.userLanguage;
+          const langCode = browserLang.split('-')[0];
+          
+          // 지원하는 언어 목록
+          const supportedLanguages = ['ko', 'en', 'ja', 'zh'];
+          
+          return supportedLanguages.includes(langCode) ? langCode : 'ko';
         }
-      });
+        
+        // 개발 환경 감지
+        function isDevelopment() {
+          return window.location.hostname === 'localhost' || 
+                 window.location.hostname === '127.0.0.1' ||
+                 window.location.port === '5500';
+        }
+        
+        // 현재 경로가 이미 언어별 경로인지 확인
+        const currentPath = window.location.pathname;
+        const isAlreadyLanguagePath = currentPath.match(/^\/(ko|en|ja|zh)\//) || 
+                                    currentPath.match(/^\/locales\/(ko|en|ja|zh)\//);
+        
+        // 이미 언어별 경로가 아닌 경우에만 리다이렉트
+        if (!isAlreadyLanguagePath && (currentPath === '/' || currentPath === '/index.html')) {
+          // 리다이렉트 실행됨을 표시
+          sessionStorage.setItem('redirected', 'true');
+          
+          const targetLang = detectBrowserLanguage();
+          
+          if (isDevelopment()) {
+            // 개발 환경: locales 폴더 경로 사용
+            window.location.replace(`/locales/${targetLang}/index.html`);
+          } else {
+            // 배포 환경: 언어별 경로 사용
+            window.location.replace(`/${targetLang}/index.html`);
+          }
+        }
+      }
+      
+      // 3초 후 세션 스토리지 정리 (다음 방문을 위해)
+      setTimeout(() => {
+        sessionStorage.removeItem('redirected');
+      }, 3000);
     </script>
+  </head>
+  <body>
+    <div style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: Arial, sans-serif;">
+      <div style="text-align: center;">
+        <h2>🌍 LikeVoca</h2>
+        <p>언어를 감지하고 있습니다...</p>
+        <p>Detecting your language...</p>
+        <p style="margin-top: 20px; font-size: 14px; color: #666;">
+          자동으로 이동하지 않으면 <a href="/locales/ko/index.html" style="color: #4B63AC;">여기를 클릭하세요</a>
+        </p>
+      </div>
+    </div>
   </body>
 </html>

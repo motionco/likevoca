@@ -126,6 +126,7 @@ document.addEventListener("DOMContentLoaded", function () {
 // 전역 함수들 노출
 window.showAreaSelection = showAreaSelection;
 window.showLearningModes = showLearningModes;
+window.updateFilterOptionsLanguage = updateFilterOptionsLanguage;
 
 function initializeLanguageSettings() {
   // 언어 설정 초기화
@@ -1782,6 +1783,26 @@ function getTranslatedText(key) {
 // 필터 옵션 업데이트 함수 (언어 변경 시 호출)
 function updateFilterOptionsLanguage() {
   loadSituationAndPurposeFilterOptions();
+
+  // 난이도 필터 옵션 번역 업데이트
+  const difficultyFilter = document.getElementById("difficulty-level");
+  if (difficultyFilter) {
+    const currentValue = difficultyFilter.value;
+    Array.from(difficultyFilter.options).forEach((option) => {
+      const i18nKey = option.getAttribute("data-i18n");
+      if (
+        i18nKey &&
+        window.translations &&
+        window.translations[currentUILanguage]
+      ) {
+        const translation = window.translations[currentUILanguage][i18nKey];
+        if (translation) {
+          option.textContent = translation;
+        }
+      }
+    });
+    difficultyFilter.value = currentValue;
+  }
 }
 
 // 전역 함수로 등록
