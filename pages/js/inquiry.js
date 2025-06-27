@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("name").value = user.email;
     } else {
       alert("로그인 후 이용해주세요.");
-      window.location.href = "../login.html";
+      window.redirectToLogin();
     }
   });
 
@@ -27,7 +27,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const user = auth.currentUser;
     if (!user) {
-      alert("로그인 후 이용해주세요.");
+      console.log("❌ 사용자가 로그인되지 않았습니다.");
+      alert("로그인이 필요합니다.");
+      window.redirectToLogin();
       return;
     }
 
@@ -54,11 +56,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       alert(`문의가 성공적으로 등록되었습니다. (문의번호: ${newInquiryId})`);
       inquiryForm.reset();
-
-      
     } catch (error) {
-        console.error("문의 등록 중 에러가 발생: ", error);
-        alert("문의 등록에 실패했습니다. 다시 시도해주세요.");
+      console.error("문의 등록 중 에러가 발생: ", error);
+      alert("문의 등록에 실패했습니다. 다시 시도해주세요.");
     }
   });
 });

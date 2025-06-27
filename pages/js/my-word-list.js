@@ -130,8 +130,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       await loadBookmarkedConcepts();
       updateUI();
     } else {
-      alert(getI18nText("login_required"));
-      window.location.href = "../login.html";
+      console.log("❌ 사용자가 로그인되지 않았습니다.");
+      alert("로그인이 필요합니다.");
+      window.redirectToLogin();
     }
   });
 

@@ -1795,8 +1795,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         await updateUsageUI();
         await loadUserBookmarks(); // 북마크 로드 추가
       } else {
-        alert(getTranslatedText("login_required"));
-        window.location.href = "../login.html";
+        console.log("❌ 사용자가 로그인되지 않았습니다.");
+        alert("로그인이 필요합니다.");
+        window.redirectToLogin();
+        return;
       }
     });
 

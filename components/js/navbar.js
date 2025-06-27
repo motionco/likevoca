@@ -112,11 +112,7 @@ function initializeNavbar(currentLanguage) {
   // 로그아웃 버튼
   const logoutButton = document.getElementById("logout-button");
   if (logoutButton) {
-    logoutButton.addEventListener("click", function () {
-      // Firebase 로그아웃 로직 (추후 구현)
-      localStorage.removeItem("userLanguage");
-      window.location.href = "../../index.html";
-    });
+    logoutButton.addEventListener("click", handleLogout);
     console.log("로그아웃 버튼 이벤트 설정 완료");
   }
 
@@ -470,6 +466,106 @@ function updateUIBasedOnAuth(isLoggedIn) {
   console.log("🎯 UI 업데이트 완료, 로그인 상태:", isLoggedIn);
 }
 
+async function handleLogout() {
+  console.log("🚪 로그아웃 시작");
+
+  try {
+    // Firebase 로그아웃 처리
+    if (
+      typeof window.auth !== "undefined" &&
+      typeof window.signOut !== "undefined"
+    ) {
+      await window.signOut(window.auth);
+      console.log("✅ Firebase 로그아웃 완료 (모듈 방식)");
+    } else if (
+      typeof window.firebaseInit !== "undefined" &&
+      window.firebaseInit.auth
+    ) {
+      await window.firebaseInit.auth.signOut();
+      console.log("✅ Firebase 로그아웃 완료 (기존 방식)");
+    }
+
+    // UI 업데이트
+    updateUIBasedOnAuth(false);
+
+    // 프로필 드롭다운 닫기
+    const profileDropdown = document.getElementById("profile-dropdown");
+    if (profileDropdown) {
+      profileDropdown.classList.add("hidden");
+    }
+
+    console.log("✅ 로그아웃 완료");
+  } catch (error) {
+    console.error("❌ 로그아웃 오류:", error);
+  }
+}
+
 // 전역에서 접근 가능하도록 함수들을 window 객체에 추가
 window.changeLanguage = changeLanguage;
 window.closeLanguageModal = closeLanguageModal;
+window.loadNavbar = loadNavbar;
+
+// loadNavbar 함수 추가
+async function loadNavbar() {
+  // 현재 URL에서 언어 정보 추출
+  const currentPath = window.location.pathname;
+  let currentLanguage = "ko"; // 기본값
+  let navbarPath = "";
+
+  console.log("현재 경로:", currentPath);
+
+  // 현재 언어 감지 (배포 환경 대응)
+  if (currentPath.includes("/locales/")) {
+    // 개발 환경: /locales/ko/index.html 형태
+    const pathParts = currentPath.split("/");
+    const localesIndex = pathParts.indexOf("locales");
+    if (localesIndex !== -1 && localesIndex + 1 < pathParts.length) {
+      currentLanguage = pathParts[localesIndex + 1];
+    }
+    // 언어별 navbar 경로 설정
+    navbarPath = `navbar.html`;
+    console.log(
+      "개발환경 언어별 navbar 사용:",
+      navbarPath,
+      "언어:",
+      currentLanguage
+    );
+  } else if (currentPath.match(/^\/(ko|en|ja|zh)\//)) {
+    // 배포 환경: /ko/index.html 형태
+    const pathParts = currentPath.split("/");
+    currentLanguage = pathParts[1]; // 첫 번째 경로 부분이 언어 코드
+    navbarPath = `/components/navbar.html`;
+    console.log(
+      "배포환경 언어별 navbar 사용:",
+      navbarPath,
+      "언어:",
+      currentLanguage
+    );
+  } else {
+    // 루트 경로에서는 기본 navbar 사용 (절대 경로로 수정)
+    navbarPath = "/components/navbar.html";
+    console.log("기본 navbar 사용:", navbarPath);
+  }
+
+  try {
+    // 네비게이션 바 로드
+    const response = await fetch(navbarPath);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.text();
+
+    const navbarContainer = document.getElementById("navbar-container");
+    if (navbarContainer) {
+      navbarContainer.innerHTML = data;
+      console.log("네비게이션 바 로드 성공");
+
+      // 네비게이션 바 로드 후 초기화
+      initializeNavbar(currentLanguage);
+    } else {
+      console.error("navbar-container 요소를 찾을 수 없습니다.");
+    }
+  } catch (error) {
+    console.error("네비게이션 바 로드 실패:", error);
+  }
+}

@@ -867,6 +867,41 @@ function handleLanguageRouting() {
   return;
 }
 
+// 언어별 로그인/회원가입 페이지로 리다이렉트하는 함수
+function goToLanguageSpecificPage(pageName) {
+  const currentLanguage = localStorage.getItem("userLanguage") || "ko";
+
+  // 개발 환경 감지
+  const isDevelopment =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1" ||
+    window.location.port === "5500" ||
+    window.location.hostname.includes("127.0.0.1");
+
+  let targetPath;
+
+  if (isDevelopment) {
+    // 개발 환경: locales 폴더 경로 사용
+    targetPath = `/locales/${currentLanguage}/${pageName}`;
+  } else {
+    // 배포 환경: 언어별 경로 사용
+    targetPath = `/${currentLanguage}/${pageName}`;
+  }
+
+  console.log(`${pageName}으로 이동:`, targetPath);
+  window.location.href = targetPath;
+}
+
+// 로그인이 필요한 페이지에서 로그인 페이지로 리다이렉트하는 함수
+function redirectToLogin() {
+  goToLanguageSpecificPage("login.html");
+}
+
+// 회원가입 페이지로 리다이렉트하는 함수
+function redirectToSignup() {
+  goToLanguageSpecificPage("signup.html");
+}
+
 // 네비게이션 링크 자동 업데이트 함수
 function updateNavigationLinks() {
   const currentLang = detectLanguageFromURL() || "ko";
@@ -921,6 +956,9 @@ if (typeof window !== "undefined") {
   window.updateMetadata = updateMetadata;
   window.handleLanguageRouting = handleLanguageRouting;
   window.updateNavigationLinks = updateNavigationLinks;
+  window.goToLanguageSpecificPage = goToLanguageSpecificPage;
+  window.redirectToLogin = redirectToLogin;
+  window.redirectToSignup = redirectToSignup;
 }
 
 export {

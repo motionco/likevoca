@@ -253,8 +253,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         currentUser = user;
         await initializePage();
       } else {
+        console.log("❌ 사용자가 로그인되지 않았습니다.");
         alert("로그인이 필요합니다.");
-        window.location.href = "../login.html";
+        window.redirectToLogin();
       }
     });
   } catch (error) {

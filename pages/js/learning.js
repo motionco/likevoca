@@ -121,6 +121,30 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // 언어 변경 핸들러 초기화
   handleLanguageChange();
+  
+  // 언어 변경 이벤트 리스너 추가
+  window.addEventListener("languageChanged", () => {
+    console.log("🌐 언어 변경 이벤트 수신 - 학습 페이지 업데이트");
+    
+    // 사용자 언어 설정 다시 가져오기
+    const userLanguage = localStorage.getItem("userLanguage") || "ko";
+    currentUILanguage = userLanguage === "auto" ? "ko" : userLanguage;
+    
+    // 번역 다시 적용
+    if (typeof window.applyLanguage === "function") {
+      window.applyLanguage();
+    }
+    
+    // 필터 옵션 언어 업데이트
+    updateFilterOptionsLanguage();
+    
+    // 현재 화면 다시 렌더링
+    if (currentLearningArea && currentLearningMode) {
+      updateCurrentView();
+    } else {
+      showAreaSelection();
+    }
+  });
 });
 
 // 전역 함수들 노출
@@ -129,13 +153,15 @@ window.showLearningModes = showLearningModes;
 window.updateFilterOptionsLanguage = updateFilterOptionsLanguage;
 
 function initializeLanguageSettings() {
+  // 사용자 언어 설정 가져오기
+  const userLanguage = localStorage.getItem("userLanguage") || "ko";
+
   // 언어 설정 초기화
   if (!window.languageSettings) {
     window.languageSettings = {
       sourceLanguage: sessionStorage.getItem("sourceLanguage") || "korean",
       targetLanguage: sessionStorage.getItem("targetLanguage") || "english",
-      currentUILanguage:
-        sessionStorage.getItem("currentUILanguage") || "korean",
+      currentUILanguage: userLanguage === "auto" ? "ko" : userLanguage,
     };
   }
 
@@ -158,6 +184,7 @@ function initializeLanguageSettings() {
     sourceLanguage,
     targetLanguage,
     currentUILanguage,
+    userLanguage,
   });
 }
 
@@ -1769,15 +1796,64 @@ async function loadLearningDataOptimized(area) {
 
 // 번역 텍스트 가져오기 함수
 function getTranslatedText(key) {
-  const currentLang = getCurrentLanguage();
-  if (
-    window.translations &&
-    window.translations[currentLang] &&
-    window.translations[currentLang][key]
-  ) {
-    return window.translations[currentLang][key];
+  // window.translations 사용
+  if (window.translations && window.translations[currentUILanguage]) {
+    return window.translations[currentUILanguage][key] || key;
   }
-  return key;
+
+  // 기본 번역 (하위 호환성)
+  const translations = {
+    ko: {
+      vocabulary: "단어",
+      grammar: "문법",
+      reading: "독해",
+      flashcards: "플래시카드",
+      typing: "타이핑",
+      pronunciation: "발음",
+      pattern: "패턴",
+      practice: "연습",
+      example: "예시",
+      flash: "플래시",
+    },
+    en: {
+      vocabulary: "Vocabulary",
+      grammar: "Grammar",
+      reading: "Reading",
+      flashcards: "Flashcards",
+      typing: "Typing",
+      pronunciation: "Pronunciation",
+      pattern: "Pattern",
+      practice: "Practice",
+      example: "Example",
+      flash: "Flash",
+    },
+    ja: {
+      vocabulary: "単語",
+      grammar: "文法",
+      reading: "読解",
+      flashcards: "フラッシュカード",
+      typing: "タイピング",
+      pronunciation: "発音",
+      pattern: "パターン",
+      practice: "練習",
+      example: "例",
+      flash: "フラッシュ",
+    },
+    zh: {
+      vocabulary: "词汇",
+      grammar: "语法",
+      reading: "阅读",
+      flashcards: "闪卡",
+      typing: "打字",
+      pronunciation: "发音",
+      pattern: "模式",
+      practice: "练习",
+      example: "例子",
+      flash: "闪现",
+    },
+  };
+
+  return translations[currentUILanguage]?.[key] || key;
 }
 
 // 필터 옵션 업데이트 함수 (언어 변경 시 호출)
