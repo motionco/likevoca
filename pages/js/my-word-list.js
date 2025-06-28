@@ -164,54 +164,77 @@ async function loadBookmarkedConcepts() {
 
     // 1. 사용자의 북마크 목록 가져오기
     const bookmarksRef = doc(db, "bookmarks", userEmail);
+    console.log("🔍 북마크 문서 참조:", bookmarksRef.path);
+
     const bookmarkDoc = await getDoc(bookmarksRef);
+    console.log("📄 북마크 문서 존재 여부:", bookmarkDoc.exists());
 
     if (!bookmarkDoc.exists()) {
-      console.log("📝 북마크 문서가 존재하지 않음");
+      console.log(
+        "📝 북마크 문서가 존재하지 않음 - 새 사용자이거나 아직 북마크하지 않음"
+      );
       userBookmarks = [];
       bookmarkedConcepts = [];
+      updateUI(); // UI 업데이트 추가
       return;
     }
 
-    userBookmarks = bookmarkDoc.data().concept_ids || [];
+    const bookmarkData = bookmarkDoc.data();
+    console.log("📋 북마크 문서 원본 데이터:", bookmarkData);
+
+    userBookmarks = bookmarkData.concept_ids || [];
     console.log("🔖 사용자 북마크 목록:", userBookmarks);
+    console.log("📊 북마크 개수:", userBookmarks.length);
 
     if (userBookmarks.length === 0) {
       console.log("📭 북마크된 개념이 없음");
       bookmarkedConcepts = [];
+      updateUI(); // UI 업데이트 추가
       return;
     }
 
     // 2. 북마크된 개념들의 세부 정보 가져오기
     bookmarkedConcepts = [];
+    console.log("🔄 북마크된 개념들의 세부 정보 로딩 시작...");
 
     // 배치로 처리하여 성능 향상
     const batchSize = 10;
     for (let i = 0; i < userBookmarks.length; i += batchSize) {
       const batch = userBookmarks.slice(i, i + batchSize);
+      console.log(`📦 배치 ${Math.floor(i / batchSize) + 1} 처리 중:`, batch);
+
       const conceptPromises = batch.map(async (conceptId) => {
         try {
+          console.log(`🔍 개념 로딩 중: ${conceptId}`);
           const conceptRef = doc(db, "concepts", conceptId);
           const conceptDoc = await getDoc(conceptRef);
 
           if (conceptDoc.exists()) {
-            return { id: conceptDoc.id, ...conceptDoc.data() };
+            const conceptData = { id: conceptDoc.id, ...conceptDoc.data() };
+            console.log(`✅ 개념 로딩 성공: ${conceptId}`, conceptData);
+            return conceptData;
+          } else {
+            console.warn(`⚠️ 개념을 찾을 수 없음: ${conceptId}`);
+            return null;
           }
-          return null;
         } catch (error) {
-          console.error(
-            `${getI18nText("error_loading_bookmarks")} ${conceptId}`,
-            error
-          );
+          console.error(`❌ 개념 로딩 오류 ${conceptId}:`, error);
           return null;
         }
       });
 
       const batchResults = await Promise.all(conceptPromises);
-      bookmarkedConcepts.push(
-        ...batchResults.filter((concept) => concept !== null)
+      const validConcepts = batchResults.filter((concept) => concept !== null);
+      console.log(
+        `📊 배치 결과 - 성공: ${validConcepts.length}, 실패: ${
+          batchResults.length - validConcepts.length
+        }`
       );
+
+      bookmarkedConcepts.push(...validConcepts);
     }
+
+    console.log("📈 총 로딩된 개념 수:", bookmarkedConcepts.length);
 
     // 최신순으로 정렬 (북마크 순서 기준)
     bookmarkedConcepts.sort((a, b) => {
@@ -225,9 +248,18 @@ async function loadBookmarkedConcepts() {
     console.log("✅ 북마크 로드 완료:", {
       총개념수: bookmarkedConcepts.length,
       필터링된개념수: filteredConcepts.length,
+      북마크ID목록: userBookmarks,
+      로딩된개념들: bookmarkedConcepts.map((c) => ({
+        id: c.id,
+        word:
+          c.expressions?.korean?.word || c.expressions?.english?.word || "N/A",
+      })),
     });
+
+    // UI 업데이트
+    updateUI();
   } catch (error) {
-    console.error(getI18nText("error_loading_bookmarks"), error);
+    console.error("❌ 북마크 로딩 전체 오류:", error);
     bookmarkedConcepts = [];
     filteredConcepts = [];
 
@@ -236,14 +268,16 @@ async function loadBookmarkedConcepts() {
       error.code === "unavailable" ||
       error.message.includes("QUIC_PROTOCOL_ERROR")
     ) {
-      console.warn("Firebase 연결 오류 감지, 재시도 중...");
-      // 3초 후 재시도
+      console.warn("🔄 Firebase 연결 오류 감지, 3초 후 재시도...");
       setTimeout(() => {
         if (currentUser) {
           loadBookmarkedConcepts();
         }
       }, 3000);
     }
+
+    // UI 업데이트 (오류 상태라도)
+    updateUI();
   }
 }
 
@@ -294,6 +328,19 @@ function displayConceptList() {
   const conceptsToShow = filteredConcepts.slice(0, displayCount);
 
   if (conceptsToShow.length === 0) {
+    const debugInfo = `
+      <div class="text-xs text-gray-400 mt-4 p-3 bg-gray-50 rounded">
+        디버깅 정보:<br>
+        - 로그인 상태: ${currentUser ? "✅ 로그인됨" : "❌ 로그인 안됨"}<br>
+        - 북마크 ID 개수: ${userBookmarks.length}<br>
+        - 로딩된 개념 개수: ${bookmarkedConcepts.length}<br>
+        - 필터링된 개념 개수: ${filteredConcepts.length}<br>
+        - 북마크 ID들: ${userBookmarks.slice(0, 3).join(", ")}${
+      userBookmarks.length > 3 ? "..." : ""
+    }
+      </div>
+    `;
+
     conceptList.innerHTML = `
       <div class="col-span-full text-center py-12">
         <i class="fas fa-bookmark text-6xl text-gray-300 mb-4"></i>
@@ -302,11 +349,12 @@ function displayConceptList() {
         )}</h3>
         <p class="text-gray-500 mb-6">${getI18nText("no_bookmarks_desc")}</p>
         <a
-          href="multilingual-dictionary.html"
+          href="vocabulary.html"
           class="bg-[#4B63AC] text-white px-6 py-3 rounded-lg hover:bg-[#3A4F8B] transition duration-300 inline-flex items-center"
         >
           <i class="fas fa-search mr-2"></i> ${getI18nText("browse_words")}
         </a>
+        ${debugInfo}
       </div>
     `;
     if (loadMoreBtn) loadMoreBtn.style.display = "none";

@@ -59,18 +59,18 @@
         "
       >
         <i class="fas fa-globe lg:mr-1"></i>
-        <span class="hidden lg:inline lg:ml-1">KR</span>
+        <span class="inline lg:ml-1">🇺🇸</span>
       </button>
 
       <!-- Desktop: 로그인/회원가입 버튼 (로그인 전) -->
-      <div id="desktop-login-section" class="hidden lg:flex space-x-2">
+      <div id="desktop-login-section" class="hidden lg:hidden space-x-2">
         <a
           href="#"
           id="login-button"
           onclick="goToLanguageSpecificPage('login.html')"
           class="border-2 border-white bg-[#4B63AC] text-white font-semibold px-4 py-1.5 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
           data-i18n="login"
-          >로그인</a
+          >Login</a
         >
         <a
           href="#"
@@ -78,12 +78,12 @@
           onclick="goToLanguageSpecificPage('signup.html')"
           class="border-2 border-white bg-white text-[#4B63AC] font-semibold px-4 py-1.5 text-sm rounded-lg hover:bg-[#4B63AC] hover:text-white transition duration-300"
           data-i18n="signup"
-          >회원가입</a
+          >Sign Up</a
         >
     </div>
 
       <!-- 유저 프로필 (반응형) -->
-      <div id="desktop-user-section" class="hidden items-center lg:flex">
+      <div id="desktop-user-section" class="hidden items-center lg:hidden">
     <div
       id="user-profile"
           class="relative flex items-center text-white"
@@ -110,7 +110,7 @@
               data-i18n="wordbook"
               data-i18n-link="my-word-list.html"
             >
-              단어장
+              My Vocabulary
             </a>
             <a
               href="profile.html"
@@ -151,53 +151,15 @@
         onclick="goToLanguageSpecificPage('login.html')"
         class="border-2 border-white bg-[#4B63AC] text-white font-semibold px-5 py-2 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
         data-i18n="login"
-        >로그인</a
+        >Login</a
       >
       <a
         href="#"
         onclick="goToLanguageSpecificPage('signup.html')"
         class="border-2 border-white bg-[#4B63AC] text-white font-semibold px-5 py-2 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
         data-i18n="signup"
-        >회원가입</a
+        >Sign Up</a
       >
-    </div>
-
-    <!-- 모바일 유저 프로필 -->
-    <div id="mobile-user-section" class="hidden flex-col items-center space-y-2">
-      <div class="flex items-center space-x-3">
-        <div
-          id="mobile-avatar"
-          class="w-10 h-10 rounded-full overflow-hidden border-2 border-white"
-        >
-          <img id="mobile-profile-image" src="" alt="프로필" class="w-full h-full object-cover" />
-        </div>
-        <span id="mobile-user-name" class="text-white font-semibold"></span>
-      </div>
-      <div class="flex flex-col space-y-2 w-full max-w-xs">
-        <a
-          href="my-word-list.html"
-          class="text-center border-2 border-white bg-[#4B63AC] text-white font-semibold px-4 py-2 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
-          data-i18n="wordbook"
-          data-i18n-link="my-word-list.html"
-        >
-          단어장
-        </a>
-        <a
-          href="profile.html"
-          class="text-center border-2 border-white bg-[#4B63AC] text-white font-semibold px-4 py-2 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
-          data-i18n="profile"
-          data-i18n-link="profile.html"
-        >
-          프로필
-        </a>
-        <button
-          id="mobile-logout-button"
-          class="border-2 border-white bg-[#4B63AC] text-white font-semibold px-4 py-2 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
-          data-i18n="logout"
-        >
-          로그아웃
-        </button>
-      </div>
     </div>
 
   </div>

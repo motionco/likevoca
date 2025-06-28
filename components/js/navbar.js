@@ -127,13 +127,6 @@ function initializeNavbar(currentLanguage) {
     console.log("로그아웃 버튼 이벤트 설정 완료");
   }
 
-  // 모바일 로그아웃 버튼
-  const mobileLogoutButton = document.getElementById("mobile-logout-button");
-  if (mobileLogoutButton) {
-    mobileLogoutButton.addEventListener("click", handleLogout);
-    console.log("모바일 로그아웃 버튼 이벤트 설정 완료");
-  }
-
   // 로그인 상태 확인 및 UI 업데이트
   checkAuthStatus();
   console.log("네비게이션 바 초기화 완료");
@@ -263,14 +256,19 @@ function updateLanguageButton(currentLanguage) {
   const languageButton = document.getElementById("language-button");
   if (languageButton) {
     const languageMap = {
-      ko: "KO",
-      en: "EN",
-      ja: "JA",
-      zh: "ZH",
+      ko: "🇰🇷",
+      en: "🇺🇸",
+      ja: "🇯🇵",
+      zh: "🇨🇳",
     };
-    const buttonText = languageMap[currentLanguage] || "KO";
-    languageButton.textContent = buttonText;
-    console.log("언어 버튼 업데이트:", buttonText);
+    const flagEmoji = languageMap[currentLanguage] || "🇰🇷";
+
+    // 버튼 내부의 span 요소 찾기
+    const spanElement = languageButton.querySelector("span");
+    if (spanElement) {
+      spanElement.textContent = flagEmoji;
+    }
+    console.log("언어 버튼 업데이트:", flagEmoji);
   }
 }
 
@@ -329,25 +327,11 @@ function updateUserProfile(user) {
     console.log("✅ 프로필 이미지 설정:", user.photoURL);
   }
 
-  // 모바일 프로필 이미지 업데이트
-  const mobileProfileImage = document.getElementById("mobile-profile-image");
-  if (mobileProfileImage && user.photoURL) {
-    mobileProfileImage.src = user.photoURL;
-    console.log("✅ 모바일 프로필 이미지 설정:", user.photoURL);
-  }
-
   // 사용자 이름 업데이트
   const userName = document.getElementById("user-name");
   if (userName) {
     userName.textContent = user.displayName || user.email;
     console.log("✅ 사용자 이름 설정:", user.displayName || user.email);
-  }
-
-  // 모바일 사용자 이름 업데이트
-  const mobileUserName = document.getElementById("mobile-user-name");
-  if (mobileUserName) {
-    mobileUserName.textContent = user.displayName || user.email;
-    console.log("✅ 모바일 사용자 이름 설정:", user.displayName || user.email);
   }
 }
 
@@ -358,50 +342,40 @@ function updateUIBasedOnAuth(isLoggedIn) {
   const desktopLoginSection = document.getElementById("desktop-login-section");
   const desktopUserSection = document.getElementById("desktop-user-section");
   const mobileLoginButtons = document.getElementById("mobile-login-buttons");
-  const mobileUserSection = document.getElementById("mobile-user-section");
 
   console.log("🔍 UI 요소 확인:", {
     desktopLoginSection: !!desktopLoginSection,
     desktopUserSection: !!desktopUserSection,
     mobileLoginButtons: !!mobileLoginButtons,
-    mobileUserSection: !!mobileUserSection,
   });
 
   if (isLoggedIn) {
     // 로그인된 상태: 로그인 버튼 숨기고 유저 프로필 표시
     if (desktopLoginSection) {
-      desktopLoginSection.classList.add("hidden");
+      desktopLoginSection.className = "hidden space-x-2";
       console.log("✅ 데스크톱 로그인 섹션 숨김");
     }
     if (desktopUserSection) {
-      desktopUserSection.classList.remove("hidden");
+      desktopUserSection.className = "flex items-center lg:flex";
       console.log("✅ 데스크톱 유저 섹션 표시");
     }
     if (mobileLoginButtons) {
       mobileLoginButtons.classList.add("hidden");
       console.log("✅ 모바일 로그인 버튼 숨김");
     }
-    if (mobileUserSection) {
-      mobileUserSection.classList.remove("hidden");
-      console.log("✅ 모바일 유저 섹션 표시");
-    }
   } else {
     // 로그인되지 않은 상태: 유저 프로필 숨기고 로그인 버튼 표시
     if (desktopLoginSection) {
-      desktopLoginSection.classList.remove("hidden");
+      desktopLoginSection.className = "flex lg:flex space-x-2";
       console.log("✅ 데스크톱 로그인 섹션 표시");
     }
     if (desktopUserSection) {
-      desktopUserSection.classList.add("hidden");
+      desktopUserSection.className = "hidden items-center lg:hidden";
       console.log("✅ 데스크톱 유저 섹션 숨김");
     }
     if (mobileLoginButtons) {
       mobileLoginButtons.classList.remove("hidden");
       console.log("✅ 모바일 로그인 버튼 표시");
-    }
-    if (mobileUserSection) {
-      mobileUserSection.classList.add("hidden");
-      console.log("✅ 모바일 유저 섹션 숨김");
     }
   }
 

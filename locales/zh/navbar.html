@@ -1,4 +1,4 @@
-﻿<nav class="bg-[#4B63AC] p-4 shadow-md">
+<nav class="bg-[#4B63AC] p-4 shadow-md">
   <div class="container mx-auto flex justify-between items-center max-w-6xl">
     <!-- 왼쪽: 햄버거 메뉴 (모바일) + 로고 -->
     <div class="flex items-center">
@@ -55,21 +55,23 @@
         "
       >
         <i class="fas fa-globe lg:mr-1"></i>
-        <span class="hidden lg:inline lg:ml-1">ZH</span>
+        <span class="inline lg:ml-1">🇨🇳</span>
       </button>
 
       <!-- Desktop: 로그인/회원가입 버튼 (로그인 전) -->
-      <div id="desktop-login-section" class="hidden lg:flex space-x-2">
+      <div id="desktop-login-section" class="hidden lg:hidden space-x-2">
         <a
-          href="/login.html"
+          href="#"
           id="login-button"
+          onclick="goToLanguageSpecificPage('login.html')"
           class="border-2 border-white bg-[#4B63AC] text-white font-semibold px-4 py-1.5 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
           data-i18n="login"
           >登录</a
         >
         <a
-          href="/signup.html"
+          href="#"
           id="signup-button"
+          onclick="goToLanguageSpecificPage('signup.html')"
           class="border-2 border-white bg-white text-[#4B63AC] font-semibold px-4 py-1.5 text-sm rounded-lg hover:bg-[#4B63AC] hover:text-white transition duration-300"
           data-i18n="signup"
           >注册</a
@@ -77,7 +79,7 @@
     </div>
 
       <!-- 유저 프로필 (반응형) -->
-      <div id="desktop-user-section" class="hidden items-center lg:flex">
+      <div id="desktop-user-section" class="hidden items-center lg:hidden">
     <div
       id="user-profile"
           class="relative flex items-center text-white"
@@ -102,13 +104,15 @@
               href="my-word-list.html"
               class="block w-full text-left px-4 py-2 hover:bg-gray-100"
               data-i18n="wordbook"
+              data-i18n-link="my-word-list.html"
             >
-              我的词汇表
+              我的单词本
             </a>
             <a
-              href="/profile.html"
+              href="profile.html"
               class="block w-full text-left px-4 py-2 hover:bg-gray-100"
               data-i18n="profile"
+              data-i18n-link="profile.html"
         >
               个人资料
             </a>
@@ -117,7 +121,7 @@
           class="block w-full text-left px-4 py-2 hover:bg-gray-100"
           data-i18n="logout"
         >
-              退出登录
+          退出登录
         </button>
           </div>
         </div>
@@ -139,18 +143,21 @@
 
     <div id="mobile-login-buttons" class="flex space-x-3">
       <a
-        href="/login.html"
+        href="#"
+        onclick="goToLanguageSpecificPage('login.html')"
         class="border-2 border-white bg-[#4B63AC] text-white font-semibold px-5 py-2 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
         data-i18n="login"
         >登录</a
       >
       <a
-        href="/signup.html"
+        href="#"
+        onclick="goToLanguageSpecificPage('signup.html')"
         class="border-2 border-white bg-[#4B63AC] text-white font-semibold px-5 py-2 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
         data-i18n="signup"
         >注册</a
       >
     </div>
+
   </div>
 </nav>
 
@@ -194,6 +201,20 @@ function goToHome() {
 // 루트 파일로 이동 (로그인, 회원가입, 프로필)
 function goToRoot(filename) {
     window.location.href = `/${filename}`;
+}
+
+// 언어별 페이지로 이동하는 함수
+function goToLanguageSpecificPage(filename) {
+  const userLanguage = localStorage.getItem('userLanguage') || 'ko';
+  const isDev = window.location.hostname === 'localhost' || 
+               window.location.hostname === '127.0.0.1' ||
+               window.location.port === '5500';
+  
+  if (isDev) {
+    window.location.href = `/locales/${userLanguage}/${filename}`;
+  } else {
+    window.location.href = `/${userLanguage}/${filename}`;
+  }
 }
 </script>
 

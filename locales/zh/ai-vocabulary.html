@@ -96,14 +96,14 @@
     <main class="container mx-auto max-w-7xl px-4 py-8">
       <div class="flex justify-between items-center mb-8">
         <h1 class="text-3xl font-bold text-gray-800" data-i18n="ai_vocabulary">
-          AI 단어장
+          AI词汇本
         </h1>
         <button
           id="ai-add-concept"
           class="bg-[#4B63AC] text-white px-4 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300 flex items-center"
           data-i18n="ai_recommend_concept"
         >
-          <i class="fas fa-robot mr-2"></i> AI 개념 추천받기
+          <i class="fas fa-robot mr-2"></i> 获取AI概念推荐
         </button>
       </div>
 
@@ -115,14 +115,13 @@
               for="search-input"
               class="hidden md:block text-sm font-medium mb-1 text-gray-700"
               data-i18n="search"
-              >검색</label
-            >
+            >搜索</label>
             <div class="relative">
               <input
                 type="text"
                 id="search-input"
                 class="w-full p-2 border rounded pl-8 h-10"
-                placeholder="검색어 입력..."
+                placeholder="输入搜索词..."
                 data-i18n-placeholder="search_placeholder"
               />
               <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
@@ -134,23 +133,22 @@
             <label
               class="block text-sm font-medium mb-1 text-gray-700"
               data-i18n="language_filter"
-              >언어 필터</label
-            >
+            >语言筛选</label>
             <div class="grid grid-cols-5 gap-1 h-10">
               <select
                 id="source-language"
                 class="col-span-2 p-2 border rounded text-sm"
               >
-                <option value="korean" data-i18n="korean">한국어</option>
-                <option value="english" data-i18n="english">영어</option>
-                <option value="japanese" data-i18n="japanese">일본어</option>
-                <option value="chinese" data-i18n="chinese">중국어</option>
+                <option value="korean" data-i18n="korean">韩语</option>
+                <option value="english" data-i18n="english">英语</option>
+                <option value="japanese" data-i18n="japanese">日语</option>
+                <option value="chinese" data-i18n="chinese">中文</option>
               </select>
 
               <button
                 id="swap-languages"
                 class="w-full h-full text-gray-600 hover:text-[#4B63AC] hover:bg-gray-100 rounded-lg transition duration-200 border border-gray-300 hover:border-[#4B63AC] flex items-center justify-center"
-                title="언어 순서 바꾸기"
+                title="交换语言顺序"
                 data-i18n-title="swap_languages"
               >
                 <i class="fas fa-exchange-alt text-sm"></i>
@@ -160,10 +158,10 @@
                 id="target-language"
                 class="col-span-2 p-2 border rounded text-sm"
               >
-                <option value="english" data-i18n="english">영어</option>
-                <option value="korean" data-i18n="korean">한국어</option>
-                <option value="japanese" data-i18n="japanese">일본어</option>
-                <option value="chinese" data-i18n="chinese">중국어</option>
+                <option value="english" data-i18n="english">英语</option>
+                <option value="korean" data-i18n="korean">韩语</option>
+                <option value="japanese" data-i18n="japanese">日语</option>
+                <option value="chinese" data-i18n="chinese">中文</option>
               </select>
             </div>
           </div>
@@ -172,30 +170,30 @@
           <div class="w-full">
             <div class="grid grid-cols-2 gap-2">
               <div>
-                <label for="domain-filter" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="domain">도메인</label>
+                <label for="domain-filter" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="domain">领域</label>
                 <select id="domain-filter" class="w-full p-2 border rounded h-10 text-sm">
-                  <option value="all" data-i18n="all_domains">전체 도메인</option>
-                  <option value="daily" data-i18n="domain_daily">일상</option>
-                  <option value="food" data-i18n="domain_food">음식</option>
-                  <option value="travel" data-i18n="domain_travel">여행</option>
-                  <option value="business" data-i18n="domain_business">비즈니스</option>
-                  <option value="education" data-i18n="domain_education">교육</option>
-                  <option value="nature" data-i18n="domain_nature">자연</option>
-                  <option value="technology" data-i18n="domain_technology">기술</option>
-                  <option value="health" data-i18n="domain_health">건강</option>
-                  <option value="sports" data-i18n="domain_sports">스포츠</option>
-                  <option value="entertainment" data-i18n="domain_entertainment">엔터테인먼트</option>
-                  <option value="culture" data-i18n="domain_culture">문화</option>
-                  <option value="other" data-i18n="domain_other">기타</option>
+                  <option value="all" data-i18n="all_domains">所有领域</option>
+                  <option value="daily" data-i18n="domain_daily">日常生活</option>
+                  <option value="food" data-i18n="domain_food">食物</option>
+                  <option value="travel" data-i18n="domain_travel">旅行</option>
+                  <option value="business" data-i18n="domain_business">商务</option>
+                  <option value="education" data-i18n="domain_education">教育</option>
+                  <option value="nature" data-i18n="domain_nature">自然</option>
+                  <option value="technology" data-i18n="domain_technology">技术</option>
+                  <option value="health" data-i18n="domain_health">健康</option>
+                  <option value="sports" data-i18n="domain_sports">体育</option>
+                  <option value="entertainment" data-i18n="domain_entertainment">娱乐</option>
+                  <option value="culture" data-i18n="domain_culture">文化</option>
+                  <option value="other" data-i18n="domain_other">其他</option>
                 </select>
               </div>
               <div>
-                <label for="sort-filter" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="sort">정렬</label>
+                <label for="sort-filter" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="sort">排序</label>
                 <select id="sort-filter" class="w-full p-2 border rounded h-10 text-sm">
-                  <option value="latest" data-i18n="latest">최신순</option>
-                  <option value="oldest" data-i18n="oldest">오래된순</option>
-                  <option value="alphabetical" data-i18n="alphabetical">가나다순</option>
-                  <option value="reverse_alphabetical" data-i18n="reverse_alphabetical">역가나다순</option>
+                  <option value="latest" data-i18n="latest">最新</option>
+                  <option value="oldest" data-i18n="oldest">最旧</option>
+                  <option value="alphabetical" data-i18n="alphabetical">字母顺序</option>
+                  <option value="reverse_alphabetical" data-i18n="reverse_alphabetical">字母倒序</option>
                 </select>
               </div>
             </div>
@@ -208,15 +206,14 @@
         >
           <div class="text-sm text-gray-600">
             <span id="filtered-count">0</span
-            ><span data-i18n="concept_count">개의 개념</span>
+            ><span data-i18n="concept_count">个概念</span>
           </div>
 
           <div class="flex items-center gap-4 w-full md:w-auto">
             <span
               class="text-sm font-medium text-gray-700 whitespace-nowrap"
               data-i18n="ai_usage"
-              >AI 사용량:</span
-            >
+            >AI使用量:</span>
             <div class="flex items-center gap-2 min-w-[200px]">
               <div class="flex-1 bg-gray-200 rounded-full h-2.5">
                 <div
@@ -248,7 +245,7 @@
           class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-6 rounded-lg transition duration-300 hidden"
           data-i18n="load_more"
         >
-          더 보기 <i class="fas fa-chevron-down ml-1"></i>
+          加载更多 <i class="fas fa-chevron-down ml-1"></i>
         </button>
       </div>
     </main>
@@ -257,7 +254,8 @@
 
     <!-- Firebase -->
     <script type="module" src="../../js/firebase/firebase-init.js"></script>
-    <script type="module" src="../../js/ai-vocabulary.js"></script>
+    <script type="module" src="../../pages/js/ai-vocabulary.js"></script>
+    <script type="module" src="../../components/js/navbar.js"></script>
     <script type="module">
       import { updateMetadata } from "../../utils/language-utils.js";
 

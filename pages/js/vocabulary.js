@@ -1993,35 +1993,54 @@ async function toggleBookmark(conceptId) {
     return;
   }
 
+  console.log("🔖 북마크 토글 시작:", conceptId);
+  console.log("👤 현재 사용자:", auth.currentUser.email);
+
   try {
     const userEmail = auth.currentUser.email;
     const bookmarksRef = doc(db, "bookmarks", userEmail);
+    console.log("📄 북마크 문서 참조:", bookmarksRef.path);
 
     let updatedBookmarks;
     const isBookmarked = userBookmarks.includes(conceptId);
+    console.log("📊 현재 북마크 상태:", {
+      개념ID: conceptId,
+      이미북마크됨: isBookmarked,
+      현재북마크목록: userBookmarks,
+      북마크개수: userBookmarks.length,
+    });
 
     if (isBookmarked) {
       // 북마크 제거
       updatedBookmarks = userBookmarks.filter((id) => id !== conceptId);
+      console.log("➖ 북마크 제거 - 새 목록:", updatedBookmarks);
       showMessage("북마크가 제거되었습니다.", "success");
     } else {
       // 북마크 추가
       updatedBookmarks = [...userBookmarks, conceptId];
+      console.log("➕ 북마크 추가 - 새 목록:", updatedBookmarks);
       showMessage("북마크가 추가되었습니다.", "success");
     }
 
     // Firestore 업데이트
-    await setDoc(bookmarksRef, {
+    const bookmarkData = {
       user_email: userEmail,
       concept_ids: updatedBookmarks,
       updated_at: new Date().toISOString(),
-    });
+    };
+    console.log("💾 Firestore에 저장할 데이터:", bookmarkData);
+
+    await setDoc(bookmarksRef, bookmarkData);
+    console.log("✅ Firestore 업데이트 완료");
 
     // 로컬 상태 업데이트
     userBookmarks = updatedBookmarks;
+    console.log("🔄 로컬 상태 업데이트 완료 - 새 북마크 목록:", userBookmarks);
+
     updateBookmarkUI();
+    console.log("🎨 UI 업데이트 완료");
   } catch (error) {
-    console.error("북마크 토글 오류:", error);
+    console.error("❌ 북마크 토글 오류:", error);
     showError("북마크 처리 중 오류가 발생했습니다.");
   }
 }
