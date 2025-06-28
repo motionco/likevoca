@@ -635,19 +635,24 @@ async function applyLanguage() {
 
     elements.forEach((element, index) => {
       const key = element.getAttribute("data-i18n");
-      // 올바른 번역 데이터 접근
-      const translationText = currentTranslations
-        ? currentTranslations[key]
-        : null;
+      const translation = currentTranslations ? currentTranslations[key] : null;
 
-      if (translationText) {
-        const oldText = element.textContent;
-        element.textContent = translationText;
+      if (translation && translation !== element.textContent.trim()) {
+        const previousText = element.textContent.trim();
+        element.textContent = translation;
         console.log(
-          `✅ 번역 적용 [${index}]: ${key} -> "${translationText}" (이전: "${oldText}")`
+          `✅ 번역 적용 [${index}]: ${key} -> "${translation}" (이전: "${previousText}")`
         );
-      } else {
-        console.warn(`❌ 번역 키 없음 [${index}]: ${key}`);
+      }
+    });
+
+    // data-i18n-link 속성을 가진 요소들의 링크 업데이트
+    const linkElements = document.querySelectorAll("[data-i18n-link]");
+    linkElements.forEach((element) => {
+      const originalHref = element.getAttribute("data-i18n-link");
+      if (originalHref) {
+        const updatedHref = updateLinkForLanguage(originalHref, langCode);
+        element.setAttribute("href", updatedHref);
       }
     });
 
@@ -959,6 +964,34 @@ if (typeof window !== "undefined") {
   window.goToLanguageSpecificPage = goToLanguageSpecificPage;
   window.redirectToLogin = redirectToLogin;
   window.redirectToSignup = redirectToSignup;
+}
+
+// 언어별 링크 업데이트 함수
+function updateLinkForLanguage(originalHref, language) {
+  // 개발 환경 감지
+  const isDevelopment =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1" ||
+    window.location.port === "5500";
+
+  // 현재 경로 정보
+  const currentPath = window.location.pathname;
+
+  if (isDevelopment) {
+    // 개발 환경: /locales/{language}/
+    if (currentPath.includes("/locales/")) {
+      return originalHref; // 상대 경로 그대로 사용
+    } else {
+      return `/locales/${language}/${originalHref}`;
+    }
+  } else {
+    // 배포 환경: /{language}/
+    if (currentPath.match(/^\/(ko|en|ja|zh)\//)) {
+      return originalHref; // 상대 경로 그대로 사용
+    } else {
+      return `/${language}/${originalHref}`;
+    }
+  }
 }
 
 export {

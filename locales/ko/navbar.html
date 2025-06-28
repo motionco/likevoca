@@ -2,12 +2,12 @@
   <div class="container mx-auto flex justify-between items-center max-w-6xl">
     <!-- 왼쪽: 햄버거 메뉴 (모바일) + 로고 -->
     <div class="flex items-center">
-      <button
-        id="menu-toggle"
+    <button
+      id="menu-toggle"
         class="text-white text-2xl lg:hidden mr-3"
-      >
-        <i class="fa-solid fa-bars"></i>
-      </button>
+    >
+      <i class="fa-solid fa-bars"></i>
+    </button>
 
       <a
         href="index.html"
@@ -19,25 +19,29 @@
     <!-- 중앙: 네비게이션 메뉴 (데스크톱만) -->
     <ul id="nav-menu" class="hidden lg:flex space-x-10 items-center">
       <li>
-        <a href="vocabulary.html" class="text-xl text-white hover:text-yellow-400" data-i18n="vocabulary">단어장</a>
+        <a href="vocabulary.html" class="text-xl text-white hover:text-yellow-400" data-i18n="vocabulary" data-i18n-link="vocabulary.html"
+          >단어장</a
+        >
       </li>
       <li>
-        <a href="ai-vocabulary.html" class="text-xl text-white hover:text-yellow-400" data-i18n="ai_vocabulary">AI 단어장</a>
+        <a href="ai-vocabulary.html" class="text-xl text-white hover:text-yellow-400" data-i18n="ai_vocabulary" data-i18n-link="ai-vocabulary.html">AI 단어장</a>
       </li>
       <li>
-        <a href="quiz.html" class="text-xl text-white hover:text-yellow-400" data-i18n="quiz">퀴즈</a>
+        <a href="quiz.html" class="text-xl text-white hover:text-yellow-400" data-i18n="quiz" data-i18n-link="quiz.html">퀴즈</a>
       </li>
       <li>
-        <a href="games.html" class="text-xl text-white hover:text-yellow-400" data-i18n="games">게임</a>
+        <a href="games.html" class="text-xl text-white hover:text-yellow-400" data-i18n="games" data-i18n-link="games.html">게임</a>
       </li>
       <li>
-        <a href="learning.html" class="text-xl text-white hover:text-yellow-400" data-i18n="learning_title">학습</a>
+        <a href="learning.html" class="text-xl text-white hover:text-yellow-400" data-i18n="learning_title" data-i18n-link="learning.html">학습</a>
       </li>
       <li>
-        <a href="progress.html" class="text-xl text-white hover:text-yellow-400" data-i18n="progress">진도</a>
+        <a href="progress.html" class="text-xl text-white hover:text-yellow-400" data-i18n="progress" data-i18n-link="progress.html">진도</a>
       </li>
       <li>
-        <a href="inquiry.html" class="text-xl text-white hover:text-yellow-400" data-i18n="inquiry">문의하기</a>
+        <a href="inquiry.html" class="text-xl text-white hover:text-yellow-400" data-i18n="inquiry" data-i18n-link="inquiry.html"
+          >문의하기</a
+        >
       </li>
     </ul>
 
@@ -61,64 +65,68 @@
       <!-- Desktop: 로그인/회원가입 버튼 (로그인 전) -->
       <div id="desktop-login-section" class="hidden lg:flex space-x-2">
         <a
-          href="/login.html"
+          href="#"
           id="login-button"
+          onclick="goToLanguageSpecificPage('login.html')"
           class="border-2 border-white bg-[#4B63AC] text-white font-semibold px-4 py-1.5 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
           data-i18n="login"
           >로그인</a
         >
         <a
-          href="/signup.html"
+          href="#"
           id="signup-button"
+          onclick="goToLanguageSpecificPage('signup.html')"
           class="border-2 border-white bg-white text-[#4B63AC] font-semibold px-4 py-1.5 text-sm rounded-lg hover:bg-[#4B63AC] hover:text-white transition duration-300"
           data-i18n="signup"
           >회원가입</a
         >
-      </div>
+    </div>
 
       <!-- 유저 프로필 (반응형) -->
       <div id="desktop-user-section" class="hidden items-center lg:flex">
-        <div
-          id="user-profile"
+    <div
+      id="user-profile"
           class="relative flex items-center text-white"
-        >
+    >
           <div id="avatar-container" class="cursor-pointer">
-            <div
-              id="avatar"
+        <div
+          id="avatar"
               class="w-8 h-8 lg:w-10 lg:h-10 rounded-full overflow-hidden border-2 border-white"
-            >
-              <img id="avatar-img" src="" alt="프로필" class="w-full h-full object-cover" />
-            </div>
-          </div>
+        >
+          <img id="profile-image" src="" alt="프로필" class="w-full h-full object-cover" />
+        </div>
+      </div>
 
-          <div
-            id="profile-dropdown"
+      <div
+        id="profile-dropdown"
             class="hidden absolute top-12 right-0 bg-white shadow-lg rounded-lg py-2 w-48 text-gray-900 z-50"
-          >
-            <div class="px-4 py-2 font-semibold border-b border-gray-200">
-              <span id="user-name"></span>
-            </div>
+      >
+        <div class="px-4 py-2 font-semibold border-b border-gray-200">
+          <span id="user-name"></span>
+        </div>
             <a
               href="my-word-list.html"
               class="block w-full text-left px-4 py-2 hover:bg-gray-100"
               data-i18n="wordbook"
+              data-i18n-link="my-word-list.html"
             >
               단어장
             </a>
             <a
-              href="/profile.html"
+              href="profile.html"
               class="block w-full text-left px-4 py-2 hover:bg-gray-100"
               data-i18n="profile"
-            >
+              data-i18n-link="profile.html"
+        >
               프로필
             </a>
-            <button
-              id="logout-button"
-              class="block w-full text-left px-4 py-2 hover:bg-gray-100"
-              data-i18n="logout"
-            >
-              로그아웃
-            </button>
+        <button
+          id="logout-button"
+          class="block w-full text-left px-4 py-2 hover:bg-gray-100"
+          data-i18n="logout"
+        >
+          로그아웃
+        </button>
           </div>
         </div>
       </div>
@@ -129,71 +137,86 @@
     id="mobile-menu"
     class="hidden flex flex-col items-center space-y-4 bg-[#4B63AC] text-white p-3 lg:hidden"
   >
-    <a href="vocabulary.html" class="text-lg hover:text-yellow-400" data-i18n="vocabulary">단어장</a>
-    <a href="ai-vocabulary.html" class="text-lg hover:text-yellow-400" data-i18n="ai_vocabulary">AI 단어장</a>
-    <a href="quiz.html" class="text-lg hover:text-yellow-400" data-i18n="quiz">퀴즈</a>
-    <a href="games.html" class="text-lg hover:text-yellow-400" data-i18n="games">게임</a>
-    <a href="learning.html" class="text-lg hover:text-yellow-400" data-i18n="learning_title">학습</a>
-    <a href="progress.html" class="text-lg hover:text-yellow-400" data-i18n="progress">진도</a>
-    <a href="inquiry.html" class="text-lg hover:text-yellow-400" data-i18n="inquiry">문의하기</a>
+    <a href="vocabulary.html" class="text-lg hover:text-yellow-400" data-i18n="vocabulary" data-i18n-link="vocabulary.html">단어장</a>
+    <a href="ai-vocabulary.html" class="text-lg hover:text-yellow-400" data-i18n="ai_vocabulary" data-i18n-link="ai-vocabulary.html">AI 단어장</a>
+    <a href="quiz.html" class="text-lg hover:text-yellow-400" data-i18n="quiz" data-i18n-link="quiz.html">퀴즈</a>
+    <a href="games.html" class="text-lg hover:text-yellow-400" data-i18n="games" data-i18n-link="games.html">게임</a>
+    <a href="learning.html" class="text-lg hover:text-yellow-400" data-i18n="learning_title" data-i18n-link="learning.html">학습</a>
+    <a href="progress.html" class="text-lg hover:text-yellow-400" data-i18n="progress" data-i18n-link="progress.html">진도</a>
+    <a href="inquiry.html" class="text-lg hover:text-yellow-400" data-i18n="inquiry" data-i18n-link="inquiry.html">문의하기</a>
 
     <div id="mobile-login-buttons" class="flex space-x-3">
       <a
-        href="/login.html"
+        href="#"
+        onclick="goToLanguageSpecificPage('login.html')"
         class="border-2 border-white bg-[#4B63AC] text-white font-semibold px-5 py-2 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
         data-i18n="login"
         >로그인</a
       >
       <a
-        href="/signup.html"
+        href="#"
+        onclick="goToLanguageSpecificPage('signup.html')"
         class="border-2 border-white bg-[#4B63AC] text-white font-semibold px-5 py-2 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
         data-i18n="signup"
         >회원가입</a
       >
     </div>
+
+    <!-- 모바일 유저 프로필 -->
+    <div id="mobile-user-section" class="hidden flex-col items-center space-y-2">
+      <div class="flex items-center space-x-3">
+        <div
+          id="mobile-avatar"
+          class="w-10 h-10 rounded-full overflow-hidden border-2 border-white"
+        >
+          <img id="mobile-profile-image" src="" alt="프로필" class="w-full h-full object-cover" />
+        </div>
+        <span id="mobile-user-name" class="text-white font-semibold"></span>
+      </div>
+      <div class="flex flex-col space-y-2 w-full max-w-xs">
+        <a
+          href="my-word-list.html"
+          class="text-center border-2 border-white bg-[#4B63AC] text-white font-semibold px-4 py-2 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
+          data-i18n="wordbook"
+          data-i18n-link="my-word-list.html"
+        >
+          단어장
+        </a>
+        <a
+          href="profile.html"
+          class="text-center border-2 border-white bg-[#4B63AC] text-white font-semibold px-4 py-2 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
+          data-i18n="profile"
+          data-i18n-link="profile.html"
+        >
+          프로필
+        </a>
+        <button
+          id="mobile-logout-button"
+          class="border-2 border-white bg-[#4B63AC] text-white font-semibold px-4 py-2 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
+          data-i18n="logout"
+        >
+          로그아웃
+        </button>
+      </div>
+    </div>
+
   </div>
 </nav>
 
 <script>
-// 개발 환경 감지
-function isDevelopment() {
-    return window.location.hostname === 'localhost' || 
-           window.location.hostname === '127.0.0.1' ||
-           window.location.port === '5500';
-}
-
-// 현재 언어 감지
-function getCurrentLanguage() {
-    const path = window.location.pathname;
-    const langMatch = path.match(/\/(ko|en|ja|zh)\//);
-    return langMatch ? langMatch[1] : 'ko';
-}
-
-// 페이지 이동 함수
-function goToPage(filename) {
-    const currentLang = getCurrentLanguage();
-    
-    if (isDevelopment()) {
-        window.location.href = `/locales/${currentLang}/${filename}`;
-    } else {
-        window.location.href = `/${currentLang}/${filename}`;
-    }
-}
-
-// 홈으로 이동
-function goToHome() {
-    const currentLang = getCurrentLanguage();
-    
-    if (isDevelopment()) {
-        window.location.href = `/locales/${currentLang}/index.html`;
-    } else {
-        window.location.href = `/${currentLang}/index.html`;
-    }
-}
-
-// 루트 파일로 이동 (로그인, 회원가입, 프로필)
-function goToRoot(filename) {
-    window.location.href = `/${filename}`;
+// 언어별 페이지로 이동하는 함수
+function goToLanguageSpecificPage(filename) {
+  const userLanguage = localStorage.getItem('userLanguage') || 'ko';
+  const isDev = window.location.hostname === 'localhost' || 
+               window.location.hostname === '127.0.0.1' ||
+               window.location.port === '5500';
+  
+  if (isDev) {
+    window.location.href = `/locales/${userLanguage}/${filename}`;
+  } else {
+    window.location.href = `/${userLanguage}/${filename}`;
+  }
 }
 </script>
+
 
