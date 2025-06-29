@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
-<html lang="zh">
+<!DOCTYPE html>
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title data-i18n="quiz_title">LikeVoca - 퀴즈</title>
-    <link rel="icon" href="../../assets/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="../assets/favicon.ico" type="image/x-icon" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       rel="stylesheet"
@@ -238,6 +238,28 @@
       </div>
     </main>
 
-    <script type="module" src="js/quiz.js"></script>
+    <!-- 네비게이션바 스크립트 -->
+    <script src="../../components/js/navbar.js"></script>
+    
+    <!-- 언어 유틸리티 스크립트 -->
+    <script type="module">
+      import { applyLanguage, getActiveLanguage } from '../../utils/language-utils.js';
+      
+      document.addEventListener('DOMContentLoaded', async () => {
+        try {
+          console.log("퀴즈 페이지 초기화 시작");
+          
+          // 언어 설정 적용
+          const currentLanguage = await getActiveLanguage();
+          await applyLanguage(currentLanguage);
+          
+          console.log("퀴즈 페이지 초기화 완료");
+        } catch (error) {
+          console.error("퀴즈 페이지 초기화 중 오류:", error);
+        }
+      });
+    </script>
+
+    <script type="module" src="../../pages/js/quiz.js"></script>
   </body>
 </html> 

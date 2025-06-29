@@ -375,14 +375,56 @@ function displayConceptList() {
 
 // 개념 카드 생성 (다국어 단어장과 동일한 스타일)
 function createConceptCard(concept) {
+  console.log("🎨 개념 카드 생성 중:", concept.id, concept);
+
   // 새로운 구조와 기존 구조 모두 지원
   const sourceExpression = concept.expressions?.[sourceLanguage] || {};
   const targetExpression = concept.expressions?.[targetLanguage] || {};
 
-  // 빈 표현인 경우 건너뛰기
-  if (!sourceExpression.word || !targetExpression.word) {
+  console.log("📝 표현 데이터:", {
+    sourceLanguage,
+    targetLanguage,
+    sourceExpression,
+    targetExpression,
+    allExpressions: concept.expressions,
+  });
+
+  // 조건을 완화: 최소한 하나의 언어에 단어가 있으면 표시
+  const hasSourceWord = sourceExpression.word;
+  const hasTargetWord = targetExpression.word;
+
+  // 모든 언어 표현을 확인하여 최소한 하나의 단어가 있는지 확인
+  const allExpressions = concept.expressions || {};
+  const availableWords = Object.values(allExpressions)
+    .filter((expr) => expr && expr.word)
+    .map((expr) => expr.word);
+
+  console.log("🔍 사용 가능한 단어들:", availableWords);
+
+  if (availableWords.length === 0) {
+    console.warn("⚠️ 사용 가능한 단어가 없어서 카드 생성 건너뜀:", concept.id);
     return "";
   }
+
+  // 표시할 단어 결정 (우선순위: target > source > 첫 번째 사용 가능한 단어)
+  const displayWord = hasTargetWord
+    ? targetExpression.word
+    : hasSourceWord
+    ? sourceExpression.word
+    : availableWords[0];
+
+  const displayDefinition =
+    targetExpression.definition ||
+    sourceExpression.definition ||
+    Object.values(allExpressions).find((expr) => expr?.definition)
+      ?.definition ||
+    "";
+
+  console.log("✅ 카드 생성 진행:", {
+    displayWord,
+    displayDefinition,
+    conceptId: concept.id,
+  });
 
   // concept_info 가져오기 (새 구조 우선, 기존 구조 fallback)
   const conceptInfo = concept.concept_info || {
@@ -464,7 +506,9 @@ function createConceptCard(concept) {
   const conceptId =
     concept.id ||
     concept._id ||
-    `${sourceExpression.word}_${targetExpression.word}`;
+    `${sourceExpression.word || "unknown"}_${
+      targetExpression.word || "unknown"
+    }`;
 
   return `
     <div 
@@ -477,11 +521,13 @@ function createConceptCard(concept) {
           <span class="text-3xl">${emoji}</span>
           <div>
             <h3 class="text-lg font-semibold text-gray-800 mb-1">
-              ${targetExpression.word || "N/A"}
+              ${displayWord}
             </h3>
             <p class="text-sm text-gray-500">${
               targetExpression.pronunciation ||
               targetExpression.romanization ||
+              sourceExpression.pronunciation ||
+              sourceExpression.romanization ||
               ""
             }</p>
           </div>
@@ -512,22 +558,24 @@ function createConceptCard(concept) {
             };
             const envLangCode = langMap[userLanguage] || "korean";
             const envExpression = concept.expressions[envLangCode];
-            return envExpression
-              ? envExpression.word
-              : sourceExpression.word || "N/A";
+            return envExpression ? envExpression.word : displayWord;
           })()}</span>
         </div>
-        <p class="text-sm text-gray-600 mt-1">${
-          targetExpression.definition || ""
-        }</p>
+        <p class="text-sm text-gray-600 mt-1">${displayDefinition}</p>
       </div>
       
       ${
-        example && example.source && example.target
+        example && (example.source || example.target)
           ? `
       <div class="border-t border-gray-200 pt-3 mt-3">
-        <p class="text-sm text-gray-700 font-medium">${example.target}</p>
-        <p class="text-sm text-gray-500 italic">${example.source}</p>
+        <p class="text-sm text-gray-700 font-medium">${
+          example.target || example.source
+        }</p>
+        ${
+          example.source && example.target && example.source !== example.target
+            ? `<p class="text-sm text-gray-500 italic">${example.source}</p>`
+            : ""
+        }
       </div>
       `
           : ""

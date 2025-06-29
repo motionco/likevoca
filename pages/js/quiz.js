@@ -46,17 +46,34 @@ document.addEventListener("DOMContentLoaded", async () => {
 // 네비게이션 바 로드
 async function loadQuizNavbar() {
   try {
-    const response = await fetch("../components/navbar.html");
+    // 현재 경로를 확인하여 적절한 네비게이션바 경로 설정
+    const currentPath = window.location.pathname;
+    let navbarPath = "../components/navbar.html";
+
+    if (currentPath.includes("/locales/")) {
+      navbarPath = "../../components/navbar.html";
+    }
+
+    const response = await fetch(navbarPath);
+    if (!response.ok) {
+      throw new Error(`네비게이션바 로드 실패: ${response.status}`);
+    }
+
     const navbarHTML = await response.text();
     document.getElementById("navbar-container").innerHTML = navbarHTML;
 
-    // 네비게이션 스크립트를 직접 import로 로드 (type module 방식)
-    const { loadNavbar } = await import("../../components/js/navbar.js");
-    if (loadNavbar) {
-      loadNavbar();
+    console.log("✅ 네비게이션 바 로드 성공");
+
+    // 네비게이션 바 초기화
+    const currentLang = localStorage.getItem("selectedLanguage") || "ko";
+    console.log("🌐 네비게이션 바 초기화 시작, 언어:", currentLang);
+
+    // navbar.js의 initializeNavbar 함수 호출
+    if (typeof window.initializeNavbar === "function") {
+      window.initializeNavbar(currentLang);
     }
   } catch (error) {
-    console.error("네비게이션 바 로드 실패:", error);
+    console.error("❌ 네비게이션 바 로드 실패:", error);
     // 기본 네비게이션 바 생성
     document.getElementById("navbar-container").innerHTML = `
       <nav class="bg-white shadow-md">

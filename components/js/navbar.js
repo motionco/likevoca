@@ -79,57 +79,62 @@ async function loadNavbar() {
 function initializeNavbar(currentLanguage) {
   console.log("네비게이션 바 초기화 시작, 언어:", currentLanguage);
 
-  // 햄버거 메뉴 토글
-  const menuToggle = document.getElementById("menu-toggle");
+  // 햄버거 메뉴 이벤트 설정
+  const hamburgerBtn = document.getElementById("hamburger-btn");
   const mobileMenu = document.getElementById("mobile-menu");
 
-  if (menuToggle && mobileMenu) {
-    menuToggle.addEventListener("click", function () {
+  if (hamburgerBtn && mobileMenu) {
+    hamburgerBtn.addEventListener("click", () => {
       mobileMenu.classList.toggle("hidden");
     });
     console.log("햄버거 메뉴 이벤트 설정 완료");
   }
 
-  // 언어 변경 버튼
+  // 언어 변경 버튼 이벤트 설정
   const languageButton = document.getElementById("language-button");
   if (languageButton) {
-    // 현재 언어에 맞게 버튼 텍스트 업데이트
-    updateLanguageButton(currentLanguage);
-
-    languageButton.addEventListener("click", function () {
+    languageButton.addEventListener("click", () => {
       showLanguageModal(currentLanguage);
     });
+    updateLanguageButton(currentLanguage);
     console.log("언어 변경 버튼 이벤트 설정 완료");
   }
 
-  // 프로필 드롭다운
+  // 프로필 드롭다운 이벤트 설정
   const avatarContainer = document.getElementById("avatar-container");
   const profileDropdown = document.getElementById("profile-dropdown");
 
   if (avatarContainer && profileDropdown) {
-    avatarContainer.addEventListener("click", function () {
+    avatarContainer.addEventListener("click", (e) => {
+      e.stopPropagation();
       profileDropdown.classList.toggle("hidden");
+      console.log("프로필 드롭다운 토글");
     });
 
-    // 외부 클릭 시 드롭다운 닫기
-    document.addEventListener("click", function (event) {
-      if (!avatarContainer.contains(event.target)) {
+    // 드롭다운 외부 클릭 시 닫기
+    document.addEventListener("click", (event) => {
+      const userProfile = document.getElementById("user-profile");
+      if (userProfile && !userProfile.contains(event.target)) {
         profileDropdown.classList.add("hidden");
       }
     });
     console.log("프로필 드롭다운 이벤트 설정 완료");
   }
 
-  // 로그아웃 버튼
+  // 로그아웃 버튼 이벤트 설정
   const logoutButton = document.getElementById("logout-button");
   if (logoutButton) {
     logoutButton.addEventListener("click", handleLogout);
     console.log("로그아웃 버튼 이벤트 설정 완료");
   }
 
-  // 로그인 상태 확인 및 UI 업데이트
-  checkAuthStatus();
   console.log("네비게이션 바 초기화 완료");
+
+  // 현재 페이지에 맞는 메뉴 이름 업데이트
+  updateCurrentPageMenuName(currentLanguage);
+
+  // Firebase 인증 상태 확인
+  checkAuthStatus();
 }
 
 function showLanguageModal(currentLanguage) {
@@ -272,6 +277,9 @@ function updateLanguageButton(currentLanguage) {
   }
 }
 
+let authCheckAttempts = 0;
+const MAX_AUTH_CHECK_ATTEMPTS = 5;
+
 function checkAuthStatus() {
   console.log("Firebase 인증 상태 확인 시작");
 
@@ -292,10 +300,10 @@ function checkAuthStatus() {
         updateUIBasedOnAuth(false);
       }
     });
-  } else if (
-    typeof window.firebaseInit !== "undefined" &&
-    window.firebaseInit.auth
-  ) {
+    return; // 성공적으로 설정했으므로 return
+  }
+
+  if (typeof window.firebaseInit !== "undefined" && window.firebaseInit.auth) {
     // 기존 방식 확인
     console.log("Firebase 인증 사용 가능 (기존 방식)");
     window.firebaseInit.auth.onAuthStateChanged((user) => {
@@ -308,12 +316,21 @@ function checkAuthStatus() {
         updateUIBasedOnAuth(false);
       }
     });
-  } else {
-    console.log("Firebase 인증을 사용할 수 없습니다. 잠시 후 다시 시도합니다.");
-    // Firebase가 아직 로드되지 않았을 수 있으므로 잠시 후 재시도
+    return; // 성공적으로 설정했으므로 return
+  }
+
+  // Firebase가 아직 로드되지 않은 경우
+  authCheckAttempts++;
+  if (authCheckAttempts < MAX_AUTH_CHECK_ATTEMPTS) {
+    console.log(
+      `Firebase 인증을 사용할 수 없습니다. 재시도 ${authCheckAttempts}/${MAX_AUTH_CHECK_ATTEMPTS}`
+    );
     setTimeout(() => {
       checkAuthStatus();
-    }, 1000);
+    }, 2000); // 2초로 간격 증가
+  } else {
+    console.log("Firebase 인증 연결 실패. 로그인되지 않은 상태로 진행합니다.");
+    updateUIBasedOnAuth(false);
   }
 }
 
@@ -426,3 +443,68 @@ document.addEventListener("DOMContentLoaded", async () => {
   console.log("📋 navbar.js DOMContentLoaded 이벤트 시작");
   await loadNavbar();
 });
+
+// 현재 페이지에 맞는 메뉴 이름 업데이트 함수 추가
+function updateCurrentPageMenuName(currentLanguage) {
+  const currentPath = window.location.pathname;
+  const currentPage = currentPath.split("/").pop() || "index.html";
+
+  console.log("현재 페이지 메뉴 이름 업데이트:", currentPage);
+
+  // 페이지별 메뉴 이름 매핑
+  const pageMenuMapping = {
+    "my-word-list.html": {
+      ko: "나만의 단어장",
+      en: "My Vocabulary",
+      ja: "私の単語帳",
+      zh: "我的单词本",
+    },
+    "vocabulary.html": {
+      ko: "단어장",
+      en: "Vocabulary",
+      ja: "単語帳",
+      zh: "单词本",
+    },
+    "ai-vocabulary.html": {
+      ko: "AI 단어장",
+      en: "AI Vocabulary",
+      ja: "AI単語帳",
+      zh: "AI单词本",
+    },
+  };
+
+  // 현재 페이지에 해당하는 메뉴 이름이 있으면 업데이트
+  if (pageMenuMapping[currentPage]) {
+    const menuName =
+      pageMenuMapping[currentPage][currentLanguage] ||
+      pageMenuMapping[currentPage]["ko"];
+
+    // 데스크톱 메뉴 업데이트
+    const desktopMenuItems = document.querySelectorAll(
+      'nav a[href*="vocabulary"], nav a[href*="my-word-list"], nav a[href*="ai-vocabulary"]'
+    );
+    desktopMenuItems.forEach((item) => {
+      if (item.href.includes(currentPage.replace(".html", ""))) {
+        const textElement = item.querySelector("span") || item;
+        if (textElement) {
+          textElement.textContent = menuName;
+          console.log(`데스크톱 메뉴 업데이트: ${currentPage} -> ${menuName}`);
+        }
+      }
+    });
+
+    // 모바일 메뉴 업데이트
+    const mobileMenuItems = document.querySelectorAll(
+      '#mobile-menu a[href*="vocabulary"], #mobile-menu a[href*="my-word-list"], #mobile-menu a[href*="ai-vocabulary"]'
+    );
+    mobileMenuItems.forEach((item) => {
+      if (item.href.includes(currentPage.replace(".html", ""))) {
+        const textElement = item.querySelector("span") || item;
+        if (textElement) {
+          textElement.textContent = menuName;
+          console.log(`모바일 메뉴 업데이트: ${currentPage} -> ${menuName}`);
+        }
+      }
+    });
+  }
+}

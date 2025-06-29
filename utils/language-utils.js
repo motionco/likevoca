@@ -964,6 +964,11 @@ if (typeof window !== "undefined") {
   window.goToLanguageSpecificPage = goToLanguageSpecificPage;
   window.redirectToLogin = redirectToLogin;
   window.redirectToSignup = redirectToSignup;
+  window.getI18nText = getI18nText;
+  window.applyI18nToPage = applyI18nToPage;
+  window.setupI18nListener = setupI18nListener;
+  window.translateDomainKey = translateDomainKey;
+  window.translateCategoryKey = translateCategoryKey;
 }
 
 // 언어별 링크 업데이트 함수
@@ -994,13 +999,106 @@ function updateLinkForLanguage(originalHref, language) {
   }
 }
 
+// 번역 텍스트 가져오기 함수
+function getI18nText(key, lang = null) {
+  try {
+    const currentLang = lang || getCurrentUILanguage();
+
+    // window.translations에서 번역 찾기
+    if (
+      window.translations &&
+      window.translations[currentLang] &&
+      window.translations[currentLang][key]
+    ) {
+      return window.translations[currentLang][key];
+    }
+
+    // translations 객체에서 번역 찾기
+    if (translations[currentLang] && translations[currentLang][key]) {
+      return translations[currentLang][key];
+    }
+
+    // 기본값 반환
+    return key;
+  } catch (error) {
+    console.error(`번역 텍스트 가져오기 실패 (${key}):`, error);
+    return key;
+  }
+}
+
+// 페이지의 모든 번역 요소에 번역 적용
+function applyI18nToPage(lang = null) {
+  try {
+    const currentLang = lang || getCurrentUILanguage();
+    console.log("🌐 페이지 번역 적용 시작, 언어:", currentLang);
+
+    // data-i18n 속성을 가진 모든 요소 번역
+    const elements = document.querySelectorAll("[data-i18n]");
+    console.log("📝 번역 요소 개수:", elements.length);
+
+    elements.forEach((element, index) => {
+      const key = element.getAttribute("data-i18n");
+      const translation = getI18nText(key, currentLang);
+
+      if (translation && translation !== key) {
+        const previousText = element.textContent.trim();
+        element.textContent = translation;
+        console.log(
+          `✅ 번역 적용 [${index}]: ${key} -> "${translation}" (이전: "${previousText}")`
+        );
+      }
+    });
+
+    // data-i18n-placeholder 속성을 가진 요소들의 placeholder 번역
+    const placeholderElements = document.querySelectorAll(
+      "[data-i18n-placeholder]"
+    );
+    placeholderElements.forEach((element) => {
+      const key = element.getAttribute("data-i18n-placeholder");
+      const translation = getI18nText(key, currentLang);
+      if (translation && translation !== key) {
+        element.placeholder = translation;
+      }
+    });
+
+    console.log("✅ 페이지 번역 적용 완료");
+  } catch (error) {
+    console.error("페이지 번역 적용 중 오류:", error);
+  }
+}
+
+// 번역 관련 이벤트 리스너 설정
+function setupI18nListener() {
+  // 언어 변경 이벤트 리스너
+  document.addEventListener("languageChanged", (event) => {
+    console.log("언어 변경 감지:", event.detail);
+    applyI18nToPage(event.detail.language);
+  });
+}
+
+// 도메인 키 번역
+function translateDomainKey(domainKey, lang = null) {
+  return getI18nText(`domain_${domainKey}`, lang) || domainKey;
+}
+
+// 카테고리 키 번역
+function translateCategoryKey(categoryKey, lang = null) {
+  return getI18nText(`category_${categoryKey}`, lang) || categoryKey;
+}
+
 export {
   SUPPORTED_LANGUAGES,
   detectBrowserLanguage,
   getCurrentLanguage,
+  getCurrentUILanguage,
   setLanguage,
   getActiveLanguage,
   applyLanguage,
   showLanguageSettingsModal,
   updateMetadata,
+  getI18nText,
+  applyI18nToPage,
+  setupI18nListener,
+  translateDomainKey,
+  translateCategoryKey,
 };

@@ -88,10 +88,53 @@ async function initializeUserLanguage() {
       );
       userLanguage = "ko";
     }
+
+    // 언어 변경 이벤트 리스너 추가
+    setupLanguageChangeListener();
   } catch (error) {
     console.error("언어 설정 로드 실패:", error);
     userLanguage = "ko"; // 기본값
   }
+}
+
+// 언어 변경 이벤트 리스너 설정
+function setupLanguageChangeListener() {
+  // 언어 변경 이벤트 감지
+  window.addEventListener("languageChanged", async (event) => {
+    console.log("🌐 AI 단어장 페이지 언어 변경 감지:", event.detail.language);
+    userLanguage = event.detail.language;
+
+    // 페이지 번역 다시 적용
+    if (typeof window.applyI18nToPage === "function") {
+      await window.applyI18nToPage(userLanguage);
+    }
+
+    // 개념 카드들 다시 렌더링 (번역된 텍스트로)
+    if (displayedConcepts.length > 0) {
+      renderConcepts();
+    }
+  });
+
+  // 로컬 스토리지 변경 감지 (다른 탭에서 언어 변경한 경우)
+  window.addEventListener("storage", async (event) => {
+    if (event.key === "userLanguage" && event.newValue !== userLanguage) {
+      console.log(
+        "🌐 AI 단어장 페이지 로컬 스토리지 언어 변경 감지:",
+        event.newValue
+      );
+      userLanguage = event.newValue;
+
+      // 페이지 번역 다시 적용
+      if (typeof window.applyI18nToPage === "function") {
+        await window.applyI18nToPage(userLanguage);
+      }
+
+      // 개념 카드들 다시 렌더링
+      if (displayedConcepts.length > 0) {
+        renderConcepts();
+      }
+    }
+  });
 }
 
 // 전역 함수로 내보내기
@@ -294,23 +337,6 @@ function initializeEventListeners() {
   if (loadMoreBtn) {
     loadMoreBtn.addEventListener("click", loadMoreConcepts);
   }
-
-  // 언어 변경 이벤트 리스너 추가
-  document.addEventListener("languageChanged", async (event) => {
-    // 사용자 언어 설정 업데이트 (실패해도 계속 진행)
-    try {
-      await initializeUserLanguage();
-    } catch (error) {
-      console.error("언어 변경 시 초기화 실패:", error);
-      userLanguage = "ko";
-    }
-    // 필터 언어 업데이트
-    if (typeof window.updateVocabularyFilterLanguage === "function") {
-      window.updateVocabularyFilterLanguage();
-    }
-    // 카드 재렌더링
-    applyFiltersAndSort();
-  });
 
   // AI 개념 수정 완료 이벤트 리스너 추가
   document.addEventListener("concept-saved", async (event) => {
