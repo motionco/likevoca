@@ -56,6 +56,7 @@
           >
           </p>
           <button
+            id="get-started-btn"
             class="w-full md:w-auto bg-[#4B63AC] text-white px-6 md:px-8 py-3 rounded-lg hover:bg-[#3A4F8B] transition duration-300 text-base md:text-lg font-semibold"
             data-i18n="get_started_free"
           >
@@ -64,7 +65,7 @@
         <div class="lg:w-1/2 mt-8 lg:mt-0 w-full px-4 lg:px-0">
           <div class="h-64 md:h-80 lg:h-96 rounded-xl overflow-hidden">
             <img
-              src="../../assets/hero.webp"
+              src="../../assets/hero.jpeg"
               class="w-full h-full object-cover rounded-xl"
               alt="Hero Image"
             />
@@ -82,7 +83,7 @@
             <div>
               <h3 class="text-2xl font-bold text-[#4B63AC] mb-4" data-i18n="wordbook">
               </h3>
-              <p class="text-gray-700 text-sm lg:text-lg" data-i18n="wordbook_desc">
+              <p class="text-gray-700 text-sm lg:text-lg" data-i18n="multilingual_dictionary_desc">
               </p>
             </div>
             <a href="my-word-list.html" class="self-end">
@@ -137,7 +138,7 @@
           <div class="h-auto md:h-48 flex flex-col justify-between space-y-4">
             <div>
               <h3 class="text-2xl font-bold text-[#E65100] mb-4" data-i18n="multilingual_dictionary"></h3>
-              <p class="text-gray-700 text-sm lg:text-lg" data-i18n="wordbook_desc">
+              <p class="text-gray-700 text-sm lg:text-lg" data-i18n="multilingual_dictionary_desc">
               </p>
             </div>
             <a href="vocabulary.html" class="self-end">
@@ -178,6 +179,24 @@
             <a href="games.html" class="self-end">
               <button
                 class="self-end bg-[#9C27B0] text-white px-6 py-2 rounded-lg hover:bg-[#7B1FA2] transition duration-300"
+                data-i18n="start"
+              >
+              </button>
+            </a>
+          </div>
+        </div>
+        <div
+          class="bg-[#FFF8E1] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
+        >
+          <div class="h-auto md:h-48 flex flex-col justify-between space-y-4">
+            <div>
+              <h3 class="text-2xl font-bold text-[#F57C00] mb-4" data-i18n="language_quiz"></h3>
+              <p class="text-gray-700 text-sm lg:text-lg" data-i18n="language_quiz_desc">
+              </p>
+            </div>
+            <a href="quiz.html" class="self-end">
+              <button
+                class="self-end bg-[#F57C00] text-white px-6 py-2 rounded-lg hover:bg-[#E65100] transition duration-300"
                 data-i18n="start"
               >
               </button>
@@ -237,6 +256,37 @@
               await applyLanguage();
             }
           }, 1000);
+          
+          // 무료로 시작하기 버튼 이벤트 처리
+          const getStartedBtn = document.getElementById('get-started-btn');
+          if (getStartedBtn) {
+            getStartedBtn.addEventListener('click', async () => {
+              try {
+                // 현재 언어 확인
+                const currentLang = await getActiveLanguage();
+                console.log("현재 언어:", currentLang);
+                
+                // Firebase 인증 상태 확인
+                const { onAuthStateChanged } = await import('../../js/firebase/firebase-init.js');
+                const { auth } = await import('../../js/firebase/firebase-init.js');
+                
+                onAuthStateChanged(auth, (user) => {
+                  if (user) {
+                    // 로그인된 사용자 - 나만의 단어장으로 이동
+                    window.location.href = 'my-word-list.html';
+                  } else {
+                    // 로그아웃된 사용자 - 현재 언어의 회원가입 페이지로 이동
+                    window.location.href = `../${currentLang}/signup.html`;
+                  }
+                });
+              } catch (error) {
+                console.error('인증 상태 확인 중 오류:', error);
+                // 오류 발생 시 현재 언어의 회원가입 페이지로 이동
+                const currentLang = localStorage.getItem('userLanguage') || 'ja';
+                window.location.href = `../${currentLang}/signup.html`;
+              }
+            });
+          }
           
         } catch (error) {
           console.error('언어 설정 적용 중 오류:', error);

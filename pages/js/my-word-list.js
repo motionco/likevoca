@@ -4,6 +4,8 @@ import {
   doc,
   getDoc,
   getDocs,
+  updateDoc,
+  setDoc,
   collection,
   query,
   where,
@@ -38,6 +40,10 @@ let filteredConcepts = [];
 let userLanguage = "ko";
 let sourceLanguage = "korean"; // 학습 소스 언어
 let targetLanguage = "korean"; // 학습 타겟 언어
+
+// 북마크 지연 해제 시스템
+let pendingUnbookmarks = new Set(); // 해제 대기 중인 북마크 ID들
+let bookmarkChangesPending = false; // 변경사항이 있는지 추적
 
 // 언어 코드 매핑
 const languageMapping = {
@@ -127,8 +133,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       currentUser = user;
+
       await loadBookmarkedConcepts();
       updateUI();
+
+      // 북마크 UI 업데이트
+      setTimeout(() => {
+        updateBookmarkUI();
+      }, 500);
     } else {
       console.log("❌ 사용자가 로그인되지 않았습니다.");
       alert("로그인이 필요합니다.");
@@ -138,7 +150,25 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // 이벤트 리스너 설정
   setupEventListeners();
+
+  // 페이지 이탈 시 지연된 북마크 해제 처리
+  setupPageUnloadHandler();
 });
+
+// 페이지 이탈 처리 설정
+function setupPageUnloadHandler() {
+  // beforeunload 이벤트 제거 - 경고 문구 없음
+
+  // unload 이벤트 - 새로고침 시에만 북마크 해제 처리
+  window.addEventListener("beforeunload", async () => {
+    if (bookmarkChangesPending && pendingUnbookmarks.size > 0) {
+      // 새로고침 시 실제 북마크 해제 처리
+      await processPendingUnbookmarks();
+    }
+  });
+
+  // 페이지 가시성 변경 시에는 처리하지 않음 (탭 전환 등에서 해제되지 않도록)
+}
 
 // 초기 언어 선택 박스 설정
 function setInitialLanguageSelections() {
@@ -195,6 +225,7 @@ async function loadBookmarkedConcepts() {
 
     // 2. 북마크된 개념들의 세부 정보 가져오기
     bookmarkedConcepts = [];
+    const invalidBookmarkIds = []; // 존재하지 않는 북마크 ID 추적
     console.log("🔄 북마크된 개념들의 세부 정보 로딩 시작...");
 
     // 배치로 처리하여 성능 향상
@@ -211,14 +242,16 @@ async function loadBookmarkedConcepts() {
 
           if (conceptDoc.exists()) {
             const conceptData = { id: conceptDoc.id, ...conceptDoc.data() };
-            console.log(`✅ 개념 로딩 성공: ${conceptId}`, conceptData);
+            console.log(`✅ 개념 로딩 성공: ${conceptId}`);
             return conceptData;
           } else {
             console.warn(`⚠️ 개념을 찾을 수 없음: ${conceptId}`);
+            invalidBookmarkIds.push(conceptId);
             return null;
           }
         } catch (error) {
           console.error(`❌ 개념 로딩 오류 ${conceptId}:`, error);
+          invalidBookmarkIds.push(conceptId);
           return null;
         }
       });
@@ -235,6 +268,41 @@ async function loadBookmarkedConcepts() {
     }
 
     console.log("📈 총 로딩된 개념 수:", bookmarkedConcepts.length);
+    console.log("🗑️ 존재하지 않는 북마크 ID 수:", invalidBookmarkIds.length);
+
+    // 3. 존재하지 않는 북마크 ID들을 정리
+    if (invalidBookmarkIds.length > 0) {
+      console.log(
+        "🧹 존재하지 않는 북마크 ID들을 정리합니다:",
+        invalidBookmarkIds
+      );
+
+      const validBookmarkIds = userBookmarks.filter(
+        (id) => !invalidBookmarkIds.includes(id)
+      );
+
+      try {
+        await updateDoc(bookmarksRef, {
+          concept_ids: validBookmarkIds,
+          updated_at: new Date().toISOString(),
+        });
+
+        userBookmarks = validBookmarkIds;
+        console.log(
+          "✅ 북마크 정리 완료. 유효한 북마크 수:",
+          validBookmarkIds.length
+        );
+
+        // 사용자에게 알림 (선택적)
+        if (invalidBookmarkIds.length > 0) {
+          console.info(
+            `📢 ${invalidBookmarkIds.length}개의 오래된 북마크가 자동으로 정리되었습니다.`
+          );
+        }
+      } catch (cleanupError) {
+        console.error("❌ 북마크 정리 중 오류:", cleanupError);
+      }
+    }
 
     // 최신순으로 정렬 (북마크 순서 기준)
     bookmarkedConcepts.sort((a, b) => {
@@ -249,11 +317,7 @@ async function loadBookmarkedConcepts() {
       총개념수: bookmarkedConcepts.length,
       필터링된개념수: filteredConcepts.length,
       북마크ID목록: userBookmarks,
-      로딩된개념들: bookmarkedConcepts.map((c) => ({
-        id: c.id,
-        word:
-          c.expressions?.korean?.word || c.expressions?.english?.word || "N/A",
-      })),
+      정리된ID수: invalidBookmarkIds.length,
     });
 
     // UI 업데이트
@@ -328,19 +392,6 @@ function displayConceptList() {
   const conceptsToShow = filteredConcepts.slice(0, displayCount);
 
   if (conceptsToShow.length === 0) {
-    const debugInfo = `
-      <div class="text-xs text-gray-400 mt-4 p-3 bg-gray-50 rounded">
-        디버깅 정보:<br>
-        - 로그인 상태: ${currentUser ? "✅ 로그인됨" : "❌ 로그인 안됨"}<br>
-        - 북마크 ID 개수: ${userBookmarks.length}<br>
-        - 로딩된 개념 개수: ${bookmarkedConcepts.length}<br>
-        - 필터링된 개념 개수: ${filteredConcepts.length}<br>
-        - 북마크 ID들: ${userBookmarks.slice(0, 3).join(", ")}${
-      userBookmarks.length > 3 ? "..." : ""
-    }
-      </div>
-    `;
-
     conceptList.innerHTML = `
       <div class="col-span-full text-center py-12">
         <i class="fas fa-bookmark text-6xl text-gray-300 mb-4"></i>
@@ -354,7 +405,6 @@ function displayConceptList() {
         >
           <i class="fas fa-search mr-2"></i> ${getI18nText("browse_words")}
         </a>
-        ${debugInfo}
       </div>
     `;
     if (loadMoreBtn) loadMoreBtn.style.display = "none";
@@ -512,12 +562,11 @@ function createConceptCard(concept) {
 
   return `
     <div 
-      class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200 cursor-pointer concept-card"
-      onclick="openConceptViewModal('${conceptId}')"
+      class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200 concept-card"
       style="border-left: 4px solid ${colorTheme}"
     >
       <div class="flex items-start justify-between mb-4">
-        <div class="flex items-center space-x-3">
+        <div class="flex items-center space-x-3" onclick="openConceptViewModal('${conceptId}')">
           <span class="text-3xl">${emoji}</span>
           <div>
             <h3 class="text-lg font-semibold text-gray-800 mb-1">
@@ -533,9 +582,14 @@ function createConceptCard(concept) {
           </div>
         </div>
         <div class="flex items-center space-x-2">
-          <i class="fas fa-bookmark text-yellow-500" title="${getI18nText(
-            "bookmarked"
-          )}"></i>
+          <button 
+            class="bookmark-btn p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+            data-concept-id="${conceptId}"
+            onclick="event.stopPropagation(); toggleBookmark('${conceptId}')"
+            title="북마크"
+          >
+            <i class="fas fa-bookmark text-yellow-500"></i>
+          </button>
           <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
             ${translateDomainCategory(
               conceptInfo.domain,
@@ -546,7 +600,7 @@ function createConceptCard(concept) {
         </div>
       </div>
       
-      <div class="border-t border-gray-200 pt-3 mt-3">
+      <div class="border-t border-gray-200 pt-3 mt-3" onclick="openConceptViewModal('${conceptId}')">
         <div class="flex items-center">
           <span class="font-medium">${(() => {
             // 환경 언어에 해당하는 표현 찾기
@@ -567,7 +621,7 @@ function createConceptCard(concept) {
       ${
         example && (example.source || example.target)
           ? `
-      <div class="border-t border-gray-200 pt-3 mt-3">
+      <div class="border-t border-gray-200 pt-3 mt-3" onclick="openConceptViewModal('${conceptId}')">
         <p class="text-sm text-gray-700 font-medium">${
           example.target || example.source
         }</p>
@@ -581,7 +635,7 @@ function createConceptCard(concept) {
           : ""
       }
       
-      <div class="flex justify-between text-xs text-gray-500 mt-3">
+      <div class="flex justify-between text-xs text-gray-500 mt-3" onclick="openConceptViewModal('${conceptId}')">
         <span class="flex items-center">
           <i class="fas fa-bookmark mr-1 text-yellow-500"></i> ${getI18nText(
             "bookmarked"
@@ -1786,3 +1840,161 @@ function generateDomainSortFilters() {
 
   console.log("✅ 나만의 단어장 도메인 및 정렬 필터 동적 생성 완료");
 }
+
+// 북마크 토글 (나만의 단어장용)
+async function toggleBookmark(conceptId) {
+  if (!currentUser) {
+    showMessage("로그인이 필요합니다.", "error");
+    return;
+  }
+
+  console.log("🔖 북마크 토글 시작:", conceptId);
+
+  const isCurrentlyBookmarked = userBookmarks.includes(conceptId);
+  const isPendingUnbookmark = pendingUnbookmarks.has(conceptId);
+
+  if (isCurrentlyBookmarked && !isPendingUnbookmark) {
+    // 북마크 해제 - 시각적으로만 처리 (실제 해제는 새로고침 시)
+    pendingUnbookmarks.add(conceptId);
+    bookmarkChangesPending = true;
+    console.log("⏳ 북마크 해제 (새로고침 시 적용):", conceptId);
+    showMessage("북마크가 해제되었습니다.", "success");
+  } else if (isCurrentlyBookmarked && isPendingUnbookmark) {
+    // 해제 취소 - 다시 북마크 상태로
+    pendingUnbookmarks.delete(conceptId);
+    console.log("🔄 북마크 해제 취소:", conceptId);
+    showMessage("북마크가 다시 추가되었습니다.", "success");
+
+    // 변경사항이 없으면 플래그 해제
+    if (pendingUnbookmarks.size === 0) {
+      bookmarkChangesPending = false;
+    }
+  } else if (!isCurrentlyBookmarked) {
+    // 북마크 추가 - 즉시 처리
+    await addBookmarkImmediately(conceptId);
+  }
+
+  // UI 업데이트
+  updateBookmarkUI();
+}
+
+// 북마크 즉시 추가
+async function addBookmarkImmediately(conceptId) {
+  try {
+    const userEmail = currentUser.email;
+    const bookmarksRef = doc(db, "bookmarks", userEmail);
+
+    const updatedBookmarks = [...userBookmarks, conceptId];
+
+    const bookmarkData = {
+      user_email: userEmail,
+      concept_ids: updatedBookmarks,
+      updated_at: new Date().toISOString(),
+    };
+
+    await setDoc(bookmarksRef, bookmarkData);
+    userBookmarks = updatedBookmarks;
+
+    console.log("✅ 북마크 추가 완료:", conceptId);
+    showMessage("북마크가 추가되었습니다.", "success");
+
+    // 개념 목록 새로고침 (새로 추가된 북마크 반영)
+    await loadBookmarkedConcepts();
+  } catch (error) {
+    console.error("❌ 북마크 추가 오류:", error);
+    showMessage("북마크 추가 중 오류가 발생했습니다.", "error");
+  }
+}
+
+// 지연된 북마크 해제 처리
+async function processPendingUnbookmarks() {
+  if (pendingUnbookmarks.size === 0) return;
+
+  try {
+    const userEmail = currentUser.email;
+    const bookmarksRef = doc(db, "bookmarks", userEmail);
+
+    // 해제 대기 중인 북마크들을 제거
+    const updatedBookmarks = userBookmarks.filter(
+      (id) => !pendingUnbookmarks.has(id)
+    );
+
+    const bookmarkData = {
+      user_email: userEmail,
+      concept_ids: updatedBookmarks,
+      updated_at: new Date().toISOString(),
+    };
+
+    await setDoc(bookmarksRef, bookmarkData);
+
+    console.log(
+      "✅ 지연된 북마크 해제 처리 완료:",
+      Array.from(pendingUnbookmarks)
+    );
+
+    // 상태 초기화
+    pendingUnbookmarks.clear();
+    bookmarkChangesPending = false;
+  } catch (error) {
+    console.error("❌ 지연된 북마크 해제 오류:", error);
+  }
+}
+
+// 북마크 UI 업데이트
+function updateBookmarkUI() {
+  const bookmarkButtons = document.querySelectorAll(".bookmark-btn");
+
+  bookmarkButtons.forEach((btn) => {
+    const conceptId = btn.getAttribute("data-concept-id");
+    const icon = btn.querySelector("i");
+
+    const isBookmarked = userBookmarks.includes(conceptId);
+    const isPendingUnbookmark = pendingUnbookmarks.has(conceptId);
+
+    if (isBookmarked && !isPendingUnbookmark) {
+      // 정상 북마크 상태
+      icon.className = "fas fa-bookmark text-yellow-500";
+      btn.title = "북마크 해제";
+    } else if (isBookmarked && isPendingUnbookmark) {
+      // 해제 상태 (그레이 색상)
+      icon.className = "fas fa-bookmark text-gray-400";
+      btn.title = "북마크 다시 추가 (클릭하여 복원)";
+    } else {
+      // 북마크 안됨
+      icon.className = "fas fa-bookmark text-gray-400";
+      btn.title = "북마크";
+    }
+  });
+}
+
+// 메시지 표시 함수
+function showMessage(message, type = "info") {
+  const messageContainer = document.createElement("div");
+  const bgColor =
+    type === "success"
+      ? "bg-green-100 border-green-400 text-green-700"
+      : type === "error"
+      ? "bg-red-100 border-red-400 text-red-700"
+      : type === "warning"
+      ? "bg-yellow-100 border-yellow-400 text-yellow-700"
+      : "bg-blue-100 border-blue-400 text-blue-700";
+
+  messageContainer.className = `fixed top-4 right-4 ${bgColor} px-4 py-3 rounded z-50 border shadow-lg`;
+  messageContainer.innerHTML = `
+    <div class="flex items-center">
+      <span>${message}</span>
+      <button onclick="this.parentElement.parentElement.remove()" class="ml-3 text-lg font-bold hover:opacity-70">×</button>
+    </div>
+  `;
+
+  document.body.appendChild(messageContainer);
+
+  setTimeout(() => {
+    if (messageContainer.parentElement) {
+      messageContainer.remove();
+    }
+  }, 4000);
+}
+
+// 전역 함수로 노출
+window.toggleBookmark = toggleBookmark;
