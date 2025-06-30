@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     console.log("🎯 퀴즈 페이지 초기화 시작");
 
-    // 네비게이션 바 로드
+    // 네비게이션바 로드
     await loadQuizNavbar();
 
     // DOM 요소 초기화
@@ -43,48 +43,30 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-// 네비게이션 바 로드
+// 네비게이션바 로드
 async function loadQuizNavbar() {
-  try {
-    // 현재 경로를 확인하여 적절한 네비게이션바 경로 설정
-    const currentPath = window.location.pathname;
-    let navbarPath = "../components/navbar.html";
+  const navbarContainer = document.getElementById("navbar-container");
+  if (navbarContainer) {
+    try {
+      const userLanguage = localStorage.getItem("userLanguage") || "ko";
+      let navbarPath = `../locales/${userLanguage}/navbar.html`;
 
-    if (currentPath.includes("/locales/")) {
-      navbarPath = "../../components/navbar.html";
+      // 현재 경로에 따라 상대 경로 조정
+      if (window.location.pathname.includes("/locales/")) {
+        navbarPath = "navbar.html";
+      }
+
+      const response = await fetch(navbarPath);
+      if (response.ok) {
+        const navbarHTML = await response.text();
+        navbarContainer.innerHTML = navbarHTML;
+        console.log("네비게이션바 로드 완료");
+      } else {
+        console.error("네비게이션바 로드 실패:", response.status);
+      }
+    } catch (error) {
+      console.error("네비게이션바 로드 오류:", error);
     }
-
-    const response = await fetch(navbarPath);
-    if (!response.ok) {
-      throw new Error(`네비게이션바 로드 실패: ${response.status}`);
-    }
-
-    const navbarHTML = await response.text();
-    document.getElementById("navbar-container").innerHTML = navbarHTML;
-
-    console.log("✅ 네비게이션 바 로드 성공");
-
-    // 네비게이션 바 초기화
-    const currentLang = localStorage.getItem("selectedLanguage") || "ko";
-    console.log("🌐 네비게이션 바 초기화 시작, 언어:", currentLang);
-
-    // navbar.js의 initializeNavbar 함수 호출
-    if (typeof window.initializeNavbar === "function") {
-      window.initializeNavbar(currentLang);
-    }
-  } catch (error) {
-    console.error("❌ 네비게이션 바 로드 실패:", error);
-    // 기본 네비게이션 바 생성
-    document.getElementById("navbar-container").innerHTML = `
-      <nav class="bg-white shadow-md">
-        <div class="container mx-auto px-4 py-3">
-          <div class="flex items-center justify-between">
-            <h1 class="text-xl font-bold text-gray-800">LikeVoca 퀴즈</h1>
-            <div class="text-sm text-gray-600">로딩 실패</div>
-          </div>
-        </div>
-      </nav>
-    `;
   }
 }
 

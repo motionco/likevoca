@@ -40,8 +40,20 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     console.log("📊 학습 진도 페이지 초기화 시작");
 
-    // 네비게이션 바 로드
-    await loadNavbar();
+    // 네비게이션바 로드
+    try {
+      const userLanguage = localStorage.getItem("userLanguage") || "ko";
+      const response = await fetch(`../locales/${userLanguage}/navbar.html`);
+      if (response.ok) {
+        const navbarHTML = await response.text();
+        navbarContainer.innerHTML = navbarHTML;
+        console.log("네비게이션바 로드 완료");
+      } else {
+        console.error("네비게이션바 로드 실패:", response.status);
+      }
+    } catch (error) {
+      console.error("네비게이션바 로드 오류:", error);
+    }
 
     // DOM 요소 초기화
     initializeElements();
@@ -58,23 +70,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     showError("페이지 초기화 중 오류가 발생했습니다.");
   }
 });
-
-// 네비게이션 바 로드
-async function loadNavbar() {
-  try {
-    const response = await fetch("../components/navbar.html");
-    const navbarHTML = await response.text();
-    document.getElementById("navbar-container").innerHTML = navbarHTML;
-
-    // 네비게이션 스크립트 로드
-    const navScript = document.createElement("script");
-    navScript.src = "../components/js/navbar.js";
-    navScript.type = "module";
-    document.head.appendChild(navScript);
-  } catch (error) {
-    console.error("네비게이션 바 로드 실패:", error);
-  }
-}
 
 // DOM 요소 초기화
 function initializeElements() {

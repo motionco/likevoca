@@ -17,7 +17,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const navbarPlaceholder = document.getElementById("navbar-placeholder");
     if (navbarPlaceholder) {
       try {
-        const response = await fetch("components/navbar.html");
+        const userLanguage = localStorage.getItem("userLanguage") || "ko";
+        const response = await fetch(`locales/${userLanguage}/navbar.html`);
         if (response.ok) {
           const html = await response.text();
           navbarPlaceholder.innerHTML = html;
@@ -29,12 +30,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         } else {
           console.error("Navbar HTML을 가져올 수 없습니다:", response.status);
           navbarPlaceholder.innerHTML =
-            '<div class="p-4 bg-blue-500 text-white">ActionLingo</div>';
+            '<div class="p-4 bg-blue-500 text-white">LikeVoca</div>';
         }
       } catch (error) {
         console.error("Navbar 로드 오류:", error);
         navbarPlaceholder.innerHTML =
-          '<div class="p-4 bg-blue-500 text-white">ActionLingo</div>';
+          '<div class="p-4 bg-blue-500 text-white">LikeVoca</div>';
       }
     }
   } catch (error) {

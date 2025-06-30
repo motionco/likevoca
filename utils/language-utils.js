@@ -1445,7 +1445,7 @@ async function loadNavbar() {
     // 현재 경로와 언어에 따라 네비게이션바 파일 경로 결정
     const currentPath = window.location.pathname;
     const currentLanguage = getCurrentLanguage();
-    let navbarPath = "components/navbar.html";
+    let navbarPath;
 
     if (currentPath.includes("/locales/")) {
       // locales 폴더 내부에서는 해당 언어의 navbar.html 사용
@@ -1463,16 +1463,18 @@ async function loadNavbar() {
     // 네비게이션바 HTML 로드
     const response = await fetch(navbarPath);
     if (!response.ok) {
-      // 언어별 네비게이션바 로드 실패 시 기본 components/navbar.html 시도
+      // 언어별 네비게이션바 로드 실패 시 기본 언어(한국어) 시도
       console.warn(
-        `언어별 네비게이션바 로드 실패 (${response.status}), 기본 네비게이션바 시도`
+        `언어별 네비게이션바 로드 실패 (${response.status}), 기본 언어(한국어) 시도`
       );
 
-      let fallbackPath = "components/navbar.html";
+      let fallbackPath;
       if (currentPath.includes("/locales/")) {
-        fallbackPath = "../../components/navbar.html";
+        fallbackPath = "../ko/navbar.html";
       } else if (currentPath.includes("/pages/")) {
-        fallbackPath = "../components/navbar.html";
+        fallbackPath = "../locales/ko/navbar.html";
+      } else {
+        fallbackPath = "locales/ko/navbar.html";
       }
 
       const fallbackResponse = await fetch(fallbackPath);
@@ -1482,7 +1484,7 @@ async function loadNavbar() {
 
       const fallbackHTML = await fallbackResponse.text();
       navbarContainer.innerHTML = fallbackHTML;
-      console.log("✅ 기본 네비게이션바 HTML 로드 완료");
+      console.log("✅ 기본 언어 네비게이션바 HTML 로드 완료");
     } else {
       const navbarHTML = await response.text();
       navbarContainer.innerHTML = navbarHTML;

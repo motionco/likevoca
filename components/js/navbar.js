@@ -85,22 +85,34 @@ async function initializeNavbar(currentLanguage) {
   // 현재 페이지에 맞는 메뉴 이름 업데이트
   updateCurrentPageMenuName(actualCurrentLanguage);
 
-  // 네비게이션바 초기화가 완전히 끝난 후 인증 상태 확인
-  // 더 긴 지연시간으로 Firebase 초기화를 기다림
+  // 네비게이션바 초기화가 완전히 끝난 후 인증 상태 확인 - 즉시 실행
+  console.log("🔐 인증 상태 확인 시작 (즉시)");
+  checkAuthStatus();
+
+  // 추가 확인 - 500ms 후
   setTimeout(() => {
-    console.log("🔐 인증 상태 확인 시작");
+    console.log("🔐 인증 상태 재확인 (500ms)");
+    checkAuthStatus();
+  }, 500);
+
+  // 추가 확인 - 1초 후
+  setTimeout(() => {
+    console.log("🔐 인증 상태 재확인 (1초)");
     checkAuthStatus();
   }, 1000);
 
-  // 추가 안전장치 - 2초 후 한번 더 확인
+  // 최종 확인 - 2초 후
   setTimeout(() => {
-    console.log("🔐 인증 상태 재확인");
+    console.log("🔐 인증 상태 최종 확인 (2초)");
     if (
       typeof window.auth !== "undefined" &&
       window.auth &&
       window.auth.currentUser
     ) {
       updateNavbarForAuthState(window.auth.currentUser);
+    } else {
+      // 로그아웃 상태로 업데이트
+      updateNavbarForAuthState(null);
     }
   }, 2000);
 }
@@ -359,32 +371,42 @@ function updateNavbarForAuthState(user) {
     // 로그인 상태
     console.log("✅ 로그인 상태로 네비게이션바 업데이트");
 
-    // 데스크톱 - 로그인 버튼 완전히 숨기고 유저 프로필 보이기
+    // 데스크톱 - 로그인 버튼 숨기고 유저 프로필 보이기
     if (desktopLoginSection) {
-      desktopLoginSection.style.display = "none";
-      desktopLoginSection.className = "hidden lg:flex space-x-2";
+      desktopLoginSection.classList.add("hidden");
+      desktopLoginSection.classList.remove("flex", "lg:flex");
+      console.log("✅ 데스크톱 로그인 섹션 숨김");
     }
     if (desktopUserSection) {
-      desktopUserSection.style.display = "";
-      desktopUserSection.className = "flex lg:flex items-center";
+      desktopUserSection.classList.remove("hidden");
+      desktopUserSection.classList.add("flex", "lg:flex");
+      console.log("✅ 데스크톱 유저 섹션 표시");
     }
 
-    // 모바일 - 로그인 버튼 완전히 숨기고 유저 섹션 보이기
+    // 모바일 - 로그인 버튼 숨기고 유저 섹션 보이기
     if (mobileLoginButtons) {
-      mobileLoginButtons.style.display = "none";
-      mobileLoginButtons.className = "hidden flex space-x-3";
+      mobileLoginButtons.classList.add("hidden");
+      mobileLoginButtons.classList.remove("flex");
+      console.log("✅ 모바일 로그인 버튼 숨김");
     }
     if (mobileUserSection) {
-      mobileUserSection.style.display = "";
-      mobileUserSection.className = "flex flex-col items-center space-y-2";
+      mobileUserSection.classList.remove("hidden");
+      mobileUserSection.classList.add("flex");
+      console.log("✅ 모바일 유저 섹션 표시");
     }
 
     // 사용자 정보 업데이트
-    const displayName = user.displayName || user.email || "사용자";
+    const displayName =
+      user.displayName || user.email?.split("@")[0] || "사용자";
+    // Google 인증의 경우 photoURL 우선 사용, 없으면 기본 이미지
     const photoURL =
       user.photoURL || "https://www.w3schools.com/howto/img_avatar.png";
 
-    console.log("👤 사용자 정보 설정:", { displayName, photoURL });
+    console.log("👤 사용자 정보 설정:", {
+      displayName,
+      photoURL,
+      provider: user.providerData?.[0]?.providerId || "unknown",
+    });
 
     if (userName) {
       userName.textContent = displayName;
@@ -394,32 +416,63 @@ function updateNavbarForAuthState(user) {
       mobileUserName.textContent = displayName;
       console.log("✅ 모바일 사용자 이름 설정:", displayName);
     }
+
+    // 프로필 이미지 설정 (데스크톱)
     if (profileImage) {
-      profileImage.src = photoURL;
+      // 이미지 로드 전에 기본 이미지로 설정
+      profileImage.src = "https://www.w3schools.com/howto/img_avatar.png";
       profileImage.alt = `${displayName}의 프로필`;
 
-      // 이미지 로드 오류 처리
-      profileImage.onerror = function () {
-        console.warn("프로필 이미지 로드 실패, 기본 이미지로 변경:", photoURL);
-        this.src = "https://www.w3schools.com/howto/img_avatar.png";
-      };
+      // Google 프로필 이미지가 있으면 로드 시도
+      if (
+        photoURL &&
+        photoURL !== "https://www.w3schools.com/howto/img_avatar.png"
+      ) {
+        const img = new Image();
+        img.onload = function () {
+          profileImage.src = photoURL;
+          console.log("✅ 데스크톱 Google 프로필 이미지 로드 성공:", photoURL);
+        };
+        img.onerror = function () {
+          console.warn(
+            "⚠️ 데스크톱 Google 프로필 이미지 로드 실패, 기본 이미지 유지:",
+            photoURL
+          );
+          // 기본 이미지는 이미 설정되어 있음
+        };
+        img.src = photoURL;
+      }
 
-      console.log("✅ 데스크톱 프로필 이미지 설정:", photoURL);
+      console.log("✅ 데스크톱 프로필 이미지 설정 완료");
     }
+
+    // 프로필 이미지 설정 (모바일)
     if (mobileProfileImage) {
-      mobileProfileImage.src = photoURL;
+      // 이미지 로드 전에 기본 이미지로 설정
+      mobileProfileImage.src = "https://www.w3schools.com/howto/img_avatar.png";
       mobileProfileImage.alt = `${displayName}의 프로필`;
 
-      // 이미지 로드 오류 처리
-      mobileProfileImage.onerror = function () {
-        console.warn(
-          "모바일 프로필 이미지 로드 실패, 기본 이미지로 변경:",
-          photoURL
-        );
-        this.src = "https://www.w3schools.com/howto/img_avatar.png";
-      };
+      // Google 프로필 이미지가 있으면 로드 시도
+      if (
+        photoURL &&
+        photoURL !== "https://www.w3schools.com/howto/img_avatar.png"
+      ) {
+        const img = new Image();
+        img.onload = function () {
+          mobileProfileImage.src = photoURL;
+          console.log("✅ 모바일 Google 프로필 이미지 로드 성공:", photoURL);
+        };
+        img.onerror = function () {
+          console.warn(
+            "⚠️ 모바일 Google 프로필 이미지 로드 실패, 기본 이미지 유지:",
+            photoURL
+          );
+          // 기본 이미지는 이미 설정되어 있음
+        };
+        img.src = photoURL;
+      }
 
-      console.log("✅ 모바일 프로필 이미지 설정:", photoURL);
+      console.log("✅ 모바일 프로필 이미지 설정 완료");
     }
 
     console.log("👤 사용자 정보 업데이트 완료:", { displayName, photoURL });
@@ -427,24 +480,28 @@ function updateNavbarForAuthState(user) {
     // 로그아웃 상태
     console.log("🚪 로그아웃 상태로 네비게이션바 업데이트");
 
-    // 데스크톱 - 유저 프로필 완전히 숨기고 로그인 버튼 보이기
+    // 데스크톱 - 유저 프로필 숨기고 로그인 버튼 보이기
     if (desktopUserSection) {
-      desktopUserSection.style.display = "none";
-      desktopUserSection.className = "hidden lg:flex items-center";
+      desktopUserSection.classList.add("hidden");
+      desktopUserSection.classList.remove("flex", "lg:flex");
+      console.log("✅ 데스크톱 유저 섹션 숨김");
     }
     if (desktopLoginSection) {
-      desktopLoginSection.style.display = "";
-      desktopLoginSection.className = "flex lg:flex space-x-2";
+      desktopLoginSection.classList.remove("hidden");
+      desktopLoginSection.classList.add("flex", "lg:flex");
+      console.log("✅ 데스크톱 로그인 섹션 표시");
     }
 
-    // 모바일 - 유저 섹션 완전히 숨기고 로그인 버튼 보이기
+    // 모바일 - 유저 섹션 숨기고 로그인 버튼 보이기
     if (mobileUserSection) {
-      mobileUserSection.style.display = "none";
-      mobileUserSection.className = "hidden flex-col items-center space-y-2";
+      mobileUserSection.classList.add("hidden");
+      mobileUserSection.classList.remove("flex");
+      console.log("✅ 모바일 유저 섹션 숨김");
     }
     if (mobileLoginButtons) {
-      mobileLoginButtons.style.display = "";
-      mobileLoginButtons.className = "flex space-x-3";
+      mobileLoginButtons.classList.remove("hidden");
+      mobileLoginButtons.classList.add("flex");
+      console.log("✅ 모바일 로그인 버튼 표시");
     }
   }
 }

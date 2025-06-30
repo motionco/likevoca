@@ -25,28 +25,31 @@ async function loadNavbar() {
       return;
     }
 
-    // 현재 경로에 따라 네비게이션바 파일 경로 결정
+    // 네비게이션바 로드
     const currentPath = window.location.pathname;
-    let navbarPath = "components/navbar.html";
+    const currentLanguage = getCurrentLanguage();
+    let navbarPath;
 
     if (currentPath.includes("/locales/")) {
-      navbarPath = "../../components/navbar.html";
+      navbarPath = "navbar.html";
     } else if (currentPath.includes("/pages/")) {
-      navbarPath = "../components/navbar.html";
+      navbarPath = `../locales/${currentLanguage}/navbar.html`;
+    } else {
+      navbarPath = `locales/${currentLanguage}/navbar.html`;
     }
 
-    console.log("📍 네비게이션바 경로:", navbarPath);
-
-    // 네비게이션바 HTML 로드
-    const response = await fetch(navbarPath);
-    if (!response.ok) {
-      throw new Error(`네비게이션바 로드 실패: ${response.status}`);
+    try {
+      const response = await fetch(navbarPath);
+      if (response.ok) {
+        const navbarHTML = await response.text();
+        navbarContainer.innerHTML = navbarHTML;
+        console.log("✅ 네비게이션바 로드 완료");
+      } else {
+        throw new Error(`네비게이션바 로드 실패: ${response.status}`);
+      }
+    } catch (error) {
+      console.error("네비게이션바 로드 오류:", error);
     }
-
-    const navbarHTML = await response.text();
-    navbarContainer.innerHTML = navbarHTML;
-
-    console.log("✅ 네비게이션바 HTML 로드 완료");
 
     // navbar.js 동적 로드
     const navbarScriptPath = currentPath.includes("/locales/")

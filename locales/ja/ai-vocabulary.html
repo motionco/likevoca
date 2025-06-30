@@ -272,7 +272,7 @@
             
             // 직접 네비게이션바 로드
             try {
-              const response = await fetch('../../components/navbar.html');
+              const response = await fetch('navbar.html');
               const navbarHTML = await response.text();
               const navbarContainer = document.getElementById('navbar-container');
               if (navbarContainer) {

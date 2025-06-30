@@ -146,7 +146,7 @@
     <a href="inquiry.html" class="text-lg hover:text-yellow-400" data-i18n="inquiry" data-i18n-link="inquiry.html">문의하기</a>
 
     <!-- 모바일 로그인 버튼들 -->
-    <div id="mobile-login-buttons" class="flex space-x-3">
+    <div id="mobile-login-buttons" class="hidden flex space-x-3">
       <a
         href="#"
         onclick="goToLanguageSpecificPage('login.html')"
@@ -215,6 +215,26 @@ function goToLanguageSpecificPage(filename) {
     window.location.href = `/${userLanguage}/${filename}`;
   }
 }
+
+// 네비게이션바 초기화 함수
+function initializeNavbar() {
+  console.log('🔧 initializeNavbar 함수 실행');
+  
+  // navbar.js의 초기화 함수들이 이미 로드되었는지 확인
+  if (typeof window.setupNavbarAuth === 'function') {
+    window.setupNavbarAuth();
+  }
+  
+  if (typeof window.setupNavbarEvents === 'function') {
+    window.setupNavbarEvents();
+  }
+}
+
+// DOM이 로드된 후 초기화
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('📍 navbar.html DOM 로드 완료');
+  initializeNavbar();
+});
 </script>
 
 

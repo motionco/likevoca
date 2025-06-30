@@ -130,7 +130,19 @@ document.addEventListener("DOMContentLoaded", async function () {
   console.log("다국어 학습 페이지 로딩 시작...");
 
   // 네비게이션바 로드
-  await loadNavbar();
+  try {
+    const userLanguage = localStorage.getItem("userLanguage") || "ko";
+    const response = await fetch(`../locales/${userLanguage}/navbar.html`);
+    if (response.ok) {
+      const navbarHTML = await response.text();
+      navbarContainer.innerHTML = navbarHTML;
+      console.log("네비게이션바 로드 완료");
+    } else {
+      console.error("네비게이션바 로드 실패:", response.status);
+    }
+  } catch (error) {
+    console.error("네비게이션바 로드 오류:", error);
+  }
 
   // 사용자 인증 상태 확인
   onAuthStateChanged(auth, async (user) => {
@@ -149,25 +161,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   });
 });
-
-// 네비게이션바 로드 함수
-async function loadNavbar() {
-  try {
-    const response = await fetch("../components/navbar.html");
-    const navbarHtml = await response.text();
-    document.getElementById("navbar-container").innerHTML = navbarHtml;
-
-    // 네비게이션바 스크립트 로드
-    const script = document.createElement("script");
-    script.type = "module";
-    script.src = "../components/js/navbar.js";
-    document.head.appendChild(script);
-
-    console.log("네비게이션바 로드 완료");
-  } catch (error) {
-    console.error("네비게이션바 로드 실패:", error);
-  }
-}
 
 // 언어 설정 함수
 function setupLanguageSettings() {
