@@ -197,8 +197,61 @@
 
     <!-- Firebase -->
     <script type="module" src="../js/firebase/firebase-init.js"></script>
-    <script type="module" src="../utils/language-utils.js"></script>
-    <script type="module" src="../components/js/navbar.js"></script>
+    <script type="module">
+      import { updateMetadata, applyLanguage } from "../utils/language-utils.js";
+
+      // 페이지 로드 후 초기화
+      document.addEventListener("DOMContentLoaded", async () => {
+        try {
+          console.log("단어장 페이지 초기화 시작");
+          
+          // 네비게이션바 로드
+          if (typeof window.loadNavbar === 'function') {
+            await window.loadNavbar();
+            console.log("네비게이션바 로드 완료");
+          } else {
+            console.warn("window.loadNavbar 함수를 찾을 수 없습니다. 직접 로드 시도...");
+            
+            // 직접 네비게이션바 로드
+            try {
+              const response = await fetch('../components/navbar.html');
+              const navbarHTML = await response.text();
+              const navbarContainer = document.getElementById('navbar-container');
+              if (navbarContainer) {
+                navbarContainer.innerHTML = navbarHTML;
+                console.log("네비게이션바 직접 로드 완료");
+                
+                // navbar.js 스크립트 동적 로드
+                const script = document.createElement('script');
+                script.src = '../components/js/navbar.js';
+                script.onload = () => {
+                  console.log("navbar.js 로드 완료");
+                  if (typeof window.initializeNavbar === 'function') {
+                    const currentLang = localStorage.getItem('preferredLanguage') || 'ko';
+                    window.initializeNavbar(currentLang);
+                  }
+                };
+                document.head.appendChild(script);
+              }
+            } catch (error) {
+              console.error("네비게이션바 직접 로드 실패:", error);
+            }
+          }
+          
+          // 번역 적용
+          await applyLanguage();
+          console.log("번역 적용 완료");
+          
+          // 메타데이터 업데이트
+          await updateMetadata("vocabulary");
+          console.log("메타데이터 업데이트 완료");
+          
+          console.log("단어장 페이지 초기화 완료");
+        } catch (error) {
+          console.error("페이지 초기화 중 오류:", error);
+        }
+      });
+    </script>
     <script type="module" src="./js/vocabulary.js"></script>
     
     <!-- 개념 모달 스크립트 -->

@@ -157,17 +157,38 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // 페이지 이탈 처리 설정
 function setupPageUnloadHandler() {
-  // beforeunload 이벤트 제거 - 경고 문구 없음
-
-  // unload 이벤트 - 새로고침 시에만 북마크 해제 처리
-  window.addEventListener("beforeunload", async () => {
+  // beforeunload 이벤트 - 새로고침, 탭 닫기, 뒤로가기, 앞으로가기 등 모든 페이지 이탈 시 처리
+  window.addEventListener("beforeunload", async (event) => {
     if (bookmarkChangesPending && pendingUnbookmarks.size > 0) {
-      // 새로고침 시 실제 북마크 해제 처리
+      // 페이지 이탈 시 실제 북마크 해제 처리
       await processPendingUnbookmarks();
     }
   });
 
-  // 페이지 가시성 변경 시에는 처리하지 않음 (탭 전환 등에서 해제되지 않도록)
+  // pagehide 이벤트 - 페이지가 숨겨질 때 (뒤로가기, 앞으로가기 포함)
+  window.addEventListener("pagehide", async (event) => {
+    if (bookmarkChangesPending && pendingUnbookmarks.size > 0) {
+      await processPendingUnbookmarks();
+    }
+  });
+
+  // visibilitychange 이벤트 - 탭 전환 시
+  document.addEventListener("visibilitychange", async () => {
+    if (
+      document.visibilityState === "hidden" &&
+      bookmarkChangesPending &&
+      pendingUnbookmarks.size > 0
+    ) {
+      await processPendingUnbookmarks();
+    }
+  });
+
+  // popstate 이벤트 - 브라우저 히스토리 변경 시 (뒤로가기, 앞으로가기)
+  window.addEventListener("popstate", async (event) => {
+    if (bookmarkChangesPending && pendingUnbookmarks.size > 0) {
+      await processPendingUnbookmarks();
+    }
+  });
 }
 
 // 초기 언어 선택 박스 설정
@@ -187,6 +208,29 @@ async function loadBookmarkedConcepts() {
     console.log("❌ 사용자가 로그인되지 않음");
     return;
   }
+
+  // 페이지 로드 시 pending 상태 정리 (실제 DB에서 제거된 북마크들을 pending에서도 제거)
+  const currentPendingArray = Array.from(pendingUnbookmarks);
+  currentPendingArray.forEach((pendingId) => {
+    if (!userBookmarks.includes(pendingId)) {
+      pendingUnbookmarks.delete(pendingId);
+    }
+  });
+
+  // pending이 비어있으면 변경사항 플래그 해제
+  if (pendingUnbookmarks.size === 0) {
+    bookmarkChangesPending = false;
+  }
+
+  console.log("🔄 북마크 pending 상태 정리 완료:", {
+    남은pending: Array.from(pendingUnbookmarks),
+    변경사항있음: bookmarkChangesPending,
+  });
+
+  // 페이지 로드 시 pending 상태 초기화 (새로고침 등으로 인한 페이지 재로드 시)
+  pendingUnbookmarks.clear();
+  bookmarkChangesPending = false;
+  console.log("🔄 북마크 pending 상태 초기화");
 
   try {
     const userEmail = currentUser.email;
@@ -1854,27 +1898,31 @@ async function toggleBookmark(conceptId) {
   const isPendingUnbookmark = pendingUnbookmarks.has(conceptId);
 
   if (isCurrentlyBookmarked && !isPendingUnbookmark) {
-    // 북마크 해제 - 시각적으로만 처리 (실제 해제는 새로고침 시)
+    // 북마크 해제 - DB에서 즉시 제거, UI에서는 그레이 상태로 표시
+    await removeBookmarkImmediately(conceptId);
     pendingUnbookmarks.add(conceptId);
     bookmarkChangesPending = true;
-    console.log("⏳ 북마크 해제 (새로고침 시 적용):", conceptId);
+    console.log("✅ 북마크 해제 완료 (DB), UI는 그레이 상태:", conceptId);
     showMessage("북마크가 해제되었습니다.", "success");
-  } else if (isCurrentlyBookmarked && isPendingUnbookmark) {
-    // 해제 취소 - 다시 북마크 상태로
+  } else if (!isCurrentlyBookmarked && isPendingUnbookmark) {
+    // 해제 취소 - 다시 북마크 추가
+    await addBookmarkImmediately(conceptId);
     pendingUnbookmarks.delete(conceptId);
-    console.log("🔄 북마크 해제 취소:", conceptId);
+    console.log("🔄 북마크 해제 취소, 다시 추가:", conceptId);
     showMessage("북마크가 다시 추가되었습니다.", "success");
 
     // 변경사항이 없으면 플래그 해제
     if (pendingUnbookmarks.size === 0) {
       bookmarkChangesPending = false;
     }
-  } else if (!isCurrentlyBookmarked) {
+    return; // addBookmarkImmediately에서 이미 UI 업데이트를 하므로 return
+  } else if (!isCurrentlyBookmarked && !isPendingUnbookmark) {
     // 북마크 추가 - 즉시 처리
     await addBookmarkImmediately(conceptId);
+    return; // addBookmarkImmediately에서 이미 UI 업데이트를 하므로 return
   }
 
-  // UI 업데이트
+  // UI 업데이트 - 북마크 해제 시에만 실행 (그레이 상태로 표시)
   updateBookmarkUI();
 }
 
@@ -1903,6 +1951,30 @@ async function addBookmarkImmediately(conceptId) {
   } catch (error) {
     console.error("❌ 북마크 추가 오류:", error);
     showMessage("북마크 추가 중 오류가 발생했습니다.", "error");
+  }
+}
+
+// 북마크 즉시 제거
+async function removeBookmarkImmediately(conceptId) {
+  try {
+    const userEmail = currentUser.email;
+    const bookmarksRef = doc(db, "bookmarks", userEmail);
+
+    const updatedBookmarks = userBookmarks.filter((id) => id !== conceptId);
+
+    const bookmarkData = {
+      user_email: userEmail,
+      concept_ids: updatedBookmarks,
+      updated_at: new Date().toISOString(),
+    };
+
+    await setDoc(bookmarksRef, bookmarkData);
+    userBookmarks = updatedBookmarks;
+
+    console.log("✅ 북마크 제거 완료:", conceptId);
+  } catch (error) {
+    console.error("❌ 북마크 제거 오류:", error);
+    showMessage("북마크 제거 중 오류가 발생했습니다.", "error");
   }
 }
 

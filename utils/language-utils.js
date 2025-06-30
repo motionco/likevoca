@@ -342,14 +342,70 @@ if (typeof window !== "undefined") {
 }
 
 // 도메인과 카테고리를 번역하는 함수
-function translateDomainCategory(domain, category, userLanguage = "ko") {
-  const langCode = userLanguage === "auto" ? "ko" : userLanguage;
-  const texts = translations[langCode] || translations.ko;
+function translateDomainCategory(domain, category, userLanguage = null) {
+  // 현재 환경 언어 감지 (우선순위: 파라미터 > getCurrentUILanguage > URL > localStorage > 기본값)
+  let langCode = userLanguage;
 
-  const domainText = texts[`domain_${domain}`] || domain;
-  const categoryText = texts[`category_${category}`] || category;
+  if (!langCode) {
+    // getCurrentUILanguage 함수 우선 사용
+    if (typeof getCurrentUILanguage === "function") {
+      langCode = getCurrentUILanguage();
+    } else {
+      // URL에서 언어 감지
+      const urlLanguage = detectLanguageFromURL();
+      if (urlLanguage) {
+        langCode = urlLanguage;
+      } else {
+        // localStorage에서 언어 가져오기
+        langCode = localStorage.getItem("userLanguage") || "ko";
+      }
+    }
+  }
 
-  return `${domainText} > ${categoryText}`;
+  // auto 언어 처리
+  if (langCode === "auto") {
+    langCode = "ko";
+  }
+
+  console.log(
+    "🌐 도메인/카테고리 번역 - 언어:",
+    langCode,
+    "도메인:",
+    domain,
+    "카테고리:",
+    category
+  );
+
+  // window.translations에서 번역 찾기 (우선)
+  let domainText = domain;
+  let categoryText = category;
+
+  if (window.translations && window.translations[langCode]) {
+    const translations = window.translations[langCode];
+    domainText = translations[`domain_${domain}`] || domain;
+    categoryText = translations[`category_${category}`] || category;
+    console.log("✅ window.translations에서 번역 찾음:", {
+      도메인: `${domain} -> ${domainText}`,
+      카테고리: `${category} -> ${categoryText}`,
+    });
+  } else {
+    // 내장 번역에서 찾기 (fallback)
+    const texts = translations[langCode] || translations.ko;
+    if (texts) {
+      domainText = texts[`domain_${domain}`] || domain;
+      categoryText = texts[`category_${category}`] || category;
+      console.log("✅ 내장 translations에서 번역 찾음:", {
+        도메인: `${domain} -> ${domainText}`,
+        카테고리: `${category} -> ${categoryText}`,
+      });
+    } else {
+      console.warn("⚠️ 번역 데이터를 찾을 수 없음, 원본 텍스트 사용");
+    }
+  }
+
+  const result = `${domainText} > ${categoryText}`;
+  console.log("✅ 최종 번역 결과:", result);
+  return result;
 }
 
 // 현재 UI 언어 가져오기 (동기 방식)
@@ -444,12 +500,41 @@ async function getActiveLanguage() {
   try {
     // 1. 먼저 URL에서 언어 확인 (최우선)
     const urlLang = detectLanguageFromURL();
+    const browserLang = detectBrowserLanguage();
+
     if (urlLang) {
       console.log("URL에서 언어 감지:", urlLang);
+
+      // 사용자가 명시적으로 설정한 언어가 있는지 확인
+      const userSetLang = localStorage.getItem("userLanguage");
+
+      // 사용자가 명시적으로 언어를 설정하지 않았고, URL 언어가 브라우저 언어와 다르면 브라우저 언어로 리디렉션
+      if (
+        !userSetLang &&
+        urlLang !== browserLang &&
+        SUPPORTED_LANGUAGES[browserLang]
+      ) {
+        console.log(
+          `🌐 브라우저 언어(${browserLang})와 URL 언어(${urlLang})가 다름. 브라우저 언어로 리디렉션합니다.`
+        );
+        cachedLanguage = browserLang;
+        localStorage.setItem("userLanguage", browserLang);
+        localStorage.setItem("preferredLanguage", browserLang);
+
+        // 브라우저 언어로 리디렉션
+        setTimeout(() => {
+          redirectToLanguagePage(browserLang, true);
+        }, 100);
+
+        return browserLang;
+      }
+
       cachedLanguage = urlLang;
       localStorage.setItem("preferredLanguage", urlLang);
-      // URL에서 감지된 언어는 사용자 설정으로도 저장
-      localStorage.setItem("userLanguage", urlLang);
+      // URL에서 감지된 언어는 사용자 설정으로도 저장 (사용자가 명시적으로 설정하지 않은 경우만)
+      if (!userSetLang) {
+        localStorage.setItem("userLanguage", urlLang);
+      }
       return urlLang;
     }
 
@@ -466,8 +551,7 @@ async function getActiveLanguage() {
     // 3. 자동 설정이거나 저장된 언어가 없는 경우
     console.log("자동 언어 감지 시도...");
 
-    // 먼저 브라우저 언어 시도
-    const browserLang = detectBrowserLanguage();
+    // 브라우저 언어 사용
     if (SUPPORTED_LANGUAGES[browserLang]) {
       console.log("브라우저 언어 사용:", browserLang);
       cachedLanguage = browserLang;
@@ -495,67 +579,70 @@ async function getActiveLanguage() {
 
 // 언어 설정 저장 및 적용
 function setLanguage(langCode) {
-  console.log("언어 설정 변경:", langCode);
+  console.log("언어 설정 저장:", langCode);
 
   if (langCode === "auto") {
     localStorage.removeItem("userLanguage");
     localStorage.removeItem("preferredLanguage"); // 도메인-카테고리-이모지용 언어 설정도 제거
     cachedLanguage = null; // 캐시 초기화
+
+    // 자동 감지 언어로 리디렉션
+    const detectedLang = detectBrowserLanguage();
+    console.log("자동 감지된 언어로 리디렉션:", detectedLang);
+
+    // 네비게이션바 언어 버튼 즉시 업데이트
+    if (window.updateLanguageButton) {
+      window.updateLanguageButton(detectedLang);
+    }
+    console.log("네비게이션바 언어 버튼 즉시 업데이트:", detectedLang);
+
+    // 100ms 지연 후 리디렉션 (사용자가 변경을 확인할 수 있도록)
+    setTimeout(() => {
+      redirectToLanguagePage(detectedLang, true);
+    }, 100);
   } else {
     localStorage.setItem("userLanguage", langCode);
     localStorage.setItem("preferredLanguage", langCode); // 도메인-카테고리-이모지용 언어 설정도 저장
     cachedLanguage = langCode; // 캐시 업데이트
+
+    // 네비게이션바 언어 버튼 즉시 업데이트
+    if (window.updateLanguageButton) {
+      window.updateLanguageButton(langCode);
+    }
+    console.log("네비게이션바 언어 버튼 즉시 업데이트:", langCode);
+
+    console.log("언어 설정이 저장되었습니다:", langCode);
+
+    // 100ms 지연 후 리디렉션 (사용자가 변경을 확인할 수 있도록)
+    setTimeout(() => {
+      redirectToLanguagePage(langCode, true);
+    }, 100);
   }
-
-  // 언어 적용 및 메타데이터 업데이트
-  applyLanguage();
-
-  // 현재 페이지 유형 감지하여 적절한 메타데이터 업데이트
-  const currentPath = window.location.pathname.toLowerCase();
-  let pageType = "home";
-
-  if (
-    currentPath.includes("multilingual-dictionary") ||
-    currentPath.includes("dictionary")
-  ) {
-    pageType = "dictionary";
-  } else if (
-    currentPath.includes("language-learning") ||
-    currentPath.includes("learning")
-  ) {
-    pageType = "learning";
-  } else if (
-    currentPath.includes("language-games") ||
-    currentPath.includes("games")
-  ) {
-    pageType = "games";
-  } else if (
-    currentPath.includes("ai-vocabulary") ||
-    currentPath.includes("ai")
-  ) {
-    pageType = "ai-vocabulary";
-  }
-
-  updateMetadata(pageType);
 }
 
 // 언어 변경 시 페이지 리다이렉트
-function redirectToLanguagePage(langCode) {
+function redirectToLanguagePage(langCode, forceRedirect = false) {
   const currentPath = window.location.pathname;
 
-  // 이미 목표 언어 경로에 있는 경우 리다이렉트하지 않음
+  // 이미 목표 언어 경로에 있는 경우 리다이렉트하지 않음 (강제 리디렉션이 아닌 경우)
   const currentLang = detectLanguageFromURL();
-  if (currentLang === langCode) {
+  if (currentLang === langCode && !forceRedirect) {
     console.log(`이미 ${langCode} 언어 페이지에 있습니다.`);
     return;
   }
 
-  // 리다이렉트 중복 방지
-  if (sessionStorage.getItem("redirecting")) {
-    console.log("이미 리다이렉트 중입니다.");
+  // 리다이렉트 중복 방지 (강제 리디렉션이 아닌 경우)
+  if (!forceRedirect && sessionStorage.getItem("redirecting")) {
+    console.log(
+      "이미 리다이렉트 중입니다. 기존 플래그를 초기화하고 재시도합니다."
+    );
+    sessionStorage.removeItem("redirecting");
+    // 100ms 후 재시도
+    setTimeout(() => redirectToLanguagePage(langCode, true), 100);
     return;
   }
 
+  console.log(`🔄 언어 리디렉션 시작: ${currentLang} → ${langCode}`);
   sessionStorage.setItem("redirecting", "true");
 
   let targetPath;
@@ -590,13 +677,15 @@ function redirectToLanguagePage(langCode) {
       : `/${langCode}/index.html`;
   }
 
-  console.log(`언어 변경: ${currentPath} → ${targetPath}`);
+  console.log(`🚀 언어 변경 리디렉션: ${currentPath} → ${targetPath}`);
+
+  // 즉시 리디렉션 실행
   window.location.href = targetPath;
 
-  // 1초 후 세션 스토리지 정리
+  // 500ms 후 세션 스토리지 정리 (더 빠르게)
   setTimeout(() => {
     sessionStorage.removeItem("redirecting");
-  }, 1000);
+  }, 500);
 }
 
 // 언어 변경 적용 (locales 방식)
@@ -747,11 +836,19 @@ function showLanguageSettingsModal() {
 
     console.log("언어 설정 저장:", selectedLang);
 
-    // 언어 설정 저장 및 적용
-    setLanguage(selectedLang);
-
-    // 모달 닫기
+    // 모달 닫기 (먼저 닫아서 사용자 경험 개선)
     document.getElementById("language-settings-modal").classList.add("hidden");
+
+    // 언어 버튼 즉시 업데이트 (리디렉션 전에)
+    if (typeof window.updateLanguageButton === "function") {
+      window.updateLanguageButton(selectedLang);
+      console.log("네비게이션바 언어 버튼 즉시 업데이트:", selectedLang);
+    }
+
+    // 언어 설정 저장 및 적용 (리디렉션 포함)
+    setTimeout(() => {
+      setLanguage(selectedLang);
+    }, 100); // 100ms 지연으로 사용자가 변경을 볼 수 있게 함
 
     // 성공 메시지 (선택사항)
     console.log("언어 설정이 저장되었습니다:", selectedLang);
@@ -940,10 +1037,12 @@ if (typeof window !== "undefined") {
     document.addEventListener("DOMContentLoaded", () => {
       handleLanguageRouting();
       updateNavigationLinks();
+      setupLanguageStateSync();
     });
   } else {
     handleLanguageRouting();
     updateNavigationLinks();
+    setupLanguageStateSync();
   }
 }
 
@@ -969,6 +1068,9 @@ if (typeof window !== "undefined") {
   window.setupI18nListener = setupI18nListener;
   window.translateDomainKey = translateDomainKey;
   window.translateCategoryKey = translateCategoryKey;
+  window.setupLanguageStateSync = setupLanguageStateSync;
+  window.reloadAndTranslateNavbar = reloadAndTranslateNavbar;
+  window.loadNavbar = loadNavbar;
 }
 
 // 언어별 링크 업데이트 함수
@@ -1086,6 +1188,379 @@ function translateCategoryKey(categoryKey, lang = null) {
   return getI18nText(`category_${categoryKey}`, lang) || categoryKey;
 }
 
+// 언어 상태 동기화 설정 (뒤로가기/앞으로가기 대응)
+function setupLanguageStateSync() {
+  console.log("🔄 언어 상태 동기화 설정");
+
+  // popstate 이벤트 리스너 (브라우저 뒤로가기/앞으로가기)
+  window.addEventListener("popstate", async (event) => {
+    console.log("🔙 브라우저 네비게이션 감지:", event);
+
+    // URL에서 언어 감지
+    const urlLanguage = detectLanguageFromURL();
+    const currentLanguage = getCurrentLanguage();
+
+    console.log("🔍 언어 비교:", { urlLanguage, currentLanguage });
+
+    if (urlLanguage && urlLanguage !== currentLanguage) {
+      console.log("⚠️ 언어 불일치 감지, 동기화 필요");
+
+      // localStorage 업데이트
+      localStorage.setItem("preferredLanguage", urlLanguage);
+
+      // 간단한 번역 적용 (재로드 없이)
+      await simpleLanguageSync(urlLanguage);
+    }
+  });
+
+  // 언어 변경 시 상태 저장
+  window.addEventListener("languageChanged", (event) => {
+    const newLanguage = event.detail.language;
+    console.log("📝 언어 변경 상태 저장:", newLanguage);
+
+    // 현재 상태를 history에 저장
+    const currentState = { language: newLanguage, timestamp: Date.now() };
+    history.replaceState(currentState, document.title, window.location.href);
+  });
+}
+
+// 간단한 언어 동기화 (네비게이션바 재로드 없이)
+async function simpleLanguageSync(language) {
+  try {
+    console.log("🔄 간단한 언어 동기화 시작, 언어:", language);
+
+    // 1. 번역 파일 재로드
+    await loadTranslations();
+
+    // 2. 페이지 번역 적용
+    await applyI18nToPage(language);
+
+    // 3. 약간의 지연 후 강제 번역 적용
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    await forceApplyTranslations(language);
+
+    // 4. 네비게이션바 함수들 호출 (있는 경우에만)
+    if (typeof window.updateLanguageButton === "function") {
+      window.updateLanguageButton(language);
+    }
+
+    if (typeof window.updateCurrentPageMenuName === "function") {
+      window.updateCurrentPageMenuName(language);
+    }
+
+    // 5. 페이지별 특수 처리
+    await handlePageSpecificSync(language);
+
+    // 6. 언어 변경 이벤트 발생
+    const languageChangeEvent = new CustomEvent("languageChanged", {
+      detail: { language: language, source: "popstate" },
+    });
+    window.dispatchEvent(languageChangeEvent);
+
+    console.log("✅ 간단한 언어 동기화 완료");
+  } catch (error) {
+    console.error("❌ 간단한 언어 동기화 실패:", error);
+  }
+}
+
+// 강제 번역 적용 함수
+async function forceApplyTranslations(language) {
+  try {
+    console.log("🔧 강제 번역 적용 시작, 언어:", language);
+
+    // 모든 data-i18n 속성을 가진 요소 강제 번역
+    const elements = document.querySelectorAll("[data-i18n]");
+    console.log(`📝 강제 번역 대상 요소: ${elements.length}개`);
+
+    elements.forEach((element, index) => {
+      const key = element.getAttribute("data-i18n");
+      const translation = getI18nText(key, language);
+
+      if (translation && translation !== key) {
+        const previousText = element.textContent.trim();
+        element.textContent = translation;
+        console.log(
+          `🔧 강제 번역 [${index}]: ${key} -> "${translation}" (이전: "${previousText}")`
+        );
+      } else {
+        console.warn(`⚠️ 번역 누락: ${key} (언어: ${language})`);
+      }
+    });
+
+    // placeholder 번역도 강제 적용
+    const placeholderElements = document.querySelectorAll(
+      "[data-i18n-placeholder]"
+    );
+    placeholderElements.forEach((element) => {
+      const key = element.getAttribute("data-i18n-placeholder");
+      const translation = getI18nText(key, language);
+      if (translation && translation !== key) {
+        element.placeholder = translation;
+      }
+    });
+
+    console.log("✅ 강제 번역 적용 완료");
+  } catch (error) {
+    console.error("❌ 강제 번역 적용 실패:", error);
+  }
+}
+
+// 페이지별 특수 동기화 처리
+async function handlePageSpecificSync(language) {
+  try {
+    const currentPath = window.location.pathname;
+
+    // 단어장 페이지
+    if (currentPath.includes("vocabulary.html")) {
+      console.log("📚 단어장 페이지 특수 동기화");
+      // 필터 UI 업데이트
+      if (typeof window.updateFilterUI === "function") {
+        await window.updateFilterUI();
+      }
+      // 개념 카드 다시 렌더링
+      if (typeof window.renderConceptCards === "function") {
+        await window.renderConceptCards();
+      }
+    }
+
+    // AI 단어장 페이지
+    if (currentPath.includes("ai-vocabulary.html")) {
+      console.log("🤖 AI 단어장 페이지 특수 동기화");
+      // 필터 UI 업데이트
+      if (typeof window.updateFilterUI === "function") {
+        await window.updateFilterUI();
+      }
+      // AI 개념 카드 다시 렌더링
+      if (typeof window.renderAIConceptCards === "function") {
+        await window.renderAIConceptCards();
+      }
+    }
+
+    // 학습 페이지
+    if (currentPath.includes("learning.html")) {
+      console.log("📖 학습 페이지 특수 동기화");
+      // 학습 UI 업데이트
+      if (typeof window.updateLearningUI === "function") {
+        await window.updateLearningUI();
+      }
+    }
+
+    // 퀴즈 페이지
+    if (currentPath.includes("quiz.html")) {
+      console.log("❓ 퀴즈 페이지 특수 동기화");
+      // 퀴즈 UI 업데이트
+      if (typeof window.updateQuizUI === "function") {
+        await window.updateQuizUI();
+      }
+    }
+  } catch (error) {
+    console.error("페이지별 특수 동기화 처리 중 오류:", error);
+  }
+}
+
+// 네비게이션바 다시 로드 및 번역 적용
+async function reloadAndTranslateNavbar(language) {
+  try {
+    console.log("🔄 네비게이션바 다시 로드 시작, 언어:", language);
+
+    const navbarContainer = document.getElementById("navbar-container");
+    if (!navbarContainer) {
+      console.warn("navbar-container를 찾을 수 없습니다.");
+      return;
+    }
+
+    // 기존 네비게이션바 백업
+    const originalContent = navbarContainer.innerHTML;
+
+    // 네비게이션바 로드 플래그 리셋
+    if (typeof window.navbarLoaded !== "undefined") {
+      window.navbarLoaded = false;
+    }
+
+    try {
+      // 네비게이션바 다시 로드 시도
+      if (typeof window.loadNavbar === "function") {
+        // 기존 내용 제거
+        navbarContainer.innerHTML = "";
+
+        // 약간의 지연 후 네비게이션바 다시 로드
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        await window.loadNavbar();
+        console.log("✅ 네비게이션바 다시 로드 완료");
+
+        // 로딩 성공 확인
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        // 네비게이션바가 제대로 로드되었는지 확인
+        const navElements = navbarContainer.querySelectorAll("nav");
+        if (navElements.length === 0) {
+          throw new Error("네비게이션바 로딩 실패 - nav 요소 없음");
+        }
+
+        // 충분한 지연 후 번역 적용
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        await applyI18nToPage(language);
+      } else {
+        console.warn("window.loadNavbar 함수를 찾을 수 없습니다.");
+        // 번역만 적용
+        await applyI18nToPage(language);
+      }
+    } catch (navError) {
+      console.error("❌ 네비게이션바 로딩 실패, 복구 시도:", navError);
+
+      // 실패 시 원본 내용 복구
+      navbarContainer.innerHTML = originalContent;
+
+      // 복구된 네비게이션바에 번역 적용
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      await applyI18nToPage(language);
+
+      console.log("🔄 네비게이션바 복구 완료");
+    }
+  } catch (error) {
+    console.error("❌ 네비게이션바 다시 로드 전체 실패:", error);
+  }
+}
+
+// 공통 네비게이션바 로딩 함수
+async function loadNavbar() {
+  try {
+    console.log("🔄 네비게이션바 로딩 시작");
+
+    // DOM 로드 확인
+    if (document.readyState === "loading") {
+      console.log("⏳ DOM 로딩 대기 중...");
+      await new Promise((resolve) => {
+        document.addEventListener("DOMContentLoaded", resolve);
+      });
+    }
+
+    const navbarContainer = document.getElementById("navbar-container");
+    if (!navbarContainer) {
+      console.error("❌ navbar-container 요소를 찾을 수 없습니다.");
+      return;
+    }
+
+    // 현재 경로와 언어에 따라 네비게이션바 파일 경로 결정
+    const currentPath = window.location.pathname;
+    const currentLanguage = getCurrentLanguage();
+    let navbarPath = "components/navbar.html";
+
+    if (currentPath.includes("/locales/")) {
+      // locales 폴더 내부에서는 해당 언어의 navbar.html 사용
+      navbarPath = "navbar.html";
+    } else if (currentPath.includes("/pages/")) {
+      // pages 폴더에서는 현재 언어에 맞는 locales 폴더의 navbar.html 사용
+      navbarPath = `../locales/${currentLanguage}/navbar.html`;
+    } else {
+      // 루트에서는 현재 언어에 맞는 locales 폴더의 navbar.html 사용
+      navbarPath = `locales/${currentLanguage}/navbar.html`;
+    }
+
+    console.log("📍 네비게이션바 경로:", navbarPath);
+
+    // 네비게이션바 HTML 로드
+    const response = await fetch(navbarPath);
+    if (!response.ok) {
+      // 언어별 네비게이션바 로드 실패 시 기본 components/navbar.html 시도
+      console.warn(
+        `언어별 네비게이션바 로드 실패 (${response.status}), 기본 네비게이션바 시도`
+      );
+
+      let fallbackPath = "components/navbar.html";
+      if (currentPath.includes("/locales/")) {
+        fallbackPath = "../../components/navbar.html";
+      } else if (currentPath.includes("/pages/")) {
+        fallbackPath = "../components/navbar.html";
+      }
+
+      const fallbackResponse = await fetch(fallbackPath);
+      if (!fallbackResponse.ok) {
+        throw new Error(`네비게이션바 로드 실패: ${fallbackResponse.status}`);
+      }
+
+      const fallbackHTML = await fallbackResponse.text();
+      navbarContainer.innerHTML = fallbackHTML;
+      console.log("✅ 기본 네비게이션바 HTML 로드 완료");
+    } else {
+      const navbarHTML = await response.text();
+      navbarContainer.innerHTML = navbarHTML;
+      console.log("✅ 언어별 네비게이션바 HTML 로드 완료");
+    }
+
+    // 약간의 지연 후 초기화 (DOM 안정화)
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    console.log("🌐 현재 언어:", currentLanguage);
+
+    // 네비게이션바 초기화
+    if (typeof window.initializeNavbar === "function") {
+      await window.initializeNavbar(currentLanguage);
+      console.log("✅ 네비게이션바 초기화 완료");
+    } else {
+      console.warn("⚠️ initializeNavbar 함수를 찾을 수 없습니다.");
+
+      // 기본 이벤트 설정
+      setupBasicNavbarEvents();
+    }
+
+    // 번역 적용
+    await applyI18nToPage(currentLanguage);
+
+    // 네비게이션바 로드 완료 플래그
+    window.navbarLoaded = true;
+
+    console.log("🎉 네비게이션바 로딩 완료");
+  } catch (error) {
+    console.error("❌ 네비게이션바 로딩 실패:", error);
+
+    // 실패 시 기본 네비게이션바 생성
+    const navbarContainer = document.getElementById("navbar-container");
+    if (navbarContainer) {
+      navbarContainer.innerHTML = `
+        <nav class="bg-[#4B63AC] p-4 shadow-md">
+          <div class="container mx-auto flex justify-between items-center max-w-6xl">
+            <a href="/" class="text-white text-xl font-bold">LikeVoca</a>
+            <div class="text-white text-sm">네비게이션바 로딩 실패 - 새로고침해주세요</div>
+          </div>
+        </nav>
+      `;
+    }
+  }
+}
+
+// 기본 네비게이션바 이벤트 설정
+function setupBasicNavbarEvents() {
+  console.log("🔧 기본 네비게이션바 이벤트 설정");
+
+  // 햄버거 메뉴
+  const menuToggle = document.getElementById("menu-toggle");
+  const mobileMenu = document.getElementById("mobile-menu");
+
+  if (menuToggle && mobileMenu) {
+    menuToggle.addEventListener("click", () => {
+      mobileMenu.classList.toggle("hidden");
+    });
+  }
+
+  // 언어 버튼
+  const languageButton = document.getElementById("language-button");
+  if (languageButton) {
+    languageButton.addEventListener("click", () => {
+      if (typeof window.showLanguageSettingsModal === "function") {
+        window.showLanguageSettingsModal();
+      }
+    });
+  }
+}
+
+// loadNavbar 함수를 전역으로 노출
+if (typeof window !== "undefined") {
+  window.loadNavbar = loadNavbar;
+  console.log("✅ loadNavbar 함수를 전역으로 노출했습니다.");
+}
+
 export {
   SUPPORTED_LANGUAGES,
   detectBrowserLanguage,
@@ -1101,4 +1576,7 @@ export {
   setupI18nListener,
   translateDomainKey,
   translateCategoryKey,
+  setupLanguageStateSync,
+  reloadAndTranslateNavbar,
+  loadNavbar,
 };

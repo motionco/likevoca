@@ -352,7 +352,7 @@ function createConceptCard(concept) {
               ? window.translateDomainCategory(
                   conceptInfo.domain,
                   conceptInfo.category,
-                  userLanguage
+                  getCurrentUILanguage() || userLanguage
                 )
               : `${conceptInfo.domain} > ${conceptInfo.category}`
           }
@@ -2146,3 +2146,58 @@ function getTranslatedDomainCategory(domain, category) {
   const categoryText = translations[`category_${category}`] || category;
   return `${domainText} > ${categoryText}`;
 }
+
+// 언어 변경 이벤트 리스너 설정
+function setupLanguageChangeListener() {
+  // 언어 변경 이벤트 감지
+  window.addEventListener("languageChanged", (event) => {
+    console.log("🌐 단어장: 언어 변경 감지", event.detail.language);
+
+    // 개념 카드들을 다시 렌더링
+    if (filteredConcepts && filteredConcepts.length > 0) {
+      displayConceptList();
+    }
+
+    // 필터 UI도 업데이트
+    if (typeof window.updateDomainCategoryEmojiLanguage === "function") {
+      window.updateDomainCategoryEmojiLanguage();
+    }
+  });
+
+  console.log("✅ 단어장: 언어 변경 리스너 설정 완료");
+}
+
+// 페이지 로드 시 언어 변경 리스너 설정
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", setupLanguageChangeListener);
+} else {
+  setupLanguageChangeListener();
+}
+
+// 전역 렌더링 함수들 (언어 동기화에서 사용)
+window.renderConceptCards = function () {
+  console.log("🔄 단어장: 개념 카드 다시 렌더링");
+  console.log("📊 현재 상태:", {
+    allConcepts: allConcepts?.length || 0,
+    filteredConcepts: filteredConcepts?.length || 0,
+  });
+
+  // 필터링된 개념이 없으면 전체 개념으로 다시 설정
+  if (!filteredConcepts || filteredConcepts.length === 0) {
+    console.log("⚠️ 필터링된 개념이 없음, 전체 개념 사용");
+    filteredConcepts = [...allConcepts];
+  }
+
+  if (filteredConcepts && filteredConcepts.length > 0) {
+    displayConceptList();
+  } else {
+    console.warn("⚠️ 표시할 개념이 없습니다");
+  }
+};
+
+window.updateFilterUI = function () {
+  console.log("🔄 단어장: 필터 UI 업데이트");
+  if (typeof window.updateDomainCategoryEmojiLanguage === "function") {
+    window.updateDomainCategoryEmojiLanguage();
+  }
+};

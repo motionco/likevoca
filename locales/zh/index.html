@@ -217,71 +217,103 @@
       
       document.addEventListener('DOMContentLoaded', async () => {
         try {
-          console.log("메인 페이지 초기화 시작");
+          console.log("主页初始化开始");
           
-          // 언어 설정 강제 적용
-          localStorage.setItem('userLanguage', 'zh');
+          // 页面加载时清理重定向标志
+          if (sessionStorage.getItem("redirecting")) {
+            console.log("清理之前的重定向标志");
+            sessionStorage.removeItem("redirecting");
+          }
           
-          // 번역 즉시 적용
+          // 导航栏加载 (使用从language-utils.js导入的函数)
+          if (typeof window.loadNavbar === 'function') {
+            await window.loadNavbar();
+            console.log("导航栏加载完成");
+          } else {
+            console.warn("找不到window.loadNavbar函数，尝试直接加载...");
+            
+            // 直接加载导航栏
+            try {
+              const response = await fetch('navbar.html');
+              const navbarHTML = await response.text();
+              const navbarContainer = document.getElementById('navbar-container');
+              if (navbarContainer) {
+                navbarContainer.innerHTML = navbarHTML;
+                console.log("导航栏直接加载完成");
+                
+                // navbar.js 脚本已经加载，只需初始化
+                if (typeof window.initializeNavbar === 'function') {
+                  await window.initializeNavbar('zh');
+                  console.log("导航栏初始化完成");
+                } else {
+                  console.warn("找不到initializeNavbar函数");
+                }
+              }
+            } catch (error) {
+              console.error("导航栏直接加载失败:", error);
+            }
+          }
+          
+          // 翻译即时应用
           await applyLanguage();
-          console.log("번역 적용 완료");
+          console.log("翻译应用完成");
           
           const currentLang = await getActiveLanguage();
-          console.log("현재 언어:", currentLang);
+          console.log("当前语言:", currentLang);
           
           await updateMetadata('home');
-          console.log("메타데이터 업데이트 완료");
+          console.log("元数据更新完成");
           
-          // 번역이 제대로 적용되었는지 확인하고 재적용
+          // 检查翻译是否正确应用并重新应用
           setTimeout(async () => {
             const testElement = document.querySelector('[data-i18n="learn_languages"]');
-            console.log("번역 확인 요소:", testElement?.textContent);
-            console.log("번역 확인 요소 HTML:", testElement?.outerHTML);
+            console.log("翻译检查元素:", testElement?.textContent);
+            console.log("翻译检查元素 HTML:", testElement?.outerHTML);
             if (testElement && testElement.textContent.trim() === '') {
-              console.log("번역 재적용 시도");
+              console.log("翻译重新应用尝试");
               await applyLanguage();
               
-              // 재적용 후 다시 확인
+              // 重新应用后再次检查
               setTimeout(() => {
-                console.log("재적용 후 텍스트:", testElement?.textContent);
+                console.log("重新应用后文本:", testElement?.textContent);
               }, 100);
             }
           }, 100);
           
-          // 추가 안전장치 - 1초 후 한번 더 확인
+          // 额外安全措施 - 1秒后再次检查
           setTimeout(async () => {
             const testElement = document.querySelector('[data-i18n="learn_languages"]');
             if (testElement && testElement.textContent.trim() === '') {
-              console.log("번역 최종 재적용");
+              console.log("翻译最终重新应用");
               await applyLanguage();
             }
           }, 1000);
           
-          // 무료로 시작하기 버튼 이벤트 처리
+          // 免费开始按钮事件处理
           const getStartedBtn = document.getElementById('get-started-btn');
           if (getStartedBtn) {
             getStartedBtn.addEventListener('click', async () => {
               try {
-                // 현재 언어 확인
+                // 检查当前语言
                 const currentLang = await getActiveLanguage();
-                console.log("현재 언어:", currentLang);
+                console.log("当前语言:", currentLang);
                 
-                // Firebase 인증 상태 확인
+                // Firebase 认证状态检查
                 const { onAuthStateChanged } = await import('../../js/firebase/firebase-init.js');
                 const { auth } = await import('../../js/firebase/firebase-init.js');
                 
                 onAuthStateChanged(auth, (user) => {
                   if (user) {
-                    // 로그인된 사용자 - 나만의 단어장으로 이동
+                    // 已登录用户 - 进入我的单词本
                     window.location.href = 'my-word-list.html';
                   } else {
-                    // 로그아웃된 사용자 - 현재 언어의 회원가입 페이지로 이동
+                    // 已注销用户 - 进入当前语言的注册页面
                     window.location.href = `../${currentLang}/signup.html`;
                   }
                 });
               } catch (error) {
-                console.error('인증 상태 확인 중 오류:', error);
-                // 오류 발생 시 현재 언어의 회원가입 페이지로 이동
+                console.error('认证状态检查中错误:', error);
+                // 错误发生时进入当前语言的注册页面
                 const currentLang = localStorage.getItem('userLanguage') || 'zh';
                 window.location.href = `../${currentLang}/signup.html`;
               }
@@ -289,7 +321,7 @@
           }
           
         } catch (error) {
-          console.error('언어 설정 적용 중 오류:', error);
+          console.error('语言设置应用中错误:', error);
         }
       });
     </script>

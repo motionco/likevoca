@@ -93,6 +93,11 @@ async function initializeFirebase() {
 // 페이지 로드 시 Firebase 초기화
 initializeFirebase();
 
+// 전역 접근을 위해 window 객체에 추가
+window.auth = auth;
+window.db = db;
+window.onAuthStateChanged = onAuthStateChanged;
+
 // 다국어 지원 언어 목록
 export const supportedLanguages = {
   korean: { nameKo: "한국어", code: "ko", example: "사과" },

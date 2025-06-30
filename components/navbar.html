@@ -63,7 +63,7 @@
       </button>
 
       <!-- Desktop: 로그인/회원가입 버튼 (로그인 전) -->
-      <div id="desktop-login-section" class="hidden lg:hidden space-x-2">
+      <div id="desktop-login-section" class="hidden lg:hidden lg:flex space-x-2">
         <a
           href="#"
           id="login-button"
@@ -83,7 +83,7 @@
     </div>
 
       <!-- 유저 프로필 (반응형) -->
-      <div id="desktop-user-section" class="hidden items-center lg:hidden">
+      <div id="desktop-user-section" class="hidden lg:hidden lg:flex items-center">
     <div
       id="user-profile"
           class="relative flex items-center text-white"
@@ -93,7 +93,7 @@
           id="avatar"
               class="w-8 h-8 lg:w-10 lg:h-10 rounded-full overflow-hidden border-2 border-white"
         >
-          <img id="profile-image" src="" alt="프로필" class="w-full h-full object-cover" />
+          <img id="profile-image" src="https://www.w3schools.com/howto/img_avatar.png" alt="프로필" class="w-full h-full object-cover" />
         </div>
       </div>
 
@@ -102,7 +102,7 @@
             class="hidden absolute top-12 right-0 bg-white shadow-lg rounded-lg py-2 w-48 text-gray-900 z-50"
       >
         <div class="px-4 py-2 font-semibold border-b border-gray-200">
-          <span id="user-name"></span>
+          <span id="user-name">사용자</span>
         </div>
             <a
               href="my-word-list.html"
@@ -145,7 +145,8 @@
     <a href="progress.html" class="text-lg hover:text-yellow-400" data-i18n="progress" data-i18n-link="progress.html">진도</a>
     <a href="inquiry.html" class="text-lg hover:text-yellow-400" data-i18n="inquiry" data-i18n-link="inquiry.html">문의하기</a>
 
-    <div id="mobile-login-buttons" class="flex space-x-3">
+    <!-- 모바일 로그인 버튼들 -->
+    <div id="mobile-login-buttons" class="hidden flex space-x-3">
       <a
         href="#"
         onclick="goToLanguageSpecificPage('login.html')"
@@ -160,6 +161,41 @@
         data-i18n="signup"
         >회원가입</a
       >
+    </div>
+
+    <!-- 모바일 사용자 프로필 -->
+    <div id="mobile-user-section" class="hidden flex-col items-center space-y-2">
+      <div class="flex items-center space-x-2">
+        <div id="mobile-avatar" class="w-8 h-8 rounded-full overflow-hidden border-2 border-white">
+          <img id="mobile-profile-image" src="https://www.w3schools.com/howto/img_avatar.png" alt="프로필" class="w-full h-full object-cover" />
+        </div>
+        <span id="mobile-user-name" class="text-white font-semibold">사용자</span>
+      </div>
+      <div class="flex space-x-3">
+        <a
+          href="my-word-list.html"
+          class="text-white hover:text-yellow-400"
+          data-i18n="wordbook"
+          data-i18n-link="my-word-list.html"
+        >
+          나만의 단어장
+        </a>
+        <a
+          href="profile.html"
+          class="text-white hover:text-yellow-400"
+          data-i18n="profile"
+          data-i18n-link="profile.html"
+        >
+          프로필
+        </a>
+        <button
+          id="mobile-logout-button"
+          class="text-white hover:text-yellow-400"
+          data-i18n="logout"
+        >
+          로그아웃
+        </button>
+      </div>
     </div>
 
   </div>

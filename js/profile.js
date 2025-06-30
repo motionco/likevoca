@@ -198,7 +198,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     logoutBtn.addEventListener("click", async () => {
       try {
         await logout();
-        window.location.href = "login.html";
+        if (typeof window.redirectToLogin === "function") {
+          window.redirectToLogin();
+        } else {
+          window.location.href = "login.html";
+        }
       } catch (error) {
         console.error("로그아웃 오류:", error);
         alert(`로그아웃 실패: ${error.message}`);
@@ -218,7 +222,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       try {
         await deleteAccount();
         alert("계정이 삭제되었습니다.");
-        window.location.href = "login.html";
+        if (typeof window.redirectToLogin === "function") {
+          window.redirectToLogin();
+        } else {
+          window.location.href = "login.html";
+        }
       } catch (error) {
         console.error("계정 삭제 오류:", error);
         alert(`계정 삭제 실패: ${error.message}`);
@@ -317,11 +325,13 @@ async function initializeNavbar() {
   if (mobileLoginButtons) {
     const links = mobileLoginButtons.querySelectorAll("a");
     links.forEach((link) => {
-      // 상대 경로를 절대 경로로 변경
+      // 상대 경로를 언어별 리다이렉트 함수로 변경
       if (link.getAttribute("href") === "login.html") {
-        link.setAttribute("href", "/login.html");
+        link.setAttribute("href", "#");
+        link.setAttribute("onclick", "window.redirectToLogin()");
       } else if (link.getAttribute("href") === "signup.html") {
-        link.setAttribute("href", "/signup.html");
+        link.setAttribute("href", "#");
+        link.setAttribute("onclick", "window.redirectToSignup()");
       }
     });
   }
@@ -331,11 +341,13 @@ async function initializeNavbar() {
   const signupButton = document.getElementById("signup-button");
 
   if (loginButton && loginButton.getAttribute("href") === "login.html") {
-    loginButton.setAttribute("href", "/login.html");
+    loginButton.setAttribute("href", "#");
+    loginButton.setAttribute("onclick", "window.redirectToLogin()");
   }
 
   if (signupButton && signupButton.getAttribute("href") === "signup.html") {
-    signupButton.setAttribute("href", "/signup.html");
+    signupButton.setAttribute("href", "#");
+    signupButton.setAttribute("onclick", "window.redirectToSignup()");
   }
 
   // 로그아웃 버튼 동작 설정
