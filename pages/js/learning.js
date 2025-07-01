@@ -13,6 +13,9 @@ import {
   orderBy,
 } from "../../js/firebase/firebase-init.js";
 
+// CollectionManager import
+import { CollectionManager } from "../../js/firebase/firebase-collection-manager.js";
+
 // 전역 변수
 let currentUser = null;
 let currentData = [];
@@ -24,6 +27,16 @@ let currentLearningMode = null;
 let sourceLanguage = "korean";
 let targetLanguage = "english";
 let currentUILanguage = "korean";
+
+// 📚 학습 활동 추적을 위한 변수들
+let collectionManager = null;
+let learningSessionData = {
+  startTime: null,
+  conceptsStudied: new Set(),
+  totalInteractions: 0,
+  correctAnswers: 0,
+  sessionActive: false,
+};
 
 // 네비게이션 중복 실행 방지
 let isNavigating = false;
@@ -91,6 +104,9 @@ async function waitForFirebaseInit() {
 // DOM 로드 완료 시 초기화
 document.addEventListener("DOMContentLoaded", function () {
   console.log("📚 학습 페이지 초기화");
+
+  // CollectionManager 초기화
+  collectionManager = new CollectionManager();
 
   // Firebase 인증 확인
   onAuthStateChanged(auth, (user) => {
@@ -2155,6 +2171,14 @@ function showLearningModes(area) {
 window.startLearningMode = async function startLearningMode(area, mode) {
   console.log(`🎯 학습 모드 시작: ${area} - ${mode}`);
 
+  // 이전 세션이 있다면 완료 처리
+  if (learningSessionData.sessionActive) {
+    await completeLearningSession();
+  }
+
+  // 새 학습 세션 시작
+  startLearningSession(area, mode);
+
   // 현재 학습 영역과 모드 설정
   currentLearningArea = area;
   currentLearningMode = mode;
@@ -3356,6 +3380,18 @@ function navigateContent(direction) {
   );
 
   const oldIndex = currentIndex;
+
+  // 📚 현재 항목 학습 완료로 추적 (다음으로 넘어갈 때)
+  const currentItem = currentData[currentIndex];
+  if (direction > 0 && currentItem) {
+    const conceptId =
+      currentItem.id ||
+      currentItem.concept_id ||
+      `${currentLearningArea}_${currentIndex}`;
+    trackLearningInteraction(conceptId, true);
+    checkSessionCompletion();
+  }
+
   currentIndex += direction;
 
   // 순환 처리
@@ -4579,6 +4615,94 @@ async function syncUserLearningData() {
   }
 }
 
+// 📚 학습 세션 시작
+function startLearningSession(area, mode) {
+  learningSessionData = {
+    startTime: new Date(),
+    conceptsStudied: new Set(),
+    totalInteractions: 0,
+    correctAnswers: 0,
+    sessionActive: true,
+    area: area,
+    mode: mode,
+  };
+  console.log("📚 학습 세션 시작:", learningSessionData);
+}
+
+// 📚 학습 상호작용 추적
+function trackLearningInteraction(conceptId, isCorrect = true) {
+  if (!learningSessionData.sessionActive) return;
+
+  learningSessionData.totalInteractions++;
+  if (isCorrect) {
+    learningSessionData.correctAnswers++;
+  }
+
+  if (conceptId) {
+    learningSessionData.conceptsStudied.add(conceptId);
+  }
+
+  console.log("📊 학습 상호작용 추적:", {
+    interactions: learningSessionData.totalInteractions,
+    correct: learningSessionData.correctAnswers,
+    conceptsCount: learningSessionData.conceptsStudied.size,
+  });
+}
+
+// 📚 학습 세션 완료 (10개 학습 후 또는 영역 전환 시)
+async function completeLearningSession() {
+  if (
+    !learningSessionData.sessionActive ||
+    !currentUser ||
+    !collectionManager
+  ) {
+    return;
+  }
+
+  const endTime = new Date();
+  const duration = Math.round(
+    (endTime - learningSessionData.startTime) / 1000 / 60
+  ); // 분 단위
+
+  const activityData = {
+    type: learningSessionData.area,
+    conceptIds: Array.from(learningSessionData.conceptsStudied),
+    duration: duration,
+    sourceLanguage: sourceLanguage,
+    targetLanguage: targetLanguage,
+    wordsStudied: learningSessionData.conceptsStudied.size,
+    totalInteractions: learningSessionData.totalInteractions,
+    correctAnswers: learningSessionData.correctAnswers,
+    sessionQuality:
+      learningSessionData.correctAnswers /
+        Math.max(learningSessionData.totalInteractions, 1) >
+      0.7
+        ? "excellent"
+        : "good",
+  };
+
+  try {
+    await collectionManager.updateLearningActivity(
+      currentUser.email,
+      activityData
+    );
+    console.log("✅ 학습 활동 추적 완료:", activityData);
+  } catch (error) {
+    console.error("❌ 학습 활동 추적 실패:", error);
+  }
+
+  // 세션 초기화
+  learningSessionData.sessionActive = false;
+}
+
+// 📚 학습 세션 자동 완료 체크 (10개 개념 학습 시)
+function checkSessionCompletion() {
+  if (learningSessionData.conceptsStudied.size >= 10) {
+    console.log("🎯 10개 개념 학습 완료 - 세션 종료");
+    completeLearningSession();
+  }
+}
+
 // 페이지 로드 시 사용자 데이터 동기화
 window.addEventListener("load", async () => {
   // Firebase 초기화 대기
@@ -4590,4 +4714,11 @@ window.addEventListener("load", async () => {
   // UI 업데이트
   updateLearningStreak();
   await updateRecentActivity();
+});
+
+// 페이지 이탈 시 진행 중인 세션 완료
+window.addEventListener("beforeunload", () => {
+  if (learningSessionData.sessionActive) {
+    completeLearningSession();
+  }
 });

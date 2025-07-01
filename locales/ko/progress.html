@@ -1,5 +1,5 @@
-﻿<!DOCTYPE html>
-<html lang="ja">
+<!DOCTYPE html>
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -34,79 +34,100 @@
         </p>
       </div>
 
-      <!-- 학습 통계 요약 -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-600" data-i18n="total_words">총 단어수</p>
-              <p id="total-words-count" class="text-2xl font-bold text-blue-600">0</p>
+      <!-- 📊 학습 현황 요약 -->
+      <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-8 border border-blue-100">
+        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+          <i class="fas fa-chart-line text-blue-600 mr-2"></i>
+          학습 현황 요약
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div class="bg-white rounded-lg shadow-sm p-5 border-l-4 border-blue-500">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-600" data-i18n="total_words">총 단어수</p>
+                <p id="total-words-count" class="text-2xl font-bold text-blue-600">0</p>
+              </div>
+              <div class="bg-blue-100 p-3 rounded-full">
+                <i class="fas fa-book text-blue-600 text-xl"></i>
+              </div>
             </div>
-            <div class="text-blue-500">
-              <i class="fas fa-book text-2xl"></i>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-sm p-5 border-l-4 border-green-500">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-600" data-i18n="mastered_words">마스터한 단어</p>
+                <p id="mastered-words-count" class="text-2xl font-bold text-green-600">0</p>
+              </div>
+              <div class="bg-green-100 p-3 rounded-full">
+                <i class="fas fa-check-circle text-green-600 text-xl"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-sm p-5 border-l-4 border-orange-500">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-600" data-i18n="study_streak">연속 학습</p>
+                <p id="study-streak-count" class="text-2xl font-bold text-orange-600">0일</p>
+              </div>
+              <div class="bg-orange-100 p-3 rounded-full">
+                <i class="fas fa-fire text-orange-600 text-xl"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-sm p-5 border-l-4 border-purple-500">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-gray-600" data-i18n="quiz_accuracy">퀴즈 정확도</p>
+                <p id="quiz-accuracy-rate" class="text-2xl font-bold text-purple-600">0%</p>
+              </div>
+              <div class="bg-purple-100 p-3 rounded-full">
+                <i class="fas fa-target text-purple-600 text-xl"></i>
+              </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-600" data-i18n="mastered_words">마스터한 단어</p>
-              <p id="mastered-words-count" class="text-2xl font-bold text-green-600">0</p>
-            </div>
-            <div class="text-green-500">
-              <i class="fas fa-check-circle text-2xl"></i>
+      <!-- 📚 학습 활동 분석 -->
+      <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 mb-8 border border-green-100">
+        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+          <i class="fas fa-chart-bar text-green-600 mr-2"></i>
+          학습 활동 분석
+        </h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- 주간 학습 활동 -->
+          <div class="bg-white rounded-lg shadow-sm p-6 border border-green-100">
+            <h3 class="text-lg font-semibold mb-4 flex items-center text-green-700" data-i18n="weekly_activity">
+              <i class="fas fa-calendar-week text-sm mr-2"></i>
+              주간 학습 활동
+            </h3>
+            <div class="relative h-64">
+              <canvas id="weekly-activity-chart" class="w-full h-full"></canvas>
             </div>
           </div>
-        </div>
 
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-600" data-i18n="study_streak">연속 학습</p>
-              <p id="study-streak-count" class="text-2xl font-bold text-orange-600">0일</p>
-            </div>
-            <div class="text-orange-500">
-              <i class="fas fa-fire text-2xl"></i>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-600" data-i18n="quiz_accuracy">퀴즈 정확도</p>
-              <p id="quiz-accuracy-rate" class="text-2xl font-bold text-purple-600">0%</p>
-            </div>
-            <div class="text-purple-500">
-              <i class="fas fa-target text-2xl"></i>
+          <!-- 카테고리별 진도 -->
+          <div class="bg-white rounded-lg shadow-sm p-6 border border-green-100">
+            <h3 class="text-lg font-semibold mb-4 flex items-center text-green-700" data-i18n="category_progress">
+              <i class="fas fa-tags text-sm mr-2"></i>
+              카테고리별 진도
+            </h3>
+            <div class="relative h-64">
+              <canvas id="category-progress-chart" class="w-full h-full"></canvas>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 학습 차트 섹션 -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <!-- 주간 학습 활동 -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <h2 class="text-xl font-semibold mb-4" data-i18n="weekly_activity">주간 학습 활동</h2>
-          <div class="relative h-64">
-            <canvas id="weekly-activity-chart" class="w-full h-full"></canvas>
-          </div>
-        </div>
-
-        <!-- 카테고리별 진도 -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <h2 class="text-xl font-semibold mb-4" data-i18n="category_progress">카테고리별 진도</h2>
-          <div class="relative h-64">
-            <canvas id="category-progress-chart" class="w-full h-full"></canvas>
-          </div>
-        </div>
-      </div>
-
-      <!-- 언어별 마스터리 -->
-      <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-        <h2 class="text-xl font-semibold mb-6" data-i18n="language_mastery">언어별 마스터리</h2>
+      <!-- 🌍 언어별 마스터리 -->
+      <div class="bg-gradient-to-r from-purple-50 to-violet-50 rounded-xl p-6 mb-8 border border-purple-100">
+        <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+          <i class="fas fa-globe text-purple-600 mr-2"></i>
+          <span data-i18n="language_mastery">언어별 마스터리</span>
+        </h2>
         
         <div class="space-y-6">
           <!-- 한국어 -->
@@ -135,9 +156,9 @@
               <div id="english-mastery-bar" class="bg-green-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
             </div>
             <div class="flex justify-between text-xs text-gray-500 mt-1">
-              <span data-i18n="beginner">Beginner</span>
-              <span data-i18n="intermediate">Intermediate</span>
-              <span data-i18n="advanced">Advanced</span>
+              <span data-i18n="beginner">초급</span>
+              <span data-i18n="intermediate">중급</span>
+              <span data-i18n="advanced">고급</span>
             </div>
           </div>
 
@@ -151,9 +172,9 @@
               <div id="japanese-mastery-bar" class="bg-red-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
             </div>
             <div class="flex justify-between text-xs text-gray-500 mt-1">
-              <span data-i18n="beginner">初級</span>
-              <span data-i18n="intermediate">中級</span>
-              <span data-i18n="advanced">上級</span>
+              <span data-i18n="beginner">초급</span>
+              <span data-i18n="intermediate">중급</span>
+              <span data-i18n="advanced">고급</span>
             </div>
           </div>
 
@@ -167,17 +188,84 @@
               <div id="chinese-mastery-bar" class="bg-yellow-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
             </div>
             <div class="flex justify-between text-xs text-gray-500 mt-1">
-              <span data-i18n="beginner">初级</span>
-              <span data-i18n="intermediate">中级</span>
-              <span data-i18n="advanced">高级</span>
+              <span data-i18n="beginner">초급</span>
+              <span data-i18n="intermediate">중급</span>
+              <span data-i18n="advanced">고급</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 최근 학습 활동 -->
-      <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-        <h2 class="text-xl font-semibold mb-4" data-i18n="recent_activities">최근 학습 활동</h2>
+      <!-- 🎮 게임 & 학습 성취도 -->
+      <div class="bg-gradient-to-r from-pink-50 to-rose-50 rounded-xl p-6 mb-8 border border-pink-100">
+        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+          <i class="fas fa-trophy text-pink-600 mr-2"></i>
+          <span data-i18n="achievements">성취도</span>
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- 게임 성취도 -->
+          <div class="bg-white rounded-lg shadow-sm p-5 border border-pink-100">
+            <div class="flex items-center mb-3">
+              <i class="fas fa-gamepad text-pink-600 mr-2"></i>
+              <h3 class="font-semibold text-gray-800" data-i18n="game_achievements">게임 성취도</h3>
+            </div>
+            <div class="space-y-2">
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-600" data-i18n="total_games">총 게임 수:</span>
+                <span id="total-games-count" class="text-sm font-medium">0회</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-600" data-i18n="avg_game_score">평균 점수:</span>
+                <span id="avg-game-score" class="text-sm font-medium">0점</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 학습 세션 성취도 -->
+          <div class="bg-white rounded-lg shadow-sm p-5 border border-pink-100">
+            <div class="flex items-center mb-3">
+              <i class="fas fa-book-reader text-pink-600 mr-2"></i>
+              <h3 class="font-semibold text-gray-800" data-i18n="learning_achievements">학습 성취도</h3>
+            </div>
+            <div class="space-y-2">
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-600" data-i18n="total_sessions">총 학습 세션:</span>
+                <span id="total-learning-sessions" class="text-sm font-medium">0회</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-600" data-i18n="avg_session_quality">평균 품질:</span>
+                <span id="avg-session-quality" class="text-sm font-medium">-</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 종합 성취도 -->
+          <div class="bg-white rounded-lg shadow-sm p-5 border border-pink-100">
+            <div class="flex items-center mb-3">
+              <i class="fas fa-star text-pink-600 mr-2"></i>
+              <h3 class="font-semibold text-gray-800" data-i18n="overall_achievements">종합 성취도</h3>
+            </div>
+            <div class="space-y-2">
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-600" data-i18n="total_study_time">총 학습 시간:</span>
+                <span id="total-study-time" class="text-sm font-medium">0분</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-600" data-i18n="completion_rate">완료율:</span>
+                <span id="completion-rate" class="text-sm font-medium">0%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🎯 최근 학습 활동 -->
+      <div class="bg-gradient-to-r from-yellow-50 to-amber-50 rounded-xl p-6 mb-8 border border-yellow-100">
+        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+          <i class="fas fa-history text-yellow-600 mr-2"></i>
+          <span data-i18n="recent_activities">최근 학습 활동</span>
+        </h2>
         
         <div id="recent-activities-list" class="space-y-3">
           <div class="text-center py-8 text-gray-500">
@@ -187,9 +275,12 @@
         </div>
       </div>
 
-      <!-- 학습 목표 설정 -->
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-xl font-semibold mb-4" data-i18n="learning_goals">학습 목표</h2>
+      <!-- 🎯 학습 목표 설정 -->
+      <div class="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl p-6 border border-teal-100">
+        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+          <i class="fas fa-bullseye text-teal-600 mr-2"></i>
+          <span data-i18n="learning_goals">학습 목표</span>
+        </h2>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- 일일 목표 -->
@@ -283,9 +374,12 @@
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="weekly_mastery_goal">
-                  마스터 목표
+                <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="weekly_mastery_goal">
+                  단어 마스터 목표
                 </label>
+                <p class="text-xs text-gray-500 mb-2">
+                  완전히 익힌 단어 수 (60% 이상 숙련도)
+                </p>
                 <div class="flex items-center space-x-3">
                   <input 
                     type="number" 

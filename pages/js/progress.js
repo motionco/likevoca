@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 네비게이션바 로드
     try {
       const userLanguage = localStorage.getItem("userLanguage") || "ko";
-      const response = await fetch(`../locales/${userLanguage}/navbar.html`);
+      const response = await fetch(`../../locales/${userLanguage}/navbar.html`);
       if (response.ok) {
         const navbarHTML = await response.text();
         navbarContainer.innerHTML = navbarHTML;
@@ -98,6 +98,14 @@ function initializeElements() {
     // 최근 활동
     recentActivitiesList: document.getElementById("recent-activities-list"),
 
+    // 🎮 성취도 요소들 추가
+    totalGamesCount: document.getElementById("total-games-count"),
+    avgGameScore: document.getElementById("avg-game-score"),
+    totalLearningSessions: document.getElementById("total-learning-sessions"),
+    avgSessionQuality: document.getElementById("avg-session-quality"),
+    totalStudyTime: document.getElementById("total-study-time"),
+    completionRate: document.getElementById("completion-rate"),
+
     // 학습 목표
     dailyWordsGoal: document.getElementById("daily-words-goal"),
     dailyQuizGoal: document.getElementById("daily-quiz-goal"),
@@ -121,6 +129,20 @@ function initializeElements() {
 function registerEventListeners() {
   // 목표 저장 버튼
   elements.saveGoalsBtn.addEventListener("click", saveUserGoals);
+
+  // 🏆 마스터한 단어 카드 클릭 이벤트
+  if (
+    elements.masteredWordsCount &&
+    elements.masteredWordsCount.parentElement
+  ) {
+    elements.masteredWordsCount.parentElement.addEventListener(
+      "click",
+      showMasteredWordsList
+    );
+    elements.masteredWordsCount.parentElement.style.cursor = "pointer";
+    elements.masteredWordsCount.parentElement.title =
+      "클릭하여 마스터한 단어 목록 보기";
+  }
 
   // 목표 입력 필드 변경 시 실시간 업데이트
   elements.dailyWordsGoal.addEventListener("input", updateDailyGoalsDisplay);
@@ -153,6 +175,15 @@ async function initializeLanguageSystem() {
   }
 }
 
+// 번역 함수
+function getTranslatedText(key) {
+  if (typeof window.translations === "object" && window.translations !== null) {
+    const currentLang = localStorage.getItem("userLanguage") || "ko";
+    return window.translations[currentLang]?.[key] || key;
+  }
+  return key;
+}
+
 // 사용자 진도 데이터 로드 (개선된 버전)
 async function loadUserProgressData() {
   try {
@@ -166,15 +197,21 @@ async function loadUserProgressData() {
     );
     console.log("📊 학습 통계:", learningStats);
 
-    // 기존 구조와 호환성을 위해 데이터 변환
+    // 📊 기존 구조와 호환성을 위해 데이터 변환
     userProgressData = {
       totalConcepts: learningStats.totalConcepts,
+      studiedConcepts: learningStats.studiedConcepts, // 📝 추가: 학습한 개념 수
       masteredConcepts: learningStats.masteredConcepts,
       practiceNeeded: learningStats.practiceNeeded,
       learning: learningStats.learning,
 
       totalQuizzes: learningStats.totalQuizzes,
       averageScore: learningStats.averageScore,
+
+      // 🎮 게임 및 학습 통계 추가
+      totalGames: learningStats.totalGames || 0,
+      totalLearningActivities: learningStats.totalLearningActivities || 0,
+      averageGameScore: learningStats.averageGameScore || 0,
 
       weeklyActivity: learningStats.weeklyActivity,
       categoryProgress: learningStats.categoryProgress,
@@ -207,11 +244,15 @@ async function loadUserProgressData() {
     // 오류 시 기본값 설정
     userProgressData = {
       totalConcepts: 0,
+      studiedConcepts: 0, // 📝 추가
       masteredConcepts: 0,
       practiceNeeded: 0,
       learning: 0,
       totalQuizzes: 0,
       averageScore: 0,
+      totalGames: 0,
+      totalLearningActivities: 0,
+      averageGameScore: 0,
       weeklyActivity: Array(7).fill(0),
       categoryProgress: {},
       recentAchievements: [],
@@ -305,12 +346,11 @@ async function processConceptProgress(progressData, userProgress) {
 // 연속 학습 일수 계산
 async function calculateStudyStreak() {
   try {
-    // 퀴즈 결과를 최근 날짜순으로 조회
+    // 퀴즈 결과 조회 (orderBy 제거)
     const quizQuery = query(
       collection(db, "quiz_results"),
       where("user_email", "==", currentUser.email),
-      orderBy("completed_at", "desc"),
-      limit(30) // 최근 30일
+      limit(50) // 충분한 데이터 확보
     );
 
     const quizSnapshot = await getDocs(quizQuery);
@@ -320,7 +360,9 @@ async function calculateStudyStreak() {
     quizSnapshot.docs.forEach((doc) => {
       const data = doc.data();
       if (data.completed_at) {
-        const date = data.completed_at.toDate();
+        const date = data.completed_at.toDate
+          ? data.completed_at.toDate()
+          : new Date(data.completed_at);
         const dateStr = date.toDateString();
         studyDates.add(dateStr);
       }
@@ -354,12 +396,11 @@ async function loadRecentActivities() {
   try {
     const activities = [];
 
-    // 최근 퀴즈 결과 조회
+    // 퀴즈 결과 조회 (orderBy 제거)
     const quizQuery = query(
       collection(db, "quiz_results"),
       where("user_email", "==", currentUser.email),
-      orderBy("completed_at", "desc"),
-      limit(10)
+      limit(20) // 충분한 데이터 확보
     );
 
     const quizSnapshot = await getDocs(quizQuery);
@@ -368,7 +409,9 @@ async function loadRecentActivities() {
       const data = doc.data();
       activities.push({
         type: "quiz",
-        title: `${data.quiz_type} 퀴즈 완료`,
+        title:
+          getTranslatedText("quiz_completed_activity") ||
+          `${data.quiz_type} Quiz Completed`,
         description: `${data.score}% (${data.correct_answers}/${data.total_questions})`,
         timestamp: data.completed_at,
         icon: "fas fa-question-circle",
@@ -381,10 +424,16 @@ async function loadRecentActivities() {
       });
     });
 
-    // 시간순 정렬
+    // JavaScript에서 시간순 정렬
     activities.sort((a, b) => {
       if (!a.timestamp || !b.timestamp) return 0;
-      return b.timestamp.toDate() - a.timestamp.toDate();
+      const aTime = a.timestamp.toDate
+        ? a.timestamp.toDate()
+        : new Date(a.timestamp);
+      const bTime = b.timestamp.toDate
+        ? b.timestamp.toDate()
+        : new Date(b.timestamp);
+      return bTime - aTime;
     });
 
     return activities.slice(0, 5); // 최근 5개만
@@ -439,6 +488,9 @@ async function displayAllData() {
     // 언어별 마스터리 업데이트
     updateLanguageMastery();
 
+    // 🎮 성취도 업데이트
+    updateAchievements();
+
     // 차트 생성
     createCharts();
 
@@ -456,9 +508,20 @@ async function displayAllData() {
 
 // 통계 요약 업데이트
 function updateStatsSummary() {
-  elements.totalWordsCount.textContent = userProgressData.totalConcepts;
+  // 📊 개선된 총 단어수 표시 (학습한 수 / 전체 수)
+  if (userProgressData.studiedConcepts !== undefined) {
+    elements.totalWordsCount.textContent = `${userProgressData.studiedConcepts}/${userProgressData.totalConcepts}`;
+    elements.totalWordsCount.title = `학습한 개념: ${userProgressData.studiedConcepts}개 / 전체 개념: ${userProgressData.totalConcepts}개`;
+  } else {
+    elements.totalWordsCount.textContent = userProgressData.totalConcepts;
+  }
+
+  // 📈 개선된 마스터리 기준으로 표시
   elements.masteredWordsCount.textContent = userProgressData.masteredConcepts;
-  elements.studyStreakCount.textContent = `${userProgressData.studyStreak}일`;
+  elements.masteredWordsCount.title = `마스터리 60% 이상 달성한 개념 수 (기존 80% → 60%로 조정)`;
+
+  const daysText = getTranslatedText("days_suffix") || "일";
+  elements.studyStreakCount.textContent = `${userProgressData.studyStreak}${daysText}`;
   elements.quizAccuracyRate.textContent = `${userProgressData.quizStats.averageAccuracy}%`;
 }
 
@@ -497,6 +560,65 @@ function updateLanguageMastery() {
     lang.percent.textContent = `${percentage}%`;
     lang.bar.style.width = `${percentage}%`;
   });
+}
+
+// 🎮 성취도 업데이트
+function updateAchievements() {
+  // 게임 성취도
+  if (elements.totalGamesCount) {
+    elements.totalGamesCount.textContent = `${
+      userProgressData.totalGames || 0
+    }회`;
+  }
+  if (elements.avgGameScore) {
+    elements.avgGameScore.textContent = `${
+      userProgressData.averageGameScore || 0
+    }점`;
+  }
+
+  // 학습 세션 성취도
+  if (elements.totalLearningSessions) {
+    elements.totalLearningSessions.textContent = `${
+      userProgressData.totalLearningActivities || 0
+    }회`;
+  }
+  if (elements.avgSessionQuality) {
+    const quality = userProgressData.averageSessionQuality || "보통";
+    const qualityMap = {
+      excellent: "우수",
+      good: "양호",
+      average: "보통",
+      poor: "부족",
+    };
+    elements.avgSessionQuality.textContent = qualityMap[quality] || quality;
+  }
+
+  // 종합 성취도
+  if (elements.totalStudyTime) {
+    // 총 학습 시간 계산 (분 단위)
+    const totalMinutes = userProgressData.totalLearningTime || 0;
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    if (hours > 0) {
+      elements.totalStudyTime.textContent = `${hours}시간 ${minutes}분`;
+    } else {
+      elements.totalStudyTime.textContent = `${minutes}분`;
+    }
+  }
+
+  if (elements.completionRate) {
+    // 완료율 계산 (마스터한 개념 / 학습한 개념)
+    const completionRate =
+      userProgressData.studiedConcepts > 0
+        ? Math.round(
+            (userProgressData.masteredConcepts /
+              userProgressData.studiedConcepts) *
+              100
+          )
+        : 0;
+    elements.completionRate.textContent = `${completionRate}%`;
+  }
 }
 
 // 차트 생성
@@ -876,4 +998,138 @@ function showSuccess(message) {
   // 실제로는 더 나은 성공 메시지 표시 방법 사용
   console.log("✅", message);
   alert(message);
+}
+
+// 🏆 마스터한 단어 목록 표시
+async function showMasteredWordsList() {
+  try {
+    console.log("🏆 마스터한 단어 목록 조회 중...");
+
+    if (!currentUser) return;
+
+    // 마스터한 개념들 조회
+    const progressQuery = query(
+      collection(db, "user_progress"),
+      where("user_email", "==", currentUser.email)
+    );
+
+    const progressSnapshot = await getDocs(progressQuery);
+    const masteredConcepts = [];
+
+    // 마스터리 레벨 60% 이상인 개념들 필터링
+    for (const doc of progressSnapshot.docs) {
+      const progressData = doc.data();
+      const masteryLevel = progressData.overall_mastery?.level || 0;
+
+      if (masteryLevel >= 60) {
+        // 개념 정보 조회
+        const conceptDoc = await getDoc(
+          doc(db, "concepts", progressData.concept_id)
+        );
+        if (conceptDoc.exists()) {
+          const conceptData = conceptDoc.data();
+          masteredConcepts.push({
+            id: progressData.concept_id,
+            masteryLevel,
+            ...conceptData,
+          });
+        }
+      }
+    }
+
+    // 마스터리 레벨 순으로 정렬
+    masteredConcepts.sort((a, b) => b.masteryLevel - a.masteryLevel);
+
+    // 모달 HTML 생성
+    const modalHTML = `
+      <div id="mastered-words-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg max-w-4xl w-full mx-4 max-h-[80vh] overflow-hidden">
+          <div class="flex justify-between items-center p-6 border-b">
+            <h2 class="text-2xl font-bold text-gray-800">
+              🏆 마스터한 단어 목록 (${masteredConcepts.length}개)
+            </h2>
+            <button id="close-mastered-modal" class="text-gray-500 hover:text-gray-700 text-2xl">
+              ✕
+            </button>
+          </div>
+          <div class="p-6 overflow-y-auto max-h-[60vh]">
+            ${
+              masteredConcepts.length === 0
+                ? '<div class="text-center py-8 text-gray-500">아직 마스터한 단어가 없습니다. 계속 학습해보세요! 🚀</div>'
+                : `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                   ${masteredConcepts
+                     .map(
+                       (concept) => `
+                     <div class="bg-gradient-to-r from-yellow-50 to-yellow-100 border-l-4 border-yellow-400 p-4 rounded-lg">
+                       <div class="flex items-center justify-between mb-2">
+                         <span class="text-lg font-semibold text-gray-800">
+                           ${
+                             concept.expressions?.korean?.word ||
+                             concept.expressions?.english?.word ||
+                             "단어"
+                           }
+                         </span>
+                         <span class="bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+                           ${Math.round(concept.masteryLevel)}%
+                         </span>
+                       </div>
+                       <div class="text-sm text-gray-600 space-y-1">
+                         ${
+                           concept.expressions?.english?.word
+                             ? `<div>🇺🇸 ${concept.expressions.english.word}</div>`
+                             : ""
+                         }
+                         ${
+                           concept.expressions?.japanese?.word
+                             ? `<div>🇯🇵 ${concept.expressions.japanese.word}</div>`
+                             : ""
+                         }
+                         ${
+                           concept.expressions?.chinese?.word
+                             ? `<div>🇨🇳 ${concept.expressions.chinese.word}</div>`
+                             : ""
+                         }
+                         <div class="text-gray-500 text-xs mt-2">
+                           ${concept.domain || "일반"} • ${
+                         concept.concept_info?.difficulty || "초급"
+                       }
+                         </div>
+                       </div>
+                     </div>
+                   `
+                     )
+                     .join("")}
+                 </div>`
+            }
+          </div>
+        </div>
+      </div>
+    `;
+
+    // 모달 표시
+    document.body.insertAdjacentHTML("beforeend", modalHTML);
+
+    // 닫기 이벤트
+    document
+      .getElementById("close-mastered-modal")
+      .addEventListener("click", () => {
+        document.getElementById("mastered-words-modal").remove();
+      });
+
+    // 배경 클릭으로 닫기
+    document
+      .getElementById("mastered-words-modal")
+      .addEventListener("click", (e) => {
+        if (e.target.id === "mastered-words-modal") {
+          document.getElementById("mastered-words-modal").remove();
+        }
+      });
+
+    console.log(
+      `✅ 마스터한 단어 목록 표시 완료: ${masteredConcepts.length}개`
+    );
+  } catch (error) {
+    console.error("❌ 마스터한 단어 목록 조회 중 오류:", error);
+    showError("마스터한 단어 목록을 불러오는 중 오류가 발생했습니다.");
+  }
 }

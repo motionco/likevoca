@@ -368,6 +368,19 @@ async function generateQuizQuestions(settings) {
           settings,
           filteredConcepts
         );
+      } else if (settings.quizType === "pronunciation") {
+        question = createPronunciationQuestion(
+          concept,
+          settings,
+          filteredConcepts
+        );
+      } else if (settings.quizType === "matching") {
+        question = createMatchingQuestion(concept, settings, filteredConcepts);
+      } else if (
+        settings.quizType === "fill_blank" ||
+        settings.quizType === "fill_in_blank"
+      ) {
+        question = createFillBlankQuestion(concept, settings, filteredConcepts);
       }
       // 추후 다른 퀴즈 타입 추가 가능
 
@@ -396,16 +409,20 @@ function createTranslationQuestion(concept, settings, allConcepts) {
       return null;
     }
 
-    // 문제 방향 결정 (한국어 → 대상언어 또는 그 반대)
-    const isFromToTarget = Math.random() < 0.5;
-    const questionExpr = isFromToTarget ? fromExpr : toExpr;
-    const answerExpr = isFromToTarget ? toExpr : fromExpr;
+    // 문제 방향 결정 (settings에 따라 고정)
+    // sourceLanguage가 korean이고 targetLanguage가 english인 경우
+    // 영어 의미 제시 → 한국어 단어 선택 (한국어 학습 강화)
+    const isKoreanToEnglish =
+      settings.sourceLanguage === "korean" &&
+      settings.targetLanguage === "english";
+    const questionExpr = isKoreanToEnglish ? toExpr : fromExpr; // 영어 의미 제시
+    const answerExpr = isKoreanToEnglish ? fromExpr : toExpr; // 한국어 단어 선택
 
     // 오답 선택지 생성 (같은 방향의 다른 개념들 사용)
     const potentialWrongOptions = allConcepts
       .filter((c) => c.id !== concept.id)
       .map((c) =>
-        isFromToTarget ? c.toExpression?.word : c.fromExpression?.word
+        isKoreanToEnglish ? c.fromExpression?.word : c.toExpression?.word
       )
       .filter((word) => word && word !== answerExpr.word);
 
@@ -429,9 +446,9 @@ function createTranslationQuestion(concept, settings, allConcepts) {
     if (sameCategory.length > 0) {
       const shuffled = shuffleArray(sameCategory);
       for (const c of shuffled) {
-        const word = isFromToTarget
-          ? c.toExpression?.word
-          : c.fromExpression?.word;
+        const word = isKoreanToEnglish
+          ? c.fromExpression?.word
+          : c.toExpression?.word;
         if (word && word !== answerExpr.word && !wrongOptions.includes(word)) {
           wrongOptions.push(word);
           if (wrongOptions.length >= 2) break;
@@ -443,9 +460,9 @@ function createTranslationQuestion(concept, settings, allConcepts) {
     if (wrongOptions.length < 3 && sameDomain.length > 0) {
       const shuffled = shuffleArray(sameDomain);
       for (const c of shuffled) {
-        const word = isFromToTarget
-          ? c.toExpression?.word
-          : c.fromExpression?.word;
+        const word = isKoreanToEnglish
+          ? c.fromExpression?.word
+          : c.toExpression?.word;
         if (word && word !== answerExpr.word && !wrongOptions.includes(word)) {
           wrongOptions.push(word);
           if (wrongOptions.length >= 3) break;
@@ -491,7 +508,10 @@ function createTranslationQuestion(concept, settings, allConcepts) {
       conceptId: concept.id, // 🎯 user_progress 업데이트를 위한 conceptId 추가
       type: "translation",
       questionText: `${translatePrompt}: "${questionExpr.word}"`,
-      hint: questionExpr.pronunciation || "",
+      hint:
+        isKoreanToEnglish && questionExpr.pronunciation
+          ? `발음: ${questionExpr.pronunciation}`
+          : questionExpr.pronunciation || "",
       options,
       correctAnswer: answerExpr.word,
       explanation:
@@ -503,6 +523,280 @@ function createTranslationQuestion(concept, settings, allConcepts) {
     };
   } catch (error) {
     console.error("❌ 번역 문제 생성 오류:", error, concept.id);
+    return null;
+  }
+}
+
+// 발음 문제 생성
+function createPronunciationQuestion(concept, settings, allConcepts) {
+  try {
+    const fromExpr = concept.fromExpression;
+    const toExpr = concept.toExpression;
+
+    // 언어 방향에 따라 발음 문제 생성
+    // 한국어 → 영어 학습인 경우, 영어 단어의 발음을 묻는 문제 생성
+    const isKoreanToEnglish =
+      settings.sourceLanguage === "korean" &&
+      settings.targetLanguage === "english";
+
+    let questionWord, questionPronunciation, hintText;
+
+    if (isKoreanToEnglish) {
+      // 영어 단어의 발음을 묻는 문제
+      if (!toExpr?.word || !toExpr?.pronunciation) {
+        console.error("❌ 영어 발음 데이터가 부족합니다:", concept.id);
+        return null;
+      }
+      questionWord = toExpr.word;
+      questionPronunciation = toExpr.pronunciation;
+      hintText = fromExpr.word ? `의미: ${fromExpr.word}` : "";
+    } else {
+      // 한국어 단어의 발음을 묻는 문제 (기존 로직)
+      if (!fromExpr?.word || !fromExpr?.pronunciation) {
+        console.error("❌ 한국어 발음 데이터가 부족합니다:", concept.id);
+        return null;
+      }
+      questionWord = fromExpr.word;
+      questionPronunciation = fromExpr.pronunciation;
+      hintText = toExpr.word ? `의미: ${toExpr.word}` : "";
+    }
+
+    // 같은 방향의 발음 데이터에서 오답 선택지 생성
+    const wrongPronunciations = allConcepts
+      .filter((c) => c.id !== concept.id)
+      .map((c) =>
+        isKoreanToEnglish
+          ? c.toExpression?.pronunciation
+          : c.fromExpression?.pronunciation
+      )
+      .filter((pron) => pron && pron !== questionPronunciation);
+
+    if (wrongPronunciations.length < 2) {
+      console.warn("⚠️ 발음 선택지가 부족합니다:", concept.id);
+      return null;
+    }
+
+    const wrongOptions = shuffleArray(wrongPronunciations).slice(0, 3);
+    const options = shuffleArray([questionPronunciation, ...wrongOptions]);
+
+    const categoryInfo =
+      concept.conceptInfo?.domain && concept.conceptInfo?.category
+        ? `${concept.conceptInfo.domain} / ${concept.conceptInfo.category}`
+        : concept.conceptInfo?.domain || "일반";
+
+    return {
+      id: concept.id,
+      conceptId: concept.id,
+      type: "pronunciation",
+      questionText: `다음 단어의 올바른 발음을 선택하세요: "${questionWord}"`,
+      hint: hintText,
+      options,
+      correctAnswer: questionPronunciation,
+      explanation: concept.conceptInfo?.definition || "",
+      category: categoryInfo,
+      difficulty: concept.conceptInfo?.difficulty || "basic",
+      emoji: concept.conceptInfo?.unicode_emoji || "🔊",
+      concept,
+    };
+  } catch (error) {
+    console.error("❌ 발음 문제 생성 오류:", error, concept.id);
+    return null;
+  }
+}
+
+// 매칭 문제 생성
+function createMatchingQuestion(concept, settings, allConcepts) {
+  try {
+    const fromExpr = concept.fromExpression;
+    const toExpr = concept.toExpression;
+
+    if (!fromExpr?.word || !toExpr?.word) {
+      console.error("❌ 매칭 데이터가 부족합니다:", concept.id);
+      return null;
+    }
+
+    // 여러 단어쌍 생성 (정답 + 오답들)
+    const wrongPairs = allConcepts
+      .filter(
+        (c) =>
+          c.id !== concept.id && c.fromExpression?.word && c.toExpression?.word
+      )
+      .slice(0, 3);
+
+    if (wrongPairs.length < 3) {
+      console.warn("⚠️ 매칭 선택지가 부족합니다:", concept.id);
+      return null;
+    }
+
+    // 언어 방향에 따른 매칭 문제 생성
+    const isKoreanToEnglish =
+      settings.sourceLanguage === "korean" &&
+      settings.targetLanguage === "english";
+
+    let questionWord, answerWord, hintText;
+
+    if (isKoreanToEnglish) {
+      // 한국어 → 영어 학습: 영어 정의/설명 제시하고 한국어 단어를 선택지로 (의미 이해 능력 측정)
+      const englishDefinition =
+        toExpr.definition ||
+        concept.conceptInfo?.definition ||
+        `A word that means ${fromExpr.word}`;
+      questionWord = englishDefinition; // 영어 정의/설명 제시
+      answerWord = fromExpr.word; // 한국어 단어 (정답)
+      hintText = toExpr.pronunciation ? `발음: ${toExpr.pronunciation}` : ""; // 영어 발음 힌트
+    } else {
+      // 영어 → 한국어 학습: 한국어 정의/설명 제시하고 영어 단어를 선택지로 (의미 이해 능력 측정)
+      const koreanDefinition =
+        fromExpr.definition ||
+        concept.conceptInfo?.definition ||
+        `${toExpr.word}을/를 의미하는 단어`;
+      questionWord = koreanDefinition; // 한국어 정의/설명 제시
+      answerWord = toExpr.word; // 영어 단어 (정답)
+      hintText = fromExpr.pronunciation
+        ? `발음: ${fromExpr.pronunciation}`
+        : ""; // 한국어 발음 힌트
+    }
+
+    // 오답 선택지 생성 (정답과 같은 언어로)
+    const wrongAnswers = wrongPairs.map((c) =>
+      isKoreanToEnglish ? c.fromExpression.word : c.toExpression.word
+    );
+
+    const options = shuffleArray([answerWord, ...wrongAnswers]);
+
+    const categoryInfo =
+      concept.conceptInfo?.domain && concept.conceptInfo?.category
+        ? `${concept.conceptInfo.domain} / ${concept.conceptInfo.category}`
+        : concept.conceptInfo?.domain || "일반";
+
+    return {
+      id: concept.id,
+      conceptId: concept.id,
+      type: "matching",
+      questionText: isKoreanToEnglish
+        ? `다음 설명에 해당하는 한국어 단어를 선택하세요:\n"${questionWord}"`
+        : `다음 설명에 해당하는 영어 단어를 선택하세요:\n"${questionWord}"`,
+      hint: hintText,
+      options, // 선택지 형태로 변경
+      correctAnswer: answerWord,
+      explanation: concept.conceptInfo?.definition || "",
+      category: categoryInfo,
+      difficulty: concept.conceptInfo?.difficulty || "basic",
+      emoji: concept.conceptInfo?.unicode_emoji || "🔗",
+      concept,
+    };
+  } catch (error) {
+    console.error("❌ 매칭 문제 생성 오류:", error, concept.id);
+    return null;
+  }
+}
+
+// 빈칸 채우기 문제 생성
+function createFillBlankQuestion(concept, settings, allConcepts) {
+  try {
+    const fromExpr = concept.fromExpression;
+    const toExpr = concept.toExpression;
+
+    if (!fromExpr?.word || !toExpr?.word) {
+      console.error("❌ 빈칸 채우기 데이터가 부족합니다:", concept.id);
+      return null;
+    }
+
+    // 언어 방향에 따른 빈칸 채우기 문제 생성
+    const isKoreanToEnglish =
+      settings.sourceLanguage === "korean" &&
+      settings.targetLanguage === "english";
+
+    let sentence, blankWord, hintText;
+
+    if (isKoreanToEnglish) {
+      // 한국어 → 영어 학습: 영어 문장에서 영어 단어를 빈칸으로 (영어 학습)
+      if (
+        concept.exampleInfo?.sentences &&
+        concept.exampleInfo.sentences.length > 0
+      ) {
+        const exampleSentence = concept.exampleInfo.sentences[0];
+        sentence = exampleSentence.english || `This is ${toExpr.word}.`;
+        blankWord = toExpr.word; // 영어 단어가 정답
+      } else {
+        // 기본 영어 문장 패턴 생성
+        sentence = `This is ${toExpr.word}.`;
+        blankWord = toExpr.word; // 영어 단어가 정답
+      }
+      hintText = fromExpr.word
+        ? `의미: ${fromExpr.word}` // 한국어 의미를 힌트로
+        : "";
+
+      // 영어 오답 선택지 생성
+      const wrongOptions = allConcepts
+        .filter((c) => c.id !== concept.id && c.toExpression?.word)
+        .map((c) => c.toExpression.word)
+        .filter((word) => word && word !== blankWord);
+
+      if (wrongOptions.length < 2) {
+        console.warn("⚠️ 영어 빈칸 채우기 선택지가 부족합니다:", concept.id);
+        return null;
+      }
+
+      const selectedWrongOptions = shuffleArray(wrongOptions).slice(0, 3);
+      var options = shuffleArray([blankWord, ...selectedWrongOptions]);
+    } else {
+      // 영어 → 한국어 학습: 한국어 문장에서 한국어 단어를 빈칸으로 (한국어 학습)
+      if (
+        concept.exampleInfo?.sentences &&
+        concept.exampleInfo.sentences.length > 0
+      ) {
+        const exampleSentence = concept.exampleInfo.sentences[0];
+        sentence = exampleSentence.korean || exampleSentence.sentence;
+        blankWord = fromExpr.word; // 한국어 단어가 정답
+      } else {
+        // 기본 한국어 문장 패턴 생성
+        sentence = `이것은 ${fromExpr.word}입니다.`;
+        blankWord = fromExpr.word; // 한국어 단어가 정답
+      }
+      hintText = toExpr.word
+        ? `의미: ${toExpr.word}` // 영어 의미를 힌트로
+        : "";
+
+      // 한국어 오답 선택지 생성
+      const wrongOptions = allConcepts
+        .filter((c) => c.id !== concept.id && c.fromExpression?.word)
+        .map((c) => c.fromExpression.word)
+        .filter((word) => word && word !== blankWord);
+
+      if (wrongOptions.length < 2) {
+        console.warn("⚠️ 한국어 빈칸 채우기 선택지가 부족합니다:", concept.id);
+        return null;
+      }
+
+      const selectedWrongOptions = shuffleArray(wrongOptions).slice(0, 3);
+      var options = shuffleArray([blankWord, ...selectedWrongOptions]);
+    }
+
+    // 단어를 빈칸으로 치환
+    const questionText = sentence.replace(blankWord, "______");
+
+    const categoryInfo =
+      concept.conceptInfo?.domain && concept.conceptInfo?.category
+        ? `${concept.conceptInfo.domain} / ${concept.conceptInfo.category}`
+        : concept.conceptInfo?.domain || "일반";
+
+    return {
+      id: concept.id,
+      conceptId: concept.id,
+      type: "fill_blank",
+      questionText: `다음 빈칸에 알맞은 단어를 선택하세요:\n${questionText}`,
+      hint: hintText,
+      options,
+      correctAnswer: blankWord,
+      explanation: concept.conceptInfo?.definition || "",
+      category: categoryInfo,
+      difficulty: concept.conceptInfo?.difficulty || "basic",
+      emoji: concept.conceptInfo?.unicode_emoji || "📝",
+      concept,
+    };
+  } catch (error) {
+    console.error("❌ 빈칸 채우기 문제 생성 오류:", error, concept.id);
     return null;
   }
 }
@@ -544,13 +838,13 @@ function displayQuestion() {
   // 문제 텍스트 표시
   elements.questionText.textContent = question.questionText;
 
-  // 힌트 표시 (발음 정보)
+  // 힌트 표시 (발음 또는 의미 정보)
   const hintElement = document.getElementById("question-hint");
   if (hintElement && question.hint && question.hint.trim()) {
     hintElement.classList.remove("hidden");
     const hintSpan = hintElement.querySelector("span");
     if (hintSpan) {
-      hintSpan.textContent = `발음: ${question.hint}`;
+      hintSpan.textContent = question.hint; // 이미 "발음:" 또는 "의미:" 레이블이 포함됨
     }
   } else if (hintElement) {
     hintElement.classList.add("hidden");
@@ -562,10 +856,11 @@ function displayQuestion() {
     feedbackElement.classList.add("hidden");
   }
 
-  // 선택지 생성
+  // 퀴즈 타입에 따른 UI 렌더링
   elements.questionOptions.innerHTML = "";
 
   if (question.options && question.options.length > 0) {
+    // 일반 선택지 문제 (translation, pronunciation, fill_blank)
     question.options.forEach((option, index) => {
       const optionElement = document.createElement("button");
       optionElement.className =
@@ -605,7 +900,6 @@ function displayQuestion() {
     `;
   }
 }
-
 // 답안 선택
 function selectAnswer(answer, optionElement) {
   const question = quizData.questions[quizData.currentQuestionIndex];
