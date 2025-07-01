@@ -1,5 +1,5 @@
 import { auth, db, conceptUtils } from "../../js/firebase/firebase-init.js";
-import { collectionManager } from "../../js/firebase/firebase-collection-manager.js";
+import { CollectionManager } from "../../js/firebase/firebase-collection-manager.js";
 import {
   collection,
   query,
@@ -20,6 +20,7 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/fi
 // 전역 변수
 let currentUser = null;
 let userProgressData = null;
+let collectionManager = new CollectionManager();
 let learningGoals = {
   daily: {
     newWords: 10,
@@ -152,13 +153,85 @@ async function initializeLanguageSystem() {
   }
 }
 
-// 사용자 진도 데이터 로드
+// 사용자 진도 데이터 로드 (개선된 버전)
 async function loadUserProgressData() {
   try {
-    console.log("📈 사용자 진도 데이터 로딩 시작");
+    console.log("📈 개인화된 학습 통계 로딩 시작");
 
     if (!currentUser) return;
 
+    // 🎯 CollectionManager의 getUserLearningStats 사용
+    const learningStats = await collectionManager.getUserLearningStats(
+      currentUser.email
+    );
+    console.log("📊 학습 통계:", learningStats);
+
+    // 기존 구조와 호환성을 위해 데이터 변환
+    userProgressData = {
+      totalConcepts: learningStats.totalConcepts,
+      masteredConcepts: learningStats.masteredConcepts,
+      practiceNeeded: learningStats.practiceNeeded,
+      learning: learningStats.learning,
+
+      totalQuizzes: learningStats.totalQuizzes,
+      averageScore: learningStats.averageScore,
+
+      weeklyActivity: learningStats.weeklyActivity,
+      categoryProgress: learningStats.categoryProgress,
+      recentAchievements: learningStats.recentAchievements,
+
+      // 계산된 값들
+      quizStats: {
+        totalAttempts: learningStats.totalQuizzes,
+        averageAccuracy: learningStats.averageScore,
+      },
+
+      // 추가 학습 데이터도 로드
+      concepts: [],
+      languageProgress: {
+        korean: { total: 0, mastered: 0 },
+        english: { total: 0, mastered: 0 },
+        japanese: { total: 0, mastered: 0 },
+        chinese: { total: 0, mastered: 0 },
+      },
+      studyStreak: 0,
+      recentActivities: [],
+    };
+
+    // 🔄 기존 상세 데이터도 병행 로드 (호환성 위해)
+    await loadDetailedProgressData();
+
+    console.log("✅ 학습 통계 로딩 완료");
+  } catch (error) {
+    console.error("❌ 학습 통계 로딩 중 오류:", error);
+    // 오류 시 기본값 설정
+    userProgressData = {
+      totalConcepts: 0,
+      masteredConcepts: 0,
+      practiceNeeded: 0,
+      learning: 0,
+      totalQuizzes: 0,
+      averageScore: 0,
+      weeklyActivity: Array(7).fill(0),
+      categoryProgress: {},
+      recentAchievements: [],
+      quizStats: { totalAttempts: 0, averageAccuracy: 0 },
+      concepts: [],
+      languageProgress: {
+        korean: { total: 0, mastered: 0 },
+        english: { total: 0, mastered: 0 },
+        japanese: { total: 0, mastered: 0 },
+        chinese: { total: 0, mastered: 0 },
+      },
+      studyStreak: 0,
+      recentActivities: [],
+    };
+  }
+}
+
+// 기존 상세 진도 데이터 로드 (호환성 위해 유지)
+async function loadDetailedProgressData() {
+  try {
     // user_progress 컬렉션에서 사용자의 모든 진도 데이터 조회
     const progressQuery = query(
       collection(db, "user_progress"),
@@ -166,70 +239,26 @@ async function loadUserProgressData() {
     );
 
     const progressSnapshot = await getDocs(progressQuery);
-    const progressData = {
-      concepts: [],
-      totalConcepts: 0,
-      masteredConcepts: 0,
-      languageProgress: {
-        korean: { total: 0, mastered: 0 },
-        english: { total: 0, mastered: 0 },
-        japanese: { total: 0, mastered: 0 },
-        chinese: { total: 0, mastered: 0 },
-      },
-      categoryProgress: {},
-      quizStats: {
-        totalAttempts: 0,
-        correctAnswers: 0,
-        averageAccuracy: 0,
-      },
-      studyStreak: 0,
-      recentActivities: [],
-    };
 
     // 진도 데이터 처리
     for (const doc of progressSnapshot.docs) {
       const data = doc.data();
-      progressData.concepts.push({
+      userProgressData.concepts.push({
         id: doc.id,
         ...data,
       });
 
-      progressData.totalConcepts++;
-
-      // 마스터리 레벨 체크 (70% 이상이면 마스터)
-      if (data.overall_mastery?.level >= 70) {
-        progressData.masteredConcepts++;
-      }
-
-      // 퀴즈 통계 누적
-      if (data.quiz_performance) {
-        progressData.quizStats.totalAttempts +=
-          data.quiz_performance.total_attempts || 0;
-        progressData.quizStats.correctAnswers +=
-          data.quiz_performance.correct_answers || 0;
-      }
-
-      // 개념 정보를 가져와서 언어별, 카테고리별 분류
-      await processConceptProgress(data, progressData);
-    }
-
-    // 평균 정확도 계산
-    if (progressData.quizStats.totalAttempts > 0) {
-      progressData.quizStats.averageAccuracy = Math.round(
-        (progressData.quizStats.correctAnswers /
-          progressData.quizStats.totalAttempts) *
-          100
-      );
+      // 언어별, 카테고리별 분류를 위한 개념 정보 처리
+      await processConceptProgress(data, userProgressData);
     }
 
     // 연속 학습 일수 계산
-    progressData.studyStreak = await calculateStudyStreak();
+    userProgressData.studyStreak = await calculateStudyStreak();
 
     // 최근 활동 로드
-    progressData.recentActivities = await loadRecentActivities();
+    userProgressData.recentActivities = await loadRecentActivities();
 
-    userProgressData = progressData;
-    console.log("✅ 사용자 진도 데이터 로딩 완료:", progressData);
+    console.log("✅ 상세 진도 데이터 로딩 완료");
   } catch (error) {
     console.error("❌ 사용자 진도 데이터 로딩 중 오류:", error);
   }
@@ -476,22 +505,18 @@ function createCharts() {
   createCategoryProgressChart();
 }
 
-// 주간 학습 활동 차트
+// 주간 학습 활동 차트 (실제 데이터 기반)
 function createWeeklyActivityChart() {
   const ctx = elements.weeklyActivityChart.getContext("2d");
 
   // 최근 7일 데이터 준비
   const last7Days = [];
-  const studyCounts = [];
+  const studyCounts = userProgressData.weeklyActivity || Array(7).fill(0);
 
   for (let i = 6; i >= 0; i--) {
     const date = new Date();
     date.setDate(date.getDate() - i);
     last7Days.push(date.toLocaleDateString("ko-KR", { weekday: "short" }));
-
-    // 해당 날짜의 학습 활동 수 계산 (임시 데이터)
-    const count = Math.floor(Math.random() * 10) + 1;
-    studyCounts.push(count);
   }
 
   if (charts.weeklyActivity) {
@@ -611,36 +636,117 @@ function createCategoryProgressChart() {
   });
 }
 
-// 최근 활동 표시
+// 최근 활동 및 성취도 표시 (개선된 버전)
 function displayRecentActivities() {
-  if (userProgressData.recentActivities.length === 0) {
-    elements.recentActivitiesList.innerHTML = `
-      <div class="text-center py-8 text-gray-500">
-        <i class="fas fa-clock text-3xl mb-2"></i>
-        <p>최근 학습 활동이 없습니다.</p>
-      </div>
+  let activitiesHTML = "";
+
+  // 🏆 최근 성취도 표시
+  if (
+    userProgressData.recentAchievements &&
+    userProgressData.recentAchievements.length > 0
+  ) {
+    activitiesHTML += `
+      <div class="mb-4">
+        <h4 class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
+          <i class="fas fa-trophy text-yellow-500 mr-2"></i>
+          최근 성취
+        </h4>
     `;
-    return;
+
+    userProgressData.recentAchievements.slice(0, 3).forEach((achievement) => {
+      const timeAgo = getTimeAgo(achievement.date?.toDate());
+      let icon = "fas fa-star text-yellow-500";
+      let title = "새로운 성취";
+
+      if (achievement.type === "mastery") {
+        icon = "fas fa-crown text-purple-500";
+        title = "개념 마스터 완료";
+      } else if (achievement.type === "high_score") {
+        icon = "fas fa-medal text-gold-500";
+        title = `${achievement.score}% 고득점`;
+      }
+
+      activitiesHTML += `
+        <div class="flex items-start space-x-3 p-2 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg mb-2">
+          <div class="flex-shrink-0">
+            <i class="${icon} text-lg"></i>
+          </div>
+          <div class="flex-1">
+            <h5 class="font-medium text-gray-800 text-sm">${title}</h5>
+            <p class="text-xs text-gray-500">${timeAgo}</p>
+          </div>
+        </div>
+      `;
+    });
+
+    activitiesHTML += "</div>";
   }
 
-  let activitiesHTML = "";
-  userProgressData.recentActivities.forEach((activity) => {
-    const timeAgo = getTimeAgo(activity.timestamp?.toDate());
+  // 📈 최근 활동 표시
+  if (
+    userProgressData.recentActivities &&
+    userProgressData.recentActivities.length > 0
+  ) {
     activitiesHTML += `
-      <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
-        <div class="flex-shrink-0">
-          <i class="${activity.icon} ${activity.color} text-lg"></i>
+      <div>
+        <h4 class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
+          <i class="fas fa-clock text-blue-500 mr-2"></i>
+          최근 활동
+        </h4>
+    `;
+
+    userProgressData.recentActivities.forEach((activity) => {
+      const timeAgo = getTimeAgo(activity.timestamp?.toDate());
+      activitiesHTML += `
+        <div class="flex items-start space-x-3 p-2 bg-gray-50 rounded-lg mb-2">
+          <div class="flex-shrink-0">
+            <i class="${activity.icon} ${activity.color} text-lg"></i>
+          </div>
+          <div class="flex-1">
+            <h5 class="font-medium text-gray-800 text-sm">${activity.title}</h5>
+            <p class="text-xs text-gray-600">${activity.description}</p>
+            <p class="text-xs text-gray-500 mt-1">${timeAgo}</p>
+          </div>
         </div>
-        <div class="flex-1">
-          <h4 class="font-medium text-gray-800">${activity.title}</h4>
-          <p class="text-sm text-gray-600">${activity.description}</p>
-          <p class="text-xs text-gray-500 mt-1">${timeAgo}</p>
+      `;
+    });
+
+    activitiesHTML += "</div>";
+  }
+
+  // 📊 학습 통계 요약
+  if (userProgressData.totalConcepts > 0) {
+    const masteryRate = Math.round(
+      (userProgressData.masteredConcepts / userProgressData.totalConcepts) * 100
+    );
+    activitiesHTML += `
+      <div class="mt-4 p-3 bg-blue-50 rounded-lg">
+        <h4 class="text-sm font-semibold text-blue-800 mb-2">학습 현황</h4>
+        <div class="grid grid-cols-2 gap-3 text-xs">
+          <div class="text-center">
+            <div class="font-bold text-blue-600">${userProgressData.totalConcepts}</div>
+            <div class="text-blue-500">총 학습 개념</div>
+          </div>
+          <div class="text-center">
+            <div class="font-bold text-green-600">${masteryRate}%</div>
+            <div class="text-green-500">마스터리 율</div>
+          </div>
         </div>
       </div>
     `;
-  });
+  }
 
-  elements.recentActivitiesList.innerHTML = activitiesHTML;
+  if (activitiesHTML === "") {
+    elements.recentActivitiesList.innerHTML = `
+      <div class="text-center py-8 text-gray-500">
+        <i class="fas fa-rocket text-3xl mb-2"></i>
+        <p class="font-medium">학습을 시작해보세요!</p>
+        <p class="text-sm">퀴즈를 풀고 성취를 쌓아보세요.</p>
+      </div>
+    `;
+  } else {
+    elements.recentActivitiesList.innerHTML = activitiesHTML;
+  }
 }
 
 // 목표 진행률 업데이트

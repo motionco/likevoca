@@ -1545,10 +1545,14 @@ export class CollectionManager {
   /**
    * 상황과 목적 기반 개념 검색
    */
-  async getConceptsBySituationAndPurpose(situations, purposes, limit = 20) {
+  async getConceptsBySituationAndPurpose(
+    situations,
+    purposes,
+    limitCount = 20
+  ) {
     try {
       const conceptsRef = collection(db, "concepts");
-      const q = query(conceptsRef, limit(limit));
+      const q = query(conceptsRef, limit(limitCount));
       const snapshot = await getDocs(q);
 
       const concepts = [];
@@ -1579,23 +1583,48 @@ export class CollectionManager {
   /**
    * 컬렉션별 데이터 조회 함수들
    */
-  async getConceptsOnly(limit = 50) {
+  async getConceptsOnly(limitCount = 50) {
     try {
+      console.log("🔍 concepts 컬렉션 조회 시작");
       const conceptsRef = collection(db, "concepts");
-      const q = query(conceptsRef, limit(limit));
+      const q = query(conceptsRef, limit(limitCount));
       const snapshot = await getDocs(q);
 
-      return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      const concepts = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      console.log(`📊 조회된 개념 수: ${concepts.length}`);
+
+      // 첫 번째 개념의 구조 로깅
+      if (concepts.length > 0) {
+        const sample = concepts[0];
+        console.log("📋 샘플 개념 구조:", {
+          id: sample.id,
+          has_expressions: !!sample.expressions,
+          expressions_keys: sample.expressions
+            ? Object.keys(sample.expressions)
+            : [],
+          has_concept_info: !!sample.concept_info,
+          concept_info: sample.concept_info,
+          sample_korean: sample.expressions?.korean,
+          sample_english: sample.expressions?.english,
+          all_fields: Object.keys(sample),
+        });
+      }
+
+      return concepts;
     } catch (error) {
-      console.error("개념 조회 오류:", error);
+      console.error("❌ 개념 조회 오류:", error);
       return [];
     }
   }
 
-  async getExamplesOnly(limit = 50) {
+  async getExamplesOnly(limitCount = 50) {
     try {
       const examplesRef = collection(db, "examples");
-      const q = query(examplesRef, limit(limit));
+      const q = query(examplesRef, limit(limitCount));
       const snapshot = await getDocs(q);
 
       return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
@@ -1605,10 +1634,10 @@ export class CollectionManager {
     }
   }
 
-  async getGrammarPatternsOnly(limit = 50) {
+  async getGrammarPatternsOnly(limitCount = 50) {
     try {
       const patternsRef = collection(db, "grammar");
-      const q = query(patternsRef, limit(limit));
+      const q = query(patternsRef, limit(limitCount));
       const snapshot = await getDocs(q);
 
       return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
@@ -1703,6 +1732,362 @@ export class CollectionManager {
     } catch (error) {
       console.error("예문 생성 오류:", error);
       throw error;
+    }
+  }
+
+  /**
+   * 퀴즈 결과를 바탕으로 사용자 진도 업데이트
+   */
+  async updateUserProgressFromQuiz(userEmail, quizResults) {
+    try {
+      console.log("📊 퀴즈 결과 기반 사용자 진도 업데이트 시작");
+
+      const batch = writeBatch(db);
+      const updatedConcepts = new Set();
+
+      // 각 퀴즈 답변에 대해 진도 업데이트
+      for (const answer of quizResults.answers) {
+        const conceptId = answer.conceptId;
+        if (!conceptId || updatedConcepts.has(conceptId)) continue;
+
+        updatedConcepts.add(conceptId);
+        const progressId = `${userEmail}_${conceptId}`;
+        const progressRef = doc(db, "user_progress", progressId);
+
+        // 기존 진도 확인
+        const progressDoc = await getDoc(progressRef);
+        let currentProgress = {};
+
+        if (progressDoc.exists()) {
+          currentProgress = progressDoc.data();
+        } else {
+          // 진도가 없으면 초기화
+          await this.initializeUserProgress(conceptId, userEmail);
+          const newProgressDoc = await getDoc(progressRef);
+          currentProgress = newProgressDoc.data();
+        }
+
+        // 새로운 성과 계산
+        const conceptAnswers = quizResults.answers.filter(
+          (a) => a.conceptId === conceptId
+        );
+        const correctAnswers = conceptAnswers.filter((a) => a.isCorrect).length;
+        const totalAnswers = conceptAnswers.length;
+        const accuracy = totalAnswers > 0 ? correctAnswers / totalAnswers : 0;
+
+        // 진도 업데이트 데이터 준비
+        const updatedData = {
+          // 퀴즈 성과 업데이트
+          "quiz_performance.total_attempts":
+            (currentProgress.quiz_performance?.total_attempts || 0) +
+            totalAnswers,
+          "quiz_performance.correct_answers":
+            (currentProgress.quiz_performance?.correct_answers || 0) +
+            correctAnswers,
+          "quiz_performance.average_time": Math.round(
+            ((currentProgress.quiz_performance?.average_time || 0) +
+              quizResults.totalTime) /
+              2
+          ),
+
+          // 어휘 마스터리 업데이트 (정확도 기반)
+          "vocabulary_mastery.recognition": Math.min(
+            100,
+            (currentProgress.vocabulary_mastery?.recognition || 0) +
+              accuracy * 20
+          ),
+          "vocabulary_mastery.last_studied": serverTimestamp(),
+          "vocabulary_mastery.study_count":
+            (currentProgress.vocabulary_mastery?.study_count || 0) + 1,
+
+          // 전체 마스터리 레벨 계산
+          "overall_mastery.last_interaction": serverTimestamp(),
+          "overall_mastery.level": this.calculateOverallMastery(
+            currentProgress,
+            accuracy
+          ),
+          "overall_mastery.status": this.calculateMasteryStatus(
+            currentProgress,
+            accuracy
+          ),
+        };
+
+        // 연속 정답 기록 업데이트
+        if (correctAnswers === totalAnswers && totalAnswers > 0) {
+          const currentStreak =
+            currentProgress.quiz_performance?.best_streak || 0;
+          updatedData["quiz_performance.best_streak"] = Math.max(
+            currentStreak,
+            totalAnswers
+          );
+        }
+
+        batch.update(progressRef, updatedData);
+      }
+
+      await batch.commit();
+      console.log("✅ 사용자 진도 업데이트 완료");
+    } catch (error) {
+      console.error("❌ 사용자 진도 업데이트 중 오류:", error);
+    }
+  }
+
+  /**
+   * 전체 마스터리 레벨 계산 (0-100)
+   */
+  calculateOverallMastery(currentProgress, recentAccuracy) {
+    const vocabMastery = currentProgress.vocabulary_mastery?.recognition || 0;
+    const quizAccuracy = currentProgress.quiz_performance?.correct_answers || 0;
+    const totalAttempts = currentProgress.quiz_performance?.total_attempts || 1;
+
+    // 기존 정확도 + 최근 정확도 가중 평균
+    const overallAccuracy =
+      (quizAccuracy / totalAttempts) * 0.7 + recentAccuracy * 0.3;
+
+    return Math.min(
+      100,
+      Math.round(vocabMastery * 0.6 + overallAccuracy * 100 * 0.4)
+    );
+  }
+
+  /**
+   * 마스터리 상태 계산
+   */
+  calculateMasteryStatus(currentProgress, recentAccuracy) {
+    const overallLevel = this.calculateOverallMastery(
+      currentProgress,
+      recentAccuracy
+    );
+
+    if (overallLevel >= 80) return "mastered";
+    if (overallLevel >= 60) return "practiced";
+    if (overallLevel >= 20) return "learning";
+    return "not_started";
+  }
+
+  /**
+   * 사용자의 전체 학습 통계 조회
+   */
+  async getUserLearningStats(userEmail) {
+    try {
+      // 사용자 진도 데이터 조회
+      const progressQuery = query(
+        collection(db, "user_progress"),
+        where("user_email", "==", userEmail)
+      );
+
+      const progressSnapshot = await getDocs(progressQuery);
+      const progressData = progressSnapshot.docs.map((doc) => doc.data());
+
+      // 퀴즈 결과 데이터 조회
+      const quizQuery = query(
+        collection(db, "quiz_results"),
+        where("user_email", "==", userEmail),
+        limit(50)
+      );
+
+      const quizSnapshot = await getDocs(quizQuery);
+      const quizData = quizSnapshot.docs.map((doc) => doc.data());
+
+      // 통계 계산
+      const stats = {
+        totalConcepts: progressData.length,
+        masteredConcepts: progressData.filter(
+          (p) => p.overall_mastery?.status === "mastered"
+        ).length,
+        practiceNeeded: progressData.filter(
+          (p) => p.overall_mastery?.status === "practiced"
+        ).length,
+        learning: progressData.filter(
+          (p) => p.overall_mastery?.status === "learning"
+        ).length,
+
+        totalQuizzes: quizData.length,
+        averageScore:
+          quizData.length > 0
+            ? Math.round(
+                quizData.reduce((sum, q) => sum + q.score, 0) / quizData.length
+              )
+            : 0,
+
+        weeklyActivity: this.calculateWeeklyActivity(quizData),
+        categoryProgress: this.calculateCategoryProgress(progressData),
+
+        recentAchievements: this.getRecentAchievements(progressData, quizData),
+      };
+
+      return stats;
+    } catch (error) {
+      console.error("❌ 사용자 학습 통계 조회 중 오류:", error);
+      return {
+        totalConcepts: 0,
+        masteredConcepts: 0,
+        practiceNeeded: 0,
+        learning: 0,
+        totalQuizzes: 0,
+        averageScore: 0,
+        weeklyActivity: [],
+        categoryProgress: {},
+        recentAchievements: [],
+      };
+    }
+  }
+
+  // 헬퍼 함수들
+  calculateWeeklyActivity(quizData) {
+    const weeklyData = Array(7).fill(0);
+    const now = new Date();
+
+    quizData.forEach((quiz) => {
+      const quizDate =
+        quiz.completed_at?.toDate?.() || new Date(quiz.completed_at);
+      const daysDiff = Math.floor((now - quizDate) / (1000 * 60 * 60 * 24));
+
+      if (daysDiff < 7) {
+        weeklyData[6 - daysDiff]++;
+      }
+    });
+
+    return weeklyData;
+  }
+
+  calculateCategoryProgress(progressData) {
+    const categories = {};
+
+    progressData.forEach((progress) => {
+      // 간단한 카테고리 분류 (실제로는 concept 데이터에서 가져와야 함)
+      const category = "vocabulary"; // 임시
+
+      if (!categories[category]) {
+        categories[category] = { total: 0, mastered: 0 };
+      }
+
+      categories[category].total++;
+      if (progress.overall_mastery?.status === "mastered") {
+        categories[category].mastered++;
+      }
+    });
+
+    return categories;
+  }
+
+  getRecentAchievements(progressData, quizData) {
+    const achievements = [];
+
+    // 최근 마스터된 개념들
+    const recentMastered = progressData
+      .filter((p) => p.overall_mastery?.status === "mastered")
+      .sort(
+        (a, b) =>
+          (b.overall_mastery?.last_interaction?.toDate() || 0) -
+          (a.overall_mastery?.last_interaction?.toDate() || 0)
+      )
+      .slice(0, 3);
+
+    recentMastered.forEach((progress) => {
+      achievements.push({
+        type: "mastery",
+        conceptId: progress.concept_id,
+        date: progress.overall_mastery?.last_interaction,
+        description: "concept_mastered",
+      });
+    });
+
+    // 높은 점수 퀴즈들
+    const highScoreQuizzes = quizData
+      .filter((q) => q.score >= 90)
+      .sort(
+        (a, b) =>
+          (b.completed_at?.toDate() || 0) - (a.completed_at?.toDate() || 0)
+      )
+      .slice(0, 2);
+
+    highScoreQuizzes.forEach((quiz) => {
+      achievements.push({
+        type: "high_score",
+        score: quiz.score,
+        date: quiz.completed_at,
+        description: "high_quiz_score",
+      });
+    });
+
+    return achievements.slice(0, 5); // 최대 5개
+  }
+
+  /**
+   * 사용자 숙련도 기반 개념 선별
+   */
+  async getConceptsByUserProgress(userEmail, targetLanguage, limit = 20) {
+    try {
+      console.log("🎯 개인 숙련도 기반 개념 선별 시작");
+
+      // 1. 사용자의 진도 데이터 조회
+      const progressQuery = query(
+        collection(db, "user_progress"),
+        where("user_email", "==", userEmail),
+        limit(50) // 최근 학습한 개념들
+      );
+
+      const progressSnapshot = await getDocs(progressQuery);
+      const userProgress = new Map();
+
+      progressSnapshot.forEach((doc) => {
+        const data = doc.data();
+        userProgress.set(data.concept_id, data);
+      });
+
+      // 2. 전체 개념 조회
+      const allConcepts = await this.getConceptsForLearning(
+        "korean",
+        targetLanguage,
+        limit * 2
+      );
+
+      // 3. 숙련도 기반 우선순위 계산
+      const conceptsWithPriority = allConcepts.map((concept) => {
+        const progress = userProgress.get(concept.id);
+        let priority = 50; // 기본 우선순위
+
+        if (progress) {
+          const masteryLevel = progress.overall_mastery?.level || 0;
+
+          // 마스터리 레벨에 따른 우선순위 조정
+          if (masteryLevel < 30) {
+            priority = 90; // 약한 개념 우선
+          } else if (masteryLevel < 60) {
+            priority = 70; // 연습 필요
+          } else if (masteryLevel < 80) {
+            priority = 40; // 복습 필요
+          } else {
+            priority = 20; // 마스터된 개념은 낮은 우선순위
+          }
+
+          // 최근 학습 여부 고려
+          const lastStudied = progress.vocabulary_mastery?.last_studied;
+          if (lastStudied) {
+            const daysSinceStudy =
+              (Date.now() - lastStudied.toDate().getTime()) /
+              (1000 * 60 * 60 * 24);
+            if (daysSinceStudy > 7) {
+              priority += 20; // 오래전 학습한 개념 우선
+            }
+          }
+        }
+
+        return { ...concept, priority };
+      });
+
+      // 4. 우선순위 기반 정렬 및 반환
+      const sortedConcepts = conceptsWithPriority
+        .sort((a, b) => b.priority - a.priority)
+        .slice(0, limit);
+
+      console.log(`✅ 개인화된 개념 선별 완료: ${sortedConcepts.length}개`);
+      return sortedConcepts;
+    } catch (error) {
+      console.error("❌ 개인 숙련도 기반 개념 선별 중 오류:", error);
+      // 오류 시 기본 개념 반환
+      return await this.getConceptsForLearning("korean", targetLanguage, limit);
     }
   }
 }
