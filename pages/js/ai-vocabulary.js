@@ -314,17 +314,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 function initializeEventListeners() {
-  // AI 개념 생성 버튼 (한국어 페이지)
-  const aiGenerateBtn = document.getElementById("ai-generate-concept");
-  if (aiGenerateBtn) {
-    aiGenerateBtn.addEventListener("click", () => {
-      if (currentUser) {
-        handleAIConceptRecommendation(currentUser, db);
-      }
-    });
-  }
-
-  // AI 개념 추천 버튼 (다른 언어 페이지)
+  // AI 개념 추천 버튼 (모든 언어 페이지에서 통일된 ID 사용)
   const aiAddBtn = document.getElementById("ai-add-concept");
   if (aiAddBtn) {
     aiAddBtn.addEventListener("click", () => {

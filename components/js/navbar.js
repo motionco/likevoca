@@ -413,3 +413,65 @@ window.detectCurrentLanguage = detectCurrentLanguage;
 window.initializeNavbar = initializeNavbar;
 window.checkAuthenticationStatus = checkAuthenticationStatus;
 window.updateNavbarForAuthState = updateNavbarForAuthState;
+
+// DOMContentLoaded 이벤트에서 자동 네비게이션바 로드 및 초기화
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    console.log("🧭 네비게이션바 자동 초기화 시작");
+
+    // 네비게이션바 컨테이너 확인
+    const navbarContainer = document.getElementById("navbar-container");
+    if (!navbarContainer) {
+      console.log("❌ navbar-container를 찾을 수 없습니다");
+      return;
+    }
+
+    // 이미 네비게이션바가 로드되어 있으면 초기화만 실행
+    if (navbarContainer.innerHTML.trim() !== "") {
+      console.log("🧭 기존 네비게이션바 발견, 초기화만 실행");
+      const currentLanguage = detectCurrentLanguage();
+      await initializeNavbar(currentLanguage);
+      return;
+    }
+
+    // loadNavbar 함수가 전역에 있으면 사용
+    if (typeof window.loadNavbar === "function") {
+      console.log("🧭 전역 loadNavbar 함수 사용");
+      await window.loadNavbar();
+      const currentLanguage = detectCurrentLanguage();
+      await initializeNavbar(currentLanguage);
+    } else {
+      // 직접 네비게이션바 로드
+      console.log("🧭 직접 네비게이션바 로드");
+      const currentLanguage = detectCurrentLanguage();
+
+      // 현재 경로에 따라 네비게이션바 경로 결정
+      let navbarPath;
+      if (window.location.pathname.includes("/locales/")) {
+        // locales 폴더 내부인 경우 (예: /locales/ko/quiz.html)
+        navbarPath = "navbar.html";
+      } else {
+        // 루트 또는 다른 폴더인 경우
+        navbarPath = `locales/${currentLanguage}/navbar.html`;
+      }
+
+      console.log(`🧭 네비게이션바 경로: ${navbarPath}`);
+
+      try {
+        const response = await fetch(navbarPath);
+        if (response.ok) {
+          const navbarHTML = await response.text();
+          navbarContainer.innerHTML = navbarHTML;
+          console.log("✅ 네비게이션바 HTML 로드 완료");
+          await initializeNavbar(currentLanguage);
+        } else {
+          console.error("❌ 네비게이션바 로드 실패:", response.status);
+        }
+      } catch (error) {
+        console.error("❌ 네비게이션바 로드 오류:", error);
+      }
+    }
+  } catch (error) {
+    console.error("❌ 네비게이션바 자동 초기화 오류:", error);
+  }
+});

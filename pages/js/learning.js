@@ -121,23 +121,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // 언어 변경 핸들러 초기화
   handleLanguageChange();
-  
+
   // 언어 변경 이벤트 리스너 추가
   window.addEventListener("languageChanged", () => {
     console.log("🌐 언어 변경 이벤트 수신 - 학습 페이지 업데이트");
-    
+
     // 사용자 언어 설정 다시 가져오기
     const userLanguage = localStorage.getItem("userLanguage") || "ko";
     currentUILanguage = userLanguage === "auto" ? "ko" : userLanguage;
-    
+
     // 번역 다시 적용
     if (typeof window.applyLanguage === "function") {
       window.applyLanguage();
     }
-    
+
     // 필터 옵션 언어 업데이트
     updateFilterOptionsLanguage();
-    
+
     // 현재 화면 다시 렌더링
     if (currentLearningArea && currentLearningMode) {
       updateCurrentView();
@@ -1390,13 +1390,15 @@ function showLoadingState(card) {
   card.innerHTML = `
     <div class="flex items-center justify-center h-full">
       <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-      <span class="ml-3 text-white">로딩 중...</span>
+              <span class="ml-3 text-white">${getTranslatedText(
+                "loading"
+              )}</span>
     </div>
   `;
 
   // 3초 후 원래 내용으로 복원 (에러 방지)
   setTimeout(() => {
-    if (card.innerHTML.includes("로딩 중...")) {
+    if (card.innerHTML.includes(getTranslatedText("loading"))) {
       card.innerHTML = originalContent;
     }
   }, 3000);
@@ -1430,8 +1432,8 @@ async function updateRecentActivity() {
     // 최근 학습 기록이 없는 경우 메시지 표시
     recentActivityEl.innerHTML = `
       <div class="text-sm text-gray-500">
-        <div>최근 학습 기록이 없습니다</div>
-        <div class="text-xs">새로운 학습을 시작해보세요!</div>
+        <div>${getTranslatedText("no_recent_activity")}</div>
+        <div class="text-xs">${getTranslatedText("start_new_learning")}</div>
       </div>
     `;
   }
@@ -1532,11 +1534,11 @@ function getSmartRecommendation(history) {
   let recommendation = {
     area: "vocabulary",
     mode: "flashcard",
-    title: "단어 플래시카드",
-    subtitle: "기본 단어 학습",
+    title: getTranslatedText("vocabulary_flashcard"),
+    subtitle: getTranslatedText("basic_vocabulary_learning"),
     icon: "fas fa-clone",
     color: "blue",
-    reason: "새로운 학습을 시작해보세요",
+    reason: getTranslatedText("start_new_learning_desc"),
   };
 
   if (history.length === 0) {
@@ -1589,10 +1591,10 @@ function getSmartRecommendation(history) {
       title: `${getAreaName(neglectedArea)} - ${getModeName(
         modes[neglectedArea].mode
       )}`,
-      subtitle: "균형잡힌 학습",
+      subtitle: getTranslatedText("balanced_learning"),
       icon: modes[neglectedArea].icon,
       color: modes[neglectedArea].color,
-      reason: "최근 학습하지 않은 영역입니다",
+      reason: getTranslatedText("neglected_area"),
     };
   } else if (mostStudiedArea) {
     // 가장 많이 학습한 영역의 다른 모드 추천
@@ -1627,7 +1629,7 @@ function getSmartRecommendation(history) {
         title: `${getAreaName(mostStudiedArea)} - ${getModeName(
           recommendedMode
         )}`,
-        subtitle: "새로운 학습 방식",
+        subtitle: getTranslatedText("new_learning_method"),
         icon: modeIcons[recommendedMode] || "fas fa-star",
         color:
           mostStudiedArea === "vocabulary"
@@ -1635,7 +1637,7 @@ function getSmartRecommendation(history) {
             : mostStudiedArea === "grammar"
             ? "green"
             : "purple",
-        reason: "새로운 학습 방식을 시도해보세요",
+        reason: getTranslatedText("try_new_method"),
       };
     }
   }
@@ -1661,17 +1663,17 @@ function getTimeAgo(date) {
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
 
-  if (diffMins < 60) return `${diffMins}분 전`;
-  if (diffHours < 24) return `${diffHours}시간 전`;
-  return `${diffDays}일 전`;
+  if (diffMins < 60) return `${diffMins}${getTranslatedText("minutes_ago")}`;
+  if (diffHours < 24) return `${diffHours}${getTranslatedText("hours_ago")}`;
+  return `${diffDays}${getTranslatedText("days_ago")}`;
 }
 
 // 영역 이름 가져오기
 function getAreaName(area) {
   const names = {
-    vocabulary: "단어 학습",
-    grammar: "문법 학습",
-    reading: "독해 학습",
+    vocabulary: getTranslatedText("vocabulary_learning"),
+    grammar: getTranslatedText("grammar_learning"),
+    reading: getTranslatedText("reading_learning"),
   };
   return names[area] || area;
 }
@@ -1679,13 +1681,13 @@ function getAreaName(area) {
 // 모드 이름 가져오기
 function getModeName(mode) {
   const names = {
-    flashcard: "플래시카드",
-    typing: "타이핑",
-    pronunciation: "발음 연습",
-    pattern: "패턴 분석",
-    practice: "실습 문제",
-    example: "예문 학습",
-    flash: "플래시 모드",
+    flashcard: getTranslatedText("flashcard_mode"),
+    typing: getTranslatedText("typing_mode"),
+    pronunciation: getTranslatedText("pronunciation_mode"),
+    pattern: getTranslatedText("pattern_mode"),
+    practice: getTranslatedText("practice_mode"),
+    example: getTranslatedText("example_mode"),
+    flash: getTranslatedText("flash_mode"),
   };
   return names[mode] || mode;
 }
@@ -1983,6 +1985,10 @@ function showLearningModes(area) {
   const uploadBtn = document.getElementById("mode-upload-btn");
   const uploadTitle = document.getElementById("mode-upload-title");
 
+  // 업로드 버튼 숨김 처리 (사용하지 않음)
+  if (uploadBtn) uploadBtn.classList.add("hidden");
+  if (uploadTitle) uploadTitle.classList.add("hidden");
+
   if (!modeSection || !modeTitle || !modeContainer) {
     console.error("❌ 모드 선택 요소들을 찾을 수 없음");
     alert("페이지 요소를 찾을 수 없습니다. 페이지를 새로고침해주세요.");
@@ -1999,9 +2005,6 @@ function showLearningModes(area) {
   switch (area) {
     case "vocabulary":
       title = "vocabulary_learning_modes";
-      if (uploadBtn) uploadBtn.classList.remove("hidden");
-      if (uploadTitle)
-        uploadTitle.setAttribute("data-i18n", "vocabulary_data_upload");
       modes = [
         {
           id: "flashcard",
@@ -2028,9 +2031,6 @@ function showLearningModes(area) {
       break;
     case "grammar":
       title = "grammar_learning_modes";
-      if (uploadBtn) uploadBtn.classList.remove("hidden");
-      if (uploadTitle)
-        uploadTitle.setAttribute("data-i18n", "grammar_pattern_data_upload");
       modes = [
         {
           id: "pattern",
@@ -2050,9 +2050,6 @@ function showLearningModes(area) {
       break;
     case "reading":
       title = "reading_learning_modes";
-      if (uploadBtn) uploadBtn.classList.remove("hidden");
-      if (uploadTitle)
-        uploadTitle.setAttribute("data-i18n", "reading_data_upload");
       modes = [
         {
           id: "example",
@@ -2821,23 +2818,32 @@ function updateTyping() {
     const category =
       concept.category || concept.concept_info?.category || "일반";
     const domain = concept.domain || concept.concept_info?.domain || "daily";
-    // 도메인을 한국어로 변환
-    const domainNames = {
-      daily: "일상",
-      business: "비즈니스",
-      academic: "교육",
-      travel: "여행",
-      food: "음식",
-      nature: "자연",
-      technology: "기술",
-      health: "건강",
-      sports: "스포츠",
-      entertainment: "엔터테인먼트",
-      other: "기타",
-    };
-    categoryElement.textContent = `${category} • ${
-      domainNames[domain] || domain
-    }`;
+    // 번역된 도메인/카테고리 표시 (translateDomainCategory 함수 사용)
+    if (typeof window.translateDomainCategory === "function") {
+      categoryElement.textContent = window.translateDomainCategory(
+        domain,
+        category
+      );
+    } else {
+      // 기본 도메인 매핑 (하위 호환성) - 번역 키 사용
+      const domainNames = {
+        daily: getTranslatedText("category_daily") || "일상",
+        business: getTranslatedText("category_business") || "비즈니스",
+        academic: getTranslatedText("category_education") || "교육",
+        travel: getTranslatedText("category_travel") || "여행",
+        food: getTranslatedText("category_food") || "음식",
+        nature: getTranslatedText("category_nature") || "자연",
+        technology: getTranslatedText("category_technology") || "기술",
+        health: getTranslatedText("category_health") || "건강",
+        sports: getTranslatedText("category_sports") || "스포츠",
+        entertainment:
+          getTranslatedText("category_entertainment") || "엔터테인먼트",
+        other: getTranslatedText("category_other") || "기타",
+      };
+      categoryElement.textContent = `${category} • ${
+        domainNames[domain] || domain
+      }`;
+    }
   }
 
   // 정답 저장
@@ -2897,10 +2903,12 @@ function checkTypingAnswer() {
   const correctAnswer = answerInput.dataset.correctAnswer;
 
   if (userAnswer === correctAnswer) {
-    resultDiv.textContent = "정답입니다! 🎉";
+    resultDiv.textContent = getTranslatedText("correct_answer");
     resultDiv.className = "mt-4 p-3 bg-green-100 text-green-800 rounded";
   } else {
-    resultDiv.textContent = `틀렸습니다. 정답: ${correctAnswer}`;
+    resultDiv.textContent = `${getTranslatedText(
+      "wrong_answer"
+    )} ${correctAnswer}`;
     resultDiv.className = "mt-4 p-3 bg-red-100 text-red-800 rounded";
   }
 

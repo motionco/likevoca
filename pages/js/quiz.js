@@ -27,9 +27,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     console.log("🎯 퀴즈 페이지 초기화 시작");
 
-    // 네비게이션바 로드
-    await loadQuizNavbar();
-
     // DOM 요소 초기화
     initializeElements();
 
@@ -42,33 +39,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     showError("페이지 초기화 중 오류가 발생했습니다.");
   }
 });
-
-// 네비게이션바 로드
-async function loadQuizNavbar() {
-  const navbarContainer = document.getElementById("navbar-container");
-  if (navbarContainer) {
-    try {
-      const userLanguage = localStorage.getItem("userLanguage") || "ko";
-      let navbarPath = `../locales/${userLanguage}/navbar.html`;
-
-      // 현재 경로에 따라 상대 경로 조정
-      if (window.location.pathname.includes("/locales/")) {
-        navbarPath = "navbar.html";
-      }
-
-      const response = await fetch(navbarPath);
-      if (response.ok) {
-        const navbarHTML = await response.text();
-        navbarContainer.innerHTML = navbarHTML;
-        console.log("네비게이션바 로드 완료");
-      } else {
-        console.error("네비게이션바 로드 실패:", response.status);
-      }
-    } catch (error) {
-      console.error("네비게이션바 로드 오류:", error);
-    }
-  }
-}
 
 // DOM 요소 초기화
 function initializeElements() {
@@ -147,19 +117,27 @@ async function startQuiz() {
     };
 
     if (settings.sourceLanguage === settings.targetLanguage) {
-      showError("원어와 대상 언어가 같을 수 없습니다.");
+      showError(
+        getTranslatedText("same_language_error") ||
+          "원어와 대상 언어가 같을 수 없습니다."
+      );
       return;
     }
 
     elements.startQuizBtn.disabled = true;
-    elements.startQuizBtn.textContent = "문제 준비 중...";
+    elements.startQuizBtn.textContent =
+      getTranslatedText("preparing_questions") || "문제 준비 중...";
 
     const questions = await generateQuizQuestions(settings);
 
     if (questions.length === 0) {
-      showError("선택한 조건에 맞는 문제를 찾을 수 없습니다.");
+      showError(
+        getTranslatedText("no_questions_found") ||
+          "선택한 조건에 맞는 문제를 찾을 수 없습니다."
+      );
       elements.startQuizBtn.disabled = false;
-      elements.startQuizBtn.textContent = "퀴즈 시작";
+      elements.startQuizBtn.textContent =
+        getTranslatedText("start_quiz") || "퀴즈 시작";
       return;
     }
 
@@ -185,72 +163,139 @@ async function startQuiz() {
     console.log(`✅ 퀴즈 시작 완료: ${questions.length}문제`);
   } catch (error) {
     console.error("❌ 퀴즈 시작 중 오류:", error);
-    showError("퀴즈를 시작할 수 없습니다.");
+    showError(
+      getTranslatedText("quiz_start_error") || "퀴즈를 시작할 수 없습니다."
+    );
     elements.startQuizBtn.disabled = false;
-    elements.startQuizBtn.textContent = "퀴즈 시작";
+    elements.startQuizBtn.textContent =
+      getTranslatedText("start_quiz") || "퀴즈 시작";
   }
 }
 
-// 퀴즈 문제 생성
+// 퀴즈 문제 생성 (concepts 컬렉션 기반)
 async function generateQuizQuestions(settings) {
   try {
     console.log("📝 퀴즈 문제 생성 중:", settings);
 
+    // 현재 사용자 확인
+    if (!currentUser) {
+      throw new Error("사용자가 로그인되지 않았습니다.");
+    }
+
+    // concepts 컬렉션에서 사용자 데이터 조회 (다양한 필드 시도)
+    console.log("🔍 사용자 정보:", {
+      uid: currentUser.uid,
+      email: currentUser.email,
+    });
+
+    // 먼저 userId로 시도
     let conceptsQuery = query(
       collection(db, "concepts"),
-      where("search_metadata.languages", "array-contains-any", [
-        settings.sourceLanguage,
-        settings.targetLanguage,
-      ]),
-      limit(settings.questionCount * 3)
+      where("userId", "==", currentUser.uid),
+      limit(100)
     );
 
-    if (settings.difficulty !== "all") {
+    let conceptsSnapshot = await getDocs(conceptsQuery);
+    console.log(`📚 userId로 조회 결과: ${conceptsSnapshot.docs.length}개`);
+
+    // userId로 조회되지 않으면 user_email로 시도
+    if (conceptsSnapshot.docs.length === 0) {
+      console.log("🔄 user_email로 재시도...");
       conceptsQuery = query(
         collection(db, "concepts"),
-        where("search_metadata.languages", "array-contains-any", [
-          settings.sourceLanguage,
-          settings.targetLanguage,
-        ]),
-        where("concept_info.difficulty", "==", settings.difficulty),
-        limit(settings.questionCount * 3)
+        where("userId", "==", currentUser.email),
+        limit(100)
+      );
+      conceptsSnapshot = await getDocs(conceptsQuery);
+      console.log(
+        `📚 user_email로 조회 결과: ${conceptsSnapshot.docs.length}개`
       );
     }
 
-    const conceptsSnapshot = await getDocs(conceptsQuery);
-    const concepts = [];
+    // 여전히 없으면 전체 컬렉션에서 조회 (테스트용)
+    if (conceptsSnapshot.docs.length === 0) {
+      console.log("🔧 전체 concepts 컬렉션에서 조회 중...");
+      conceptsSnapshot = await getDocs(
+        query(collection(db, "concepts"), limit(100))
+      );
+      console.log(`📚 전체 조회 결과: ${conceptsSnapshot.docs.length}개`);
 
-    for (const docSnap of conceptsSnapshot.docs) {
-      const conceptData = docSnap.data();
-
-      if (
-        conceptData.expressions?.[settings.sourceLanguage]?.word &&
-        conceptData.expressions?.[settings.targetLanguage]?.word
-      ) {
-        concepts.push({
-          id: docSnap.id,
-          ...conceptData,
+      // 각 문서의 구조를 로깅
+      if (conceptsSnapshot.docs.length > 0) {
+        const sampleDoc = conceptsSnapshot.docs[0].data();
+        console.log("📋 샘플 문서 구조:", {
+          id: conceptsSnapshot.docs[0].id,
+          hasUserId: !!sampleDoc.userId,
+          hasUserEmail: !!sampleDoc.user_email,
+          keys: Object.keys(sampleDoc),
         });
       }
     }
 
-    const questions = [];
-    const shuffledConcepts = shuffleArray([...concepts]);
+    const allConcepts = [];
 
-    for (
-      let i = 0;
-      i < Math.min(settings.questionCount, shuffledConcepts.length);
-      i++
-    ) {
+    console.log(`📚 총 ${conceptsSnapshot.docs.length}개 개념 데이터 조회`);
+
+    // 각 개념 데이터를 파싱하고 필터링
+    for (const docSnap of conceptsSnapshot.docs) {
+      const conceptData = docSnap.data();
+
+      // expressions 필드에서 source/target 언어 데이터 확인
+      const sourceExpression =
+        conceptData.expressions?.[settings.sourceLanguage];
+      const targetExpression =
+        conceptData.expressions?.[settings.targetLanguage];
+
+      if (sourceExpression?.word && targetExpression?.word) {
+        // 난이도 필터링
+        if (
+          settings.difficulty === "all" ||
+          conceptData.concept_info?.difficulty === settings.difficulty
+        ) {
+          allConcepts.push({
+            id: docSnap.id,
+            ...conceptData,
+          });
+        }
+      }
+    }
+
+    console.log(`✅ 필터링된 개념: ${allConcepts.length}개`);
+
+    if (allConcepts.length === 0) {
+      console.log("❌ 조건에 맞는 개념이 없습니다");
+      return [];
+    }
+
+    // 퀴즈 문제 생성
+    const questions = [];
+    const usedConcepts = new Set();
+    const availableCount = Math.min(settings.questionCount, allConcepts.length);
+
+    // 개념을 섞어서 랜덤 선택
+    const shuffledConcepts = shuffleArray([...allConcepts]);
+
+    for (let i = 0; i < availableCount; i++) {
       const concept = shuffledConcepts[i];
-      const question = createTranslationQuestion(concept, settings, concepts);
+
+      if (usedConcepts.has(concept.id)) {
+        continue;
+      }
+
+      usedConcepts.add(concept.id);
+
+      let question;
+      if (settings.quizType === "translation") {
+        question = createTranslationQuestion(concept, settings, allConcepts);
+      }
+      // 추후 다른 퀴즈 타입 추가 가능
 
       if (question) {
         questions.push(question);
       }
     }
 
-    console.log(`✅ ${questions.length}개 문제 생성 완료`);
+    console.log(`🎯 최종 생성된 문제: ${questions.length}개`);
     return questions;
   } catch (error) {
     console.error("❌ 퀴즈 문제 생성 중 오류:", error);
@@ -258,40 +303,128 @@ async function generateQuizQuestions(settings) {
   }
 }
 
-// 번역 문제 생성
+// 번역 문제 생성 (concepts 구조 기반)
 function createTranslationQuestion(concept, settings, allConcepts) {
-  const sourceExpr = concept.expressions[settings.sourceLanguage];
-  const targetExpr = concept.expressions[settings.targetLanguage];
+  try {
+    const sourceExpr = concept.expressions[settings.sourceLanguage];
+    const targetExpr = concept.expressions[settings.targetLanguage];
 
-  const isSourceToTarget = Math.random() < 0.5;
-  const questionExpr = isSourceToTarget ? sourceExpr : targetExpr;
-  const answerExpr = isSourceToTarget ? targetExpr : sourceExpr;
+    if (!sourceExpr?.word || !targetExpr?.word) {
+      console.error("❌ 언어 데이터가 부족합니다:", concept.id);
+      return null;
+    }
 
-  const wrongOptions = allConcepts
-    .filter((c) => c.id !== concept.id)
-    .map((c) =>
-      isSourceToTarget
-        ? c.expressions[settings.targetLanguage]?.word
-        : c.expressions[settings.sourceLanguage]?.word
-    )
-    .filter(Boolean)
-    .slice(0, 3);
+    // 문제 방향 결정 (원어 → 대상언어 또는 그 반대)
+    const isSourceToTarget = Math.random() < 0.5;
+    const questionExpr = isSourceToTarget ? sourceExpr : targetExpr;
+    const answerExpr = isSourceToTarget ? targetExpr : sourceExpr;
+    const answerLanguage = isSourceToTarget
+      ? settings.targetLanguage
+      : settings.sourceLanguage;
 
-  const options = shuffleArray([answerExpr.word, ...wrongOptions]);
+    // 같은 카테고리나 도메인에서 오답 선택지 생성
+    const sameCategory = allConcepts.filter(
+      (c) =>
+        c.id !== concept.id &&
+        c.concept_info?.category === concept.concept_info?.category &&
+        c.expressions[answerLanguage]?.word
+    );
 
-  return {
-    id: concept.id,
-    type: "translation",
-    questionText: `다음 단어를 번역하세요: "${questionExpr.word}"`,
-    hint: questionExpr.pronunciation || questionExpr.romanization || "",
-    options,
-    correctAnswer: answerExpr.word,
-    explanation: answerExpr.definition || "",
-    concept,
-  };
+    const sameDomain = allConcepts.filter(
+      (c) =>
+        c.id !== concept.id &&
+        c.concept_info?.domain === concept.concept_info?.domain &&
+        c.expressions[answerLanguage]?.word &&
+        !sameCategory.find((sc) => sc.id === c.id)
+    );
+
+    const otherConcepts = allConcepts.filter(
+      (c) =>
+        c.id !== concept.id &&
+        c.expressions[answerLanguage]?.word &&
+        !sameCategory.find((sc) => sc.id === c.id) &&
+        !sameDomain.find((sd) => sd.id === c.id)
+    );
+
+    // 오답 선택지 우선순위: 같은 카테고리 > 같은 도메인 > 다른 개념
+    let wrongOptions = [];
+
+    // 같은 카테고리에서 1-2개
+    if (sameCategory.length > 0) {
+      const shuffledSameCategory = shuffleArray(sameCategory);
+      wrongOptions.push(
+        ...shuffledSameCategory
+          .slice(0, 2)
+          .map((c) => c.expressions[answerLanguage].word)
+      );
+    }
+
+    // 같은 도메인에서 추가
+    if (wrongOptions.length < 3 && sameDomain.length > 0) {
+      const shuffledSameDomain = shuffleArray(sameDomain);
+      const needed = 3 - wrongOptions.length;
+      wrongOptions.push(
+        ...shuffledSameDomain
+          .slice(0, needed)
+          .map((c) => c.expressions[answerLanguage].word)
+      );
+    }
+
+    // 다른 개념에서 나머지 채우기
+    if (wrongOptions.length < 3 && otherConcepts.length > 0) {
+      const shuffledOthers = shuffleArray(otherConcepts);
+      const needed = 3 - wrongOptions.length;
+      wrongOptions.push(
+        ...shuffledOthers
+          .slice(0, needed)
+          .map((c) => c.expressions[answerLanguage].word)
+      );
+    }
+
+    // 중복 제거 및 정답과 다른지 확인
+    wrongOptions = [...new Set(wrongOptions)]
+      .filter((option) => option !== answerExpr.word)
+      .slice(0, 3);
+
+    // 선택지가 부족하면 문제 생성 실패
+    if (wrongOptions.length < 2) {
+      console.warn("⚠️ 오답 선택지가 부족합니다:", concept.id);
+      return null;
+    }
+
+    // 모든 선택지 섞기
+    const options = shuffleArray([answerExpr.word, ...wrongOptions]);
+
+    // 문제 텍스트 생성
+    const translatePrompt =
+      getTranslatedText("translate_this_word") || "다음 단어를 번역하세요";
+
+    // 카테고리 정보 생성
+    const categoryInfo =
+      concept.concept_info?.domain && concept.concept_info?.category
+        ? `${concept.concept_info.domain} / ${concept.concept_info.category}`
+        : concept.concept_info?.domain || "일반";
+
+    return {
+      id: concept.id,
+      type: "translation",
+      questionText: `${translatePrompt}: "${questionExpr.word}"`,
+      hint: questionExpr.pronunciation || "",
+      options,
+      correctAnswer: answerExpr.word,
+      explanation: answerExpr.definition || targetExpr.definition || "",
+      category: categoryInfo,
+      difficulty: concept.concept_info?.difficulty || "basic",
+      emoji: concept.concept_info?.unicode_emoji || "📝",
+      concept,
+    };
+  } catch (error) {
+    console.error("❌ 번역 문제 생성 오류:", error, concept.id);
+    return null;
+  }
 }
 
-// 문제 표시
+// 문제 표시 (새로운 concepts 구조 지원)
 function displayQuestion() {
   const question = quizData.questions[quizData.currentQuestionIndex];
   const progress =
@@ -302,22 +435,39 @@ function displayQuestion() {
   elements.totalQuestions.textContent = quizData.questions.length;
   elements.quizProgress.style.width = `${progress}%`;
 
-  // 카테고리 표시
+  // 카테고리 표시 (이모지 포함)
   const categoryElement = document.getElementById("question-category");
-  if (categoryElement && question.concept) {
-    const category = question.concept.concept_info?.category || "일반";
-    const domain = question.concept.concept_info?.domain || "기타";
-    categoryElement.textContent = `${domain} / ${category}`;
+  if (categoryElement) {
+    const emoji = question.emoji || "📝";
+    const category = question.category || "일반";
+    const difficulty = question.difficulty || "basic";
+
+    // 난이도 표시를 위한 색상 설정
+    const difficultyColors = {
+      basic: "bg-green-100 text-green-800",
+      intermediate: "bg-yellow-100 text-yellow-800",
+      advanced: "bg-red-100 text-red-800",
+      fluent: "bg-purple-100 text-purple-800",
+      technical: "bg-gray-100 text-gray-800",
+    };
+
+    const colorClass =
+      difficultyColors[difficulty] || "bg-blue-100 text-blue-800";
+    categoryElement.className = `text-sm px-3 py-1 rounded-full inline-block mb-4 ${colorClass}`;
+    categoryElement.textContent = `${emoji} ${category}`;
   }
 
   // 문제 텍스트 표시
   elements.questionText.textContent = question.questionText;
 
-  // 힌트 표시
+  // 힌트 표시 (발음 정보)
   const hintElement = document.getElementById("question-hint");
-  if (hintElement && question.hint) {
+  if (hintElement && question.hint && question.hint.trim()) {
     hintElement.classList.remove("hidden");
-    hintElement.querySelector("span").textContent = question.hint;
+    const hintSpan = hintElement.querySelector("span");
+    if (hintSpan) {
+      hintSpan.textContent = `발음: ${question.hint}`;
+    }
   } else if (hintElement) {
     hintElement.classList.add("hidden");
   }
@@ -331,24 +481,45 @@ function displayQuestion() {
   // 선택지 생성
   elements.questionOptions.innerHTML = "";
 
-  question.options?.forEach((option, index) => {
-    const optionElement = document.createElement("button");
-    optionElement.className =
-      "w-full p-4 text-left border-2 border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 text-lg font-medium";
-    optionElement.innerHTML = `
-      <div class="flex items-center">
-        <span class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mr-4 text-sm font-bold">
-          ${String.fromCharCode(65 + index)}
-        </span>
-        <span>${option}</span>
+  if (question.options && question.options.length > 0) {
+    question.options.forEach((option, index) => {
+      const optionElement = document.createElement("button");
+      optionElement.className =
+        "w-full p-4 text-left border-2 border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 text-lg font-medium focus:outline-none focus:ring-2 focus:ring-blue-500";
+
+      optionElement.innerHTML = `
+        <div class="flex items-center">
+          <span class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mr-4 text-sm font-bold">
+            ${String.fromCharCode(65 + index)}
+          </span>
+          <span class="flex-1">${option}</span>
+        </div>
+      `;
+
+      optionElement.addEventListener("click", () =>
+        selectAnswer(option, optionElement)
+      );
+
+      // 키보드 접근성 추가
+      optionElement.setAttribute("tabindex", "0");
+      optionElement.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          selectAnswer(option, optionElement);
+        }
+      });
+
+      elements.questionOptions.appendChild(optionElement);
+    });
+  } else {
+    // 선택지가 없는 경우 오류 메시지
+    elements.questionOptions.innerHTML = `
+      <div class="text-center text-red-600 p-4">
+        <i class="fas fa-exclamation-triangle text-2xl mb-2"></i>
+        <p>문제 선택지를 불러올 수 없습니다.</p>
       </div>
     `;
-
-    optionElement.addEventListener("click", () =>
-      selectAnswer(option, optionElement)
-    );
-    elements.questionOptions.appendChild(optionElement);
-  });
+  }
 }
 
 // 답안 선택
@@ -404,24 +575,42 @@ function selectAnswer(answer, optionElement) {
   }, 2000);
 }
 
-// 답안 피드백 표시
+// 답안 피드백 표시 (concepts 구조 기반)
 function showAnswerFeedback(isCorrect, question) {
   const feedbackElement = document.getElementById("answer-feedback");
   const feedbackContent = document.getElementById("feedback-content");
 
   if (!feedbackElement || !feedbackContent) return;
 
+  // 번역된 메시지 가져오기
+  const correctMsg = getTranslatedText("correct_answer") || "정답입니다! 🎉";
+  const wrongMsg = getTranslatedText("wrong_answer") || "틀렸습니다";
+
   if (isCorrect) {
     feedbackElement.className =
-      "mt-6 p-4 rounded-lg bg-green-50 border border-green-200";
+      "mt-6 p-4 rounded-lg bg-green-100 border border-green-300";
     feedbackContent.innerHTML = `
-      <div class="flex items-center justify-center text-green-800">
-        <i class="fas fa-check-circle text-2xl mr-3"></i>
-        <div>
-          <div class="font-bold text-lg">정답입니다!</div>
+      <div class="flex items-start text-green-800">
+        <i class="fas fa-check-circle text-2xl mr-3 mt-1"></i>
+        <div class="flex-1">
+          <div class="font-bold text-lg">${correctMsg}</div>
           ${
             question.explanation
-              ? `<div class="text-sm mt-1">${question.explanation}</div>`
+              ? `
+            <div class="text-sm mt-2 p-2 bg-green-50 rounded-lg">
+              <i class="fas fa-info-circle mr-1"></i>
+              ${question.explanation}
+            </div>
+          `
+              : ""
+          }
+          ${
+            question.category
+              ? `
+            <div class="text-xs text-green-600 mt-2">
+              ${question.emoji || "📝"} ${question.category}
+            </div>
+          `
               : ""
           }
         </div>
@@ -429,18 +618,32 @@ function showAnswerFeedback(isCorrect, question) {
     `;
   } else {
     feedbackElement.className =
-      "mt-6 p-4 rounded-lg bg-red-50 border border-red-200";
+      "mt-6 p-4 rounded-lg bg-red-100 border border-red-300";
     feedbackContent.innerHTML = `
-      <div class="flex items-center justify-center text-red-800">
-        <i class="fas fa-times-circle text-2xl mr-3"></i>
-        <div>
-          <div class="font-bold text-lg">틀렸습니다</div>
-          <div class="text-sm mt-1">정답: <span class="font-semibold">${
+      <div class="flex items-start text-red-800">
+        <i class="fas fa-times-circle text-2xl mr-3 mt-1"></i>
+        <div class="flex-1">
+          <div class="font-bold text-lg">${wrongMsg}</div>
+          <div class="text-lg font-bold mt-1 text-red-900">정답: ${
             question.correctAnswer
-          }</span></div>
+          }</div>
           ${
             question.explanation
-              ? `<div class="text-sm mt-1">${question.explanation}</div>`
+              ? `
+            <div class="text-sm mt-2 p-2 bg-red-50 rounded-lg">
+              <i class="fas fa-info-circle mr-1"></i>
+              ${question.explanation}
+            </div>
+          `
+              : ""
+          }
+          ${
+            question.category
+              ? `
+            <div class="text-xs text-red-600 mt-2">
+              ${question.emoji || "📝"} ${question.category}
+            </div>
+          `
               : ""
           }
         </div>
@@ -481,7 +684,9 @@ function skipQuestion() {
 
 // 퀴즈 종료
 function quitQuiz() {
-  if (confirm("정말로 퀴즈를 종료하시겠습니까?")) {
+  const confirmMsg =
+    getTranslatedText("quit_quiz_confirm") || "정말로 퀴즈를 종료하시겠습니까?";
+  if (confirm(confirmMsg)) {
     quizData.isActive = false;
     resetQuizSettings();
   }
@@ -579,7 +784,8 @@ function resetQuizSettings() {
   elements.quizResults.classList.add("hidden");
 
   elements.startQuizBtn.disabled = false;
-  elements.startQuizBtn.textContent = "퀴즈 시작";
+  elements.startQuizBtn.textContent =
+    getTranslatedText("start_quiz") || "퀴즈 시작";
 
   stopTimer();
 
@@ -705,4 +911,24 @@ function formatDate(date) {
 
 function showError(message) {
   alert(message);
+}
+
+// 번역 텍스트 가져오기 함수 (language-utils에서 가져옴)
+function getTranslatedText(key) {
+  try {
+    // 전역 번역 함수가 있으면 사용
+    if (typeof window.getTranslatedText === "function") {
+      return window.getTranslatedText(key);
+    }
+
+    // localStorage에서 번역 데이터 직접 가져오기
+    const currentLanguage = localStorage.getItem("userLanguage") || "ko";
+    const translations = JSON.parse(
+      localStorage.getItem(`translations_${currentLanguage}`)
+    );
+    return translations && translations[key] ? translations[key] : null;
+  } catch (error) {
+    console.error("번역 텍스트 가져오기 오류:", error);
+    return null;
+  }
 }
