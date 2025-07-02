@@ -17,6 +17,7 @@ import {
   arrayRemove,
   serverTimestamp,
   addDoc,
+  FieldPath,
 } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 
 /**
@@ -895,92 +896,25 @@ export class CollectionManager {
         `게임용 개념 조회: ${userLang}(${mappedUserLang}) -> ${targetLang}(${mappedTargetLang}), 난이도: ${difficulty}`
       );
 
-      // Firebase 비용 최적화: 적당한 수만 가져온 후 무작위 선택
-      // 29개 정도는 비용에 큰 영향 없으므로 현재 방식 유지하되 limit 줄임
-      let conceptsQuery = query(collection(db, "concepts"), limit(50));
-
-      // 난이도 조건이 있고 basic이 아닌 경우에만 서버 필터링
-      if (difficulty && difficulty !== "all" && difficulty !== "basic") {
-        conceptsQuery = query(
-          collection(db, "concepts"),
-          where("concept_info.difficulty", "==", difficulty),
-          limit(50)
-        );
-      }
-
-      const conceptsSnapshot = await getDocs(conceptsQuery);
-      const concepts = [];
-
-      console.log(
-        `DB에서 조회된 전체 개념 수: ${conceptsSnapshot.docs.length}`
+      // 🎲 진정한 랜덤 조회를 위한 새로운 방식
+      // 여러 개의 작은 랜덤 쿼리로 분산하여 더 나은 랜덤성과 비용 효율성 확보
+      const concepts = await this.getRandomConceptsOptimized(
+        mappedUserLang,
+        mappedTargetLang,
+        difficulty,
+        limitCount
       );
 
-      for (const doc of conceptsSnapshot.docs) {
-        const conceptData = doc.data();
-
-        // 개념 데이터 구조 디버깅 (첫 5개만)
-        if (concepts.length < 5) {
-          console.log(`개념 ${doc.id} 검사:`, {
-            expressions: Object.keys(conceptData.expressions || {}),
-            hasUserLang: !!conceptData.expressions?.[mappedUserLang]?.word,
-            hasTargetLang: !!conceptData.expressions?.[mappedTargetLang]?.word,
-            userLangWord:
-              conceptData.expressions?.[mappedUserLang]?.word || "없음",
-            targetLangWord:
-              conceptData.expressions?.[mappedTargetLang]?.word || "없음",
-            conceptInfo: conceptData.concept_info || "없음",
-          });
-        }
-
-        // 언어 필터링: 요청된 언어 쌍이 모두 있는지 확인
-        if (
-          conceptData.expressions?.[mappedUserLang]?.word &&
-          conceptData.expressions?.[mappedTargetLang]?.word
-        ) {
-          concepts.push({
-            id: doc.id,
-            conceptInfo: conceptData.concept_info,
-            expressions: {
-              [mappedUserLang]: conceptData.expressions[mappedUserLang],
-              [mappedTargetLang]: conceptData.expressions[mappedTargetLang],
-            },
-            media: conceptData.media,
-            gameMetadata: {
-              difficulty: conceptData.concept_info?.difficulty || "basic",
-              domain: conceptData.concept_info?.domain || "general",
-              category: conceptData.concept_info?.category || "common",
-            },
-          });
-
-          // 모든 유효한 개념을 수집 (limit 제거)
-          // 나중에 무작위로 선택하기 위해 break 제거
-        }
-      }
-
       console.log(`🔍 수집된 모든 유효한 개념 수: ${concepts.length}`);
-
-      // Fisher-Yates 셔플 알고리즘으로 강력한 무작위화
-      const shuffledConcepts = [...concepts];
-      for (let i = shuffledConcepts.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffledConcepts[i], shuffledConcepts[j]] = [
-          shuffledConcepts[j],
-          shuffledConcepts[i],
-        ];
-      }
-
-      // 요청된 수만큼만 반환
-      const selectedConcepts = shuffledConcepts.slice(0, limitCount);
-
       console.log(
-        `✅ 최종 선택된 게임용 개념 수: ${selectedConcepts.length} (전체 ${concepts.length}개 중에서 무작위 선택)`
+        `✅ 최종 선택된 게임용 개념 수: ${concepts.length} (최적화된 랜덤 조회)`
       );
 
       // 선택된 개념들의 세부 정보 출력
-      if (selectedConcepts.length > 0) {
+      if (concepts.length > 0) {
         console.log(
           "🎯 무작위 선택된 개념들:",
-          selectedConcepts.map((c) => ({
+          concepts.map((c) => ({
             id: c.id,
             userWord: c.expressions[mappedUserLang]?.word,
             targetWord: c.expressions[mappedTargetLang]?.word,
@@ -990,11 +924,282 @@ export class CollectionManager {
         );
       }
 
-      return selectedConcepts;
+      return concepts;
     } catch (error) {
       console.error("게임용 개념 조회 중 오류:", error);
       throw error;
     }
+  }
+
+  // 🎲 최적화된 랜덤 개념 조회 메서드
+  async getRandomConceptsOptimized(
+    mappedUserLang,
+    mappedTargetLang,
+    difficulty,
+    limitCount
+  ) {
+    const concepts = [];
+    const maxAttempts = 3; // 최대 시도 횟수
+    let attempt = 0;
+
+    while (concepts.length < limitCount && attempt < maxAttempts) {
+      attempt++;
+      console.log(`🎲 랜덤 조회 시도 ${attempt}/${maxAttempts}`);
+
+      try {
+        // 랜덤 시작점을 사용한 효율적 조회
+        const randomConcepts = await this.getRandomConceptsBatch(
+          mappedUserLang,
+          mappedTargetLang,
+          difficulty,
+          limitCount - concepts.length
+        );
+
+        // 중복 제거하면서 추가
+        for (const concept of randomConcepts) {
+          if (!concepts.find((c) => c.id === concept.id)) {
+            concepts.push(concept);
+            if (concepts.length >= limitCount) break;
+          }
+        }
+
+        console.log(
+          `🎲 시도 ${attempt} 결과: ${randomConcepts.length}개 조회, 총 ${concepts.length}개 수집`
+        );
+      } catch (error) {
+        console.warn(`🎲 시도 ${attempt} 실패:`, error.message);
+      }
+    }
+
+    // 부족하면 기존 방식으로 보완
+    if (concepts.length < limitCount) {
+      console.log(
+        `🔄 랜덤 조회로 ${concepts.length}개만 수집됨. 기존 방식으로 보완 시도`
+      );
+      const fallbackConcepts = await this.getFallbackConcepts(
+        mappedUserLang,
+        mappedTargetLang,
+        difficulty,
+        limitCount - concepts.length,
+        concepts.map((c) => c.id) // 이미 선택된 ID들 제외
+      );
+      concepts.push(...fallbackConcepts);
+    }
+
+    return concepts;
+  }
+
+  // 🎲 랜덤 배치 조회
+  async getRandomConceptsBatch(
+    mappedUserLang,
+    mappedTargetLang,
+    difficulty,
+    needed
+  ) {
+    // 여러 랜덤 접근 방식을 조합
+    const strategies = [
+      () =>
+        this.getConceptsWithRandomStart(
+          mappedUserLang,
+          mappedTargetLang,
+          difficulty,
+          needed
+        ),
+      () =>
+        this.getConceptsWithRandomOrder(
+          mappedUserLang,
+          mappedTargetLang,
+          difficulty,
+          needed
+        ),
+    ];
+
+    // 랜덤하게 전략 선택
+    const strategy = strategies[Math.floor(Math.random() * strategies.length)];
+    return await strategy();
+  }
+
+  // 🎲 랜덤 시작점을 사용한 조회
+  async getConceptsWithRandomStart(
+    mappedUserLang,
+    mappedTargetLang,
+    difficulty,
+    needed
+  ) {
+    // 랜덤 문서 ID 기반 시작점 설정
+    const randomId = this.generateRandomDocumentId();
+
+    let conceptsQuery = query(
+      collection(db, "concepts"),
+      where(FieldPath.documentId(), ">=", randomId),
+      limit(needed * 2) // 여유있게 조회
+    );
+
+    // 난이도 조건 추가
+    if (difficulty && difficulty !== "all" && difficulty !== "basic") {
+      conceptsQuery = query(
+        collection(db, "concepts"),
+        where("concept_info.difficulty", "==", difficulty),
+        where(FieldPath.documentId(), ">=", randomId),
+        limit(needed * 2)
+      );
+    }
+
+    return await this.executeConceptQuery(
+      conceptsQuery,
+      mappedUserLang,
+      mappedTargetLang,
+      needed
+    );
+  }
+
+  // 🎲 랜덤 정렬 기반 조회
+  async getConceptsWithRandomOrder(
+    mappedUserLang,
+    mappedTargetLang,
+    difficulty,
+    needed
+  ) {
+    // 다른 시작점에서 조회
+    let conceptsQuery = query(
+      collection(db, "concepts"),
+      limit(needed * 3) // 더 여유있게 조회해서 선택권 확보
+    );
+
+    if (difficulty && difficulty !== "all" && difficulty !== "basic") {
+      conceptsQuery = query(
+        collection(db, "concepts"),
+        where("concept_info.difficulty", "==", difficulty),
+        limit(needed * 3)
+      );
+    }
+
+    const concepts = await this.executeConceptQuery(
+      conceptsQuery,
+      mappedUserLang,
+      mappedTargetLang,
+      needed * 3
+    );
+
+    // Fisher-Yates 셔플로 랜덤 선택
+    const shuffled = [...concepts];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    return shuffled.slice(0, needed);
+  }
+
+  // 🎲 랜덤 문서 ID 생성
+  generateRandomDocumentId() {
+    // Firestore 문서 ID 패턴을 따른 랜덤 문자열 생성
+    const chars =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let result = "";
+    for (let i = 0; i < 20; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  }
+
+  // 🔄 쿼리 실행 및 개념 변환
+  async executeConceptQuery(
+    conceptsQuery,
+    mappedUserLang,
+    mappedTargetLang,
+    maxResults
+  ) {
+    const conceptsSnapshot = await getDocs(conceptsQuery);
+    const concepts = [];
+
+    for (const doc of conceptsSnapshot.docs) {
+      if (concepts.length >= maxResults) break;
+
+      const conceptData = doc.data();
+
+      // 언어 필터링: 요청된 언어 쌍이 모두 있는지 확인
+      if (
+        conceptData.expressions?.[mappedUserLang]?.word &&
+        conceptData.expressions?.[mappedTargetLang]?.word
+      ) {
+        concepts.push({
+          id: doc.id,
+          conceptInfo: conceptData.concept_info,
+          expressions: {
+            [mappedUserLang]: conceptData.expressions[mappedUserLang],
+            [mappedTargetLang]: conceptData.expressions[mappedTargetLang],
+          },
+          media: conceptData.media,
+          gameMetadata: {
+            difficulty: conceptData.concept_info?.difficulty || "basic",
+            domain: conceptData.concept_info?.domain || "general",
+            category: conceptData.concept_info?.category || "common",
+          },
+        });
+      }
+    }
+
+    return concepts;
+  }
+
+  // 🔄 폴백 개념 조회 (기존 방식)
+  async getFallbackConcepts(
+    mappedUserLang,
+    mappedTargetLang,
+    difficulty,
+    needed,
+    excludeIds = []
+  ) {
+    let conceptsQuery = query(collection(db, "concepts"), limit(50));
+
+    if (difficulty && difficulty !== "all" && difficulty !== "basic") {
+      conceptsQuery = query(
+        collection(db, "concepts"),
+        where("concept_info.difficulty", "==", difficulty),
+        limit(50)
+      );
+    }
+
+    const conceptsSnapshot = await getDocs(conceptsQuery);
+    const concepts = [];
+
+    for (const doc of conceptsSnapshot.docs) {
+      if (excludeIds.includes(doc.id)) continue; // 이미 선택된 것 제외
+
+      const conceptData = doc.data();
+
+      if (
+        conceptData.expressions?.[mappedUserLang]?.word &&
+        conceptData.expressions?.[mappedTargetLang]?.word
+      ) {
+        concepts.push({
+          id: doc.id,
+          conceptInfo: conceptData.concept_info,
+          expressions: {
+            [mappedUserLang]: conceptData.expressions[mappedUserLang],
+            [mappedTargetLang]: conceptData.expressions[mappedTargetLang],
+          },
+          media: conceptData.media,
+          gameMetadata: {
+            difficulty: conceptData.concept_info?.difficulty || "basic",
+            domain: conceptData.concept_info?.domain || "general",
+            category: conceptData.concept_info?.category || "common",
+          },
+        });
+
+        if (concepts.length >= needed) break;
+      }
+    }
+
+    // 셔플 후 필요한 만큼만 반환
+    const shuffled = [...concepts];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    return shuffled.slice(0, needed);
   }
 
   // === 헬퍼 메서드들 ===

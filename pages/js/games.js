@@ -780,12 +780,15 @@ async function loadGameWords() {
     const gameType = gameTypeMap[currentGameType] || "matching";
     const languages = [sourceLanguage, targetLanguage];
     const limit = gameWordCount[currentGameType] || 8;
+    // Firebase 조회 시에는 더 많이 가져와서 무작위 선택
+    const fetchLimit = 50;
 
     console.log("🔍 개념 조회 파라미터:", {
-      gameType: "matching",
+      gameType: "matching", // 단어 섞기도 같은 조회 함수 사용
       gameDifficulty,
       languages: [sourceLanguage, targetLanguage],
-      limit,
+      fetchLimit: fetchLimit, // Firebase 비용 최적화: 50개 조회 후 무작위 선택
+      actualGameLimit: limit, // 실제 게임에서 사용할 단어 수
     });
 
     console.log("🔍 conceptUtils 확인:", {
@@ -806,7 +809,7 @@ async function loadGameWords() {
         "matching", // gameType은 항상 matching으로 통일
         gameDifficulty,
         [sourceLanguage, targetLanguage],
-        limit
+        fetchLimit // Firebase에서는 50개 조회
       );
 
       console.log(`Firebase에서 ${concepts.length}개 개념 로딩 완료`, concepts);
@@ -850,7 +853,7 @@ async function loadGameWords() {
         "matching",
         null, // 난이도 제한 없음
         [sourceLanguage, targetLanguage],
-        limit
+        fetchLimit // Firebase에서는 50개 조회
       );
 
       if (conceptsWithoutDifficulty.length >= 1) {
@@ -1907,6 +1910,9 @@ function initWordScrambleGame(container) {
           <button id="reset-scramble" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600">
             다시 배열
           </button>
+          <button id="skip-scramble" class="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600">
+            다음 문제
+          </button>
         </div>
       </div>
       
@@ -1972,9 +1978,12 @@ function initWordScrambleGame(container) {
       const answerContainer = container.querySelector("#scramble-answer");
 
       // 답안 영역의 모든 글자를 다시 섞기 영역으로 이동
-      const answerLetters = answerContainer.querySelectorAll("button");
+      const answerLetters = Array.from(
+        answerContainer.querySelectorAll("button")
+      );
       answerLetters.forEach((letter) => {
-        scrambleContainer.appendChild(letter);
+        // moveLetter 함수를 사용해서 이벤트 리스너도 함께 재설정
+        moveLetter(letter, scrambleContainer);
       });
     });
   }
@@ -2023,6 +2032,26 @@ function initWordScrambleGame(container) {
 
   // 첫 번째 단어 표시
   showNextScrambleWord();
+
+  // 다음 문제 스킵 버튼 이벤트 리스너 추가
+  const skipBtn = container.querySelector("#skip-scramble");
+  if (skipBtn) {
+    skipBtn.addEventListener("click", () => {
+      // 기존 메시지들 제거
+      const wrongMessage = document.getElementById("scramble-wrong-message");
+      const correctMessage = document.getElementById(
+        "scramble-correct-message"
+      );
+      if (wrongMessage) wrongMessage.remove();
+      if (correctMessage) correctMessage.remove();
+
+      // 다음 문제로 넘어가기
+      currentScrambleWordIndex++;
+      showNextScrambleWord();
+
+      console.log("🔤 단어 섞기 - 문제 스킵됨");
+    });
+  }
 }
 
 // 다음 단어 섞기 문제 표시
@@ -2032,6 +2061,16 @@ function showNextScrambleWord() {
     gameWordsLength: gameWords.length,
     gameWords: gameWords.slice(0, 2), // 처음 2개만 로그
   });
+
+  // 기존 메시지들 제거 (새 문제 시작)
+  const existingWrongMessage = document.getElementById(
+    "scramble-wrong-message"
+  );
+  const existingCorrectMessage = document.getElementById(
+    "scramble-correct-message"
+  );
+  if (existingWrongMessage) existingWrongMessage.remove();
+  if (existingCorrectMessage) existingCorrectMessage.remove();
 
   if (gameWords.length === 0) {
     console.error("❌ gameWords가 비어있습니다! 게임을 중단합니다.");
@@ -2088,7 +2127,7 @@ function showNextScrambleWord() {
     });
   }
 
-  // 답안 영역 초기화
+  // 답안 영역 초기화 (이전 문제 입력 제거)
   if (answerContainer) {
     answerContainer.innerHTML = "";
   }
@@ -2097,10 +2136,25 @@ function showNextScrambleWord() {
 // 글자 이동 함수
 function moveLetter(letterBtn, targetContainer) {
   if (targetContainer && letterBtn) {
-    targetContainer.appendChild(letterBtn);
-    letterBtn.addEventListener("click", () => {
-      moveLetter(letterBtn, document.getElementById("scramble-container"));
+    // 기존 이벤트 리스너 제거
+    const newLetterBtn = letterBtn.cloneNode(true);
+    letterBtn.parentNode.replaceChild(newLetterBtn, letterBtn);
+
+    // 새로운 이벤트 리스너 추가
+    newLetterBtn.addEventListener("click", () => {
+      const scrambleContainer = document.getElementById("scramble-container");
+      const answerContainer = document.getElementById("scramble-answer");
+
+      if (newLetterBtn.parentNode === scrambleContainer) {
+        // 섞기 영역에서 답안 영역으로
+        moveLetter(newLetterBtn, answerContainer);
+      } else if (newLetterBtn.parentNode === answerContainer) {
+        // 답안 영역에서 섞기 영역으로
+        moveLetter(newLetterBtn, scrambleContainer);
+      }
     });
+
+    targetContainer.appendChild(newLetterBtn);
   }
 }
 
@@ -2122,13 +2176,22 @@ function checkScrambleAnswer() {
     const scoreElement = document.getElementById("scramble-score");
     if (scoreElement) scoreElement.textContent = score;
 
+    // 기존 메시지 제거
+    const wrongMessage = document.getElementById("scramble-wrong-message");
+    if (wrongMessage) {
+      wrongMessage.remove();
+    }
+
+    // 정답 메시지 표시
+    showScrambleCorrectMessage();
+
     // 성공 효과
     answerContainer.classList.add("bg-green-100", "border-green-500");
     setTimeout(() => {
       answerContainer.classList.remove("bg-green-100", "border-green-500");
       currentScrambleWordIndex++;
       showNextScrambleWord();
-    }, 1000);
+    }, 1500);
   } else {
     // 오답
     score = Math.max(0, score - 2);
@@ -2137,9 +2200,52 @@ function checkScrambleAnswer() {
 
     // 실패 효과
     answerContainer.classList.add("bg-red-100", "border-red-500");
+
+    // 오답 메시지 표시
+    showScrambleSkipOption();
+
     setTimeout(() => {
       answerContainer.classList.remove("bg-red-100", "border-red-500");
     }, 1000);
+  }
+}
+
+// 단어 섞기 오답 메시지 표시
+function showScrambleSkipOption() {
+  // 기존 메시지가 있으면 제거
+  const existingMessage = document.getElementById("scramble-wrong-message");
+  if (existingMessage) {
+    existingMessage.remove();
+  }
+  const existingCorrectMessage = document.getElementById(
+    "scramble-correct-message"
+  );
+  if (existingCorrectMessage) {
+    existingCorrectMessage.remove();
+  }
+
+  // 오답 메시지 HTML 생성
+  const wrongAnswerHTML = `
+    <div id="scramble-wrong-message" class="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-center">
+      <div class="flex items-center justify-center">
+        <i class="fas fa-times-circle text-red-500 mr-2"></i>
+        <span class="text-sm font-medium text-red-700">오답입니다</span>
+      </div>
+    </div>
+  `;
+
+  // 확인 버튼 아래에 추가
+  const checkBtn = document.getElementById("check-scramble");
+  if (checkBtn) {
+    checkBtn.insertAdjacentHTML("afterend", wrongAnswerHTML);
+
+    // 3초 후 자동으로 오답 메시지 제거
+    setTimeout(() => {
+      const wrongMessage = document.getElementById("scramble-wrong-message");
+      if (wrongMessage) {
+        wrongMessage.remove();
+      }
+    }, 3000);
   }
 }
 
@@ -2400,6 +2506,41 @@ function checkMemoryMatch() {
   firstCard = null;
   secondCard = null;
   canSelect = true;
+}
+
+// 단어 섞기 정답 메시지 표시
+function showScrambleCorrectMessage() {
+  // 기존 메시지가 있으면 제거
+  const existingMessage = document.getElementById("scramble-correct-message");
+  if (existingMessage) {
+    existingMessage.remove();
+  }
+
+  // 정답 메시지 HTML 생성
+  const correctAnswerHTML = `
+    <div id="scramble-correct-message" class="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg text-center">
+      <div class="flex items-center justify-center">
+        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+        <span class="text-sm font-medium text-green-700">정답입니다</span>
+      </div>
+    </div>
+  `;
+
+  // 확인 버튼 아래에 추가
+  const checkBtn = document.getElementById("check-scramble");
+  if (checkBtn) {
+    checkBtn.insertAdjacentHTML("afterend", correctAnswerHTML);
+
+    // 1.5초 후 자동으로 정답 메시지 제거
+    setTimeout(() => {
+      const correctMessage = document.getElementById(
+        "scramble-correct-message"
+      );
+      if (correctMessage) {
+        correctMessage.remove();
+      }
+    }, 1500);
+  }
 }
 
 // ======== 이벤트 리스너 초기화 ========
