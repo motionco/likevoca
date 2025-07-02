@@ -30,6 +30,9 @@ let attempts = 0;
 let firstCard = null;
 let secondCard = null;
 let canSelect = true;
+
+// 자동 정답 확인 타이머 관리
+let autoCheckTimer = null;
 let memoryPairs = 0;
 let currentUser = null;
 let collectionManager = new CollectionManager();
@@ -1973,18 +1976,16 @@ function initWordScrambleGame(container) {
   const resetBtn = container.querySelector("#reset-scramble");
   if (resetBtn) {
     resetBtn.addEventListener("click", () => {
-      // 현재 단어 재배열
-      const scrambleContainer = container.querySelector("#scramble-container");
-      const answerContainer = container.querySelector("#scramble-answer");
-
-      // 답안 영역의 모든 글자를 다시 섞기 영역으로 이동
-      const answerLetters = Array.from(
-        answerContainer.querySelectorAll("button")
+      // 기존 메시지들 제거
+      const wrongMessage = document.getElementById("scramble-wrong-message");
+      const correctMessage = document.getElementById(
+        "scramble-correct-message"
       );
-      answerLetters.forEach((letter) => {
-        // moveLetter 함수를 사용해서 이벤트 리스너도 함께 재설정
-        moveLetter(letter, scrambleContainer);
-      });
+      if (wrongMessage) wrongMessage.remove();
+      if (correctMessage) correctMessage.remove();
+
+      // 답안 영역의 글자들을 원래 자리로 되돌리기
+      resetScrambleLettersToOriginalPosition();
     });
   }
 
@@ -2072,6 +2073,9 @@ function showNextScrambleWord() {
   if (existingWrongMessage) existingWrongMessage.remove();
   if (existingCorrectMessage) existingCorrectMessage.remove();
 
+  // 자동 확인 타이머 해제 (새 문제 시작)
+  clearAutoCheckTimer();
+
   if (gameWords.length === 0) {
     console.error("❌ gameWords가 비어있습니다! 게임을 중단합니다.");
     alert("게임에 필요한 단어를 불러올 수 없습니다. 다시 시도해주세요.");
@@ -2155,11 +2159,59 @@ function moveLetter(letterBtn, targetContainer) {
     });
 
     targetContainer.appendChild(newLetterBtn);
+
+    // 답안 영역으로 이동했을 때 자동 확인 체크
+    if (targetContainer.id === "scramble-answer") {
+      checkAutoComplete();
+    } else {
+      // 답안 영역에서 나갔을 때 자동 확인 타이머 해제
+      clearAutoCheckTimer();
+    }
+  }
+}
+
+// 모든 글자가 입력되었는지 확인하고 자동으로 정답 확인하는 함수
+function checkAutoComplete() {
+  const answerContainer = document.getElementById("scramble-answer");
+  const correctAnswer = answerContainer.getAttribute("data-correct");
+
+  if (answerContainer && correctAnswer) {
+    const currentAnswer = Array.from(answerContainer.querySelectorAll("button"))
+      .map((btn) => btn.textContent)
+      .join("");
+
+    // 모든 글자가 입력되었는지 확인
+    if (currentAnswer.length === correctAnswer.length) {
+      console.log("🔤 모든 글자 입력 완료 - 2초 후 자동 정답 확인");
+
+      // 기존 타이머가 있으면 제거
+      clearAutoCheckTimer();
+
+      // 2초 후 자동으로 정답 확인
+      autoCheckTimer = setTimeout(() => {
+        checkScrambleAnswer();
+      }, 2000);
+    } else {
+      // 글자가 부족하면 자동 확인 타이머 해제
+      clearAutoCheckTimer();
+    }
+  }
+}
+
+// 자동 확인 타이머 해제 함수
+function clearAutoCheckTimer() {
+  if (autoCheckTimer) {
+    clearTimeout(autoCheckTimer);
+    autoCheckTimer = null;
+    console.log("🔤 자동 정답 확인 타이머 해제");
   }
 }
 
 // 단어 섞기 답안 확인
 function checkScrambleAnswer() {
+  // 자동 확인 타이머 해제 (수동 확인 시)
+  clearAutoCheckTimer();
+
   const answerContainer = document.getElementById("scramble-answer");
   if (!answerContainer) return;
 
@@ -2226,7 +2278,7 @@ function showScrambleSkipOption() {
 
   // 오답 메시지 HTML 생성
   const wrongAnswerHTML = `
-    <div id="scramble-wrong-message" class="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-center">
+    <div id="scramble-wrong-message" class="mt-4 mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-center">
       <div class="flex items-center justify-center">
         <i class="fas fa-times-circle text-red-500 mr-2"></i>
         <span class="text-sm font-medium text-red-700">오답입니다</span>
@@ -2234,18 +2286,47 @@ function showScrambleSkipOption() {
     </div>
   `;
 
-  // 확인 버튼 아래에 추가
-  const checkBtn = document.getElementById("check-scramble");
-  if (checkBtn) {
-    checkBtn.insertAdjacentHTML("afterend", wrongAnswerHTML);
+  // 버튼들 위쪽에 추가 (더 깔끔한 UI)
+  const buttonsContainer = document.querySelector(
+    ".flex.justify-center.space-x-4"
+  );
+  if (buttonsContainer) {
+    buttonsContainer.insertAdjacentHTML("beforebegin", wrongAnswerHTML);
 
-    // 3초 후 자동으로 오답 메시지 제거
+    // 2초 후 자동으로 답안 영역의 글자들을 원래 자리로 되돌리기 (메시지도 함께 제거됨)
     setTimeout(() => {
-      const wrongMessage = document.getElementById("scramble-wrong-message");
-      if (wrongMessage) {
-        wrongMessage.remove();
-      }
-    }, 3000);
+      resetScrambleLettersToOriginalPosition();
+    }, 2000);
+  }
+}
+
+// 답안 영역의 글자들을 원래 섞기 영역으로 되돌리는 함수
+function resetScrambleLettersToOriginalPosition() {
+  const scrambleContainer = document.getElementById("scramble-container");
+  const answerContainer = document.getElementById("scramble-answer");
+
+  if (scrambleContainer && answerContainer) {
+    // 답안 영역의 모든 글자를 원래 자리로 이동
+    const answerLetters = Array.from(
+      answerContainer.querySelectorAll("button")
+    );
+    answerLetters.forEach((letter) => {
+      // moveLetter 함수를 사용해서 이벤트 리스너도 함께 재설정
+      moveLetter(letter, scrambleContainer);
+    });
+
+    // 오답 메시지도 동시에 제거
+    const wrongMessage = document.getElementById("scramble-wrong-message");
+    if (wrongMessage) {
+      wrongMessage.remove();
+    }
+
+    // 자동 확인 타이머도 해제 (답안이 리셋되므로)
+    clearAutoCheckTimer();
+
+    console.log(
+      "🔤 단어 섞기 - 답안 글자들을 원래 자리로 되돌림 + 메시지 제거"
+    );
   }
 }
 
@@ -2518,7 +2599,7 @@ function showScrambleCorrectMessage() {
 
   // 정답 메시지 HTML 생성
   const correctAnswerHTML = `
-    <div id="scramble-correct-message" class="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg text-center">
+    <div id="scramble-correct-message" class="mt-4 mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-center">
       <div class="flex items-center justify-center">
         <i class="fas fa-check-circle text-green-500 mr-2"></i>
         <span class="text-sm font-medium text-green-700">정답입니다</span>
@@ -2526,10 +2607,12 @@ function showScrambleCorrectMessage() {
     </div>
   `;
 
-  // 확인 버튼 아래에 추가
-  const checkBtn = document.getElementById("check-scramble");
-  if (checkBtn) {
-    checkBtn.insertAdjacentHTML("afterend", correctAnswerHTML);
+  // 버튼들 위쪽에 추가 (더 깔끔한 UI)
+  const buttonsContainer = document.querySelector(
+    ".flex.justify-center.space-x-4"
+  );
+  if (buttonsContainer) {
+    buttonsContainer.insertAdjacentHTML("beforebegin", correctAnswerHTML);
 
     // 1.5초 후 자동으로 정답 메시지 제거
     setTimeout(() => {
