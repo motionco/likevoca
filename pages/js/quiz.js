@@ -420,8 +420,8 @@ function createTranslationQuestion(concept, settings, allConcepts) {
 
     // 오답 선택지 생성 (같은 방향의 다른 개념들 사용)
     const potentialWrongOptions = allConcepts
-      .filter((c) => c.id !== concept.id)
-      .map((c) =>
+    .filter((c) => c.id !== concept.id)
+    .map((c) =>
         isKoreanToEnglish ? c.fromExpression?.word : c.toExpression?.word
       )
       .filter((word) => word && word !== answerExpr.word);
@@ -503,24 +503,24 @@ function createTranslationQuestion(concept, settings, allConcepts) {
         ? `${concept.conceptInfo.domain} / ${concept.conceptInfo.category}`
         : concept.conceptInfo?.domain || "일반";
 
-    return {
-      id: concept.id,
+  return {
+    id: concept.id,
       conceptId: concept.id, // 🎯 user_progress 업데이트를 위한 conceptId 추가
-      type: "translation",
+    type: "translation",
       questionText: `${translatePrompt}: "${questionExpr.word}"`,
       hint:
         isKoreanToEnglish && questionExpr.pronunciation
           ? `발음: ${questionExpr.pronunciation}`
           : questionExpr.pronunciation || "",
-      options,
-      correctAnswer: answerExpr.word,
+    options,
+    correctAnswer: answerExpr.word,
       explanation:
         answerExpr.definition || concept.conceptInfo?.definition || "",
       category: categoryInfo,
       difficulty: concept.conceptInfo?.difficulty || "basic",
       emoji: concept.conceptInfo?.unicode_emoji || "📝",
-      concept,
-    };
+    concept,
+  };
   } catch (error) {
     console.error("❌ 번역 문제 생성 오류:", error, concept.id);
     return null;
@@ -862,22 +862,22 @@ function displayQuestion() {
   if (question.options && question.options.length > 0) {
     // 일반 선택지 문제 (translation, pronunciation, fill_blank)
     question.options.forEach((option, index) => {
-      const optionElement = document.createElement("button");
-      optionElement.className =
+    const optionElement = document.createElement("button");
+    optionElement.className =
         "w-full p-4 text-left border-2 border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 text-lg font-medium focus:outline-none focus:ring-2 focus:ring-blue-500";
 
-      optionElement.innerHTML = `
-        <div class="flex items-center">
-          <span class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mr-4 text-sm font-bold">
-            ${String.fromCharCode(65 + index)}
-          </span>
+    optionElement.innerHTML = `
+      <div class="flex items-center">
+        <span class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mr-4 text-sm font-bold">
+          ${String.fromCharCode(65 + index)}
+        </span>
           <span class="flex-1">${option}</span>
-        </div>
-      `;
+      </div>
+    `;
 
-      optionElement.addEventListener("click", () =>
-        selectAnswer(option, optionElement)
-      );
+    optionElement.addEventListener("click", () =>
+      selectAnswer(option, optionElement)
+    );
 
       // 키보드 접근성 추가
       optionElement.setAttribute("tabindex", "0");
@@ -888,8 +888,8 @@ function displayQuestion() {
         }
       });
 
-      elements.questionOptions.appendChild(optionElement);
-    });
+    elements.questionOptions.appendChild(optionElement);
+  });
   } else {
     // 선택지가 없는 경우 오류 메시지
     elements.questionOptions.innerHTML = `

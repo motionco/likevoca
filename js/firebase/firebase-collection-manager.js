@@ -16,6 +16,7 @@ import {
   arrayUnion,
   arrayRemove,
   serverTimestamp,
+  addDoc,
 } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 
 /**
@@ -870,7 +871,12 @@ export class CollectionManager {
   /**
    * 게임용 개념 조회 - 최적화된 쿼리
    */
-  async getConceptsForGame(gameType, difficulty, languagePair, limit = 10) {
+  async getConceptsForGame(
+    gameType,
+    difficulty,
+    languagePair,
+    limitCount = 10
+  ) {
     try {
       const [userLang, targetLang] = languagePair;
 
@@ -889,23 +895,16 @@ export class CollectionManager {
         `게임용 개념 조회: ${userLang}(${mappedUserLang}) -> ${targetLang}(${mappedTargetLang}), 난이도: ${difficulty}`
       );
 
-      let conceptsQuery = query(
-        collection(db, "concepts"),
-        where("search_metadata.languages", "array-contains-any", [
-          mappedUserLang,
-          mappedTargetLang,
-        ])
-      );
+      // Firebase 비용 최적화: 적당한 수만 가져온 후 무작위 선택
+      // 29개 정도는 비용에 큰 영향 없으므로 현재 방식 유지하되 limit 줄임
+      let conceptsQuery = query(collection(db, "concepts"), limit(50));
 
-      // 난이도 조건 추가
+      // 난이도 조건이 있고 basic이 아닌 경우에만 서버 필터링
       if (difficulty && difficulty !== "all" && difficulty !== "basic") {
         conceptsQuery = query(
           collection(db, "concepts"),
-          where("search_metadata.languages", "array-contains-any", [
-            mappedUserLang,
-            mappedTargetLang,
-          ]),
-          where("concept_info.difficulty", "==", difficulty)
+          where("concept_info.difficulty", "==", difficulty),
+          limit(50)
         );
       }
 
@@ -919,18 +918,21 @@ export class CollectionManager {
       for (const doc of conceptsSnapshot.docs) {
         const conceptData = doc.data();
 
-        // 개념 데이터 구조 디버깅
-        console.log(`개념 ${doc.id} 검사:`, {
-          expressions: Object.keys(conceptData.expressions || {}),
-          hasUserLang: !!conceptData.expressions?.[mappedUserLang]?.word,
-          hasTargetLang: !!conceptData.expressions?.[mappedTargetLang]?.word,
-          userLangWord:
-            conceptData.expressions?.[mappedUserLang]?.word || "없음",
-          targetLangWord:
-            conceptData.expressions?.[mappedTargetLang]?.word || "없음",
-          conceptInfo: conceptData.concept_info || "없음",
-        });
+        // 개념 데이터 구조 디버깅 (첫 5개만)
+        if (concepts.length < 5) {
+          console.log(`개념 ${doc.id} 검사:`, {
+            expressions: Object.keys(conceptData.expressions || {}),
+            hasUserLang: !!conceptData.expressions?.[mappedUserLang]?.word,
+            hasTargetLang: !!conceptData.expressions?.[mappedTargetLang]?.word,
+            userLangWord:
+              conceptData.expressions?.[mappedUserLang]?.word || "없음",
+            targetLangWord:
+              conceptData.expressions?.[mappedTargetLang]?.word || "없음",
+            conceptInfo: conceptData.concept_info || "없음",
+          });
+        }
 
+        // 언어 필터링: 요청된 언어 쌍이 모두 있는지 확인
         if (
           conceptData.expressions?.[mappedUserLang]?.word &&
           conceptData.expressions?.[mappedTargetLang]?.word
@@ -950,24 +952,35 @@ export class CollectionManager {
             },
           });
 
-          console.log(`개념 ${doc.id} 추가됨`);
-
-          // limit 적용
-          if (concepts.length >= limit) {
-            break;
-          }
-        } else {
-          console.log(`개념 ${doc.id} 제외됨 - 필요한 언어 누락`);
+          // 모든 유효한 개념을 수집 (limit 제거)
+          // 나중에 무작위로 선택하기 위해 break 제거
         }
       }
 
-      console.log(`최종 게임용 개념 수: ${concepts.length}`);
+      console.log(`🔍 수집된 모든 유효한 개념 수: ${concepts.length}`);
+
+      // Fisher-Yates 셔플 알고리즘으로 강력한 무작위화
+      const shuffledConcepts = [...concepts];
+      for (let i = shuffledConcepts.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledConcepts[i], shuffledConcepts[j]] = [
+          shuffledConcepts[j],
+          shuffledConcepts[i],
+        ];
+      }
+
+      // 요청된 수만큼만 반환
+      const selectedConcepts = shuffledConcepts.slice(0, limitCount);
+
+      console.log(
+        `✅ 최종 선택된 게임용 개념 수: ${selectedConcepts.length} (전체 ${concepts.length}개 중에서 무작위 선택)`
+      );
 
       // 선택된 개념들의 세부 정보 출력
-      if (concepts.length > 0) {
+      if (selectedConcepts.length > 0) {
         console.log(
-          "선택된 개념들:",
-          concepts.map((c) => ({
+          "🎯 무작위 선택된 개념들:",
+          selectedConcepts.map((c) => ({
             id: c.id,
             userWord: c.expressions[mappedUserLang]?.word,
             targetWord: c.expressions[mappedTargetLang]?.word,
@@ -977,7 +990,7 @@ export class CollectionManager {
         );
       }
 
-      return concepts;
+      return selectedConcepts;
     } catch (error) {
       console.error("게임용 개념 조회 중 오류:", error);
       throw error;
@@ -1894,11 +1907,16 @@ export class CollectionManager {
       // 🔍 디버깅: 중복 개념 ID 체크
       const conceptIds = new Set();
       const validProgressData = [];
+      const duplicateData = [];
 
       progressData.forEach((progress) => {
-        if (progress.concept_id && !conceptIds.has(progress.concept_id)) {
-          conceptIds.add(progress.concept_id);
-          validProgressData.push(progress);
+        if (progress.concept_id) {
+          if (!conceptIds.has(progress.concept_id)) {
+            conceptIds.add(progress.concept_id);
+            validProgressData.push(progress);
+          } else {
+            duplicateData.push(progress);
+          }
         }
       });
 
@@ -1907,9 +1925,18 @@ export class CollectionManager {
         - 원본 진도 레코드: ${progressData.length}
         - 유효한 진도 레코드: ${validProgressData.length}
         - 중복 제거된 개념 수: ${conceptIds.size}
+        - 중복된 레코드 수: ${duplicateData.length}
       `);
 
-      // 중복 제거된 데이터 사용
+      // 중복 데이터가 있다면 로그 출력
+      if (duplicateData.length > 0) {
+        console.warn(
+          "⚠️ 중복된 진도 데이터 발견:",
+          duplicateData.map((d) => d.concept_id)
+        );
+      }
+
+      // 중복 제거된 데이터 사용 (실제 개념 존재 여부는 나중에 확인)
       const finalProgressData = validProgressData;
 
       // 퀴즈 결과 데이터 조회
@@ -1993,6 +2020,12 @@ export class CollectionManager {
                   gameData.length
               )
             : 0,
+        bestGameScore:
+          gameData.length > 0
+            ? Math.max(...gameData.map((g) => g.score || 0))
+            : 0,
+        gamesWon: gameData.filter((g) => (g.score || 0) >= 80).length,
+        gamesByType: this.calculateGamesByType(gameData),
 
         recentAchievements: this.getRecentAchievementsEnhanced(
           finalProgressData,
@@ -2639,6 +2672,47 @@ export class CollectionManager {
       // 오류 시 기본 개념 반환
       return await this.getConceptsForLearning("korean", targetLanguage, limit);
     }
+  }
+
+  /**
+   * 🎮 게임 타입별 통계 계산
+   */
+  calculateGamesByType(gameData) {
+    const gamesByType = {};
+
+    gameData.forEach((game) => {
+      const gameType = game.game_type || "unknown";
+
+      if (!gamesByType[gameType]) {
+        gamesByType[gameType] = {
+          count: 0,
+          totalScore: 0,
+          bestScore: 0,
+          averageScore: 0,
+          gamesWon: 0,
+        };
+      }
+
+      gamesByType[gameType].count += 1;
+      gamesByType[gameType].totalScore += game.score || 0;
+
+      if ((game.score || 0) > gamesByType[gameType].bestScore) {
+        gamesByType[gameType].bestScore = game.score || 0;
+      }
+
+      if ((game.score || 0) >= 80) {
+        gamesByType[gameType].gamesWon += 1;
+      }
+    });
+
+    // 평균 점수 계산
+    Object.keys(gamesByType).forEach((gameType) => {
+      const stats = gamesByType[gameType];
+      stats.averageScore =
+        stats.count > 0 ? Math.round(stats.totalScore / stats.count) : 0;
+    });
+
+    return gamesByType;
   }
 }
 

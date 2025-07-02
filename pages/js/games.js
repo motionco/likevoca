@@ -1,17 +1,20 @@
-import { loadNavbar } from "../../components/js/navbar.js";
 import {
   collection,
   query,
   getDocs,
   where,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  addDoc,
+  serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
-import {
-  db,
-  conceptUtils,
-  mediaUtils,
-  userProgressUtils,
-} from "../../js/firebase/firebase-init.js";
-import { getActiveLanguage } from "../../utils/language-utils.js";
+import { db, conceptUtils } from "../../js/firebase/firebase-init.js";
+import { CollectionManager } from "../../js/firebase/firebase-collection-manager.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
+import { auth } from "../../js/firebase/firebase-init.js";
+import { getI18nText } from "../../utils/language-utils.js";
 
 // 게임에 필요한 전역 변수
 let sourceLanguage = "korean";
@@ -20,11 +23,16 @@ let currentGame = null;
 let gameWords = [];
 let score = 0;
 let timerInterval = null;
-let memoryPairs = 0;
-let canSelect = true;
+let currentScrambleWordIndex = 0;
+let selectedCards = [];
+let matchedPairs = 0;
+let attempts = 0;
 let firstCard = null;
 let secondCard = null;
+let canSelect = true;
+let memoryPairs = 0;
 let currentUser = null;
+let collectionManager = new CollectionManager();
 let gameResults = {
   totalGames: 0,
   totalScore: 0,
@@ -248,136 +256,443 @@ const reverseLanguageMapping = {
   chinese: "zh",
 };
 
+// 언어 설정 저장 키
+const LANGUAGE_SETTINGS_KEY = "likevoca_game_language_settings";
+
 // 페이지 초기화
 document.addEventListener("DOMContentLoaded", async () => {
+  // 인증 상태 확인
+  onAuthStateChanged(auth, (user) => {
+    currentUser = user;
+    if (user) {
+      loadGameStats();
+    }
+  });
+
+  // 저장된 언어 설정 불러오기
+  loadLanguageSettings();
+
+  // 언어 선택 이벤트 리스너
+  setupLanguageSelectors();
+
+  // 게임 카드 클릭 이벤트 리스너
+  setupGameCards();
+});
+
+// 저장된 언어 설정 불러오기
+function loadLanguageSettings() {
   try {
-    await loadNavbar();
+    const savedSettings = localStorage.getItem(LANGUAGE_SETTINGS_KEY);
+    if (savedSettings) {
+      const settings = JSON.parse(savedSettings);
+      sourceLanguage = settings.sourceLanguage || "korean";
+      targetLanguage = settings.targetLanguage || "english";
 
-    // 현재 사용자 정보 가져오기
-    const { onAuthStateChanged } = await import(
-      "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js"
-    );
-    const { auth } = await import("../../js/firebase/firebase-init.js");
+      // UI 업데이트
+      document.getElementById("source-language").value = sourceLanguage;
+      document.getElementById("target-language").value = targetLanguage;
+    }
+  } catch (error) {
+    console.error("언어 설정 불러오기 오류:", error);
+  }
+}
 
-    onAuthStateChanged(auth, (user) => {
-      currentUser = user;
-      console.log("현재 사용자:", currentUser?.email || "비로그인");
+// 언어 설정 저장
+function saveLanguageSettings() {
+  try {
+    const settings = {
+      sourceLanguage,
+      targetLanguage,
+      lastUpdated: new Date().toISOString(),
+    };
+    localStorage.setItem(LANGUAGE_SETTINGS_KEY, JSON.stringify(settings));
+    console.log("언어 설정 저장됨:", settings);
+  } catch (error) {
+    console.error("언어 설정 저장 오류:", error);
+  }
+}
+
+// 언어 선택기 설정
+function setupLanguageSelectors() {
+  const sourceSelect = document.getElementById("source-language");
+  const targetSelect = document.getElementById("target-language");
+
+  if (sourceSelect) {
+    sourceSelect.addEventListener("change", (e) => {
+      sourceLanguage = e.target.value;
+      // 같은 언어 선택 방지
+      if (sourceLanguage === targetLanguage) {
+        targetLanguage = sourceLanguage === "korean" ? "english" : "korean";
+        targetSelect.value = targetLanguage;
+      }
+      saveLanguageSettings();
+      console.log("원본 언어 변경:", sourceLanguage);
     });
+  }
 
-    // 게임 컨테이너 확인 로그 추가
-    console.log(
-      "메모리 게임 컨테이너:",
-      document.getElementById("memory-game")
-    );
-    console.log(
-      "단어 맞추기 컨테이너:",
-      document.getElementById("word-matching-game")
-    );
-    console.log(
-      "단어 섞기 컨테이너:",
-      document.getElementById("word-scramble-game")
-    );
+  if (targetSelect) {
+    targetSelect.addEventListener("change", (e) => {
+      targetLanguage = e.target.value;
+      // 같은 언어 선택 방지
+      if (targetLanguage === sourceLanguage) {
+        sourceLanguage = targetLanguage === "korean" ? "english" : "korean";
+        sourceSelect.value = sourceLanguage;
+      }
+      saveLanguageSettings();
+      console.log("대상 언어 변경:", targetLanguage);
+    });
+  }
+}
 
-    // UI 언어 변경 이벤트 리스너 등록
-    document.addEventListener("languageChanged", updateGameLabels);
+// 게임 카드 설정
+function setupGameCards() {
+  const gameCards = document.querySelectorAll(".game-card");
 
-    // 난이도 선택 이벤트 리스너
-    const difficultySelect = document.getElementById("game-difficulty");
-    if (difficultySelect) {
-      difficultySelect.addEventListener("change", (e) => {
-        gameDifficulty = e.target.value;
-        console.log("게임 난이도 변경:", gameDifficulty);
-        if (currentGame) loadGame(currentGame);
-      });
+  gameCards.forEach((card) => {
+    card.addEventListener("click", () => {
+      const gameType = card.getAttribute("data-game");
+      navigateToGame(gameType);
+    });
+  });
+}
+
+// 게임 시작 (페이지 내에서)
+async function navigateToGame(gameType) {
+  try {
+    console.log("게임 시작:", gameType);
+
+    // 현재 게임 타입 설정
+    currentGameType = gameType;
+
+    // 게임 시작 시간 설정
+    gameState.startTime = Date.now();
+    gameState.isGameActive = true;
+
+    // 게임용 단어 로드
+    await loadGameWords();
+
+    if (gameWords.length === 0) {
+      alert(
+        getI18nText("insufficient_words") || "게임에 필요한 단어가 부족합니다."
+      );
+      return;
     }
 
-    // 언어 선택 이벤트 리스너
-    document
-      .getElementById("source-language")
-      .addEventListener("change", (e) => {
-        sourceLanguage = e.target.value;
-        if (currentGame) loadGame(currentGame);
+    // 화면 전환
+    const gameSelectionArea = document.getElementById("game-selection-area");
+    const gamePlayArea = document.getElementById("game-play-area");
+
+    if (gameSelectionArea && gamePlayArea) {
+      gameSelectionArea.classList.add("hidden");
+      gamePlayArea.classList.remove("hidden");
+    }
+
+    // 게임 제목 설정
+    const gameTitle = document.getElementById("current-game-title");
+    if (gameTitle) {
+      gameTitle.textContent = getGameTypeName(gameType);
+    }
+
+    // 게임 초기화
+    await initializeGame(gameType);
+  } catch (error) {
+    console.error("게임 시작 오류:", error);
+    alert(getI18nText("game_start_error") || "게임을 시작할 수 없습니다.");
+  }
+}
+
+// 현재 언어 코드 가져오기
+function getCurrentLanguage() {
+  const path = window.location.pathname;
+  if (path.includes("/ko/")) return "ko";
+  if (path.includes("/ja/")) return "ja";
+  if (path.includes("/zh/")) return "zh";
+  return "en"; // 기본값
+}
+
+// 헬퍼 함수들
+function getWordByLanguage(word, language) {
+  // 새로운 구조 우선 확인
+  if (word.expressions && word.expressions[language]) {
+    return word.expressions[language].word;
+  }
+
+  // 기본 데이터 구조 지원
+  if (word.languages && word.languages[language]) {
+    return word.languages[language].word;
+  }
+
+  // 단순 구조 지원 (source/target 필드)
+  if (language === sourceLanguage && word.source) {
+    return word.source;
+  }
+  if (language === targetLanguage && word.target) {
+    return word.target;
+  }
+
+  // 직접 언어 코드로 접근
+  return word[language] || "";
+}
+
+function getSourceLanguageName() {
+  const names = {
+    korean: getI18nText("korean") || "한국어",
+    english: getI18nText("english") || "영어",
+    japanese: getI18nText("japanese") || "일본어",
+    chinese: getI18nText("chinese") || "중국어",
+  };
+  return names[sourceLanguage] || sourceLanguage;
+}
+
+function getTargetLanguageName() {
+  const names = {
+    korean: getI18nText("korean") || "한국어",
+    english: getI18nText("english") || "영어",
+    japanese: getI18nText("japanese") || "일본어",
+    chinese: getI18nText("chinese") || "중국어",
+  };
+  return names[targetLanguage] || targetLanguage;
+}
+
+// 게임 통계 로드
+async function loadGameStats() {
+  if (!currentUser) return;
+
+  try {
+    // 올바른 컬렉션에서 집계된 통계 조회
+    const gameStatsRef = doc(db, "game_user_stats", currentUser.uid);
+    const gameStatsSnap = await getDoc(gameStatsRef);
+
+    if (gameStatsSnap.exists()) {
+      const stats = gameStatsSnap.data();
+
+      // 통계 UI 업데이트
+      const totalGamesElement = document.getElementById("total-games-played");
+      const bestScoreElement = document.getElementById("best-score");
+      const averageScoreElement = document.getElementById("average-score");
+
+      if (totalGamesElement) {
+        totalGamesElement.textContent = stats.totalGames || 0;
+      }
+      if (bestScoreElement) {
+        bestScoreElement.textContent = stats.bestScore || 0;
+      }
+
+      // 평균 점수 계산
+      const averageScore =
+        stats.totalGames > 0
+          ? Math.round((stats.totalScore || 0) / stats.totalGames)
+          : 0;
+      if (averageScoreElement) {
+        averageScoreElement.textContent = averageScore;
+      }
+
+      console.log("🎯 게임 통계 UI 업데이트 완료:", {
+        totalGames: stats.totalGames || 0,
+        bestScore: stats.bestScore || 0,
+        averageScore: averageScore,
       });
+    } else {
+      console.log("📊 게임 통계 데이터가 없습니다. 첫 게임을 플레이해보세요!");
 
-    document
-      .getElementById("target-language")
-      .addEventListener("change", (e) => {
-        targetLanguage = e.target.value;
-        if (currentGame) loadGame(currentGame);
-      });
+      // 기본값으로 UI 업데이트
+      const totalGamesElement = document.getElementById("total-games-played");
+      const bestScoreElement = document.getElementById("best-score");
+      const averageScoreElement = document.getElementById("average-score");
 
-    // 게임 카드 선택 이벤트 리스너
-    document.querySelectorAll(".game-card").forEach((card) => {
-      card.addEventListener("click", () => {
-        const gameType = card.getAttribute("data-game");
-        console.log(`게임 카드 클릭됨: ${gameType}`);
+      if (totalGamesElement) totalGamesElement.textContent = "0";
+      if (bestScoreElement) bestScoreElement.textContent = "0";
+      if (averageScoreElement) averageScoreElement.textContent = "0";
+    }
+  } catch (error) {
+    console.error("게임 통계 로드 오류:", error);
+  }
+}
 
-        // 이전 게임 타이머 정리
-        if (timerInterval) {
-          clearInterval(timerInterval);
-          timerInterval = null;
-        }
+// 게임 결과 저장 (다른 게임 페이지에서 사용할 함수)
+export async function saveGameResult(
+  gameType,
+  score,
+  timeSpent,
+  isCompleted = true
+) {
+  if (!currentUser) {
+    console.warn("사용자가 로그인하지 않아 게임 결과를 저장할 수 없습니다.");
+    return false;
+  }
 
-        // 활성 카드 스타일 변경
-        document.querySelectorAll(".game-card").forEach((c) => {
-          c.classList.remove("active");
-        });
-        card.classList.add("active");
+  try {
+    const gameResultsRef = collection(db, "game_results");
 
-        // 게임 로드에 정확한 게임 타입 문자열 전달 확인
-        if (gameType === "memory-game") {
-          // 메모리 게임 컨테이너 미리 확인
-          const memoryGameContainer = document.getElementById("memory-game");
-          console.log(
-            "메모리 게임 컨테이너 확인 (클릭 시):",
-            memoryGameContainer
-          );
-          if (!memoryGameContainer) {
-            console.error("메모리 게임 컨테이너가 없습니다!");
-            return;
-          }
-        }
-
-        // 게임 로드
-        loadGame(gameType);
-      });
+    // 개별 게임 세션 저장 (진도 페이지와 일치하는 구조)
+    await addDoc(gameResultsRef, {
+      userId: currentUser.uid,
+      gameType,
+      score,
+      timeSpent,
+      isCompleted,
+      sourceLanguage,
+      targetLanguage,
+      accuracy: Math.round((score / 100) * 100) || 0, // 정확도 추가
+      success: score >= 70, // 성공 여부
+      timestamp: serverTimestamp(), // 진도 페이지에서 사용하는 필드명
+      playedAt: serverTimestamp(),
     });
 
-    // 게임 재시작 버튼 이벤트 리스너
-    document
-      .getElementById("restart-matching")
-      ?.addEventListener("click", () => restartGame("word-matching"));
-    document
-      .getElementById("restart-scramble")
-      ?.addEventListener("click", () => restartGame("word-scramble"));
-    document
-      .getElementById("restart-memory")
-      ?.addEventListener("click", () => restartGame("memory-game"));
+    // 전체 통계 업데이트는 기존 방식 유지
+    const userStatsRef = doc(db, "game_user_stats", currentUser.uid);
+    const userStatsSnap = await getDoc(userStatsRef);
 
-    // 단어 섞기 게임 확인 버튼
-    document
-      .getElementById("check-scramble")
-      ?.addEventListener("click", checkScrambleAnswer);
+    if (userStatsSnap.exists()) {
+      const currentStats = userStatsSnap.data();
+      const updatedStats = {
+        totalGames: (currentStats.totalGames || 0) + 1,
+        totalScore: (currentStats.totalScore || 0) + score,
+        bestScore: Math.max(currentStats.bestScore || 0, score),
+        lastPlayed: serverTimestamp(),
+      };
 
-    // 자동으로 첫 번째 게임 카드 클릭 (기본 게임 표시)
-    setTimeout(() => {
-      const firstGameCard = document.querySelector(
-        ".game-card[data-game='word-matching']"
-      );
-      if (firstGameCard) {
-        firstGameCard.click();
+      // 게임 타입별 통계 업데이트
+      if (currentStats.gameTypeStats) {
+        updatedStats.gameTypeStats = { ...currentStats.gameTypeStats };
+      } else {
+        updatedStats.gameTypeStats = {};
       }
-    }, 500);
+
+      if (!updatedStats.gameTypeStats[gameType]) {
+        updatedStats.gameTypeStats[gameType] = {
+          played: 0,
+          bestScore: 0,
+          totalScore: 0,
+        };
+      }
+
+      updatedStats.gameTypeStats[gameType].played += 1;
+      updatedStats.gameTypeStats[gameType].totalScore += score;
+      updatedStats.gameTypeStats[gameType].bestScore = Math.max(
+        updatedStats.gameTypeStats[gameType].bestScore,
+        score
+      );
+
+      await updateDoc(userStatsRef, updatedStats);
+    } else {
+      // 첫 게임 결과
+      const initialStats = {
+        totalGames: 1,
+        totalScore: score,
+        bestScore: score,
+        lastPlayed: serverTimestamp(),
+        gameTypeStats: {
+          [gameType]: {
+            played: 1,
+            bestScore: score,
+            totalScore: score,
+          },
+        },
+      };
+
+      await setDoc(userStatsRef, initialStats);
+    }
+
+    console.log("게임 결과 저장 완료:", { gameType, score, timeSpent });
+    return true;
   } catch (error) {
-    console.error("페이지 초기화 중 오류 발생:", error);
+    console.error("게임 결과 저장 오류:", error);
+    return false;
   }
-});
+}
+
+// 게임 설정 내보내기 (다른 게임 페이지에서 사용)
+export function getGameSettings() {
+  return {
+    sourceLanguage,
+    targetLanguage,
+    currentUser,
+  };
+}
+
+// 언어 설정 불러오기 (다른 게임 페이지에서 사용)
+export function loadGameLanguageSettings() {
+  try {
+    const savedSettings = localStorage.getItem(LANGUAGE_SETTINGS_KEY);
+    if (savedSettings) {
+      const settings = JSON.parse(savedSettings);
+      return {
+        sourceLanguage: settings.sourceLanguage || "korean",
+        targetLanguage: settings.targetLanguage || "english",
+      };
+    }
+  } catch (error) {
+    console.error("언어 설정 불러오기 오류:", error);
+  }
+
+  return {
+    sourceLanguage: "korean",
+    targetLanguage: "english",
+  };
+}
 
 // 게임 레이블 업데이트 함수
 async function updateGameLabels() {
   // 게임 UI의 레이블을 현재 언어로 업데이트
-  const activeLanguage = await getActiveLanguage();
+  console.log("게임 레이블 업데이트:", { sourceLanguage, targetLanguage });
   // 필요한 경우 여기에 번역 로직 추가
+}
+
+// 게임 초기화 함수
+async function initializeGame(gameType) {
+  try {
+    console.log("게임 초기화 시작:", gameType);
+
+    // 모든 게임 컨테이너 숨기기
+    document.querySelectorAll(".game-container").forEach((container) => {
+      container.style.display = "none";
+    });
+
+    // 선택된 게임 컨테이너 표시
+    const gameContainer = document.getElementById(`${gameType}-container`);
+    if (gameContainer) {
+      gameContainer.style.display = "block";
+
+      // 게임별 초기화
+      switch (gameType) {
+        case "word-matching":
+          initWordMatchingGame(gameContainer);
+          break;
+        case "word-scramble":
+          initWordScrambleGame(gameContainer);
+          break;
+        case "memory-game":
+          initMemoryGame(gameContainer);
+          break;
+        default:
+          console.warn("알 수 없는 게임 타입:", gameType);
+      }
+    }
+  } catch (error) {
+    console.error("게임 초기화 오류:", error);
+  }
+}
+
+// 게임 선택으로 돌아가기
+function backToGameSelection() {
+  const gameSelectionArea = document.getElementById("game-selection-area");
+  const gamePlayArea = document.getElementById("game-play-area");
+
+  if (gameSelectionArea && gamePlayArea) {
+    gamePlayArea.classList.add("hidden");
+    gameSelectionArea.classList.remove("hidden");
+  }
+
+  // 게임 상태 초기화
+  currentGameType = null;
+  gameWords = [];
+
+  // 타이머 정리
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
 }
 
 // 게임 로드 함수
@@ -402,25 +717,34 @@ async function loadGame(gameType) {
       container.style.display = "none";
     });
 
-    // 선택한 게임 컨테이너 표시
-    const gameContainer = document.getElementById(`${gameType}-game`);
-    if (gameContainer) {
-      gameContainer.style.display = "block";
-    }
-
     // 게임용 단어 로드
     await loadGameWords();
 
-    // 게임별 초기화
+    if (gameWords.length === 0) {
+      alert(
+        getI18nText("insufficient_words") || "게임에 필요한 단어가 부족합니다."
+      );
+      return;
+    }
+
+    // 선택한 게임 컨테이너 표시 및 초기화
+    const gameContainer = document.getElementById(`${gameType}-container`);
+    if (!gameContainer) {
+      console.error(`게임 컨테이너를 찾을 수 없습니다: ${gameType}-container`);
+      return;
+    }
+
+    gameContainer.style.display = "block";
+
     switch (gameType) {
       case "word-matching":
-        initWordMatchingGame();
+        initWordMatchingGame(gameContainer);
         break;
       case "word-scramble":
-        initWordScrambleGame();
+        initWordScrambleGame(gameContainer);
         break;
       case "memory-game":
-        initMemoryGame();
+        initMemoryGame(gameContainer);
         break;
     }
 
@@ -433,6 +757,20 @@ async function loadGame(gameType) {
 // 게임 단어 로드 함수 (새로운 구조 활용)
 async function loadGameWords() {
   try {
+    // 언어 설정 확인 및 기본값 설정
+    if (!sourceLanguage || !targetLanguage) {
+      console.warn("⚠️ 언어 설정이 없습니다. 기본값을 설정합니다.");
+      sourceLanguage = "korean";
+      targetLanguage = "english";
+    }
+
+    console.log("🎮 게임 단어 로딩 시작:", {
+      currentGameType,
+      sourceLanguage,
+      targetLanguage,
+      gameDifficulty,
+    });
+
     const gameTypeMap = {
       "word-matching": "matching",
       "word-scramble": "spelling",
@@ -443,7 +781,27 @@ async function loadGameWords() {
     const languages = [sourceLanguage, targetLanguage];
     const limit = gameWordCount[currentGameType] || 8;
 
+    console.log("🔍 개념 조회 파라미터:", {
+      gameType: "matching",
+      gameDifficulty,
+      languages: [sourceLanguage, targetLanguage],
+      limit,
+    });
+
+    console.log("🔍 conceptUtils 확인:", {
+      conceptUtilsExists: !!conceptUtils,
+      getConceptsForGameExists: !!(
+        conceptUtils && conceptUtils.getConceptsForGame
+      ),
+    });
+
     try {
+      if (!conceptUtils || !conceptUtils.getConceptsForGame) {
+        throw new Error(
+          "conceptUtils.getConceptsForGame이 정의되지 않았습니다."
+        );
+      }
+
       const concepts = await conceptUtils.getConceptsForGame(
         "matching", // gameType은 항상 matching으로 통일
         gameDifficulty,
@@ -451,7 +809,7 @@ async function loadGameWords() {
         limit
       );
 
-      console.log(`Firebase에서 ${concepts.length}개 개념 로딩 완료`);
+      console.log(`Firebase에서 ${concepts.length}개 개념 로딩 완료`, concepts);
 
       // Firebase에서 가져온 개념이 1개 이상이면 사용 (최소 요구사항 완화)
       if (concepts.length >= 1) {
@@ -475,8 +833,14 @@ async function loadGameWords() {
           gameWords = firebaseWords;
         }
 
+        // 최종 무작위 섞기 (Fisher-Yates 알고리즘)
+        for (let i = gameWords.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [gameWords[i], gameWords[j]] = [gameWords[j], gameWords[i]];
+        }
+
         console.log(
-          `게임 단어 로딩 완료: ${gameWords.length}개 (Firebase: ${firebaseWords.length}개)`
+          `🎯 게임 단어 로딩 완료: ${gameWords.length}개 (Firebase: ${firebaseWords.length}개, 무작위 섞기 적용)`
         );
         return;
       }
@@ -512,8 +876,14 @@ async function loadGameWords() {
           gameWords = firebaseWords;
         }
 
+        // 최종 무작위 섞기 (Fisher-Yates 알고리즘)
+        for (let i = gameWords.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [gameWords[i], gameWords[j]] = [gameWords[j], gameWords[i]];
+        }
+
         console.log(
-          `게임 단어 로딩 완료: ${gameWords.length}개 (Firebase: ${firebaseWords.length}개)`
+          `🎯 게임 단어 로딩 완료: ${gameWords.length}개 (Firebase: ${firebaseWords.length}개, 무작위 섞기 적용)`
         );
         return;
       }
@@ -522,17 +892,36 @@ async function loadGameWords() {
     }
 
     // Firebase에서 개념을 전혀 가져오지 못한 경우만 기본 단어 세트 사용
-    console.log("기본 단어 세트를 사용합니다.");
-    return useDefaultWords();
+    console.log("🔄 Firebase 개념 로딩 실패, 기본 단어 세트를 사용합니다.");
+    useDefaultWords();
   } catch (error) {
     console.error("단어 로드 중 오류 발생:", error);
-    console.log("오류가 발생하여 기본 단어 세트를 사용합니다.");
-    return useDefaultWords();
+    console.log("🔄 오류가 발생하여 기본 단어 세트를 사용합니다.");
+    useDefaultWords();
   }
+
+  console.log("📝 최종 gameWords:", gameWords);
+  return gameWords;
 }
 
 // 기본 단어 세트 사용 함수
 function useDefaultWords() {
+  // 언어 설정 확인 및 기본값 설정
+  if (!sourceLanguage || !targetLanguage) {
+    console.warn(
+      "⚠️ useDefaultWords에서 언어 설정이 없습니다. 기본값을 설정합니다."
+    );
+    sourceLanguage = "korean";
+    targetLanguage = "english";
+  }
+
+  console.log("🔧 기본 단어 세트 사용 시작:", {
+    sourceLanguage,
+    targetLanguage,
+    defaultWordsLength: defaultWords.length,
+    requiredCount: gameWordCount[currentGameType] || 8,
+  });
+
   const defaultWordsMapped = defaultWords.map((word) => ({
     id: word.id,
     source: word.languages[sourceLanguage]?.word || "",
@@ -548,12 +937,23 @@ function useDefaultWords() {
     isFromFirebase: false,
   }));
 
-  const shuffledWords = defaultWordsMapped
-    .filter((word) => word.source && word.target) // 유효한 단어만 필터링
-    .sort(() => 0.5 - Math.random());
+  console.log("🔧 매핑된 기본 단어들:", defaultWordsMapped.slice(0, 3));
+
+  const validWords = defaultWordsMapped.filter(
+    (word) => word.source && word.target
+  ); // 유효한 단어만 필터링
+
+  console.log("🔧 필터링 후 유효한 단어 수:", validWords.length);
+
+  // Fisher-Yates 셔플 알고리즘으로 강력한 무작위화
+  const shuffledWords = [...validWords];
+  for (let i = shuffledWords.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledWords[i], shuffledWords[j]] = [shuffledWords[j], shuffledWords[i]];
+  }
 
   gameWords = shuffledWords.slice(0, gameWordCount[currentGameType] || 8);
-  console.log("기본 단어 목록:", gameWords);
+  console.log("🎯 최종 선택된 기본 단어 목록:", gameWords);
   return gameWords;
 }
 
@@ -574,11 +974,18 @@ function getDefaultWordsForGame(neededCount) {
     isFromFirebase: false,
   }));
 
-  const validWords = defaultWordsMapped
-    .filter((word) => word.source && word.target) // 유효한 단어만 필터링
-    .sort(() => 0.5 - Math.random());
+  const validWords = defaultWordsMapped.filter(
+    (word) => word.source && word.target
+  ); // 유효한 단어만 필터링
 
-  return validWords.slice(0, neededCount);
+  // Fisher-Yates 셔플 알고리즘으로 강력한 무작위화
+  const shuffledWords = [...validWords];
+  for (let i = shuffledWords.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledWords[i], shuffledWords[j]] = [shuffledWords[j], shuffledWords[i]];
+  }
+
+  return shuffledWords.slice(0, neededCount);
 }
 
 // 게임 재시작 함수
@@ -636,61 +1043,107 @@ async function completeGame(finalScore, timeSpent) {
     gameState.isGameActive = false;
     gameState.endTime = Date.now();
 
-    const totalTime = Math.round(
-      (gameState.endTime - gameState.startTime) / 1000
-    );
-    const accuracy = Math.round((finalScore / gameState.maxScore) * 100);
+    // 타이머 정리
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+
+    // 시간 계산 - timeSpent가 있으면 사용, 없으면 게임 시작 시간부터 계산
+    let totalTime;
+    if (timeSpent && timeSpent > 0 && timeSpent < 1000) {
+      // 정상적인 범위의 시간
+      totalTime = Math.round(timeSpent);
+    } else if (gameState.startTime) {
+      totalTime = Math.round((gameState.endTime - gameState.startTime) / 1000);
+    } else {
+      totalTime = 60; // 기본값 (1분)
+    }
+
+    // 정확도 계산 - 게임별 최대 점수 기준
+    const maxScore = (gameWords?.length || 8) * 10; // 단어당 10점
+    const accuracy = Math.round((finalScore / maxScore) * 100) || 0;
+
+    console.log("🎯 게임 완료 계산:", {
+      finalScore,
+      maxScore,
+      accuracy,
+      totalTime,
+      timeSpent,
+      gameStateStartTime: gameState.startTime,
+      gameStateEndTime: gameState.endTime,
+    });
 
     // 사용자 게임 통계 업데이트 (분리된 컬렉션 연동)
     if (currentUser) {
-      // 게임 통계 업데이트
-      await userProgressUtils.updateGameStats(
-        currentUser.email,
-        targetLanguage,
-        currentGameType,
-        accuracy,
-        totalTime
-      );
+      // 게임 통계 업데이트 (CollectionManager 사용)
+      try {
+        // updateUserProgressFromQuiz는 다른 매개변수 구조를 사용
+        const quizResults = {
+          gameType: currentGameType,
+          score: finalScore,
+          accuracy: accuracy,
+          timeSpent: totalTime,
+          answers: gameWords.map((word) => ({
+            conceptId: word.id,
+            isCorrect: true, // 게임에서는 정확도로 대체
+            responseTime: totalTime / gameWords.length,
+          })),
+        };
 
-      // 학습한 개념들의 진도 업데이트 (분리된 컬렉션 지원)
+        await collectionManager.updateUserProgressFromQuiz(
+          currentUser.email,
+          quizResults
+        );
+        console.log("✓ 게임 통계 업데이트 완료");
+      } catch (error) {
+        console.warn("게임 통계 업데이트 중 오류:", error);
+      }
+
+      // 학습한 개념들의 진도 업데이트
       let updatedConceptsCount = 0;
       if (gameWords && gameWords.length > 0) {
-        for (const conceptData of gameWords) {
+        // 🎮 게임 활동 데이터 준비
+        const conceptIds = gameWords
+          .filter((word) => word.id && word.id !== "default") // 기본 단어 제외
+          .map((word) => word.id);
+
+        if (conceptIds.length > 0) {
           try {
-            // Firebase에서 가져온 개념만 진도 업데이트 (기본 단어 제외)
-            if (!conceptData.isFromFirebase) {
-              console.log(`기본 단어 ${conceptData.id} 진도 업데이트 건너뜀`);
-              continue;
-            }
+            // 게임 활동 추적
+            const gameActivityData = {
+              type: currentGameType,
+              score: finalScore,
+              maxScore: (gameWords?.length || 8) * 10,
+              timeSpent: totalTime,
+              wordsPlayed: gameWords?.length || 0,
+              correctAnswers: Math.round(finalScore / 10),
+              totalAnswers: gameWords?.length || 0,
+              difficulty: gameDifficulty || "basic",
+              sourceLanguage: sourceLanguage,
+              targetLanguage: targetLanguage,
+              conceptIds: conceptIds,
+              accuracyRate: accuracy / 100, // 0-1 범위로 변환
+              performanceRating:
+                accuracy >= 90
+                  ? "excellent"
+                  : accuracy >= 80
+                  ? "good"
+                  : accuracy >= 70
+                  ? "fair"
+                  : "needs_improvement",
+            };
 
-            // 개념 ID 정확히 추출
-            const conceptId =
-              conceptData.id || conceptData._id || conceptData.concept_id;
-
-            if (conceptId) {
-              // 어휘 진도 업데이트 (게임 성과 반영)
-              const masteryStatus =
-                accuracy >= 80 ? "known" : accuracy >= 60 ? "learning" : "weak";
-
-              await userProgressUtils.updateVocabularyProgress(
-                currentUser.email,
-                targetLanguage,
-                conceptId,
-                masteryStatus,
-                {
-                  game_accuracy: accuracy,
-                  game_type: currentGameType,
-                  last_game_score: finalScore,
-                  time_spent: totalTime,
-                  source: "game_completion",
-                }
-              );
-
-              updatedConceptsCount++;
-              console.log(`✓ 개념 ${conceptId}의 게임 진도 업데이트 완료`);
-            }
+            await collectionManager.updateGameActivity(
+              currentUser.email,
+              gameActivityData
+            );
+            updatedConceptsCount = conceptIds.length;
+            console.log(
+              `✓ 게임 활동 추적 및 진도 업데이트 완료: ${conceptIds.length}개 개념`
+            );
           } catch (error) {
-            console.warn("개념 진도 업데이트 중 오류:", error);
+            console.warn("게임 활동 추적 중 오류:", error);
           }
         }
       }
@@ -703,39 +1156,215 @@ async function completeGame(finalScore, timeSpent) {
         totalWords: gameWords?.length || 0,
       });
 
+      // 🎮 게임 결과 저장 (Firebase 직접 사용)
+      try {
+        const gameResult = {
+          userId: currentUser.uid,
+          gameType: currentGameType,
+          score: finalScore,
+          timeSpent: totalTime,
+          difficulty: gameDifficulty,
+          correctAnswers: Math.round(
+            (finalScore / 100) * (gameWords?.length || 0)
+          ),
+          totalQuestions: gameWords?.length || 0,
+          sourceLanguage: sourceLanguage,
+          targetLanguage: targetLanguage,
+          accuracy: accuracy,
+          playedAt: new Date(),
+          wordsUsed: gameWords.map((word) => ({
+            id: word.id,
+            source: word.source,
+            target: word.target,
+            domain: word.domain,
+          })),
+        };
+
+        // 게임 결과 저장 (개별 결과 + 집계 통계 모두 업데이트)
+        const saveSuccess = await saveGameResult(
+          currentGameType,
+          finalScore,
+          totalTime,
+          true // 완료됨
+        );
+
+        if (saveSuccess) {
+          console.log("✅ 게임 결과 및 통계 저장 완료");
+
+          // 🔄 게임 통계 새로고침 (게임 페이지 통계 업데이트)
+          try {
+            await loadGameStats();
+            console.log("🎯 게임 페이지 통계 새로고침 완료");
+          } catch (error) {
+            console.warn("게임 통계 새로고침 중 오류:", error);
+          }
+
+          // 🔄 진도 페이지의 게임 성취도도 업데이트 (있는 경우)
+          try {
+            if (typeof window.refreshProgressGameStats === "function") {
+              await window.refreshProgressGameStats();
+              console.log("🎯 진도 페이지 게임 성취도 업데이트 완료");
+            }
+          } catch (error) {
+            console.warn("진도 페이지 게임 성취도 업데이트 중 오류:", error);
+          }
+        } else {
+          console.error("❌ 게임 결과 저장 실패");
+        }
+      } catch (error) {
+        console.error("❌ 게임 결과 저장 중 오류:", error);
+      }
+
       // 게임 결과 표시
-      showGameResults({
-        gameType: currentGameType,
-        difficulty: gameState.difficulty,
-        finalScore: finalScore,
-        totalTime: totalTime,
-        accuracy: accuracy,
-        concepts: updatedConceptsCount,
-        totalWords: gameWords?.length || 0,
-        completionReason:
-          typeof finalScore === "string" && finalScore.includes("시간")
-            ? "timeout"
-            : "finished",
-      });
+      if (currentGameType === "word-matching") {
+        showWordMatchingResults({
+          finalScore: finalScore,
+          totalTime: totalTime,
+          accuracy: accuracy,
+          concepts: updatedConceptsCount,
+          totalWords: gameWords?.length || 0,
+        });
+      } else if (currentGameType === "word-scramble") {
+        showWordScrambleResults({
+          finalScore: finalScore,
+          totalTime: totalTime,
+          accuracy: accuracy,
+          concepts: updatedConceptsCount,
+          totalWords: gameWords?.length || 0,
+        });
+      } else if (currentGameType === "memory-game") {
+        showMemoryGameResults({
+          finalScore: finalScore,
+          totalTime: totalTime,
+          accuracy: accuracy,
+          concepts: updatedConceptsCount,
+          totalWords: gameWords?.length || 0,
+        });
+      } else {
+        showGameResults({
+          gameType: currentGameType,
+          difficulty: gameState.difficulty,
+          finalScore: finalScore,
+          totalTime: totalTime,
+          accuracy: accuracy,
+          concepts: updatedConceptsCount,
+          totalWords: gameWords?.length || 0,
+          completionReason:
+            typeof finalScore === "string" && finalScore.includes("시간")
+              ? "timeout"
+              : "finished",
+        });
+      }
     }
   } catch (error) {
     console.error("게임 완료 처리 중 오류:", error);
 
     // 오류가 발생해도 결과는 표시
-    showGameResults({
-      gameType: currentGameType,
-      difficulty: gameState.difficulty,
-      finalScore: finalScore,
-      totalTime: timeSpent || 0,
-      accuracy: Math.round((finalScore / gameState.maxScore) * 100),
-      concepts: 0, // 오류 발생 시 0개로 표시
-      totalWords: gameWords?.length || 0,
-      error: "진도 업데이트 중 일부 오류가 발생했습니다.",
-      completionReason:
-        typeof finalScore === "string" && finalScore.includes("시간")
-          ? "timeout"
-          : "error",
-    });
+    if (currentGameType === "word-matching") {
+      showWordMatchingResults({
+        finalScore: finalScore,
+        totalTime: timeSpent || 0,
+        accuracy:
+          Math.round((finalScore / (gameWords?.length * 10 || 80)) * 100) || 0,
+        concepts: 0, // 오류 발생 시 0개로 표시
+        totalWords: gameWords?.length || 0,
+        error: "진도 업데이트 중 일부 오류가 발생했습니다.",
+      });
+    } else if (currentGameType === "word-scramble") {
+      showWordScrambleResults({
+        finalScore: finalScore,
+        totalTime: timeSpent || 0,
+        accuracy:
+          Math.round((finalScore / (gameWords?.length * 10 || 80)) * 100) || 0,
+        concepts: 0, // 오류 발생 시 0개로 표시
+        totalWords: gameWords?.length || 0,
+        error: "진도 업데이트 중 일부 오류가 발생했습니다.",
+      });
+    } else if (currentGameType === "memory-game") {
+      showMemoryGameResults({
+        finalScore: finalScore,
+        totalTime: timeSpent || 0,
+        accuracy:
+          Math.round((finalScore / (gameWords?.length * 10 || 80)) * 100) || 0,
+        concepts: 0, // 오류 발생 시 0개로 표시
+        totalWords: gameWords?.length || 0,
+        error: "진도 업데이트 중 일부 오류가 발생했습니다.",
+      });
+    } else {
+      showGameResults({
+        gameType: currentGameType,
+        difficulty: gameState.difficulty,
+        finalScore: finalScore,
+        totalTime: timeSpent || 0,
+        accuracy: Math.round((finalScore / gameState.maxScore) * 100),
+        concepts: 0, // 오류 발생 시 0개로 표시
+        totalWords: gameWords?.length || 0,
+        error: "진도 업데이트 중 일부 오류가 발생했습니다.",
+        completionReason:
+          typeof finalScore === "string" && finalScore.includes("시간")
+            ? "timeout"
+            : "error",
+      });
+    }
+  }
+}
+
+// 단어 맞추기 게임 결과 표시 (인라인)
+function showWordMatchingResults(results) {
+  const gameContainer = document.querySelector("#word-matching-container");
+  if (!gameContainer) return;
+
+  // 헤더 부분 숨기기
+  const headerArea = gameContainer.querySelector(
+    ".flex.justify-between.items-center"
+  );
+  if (headerArea) {
+    headerArea.classList.add("hidden");
+  }
+
+  // 게임 진행 화면 숨기기
+  const gameArea = gameContainer.querySelector("#matching-game");
+  if (gameArea) {
+    gameArea.classList.add("hidden");
+  }
+
+  // 결과 화면 보이기
+  const resultsArea = gameContainer.querySelector("#matching-results");
+  if (resultsArea) {
+    resultsArea.classList.remove("hidden");
+
+    // 결과 데이터 업데이트
+    const scoreElement = resultsArea.querySelector("#matching-final-score");
+    const accuracyElement = resultsArea.querySelector("#matching-accuracy");
+    const timeElement = resultsArea.querySelector("#matching-time");
+
+    if (scoreElement) scoreElement.textContent = results.finalScore;
+    if (accuracyElement) accuracyElement.textContent = `${results.accuracy}%`;
+    if (timeElement) {
+      const minutes = Math.floor(results.totalTime / 60);
+      const seconds = results.totalTime % 60;
+      timeElement.textContent = `${minutes
+        .toString()
+        .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+    }
+
+    // 성과 메시지 업데이트
+    const titleElement = resultsArea.querySelector("h2");
+    if (titleElement) {
+      let message = "게임 완료!";
+      if (results.accuracy >= 90) {
+        message = "🎉 완벽해요!";
+      } else if (results.accuracy >= 80) {
+        message = "👏 잘했어요!";
+      } else if (results.accuracy >= 70) {
+        message = "👍 괜찮아요!";
+      } else {
+        message = "💪 다시 도전!";
+      }
+      titleElement.textContent = message;
+    }
+
+    console.log("✅ 단어 맞추기 게임 결과 화면 표시 완료");
   }
 }
 
@@ -751,6 +1380,25 @@ function showGameResults(results) {
   const resultsElement = document.getElementById("game-results");
   if (resultsElement) {
     resultsElement.style.display = "block";
+  } else {
+    // 결과 영역이 없으면 alert로 표시
+    let message = `게임 완료!\n\n`;
+    message += `게임: ${getGameTypeName(results.gameType)}\n`;
+    message += `점수: ${results.finalScore}점\n`;
+    message += `정확도: ${results.accuracy || 0}%\n`;
+    message += `소요 시간: ${results.totalTime}초\n`;
+    if (results.concepts > 0) {
+      message += `학습한 단어: ${results.concepts}개\n`;
+    }
+
+    alert(message);
+
+    // 게임 선택 화면으로 돌아가기
+    setTimeout(() => {
+      backToGameSelection();
+    }, 1000);
+
+    return;
   }
 
   // 기본 결과 정보
@@ -902,6 +1550,9 @@ function showGameResults(results) {
 // 게임 타입 이름 변환
 function getGameTypeName(gameType) {
   const names = {
+    "word-matching": getI18nText("word_matching_title") || "단어 맞추기",
+    "word-scramble": getI18nText("word_scramble_title") || "단어 섞기",
+    "memory-game": getI18nText("memory_game_title") || "단어 기억 게임",
     memory: "메모리 게임",
     pronunciation: "발음 게임",
     spelling: "철자 게임",
@@ -920,943 +1571,988 @@ function getDifficultyName(difficulty) {
   return names[difficulty] || difficulty;
 }
 
-// ======== 단어 맞추기 게임 함수 ========
+// ======== 게임 초기화 함수들 ========
 
 // 단어 맞추기 게임 초기화
-function initWordMatchingGame() {
-  const sourceWordsContainer = document.querySelector(".source-words");
-  const targetWordsContainer = document.querySelector(".target-words");
+function initWordMatchingGame(container) {
+  console.log("단어 맞추기 게임 초기화");
 
-  sourceWordsContainer.innerHTML = "";
-  targetWordsContainer.innerHTML = "";
-
-  document.getElementById("matching-score").textContent = "0";
+  // 게임 상태 초기화
   score = 0;
 
-  // 단어 카드 생성
-  const targetWordsCopy = [...gameWords].sort(() => 0.5 - Math.random());
-
-  gameWords.forEach((word, index) => {
-    // 원본 단어 카드
-    const sourceCard = createWordCard(word.source, index, "source");
-    sourceWordsContainer.appendChild(sourceCard);
-
-    // 대상 단어 카드
-    const targetIndex = targetWordsCopy.findIndex((w) => w.id === word.id);
-    const targetCard = createWordCard(
-      targetWordsCopy[targetIndex].target,
-      targetIndex,
-      "target"
-    );
-    targetWordsContainer.appendChild(targetCard);
+  console.log("🎯 단어 맞추기 초기화:", {
+    gameWordsLength: gameWords.length,
+    sourceLanguage,
+    targetLanguage,
+    score,
   });
 
-  // 드래그 앤 드롭 설정
-  setupDragAndDrop();
+  if (gameWords.length === 0) {
+    console.error("❌ gameWords가 비어있습니다! 게임을 중단합니다.");
+    alert("게임에 필요한 단어를 불러올 수 없습니다. 다시 시도해주세요.");
+    backToGameSelection();
+    return;
+  }
+
+  // 게임 HTML 생성
+  container.innerHTML = `
+    <div class="bg-white rounded-xl p-6 shadow-lg">
+      <div class="flex justify-between items-center mb-6">
+        <div class="flex items-center space-x-4">
+          <div class="text-lg font-semibold">점수: <span id="matching-score">0</span></div>
+          <div class="text-lg font-semibold">시간: <span id="matching-timer">60</span>초</div>
+        </div>
+        <button id="matching-end" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
+          게임 종료
+        </button>
+      </div>
+      
+      <!-- 게임 진행 화면 --> 
+      <div id="matching-game" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div>
+          <h3 class="text-lg font-bold mb-4 text-center">${getSourceLanguageName()}</h3>
+          <div id="source-words" class="grid grid-cols-2 gap-3 min-h-[300px]"></div>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold mb-4 text-center">${getTargetLanguageName()}</h3>
+          <div id="target-words" class="grid grid-cols-2 gap-3 min-h-[300px]"></div>
+        </div>
+      </div>
+      
+      <!-- 게임 결과 화면 -->
+      <div id="matching-results" class="hidden">
+        <div class="bg-white rounded-lg shadow-md p-8 text-center">
+          <div class="mb-6">
+            <i class="fas fa-trophy text-6xl text-yellow-500 mb-4"></i>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">게임 완료!</h2>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-green-50 p-4 rounded-lg">
+              <div class="text-3xl font-bold text-green-600" id="matching-final-score">0</div>
+              <div class="text-sm text-gray-600">점수</div>
+            </div>
+            
+            <div class="bg-blue-50 p-4 rounded-lg">
+              <div class="text-3xl font-bold text-blue-600" id="matching-accuracy">0%</div>
+              <div class="text-sm text-gray-600">정확도</div>
+            </div>
+            
+            <div class="bg-purple-50 p-4 rounded-lg">
+              <div class="text-3xl font-bold text-purple-600" id="matching-time">00:00</div>
+              <div class="text-sm text-gray-600">소요 시간</div>
+            </div>
+          </div>
+          
+          <div class="space-x-4">
+            <button 
+              id="retry-matching-btn"
+              class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              다시 도전
+            </button>
+            
+            <button 
+              id="new-matching-btn"
+              class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
+            >
+              새 게임
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const sourceContainer = container.querySelector("#source-words");
+  const targetContainer = container.querySelector("#target-words");
+
+  // 점수 초기화
+  score = 0;
+
+  console.log("단어 맞추기 게임: gameWords 배열", gameWords);
+  console.log(
+    "단어 맞추기 게임: 원본 언어",
+    sourceLanguage,
+    "목표 언어",
+    targetLanguage
+  );
+
+  // 단어 카드 생성 (원본 언어)
+  gameWords.forEach((word, index) => {
+    const sourceText = getWordByLanguage(word, sourceLanguage);
+    console.log(`원본 단어 ${index}:`, sourceText, "전체 데이터:", word);
+    const sourceCard = createMatchingCard(sourceText, index, "source");
+    sourceContainer.appendChild(sourceCard);
+  });
+
+  // 단어 카드 생성 (목표 언어) - 섞어서 표시
+  const shuffledWords = [...gameWords].sort(() => 0.5 - Math.random());
+  shuffledWords.forEach((word, index) => {
+    const targetText = getWordByLanguage(word, targetLanguage);
+    console.log(`목표 단어 ${index}:`, targetText, "전체 데이터:", word);
+    const targetCard = createMatchingCard(
+      targetText,
+      gameWords.indexOf(word),
+      "target",
+      word.id
+    );
+    targetContainer.appendChild(targetCard);
+  });
+
+  // 게임 종료 버튼 이벤트
+  const endBtn = container.querySelector("#matching-end");
+  if (endBtn) {
+    endBtn.addEventListener("click", () => {
+      completeGame(score);
+    });
+  }
+
+  // 다시 도전 버튼 이벤트
+  const retryBtn = container.querySelector("#retry-matching-btn");
+  if (retryBtn) {
+    retryBtn.addEventListener("click", () => {
+      // 결과 화면 숨기고 게임 화면 보이기
+      container.querySelector("#matching-results").classList.add("hidden");
+      container.querySelector("#matching-game").classList.remove("hidden");
+
+      // 헤더 부분도 다시 보이기
+      const headerArea = container.querySelector(
+        ".flex.justify-between.items-center"
+      );
+      if (headerArea) {
+        headerArea.classList.remove("hidden");
+      }
+
+      // 게임 재시작
+      initWordMatchingGame(container);
+    });
+  }
+
+  // 새 게임 버튼 이벤트
+  const newGameBtn = container.querySelector("#new-matching-btn");
+  if (newGameBtn) {
+    newGameBtn.addEventListener("click", () => {
+      backToGameSelection();
+    });
+  }
 
   // 타이머 시작
   startTimer("matching-timer", 60, () => {
-    completeGame(`시간이 종료되었습니다! 최종 점수: ${score}점`);
+    completeGame(score, 60);
   });
 }
 
-// 단어 카드 생성 함수
-function createWordCard(word, index, type) {
+// 매칭 카드 생성
+function createMatchingCard(text, index, type, wordId = null) {
   const card = document.createElement("div");
   card.className =
-    "bg-[#F3E5F5] p-4 rounded-lg shadow-md text-center cursor-move";
-  card.setAttribute("draggable", "true");
+    "bg-purple-100 p-4 rounded-lg shadow-md text-center cursor-pointer hover:bg-purple-200 transition-colors";
   card.setAttribute("data-index", index);
   card.setAttribute("data-type", type);
-  card.textContent = word;
+  if (wordId) card.setAttribute("data-word-id", wordId);
+  card.textContent = text;
 
-  // 드래그 이벤트
-  card.addEventListener("dragstart", (e) => {
-    e.dataTransfer.setData(
-      "text/plain",
-      JSON.stringify({
-        index: index,
-        type: type,
-      })
-    );
-    // 드래그 효과 설정
-    e.dataTransfer.effectAllowed = "move";
-    setTimeout(() => {
-      card.classList.add("opacity-50");
-    }, 0);
-  });
-
-  card.addEventListener("dragend", () => {
-    card.classList.remove("opacity-50");
-  });
-
-  // 모바일 터치 이벤트 (터치할 때 효과 표시)
-  card.addEventListener("touchstart", () => {
-    card.classList.add("bg-[#E1BEE7]");
-  });
-
-  card.addEventListener("touchend", () => {
-    card.classList.remove("bg-[#E1BEE7]");
-  });
-
-  // 클릭 이벤트 추가 (모바일에서 드래그 대체용)
+  // 클릭 이벤트 추가
   card.addEventListener("click", () => {
-    // 이미 선택된 카드가 있는지 확인
-    const selectedCard = document.querySelector(".selected-card");
-
-    if (selectedCard) {
-      // 이미 선택된 카드가 있다면, 현재 카드와 매칭 시도
-      const selectedType = selectedCard.getAttribute("data-type");
-      const selectedIndex = parseInt(selectedCard.getAttribute("data-index"));
-
-      // 같은 유형의 카드면 무시
-      if (type === selectedType) {
-        selectedCard.classList.remove("selected-card", "bg-[#E1BEE7]");
-        return;
-      }
-
-      // 매칭 확인 (소스 카드가 선택되었다면 현재는 타겟, 그 반대도 마찬가지)
-      if (type === "source") {
-        checkWordMatch(index, selectedIndex);
-      } else {
-        checkWordMatch(selectedIndex, index);
-      }
-
-      // 선택 상태 해제
-      selectedCard.classList.remove("selected-card", "bg-[#E1BEE7]");
-    } else {
-      // 카드 선택 표시
-      card.classList.add("selected-card", "bg-[#E1BEE7]");
-    }
+    handleMatchingCardClick(card);
   });
 
   return card;
 }
 
-// 드래그 앤 드롭 설정
-function setupDragAndDrop() {
-  const cards = document.querySelectorAll(
-    ".source-words > div, .target-words > div"
-  );
+// 매칭 카드 클릭 처리
+function handleMatchingCardClick(card) {
+  const selectedCard = document.querySelector(".selected-matching-card");
 
-  cards.forEach((card) => {
-    // 드롭 영역에 들어왔을 때
-    card.addEventListener("dragover", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      card.classList.add("bg-[#E1BEE7]");
-    });
+  if (selectedCard) {
+    if (selectedCard === card) {
+      // 같은 카드 클릭 시 선택 해제
+      selectedCard.classList.remove("selected-matching-card", "bg-yellow-200");
+      selectedCard.classList.add("bg-purple-100");
+      return;
+    }
 
-    // 드롭 영역에서 나갔을 때
-    card.addEventListener("dragleave", () => {
-      card.classList.remove("bg-[#E1BEE7]");
-    });
+    // 두 카드가 매칭되는지 확인
+    const selectedType = selectedCard.getAttribute("data-type");
+    const currentType = card.getAttribute("data-type");
 
-    // 드래그 시작시 데이터 설정 강화
-    card.addEventListener("dragstart", (e) => {
-      const index = card.getAttribute("data-index");
-      const type = card.getAttribute("data-type");
-      e.dataTransfer.setData(
-        "text/plain",
-        JSON.stringify({
-          index: index,
-          type: type,
-        })
-      );
-      e.dataTransfer.effectAllowed = "move";
-    });
+    if (selectedType !== currentType) {
+      checkWordMatch(selectedCard, card);
+    }
 
-    // 드롭 이벤트
-    card.addEventListener("drop", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      card.classList.remove("bg-[#E1BEE7]");
-
-      try {
-        const dragData = JSON.parse(e.dataTransfer.getData("text/plain"));
-        const dropType = card.getAttribute("data-type");
-        const dropIndex = parseInt(card.getAttribute("data-index"));
-
-        // 같은 유형의 카드면 무시
-        if (dragData.type === dropType) return;
-
-        // 매칭 확인
-        checkWordMatch(dragData.index, dropIndex);
-      } catch (err) {
-        console.error("드롭 처리 중 오류:", err);
-      }
-    });
-  });
+    // 선택 상태 해제
+    selectedCard.classList.remove("selected-matching-card", "bg-yellow-200");
+    selectedCard.classList.add("bg-purple-100");
+  } else {
+    // 카드 선택
+    card.classList.add("selected-matching-card", "bg-yellow-200");
+    card.classList.remove("bg-purple-100");
+  }
 }
 
 // 단어 매칭 확인
-function checkWordMatch(sourceIndex, targetIndex) {
-  const sourceWord = gameWords[sourceIndex];
-  const targetWord = gameWords.find((_, i) => {
-    const targetCard = document.querySelector(
-      `.target-words > div[data-index="${targetIndex}"]`
-    );
-    return targetCard.textContent === sourceWord.target;
-  });
+function checkWordMatch(card1, card2) {
+  // 카드 타입 확인하여 source와 target 구분
+  const card1Type = card1.getAttribute("data-type");
+  const card2Type = card2.getAttribute("data-type");
 
-  if (targetWord) {
-    // 매칭 성공
-    const sourceCard = document.querySelector(
-      `.source-words > div[data-index="${sourceIndex}"]`
-    );
-    const targetCard = document.querySelector(
-      `.target-words > div[data-index="${targetIndex}"]`
-    );
+  let sourceCard, targetCard;
 
-    sourceCard.classList.remove("bg-[#F3E5F5]");
-    targetCard.classList.remove("bg-[#F3E5F5]");
-    sourceCard.classList.add("bg-[#C8E6C9]", "text-[#2E7D32]");
-    targetCard.classList.add("bg-[#C8E6C9]", "text-[#2E7D32]");
-
-    sourceCard.setAttribute("draggable", "false");
-    targetCard.setAttribute("draggable", "false");
-
-    score += 10;
-    document.getElementById("matching-score").textContent = score;
-
-    // 모든 단어 매칭 완료 확인
-    const remainingCards = document.querySelectorAll(
-      ".source-words > div[draggable='true']"
-    );
-    if (remainingCards.length === 0) {
-      completeGame(`축하합니다! 모든 단어를 매칭했습니다! 점수: ${score}점`);
-    }
+  if (card1Type === "source" && card2Type === "target") {
+    sourceCard = card1;
+    targetCard = card2;
+  } else if (card1Type === "target" && card2Type === "source") {
+    sourceCard = card2;
+    targetCard = card1;
   } else {
-    // 매칭 실패
-    score = Math.max(0, score - 2);
-    document.getElementById("matching-score").textContent = score;
-
-    // 잠시 색상 변경으로 피드백
-    const sourceCard = document.querySelector(
-      `.source-words > div[data-index="${sourceIndex}"]`
-    );
-    const targetCard = document.querySelector(
-      `.target-words > div[data-index="${targetIndex}"]`
-    );
-
-    sourceCard.classList.add("bg-[#FFCDD2]");
-    targetCard.classList.add("bg-[#FFCDD2]");
-
-    setTimeout(() => {
-      sourceCard.classList.remove("bg-[#FFCDD2]");
-      targetCard.classList.remove("bg-[#FFCDD2]");
-      sourceCard.classList.add("bg-[#F3E5F5]");
-      targetCard.classList.add("bg-[#F3E5F5]");
-    }, 800);
-  }
-}
-
-// ======== 단어 섞기 게임 함수 ========
-
-// 단어 섞기 게임 초기화
-function initWordScrambleGame() {
-  document.getElementById("scramble-score").textContent = "0";
-  score = 0;
-
-  showNextScrambleWord();
-
-  // 타이머 시작
-  startTimer("scramble-timer", 60, () => {
-    completeGame(`시간이 종료되었습니다! 최종 점수: ${score}점`);
-  });
-}
-
-// 특수 문자 처리 함수 (한중일 문자 고려)
-function tokenizeForScramble(word) {
-  // 한중일 문자 각각을 하나의 토큰으로 처리
-  const tokens = [];
-  const regex =
-    /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uac00-\ud7af]/;
-
-  for (let i = 0; i < word.length; i++) {
-    if (regex.test(word[i])) {
-      // 한중일 문자는 각각을 개별 토큰으로 처리
-      tokens.push(word[i]);
-    } else {
-      // 다른 문자는 그대로 처리
-      tokens.push(word[i]);
-    }
-  }
-
-  return tokens;
-}
-
-// 다음 섞인 단어 표시
-function showNextScrambleWord() {
-  if (gameWords.length === 0) {
-    completeGame(`축하합니다! 모든 단어를 완성했습니다! 점수: ${score}점`);
+    console.error("잘못된 카드 조합:", card1Type, card2Type);
     return;
   }
 
-  // 다음 단어 가져오기
-  const randomIndex = Math.floor(Math.random() * gameWords.length);
-  const currentWord = gameWords[randomIndex];
-  gameWords.splice(randomIndex, 1);
+  const sourceIndex = parseInt(sourceCard.getAttribute("data-index"));
+  const targetWordId = targetCard.getAttribute("data-word-id");
 
-  // 단어 힌트 표시 (원본 언어 단어)
-  document.getElementById("scramble-hint").textContent = currentWord.source;
+  const sourceWord = gameWords[sourceIndex];
 
-  // 단어를 토큰으로 분리하고 섞기
-  const targetWordTokens = tokenizeForScramble(currentWord.target);
-  const scrambledTokens = [...targetWordTokens].sort(() => 0.5 - Math.random());
-
-  // 컨테이너 초기화
-  const scrambleContainer = document.getElementById("scramble-container");
-  const answerContainer = document.getElementById("scramble-answer");
-  scrambleContainer.innerHTML = "";
-  answerContainer.innerHTML = "";
-
-  // 드래그 가능한 글자 요소 생성
-  scrambledTokens.forEach((token, index) => {
-    const tokenElement = document.createElement("div");
-    tokenElement.className =
-      "drag-item bg-[#F3E5F5] text-[#9C27B0] px-4 py-2 rounded-lg text-xl font-medium";
-    tokenElement.setAttribute("draggable", "true");
-    tokenElement.setAttribute("data-char", token);
-    tokenElement.setAttribute("data-index", index);
-    tokenElement.textContent = token;
-
-    // 드래그 시작 이벤트
-    tokenElement.addEventListener("dragstart", (e) => {
-      e.dataTransfer.setData("text/plain", index.toString());
-      setTimeout(() => {
-        tokenElement.classList.add("opacity-50");
-      }, 0);
-    });
-
-    // 드래그 종료 이벤트
-    tokenElement.addEventListener("dragend", () => {
-      tokenElement.classList.remove("opacity-50");
-    });
-
-    // 클릭 이벤트 추가 (모바일 지원)
-    tokenElement.addEventListener("click", () => {
-      // 토큰을 답변 컨테이너로 이동
-      answerContainer.appendChild(tokenElement);
-      tokenElement.classList.remove("bg-[#F3E5F5]");
-      tokenElement.classList.add("bg-[#E1BEE7]");
-
-      // 모든 글자가 드롭 영역으로 이동했는지 확인
-      const remainingChars = document.querySelectorAll(
-        "#scramble-container .drag-item"
-      );
-      if (remainingChars.length === 0) {
-        // 자동으로 정답 확인
-        checkScrambleAnswer();
-      }
-    });
-
-    scrambleContainer.appendChild(tokenElement);
+  console.log("🔍 카드 매칭 확인:", {
+    sourceIndex,
+    targetWordId,
+    sourceWord: sourceWord
+      ? `${sourceWord.source} -> ${sourceWord.target}`
+      : null,
+    sourceWordId: sourceWord?.id,
   });
 
-  // 드롭 영역 설정
-  setupScrambleDropZone(answerContainer, targetWordTokens.join(""));
-
-  // 답변 컨테이너 클릭 시 이벤트 추가 (모바일에서 다시 이동)
-  answerContainer.addEventListener("click", (e) => {
-    if (e.target !== answerContainer) {
-      // 클릭된 토큰이 답변 컨테이너 내의 토큰이면
-      const tokenElement = e.target.closest(".drag-item");
-      if (tokenElement) {
-        // 다시 원래 컨테이너로 이동
-        scrambleContainer.appendChild(tokenElement);
-        tokenElement.classList.remove("bg-[#E1BEE7]");
-        tokenElement.classList.add("bg-[#F3E5F5]");
-      }
-    }
-  });
-}
-
-// 섞기 게임 드롭 영역 설정
-function setupScrambleDropZone(dropZone, correctWord) {
-  // 드래그 오버 이벤트
-  dropZone.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    dropZone.classList.add("hover");
-  });
-
-  // 드래그 떠남 이벤트
-  dropZone.addEventListener("dragleave", () => {
-    dropZone.classList.remove("hover");
-  });
-
-  // 드롭 이벤트
-  dropZone.addEventListener("drop", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    dropZone.classList.remove("hover");
-
-    // 드래그 된 요소 가져오기
-    const charIndex = e.dataTransfer.getData("text/plain");
-    const charElement = document.querySelector(
-      `#scramble-container .drag-item[data-index="${charIndex}"]`
-    );
-
-    if (charElement) {
-      // 글자 요소를 드롭 영역으로 이동
-      dropZone.appendChild(charElement);
-      charElement.classList.remove("bg-[#F3E5F5]");
-      charElement.classList.add("bg-[#E1BEE7]");
-
-      // 모든 글자가 드롭 영역으로 이동했는지 확인
-      const remainingChars = document.querySelectorAll(
-        "#scramble-container .drag-item"
-      );
-      if (remainingChars.length === 0) {
-        // 자동으로 정답 확인
-        checkScrambleAnswer();
-      }
-    }
-  });
-
-  // 정답 확인 버튼 이벤트
-  document.getElementById("check-scramble").addEventListener("click", () => {
-    checkScrambleAnswer();
-  });
-
-  // dropZone 속성에 정답 저장
-  dropZone.setAttribute("data-correct-word", correctWord);
-}
-
-// 스크램블 게임 정답 확인
-function checkScrambleAnswer() {
-  const answerContainer = document.getElementById("scramble-answer");
-  const correctWord = answerContainer.getAttribute("data-correct-word");
-
-  // 제출한 답안 구성
-  const charElements = answerContainer.querySelectorAll(".drag-item");
-  const userAnswer = Array.from(charElements)
-    .map((el) => el.getAttribute("data-char"))
-    .join("");
-
-  if (userAnswer === correctWord) {
-    // 정답
-    charElements.forEach((el) => {
-      el.classList.remove("bg-[#E1BEE7]");
-      el.classList.add("bg-[#C8E6C9]", "text-[#2E7D32]");
-    });
+  if (sourceWord && sourceWord.id === targetWordId) {
+    // 매칭 성공
+    sourceCard.classList.add("bg-green-200", "text-green-800");
+    targetCard.classList.add("bg-green-200", "text-green-800");
+    sourceCard.style.pointerEvents = "none";
+    targetCard.style.pointerEvents = "none";
 
     score += 10;
-    document.getElementById("scramble-score").textContent = score;
+    const scoreElement = document.getElementById("matching-score");
+    if (scoreElement) scoreElement.textContent = score;
+
+    // 모든 카드가 매칭되었는지 확인
+    const remainingCards = document.querySelectorAll(
+      "#source-words > div:not(.bg-green-200)"
+    );
+    if (remainingCards.length === 0) {
+      setTimeout(() => {
+        completeGame(score);
+      }, 500);
+    }
+  } else {
+    // 매칭 실패
+    sourceCard.classList.add("bg-red-200");
+    targetCard.classList.add("bg-red-200");
 
     setTimeout(() => {
+      sourceCard.classList.remove("bg-red-200");
+      targetCard.classList.remove("bg-red-200");
+    }, 1000);
+
+    score = Math.max(0, score - 2);
+    const scoreElement = document.getElementById("matching-score");
+    if (scoreElement) scoreElement.textContent = score;
+  }
+}
+
+// 단어 섞기 게임 초기화
+function initWordScrambleGame(container) {
+  console.log("단어 섞기 게임 초기화");
+
+  // 게임 상태 초기화
+  currentScrambleWordIndex = 0;
+  score = 0;
+
+  console.log("🔤 단어 섞기 초기화:", {
+    gameWordsLength: gameWords.length,
+    currentScrambleWordIndex,
+    score,
+  });
+
+  // 게임 HTML 생성
+  container.innerHTML = `
+    <div class="bg-white rounded-xl p-6 shadow-lg">
+      <div class="flex justify-between items-center mb-6">
+        <div class="flex items-center space-x-4">
+          <div class="text-lg font-semibold">점수: <span id="scramble-score">0</span></div>
+          <div class="text-lg font-semibold">시간: <span id="scramble-timer">60</span>초</div>
+        </div>
+        <button id="scramble-end" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
+          게임 종료
+        </button>
+      </div>
+      
+      <!-- 게임 진행 화면 -->
+      <div id="scramble-game" class="text-center">
+        <div class="mb-4">
+          <h3 class="text-lg font-bold mb-2">힌트: <span id="scramble-hint" class="text-purple-600"></span></h3>
+          <p class="text-gray-600 text-sm">아래 글자들을 올바른 순서로 배열하세요</p>
+        </div>
+        
+        <div class="mb-6">
+          <div id="scramble-container" class="flex flex-wrap justify-center gap-2 mb-4 min-h-[60px] p-4 border-2 border-gray-300 rounded-lg"></div>
+          <div class="text-sm text-gray-500 mb-2">정답 입력</div>
+          <div id="scramble-answer" class="flex flex-wrap justify-center gap-1 min-h-[60px] p-4 border-2 border-purple-300 rounded-lg bg-purple-50" data-correct=""></div>
+        </div>
+        
+        <div class="flex justify-center space-x-4">
+          <button id="check-scramble" class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600">
+            확인
+          </button>
+          <button id="reset-scramble" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600">
+            다시 배열
+          </button>
+        </div>
+      </div>
+      
+      <!-- 게임 결과 화면 -->
+      <div id="scramble-results" class="hidden">
+        <div class="bg-white rounded-lg shadow-md p-8 text-center">
+          <div class="mb-6">
+            <i class="fas fa-trophy text-6xl text-yellow-500 mb-4"></i>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">게임 완료!</h2>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-green-50 p-4 rounded-lg">
+              <div class="text-3xl font-bold text-green-600" id="scramble-final-score">0</div>
+              <div class="text-sm text-gray-600">점수</div>
+            </div>
+            
+            <div class="bg-blue-50 p-4 rounded-lg">
+              <div class="text-3xl font-bold text-blue-600" id="scramble-accuracy">0%</div>
+              <div class="text-sm text-gray-600">정확도</div>
+            </div>
+            
+            <div class="bg-purple-50 p-4 rounded-lg">
+              <div class="text-3xl font-bold text-purple-600" id="scramble-time">00:00</div>
+              <div class="text-sm text-gray-600">소요 시간</div>
+            </div>
+          </div>
+          
+          <div class="space-x-4">
+            <button 
+              id="retry-scramble-btn"
+              class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              다시 도전
+            </button>
+            
+            <button 
+              id="new-scramble-btn"
+              class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
+            >
+              새 게임
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  score = 0;
+  currentScrambleWordIndex = 0;
+
+  // 버튼 이벤트 리스너들
+  const checkBtn = container.querySelector("#check-scramble");
+  if (checkBtn) {
+    checkBtn.addEventListener("click", checkScrambleAnswer);
+  }
+
+  const resetBtn = container.querySelector("#reset-scramble");
+  if (resetBtn) {
+    resetBtn.addEventListener("click", () => {
+      // 현재 단어 재배열
+      const scrambleContainer = container.querySelector("#scramble-container");
+      const answerContainer = container.querySelector("#scramble-answer");
+
+      // 답안 영역의 모든 글자를 다시 섞기 영역으로 이동
+      const answerLetters = answerContainer.querySelectorAll("button");
+      answerLetters.forEach((letter) => {
+        scrambleContainer.appendChild(letter);
+      });
+    });
+  }
+
+  // 다시 시작 버튼 이벤트
+  const restartBtn = container.querySelector("#scramble-end");
+  if (restartBtn) {
+    restartBtn.addEventListener("click", () => {
+      completeGame(score);
+    });
+  }
+
+  // 다시 도전 버튼 이벤트
+  const retryBtn = container.querySelector("#retry-scramble-btn");
+  if (retryBtn) {
+    retryBtn.addEventListener("click", () => {
+      // 결과 화면 숨기고 게임 화면 보이기
+      container.querySelector("#scramble-results").classList.add("hidden");
+      container.querySelector("#scramble-game").classList.remove("hidden");
+
+      // 헤더 부분도 다시 보이기
+      const headerArea = container.querySelector(
+        ".flex.justify-between.items-center"
+      );
+      if (headerArea) {
+        headerArea.classList.remove("hidden");
+      }
+
+      // 게임 재시작
+      initWordScrambleGame(container);
+    });
+  }
+
+  // 새 게임 버튼 이벤트
+  const newGameBtn = container.querySelector("#new-scramble-btn");
+  if (newGameBtn) {
+    newGameBtn.addEventListener("click", () => {
+      backToGameSelection();
+    });
+  }
+
+  // 타이머 시작
+  startTimer("scramble-timer", 60, () => {
+    completeGame(score, 60);
+  });
+
+  // 첫 번째 단어 표시
+  showNextScrambleWord();
+}
+
+// 다음 단어 섞기 문제 표시
+function showNextScrambleWord() {
+  console.log("🔤 단어 섞기 - 다음 단어 표시:", {
+    currentScrambleWordIndex,
+    gameWordsLength: gameWords.length,
+    gameWords: gameWords.slice(0, 2), // 처음 2개만 로그
+  });
+
+  if (gameWords.length === 0) {
+    console.error("❌ gameWords가 비어있습니다! 게임을 중단합니다.");
+    alert("게임에 필요한 단어를 불러올 수 없습니다. 다시 시도해주세요.");
+    backToGameSelection();
+    return;
+  }
+
+  if (currentScrambleWordIndex >= gameWords.length) {
+    completeGame(score);
+    return;
+  }
+
+  const currentWord = gameWords[currentScrambleWordIndex];
+  const targetWord = getWordByLanguage(currentWord, targetLanguage);
+  const sourceWord = getWordByLanguage(currentWord, sourceLanguage);
+
+  console.log(
+    "단어 섞기: 현재 단어",
+    currentWord,
+    "목표:",
+    targetWord,
+    "힌트:",
+    sourceWord
+  );
+
+  // 힌트 표시 (원본 언어)
+  const hintElement = document.getElementById("scramble-hint");
+  if (hintElement) {
+    hintElement.textContent = sourceWord;
+  }
+
+  // 정답 저장
+  const answerContainer = document.getElementById("scramble-answer");
+  if (answerContainer) {
+    answerContainer.setAttribute("data-correct", targetWord);
+  }
+
+  // 글자들을 섞어서 표시
+  const scrambleContainer = document.getElementById("scramble-container");
+  if (scrambleContainer) {
+    scrambleContainer.innerHTML = "";
+
+    const letters = targetWord.split("").sort(() => 0.5 - Math.random());
+    letters.forEach((letter, index) => {
+      const letterBtn = document.createElement("button");
+      letterBtn.className =
+        "letter-btn bg-blue-500 text-white px-3 py-2 rounded-lg hover:bg-blue-600 transition-colors";
+      letterBtn.textContent = letter;
+      letterBtn.addEventListener("click", () => {
+        moveLetter(letterBtn, document.getElementById("scramble-answer"));
+      });
+      scrambleContainer.appendChild(letterBtn);
+    });
+  }
+
+  // 답안 영역 초기화
+  if (answerContainer) {
+    answerContainer.innerHTML = "";
+  }
+}
+
+// 글자 이동 함수
+function moveLetter(letterBtn, targetContainer) {
+  if (targetContainer && letterBtn) {
+    targetContainer.appendChild(letterBtn);
+    letterBtn.addEventListener("click", () => {
+      moveLetter(letterBtn, document.getElementById("scramble-container"));
+    });
+  }
+}
+
+// 단어 섞기 답안 확인
+function checkScrambleAnswer() {
+  const answerContainer = document.getElementById("scramble-answer");
+  if (!answerContainer) return;
+
+  const correctAnswer = answerContainer.getAttribute("data-correct");
+  const userAnswer = Array.from(answerContainer.querySelectorAll("button"))
+    .map((btn) => btn.textContent)
+    .join("");
+
+  console.log("단어 섞기 답안 확인:", userAnswer, "정답:", correctAnswer);
+
+  if (userAnswer === correctAnswer) {
+    // 정답
+    score += 10;
+    const scoreElement = document.getElementById("scramble-score");
+    if (scoreElement) scoreElement.textContent = score;
+
+    // 성공 효과
+    answerContainer.classList.add("bg-green-100", "border-green-500");
+    setTimeout(() => {
+      answerContainer.classList.remove("bg-green-100", "border-green-500");
+      currentScrambleWordIndex++;
       showNextScrambleWord();
     }, 1000);
   } else {
     // 오답
-    charElements.forEach((el) => {
-      el.classList.remove("bg-[#E1BEE7]");
-      el.classList.add("bg-[#FFCDD2]", "text-[#D32F2F]");
-    });
-
     score = Math.max(0, score - 2);
-    document.getElementById("scramble-score").textContent = score;
+    const scoreElement = document.getElementById("scramble-score");
+    if (scoreElement) scoreElement.textContent = score;
 
+    // 실패 효과
+    answerContainer.classList.add("bg-red-100", "border-red-500");
     setTimeout(() => {
-      // 카드 다시 뒤집기
-      [charElements[0], charElements[1]].forEach((card) => {
-        card.classList.remove("bg-[#FFCDD2]", "text-[#D32F2F]");
-        card.classList.add("bg-[#F3E5F5]", "text-[#9C27B0]");
-      });
+      answerContainer.classList.remove("bg-red-100", "border-red-500");
     }, 1000);
   }
 }
 
-// ======== 단어 기억 게임 함수 ========
+// 메모리 게임 초기화
+function initMemoryGame(container) {
+  console.log("메모리 게임 초기화");
 
-// 단어 기억 게임 초기화 (개선된 버전)
-function initMemoryGame() {
-  console.log("메모리 게임 초기화 시작");
-
-  // 메모리 게임 컨테이너를 더 확실하게 찾기
-  let gameContainer = document.getElementById("memory-game");
-
-  // ID로 찾지 못했다면 다른 방법으로 찾기
-  if (!gameContainer) {
-    gameContainer = document.querySelector('.game-container[id*="memory"]');
-  }
-
-  if (!gameContainer) {
-    console.error("메모리 게임 컨테이너를 찾을 수 없습니다");
-    return;
-  }
-
-  // 컨테이너 강제 표시
-  gameContainer.style.display = "block";
-  gameContainer.style.visibility = "visible";
-  gameContainer.style.opacity = "1";
-
-  const memoryBoard =
-    gameContainer.querySelector("#memory-board") ||
-    gameContainer.querySelector(".grid");
-
-  if (!memoryBoard) {
-    console.error("메모리 보드 요소를 찾을 수 없습니다");
-    return;
-  }
-
-  // 메모리 보드도 강제 표시
-  memoryBoard.style.display = "grid";
-  memoryBoard.style.visibility = "visible";
-  memoryBoard.style.opacity = "1";
-
-  memoryBoard.innerHTML = "";
+  // 게임 상태 초기화
   memoryPairs = 0;
-
-  // 메모리 게임 전용 변수 초기화
   canSelect = true;
   firstCard = null;
   secondCard = null;
 
-  // 메모리 페어 카운터 업데이트
-  const pairsCounter = gameContainer.querySelector("#memory-pairs");
-  if (pairsCounter) {
-    pairsCounter.textContent = "0";
-  }
-
-  // 카드 크기와 그리드 설정 조정 (반응형으로 개선)
-  const cardCount = gameWords.length * 2;
-  let gridCols =
-    "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6";
-
-  // 카드 수에 따른 최적 그리드 설정
-  if (cardCount <= 8) {
-    gridCols = "grid-cols-2 sm:grid-cols-3 md:grid-cols-4";
-  } else if (cardCount <= 12) {
-    gridCols = "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5";
-  } else if (cardCount <= 16) {
-    gridCols =
-      "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6";
-  } else {
-    gridCols =
-      "grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7";
-  }
-
-  memoryBoard.className = `grid ${gridCols} gap-2 sm:gap-3 md:gap-4 min-h-[300px]`;
-  memoryBoard.style.display = "grid";
-
-  // 강제 스타일 적용 (반응형 지원 - 최소 2열 유지)
-  memoryBoard.style.cssText = `
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 0.75rem;
-    min-height: 300px;
-    width: 100%;
-    padding: 1rem;
-    background: transparent;
-    justify-items: center;
-  `;
-
-  console.log(
-    `메모리 게임 카드 생성: ${gameWords.length * 2}개 (${
-      gameWords.length
-    }개 단어 × 2)`
-  );
-
-  // 카드 쌍 생성 (각 단어당 2개 카드)
-  const cardPairs = [];
-  gameWords.forEach((word, index) => {
-    // 각 단어에 대해 2개의 카드 생성 (같은 wordId로 매치되도록)
-    cardPairs.push({
-      id: `card_${index}_1`,
-      word: word,
-      wordId: word.id || `word_${index}`,
-      displayType: "target", // 대상 언어 표시
-    });
-    cardPairs.push({
-      id: `card_${index}_2`,
-      word: word,
-      wordId: word.id || `word_${index}`,
-      displayType: "source", // 원본 언어 표시
-    });
+  console.log("🧠 메모리 게임 초기화:", {
+    gameWordsLength: gameWords.length,
+    sourceLanguage,
+    targetLanguage,
+    memoryPairs,
   });
 
-  // 카드 셞플
-  const shuffledCards = cardPairs.sort(() => Math.random() - 0.5);
-
-  // 카드 HTML 생성
-  shuffledCards.forEach((cardData) => {
-    const card = document.createElement("div");
-    card.className =
-      "memory-card relative w-full h-32 cursor-pointer transform transition-transform duration-300 hover:scale-105 bg-white rounded-lg shadow-md";
-    card.dataset.word = cardData.wordId;
-    card.dataset.cardId = cardData.id;
-
-    // 카드가 보이도록 강제 스타일 적용 - 세로 레이아웃
-    card.style.cssText = `
-      position: relative !important;
-      width: 100% !important;
-      max-width: 200px !important;
-      min-width: 140px !important;
-      height: 8rem !important;
-      min-height: 8rem !important;
-      max-height: 8rem !important;
-      cursor: pointer !important;
-      background: white !important;
-      border-radius: 0.5rem !important;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
-      border: 2px solid #e2e8f0 !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      overflow: hidden !important;
-      margin: 4px auto !important;
-      z-index: 1 !important;
-    `;
-
-    // 디스플레이할 단어 결정
-    const displayWord =
-      cardData.displayType === "target"
-        ? cardData.word.target || cardData.word.source || "단어 없음"
-        : cardData.word.source || cardData.word.target || "단어 없음";
-
-    // 언어 배지 색상 설정
-    const badgeColor =
-      cardData.displayType === "target"
-        ? "bg-blue-100 text-blue-800"
-        : "bg-green-100 text-green-800";
-
-    const badgeText =
-      cardData.displayType === "target"
-        ? targetLanguage.toUpperCase()
-        : sourceLanguage.toUpperCase();
-
-    // 이모지 가져오기 (개념 데이터에서)
-    const emoji =
-      cardData.word.emoji ||
-      cardData.word.unicode_emoji ||
-      cardData.word.concept_info?.unicode_emoji ||
-      cardData.word.conceptInfo?.unicode_emoji ||
-      "📝";
-
-    // 세로 레이아웃 카드 구조 - 이모지, 단어, 언어 배지 순
-    card.innerHTML = `
-      <div class="card-front" style="
-        position: absolute !important; 
-        width: 100% !important; 
-        height: 100% !important; 
-        background: linear-gradient(135deg, #3b82f6, #1e40af) !important; 
-        border-radius: 0.5rem !important; 
-        display: flex !important; 
-        align-items: center !important; 
-        justify-content: center !important;
-        transition: all 0.3s ease !important;
-        z-index: 2 !important;
-        transform: rotateY(0deg) !important;
-      ">
-        <div style="color: white !important; font-size: 2rem !important; font-weight: bold !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.5) !important;">?</div>
-      </div>
-      <div class="card-back" style="
-        position: absolute !important; 
-        width: 100% !important; 
-        height: 100% !important; 
-        background: linear-gradient(135deg, #10b981, #047857) !important; 
-        border-radius: 0.5rem !important; 
-        display: flex !important; 
-        align-items: center !important; 
-        justify-content: center !important; 
-        color: white !important;
-        opacity: 0 !important;
-        transform: rotateY(-180deg) !important;
-        transition: all 0.3s ease !important;
-        z-index: 1 !important;
-      ">
-        <div style="text-align: center !important; padding: 12px !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; height: 100% !important; width: 100% !important;">
-          <div style="font-size: 2.2rem !important; margin-bottom: 8px !important; flex-shrink: 0 !important;">${emoji}</div>
-          <div style="font-size: 1rem !important; font-weight: bold !important; margin-bottom: 8px !important; word-break: break-word !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.3) !important; line-height: 1.1 !important; text-align: center !important; flex: 1 !important; display: flex !important; align-items: center !important; justify-content: center !important;">${displayWord}</div>
-          <span class="${badgeColor}" style="font-size: 0.65rem !important; padding: 2px 6px !important; border-radius: 9999px !important; display: inline-block !important; flex-shrink: 0 !important;">${badgeText}</span>
-        </div>
-      </div>
-    `;
-
-    // 카드 클릭 이벤트
-    card.addEventListener("click", () => {
-      if (
-        !card.classList.contains("flipped") &&
-        !card.classList.contains("matched") &&
-        canSelect
-      ) {
-        flipCard(card, cardData.word);
-      }
-    });
-
-    memoryBoard.appendChild(card);
-  });
-
-  // 메모리 보드가 실제로 보이는지 확인
-  console.log("메모리 보드 상태:", {
-    boardElement: memoryBoard,
-    boardVisible: memoryBoard.offsetWidth > 0 && memoryBoard.offsetHeight > 0,
-    childrenCount: memoryBoard.children.length,
-    boardStyles: window.getComputedStyle(memoryBoard),
-  });
-
-  // 메모리 게임 CSS 스타일 업데이트
-  updateMemoryGameStyles();
-
-  // 타이머 시작 (난이도에 따라 시간 조정)
-  const timeMap = {
-    basic: 120,
-    intermediate: 90,
-    advanced: 60,
-  };
-
-  const gameTime = timeMap[gameDifficulty] || 120;
-  const timerElement = gameContainer.querySelector("#memory-timer");
-  if (timerElement) {
-    startTimer("memory-timer", gameTime, () => {
-      const completedPairs = memoryPairs;
-      const totalPairs = gameWords.length;
-      const finalScore = Math.round((completedPairs / totalPairs) * 100);
-
-      completeGame(
-        `시간이 종료되었습니다! 발견한 쌍: ${completedPairs}/${totalPairs}`,
-        gameTime
-      );
-    });
-  } else {
-    console.warn("메모리 게임 타이머 요소를 찾을 수 없습니다");
-  }
-
-  console.log("메모리 게임 초기화 완료");
-}
-
-// 메모리 카드 뒤집기 함수 (개선된 버전)
-function flipCard(card, word) {
-  if (!card) {
-    console.error("카드 요소가 존재하지 않습니다");
+  if (gameWords.length === 0) {
+    console.error("❌ gameWords가 비어있습니다! 게임을 중단합니다.");
+    alert("게임에 필요한 단어를 불러올 수 없습니다. 다시 시도해주세요.");
+    backToGameSelection();
     return;
   }
 
+  // 게임 HTML 생성
+  container.innerHTML = `
+    <div class="bg-white rounded-xl p-6 shadow-lg">
+      <div class="flex justify-between items-center mb-6">
+        <div class="flex items-center space-x-4">
+          <div class="text-lg font-semibold">발견한 쌍: <span id="memory-pairs">0</span>/<span id="total-pairs">${gameWords.length}</span></div>
+          <div class="text-lg font-semibold">시간: <span id="memory-timer">90</span>초</div>
+        </div>
+        <button id="memory-end" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
+          게임 종료
+        </button>
+      </div>
+      
+      <!-- 게임 진행 화면 -->
+      <div id="memory-game">
+        <div class="text-center mb-4">
+          <p class="text-gray-600">같은 의미의 카드 쌍을 찾아 매칭하세요</p>
+        </div>
+        
+        <div id="memory-board" class="grid grid-cols-4 gap-4 justify-center max-w-2xl mx-auto"></div>
+      </div>
+      
+      <!-- 게임 결과 화면 -->
+      <div id="memory-results" class="hidden">
+        <div class="bg-white rounded-lg shadow-md p-8 text-center">
+          <div class="mb-6">
+            <i class="fas fa-trophy text-6xl text-yellow-500 mb-4"></i>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">게임 완료!</h2>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-green-50 p-4 rounded-lg">
+              <div class="text-3xl font-bold text-green-600" id="memory-final-score">0</div>
+              <div class="text-sm text-gray-600">점수</div>
+            </div>
+            
+            <div class="bg-blue-50 p-4 rounded-lg">
+              <div class="text-3xl font-bold text-blue-600" id="memory-accuracy">0%</div>
+              <div class="text-sm text-gray-600">정확도</div>
+            </div>
+            
+            <div class="bg-purple-50 p-4 rounded-lg">
+              <div class="text-3xl font-bold text-purple-600" id="memory-time">00:00</div>
+              <div class="text-sm text-gray-600">소요 시간</div>
+            </div>
+          </div>
+          
+          <div class="space-x-4">
+            <button 
+              id="retry-memory-btn"
+              class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              다시 도전
+            </button>
+            
+            <button 
+              id="new-memory-btn"
+              class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
+            >
+              새 게임
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const gameBoard = container.querySelector("#memory-board");
+
+  // 다시 시작 버튼 이벤트
+  const restartBtn = container.querySelector("#memory-end");
+  if (restartBtn) {
+    restartBtn.addEventListener("click", () => {
+      completeGame(memoryPairs * 10);
+    });
+  }
+
+  // 다시 도전 버튼 이벤트
+  const retryBtn = container.querySelector("#retry-memory-btn");
+  if (retryBtn) {
+    retryBtn.addEventListener("click", () => {
+      // 결과 화면 숨기고 게임 화면 보이기
+      container.querySelector("#memory-results").classList.add("hidden");
+      container.querySelector("#memory-game").classList.remove("hidden");
+
+      // 헤더 부분도 다시 보이기
+      const headerArea = container.querySelector(
+        ".flex.justify-between.items-center"
+      );
+      if (headerArea) {
+        headerArea.classList.remove("hidden");
+      }
+
+      // 게임 재시작
+      initMemoryGame(container);
+    });
+  }
+
+  // 새 게임 버튼 이벤트
+  const newGameBtn = container.querySelector("#new-memory-btn");
+  if (newGameBtn) {
+    newGameBtn.addEventListener("click", () => {
+      backToGameSelection();
+    });
+  }
+
+  // 카드 쌍 생성
+  const cardPairs = [];
+  gameWords.forEach((word, index) => {
+    cardPairs.push({
+      id: `${word.id}_source`,
+      text: getWordByLanguage(word, sourceLanguage),
+      pairId: word.id,
+    });
+    cardPairs.push({
+      id: `${word.id}_target`,
+      text: getWordByLanguage(word, targetLanguage),
+      pairId: word.id,
+    });
+  });
+
+  // 카드 섞기
+  const shuffledCards = cardPairs.sort(() => 0.5 - Math.random());
+
+  // 카드 생성
+  shuffledCards.forEach((cardData) => {
+    const card = createMemoryCard(cardData);
+    gameBoard.appendChild(card);
+  });
+
+  // 타이머 시작
+  startTimer("memory-timer", 90, () => {
+    completeGame(memoryPairs * 10, 90);
+  });
+}
+
+// 메모리 카드 생성
+function createMemoryCard(cardData) {
+  const card = document.createElement("div");
+  card.className =
+    "memory-card bg-purple-500 text-white p-4 rounded-lg cursor-pointer hover:bg-purple-600 transition-all transform hover:scale-105";
+  card.dataset.pairId = cardData.pairId;
+  card.dataset.cardId = cardData.id;
+  card.innerHTML = `
+    <div class="card-front flex items-center justify-center min-h-[60px]">
+      <span class="text-lg font-semibold">${cardData.text}</span>
+      </div>
+    <div class="card-back hidden flex items-center justify-center min-h-[60px] bg-gray-300 text-gray-700">
+      <span class="text-xl">?</span>
+      </div>
+    `;
+
+  card.addEventListener("click", () => flipMemoryCard(card));
+
+  return card;
+}
+
+// 메모리 카드 뒤집기
+function flipMemoryCard(card) {
   if (
+    !canSelect ||
     card.classList.contains("flipped") ||
     card.classList.contains("matched")
   ) {
-    console.log("이미 뒤집어진 카드이거나 매치된 카드입니다");
-    return; // 이미 뒤집어진 카드나 매치된 카드는 무시
-  }
-
-  console.log("카드 뒤집기 시작:", {
-    word: word,
-    cardId: card.dataset.cardId,
-    wordId: card.dataset.word,
-  });
-
-  const frontFace = card.querySelector(".card-front");
-  const backFace = card.querySelector(".card-back");
-
-  if (!frontFace || !backFace) {
-    console.error("카드 앞면 또는 뒷면 요소를 찾을 수 없습니다");
     return;
   }
 
-  // 선택 금지 (애니메이션 중에는 다른 카드 클릭 방지)
-  canSelect = false;
-
-  // 카드 뒤집기 애니메이션 - 3D 회전 효과
-  card.classList.add("flipped");
-
-  // CSS 3D 변환으로 부드러운 뒤집기 효과
-  frontFace.style.transform = "rotateY(-180deg)";
-  frontFace.style.opacity = "0";
-  frontFace.style.zIndex = "1";
-
-  backFace.style.transform = "rotateY(0deg)";
-  backFace.style.opacity = "1";
-  backFace.style.zIndex = "2";
-
-  console.log("카드 뒤집기 애니메이션 완료");
-
-  // 선택 허용 복원 및 매치 확인
-  setTimeout(() => {
-    canSelect = true;
-    checkMemoryMatch();
-  }, 300); // 애니메이션 시간 단축
-}
-
-// 메모리 게임 매치 확인 함수 (완전히 새로 작성)
-function checkMemoryMatch() {
-  const flippedCards = document.querySelectorAll(
-    ".memory-card.flipped:not(.matched)"
+  // 카드 뒤집기 효과
+  card.classList.add(
+    "flipped",
+    "bg-white",
+    "text-black",
+    "border-2",
+    "border-purple-500"
   );
+  card.classList.remove("bg-purple-500", "text-white");
 
-  if (flippedCards.length === 2) {
-    // 선택 금지 (매치 확인 중)
+  if (!firstCard) {
+    firstCard = card;
+  } else if (!secondCard) {
+    secondCard = card;
     canSelect = false;
-
-    const [card1, card2] = flippedCards;
-    const word1Data = card1.dataset.word;
-    const word2Data = card2.dataset.word;
-
-    if (word1Data === word2Data) {
-      // 매치 성공
-      setTimeout(() => {
-        card1.classList.add("matched");
-        card2.classList.add("matched");
-
-        // 매치된 카드에 성공 효과 추가
-        [card1, card2].forEach((card) => {
-          card.style.background =
-            "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)";
-          card.style.transform = "scale(1.05)";
-          card.style.boxShadow = "0 0 20px rgba(46, 125, 50, 0.7)";
-        });
-
-        memoryPairs++;
-
-        // 페어 카운터 업데이트
-        const pairsCounter = document.getElementById("memory-pairs");
-        if (pairsCounter) {
-          pairsCounter.textContent = memoryPairs;
-        }
-
-        console.log(
-          `매치 성공! 현재 ${memoryPairs}/${gameWords.length} 쌍 완료`
-        );
-
-        // 모든 카드가 매치되었는지 확인
-        const totalPairs = gameWords.length;
-        if (memoryPairs >= totalPairs) {
-          setTimeout(() => {
-            const finalScore = 100; // 모든 쌍을 맞춘 경우 100점
-            completeGame(finalScore, Date.now() - gameState.startTime);
-          }, 500);
-        }
-
-        // 선택 허용 복원
-        canSelect = true;
-      }, 500);
-    } else {
-      // 매치 실패
-      // 실패 피드백 표시
-      [card1, card2].forEach((card) => {
-        card.style.border = "3px solid #f87171";
-      });
-
-      setTimeout(() => {
-        // 실패 피드백 제거
-        [card1, card2].forEach((card) => {
-          card.style.border = "";
-        });
-
-        // 카드 다시 뒤집기
-        [card1, card2].forEach((card) => {
-          card.classList.remove("flipped");
-
-          const frontFace = card.querySelector(".card-front");
-          const backFace = card.querySelector(".card-back");
-
-          if (frontFace && backFace) {
-            frontFace.style.transform = "rotateY(0deg)";
-            frontFace.style.opacity = "1";
-            frontFace.style.zIndex = "2";
-
-            backFace.style.transform = "rotateY(-180deg)";
-            backFace.style.opacity = "0";
-            backFace.style.zIndex = "1";
-          }
-        });
-
-        // 선택 허용 복원
-        canSelect = true;
-      }, 1000);
-    }
-  } else {
-    // 2개가 아닌 경우 선택 허용
-    canSelect = true;
+    setTimeout(() => checkMemoryMatch(), 1000);
   }
 }
 
-// 메모리 게임 CSS 스타일 업데이트
-function updateMemoryGameStyles() {
-  // 메모리 게임 CSS 스타일 업데이트 로직을 구현해야 합니다.
-  // 현재는 기본 스타일만 적용됩니다.
+// 메모리 카드 매칭 확인
+function checkMemoryMatch() {
+  const firstPairId = firstCard.dataset.pairId;
+  const secondPairId = secondCard.dataset.pairId;
+
+  if (firstPairId === secondPairId) {
+    // 매칭 성공
+    firstCard.classList.add("matched", "bg-green-200", "text-green-800");
+    secondCard.classList.add("matched", "bg-green-200", "text-green-800");
+
+    memoryPairs++;
+    const pairsElement = document.getElementById("memory-pairs");
+    if (pairsElement) pairsElement.textContent = memoryPairs;
+
+    // 모든 쌍을 찾았는지 확인
+    if (memoryPairs === gameWords.length) {
+      setTimeout(() => {
+        completeGame(memoryPairs * 10);
+      }, 500);
+    }
+  } else {
+    // 매칭 실패 - 카드 다시 뒤집기
+    setTimeout(() => {
+      firstCard.classList.remove(
+        "flipped",
+        "bg-white",
+        "text-black",
+        "border-2",
+        "border-purple-500"
+      );
+      firstCard.classList.add("bg-purple-500", "text-white");
+
+      secondCard.classList.remove(
+        "flipped",
+        "bg-white",
+        "text-black",
+        "border-2",
+        "border-purple-500"
+      );
+      secondCard.classList.add("bg-purple-500", "text-white");
+    }, 500);
+  }
+
+  // 상태 초기화
+  firstCard = null;
+  secondCard = null;
+  canSelect = true;
 }
 
-// 🎮 게임 초기화 및 이벤트 리스너 설정
-document.addEventListener("DOMContentLoaded", async function () {
-  console.log("🎮 게임 페이지 초기화 시작");
+// ======== 이벤트 리스너 초기화 ========
 
+// 페이지 로드 완료 후 초기화
+document.addEventListener("DOMContentLoaded", async () => {
   try {
-    // 네비게이션바 로드
-    await loadNavbar();
+    console.log("게임 페이지 초기화 시작");
 
-    // 언어 설정 초기화
-    if (typeof applyLanguage === "function") {
-      await applyLanguage();
+    // 언어 설정 로드
+    loadLanguageSettings();
+    setupLanguageSelectors();
+
+    // 게임 카드 설정
+    setupGameCards();
+
+    // "게임 선택으로 돌아가기" 버튼 이벤트
+    const backButton = document.getElementById("back-to-games");
+    if (backButton) {
+      backButton.addEventListener("click", backToGameSelection);
     }
 
-    // 언어 선택 이벤트 리스너
-    const sourceLanguageSelect = document.getElementById("source-language");
-    const targetLanguageSelect = document.getElementById("target-language");
-
-    if (sourceLanguageSelect && targetLanguageSelect) {
-      sourceLanguageSelect.addEventListener("change", (e) => {
-        sourceLanguage = e.target.value;
-        console.log("원본 언어 변경:", sourceLanguage);
-        updateGameLabels();
-      });
-
-      targetLanguageSelect.addEventListener("change", (e) => {
-        targetLanguage = e.target.value;
-        console.log("목표 언어 변경:", targetLanguage);
-        updateGameLabels();
-      });
-
-      // 초기 언어 설정
-      sourceLanguage = sourceLanguageSelect.value;
-      targetLanguage = targetLanguageSelect.value;
-    }
-
-    // 🎯 게임 카드 클릭 이벤트 설정
-    const gameCards = document.querySelectorAll(".game-card");
-    gameCards.forEach((card) => {
-      card.addEventListener("click", async function () {
-        const gameType = this.dataset.game;
-        console.log(`🎮 게임 선택: ${gameType}`);
-
-        // 모든 카드 비활성화
-        gameCards.forEach((c) => c.classList.remove("active"));
-
-        // 선택된 카드 활성화
-        this.classList.add("active");
-
-        // 게임 로드
-        await loadGame(gameType);
-      });
-    });
-
-    // 재시작 버튼 이벤트 설정
-    document.addEventListener("click", function (e) {
-      if (
-        e.target.id === "restart-matching" ||
-        e.target.closest("#restart-matching")
-      ) {
-        restartGame("word-matching");
-      } else if (
-        e.target.id === "restart-scramble" ||
-        e.target.closest("#restart-scramble")
-      ) {
-        restartGame("word-scramble");
-      } else if (
-        e.target.id === "restart-memory" ||
-        e.target.closest("#restart-memory")
-      ) {
-        restartGame("memory-game");
+    // 사용자 인증 상태 체크
+    onAuthStateChanged(auth, (user) => {
+      currentUser = user;
+      if (user) {
+        console.log("사용자 로그인 확인됨:", user.email);
+        loadGameStats();
+      } else {
+        console.log("사용자 로그아웃 상태");
       }
     });
 
-    // 초기 라벨 업데이트
-    await updateGameLabels();
-
-    console.log("✅ 게임 페이지 초기화 완료");
+    console.log("게임 페이지 초기화 완료");
   } catch (error) {
-    console.error("❌ 게임 페이지 초기화 중 오류:", error);
+    console.error("게임 페이지 초기화 오류:", error);
   }
 });
+
+// 단어 섞기 게임 결과 표시 (인라인)
+function showWordScrambleResults(results) {
+  const gameContainer = document.querySelector("#word-scramble-container");
+  if (!gameContainer) return;
+
+  // 헤더 부분 숨기기
+  const headerArea = gameContainer.querySelector(
+    ".flex.justify-between.items-center"
+  );
+  if (headerArea) {
+    headerArea.classList.add("hidden");
+  }
+
+  // 게임 진행 화면 숨기기
+  const gameArea = gameContainer.querySelector("#scramble-game");
+  if (gameArea) {
+    gameArea.classList.add("hidden");
+  }
+
+  // 결과 화면 보이기
+  const resultsArea = gameContainer.querySelector("#scramble-results");
+  if (resultsArea) {
+    resultsArea.classList.remove("hidden");
+
+    // 결과 데이터 업데이트
+    const scoreElement = resultsArea.querySelector("#scramble-final-score");
+    const accuracyElement = resultsArea.querySelector("#scramble-accuracy");
+    const timeElement = resultsArea.querySelector("#scramble-time");
+
+    if (scoreElement) scoreElement.textContent = results.finalScore;
+    if (accuracyElement) accuracyElement.textContent = `${results.accuracy}%`;
+    if (timeElement) {
+      const minutes = Math.floor(results.totalTime / 60);
+      const seconds = results.totalTime % 60;
+      timeElement.textContent = `${minutes
+        .toString()
+        .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+    }
+
+    // 성과 메시지 업데이트
+    const titleElement = resultsArea.querySelector("h2");
+    if (titleElement) {
+      let message = "게임 완료!";
+      if (results.accuracy >= 90) {
+        message = "🎉 완벽해요!";
+      } else if (results.accuracy >= 80) {
+        message = "👏 잘했어요!";
+      } else if (results.accuracy >= 70) {
+        message = "👍 괜찮아요!";
+      } else {
+        message = "💪 다시 도전!";
+      }
+      titleElement.textContent = message;
+    }
+
+    console.log("✅ 단어 섞기 게임 결과 화면 표시 완료");
+  }
+}
+
+// 단어 기억 게임 결과 표시 (인라인)
+function showMemoryGameResults(results) {
+  const gameContainer = document.querySelector("#memory-game-container");
+  if (!gameContainer) return;
+
+  // 헤더 부분 숨기기
+  const headerArea = gameContainer.querySelector(
+    ".flex.justify-between.items-center"
+  );
+  if (headerArea) {
+    headerArea.classList.add("hidden");
+  }
+
+  // 게임 진행 화면 숨기기
+  const gameArea = gameContainer.querySelector("#memory-game");
+  if (gameArea) {
+    gameArea.classList.add("hidden");
+  }
+
+  // 결과 화면 보이기
+  const resultsArea = gameContainer.querySelector("#memory-results");
+  if (resultsArea) {
+    resultsArea.classList.remove("hidden");
+
+    // 결과 데이터 업데이트
+    const scoreElement = resultsArea.querySelector("#memory-final-score");
+    const accuracyElement = resultsArea.querySelector("#memory-accuracy");
+    const timeElement = resultsArea.querySelector("#memory-time");
+
+    if (scoreElement) scoreElement.textContent = results.finalScore;
+    if (accuracyElement) accuracyElement.textContent = `${results.accuracy}%`;
+    if (timeElement) {
+      const minutes = Math.floor(results.totalTime / 60);
+      const seconds = results.totalTime % 60;
+      timeElement.textContent = `${minutes
+        .toString()
+        .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+    }
+
+    // 성과 메시지 업데이트
+    const titleElement = resultsArea.querySelector("h2");
+    if (titleElement) {
+      let message = "게임 완료!";
+      if (results.accuracy >= 90) {
+        message = "🎉 완벽해요!";
+      } else if (results.accuracy >= 80) {
+        message = "👏 잘했어요!";
+      } else if (results.accuracy >= 70) {
+        message = "👍 괜찮아요!";
+      } else {
+        message = "💪 다시 도전!";
+      }
+      titleElement.textContent = message;
+    }
+
+    console.log("✅ 단어 기억 게임 결과 화면 표시 완료");
+  }
+}

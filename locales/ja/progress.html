@@ -36,50 +36,68 @@
 
       <!-- 학습 통계 요약 -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white rounded-lg shadow-md p-6">
+        <div id="total-words-card" class="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:bg-blue-50 hover:shadow-lg transition-all duration-200">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm font-medium text-gray-600" data-i18n="total_words">총 단어수</p>
+              <p class="text-sm font-medium text-gray-600" data-i18n="total_words">総単語数</p>
               <p id="total-words-count" class="text-2xl font-bold text-blue-600">0</p>
             </div>
-            <div class="text-blue-500">
-              <i class="fas fa-book text-2xl"></i>
+            <div class="bg-blue-100 p-3 rounded-full">
+              <i class="fas fa-book text-blue-600 text-xl"></i>
             </div>
           </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md p-6">
+        <div id="mastered-words-card" class="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:bg-green-50 hover:shadow-lg transition-all duration-200">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm font-medium text-gray-600" data-i18n="mastered_words">마스터한 단어</p>
+              <p class="text-sm font-medium text-gray-600" data-i18n="mastered_words">マスター済み</p>
               <p id="mastered-words-count" class="text-2xl font-bold text-green-600">0</p>
             </div>
-            <div class="text-green-500">
-              <i class="fas fa-check-circle text-2xl"></i>
+            <div class="bg-green-100 p-3 rounded-full">
+              <i class="fas fa-check-circle text-green-600 text-xl"></i>
             </div>
           </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md p-6">
+        <div id="study-streak-card" class="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:bg-orange-50 hover:shadow-lg transition-all duration-200">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm font-medium text-gray-600" data-i18n="study_streak">연속 학습</p>
-              <p id="study-streak-count" class="text-2xl font-bold text-orange-600">0일</p>
+              <p class="text-sm font-medium text-gray-600" data-i18n="study_streak">連続学習</p>
+              <p id="study-streak-count" class="text-2xl font-bold text-orange-600">0日</p>
             </div>
-            <div class="text-orange-500">
-              <i class="fas fa-fire text-2xl"></i>
+            <div class="bg-orange-100 p-3 rounded-full">
+              <i class="fas fa-fire text-orange-600 text-xl"></i>
             </div>
           </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md p-6">
+        <div id="quiz-accuracy-card" class="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:bg-purple-50 hover:shadow-lg transition-all duration-200">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm font-medium text-gray-600" data-i18n="quiz_accuracy">퀴즈 정확도</p>
+              <p class="text-sm font-medium text-gray-600" data-i18n="quiz_accuracy">クイズ正答率</p>
               <p id="quiz-accuracy-rate" class="text-2xl font-bold text-purple-600">0%</p>
             </div>
-            <div class="text-purple-500">
-              <i class="fas fa-target text-2xl"></i>
+            <div class="bg-purple-100 p-3 rounded-full">
+              <i class="fas fa-target text-purple-600 text-xl"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- ゲーム成果 -->
+        <div id="total-games-card" class="bg-white rounded-lg shadow-sm p-5 border border-pink-100 cursor-pointer hover:shadow-md transition-shadow">
+          <div class="flex items-center mb-3">
+            <i class="fas fa-gamepad text-pink-600 mr-2"></i>
+            <h3 class="font-semibold text-gray-800" data-i18n="game_achievements">ゲーム成果</h3>
+          </div>
+          <div class="space-y-2">
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600" data-i18n="total_games">総ゲーム数:</span>
+              <span id="total-games-count" class="text-sm font-medium">0回</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600" data-i18n="avg_game_score">平均スコア:</span>
+              <span id="avg-game-score" class="text-sm font-medium">0点</span>
             </div>
           </div>
         </div>

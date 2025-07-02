@@ -39,9 +39,6 @@
     <script type="module" src="../../utils/language-utils.js"></script>
     <script type="module" src="../../js/language-init.js"></script>
     
-    <!-- 🎮 게임 JavaScript 추가 -->
-    <script type="module" src="../../pages/js/games.js"></script>
-    
     <style>
       .game-card {
         transition: transform 0.3s, box-shadow 0.3s;
@@ -100,6 +97,34 @@
         </div>
       </div>
 
+
+
+      <!-- 게임 실행 영역 -->
+      <div id="game-play-area" class="hidden">
+        <div class="flex justify-between items-center mb-6">
+          <h2 id="current-game-title" class="text-2xl font-bold text-gray-800"></h2>
+          <button id="back-to-games" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+            <i class="fas fa-arrow-left mr-2"></i><span data-i18n="back_to_games">게임 선택으로 돌아가기</span>
+          </button>
+        </div>
+        
+        <!-- 게임별 컨테이너 -->
+        <div id="word-matching-container" class="game-container"></div>
+        <div id="word-scramble-container" class="game-container"></div>
+        <div id="memory-game-container" class="game-container"></div>
+      </div>
+
+      <!-- 게임 선택 영역 -->
+      <div id="game-selection-area">
+        <!-- 게임 선택 안내 -->
+        <div class="text-center mb-8">
+          <h2 class="text-2xl font-bold mb-4" data-i18n="select_game_to_play">원하는 게임을 선택해주세요</h2>
+          <p class="text-gray-600 max-w-2xl mx-auto" data-i18n="game_selection_desc">
+            각 게임을 클릭하면 게임이 시작됩니다. 위에서 원본 언어와 대상 언어를 선택하면 
+            해당 설정이 게임에도 적용됩니다.
+          </p>
+        </div>
+        
       <!-- 게임 선택 카드 -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
         <div class="game-card bg-white rounded-xl p-6 shadow-lg cursor-pointer" data-game="word-matching">
@@ -112,10 +137,13 @@
               원본 언어와 대상 언어의 단어를 올바르게 연결하는 게임입니다.
             </p>
             <div class="mt-auto">
-              <div class="flex justify-between text-sm text-gray-500">
-                <span><i class="fas fa-stopwatch mr-1"></i> 제한시간</span>
-                <span><i class="fas fa-star mr-1"></i> 초급</span>
+                <div class="flex justify-between text-sm text-gray-500 mb-4">
+                  <span><i class="fas fa-stopwatch mr-1"></i> <span data-i18n="time_limit">제한시간</span></span>
+                  <span><i class="fas fa-star mr-1"></i> <span data-i18n="beginner">초급</span></span>
               </div>
+                <button class="w-full bg-[#9C27B0] text-white py-2 rounded-lg hover:bg-[#7B1FA2] transition-colors">
+                  <i class="fas fa-play mr-2"></i><span data-i18n="start_game">게임 시작</span>
+                </button>
             </div>
           </div>
         </div>
@@ -130,10 +158,13 @@
               섞인 글자를 올바른 순서로 정렬하여 단어를 완성하세요.
             </p>
             <div class="mt-auto">
-              <div class="flex justify-between text-sm text-gray-500">
-                <span><i class="fas fa-stopwatch mr-1"></i> 제한시간</span>
-                <span><i class="fas fa-star mr-1"></i><i class="fas fa-star mr-1"></i> 중급</span>
+                <div class="flex justify-between text-sm text-gray-500 mb-4">
+                  <span><i class="fas fa-stopwatch mr-1"></i> <span data-i18n="time_limit">제한시간</span></span>
+                  <span><i class="fas fa-star mr-1"></i><i class="fas fa-star mr-1"></i> <span data-i18n="intermediate">중급</span></span>
               </div>
+                <button class="w-full bg-[#9C27B0] text-white py-2 rounded-lg hover:bg-[#7B1FA2] transition-colors">
+                  <i class="fas fa-play mr-2"></i><span data-i18n="start_game">게임 시작</span>
+                </button>
             </div>
           </div>
         </div>
@@ -148,116 +179,34 @@
               짝을 이루는 단어 카드를 찾아 매칭하는 메모리 게임입니다.
             </p>
             <div class="mt-auto">
-              <div class="flex justify-between text-sm text-gray-500">
-                <span><i class="fas fa-stopwatch mr-1"></i> 제한시간</span>
-                <span><i class="fas fa-star mr-1"></i><i class="fas fa-star mr-1"></i><i class="fas fa-star mr-1"></i> 고급</span>
+                <div class="flex justify-between text-sm text-gray-500 mb-4">
+                  <span><i class="fas fa-stopwatch mr-1"></i> <span data-i18n="time_limit">제한시간</span></span>
+                  <span><i class="fas fa-star mr-1"></i><i class="fas fa-star mr-1"></i><i class="fas fa-star mr-1"></i> <span data-i18n="advanced">고급</span></span>
               </div>
+                <button class="w-full bg-[#9C27B0] text-white py-2 rounded-lg hover:bg-[#7B1FA2] transition-colors">
+                  <i class="fas fa-play mr-2"></i><span data-i18n="start_game">게임 시작</span>
+                </button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 게임 컨테이너 영역 -->
-      <div id="game-container" class="bg-white rounded-lg shadow-lg p-6 mb-8">
-        <!-- 게임 시작 전 안내 화면 -->
-        <div id="game-intro" class="text-center py-12">
-          <i class="fas fa-gamepad text-[#9C27B0] text-6xl mb-6"></i>
-          <h2 class="text-2xl font-bold mb-4" data-i18n="select_game">게임을 선택해주세요</h2>
-          <p class="text-gray-600 max-w-lg mx-auto" data-i18n="select_game_desc">
-            위에서 게임을 선택하면 여기에 게임이 로드됩니다. 
-            언어 선택을 통해 원하는 언어 조합으로 학습할 수 있습니다.
-          </p>
-        </div>
-
-        <!-- 단어 맞추기 게임 -->
-        <div id="word-matching-game" class="game-container">
-          <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold" data-i18n="word_matching_title">단어 맞추기</h2>
-            <div class="flex items-center">
-              <div class="mr-4">
-                <span class="font-bold text-[#9C27B0]" data-i18n="score">점수:</span>
-                <span id="matching-score">0</span>
-              </div>
-              <div class="mr-4">
-                <span class="font-bold text-[#9C27B0]" data-i18n="time">시간:</span>
-                <span id="matching-timer">60</span><span data-i18n="seconds">초</span>
-              </div>
-              <button id="restart-matching" class="bg-[#9C27B0] text-white px-4 py-2 rounded-lg hover:bg-[#7B1FA2]">
-                <i class="fas fa-redo mr-1"></i> <span data-i18n="restart">재시작</span>
-              </button>
+        <!-- 게임 통계 -->
+        <div class="bg-white rounded-xl p-6 shadow-lg">
+          <h2 class="text-xl font-bold mb-4" data-i18n="game_stats">게임 통계</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="text-center p-4 bg-purple-50 rounded-lg">
+              <div class="text-2xl font-bold text-[#9C27B0]" id="total-games-played">0</div>
+              <div class="text-sm text-gray-600" data-i18n="total_games_played">총 게임 횟수</div>
             </div>
-          </div>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="source-words space-y-4">
-              <!-- 원본 단어들이 동적으로 추가됨 -->
+            <div class="text-center p-4 bg-green-50 rounded-lg">
+              <div class="text-2xl font-bold text-green-600" id="best-score">0</div>
+              <div class="text-sm text-gray-600" data-i18n="best_score">최고 점수</div>
             </div>
-            <div class="target-words space-y-4">
-              <!-- 대상 단어들이 동적으로 추가됨 -->
+            <div class="text-center p-4 bg-blue-50 rounded-lg">
+              <div class="text-2xl font-bold text-blue-600" id="average-score">0</div>
+              <div class="text-sm text-gray-600" data-i18n="average_score">평균 점수</div>
             </div>
-          </div>
-        </div>
-
-        <!-- 단어 섞기 게임 -->
-        <div id="word-scramble-game" class="game-container">
-          <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold" data-i18n="word_scramble_title">단어 섞기</h2>
-            <div class="flex items-center">
-              <div class="mr-4">
-                <span class="font-bold text-[#9C27B0]" data-i18n="score">점수:</span>
-                <span id="scramble-score">0</span>
-              </div>
-              <div class="mr-4">
-                <span class="font-bold text-[#9C27B0]" data-i18n="time">시간:</span>
-                <span id="scramble-timer">60</span><span data-i18n="seconds">초</span>
-              </div>
-              <button id="restart-scramble" class="bg-[#9C27B0] text-white px-4 py-2 rounded-lg hover:bg-[#7B1FA2]">
-                <i class="fas fa-redo mr-1"></i> <span data-i18n="restart">재시작</span>
-              </button>
-            </div>
-          </div>
-          
-          <div class="flex flex-col items-center">
-            <div class="text-xl font-bold mb-4">
-              <span id="scramble-hint"></span>
-            </div>
-            
-            <div id="scramble-container" class="flex justify-center flex-wrap gap-2 mb-6">
-              <!-- 글자 요소들이 동적으로 추가됨 -->
-            </div>
-            
-            <div id="scramble-answer" class="flex justify-center flex-wrap gap-2 p-4 drop-zone min-w-[300px] mb-6">
-              <!-- 사용자가 여기에 글자를 드롭 -->
-            </div>
-            
-            <button id="check-scramble" class="bg-[#9C27B0] text-white px-6 py-2 rounded-lg hover:bg-[#7B1FA2]" data-i18n="check_answer">
-              확인하기
-            </button>
-          </div>
-        </div>
-
-        <!-- 단어 기억 게임 -->
-        <div id="memory-game" class="game-container">
-          <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold" data-i18n="memory_game_title">단어 기억 게임</h2>
-            <div class="flex items-center">
-              <div class="mr-4">
-                <span class="font-bold text-[#9C27B0]" data-i18n="found_pairs">찾은 쌍:</span>
-                <span id="memory-pairs">0</span>/8
-              </div>
-              <div class="mr-4">
-                <span class="font-bold text-[#9C27B0]" data-i18n="time">시간:</span>
-                <span id="memory-timer">120</span><span data-i18n="seconds">초</span>
-              </div>
-              <button id="restart-memory" class="bg-[#9C27B0] text-white px-4 py-2 rounded-lg hover:bg-[#7B1FA2]">
-                <i class="fas fa-redo mr-1"></i> <span data-i18n="restart">재시작</span>
-              </button>
-            </div>
-          </div>
-          
-          <div id="memory-board" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 min-h-[400px]">
-            <!-- 메모리 카드가 동적으로 추가됨 -->
-            <div class="bg-gray-200 p-4 rounded text-center">메모리 게임이 로드 중입니다...</div>
           </div>
         </div>
       </div>
@@ -269,7 +218,7 @@
     <script type="module" src="../../js/language-init.js"></script>
     <!-- 네비게이션바 스크립트 -->
     <script type="module" src="../../components/js/navbar.js"></script>
-    <!-- 게임 스크립트 -->
+    <!-- 게임 선택 스크립트 -->
     <script type="module" src="../../pages/js/games.js"></script>
     <script type="module">
       import { updateMetadata } from '../../utils/language-utils.js';
@@ -277,10 +226,6 @@
       // 페이지 로드 후 메타데이터 업데이트
       document.addEventListener('DOMContentLoaded', async () => {
         await updateMetadata('games');
-        
-        // 메모리 게임 컨테이너 확인
-        console.log('메모리 게임 컨테이너 확인:', document.getElementById('memory-game'));
-        console.log('메모리 게임 보드 확인:', document.getElementById('memory-board'));
       });
     </script>
   </body>
