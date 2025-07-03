@@ -700,5 +700,8 @@
   "insufficient_words": "ゲームに必要な単語が不足しています",
   "game_start_error": "ゲームを開始できません",
   "word_matching_title": "単語マッチング",
-  "word_scramble_title": "単語シャッフル"
+  "word_scramble_title": "単語シャッフル",
+  "avg_session_quality": "学習効率:",
+  "learning_efficiency": "学習効率",
+  "session_quality_desc": "学習時間、正確性、集中度を総合した効率性スコアです。"
 } 

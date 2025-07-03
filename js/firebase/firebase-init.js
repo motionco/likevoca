@@ -456,11 +456,11 @@ export const conceptUtils = {
         ) {
           concepts.push({
             id: doc.id,
-            conceptInfo: data.concept_info || {
+            concept_info: data.concept_info || {
               domain: data.domain || "general",
               category: data.category || "common",
               difficulty: conceptDifficulty,
-              emoji: data.emoji || "📚",
+              unicode_emoji: data.emoji || "📚",
             },
             expressions: {
               [userLang]: data.expressions[userLang],

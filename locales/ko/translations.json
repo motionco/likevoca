@@ -688,5 +688,8 @@
   "insufficient_words": "게임에 필요한 단어가 부족합니다",
   "game_start_error": "게임을 시작할 수 없습니다",
   "word_matching_title": "단어 맞추기",
-  "word_scramble_title": "단어 섞기"
+  "word_scramble_title": "단어 섞기",
+  "avg_session_quality": "학습 효율:",
+  "learning_efficiency": "학습 효율",
+  "session_quality_desc": "학습 시간, 정확도, 집중도를 종합한 효율성 점수입니다."
 } 

@@ -15,6 +15,7 @@ import { CollectionManager } from "../../js/firebase/firebase-collection-manager
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
 import { auth } from "../../js/firebase/firebase-init.js";
 import { getI18nText } from "../../utils/language-utils.js";
+import { selectEmojiForWord } from "../../utils/emoji-utils.js";
 
 // 게임에 필요한 전역 변수
 let sourceLanguage = "korean";
@@ -462,53 +463,76 @@ async function loadGameStats() {
   if (!currentUser) return;
 
   try {
-    // 올바른 컬렉션에서 집계된 통계 조회
-    const gameStatsRef = doc(db, "game_user_stats", currentUser.uid);
-    const gameStatsSnap = await getDoc(gameStatsRef);
+    // game_records에서 실시간 통계 계산 (records 컬렉션)
+    const gameRecordsRef = collection(db, "game_records");
+    const q = query(
+      gameRecordsRef,
+      where("user_email", "==", currentUser.email)
+    );
 
-    if (gameStatsSnap.exists()) {
-      const stats = gameStatsSnap.data();
+    const querySnapshot = await getDocs(q);
+    const gameResults = [];
 
-      // 통계 UI 업데이트
-      const totalGamesElement = document.getElementById("total-games-played");
-      const bestScoreElement = document.getElementById("best-score");
-      const averageScoreElement = document.getElementById("average-score");
-
-      if (totalGamesElement) {
-        totalGamesElement.textContent = stats.totalGames || 0;
-      }
-      if (bestScoreElement) {
-        bestScoreElement.textContent = stats.bestScore || 0;
-      }
-
-      // 평균 점수 계산
-      const averageScore =
-        stats.totalGames > 0
-          ? Math.round((stats.totalScore || 0) / stats.totalGames)
-          : 0;
-      if (averageScoreElement) {
-        averageScoreElement.textContent = averageScore;
-      }
-
-      console.log("🎯 게임 통계 UI 업데이트 완료:", {
-        totalGames: stats.totalGames || 0,
-        bestScore: stats.bestScore || 0,
-        averageScore: averageScore,
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      gameResults.push({
+        id: doc.id,
+        ...data,
+        playedAt:
+          data.timestamp?.toDate() ||
+          data.completed_at?.toDate() ||
+          data.playedAt?.toDate() ||
+          new Date(),
       });
-    } else {
-      console.log("📊 게임 통계 데이터가 없습니다. 첫 게임을 플레이해보세요!");
+    });
 
-      // 기본값으로 UI 업데이트
-      const totalGamesElement = document.getElementById("total-games-played");
-      const bestScoreElement = document.getElementById("best-score");
-      const averageScoreElement = document.getElementById("average-score");
+    // 실시간 통계 계산
+    let totalGames = gameResults.length;
+    let totalScore = 0;
+    let bestScore = 0;
 
-      if (totalGamesElement) totalGamesElement.textContent = "0";
-      if (bestScoreElement) bestScoreElement.textContent = "0";
-      if (averageScoreElement) averageScoreElement.textContent = "0";
+    gameResults.forEach((game) => {
+      const score = game.score || 0;
+      totalScore += score;
+      if (score > bestScore) {
+        bestScore = score;
+      }
+    });
+
+    const averageScore =
+      totalGames > 0 ? Math.round(totalScore / totalGames) : 0;
+
+    // 통계 UI 업데이트
+    const totalGamesElement = document.getElementById("total-games-played");
+    const bestScoreElement = document.getElementById("best-score");
+    const averageScoreElement = document.getElementById("average-score");
+
+    if (totalGamesElement) {
+      totalGamesElement.textContent = totalGames;
     }
+    if (bestScoreElement) {
+      bestScoreElement.textContent = bestScore;
+    }
+    if (averageScoreElement) {
+      averageScoreElement.textContent = averageScore;
+    }
+
+    console.log("🎯 게임 통계 UI 업데이트 완료:", {
+      totalGames,
+      bestScore,
+      averageScore,
+    });
   } catch (error) {
     console.error("게임 통계 로드 오류:", error);
+
+    // 오류 시 기본값으로 UI 업데이트
+    const totalGamesElement = document.getElementById("total-games-played");
+    const bestScoreElement = document.getElementById("best-score");
+    const averageScoreElement = document.getElementById("average-score");
+
+    if (totalGamesElement) totalGamesElement.textContent = "0";
+    if (bestScoreElement) bestScoreElement.textContent = "0";
+    if (averageScoreElement) averageScoreElement.textContent = "0";
   }
 }
 
@@ -525,82 +549,39 @@ export async function saveGameResult(
   }
 
   try {
-    const gameResultsRef = collection(db, "game_results");
-
-    // 개별 게임 세션 저장 (진도 페이지와 일치하는 구조)
-    await addDoc(gameResultsRef, {
-      userId: currentUser.uid,
-      gameType,
+    // game_records 컬렉션에 저장 (records 구조)
+    const gameActivityData = {
+      user_email: currentUser.email,
+      userId: currentUser.uid, // 진도 페이지 호환성
+      game_type: gameType,
+      gameType, // camelCase 호환성
       score,
       timeSpent,
+      time_spent: timeSpent, // snake_case 호환성
       isCompleted,
       sourceLanguage,
       targetLanguage,
-      accuracy: Math.round((score / 100) * 100) || 0, // 정확도 추가
-      success: score >= 70, // 성공 여부
-      timestamp: serverTimestamp(), // 진도 페이지에서 사용하는 필드명
-      playedAt: serverTimestamp(),
-    });
+      language_pair: {
+        source: sourceLanguage,
+        target: targetLanguage,
+      },
+      accuracy: Math.round((score / 100) * 100) || 0,
+      success: score >= 70,
+      timestamp: serverTimestamp(), // 진도 페이지용
+      completed_at: serverTimestamp(), // 활동용
+      playedAt: serverTimestamp(), // 추가 호환성
+    };
 
-    // 전체 통계 업데이트는 기존 방식 유지
-    const userStatsRef = doc(db, "game_user_stats", currentUser.uid);
-    const userStatsSnap = await getDoc(userStatsRef);
+    // CollectionManager를 통해 저장 (진도 업데이트 포함)
+    await collectionManager.updateGameRecord(
+      currentUser.email,
+      gameActivityData
+    );
 
-    if (userStatsSnap.exists()) {
-      const currentStats = userStatsSnap.data();
-      const updatedStats = {
-        totalGames: (currentStats.totalGames || 0) + 1,
-        totalScore: (currentStats.totalScore || 0) + score,
-        bestScore: Math.max(currentStats.bestScore || 0, score),
-        lastPlayed: serverTimestamp(),
-      };
-
-      // 게임 타입별 통계 업데이트
-      if (currentStats.gameTypeStats) {
-        updatedStats.gameTypeStats = { ...currentStats.gameTypeStats };
-      } else {
-        updatedStats.gameTypeStats = {};
-      }
-
-      if (!updatedStats.gameTypeStats[gameType]) {
-        updatedStats.gameTypeStats[gameType] = {
-          played: 0,
-          bestScore: 0,
-          totalScore: 0,
-        };
-      }
-
-      updatedStats.gameTypeStats[gameType].played += 1;
-      updatedStats.gameTypeStats[gameType].totalScore += score;
-      updatedStats.gameTypeStats[gameType].bestScore = Math.max(
-        updatedStats.gameTypeStats[gameType].bestScore,
-        score
-      );
-
-      await updateDoc(userStatsRef, updatedStats);
-    } else {
-      // 첫 게임 결과
-      const initialStats = {
-        totalGames: 1,
-        totalScore: score,
-        bestScore: score,
-        lastPlayed: serverTimestamp(),
-        gameTypeStats: {
-          [gameType]: {
-            played: 1,
-            bestScore: score,
-            totalScore: score,
-          },
-        },
-      };
-
-      await setDoc(userStatsRef, initialStats);
-    }
-
-    console.log("게임 결과 저장 완료:", { gameType, score, timeSpent });
+    console.log("게임 활동 저장 완료:", { gameType, score, timeSpent });
     return true;
   } catch (error) {
-    console.error("게임 결과 저장 오류:", error);
+    console.error("게임 활동 저장 오류:", error);
     return false;
   }
 }
@@ -826,6 +807,8 @@ async function loadGameWords() {
           domain: concept.conceptInfo?.domain || "general",
           category: concept.conceptInfo?.category || "",
           difficulty: concept.conceptInfo?.difficulty || "basic",
+          // 이모지 정보 포함 (concept_info로 통일)
+          concept_info: concept.concept_info || concept.conceptInfo,
           isFromFirebase: true,
         }));
 
@@ -869,6 +852,8 @@ async function loadGameWords() {
             domain: concept.conceptInfo?.domain || "general",
             category: concept.conceptInfo?.category || "",
             difficulty: concept.conceptInfo?.difficulty || "basic",
+            // 이모지 정보 포함 (concept_info로 통일)
+            concept_info: concept.concept_info || concept.conceptInfo,
             isFromFirebase: true,
           }));
 
@@ -1118,6 +1103,7 @@ async function completeGame(finalScore, timeSpent) {
           try {
             // 게임 활동 추적
             const gameActivityData = {
+              userId: currentUser.uid, // 🔥 중요: userId 추가
               type: currentGameType,
               score: finalScore,
               maxScore: (gameWords?.length || 8) * 10,
@@ -1140,7 +1126,7 @@ async function completeGame(finalScore, timeSpent) {
                   : "needs_improvement",
             };
 
-            await collectionManager.updateGameActivity(
+            await collectionManager.updateGameRecord(
               currentUser.email,
               gameActivityData
             );
@@ -1162,63 +1148,45 @@ async function completeGame(finalScore, timeSpent) {
         totalWords: gameWords?.length || 0,
       });
 
-      // 🎮 게임 결과 저장 (Firebase 직접 사용)
+      // 🔄 게임 통계 새로고침 (게임 페이지 통계 업데이트)
       try {
-        const gameResult = {
-          userId: currentUser.uid,
-          gameType: currentGameType,
-          score: finalScore,
-          timeSpent: totalTime,
-          difficulty: gameDifficulty,
-          correctAnswers: Math.round(
-            (finalScore / 100) * (gameWords?.length || 0)
-          ),
-          totalQuestions: gameWords?.length || 0,
-          sourceLanguage: sourceLanguage,
-          targetLanguage: targetLanguage,
-          accuracy: accuracy,
-          playedAt: new Date(),
-          wordsUsed: gameWords.map((word) => ({
-            id: word.id,
-            source: word.source,
-            target: word.target,
-            domain: word.domain,
-          })),
-        };
+        await loadGameStats();
+        console.log("🎯 게임 페이지 통계 새로고침 완료");
+      } catch (error) {
+        console.warn("게임 통계 새로고침 중 오류:", error);
+      }
 
-        // 게임 결과 저장 (개별 결과 + 집계 통계 모두 업데이트)
-        const saveSuccess = await saveGameResult(
-          currentGameType,
-          finalScore,
-          totalTime,
-          true // 완료됨
-        );
-
-        if (saveSuccess) {
-          console.log("✅ 게임 결과 및 통계 저장 완료");
-
-          // 🔄 게임 통계 새로고침 (게임 페이지 통계 업데이트)
-          try {
-            await loadGameStats();
-            console.log("🎯 게임 페이지 통계 새로고침 완료");
-          } catch (error) {
-            console.warn("게임 통계 새로고침 중 오류:", error);
-          }
-
-          // 🔄 진도 페이지의 게임 성취도도 업데이트 (있는 경우)
-          try {
-            if (typeof window.refreshProgressGameStats === "function") {
-              await window.refreshProgressGameStats();
-              console.log("🎯 진도 페이지 게임 성취도 업데이트 완료");
-            }
-          } catch (error) {
-            console.warn("진도 페이지 게임 성취도 업데이트 중 오류:", error);
-          }
+      // 🔄 진도 페이지의 게임 성취도도 업데이트 (있는 경우)
+      try {
+        if (typeof window.refreshProgressGameStats === "function") {
+          console.log("🎯 진도 페이지 게임 성취도 업데이트 시작...");
+          await window.refreshProgressGameStats();
+          console.log("🎯 진도 페이지 게임 성취도 업데이트 완료");
         } else {
-          console.error("❌ 게임 결과 저장 실패");
+          console.warn(
+            "⚠️ 진도 페이지가 로드되지 않아 localStorage로 게임 완료 상태 저장"
+          );
+          // localStorage에 게임 완료 정보 저장 (진도 페이지에서 감지용)
+          const gameCompletionData = {
+            gameType: currentGameType,
+            score: finalScore,
+            accuracy: accuracy,
+            totalTime: totalTime,
+            conceptsUpdated: updatedConceptsCount,
+            completedAt: new Date().toISOString(),
+            userId: currentUser.uid,
+          };
+          localStorage.setItem(
+            "gameCompletionUpdate",
+            JSON.stringify(gameCompletionData)
+          );
+          console.log(
+            "📦 localStorage에 게임 완료 데이터 저장:",
+            gameCompletionData
+          );
         }
       } catch (error) {
-        console.error("❌ 게임 결과 저장 중 오류:", error);
+        console.warn("진도 페이지 게임 성취도 업데이트 중 오류:", error);
       }
 
       // 게임 결과 표시
@@ -2462,16 +2430,29 @@ function initMemoryGame(container) {
 
   // 카드 쌍 생성
   const cardPairs = [];
+
   gameWords.forEach((word, index) => {
+    const sourceText = getWordByLanguage(word, sourceLanguage);
+    const targetText = getWordByLanguage(word, targetLanguage);
+
+    // 이모지 검출 단순화 - concept_info.unicode_emoji를 1순위로, 그 외에는 기본 이모지
+    const wordEmoji = word.concept_info?.unicode_emoji || "📝";
+
     cardPairs.push({
       id: `${word.id}_source`,
-      text: getWordByLanguage(word, sourceLanguage),
+      text: sourceText,
       pairId: word.id,
+      emoji: wordEmoji,
+      language: sourceLanguage,
+      wordData: word,
     });
     cardPairs.push({
       id: `${word.id}_target`,
-      text: getWordByLanguage(word, targetLanguage),
+      text: targetText,
       pairId: word.id,
+      emoji: wordEmoji,
+      language: targetLanguage,
+      wordData: word,
     });
   });
 
@@ -2494,17 +2475,31 @@ function initMemoryGame(container) {
 function createMemoryCard(cardData) {
   const card = document.createElement("div");
   card.className =
-    "memory-card bg-purple-500 text-white p-4 rounded-lg cursor-pointer hover:bg-purple-600 transition-all transform hover:scale-105";
+    "memory-card rounded-lg cursor-pointer transition-all transform hover:scale-105";
   card.dataset.pairId = cardData.pairId;
   card.dataset.cardId = cardData.id;
+
+  // 카드 전체가 뒤집히도록 스타일 설정
+  card.style.transformStyle = "preserve-3d";
+  card.style.transition = "transform 0.6s";
+  card.style.minHeight = "90px"; // 자연스러운 최소 높이만 설정
+
+  // 이모지 검출 단순화 - 이미 initMemoryGame에서 설정된 이모지 사용
+  const cardEmoji = cardData.emoji;
+
   card.innerHTML = `
-    <div class="card-front flex items-center justify-center min-h-[60px]">
-      <span class="text-lg font-semibold">${cardData.text}</span>
+    <div class="card-front" style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; transform: rotateY(180deg);">
+      <div class="flex flex-col items-center justify-center bg-blue-50 text-gray-800 rounded-lg h-full p-2 min-h-[90px] border border-blue-200">
+        <div class="text-lg sm:text-xl mb-1">${cardEmoji}</div>
+        <span class="text-xs sm:text-sm font-semibold text-center leading-tight break-words max-w-full overflow-hidden">${cardData.text}</span>
       </div>
-    <div class="card-back hidden flex items-center justify-center min-h-[60px] bg-gray-300 text-gray-700">
-      <span class="text-xl">?</span>
+    </div>
+    <div class="card-back" style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden;">
+      <div class="flex items-center justify-center bg-gray-300 text-gray-700 rounded-lg h-full p-2 min-h-[90px] hover:bg-gray-400">
+        <span class="text-lg sm:text-2xl">❓</span>
       </div>
-    `;
+    </div>
+  `;
 
   card.addEventListener("click", () => flipMemoryCard(card));
 
@@ -2521,15 +2516,9 @@ function flipMemoryCard(card) {
     return;
   }
 
-  // 카드 뒤집기 효과
-  card.classList.add(
-    "flipped",
-    "bg-white",
-    "text-black",
-    "border-2",
-    "border-purple-500"
-  );
-  card.classList.remove("bg-purple-500", "text-white");
+  // 카드 전체 뒤집기 애니메이션 효과
+  card.style.transform = "rotateY(180deg)";
+  card.classList.add("flipped");
 
   if (!firstCard) {
     firstCard = card;
@@ -2542,13 +2531,48 @@ function flipMemoryCard(card) {
 
 // 메모리 카드 매칭 확인
 function checkMemoryMatch() {
+  // null 체크 추가
+  if (!firstCard || !secondCard) {
+    console.error("❌ 카드가 null입니다:", { firstCard, secondCard });
+    firstCard = null;
+    secondCard = null;
+    canSelect = true;
+    return;
+  }
+
   const firstPairId = firstCard.dataset.pairId;
   const secondPairId = secondCard.dataset.pairId;
 
   if (firstPairId === secondPairId) {
     // 매칭 성공
-    firstCard.classList.add("matched", "bg-green-200", "text-green-800");
-    secondCard.classList.add("matched", "bg-green-200", "text-green-800");
+
+    // 매칭 성공한 카드들의 배경색 변경
+    const firstCardBack = firstCard.querySelector(".card-back > div");
+    const firstCardFront = firstCard.querySelector(".card-front > div");
+    const secondCardBack = secondCard.querySelector(".card-back > div");
+    const secondCardFront = secondCard.querySelector(".card-front > div");
+
+    if (firstCardBack)
+      firstCardBack.className = firstCardBack.className
+        .replace("bg-gray-300", "bg-green-200")
+        .replace("text-gray-700", "text-green-800");
+    if (firstCardFront)
+      firstCardFront.className = firstCardFront.className
+        .replace("bg-blue-50", "bg-green-200")
+        .replace("text-gray-800", "text-green-800")
+        .replace("border-blue-200", "border-green-300");
+    if (secondCardBack)
+      secondCardBack.className = secondCardBack.className
+        .replace("bg-gray-300", "bg-green-200")
+        .replace("text-gray-700", "text-green-800");
+    if (secondCardFront)
+      secondCardFront.className = secondCardFront.className
+        .replace("bg-blue-50", "bg-green-200")
+        .replace("text-gray-800", "text-green-800")
+        .replace("border-blue-200", "border-green-300");
+
+    firstCard.classList.add("matched");
+    secondCard.classList.add("matched");
 
     memoryPairs++;
     const pairsElement = document.getElementById("memory-pairs");
@@ -2560,33 +2584,34 @@ function checkMemoryMatch() {
         completeGame(memoryPairs * 10);
       }, 500);
     }
+
+    // 상태 초기화 (매칭 성공 시 바로)
+    firstCard = null;
+    secondCard = null;
+    canSelect = true;
   } else {
     // 매칭 실패 - 카드 다시 뒤집기
+
     setTimeout(() => {
-      firstCard.classList.remove(
-        "flipped",
-        "bg-white",
-        "text-black",
-        "border-2",
-        "border-purple-500"
-      );
-      firstCard.classList.add("bg-purple-500", "text-white");
+      // null 체크 추가 (카드가 중간에 제거될 수 있음)
+      if (firstCard && firstCard.parentNode) {
+        firstCard.style.transform = "rotateY(0deg)";
+        firstCard.classList.remove("flipped");
+      }
 
-      secondCard.classList.remove(
-        "flipped",
-        "bg-white",
-        "text-black",
-        "border-2",
-        "border-purple-500"
-      );
-      secondCard.classList.add("bg-purple-500", "text-white");
-    }, 500);
+      if (secondCard && secondCard.parentNode) {
+        secondCard.style.transform = "rotateY(0deg)";
+        secondCard.classList.remove("flipped");
+      }
+
+      console.log("🔄 카드 뒤집기 완료");
+
+      // 상태 초기화 (매칭 실패 시 지연 후)
+      firstCard = null;
+      secondCard = null;
+      canSelect = true;
+    }, 500); // 0.5초 후 카드를 뒤집습니다
   }
-
-  // 상태 초기화
-  firstCard = null;
-  secondCard = null;
-  canSelect = true;
 }
 
 // 단어 섞기 정답 메시지 표시

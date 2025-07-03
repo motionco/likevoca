@@ -733,5 +733,8 @@
   "insufficient_words": "Insufficient words for the game",
   "game_start_error": "Unable to start the game",
   "word_matching_title": "Word Matching",
-  "word_scramble_title": "Word Scramble"
+  "word_scramble_title": "Word Scramble",
+  "avg_session_quality": "Learning Efficiency:",
+  "learning_efficiency": "Learning Efficiency",
+  "session_quality_desc": "A comprehensive efficiency score based on study time, accuracy, and focus."
 } 

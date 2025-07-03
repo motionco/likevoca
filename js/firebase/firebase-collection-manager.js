@@ -18,6 +18,7 @@ import {
   serverTimestamp,
   addDoc,
   FieldPath,
+  documentId,
 } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 
 /**
@@ -26,7 +27,7 @@ import {
  * - examples: 예문 정보
  * - grammar: 문법 패턴 정보
  * - quiz_templates: 퀴즈 템플릿 정보
- * - user_progress: 사용자 학습 진도
+ * - user_records: 사용자 학습 진도
  * - language_indexes: 언어별 인덱스 (기존 유지)
  */
 
@@ -332,7 +333,7 @@ export class CollectionManager {
       await this.updateLanguageIndexes(conceptId, integratedConceptData);
       console.log(`✓ 언어별 인덱스 업데이트 완료: ${conceptId}`);
 
-      // 6. 사용자 진도 초기화 (user_progress 컬렉션)
+      // 6. 사용자 진도 초기화 (user_records 컬렉션)
       if (auth.currentUser) {
         await this.initializeUserProgress(conceptId, auth.currentUser.email);
         console.log(`✓ 사용자 진도 초기화 완료: ${conceptId}`);
@@ -685,7 +686,7 @@ export class CollectionManager {
   async initializeUserProgress(conceptId, userEmail) {
     try {
       const progressId = `${userEmail}_${conceptId}`;
-      const progressRef = doc(db, "user_progress", progressId);
+      const progressRef = doc(db, "user_records", progressId);
 
       const progressDoc = {
         progress_id: progressId,
@@ -1031,7 +1032,7 @@ export class CollectionManager {
 
     let conceptsQuery = query(
       collection(db, "concepts"),
-      where(FieldPath.documentId(), ">=", randomId),
+      where(documentId(), ">=", randomId),
       limit(needed * 2) // 여유있게 조회
     );
 
@@ -1040,7 +1041,7 @@ export class CollectionManager {
       conceptsQuery = query(
         collection(db, "concepts"),
         where("concept_info.difficulty", "==", difficulty),
-        where(FieldPath.documentId(), ">=", randomId),
+        where(documentId(), ">=", randomId),
         limit(needed * 2)
       );
     }
@@ -1125,7 +1126,7 @@ export class CollectionManager {
       ) {
         concepts.push({
           id: doc.id,
-          conceptInfo: conceptData.concept_info,
+          concept_info: conceptData.concept_info, // 통일된 필드명
           expressions: {
             [mappedUserLang]: conceptData.expressions[mappedUserLang],
             [mappedTargetLang]: conceptData.expressions[mappedTargetLang],
@@ -1175,7 +1176,7 @@ export class CollectionManager {
       ) {
         concepts.push({
           id: doc.id,
-          conceptInfo: conceptData.concept_info,
+          concept_info: conceptData.concept_info, // 통일된 필드명
           expressions: {
             [mappedUserLang]: conceptData.expressions[mappedUserLang],
             [mappedTargetLang]: conceptData.expressions[mappedTargetLang],
@@ -1977,7 +1978,7 @@ export class CollectionManager {
 
         updatedConcepts.add(conceptId);
         const progressId = `${userEmail}_${conceptId}`;
-        const progressRef = doc(db, "user_progress", progressId);
+        const progressRef = doc(db, "user_records", progressId);
 
         // 기존 진도 확인
         const progressDoc = await getDoc(progressRef);
@@ -2102,8 +2103,9 @@ export class CollectionManager {
 
       // 사용자 진도 데이터 조회
       const progressQuery = query(
-        collection(db, "user_progress"),
-        where("user_email", "==", userEmail)
+        collection(db, "user_records"),
+        where("user_email", "==", userEmail),
+        limit(50) // 최근 학습한 개념들
       );
 
       const progressSnapshot = await getDocs(progressQuery);
@@ -2144,9 +2146,9 @@ export class CollectionManager {
       // 중복 제거된 데이터 사용 (실제 개념 존재 여부는 나중에 확인)
       const finalProgressData = validProgressData;
 
-      // 퀴즈 결과 데이터 조회
+      // 퀴즈 기록 데이터 조회
       const quizQuery = query(
-        collection(db, "quiz_results"),
+        collection(db, "quiz_records"),
         where("user_email", "==", userEmail),
         limit(50)
       );
@@ -2154,9 +2156,9 @@ export class CollectionManager {
       const quizSnapshot = await getDocs(quizQuery);
       const quizData = quizSnapshot.docs.map((doc) => doc.data());
 
-      // 🎮 게임 활동 데이터 조회
+      // 🎮 게임 기록 데이터 조회
       const gameQuery = query(
-        collection(db, "game_activities"),
+        collection(db, "game_records"),
         where("user_email", "==", userEmail),
         limit(30)
       );
@@ -2164,9 +2166,9 @@ export class CollectionManager {
       const gameSnapshot = await getDocs(gameQuery);
       const gameData = gameSnapshot.docs.map((doc) => doc.data());
 
-      // 📚 학습 활동 데이터 조회
+      // 📚 학습 기록 데이터 조회
       const learningQuery = query(
-        collection(db, "learning_activities"),
+        collection(db, "learning_records"),
         where("user_email", "==", userEmail),
         limit(30)
       );
@@ -2450,13 +2452,19 @@ export class CollectionManager {
     try {
       console.log("📚 학습 활동 추적 시작:", activityData);
 
-      const learningActivityRef = doc(collection(db, "learning_activities"));
+      const learningActivityRef = doc(collection(db, "learning_records"));
 
       const activityDoc = {
         user_email: userEmail,
         activity_type: activityData.type, // "vocabulary", "grammar", "reading"
         concept_ids: activityData.conceptIds || [],
-        duration_minutes: activityData.duration || 0,
+
+        // 🔄 품질 계산에 필요한 필드들 (progress.js와 동기화)
+        session_duration: activityData.duration || 0, // 분 단위
+        concepts_studied: activityData.wordsStudied || 0,
+        correct_answers: activityData.correctAnswers || 0,
+        total_interactions: activityData.totalInteractions || 0,
+
         completed_at: serverTimestamp(),
         score: activityData.score || null,
         difficulty: activityData.difficulty || "beginner",
@@ -2464,10 +2472,20 @@ export class CollectionManager {
           source: activityData.sourceLanguage || "korean",
           target: activityData.targetLanguage || "english",
         },
+
+        // 추가 메타데이터
         metadata: {
+          // 🔄 호환성을 위한 기존 필드들 유지
+          duration_minutes: activityData.duration || 0,
           words_studied: activityData.wordsStudied || 0,
           concepts_mastered: activityData.conceptsMastered || 0,
           session_quality: activityData.sessionQuality || "good",
+
+          // 🎯 정확도 계산
+          accuracy_rate:
+            activityData.totalInteractions > 0
+              ? activityData.correctAnswers / activityData.totalInteractions
+              : 0,
         },
       };
 
@@ -2497,7 +2515,7 @@ export class CollectionManager {
         updatedConcepts.add(conceptId);
 
         const progressId = `${userEmail}_${conceptId}`;
-        const progressRef = doc(db, "user_progress", progressId);
+        const progressRef = doc(db, "user_records", progressId);
 
         // 기존 진도 확인
         const progressDoc = await getDoc(progressRef);
@@ -2551,29 +2569,138 @@ export class CollectionManager {
   }
 
   /**
-   * 🎮 게임 활동 추적
+   * 🎯 통합 사용자 활동 추적 (게임, 퀴즈, 학습)
    */
-  async updateGameActivity(userEmail, gameData) {
+  async updateUserActivity(userEmail, activityData) {
     try {
-      console.log("🎮 게임 활동 추적 시작:", gameData);
+      console.log("🎯 사용자 활동 추적 시작:", activityData);
 
-      const gameActivityRef = doc(collection(db, "game_activities"));
+      const userActivityRef = doc(collection(db, "user_activities"));
 
       const activityDoc = {
         user_email: userEmail,
-        game_type: gameData.type, // "word-matching", "word-scramble", "memory-game"
+        userId: activityData.userId, // 진도 페이지 호환성
+        activity_type: activityData.activity_type, // "game", "quiz", "learning"
+
+        // 게임 관련 데이터
+        ...(activityData.activity_type === "game" && {
+          game_type: activityData.game_type || activityData.type,
+          gameType:
+            activityData.gameType ||
+            activityData.game_type ||
+            activityData.type,
+          words_played: activityData.wordsPlayed || 0,
+          correct_answers: activityData.correctAnswers || 0,
+          total_answers: activityData.totalAnswers || 0,
+        }),
+
+        // 퀴즈 관련 데이터
+        ...(activityData.activity_type === "quiz" && {
+          quiz_type: activityData.quiz_type || activityData.type,
+          quizType:
+            activityData.quizType ||
+            activityData.quiz_type ||
+            activityData.type,
+          correct_answers: activityData.correctAnswers || 0,
+          total_questions: activityData.totalQuestions || 0,
+          question_results: activityData.questionResults || [],
+        }),
+
+        // 학습 관련 데이터
+        ...(activityData.activity_type === "learning" && {
+          learning_type: activityData.learning_type || activityData.type,
+          learningType:
+            activityData.learningType ||
+            activityData.learning_type ||
+            activityData.type,
+          session_duration: activityData.sessionDuration || 0,
+          concepts_studied: activityData.conceptsStudied || 0,
+          learning_method: activityData.learningMethod || "standard",
+        }),
+
+        // 공통 데이터
+        score: activityData.score || 0,
+        max_score: activityData.maxScore || 0,
+        time_spent: activityData.timeSpent || activityData.time_spent || 0,
+        timeSpent: activityData.timeSpent || activityData.time_spent || 0,
+        difficulty: activityData.difficulty || "basic",
+        sourceLanguage: activityData.sourceLanguage,
+        targetLanguage: activityData.targetLanguage,
+        language_pair: activityData.language_pair || {
+          source: activityData.sourceLanguage || "korean",
+          target: activityData.targetLanguage || "english",
+        },
+        accuracy: activityData.accuracy || 0,
+        success: activityData.success || false,
+        isCompleted: activityData.isCompleted || true,
+        timestamp: activityData.timestamp || serverTimestamp(),
+        completed_at: activityData.completed_at || serverTimestamp(),
+        playedAt: activityData.playedAt || serverTimestamp(),
+        metadata: {
+          duration:
+            activityData.gameDuration || activityData.sessionDuration || 0,
+          accuracy_rate: activityData.accuracyRate || 0,
+          performance_rating: activityData.performanceRating || "good",
+        },
+      };
+
+      await setDoc(userActivityRef, activityDoc);
+
+      // 활동에서 사용된 개념들에 대한 진도 업데이트
+      if (activityData.conceptIds && activityData.conceptIds.length > 0) {
+        switch (activityData.activity_type) {
+          case "game":
+            await this.updateUserProgressFromGame(userEmail, activityData);
+            break;
+          case "quiz":
+            await this.updateUserProgressFromQuiz(userEmail, activityData);
+            break;
+          case "learning":
+            await this.updateUserProgressFromLearning(userEmail, activityData);
+            break;
+        }
+      }
+
+      console.log("✅ 사용자 활동 추적 완료");
+    } catch (error) {
+      console.error("❌ 사용자 활동 추적 중 오류:", error);
+    }
+  }
+
+  /**
+   * 🎮 게임 기록 추적 및 진도 업데이트
+   */
+  async updateGameRecord(userEmail, gameData) {
+    try {
+      console.log("🎮 게임 기록 추적 시작:", gameData);
+
+      const gameRecordRef = doc(collection(db, "game_records"));
+
+      const activityDoc = {
+        user_email: userEmail,
+        userId: gameData.userId, // 진도 페이지 호환성
+        game_type: gameData.game_type || gameData.type, // "word-matching", "word-scramble", "memory-game"
+        gameType: gameData.gameType || gameData.game_type || gameData.type, // camelCase 호환성
         score: gameData.score || 0,
         max_score: gameData.maxScore || 0,
-        time_spent: gameData.timeSpent || 0,
+        time_spent: gameData.timeSpent || gameData.time_spent || 0,
+        timeSpent: gameData.timeSpent || gameData.time_spent || 0, // camelCase 호환성
         words_played: gameData.wordsPlayed || 0,
         correct_answers: gameData.correctAnswers || 0,
         total_answers: gameData.totalAnswers || 0,
         difficulty: gameData.difficulty || "basic",
-        language_pair: {
+        sourceLanguage: gameData.sourceLanguage,
+        targetLanguage: gameData.targetLanguage,
+        language_pair: gameData.language_pair || {
           source: gameData.sourceLanguage || "korean",
           target: gameData.targetLanguage || "english",
         },
-        completed_at: serverTimestamp(),
+        accuracy: gameData.accuracy || 0,
+        success: gameData.success || false,
+        isCompleted: gameData.isCompleted || true,
+        timestamp: gameData.timestamp || serverTimestamp(), // 진도 페이지용
+        completed_at: gameData.completed_at || serverTimestamp(), // game_activities용
+        playedAt: gameData.playedAt || serverTimestamp(), // 추가 호환성
         metadata: {
           game_duration: gameData.gameDuration || 0,
           accuracy_rate: gameData.accuracyRate || 0,
@@ -2581,16 +2708,16 @@ export class CollectionManager {
         },
       };
 
-      await setDoc(gameActivityRef, activityDoc);
+      await setDoc(gameRecordRef, activityDoc);
 
       // 게임에서 사용된 개념들에 대한 진도 업데이트
       if (gameData.conceptIds && gameData.conceptIds.length > 0) {
         await this.updateUserProgressFromGame(userEmail, gameData);
       }
 
-      console.log("✅ 게임 활동 추적 완료");
+      console.log("✅ 게임 기록 추적 완료");
     } catch (error) {
-      console.error("❌ 게임 활동 추적 중 오류:", error);
+      console.error("❌ 게임 기록 추적 중 오류:", error);
     }
   }
 
@@ -2607,7 +2734,7 @@ export class CollectionManager {
         updatedConcepts.add(conceptId);
 
         const progressId = `${userEmail}_${conceptId}`;
-        const progressRef = doc(db, "user_progress", progressId);
+        const progressRef = doc(db, "user_records", progressId);
 
         // 기존 진도 확인
         const progressDoc = await getDoc(progressRef);
@@ -2811,7 +2938,7 @@ export class CollectionManager {
 
       // 1. 사용자의 진도 데이터 조회
       const progressQuery = query(
-        collection(db, "user_progress"),
+        collection(db, "user_records"),
         where("user_email", "==", userEmail),
         limit(50) // 최근 학습한 개념들
       );
