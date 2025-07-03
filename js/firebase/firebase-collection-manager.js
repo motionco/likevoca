@@ -932,62 +932,117 @@ export class CollectionManager {
     }
   }
 
-  // 🎲 최적화된 랜덤 개념 조회 메서드
+  // 🎲 최적화된 랜덤 개념 조회 메서드 (randomField 활용)
   async getRandomConceptsOptimized(
     mappedUserLang,
     mappedTargetLang,
     difficulty,
     limitCount
   ) {
-    const concepts = [];
-    const maxAttempts = 3; // 최대 시도 횟수
-    let attempt = 0;
+    console.log("🎲 randomField를 활용한 게임용 랜덤 조회 시작...");
 
-    while (concepts.length < limitCount && attempt < maxAttempts) {
-      attempt++;
-      console.log(`🎲 랜덤 조회 시도 ${attempt}/${maxAttempts}`);
+    try {
+      console.log("🚀 randomField를 활용한 효율적인 조회...");
+      const concepts = [];
+      const maxAttempts = 3;
+      let attempt = 0;
 
-      try {
-        // 랜덤 시작점을 사용한 효율적 조회
-        const randomConcepts = await this.getRandomConceptsBatch(
-          mappedUserLang,
-          mappedTargetLang,
-          difficulty,
-          limitCount - concepts.length
-        );
-
-        // 중복 제거하면서 추가
-        for (const concept of randomConcepts) {
-          if (!concepts.find((c) => c.id === concept.id)) {
-            concepts.push(concept);
-            if (concepts.length >= limitCount) break;
-          }
-        }
+      while (concepts.length < limitCount && attempt < maxAttempts) {
+        attempt++;
+        const randomValue = Math.random();
 
         console.log(
-          `🎲 시도 ${attempt} 결과: ${randomConcepts.length}개 조회, 총 ${concepts.length}개 수집`
+          `🎲 시도 ${attempt}: randomField >= ${randomValue.toFixed(6)}`
         );
-      } catch (error) {
-        console.warn(`🎲 시도 ${attempt} 실패:`, error.message);
-      }
-    }
 
-    // 부족하면 기존 방식으로 보완
-    if (concepts.length < limitCount) {
-      console.log(
-        `🔄 랜덤 조회로 ${concepts.length}개만 수집됨. 기존 방식으로 보완 시도`
-      );
-      const fallbackConcepts = await this.getFallbackConcepts(
+        // randomField 기반 쿼리 구성
+        let conceptsQuery = query(
+          collection(db, "concepts"),
+          where("randomField", ">=", randomValue),
+          limit(limitCount * 2)
+        );
+
+        // 난이도 조건 추가
+        if (difficulty && difficulty !== "all" && difficulty !== "basic") {
+          conceptsQuery = query(
+            collection(db, "concepts"),
+            where("randomField", ">=", randomValue),
+            where("concept_info.difficulty", "==", difficulty),
+            limit(limitCount * 2)
+          );
+        }
+
+        const snapshot = await getDocs(conceptsQuery);
+        console.log(`📊 첫 번째 쿼리로 ${snapshot.size}개 문서 조회`);
+
+        // 부족하면 반대 방향으로 조회
+        if (snapshot.size < limitCount && randomValue > 0.1) {
+          const reverseQuery = query(
+            collection(db, "concepts"),
+            where("randomField", "<", randomValue),
+            orderBy("randomField", "desc"),
+            limit(limitCount * 2)
+          );
+
+          const reverseSnapshot = await getDocs(reverseQuery);
+          console.log(
+            `📊 역방향 쿼리로 추가 ${reverseSnapshot.size}개 문서 조회`
+          );
+
+          reverseSnapshot.forEach((doc) => snapshot.docs.push(doc));
+        }
+
+        // 유효한 개념 필터링 및 추가
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          if (
+            data.expressions?.[mappedUserLang] &&
+            data.expressions?.[mappedTargetLang] &&
+            !concepts.find((c) => c.id === doc.id)
+          ) {
+            concepts.push({
+              id: doc.id,
+              conceptInfo: data.concept_info || {
+                domain: data.domain || "general",
+                category: data.category || "common",
+                difficulty: data.concept_info?.difficulty || "basic",
+                unicode_emoji: data.emoji || "📚",
+              },
+              expressions: {
+                [mappedUserLang]: data.expressions[mappedUserLang],
+                [mappedTargetLang]: data.expressions[mappedTargetLang],
+              },
+              media: data.media,
+              gameMetadata: {
+                difficulty: data.concept_info?.difficulty || "basic",
+                domain: data.concept_info?.domain || "general",
+                category: data.concept_info?.category || "common",
+              },
+            });
+          }
+        });
+
+        console.log(`🎯 시도 ${attempt} 결과: 총 ${concepts.length}개 수집`);
+        if (concepts.length >= limitCount) break;
+      }
+
+      // Fisher-Yates 알고리즘으로 무작위 섞기
+      for (let i = concepts.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [concepts[i], concepts[j]] = [concepts[j], concepts[i]];
+      }
+
+      return concepts.slice(0, limitCount);
+    } catch (error) {
+      console.error("❌ randomField 기반 조회 실패:", error);
+      console.log("🔄 기존 방식으로 폴백...");
+      return await this.getFallbackConcepts(
         mappedUserLang,
         mappedTargetLang,
         difficulty,
-        limitCount - concepts.length,
-        concepts.map((c) => c.id) // 이미 선택된 ID들 제외
+        limitCount
       );
-      concepts.push(...fallbackConcepts);
     }
-
-    return concepts;
   }
 
   // 🎲 랜덤 배치 조회
@@ -1804,15 +1859,57 @@ export class CollectionManager {
    */
   async getConceptsOnly(limitCount = 50) {
     try {
-      console.log("🔍 concepts 컬렉션 조회 시작");
-      const conceptsRef = collection(db, "concepts");
-      const q = query(conceptsRef, limit(limitCount));
-      const snapshot = await getDocs(q);
+      console.log("🔍 concepts 컬렉션 조회 시작 (randomField 활용)");
 
-      const concepts = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      let concepts = [];
+
+      console.log("🎲 randomField를 활용한 효율적인 조회...");
+
+      // randomField 기반 랜덤 조회
+      const randomValue = Math.random();
+      console.log(`🎲 randomField >= ${randomValue.toFixed(6)}로 조회`);
+
+      let conceptsQuery = query(
+        collection(db, "concepts"),
+        where("randomField", ">=", randomValue),
+        limit(limitCount)
+      );
+
+      let snapshot = await getDocs(conceptsQuery);
+      console.log(`📊 첫 번째 쿼리로 ${snapshot.size}개 문서 조회`);
+
+      // 부족하면 반대 방향으로 추가 조회
+      if (snapshot.size < limitCount && randomValue > 0.1) {
+        const reverseQuery = query(
+          collection(db, "concepts"),
+          where("randomField", "<", randomValue),
+          orderBy("randomField", "desc"),
+          limit(limitCount - snapshot.size)
+        );
+
+        const reverseSnapshot = await getDocs(reverseQuery);
+        console.log(
+          `📊 역방향 쿼리로 추가 ${reverseSnapshot.size}개 문서 조회`
+        );
+
+        // 두 결과를 합치기
+        const allDocs = [...snapshot.docs, ...reverseSnapshot.docs];
+        concepts = allDocs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+      } else {
+        concepts = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+      }
+
+      // Fisher-Yates 알고리즘으로 무작위 섞기
+      for (let i = concepts.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [concepts[i], concepts[j]] = [concepts[j], concepts[i]];
+      }
 
       console.log(`📊 조회된 개념 수: ${concepts.length}`);
 
@@ -1842,11 +1939,60 @@ export class CollectionManager {
 
   async getExamplesOnly(limitCount = 50) {
     try {
-      const examplesRef = collection(db, "examples");
-      const q = query(examplesRef, limit(limitCount));
-      const snapshot = await getDocs(q);
+      console.log("🔍 examples 컬렉션 조회 시작 (randomField 활용)");
 
-      return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      let examples = [];
+
+      console.log("🎲 randomField를 활용한 효율적인 조회...");
+
+      // randomField 기반 랜덤 조회
+      const randomValue = Math.random();
+      console.log(`🎲 randomField >= ${randomValue.toFixed(6)}로 조회`);
+
+      let examplesQuery = query(
+        collection(db, "examples"),
+        where("randomField", ">=", randomValue),
+        limit(limitCount)
+      );
+
+      let snapshot = await getDocs(examplesQuery);
+      console.log(`📊 첫 번째 쿼리로 ${snapshot.size}개 문서 조회`);
+
+      // 부족하면 반대 방향으로 추가 조회
+      if (snapshot.size < limitCount && randomValue > 0.1) {
+        const reverseQuery = query(
+          collection(db, "examples"),
+          where("randomField", "<", randomValue),
+          orderBy("randomField", "desc"),
+          limit(limitCount - snapshot.size)
+        );
+
+        const reverseSnapshot = await getDocs(reverseQuery);
+        console.log(
+          `📊 역방향 쿼리로 추가 ${reverseSnapshot.size}개 문서 조회`
+        );
+
+        // 두 결과를 합치기
+        const allDocs = [...snapshot.docs, ...reverseSnapshot.docs];
+        examples = allDocs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+      } else {
+        examples = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+      }
+
+      // Fisher-Yates 알고리즘으로 무작위 섞기
+      for (let i = examples.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [examples[i], examples[j]] = [examples[j], examples[i]];
+      }
+
+      console.log(`📊 조회된 예문 수: ${examples.length}`);
+      return examples;
     } catch (error) {
       console.error("예문 조회 오류:", error);
       return [];
@@ -1855,11 +2001,60 @@ export class CollectionManager {
 
   async getGrammarPatternsOnly(limitCount = 50) {
     try {
-      const patternsRef = collection(db, "grammar");
-      const q = query(patternsRef, limit(limitCount));
-      const snapshot = await getDocs(q);
+      console.log("🔍 grammar 컬렉션 조회 시작 (randomField 활용)");
 
-      return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      let patterns = [];
+
+      console.log("🎲 randomField를 활용한 효율적인 조회...");
+
+      // randomField 기반 랜덤 조회
+      const randomValue = Math.random();
+      console.log(`🎲 randomField >= ${randomValue.toFixed(6)}로 조회`);
+
+      let patternsQuery = query(
+        collection(db, "grammar"),
+        where("randomField", ">=", randomValue),
+        limit(limitCount)
+      );
+
+      let snapshot = await getDocs(patternsQuery);
+      console.log(`📊 첫 번째 쿼리로 ${snapshot.size}개 문서 조회`);
+
+      // 부족하면 반대 방향으로 추가 조회
+      if (snapshot.size < limitCount && randomValue > 0.1) {
+        const reverseQuery = query(
+          collection(db, "grammar"),
+          where("randomField", "<", randomValue),
+          orderBy("randomField", "desc"),
+          limit(limitCount - snapshot.size)
+        );
+
+        const reverseSnapshot = await getDocs(reverseQuery);
+        console.log(
+          `📊 역방향 쿼리로 추가 ${reverseSnapshot.size}개 문서 조회`
+        );
+
+        // 두 결과를 합치기
+        const allDocs = [...snapshot.docs, ...reverseSnapshot.docs];
+        patterns = allDocs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+      } else {
+        patterns = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+      }
+
+      // Fisher-Yates 알고리즘으로 무작위 섞기
+      for (let i = patterns.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [patterns[i], patterns[j]] = [patterns[j], patterns[i]];
+      }
+
+      console.log(`📊 조회된 문법 패턴 수: ${patterns.length}`);
+      return patterns;
     } catch (error) {
       console.error("문법 패턴 조회 오류:", error);
       return [];
@@ -1871,6 +2066,8 @@ export class CollectionManager {
    */
   async createConcept(conceptData) {
     try {
+      console.log("🎲 createConcept 함수 호출됨 - randomField 자동 추가 버전");
+
       const conceptRef = doc(collection(db, "concepts"));
       const conceptId = conceptRef.id;
 
@@ -1888,10 +2085,14 @@ export class CollectionManager {
         };
       }
 
+      const randomFieldValue = conceptData.randomField || Math.random();
+      console.log(`🎲 randomField 값: ${randomFieldValue.toFixed(6)}`);
+
       const conceptDoc = {
         concept_info: conceptInfo,
         expressions: conceptData.expressions || {},
         representative_example: conceptData.representative_example || null,
+        randomField: randomFieldValue, // 🎲 효율적인 랜덤 쿼리를 위한 필드
         created_at: serverTimestamp(),
       };
 
@@ -1901,6 +2102,8 @@ export class CollectionManager {
       }
 
       console.log("💾 Firebase에 저장될 데이터:", conceptDoc);
+      console.log("🎲 randomField 포함 여부:", !!conceptDoc.randomField);
+
       await setDoc(conceptRef, conceptDoc);
       console.log(`✓ 개념 생성 완료: ${conceptId}`);
       return conceptId;
@@ -1920,6 +2123,7 @@ export class CollectionManager {
 
       const patternDoc = {
         ...patternData,
+        randomField: patternData.randomField || Math.random(), // 🎲 효율적인 랜덤 쿼리를 위한 필드
         created_at: serverTimestamp(),
       };
 
@@ -1942,6 +2146,7 @@ export class CollectionManager {
 
       const exampleDoc = {
         ...exampleData,
+        randomField: exampleData.randomField || Math.random(), // 🎲 효율적인 랜덤 쿼리를 위한 필드
         created_at: serverTimestamp(),
       };
 

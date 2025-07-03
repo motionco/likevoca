@@ -967,6 +967,9 @@ export const conceptUtils = {
         // 추가 예문들 (다국어 단어장과 완전히 동일한 구조)
         examples: conceptData.examples || [],
 
+        // 🎲 효율적인 랜덤 쿼리를 위한 필드 (다국어 단어장과 동일)
+        randomField: Math.random(),
+
         // 시간 정보 (단일화)
         created_at: new Date(),
       };

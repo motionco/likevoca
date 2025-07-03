@@ -2380,104 +2380,57 @@ async function loadVocabularyData() {
         "concepts"
       );
 
-      // 1. 먼저 randomField가 있는 문서가 있는지 확인
-      const testQuery = window.firebaseInit.query(
+      console.log("🚀 randomField를 활용한 효율적인 조회 시작...");
+
+      // 효율적인 랜덤 쿼리 (최대 10개만 읽음)
+      const randomValue = Math.random();
+      const randomQuery = window.firebaseInit.query(
         conceptsRef,
-        window.firebaseInit.where("randomField", ">=", 0),
-        window.firebaseInit.limit(1)
+        window.firebaseInit.where("randomField", ">=", randomValue),
+        window.firebaseInit.limit(10)
       );
-      const testSnapshot = await window.firebaseInit.getDocs(testQuery);
 
-      if (testSnapshot.size > 0) {
-        console.log("🚀 randomField를 활용한 효율적인 조회 시작...");
+      const randomSnapshot = await window.firebaseInit.getDocs(randomQuery);
 
-        // 2. 효율적인 랜덤 쿼리 (최대 10개만 읽음)
-        const randomValue = Math.random();
-        const randomQuery = window.firebaseInit.query(
-          conceptsRef,
-          window.firebaseInit.where("randomField", ">=", randomValue),
-          window.firebaseInit.limit(10)
+      if (randomSnapshot.size >= 10) {
+        // 충분한 데이터가 있는 경우
+        data = randomSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        console.log(
+          `💰 효율적인 조회 성공: ${data.length}개 단어 (비용 절약!)`
         );
-
-        const randomSnapshot = await window.firebaseInit.getDocs(randomQuery);
-
-        if (randomSnapshot.size >= 10) {
-          // 충분한 데이터가 있는 경우
-          data = randomSnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-          console.log(
-            `💰 효율적인 조회 성공: ${data.length}개 단어 (비용 절약!)`
-          );
-        } else {
-          // 충분하지 않은 경우 추가 조회
-          const additionalQuery = window.firebaseInit.query(
-            conceptsRef,
-            window.firebaseInit.where("randomField", "<", randomValue),
-            window.firebaseInit.limit(10 - randomSnapshot.size)
-          );
-
-          const additionalSnapshot = await window.firebaseInit.getDocs(
-            additionalQuery
-          );
-
-          const firstBatch = randomSnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-
-          const secondBatch = additionalSnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-
-          data = [...firstBatch, ...secondBatch];
-          console.log(
-            `💰 효율적인 조회 성공: ${data.length}개 단어 (2개 쿼리)`
-          );
-        }
-
-        // Fisher-Yates 셔플 적용
-        for (let i = data.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [data[i], data[j]] = [data[j], data[i]];
-        }
       } else {
-        console.log("⚠️ randomField가 없음. 기존 방식 사용...");
-
-        // 3. 기존 방식 (전체 컬렉션 조회) - 비효율적
-        const totalConceptsSnapshot = await window.firebaseInit.getDocs(
-          conceptsRef
+        // 충분하지 않은 경우 추가 조회
+        const additionalQuery = window.firebaseInit.query(
+          conceptsRef,
+          window.firebaseInit.where("randomField", "<", randomValue),
+          window.firebaseInit.limit(10 - randomSnapshot.size)
         );
-        const totalConcepts = totalConceptsSnapshot.size;
 
-        console.log(`📊 전체 개념 수: ${totalConcepts}개`);
+        const additionalSnapshot = await window.firebaseInit.getDocs(
+          additionalQuery
+        );
 
-        if (totalConcepts > 0) {
-          // 전체 문서에서 랜덤 선택
-          const allDocs = totalConceptsSnapshot.docs;
-          const shuffledDocs = [...allDocs];
+        const firstBatch = randomSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
 
-          // Fisher-Yates 알고리즘으로 셔플
-          for (let i = shuffledDocs.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [shuffledDocs[i], shuffledDocs[j]] = [
-              shuffledDocs[j],
-              shuffledDocs[i],
-            ];
-          }
+        const secondBatch = additionalSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
 
-          // 최종 10개 선택
-          data = shuffledDocs.slice(0, 10).map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
+        data = [...firstBatch, ...secondBatch];
+        console.log(`💰 효율적인 조회 성공: ${data.length}개 단어 (2개 쿼리)`);
+      }
 
-          console.log(
-            `💸 기존 방식 사용: ${data.length}개 단어 (전체 ${totalConcepts}개 읽음)`
-          );
-        }
+      // Fisher-Yates 셔플 적용
+      for (let i = data.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [data[i], data[j]] = [data[j], data[i]];
       }
 
       console.log(
@@ -2545,136 +2498,81 @@ async function loadGrammarData() {
     let grammarData = [];
 
     try {
-      // 1. randomField가 있는 문서가 있는지 확인
-      const testQuery = window.firebaseInit.query(
+      console.log("🚀 문법 패턴 - randomField를 활용한 효율적인 조회...");
+
+      // 효율적인 랜덤 쿼리 (최대 20개만 읽음)
+      const randomValue = Math.random();
+      const randomQuery = window.firebaseInit.query(
         grammarRef,
-        window.firebaseInit.where("randomField", ">=", 0),
-        window.firebaseInit.limit(1)
+        window.firebaseInit.where("randomField", ">=", randomValue),
+        window.firebaseInit.limit(20)
       );
-      const testSnapshot = await window.firebaseInit.getDocs(testQuery);
 
-      if (testSnapshot.size > 0) {
-        console.log("🚀 문법 패턴 - randomField를 활용한 효율적인 조회...");
+      const randomSnapshot = await window.firebaseInit.getDocs(randomQuery);
 
-        // 2. 효율적인 랜덤 쿼리 (최대 20개만 읽음)
-        const randomValue = Math.random();
-        const randomQuery = window.firebaseInit.query(
-          grammarRef,
-          window.firebaseInit.where("randomField", ">=", randomValue),
-          window.firebaseInit.limit(20)
-        );
-
-        const randomSnapshot = await window.firebaseInit.getDocs(randomQuery);
-
-        if (randomSnapshot.size >= 10) {
-          // 충분한 데이터가 있는 경우
-          grammarData = randomSnapshot.docs.map((doc) => {
-            const docData = doc.data();
-            return {
-              id: doc.id,
-              pattern_id: doc.id,
-              pattern_name: docData.pattern_name || "문법 패턴",
-              pattern_type: docData.pattern_type || "basic",
-              difficulty: docData.difficulty || "intermediate",
-              domain: docData.domain || "daily",
-              ...docData,
-            };
-          });
-          console.log(
-            `💰 문법 패턴 효율적인 조회 성공: ${grammarData.length}개`
-          );
-        } else {
-          // 충분하지 않은 경우 추가 조회
-          const additionalQuery = window.firebaseInit.query(
-            grammarRef,
-            window.firebaseInit.where("randomField", "<", randomValue),
-            window.firebaseInit.limit(20 - randomSnapshot.size)
-          );
-
-          const additionalSnapshot = await window.firebaseInit.getDocs(
-            additionalQuery
-          );
-
-          const firstBatch = randomSnapshot.docs.map((doc) => {
-            const docData = doc.data();
-            return {
-              id: doc.id,
-              pattern_id: doc.id,
-              pattern_name: docData.pattern_name || "문법 패턴",
-              pattern_type: docData.pattern_type || "basic",
-              difficulty: docData.difficulty || "intermediate",
-              domain: docData.domain || "daily",
-              ...docData,
-            };
-          });
-
-          const secondBatch = additionalSnapshot.docs.map((doc) => {
-            const docData = doc.data();
-            return {
-              id: doc.id,
-              pattern_id: doc.id,
-              pattern_name: docData.pattern_name || "문법 패턴",
-              pattern_type: docData.pattern_type || "basic",
-              difficulty: docData.difficulty || "intermediate",
-              domain: docData.domain || "daily",
-              ...docData,
-            };
-          });
-
-          grammarData = [...firstBatch, ...secondBatch];
-          console.log(
-            `💰 문법 패턴 효율적인 조회 성공: ${grammarData.length}개 (2개 쿼리)`
-          );
-        }
-
-        // Fisher-Yates 셔플 적용
-        for (let i = grammarData.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [grammarData[i], grammarData[j]] = [grammarData[j], grammarData[i]];
-        }
+      if (randomSnapshot.size >= 10) {
+        // 충분한 데이터가 있는 경우
+        grammarData = randomSnapshot.docs.map((doc) => {
+          const docData = doc.data();
+          return {
+            id: doc.id,
+            pattern_id: doc.id,
+            pattern_name: docData.pattern_name || "문법 패턴",
+            pattern_type: docData.pattern_type || "basic",
+            difficulty: docData.difficulty || "intermediate",
+            domain: docData.domain || "daily",
+            ...docData,
+          };
+        });
+        console.log(`💰 문법 패턴 효율적인 조회 성공: ${grammarData.length}개`);
       } else {
-        console.log("⚠️ 문법 패턴 - randomField가 없음. 기존 방식 사용...");
-
-        // 3. 기존 방식 (전체 컬렉션 조회) - 비효율적
-        const totalGrammarSnapshot = await window.firebaseInit.getDocs(
-          grammarRef
+        // 충분하지 않은 경우 추가 조회
+        const additionalQuery = window.firebaseInit.query(
+          grammarRef,
+          window.firebaseInit.where("randomField", "<", randomValue),
+          window.firebaseInit.limit(20 - randomSnapshot.size)
         );
-        const totalGrammar = totalGrammarSnapshot.size;
 
-        console.log(`📊 전체 문법 패턴 수: ${totalGrammar}개`);
+        const additionalSnapshot = await window.firebaseInit.getDocs(
+          additionalQuery
+        );
 
-        if (totalGrammar > 0) {
-          // 전체 문서에서 랜덤 선택
-          const allDocs = totalGrammarSnapshot.docs;
-          const shuffledDocs = [...allDocs];
+        const firstBatch = randomSnapshot.docs.map((doc) => {
+          const docData = doc.data();
+          return {
+            id: doc.id,
+            pattern_id: doc.id,
+            pattern_name: docData.pattern_name || "문법 패턴",
+            pattern_type: docData.pattern_type || "basic",
+            difficulty: docData.difficulty || "intermediate",
+            domain: docData.domain || "daily",
+            ...docData,
+          };
+        });
 
-          // Fisher-Yates 알고리즘으로 셔플
-          for (let i = shuffledDocs.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [shuffledDocs[i], shuffledDocs[j]] = [
-              shuffledDocs[j],
-              shuffledDocs[i],
-            ];
-          }
+        const secondBatch = additionalSnapshot.docs.map((doc) => {
+          const docData = doc.data();
+          return {
+            id: doc.id,
+            pattern_id: doc.id,
+            pattern_name: docData.pattern_name || "문법 패턴",
+            pattern_type: docData.pattern_type || "basic",
+            difficulty: docData.difficulty || "intermediate",
+            domain: docData.domain || "daily",
+            ...docData,
+          };
+        });
 
-          // 최대 20개 선택
-          grammarData = shuffledDocs.slice(0, 20).map((doc) => {
-            const docData = doc.data();
-            return {
-              id: doc.id,
-              pattern_id: doc.id,
-              pattern_name: docData.pattern_name || "문법 패턴",
-              pattern_type: docData.pattern_type || "basic",
-              difficulty: docData.difficulty || "intermediate",
-              domain: docData.domain || "daily",
-              ...docData,
-            };
-          });
+        grammarData = [...firstBatch, ...secondBatch];
+        console.log(
+          `💰 문법 패턴 효율적인 조회 성공: ${grammarData.length}개 (2개 쿼리)`
+        );
+      }
 
-          console.log(
-            `💸 문법 패턴 기존 방식 사용: ${grammarData.length}개 (전체 ${totalGrammar}개 읽음)`
-          );
-        }
+      // Fisher-Yates 셔플 적용
+      for (let i = grammarData.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [grammarData[i], grammarData[j]] = [grammarData[j], grammarData[i]];
       }
     } catch (error) {
       console.error("❌ 문법 패턴 랜덤 조회 실패:", error);
@@ -2731,178 +2629,109 @@ async function loadReadingData() {
     let exampleData = [];
 
     try {
-      // 1. randomField가 있는 문서가 있는지 확인
-      const testQuery = window.firebaseInit.query(
+      console.log("🚀 독해 예문 - randomField를 활용한 효율적인 조회...");
+
+      // 효율적인 랜덤 쿼리 (최대 15개만 읽음)
+      const randomValue = Math.random();
+      const randomQuery = window.firebaseInit.query(
         examplesRef,
-        window.firebaseInit.where("randomField", ">=", 0),
-        window.firebaseInit.limit(1)
+        window.firebaseInit.where("randomField", ">=", randomValue),
+        window.firebaseInit.limit(15)
       );
-      const testSnapshot = await window.firebaseInit.getDocs(testQuery);
 
-      if (testSnapshot.size > 0) {
-        console.log("🚀 독해 예문 - randomField를 활용한 효율적인 조회...");
+      const randomSnapshot = await window.firebaseInit.getDocs(randomQuery);
 
-        // 2. 효율적인 랜덤 쿼리 (최대 15개만 읽음)
-        const randomValue = Math.random();
-        const randomQuery = window.firebaseInit.query(
-          examplesRef,
-          window.firebaseInit.where("randomField", ">=", randomValue),
-          window.firebaseInit.limit(15)
-        );
+      if (randomSnapshot.size >= 10) {
+        // 충분한 데이터가 있는 경우
+        exampleData = randomSnapshot.docs
+          .map((doc) => {
+            const docData = doc.data();
+            console.log("📖 원본 예문 데이터:", docData);
 
-        const randomSnapshot = await window.firebaseInit.getDocs(randomQuery);
+            // 지역화된 예문 생성
+            const localizedExample = getLocalizedReadingExample({
+              id: doc.id,
+              ...docData,
+            });
+            console.log("📖 지역화된 예문:", localizedExample);
 
-        if (randomSnapshot.size >= 10) {
-          // 충분한 데이터가 있는 경우
-          exampleData = randomSnapshot.docs
-            .map((doc) => {
-              const docData = doc.data();
-              console.log("📖 원본 예문 데이터:", docData);
-
-              // 지역화된 예문 생성
-              const localizedExample = getLocalizedReadingExample({
+            if (localizedExample) {
+              const processedData = {
                 id: doc.id,
-                ...docData,
-              });
-              console.log("📖 지역화된 예문:", localizedExample);
+                example_id: doc.id,
+                ...localizedExample,
+                tags: [], // 빈 태그 배열로 초기화
+              };
+              console.log("📖 처리된 예문 데이터:", processedData);
+              return processedData;
+            }
+            return null;
+          })
+          .filter(Boolean);
 
-              if (localizedExample) {
-                const processedData = {
-                  id: doc.id,
-                  example_id: doc.id,
-                  ...localizedExample,
-                  tags: [], // 빈 태그 배열로 초기화
-                };
-                console.log("📖 처리된 예문 데이터:", processedData);
-                return processedData;
-              }
-              return null;
-            })
-            .filter(Boolean);
-
-          console.log(
-            `💰 독해 예문 효율적인 조회 성공: ${exampleData.length}개`
-          );
-        } else {
-          // 충분하지 않은 경우 추가 조회
-          const additionalQuery = window.firebaseInit.query(
-            examplesRef,
-            window.firebaseInit.where("randomField", "<", randomValue),
-            window.firebaseInit.limit(15 - randomSnapshot.size)
-          );
-
-          const additionalSnapshot = await window.firebaseInit.getDocs(
-            additionalQuery
-          );
-
-          const firstBatch = randomSnapshot.docs
-            .map((doc) => {
-              const docData = doc.data();
-              const localizedExample = getLocalizedReadingExample({
-                id: doc.id,
-                ...docData,
-              });
-
-              if (localizedExample) {
-                return {
-                  id: doc.id,
-                  example_id: doc.id,
-                  ...localizedExample,
-                  tags: [],
-                };
-              }
-              return null;
-            })
-            .filter(Boolean);
-
-          const secondBatch = additionalSnapshot.docs
-            .map((doc) => {
-              const docData = doc.data();
-              const localizedExample = getLocalizedReadingExample({
-                id: doc.id,
-                ...docData,
-              });
-
-              if (localizedExample) {
-                return {
-                  id: doc.id,
-                  example_id: doc.id,
-                  ...localizedExample,
-                  tags: [],
-                };
-              }
-              return null;
-            })
-            .filter(Boolean);
-
-          exampleData = [...firstBatch, ...secondBatch];
-          console.log(
-            `💰 독해 예문 효율적인 조회 성공: ${exampleData.length}개 (2개 쿼리)`
-          );
-        }
-
-        // Fisher-Yates 셔플 적용
-        for (let i = exampleData.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [exampleData[i], exampleData[j]] = [exampleData[j], exampleData[i]];
-        }
+        console.log(`💰 독해 예문 효율적인 조회 성공: ${exampleData.length}개`);
       } else {
-        console.log("⚠️ 독해 예문 - randomField가 없음. 기존 방식 사용...");
-
-        // 3. 기존 방식 (전체 컬렉션 조회) - 비효율적
-        const totalExamplesSnapshot = await window.firebaseInit.getDocs(
-          examplesRef
+        // 충분하지 않은 경우 추가 조회
+        const additionalQuery = window.firebaseInit.query(
+          examplesRef,
+          window.firebaseInit.where("randomField", "<", randomValue),
+          window.firebaseInit.limit(15 - randomSnapshot.size)
         );
-        const totalExamples = totalExamplesSnapshot.size;
 
-        console.log(`📊 전체 독해 예문 수: ${totalExamples}개`);
+        const additionalSnapshot = await window.firebaseInit.getDocs(
+          additionalQuery
+        );
 
-        if (totalExamples > 0) {
-          // 전체 문서에서 랜덤 선택
-          const allDocs = totalExamplesSnapshot.docs;
-          const shuffledDocs = [...allDocs];
+        const firstBatch = randomSnapshot.docs
+          .map((doc) => {
+            const docData = doc.data();
+            const localizedExample = getLocalizedReadingExample({
+              id: doc.id,
+              ...docData,
+            });
 
-          // Fisher-Yates 알고리즘으로 셔플
-          for (let i = shuffledDocs.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [shuffledDocs[i], shuffledDocs[j]] = [
-              shuffledDocs[j],
-              shuffledDocs[i],
-            ];
-          }
-
-          // 최대 15개 선택
-          exampleData = shuffledDocs
-            .slice(0, 15)
-            .map((doc) => {
-              const docData = doc.data();
-              console.log("📖 원본 예문 데이터:", docData);
-
-              // 지역화된 예문 생성
-              const localizedExample = getLocalizedReadingExample({
+            if (localizedExample) {
+              return {
                 id: doc.id,
-                ...docData,
-              });
-              console.log("📖 지역화된 예문:", localizedExample);
+                example_id: doc.id,
+                ...localizedExample,
+                tags: [],
+              };
+            }
+            return null;
+          })
+          .filter(Boolean);
 
-              if (localizedExample) {
-                const processedData = {
-                  id: doc.id,
-                  example_id: doc.id,
-                  ...localizedExample,
-                  tags: [], // 빈 태그 배열로 초기화
-                };
-                console.log("📖 처리된 예문 데이터:", processedData);
-                return processedData;
-              }
-              return null;
-            })
-            .filter(Boolean);
+        const secondBatch = additionalSnapshot.docs
+          .map((doc) => {
+            const docData = doc.data();
+            const localizedExample = getLocalizedReadingExample({
+              id: doc.id,
+              ...docData,
+            });
 
-          console.log(
-            `💸 독해 예문 기존 방식 사용: ${exampleData.length}개 (전체 ${totalExamples}개 읽음)`
-          );
-        }
+            if (localizedExample) {
+              return {
+                id: doc.id,
+                example_id: doc.id,
+                ...localizedExample,
+                tags: [],
+              };
+            }
+            return null;
+          })
+          .filter(Boolean);
+
+        exampleData = [...firstBatch, ...secondBatch];
+        console.log(
+          `💰 독해 예문 효율적인 조회 성공: ${exampleData.length}개 (2개 쿼리)`
+        );
+      }
+
+      // Fisher-Yates 셔플 적용
+      for (let i = exampleData.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [exampleData[i], exampleData[j]] = [exampleData[j], exampleData[i]];
       }
     } catch (error) {
       console.error("❌ 독해 예문 랜덤 조회 실패:", error);

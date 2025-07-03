@@ -273,6 +273,7 @@ async function uploadConcepts(data) {
         },
         expressions: conceptData.expressions || {},
         representative_example: conceptData.representative_example || null,
+        randomField: Math.random(), // 🎲 효율적인 랜덤 쿼리를 위한 필드
         created_at: serverTimestamp(),
       };
 
@@ -311,6 +312,7 @@ async function uploadExamples(data) {
           : ["casual"],
         purpose: exampleData.purpose || null,
         translations: exampleData.translations || {},
+        randomField: Math.random(), // 🎲 효율적인 랜덤 쿼리를 위한 필드
         created_at: serverTimestamp(),
       };
 
@@ -350,6 +352,7 @@ async function uploadGrammarPatterns(data) {
         purpose: patternData.purpose || "description",
         pattern: patternData.pattern || {},
         example: patternData.example || {},
+        randomField: Math.random(), // 🎲 효율적인 랜덤 쿼리를 위한 필드
         created_at: patternData.created_at || new Date().toISOString(),
       };
 
