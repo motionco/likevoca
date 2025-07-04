@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
@@ -15,9 +15,8 @@
   <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/profile" />
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/profile.css">
-  <script type="module" src="components/js/navbar.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/profile.css">
 </head>
 <body class="bg-gray-100">
   <!-- 네비게이션바 컨테이너 -->
@@ -29,7 +28,7 @@
       
       <div id="auth-required" class="p-6 bg-yellow-100 rounded-lg border border-yellow-300 mb-4">
         <p class="text-lg">このページを表示するにはログインが必要です。</p>
-        <a href="login.html" class="btn btn-primary mt-3 inline-block">ログイン</a>
+        <a href="#" onclick="window.redirectToLogin()" class="btn btn-primary mt-3 inline-block">ログイン</a>
       </div>
       
       <div id="profile-content">
@@ -95,10 +94,10 @@
   </footer>
 
   <!-- Firebase -->
-  <script type="module" src="js/firebase/firebase-init.js"></script>
-  <script type="module" src="js/profile.js"></script>
-  
-  
+  <script type="module" src="../../js/firebase/firebase-init.js"></script>
+  <script type="module" src="../../utils/language-utils.js"></script>
+  <script type="module" src="../../js/language-init.js"></script>
+  <script type="module" src="../../js/profile.js"></script>
+  <script type="module" src="../../components/js/navbar.js"></script>
 </body>
 </html> 
-

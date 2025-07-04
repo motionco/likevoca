@@ -213,8 +213,25 @@ const domainTranslations = {
 
 // 개념 카드 생성 함수 (확장된 구조 지원 및 디버깅 개선)
 function createConceptCard(concept) {
-  const sourceLanguage = document.getElementById("source-language").value;
-  const targetLanguage = document.getElementById("target-language").value;
+  // 단어장 페이지의 실제 요소 ID 사용
+  const sourceLanguageElement = document.getElementById("language-filter");
+  const targetLanguageElement = document.getElementById(
+    "translation-language-filter"
+  );
+
+  // 요소가 없는 경우 기본값 사용
+  const sourceLanguage = sourceLanguageElement
+    ? sourceLanguageElement.value === "all"
+      ? "korean"
+      : sourceLanguageElement.value
+    : "korean";
+  const targetLanguage = targetLanguageElement
+    ? targetLanguageElement.value === "all"
+      ? "english"
+      : targetLanguageElement.value
+    : "english";
+
+  console.log("카드 생성 - 언어 설정:", { sourceLanguage, targetLanguage });
 
   // 새로운 구조와 기존 구조 모두 지원
   const sourceExpression = concept.expressions?.[sourceLanguage] || {};
@@ -222,6 +239,10 @@ function createConceptCard(concept) {
 
   // 빈 표현인 경우 건너뛰기
   if (!sourceExpression.word || !targetExpression.word) {
+    console.log("카드 생성 건너뛰기 - 빈 표현:", {
+      sourceExpression,
+      targetExpression,
+    });
     return "";
   }
 
@@ -482,8 +503,12 @@ function displayConceptList() {
     .map((concept) => createConceptCard(concept))
     .filter((html) => html); // 빈 HTML 제거
 
-  // HTML 삽입
-  conceptList.innerHTML = cardHTMLs.join("");
+  // HTML 삽입 (그리드 레이아웃 적용)
+  conceptList.innerHTML = `
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      ${cardHTMLs.join("")}
+    </div>
+  `;
 
   // 북마크 UI 업데이트
   updateBookmarkUI();
@@ -1841,8 +1866,8 @@ function setupEventListeners() {
     sortOption: document.getElementById("sort-option"),
     swapButton: document.getElementById("swap-languages"),
     loadMoreButton: document.getElementById("load-more"),
-    addConceptButton: document.getElementById("add-concept"),
-    bulkAddButton: document.getElementById("bulk-add-concept"),
+    addConceptButton: document.getElementById("add-concept-btn"),
+    bulkAddButton: document.getElementById("bulk-add-btn"),
   };
 
   // 모든 요소가 제대로 찾아졌는지 확인
@@ -1900,7 +1925,7 @@ function setupEventListeners() {
     });
     console.log("✅ 새 개념 추가 버튼 이벤트 리스너 등록 완료");
   } else {
-    console.error("❌ add-concept 버튼 요소를 찾을 수 없습니다");
+    console.error("❌ add-concept-btn 버튼 요소를 찾을 수 없습니다");
   }
 
   // 대량 개념 추가 버튼 이벤트
@@ -1917,7 +1942,7 @@ function setupEventListeners() {
     });
     console.log("✅ 대량 개념 추가 버튼 이벤트 리스너 등록 완료");
   } else {
-    console.error("❌ bulk-add-concept 버튼 요소를 찾을 수 없습니다");
+    console.error("❌ bulk-add-btn 버튼 요소를 찾을 수 없습니다");
   }
 
   // 개념 저장 이벤트 리스너 (모달에서 호출)
