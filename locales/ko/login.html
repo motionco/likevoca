@@ -86,7 +86,7 @@
               class="h-4 w-4 text-[#4B63AC] border-gray-300 rounded"
             /><span class="ml-2 text-sm text-gray-700">자동 로그인</span>
           </label>
-          <a href="forgotpassword.html" class="text-sm text-[#4B63AC] hover:underline">비밀번호를 잊으셨나요?</a>
+          <a href="#" onclick="goToLanguageSpecificPage('forgotpassword.html'); return false;" class="text-sm text-[#4B63AC] hover:underline">비밀번호를 잊으셨나요?</a>
         </div>
 
         <div
@@ -105,10 +105,26 @@
 
       <p class="mt-6 text-sm text-center text-gray-600">
         <span>계정이 없으신가요?</span>
-        <a href="signup.html" class="text-[#4B63AC] hover:underline">회원가입</a>
+        <a href="#" onclick="goToLanguageSpecificPage('signup.html'); return false;" class="text-[#4B63AC] hover:underline">회원가입</a>
       </p>
     </div>
     </div>
+    
+    <script>
+      // 언어별 페이지로 이동하는 함수
+      function goToLanguageSpecificPage(filename) {
+        const userLanguage = localStorage.getItem('userLanguage') || 'ko';
+        const isDev = window.location.hostname === 'localhost' || 
+                     window.location.hostname === '127.0.0.1' ||
+                     window.location.port === '5500';
+        
+        if (isDev) {
+          window.location.href = `/locales/${userLanguage}/${filename}`;
+        } else {
+          window.location.href = `/${userLanguage}/${filename}`;
+        }
+      }
+    </script>
   </body>
 </html>
 

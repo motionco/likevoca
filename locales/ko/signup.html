@@ -102,10 +102,26 @@
       </form>
       <p class="mt-6 text-sm text-center text-gray-600">
         <span>이미 계정이 있으신가요?</span>
-        <a href="login.html" class="text-[#4B63AC] hover:underline">로그인</a>
+        <a href="#" onclick="goToLanguageSpecificPage('login.html'); return false;" class="text-[#4B63AC] hover:underline">로그인</a>
       </p>
     </div>
     </div>
+    
+    <script>
+      // 언어별 페이지로 이동하는 함수
+      function goToLanguageSpecificPage(filename) {
+        const userLanguage = localStorage.getItem('userLanguage') || 'ko';
+        const isDev = window.location.hostname === 'localhost' || 
+                     window.location.hostname === '127.0.0.1' ||
+                     window.location.port === '5500';
+        
+        if (isDev) {
+          window.location.href = `/locales/${userLanguage}/${filename}`;
+        } else {
+          window.location.href = `/${userLanguage}/${filename}`;
+        }
+      }
+    </script>
   </body>
 </html>
 
