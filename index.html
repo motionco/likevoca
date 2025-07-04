@@ -1,85 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LikeVoca - Redirecting...</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LikeVoca - Multilingual Learning Platform</title>
+    <meta name="description" content="Learn languages effectively with LikeVoca's systematic curriculum and intuitive learning system.">
+    
+    <!-- 기본 언어별 링크 -->
+    <link rel="alternate" hreflang="ko" href="/ko/" />
+    <link rel="alternate" hreflang="en" href="/en/" />
+    <link rel="alternate" hreflang="ja" href="/ja/" />
+    <link rel="alternate" hreflang="zh" href="/zh/" />
+    <link rel="alternate" hreflang="x-default" href="/en/" />
+    
     <script>
-      console.log("루트 index.html 로드됨");
-      
-      // 브라우저 언어 감지
-      function detectBrowserLanguage() {
-        // localStorage에서 저장된 언어 확인
-        const savedLang = localStorage.getItem('userLanguage');
-        if (savedLang) {
-          console.log("저장된 언어 사용:", savedLang);
-          return savedLang;
+        // 언어 감지 및 리디렉션
+        function detectAndRedirect() {
+            // 사용자가 설정한 언어 확인
+            const userLanguage = localStorage.getItem('userLanguage');
+            
+            if (userLanguage) {
+                // 사용자가 이미 언어를 설정한 경우
+                redirectToLanguage(userLanguage);
+                return;
+            }
+            
+            // 브라우저 언어 감지
+            const browserLanguage = navigator.language || navigator.userLanguage;
+            let targetLanguage = 'en'; // 기본값
+            
+            if (browserLanguage.startsWith('ko')) {
+                targetLanguage = 'ko';
+            } else if (browserLanguage.startsWith('ja')) {
+                targetLanguage = 'ja';
+            } else if (browserLanguage.startsWith('zh')) {
+                targetLanguage = 'zh';
+            }
+            
+            // 언어 설정 저장
+            localStorage.setItem('userLanguage', targetLanguage);
+            redirectToLanguage(targetLanguage);
         }
         
-        // 브라우저 언어 감지
-        const browserLang = navigator.language || navigator.userLanguage;
-        const langCode = browserLang.split('-')[0];
-        
-        // 지원하는 언어 목록
-        const supportedLanguages = ['ko', 'en', 'ja', 'zh'];
-        const detectedLang = supportedLanguages.includes(langCode) ? langCode : 'ko';
-        
-        console.log("브라우저 언어 감지:", browserLang, "→", detectedLang);
-        return detectedLang;
-      }
-      
-      // 개발 환경 감지
-      function isDevelopment() {
-        return window.location.hostname === 'localhost' || 
-               window.location.hostname === '127.0.0.1' ||
-               window.location.port === '5500' ||
-               window.location.hostname.includes('127.0.0.1');
-      }
-      
-      // 즉시 실행 함수로 리다이렉트
-      (function() {
-        const currentPath = window.location.pathname;
-        console.log("현재 경로:", currentPath);
-        
-        // 현재 경로가 이미 언어별 경로인지 확인
-        const isAlreadyLanguagePath = currentPath.match(/^\/(ko|en|ja|zh)\//) || 
-                                    currentPath.match(/^\/locales\/(ko|en|ja|zh)\//);
-        
-        console.log("이미 언어별 경로인가?", isAlreadyLanguagePath);
-        
-        // 루트 경로에서만 리다이렉트 실행
-        if (!isAlreadyLanguagePath && (currentPath === '/' || currentPath === '/index.html' || currentPath === '')) {
-          const targetLang = detectBrowserLanguage();
-          let targetPath;
-          
-          if (isDevelopment()) {
-            // 개발 환경: locales 폴더 경로 사용
-            targetPath = `/locales/${targetLang}/index.html`;
-          } else {
-            // 배포 환경: 언어별 경로 사용
-            targetPath = `/${targetLang}/index.html`;
-          }
-          
-          console.log("리다이렉트 실행:", targetPath);
-          
-          // 즉시 리다이렉트
-          window.location.replace(targetPath);
-        } else {
-          console.log("리다이렉트 불필요");
+        function redirectToLanguage(language) {
+            const isDev = window.location.hostname === 'localhost' || 
+                         window.location.hostname === '127.0.0.1' ||
+                         window.location.port === '5500';
+            
+            if (isDev) {
+                window.location.href = `/locales/${language}/index.html`;
+            } else {
+                window.location.href = `/${language}/`;
+            }
         }
-      })();
+        
+        // 페이지 로드 시 즉시 리디렉션
+        detectAndRedirect();
     </script>
-  </head>
-  <body>
-    <div style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: Arial, sans-serif;">
-      <div style="text-align: center;">
-        <h2>🌍 LikeVoca</h2>
-        <p>언어를 감지하고 있습니다...</p>
-        <p>Detecting your language...</p>
-        <p style="margin-top: 20px; font-size: 14px; color: #666;">
-          자동으로 이동하지 않으면 <a href="/locales/ko/index.html" style="color: #4B63AC;">여기를 클릭하세요</a>
-        </p>
+</head>
+<body>
+    <div style="text-align: center; margin-top: 50px; font-family: Arial, sans-serif;">
+        <h1>LikeVoca</h1>
+        <p>Redirecting to your language...</p>
+        <p>언어별 페이지로 이동 중...</p>
+        <p>言語別ページに移動中...</p>
+        <p>正在跳转到语言页面...</p>
+        
+        <div style="margin-top: 30px;">
+            <p>If not redirected automatically, please choose your language:</p>
+            <a href="/locales/ko/index.html" style="margin: 10px; padding: 10px 20px; background: #4B63AC; color: white; text-decoration: none; border-radius: 5px;">한국어</a>
+            <a href="/locales/en/index.html" style="margin: 10px; padding: 10px 20px; background: #4B63AC; color: white; text-decoration: none; border-radius: 5px;">English</a>
+            <a href="/locales/ja/index.html" style="margin: 10px; padding: 10px 20px; background: #4B63AC; color: white; text-decoration: none; border-radius: 5px;">日本語</a>
+            <a href="/locales/zh/index.html" style="margin: 10px; padding: 10px 20px; background: #4B63AC; color: white; text-decoration: none; border-radius: 5px;">中文</a>
         </div>
-      </div>
-  </body>
-</html>
+    </div>
+</body>
+</html> 

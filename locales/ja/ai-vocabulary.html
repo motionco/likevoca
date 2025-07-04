@@ -3,35 +3,35 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI 단어장 - LikeVoca</title>
+    <title>AI 単語帳 - LikeVoca</title>
 
     <!-- 기본 메타 태그 -->
     <meta
       name="description"
-      content="AI가 추천하는 다국어 단어장을 만들고 효과적으로 학습하세요."
+      content="AIが推薦する多言語単語帳を作成し、効果的に学習しましょう。"
     />
     <meta
       name="keywords"
-      content="AI 단어장, 다국어 단어장, 영어 단어장, 일본어 단어장, 중국어 단어장, AI 언어 학습"
+      content="AI 単語帳, 多言語単語帳, 英単語, 日本語単語, 中国語単語, AI 言語学習"
     />
 
     <!-- Open Graph / 소셜 미디어 메타 태그 -->
-    <meta property="og:title" content="LikeVoca - AI 단어장" />
+    <meta property="og:title" content="LikeVoca - AI 単語帳" />
     <meta
       property="og:description"
-      content="AI가 추천하는 다국어 단어장을 만들고 효과적으로 학습하세요."
+      content="AIが推薦する多言語単語帳を作成し、効果的に学習しましょう。"
     />
     <meta property="og:type" content="website" />
     <meta
       property="og:url"
       content="https://likevoca.com/ai-vocabulary.html"
     />
-    <meta property="og:locale" content="ko" />
+    <meta property="og:locale" content="ja" />
 
     <!-- 표준 링크 -->
     <link
       rel="canonical"
-      href="https://likevoca.com/ko/ai-vocabulary.html"
+      href="https://likevoca.com/ja/ai-vocabulary.html"
     />
 
     <!-- 대체 언어 링크 (초기값) -->
@@ -95,15 +95,14 @@
 
     <main class="container mx-auto max-w-7xl px-4 py-8">
       <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800" data-i18n="ai_vocabulary">
-          AI単語帳
+        <h1 class="text-3xl font-bold text-gray-800">
+          AI 単語帳
         </h1>
         <button
           id="ai-add-concept"
           class="bg-[#4B63AC] text-white px-4 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300 flex items-center"
-          data-i18n="ai_recommend_concept"
         >
-          <i class="fas fa-robot mr-2"></i> AI概念推薦を受ける
+          <i class="fas fa-robot mr-2"></i> AI 概念推薦を取得
         </button>
       </div>
 
@@ -114,7 +113,6 @@
             <label
               for="search-input"
               class="hidden md:block text-sm font-medium mb-1 text-gray-700"
-              data-i18n="search"
             >検索</label>
             <div class="relative">
               <input
@@ -122,7 +120,6 @@
                 id="search-input"
                 class="w-full p-2 border rounded pl-8 h-10"
                 placeholder="検索語を入力..."
-                data-i18n-placeholder="search_placeholder"
               />
               <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
             </div>
@@ -132,24 +129,22 @@
           <div class="w-full">
             <label
               class="block text-sm font-medium mb-1 text-gray-700"
-              data-i18n="language_filter"
             >言語フィルター</label>
             <div class="grid grid-cols-5 gap-1 h-10">
               <select
                 id="source-language"
                 class="col-span-2 p-2 border rounded text-sm"
               >
-                <option value="korean" data-i18n="korean">韓国語</option>
-                <option value="english" data-i18n="english">英語</option>
-                <option value="japanese" data-i18n="japanese">日本語</option>
-                <option value="chinese" data-i18n="chinese">中国語</option>
+                <option value="korean">韓国語</option>
+                <option value="english">英語</option>
+                <option value="japanese">日本語</option>
+                <option value="chinese">中国語</option>
               </select>
 
               <button
                 id="swap-languages"
                 class="w-full h-full text-gray-600 hover:text-[#4B63AC] hover:bg-gray-100 rounded-lg transition duration-200 border border-gray-300 hover:border-[#4B63AC] flex items-center justify-center"
-                title="言語順序を変更"
-                data-i18n-title="swap_languages"
+                title="言語を交換"
               >
                 <i class="fas fa-exchange-alt text-sm"></i>
               </button>
@@ -158,10 +153,10 @@
                 id="target-language"
                 class="col-span-2 p-2 border rounded text-sm"
               >
-                <option value="english" data-i18n="english">英語</option>
-                <option value="korean" data-i18n="korean">韓国語</option>
-                <option value="japanese" data-i18n="japanese">日本語</option>
-                <option value="chinese" data-i18n="chinese">中国語</option>
+                <option value="english">英語</option>
+                <option value="korean">韓国語</option>
+                <option value="japanese">日本語</option>
+                <option value="chinese">中国語</option>
               </select>
             </div>
           </div>
@@ -170,30 +165,30 @@
           <div class="w-full">
             <div class="grid grid-cols-2 gap-2">
               <div>
-                <label for="domain-filter" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="domain">ドメイン</label>
+                <label for="domain-filter" class="block text-sm font-medium mb-1 text-gray-700">ドメイン</label>
                 <select id="domain-filter" class="w-full p-2 border rounded h-10 text-sm">
-                  <option value="all" data-i18n="all_domains">全ドメイン</option>
-                  <option value="daily" data-i18n="domain_daily">日常</option>
-                  <option value="food" data-i18n="domain_food">食べ物</option>
-                  <option value="travel" data-i18n="domain_travel">旅行</option>
-                  <option value="business" data-i18n="domain_business">ビジネス</option>
-                  <option value="education" data-i18n="domain_education">教育</option>
-                  <option value="nature" data-i18n="domain_nature">自然</option>
-                  <option value="technology" data-i18n="domain_technology">技術</option>
-                  <option value="health" data-i18n="domain_health">健康</option>
-                  <option value="sports" data-i18n="domain_sports">スポーツ</option>
-                  <option value="entertainment" data-i18n="domain_entertainment">エンターテインメント</option>
-                  <option value="culture" data-i18n="domain_culture">文化</option>
-                  <option value="other" data-i18n="domain_other">その他</option>
+                  <option value="all">すべてのドメイン</option>
+                  <option value="daily">日常生活</option>
+                  <option value="food">食べ物</option>
+                  <option value="travel">旅行</option>
+                  <option value="business">ビジネス</option>
+                  <option value="education">教育</option>
+                  <option value="nature">自然</option>
+                  <option value="technology">技術</option>
+                  <option value="health">健康</option>
+                  <option value="sports">スポーツ</option>
+                  <option value="entertainment">エンターテイメント</option>
+                  <option value="culture">文化</option>
+                  <option value="other">その他</option>
                 </select>
               </div>
               <div>
-                <label for="sort-filter" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="sort">並び順</label>
+                <label for="sort-filter" class="block text-sm font-medium mb-1 text-gray-700">並び替え</label>
                 <select id="sort-filter" class="w-full p-2 border rounded h-10 text-sm">
-                  <option value="latest" data-i18n="latest">最新順</option>
-                  <option value="oldest" data-i18n="oldest">古い順</option>
-                  <option value="alphabetical" data-i18n="alphabetical">あいうえお順</option>
-                  <option value="reverse_alphabetical" data-i18n="reverse_alphabetical">逆あいうえお順</option>
+                  <option value="latest">最新</option>
+                  <option value="oldest">最古</option>
+                  <option value="alphabetical">アルファベット順</option>
+                  <option value="reverse_alphabetical">逆アルファベット順</option>
                 </select>
               </div>
             </div>
@@ -205,15 +200,11 @@
           class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
         >
           <div class="text-sm text-gray-600">
-            <span id="filtered-count">0</span
-            ><span data-i18n="concept_count">個の概念</span>
+            <span id="concept-count">0</span><span> 概念</span>
           </div>
 
           <div class="flex items-center gap-4 w-full md:w-auto">
-            <span
-              class="text-sm font-medium text-gray-700 whitespace-nowrap"
-              data-i18n="ai_usage"
-            >AI使用量:</span>
+            <span class="text-sm font-medium text-gray-700 whitespace-nowrap">AI 使用量:</span>
             <div class="flex items-center gap-2 min-w-[200px]">
               <div class="flex-1 bg-gray-200 rounded-full h-2.5">
                 <div
@@ -222,30 +213,22 @@
                   style="width: 0%"
                 ></div>
               </div>
-              <span
-                id="ai-usage-text"
-                class="text-sm font-medium whitespace-nowrap"
-                >0/0</span
-              >
+              <span id="ai-usage-text" class="text-sm font-medium whitespace-nowrap">0/10</span>
             </div>
           </div>
         </div>
       </div>
 
       <!-- 개념 카드 표시 영역 -->
-      <div
-        id="concept-list"
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-      ></div>
+      <div id="concept-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 
       <!-- 더 보기 버튼 -->
       <div class="flex justify-center mt-8">
         <button
           id="load-more"
           class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-6 rounded-lg transition duration-300 hidden"
-          data-i18n="load_more"
         >
-          もっと見る <i class="fas fa-chevron-down ml-1"></i>
+          もっと読み込む <i class="fas fa-chevron-down ml-1"></i>
         </button>
       </div>
     </main>

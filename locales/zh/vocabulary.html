@@ -3,21 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>단어장 - LikeVoca</title>
+    <title>词汇本 - LikeVoca</title>
 
     <!-- 기본 메타 태그 -->
-    <meta name="description" content="나만의 단어장을 만들고 효과적으로 학습하세요." />
-    <meta name="keywords" content="단어장, 영어 단어장, 일본어 단어장, 중국어 단어장, 언어 학습" />
+    <meta name="description" content="创建您自己的词汇本，有效学习。" />
+    <meta name="keywords" content="词汇本, 英语词汇, 日语词汇, 中文词汇, 语言学习" />
     
     <!-- Open Graph / 소셜 미디어 메타 태그 -->
-    <meta property="og:title" content="LikeVoca - 단어장" />
-    <meta property="og:description" content="나만의 단어장을 만들고 효과적으로 학습하세요." />
+    <meta property="og:title" content="LikeVoca - 词汇本" />
+    <meta property="og:description" content="创建您自己的词汇本，有效学习。" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://likevoca.com/vocabulary.html" />
-    <meta property="og:locale" content="ko" />
+    <meta property="og:locale" content="zh" />
     
     <!-- 표준 링크 -->
-    <link rel="canonical" href="https://likevoca.com/ko/vocabulary.html" />
+    <link rel="canonical" href="https://likevoca.com/zh/vocabulary.html" />
     
     <!-- 대체 언어 링크 (초기값) -->
     <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/vocabulary.html" />
@@ -57,21 +57,19 @@
 
     <main class="container mx-auto max-w-7xl px-4 py-8">
       <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800" data-i18n="vocabulary">단어장</h1>
+        <h1 class="text-3xl font-bold text-gray-800">词汇本</h1>
         <div class="flex space-x-2">
           <button
             id="add-concept"
             class="bg-[#4B63AC] text-white px-4 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300 flex items-center"
-            data-i18n="add_new_concept"
           >
-            <i class="fas fa-plus mr-2"></i> 새 개념 추가
+            <i class="fas fa-plus mr-2"></i> 添加新概念
           </button>
           <button
             id="bulk-add-concept"
             class="bg-[#4B63AC] text-white px-4 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300 flex items-center"
-            data-i18n="bulk_add_concept"
           >
-            <i class="fas fa-file-import mr-2"></i> 대량 개념 추가
+            <i class="fas fa-file-import mr-2"></i> 批量添加
           </button>
         </div>
       </div>
@@ -80,14 +78,13 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <!-- 검색 필터 -->
           <div class="w-full">
-            <label for="search-input" class="hidden md:block text-sm font-medium mb-1 text-gray-700" data-i18n="search">검색</label>
+            <label for="search-input" class="hidden md:block text-sm font-medium mb-1 text-gray-700">搜索</label>
             <div class="relative">
               <input
                 type="text"
                 id="search-input"
                 class="w-full p-2 border rounded pl-8 h-10"
-                placeholder="검색어 입력..."
-                data-i18n-placeholder="search_placeholder"
+                placeholder="输入搜索词..."
               />
               <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
             </div>
@@ -98,31 +95,29 @@
             <label
               for="language-filter"
               class="text-sm font-medium text-gray-700"
-              data-i18n="language_filter"
-              >언어 필터</label
+              >语言筛选</label
             >
             <div class="grid grid-cols-5 gap-1 h-10">
               <select id="source-language" class="col-span-2 p-2 border rounded text-sm">
-              <option value="korean" data-i18n="korean">한국어</option>
-              <option value="english" data-i18n="english">영어</option>
-              <option value="japanese" data-i18n="japanese">일본어</option>
-              <option value="chinese" data-i18n="chinese">중국어</option>
+              <option value="korean">韩语</option>
+              <option value="english">英语</option>
+              <option value="japanese">日语</option>
+              <option value="chinese">中文</option>
             </select>
 
             <button
               id="swap-languages"
                 class="w-full h-full text-gray-600 hover:text-[#4B63AC] hover:bg-gray-100 rounded-lg transition duration-200 border border-gray-300 hover:border-[#4B63AC] flex items-center justify-center"
-              title="언어 순서 바꾸기"
-              data-i18n-title="swap_languages"
+              title="交换语言"
             >
               <i class="fas fa-exchange-alt text-sm"></i>
             </button>
               
               <select id="target-language" class="col-span-2 p-2 border rounded text-sm">
-              <option value="english" data-i18n="english">영어</option>
-              <option value="korean" data-i18n="korean">한국어</option>
-              <option value="japanese" data-i18n="japanese">일본어</option>
-              <option value="chinese" data-i18n="chinese">중국어</option>
+              <option value="english">英语</option>
+              <option value="korean">韩语</option>
+              <option value="japanese">日语</option>
+              <option value="chinese">中文</option>
             </select>
             </div>
           </div>
@@ -131,44 +126,44 @@
                       <div class="w-full">
               <div class="grid grid-cols-2 gap-2">
                 <div>
-                  <label for="domain-filter" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="domain">도메인</label>
+                  <label for="domain-filter" class="block text-sm font-medium mb-1 text-gray-700">领域</label>
                   <select id="domain-filter" class="w-full p-2 border rounded h-10 text-sm">
-                    <option value="all" data-i18n="all_domains">전체 도메인</option>
-                    <option value="daily" data-i18n="domain_daily">일상</option>
-                    <option value="food" data-i18n="domain_food">음식</option>
-                    <option value="travel" data-i18n="domain_travel">여행</option>
-                    <option value="business" data-i18n="domain_business">비즈니스</option>
-                    <option value="education" data-i18n="domain_education">교육</option>
-                    <option value="nature" data-i18n="domain_nature">자연</option>
-                    <option value="technology" data-i18n="domain_technology">기술</option>
-                    <option value="health" data-i18n="domain_health">건강</option>
-                    <option value="sports" data-i18n="domain_sports">스포츠</option>
-                    <option value="entertainment" data-i18n="domain_entertainment">엔터테인먼트</option>
-                    <option value="culture" data-i18n="domain_culture">문화</option>
-                    <option value="other" data-i18n="domain_other">기타</option>
+                    <option value="all">所有领域</option>
+                    <option value="daily">日常生活</option>
+                    <option value="food">食物</option>
+                    <option value="travel">旅行</option>
+                    <option value="business">商务</option>
+                    <option value="education">教育</option>
+                    <option value="nature">自然</option>
+                    <option value="technology">技术</option>
+                    <option value="health">健康</option>
+                    <option value="sports">运动</option>
+                    <option value="entertainment">娱乐</option>
+                    <option value="culture">文化</option>
+                    <option value="other">其他</option>
                   </select>
                 </div>
                 <div>
-                  <label for="sort-filter" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="sort">정렬</label>
+                  <label for="sort-filter" class="block text-sm font-medium mb-1 text-gray-700">排序</label>
                   <select id="sort-filter" class="w-full p-2 border rounded h-10 text-sm">
-                    <option value="latest" data-i18n="latest">최신순</option>
-                    <option value="oldest" data-i18n="oldest">오래된순</option>
-                    <option value="alphabetical" data-i18n="alphabetical">가나다순</option>
-                    <option value="reverse_alphabetical" data-i18n="reverse_alphabetical">역가나다순</option>
+                    <option value="latest">最新</option>
+                    <option value="oldest">最旧</option>
+                    <option value="alphabetical">字母顺序</option>
+                    <option value="reverse_alphabetical">反字母顺序</option>
                   </select>
                 </div>
               </div>
-                         </div>
+          </div>
         </div>
 
         <!-- 개념 수 및 사용량 표시 -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div class="text-sm text-gray-600">
-            <span id="concept-count">0</span><span data-i18n="concept_count">개의 개념</span>
+            <span id="concept-count">0</span><span> 个概念</span>
           </div>
 
           <div class="flex items-center gap-4 w-full md:w-auto">
-            <span class="text-sm font-medium text-gray-700 whitespace-nowrap" data-i18n="concept_usage">개념 사용량:</span>
+            <span class="text-sm font-medium text-gray-700 whitespace-nowrap">概念使用量:</span>
             <div class="flex items-center gap-2 min-w-[200px]">
               <div class="flex-1 bg-gray-200 rounded-full h-2.5">
           <div id="concept-usage-bar" class="bg-[#4B63AC] h-2.5 rounded-full" style="width: 0%"></div>
@@ -187,9 +182,8 @@
         <button
           id="load-more"
           class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-6 rounded-lg transition duration-300 hidden"
-          data-i18n="load_more"
         >
-          더 보기 <i class="fas fa-chevron-down ml-1"></i>
+          加载更多 <i class="fas fa-chevron-down ml-1"></i>
         </button>
       </div>
     </main>

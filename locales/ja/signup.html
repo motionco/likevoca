@@ -3,7 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Likevoca - 회원가입 페이지</title>
+    <title>サインアップ - LikeVoca</title>
+    <meta name="description" content="LikeVocaアカウントを作成して、多言語学習の旅を始めましょう。パーソナライズされた単語帳、クイズ、進捗追跡機能をご利用いただけます" />
+    <meta property="og:title" content="サインアップ - LikeVoca" />
+    <meta property="og:description" content="LikeVocaアカウントを作成して、多言語学習の旅を始めましょう。パーソナライズされた単語帳、クイズ、進捗追跡機能をご利用いただけます" />
+    <meta property="og:locale" content="ja_JP" />
+    <link rel="canonical" href="https://likevoca.com/ja/signup" />
+    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/signup" />
+    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/signup" />
+    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/signup" />
+    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/signup" />
     <link href="../../css/style.css" rel="stylesheet" />
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -21,9 +30,7 @@
     
     <div class="flex items-center justify-center min-h-screen py-12">
     <div class="bg-white shadow-lg rounded-lg w-11/12 sm:w-96 p-6">
-      <h1 class="text-3xl font-bold text-gray-800 text-center mb-6" data-i18n="create_account">
-        회원가입
-      </h1>
+      <h1 class="text-3xl font-bold text-gray-800 text-center mb-6">アカウント作成</h1>
 
       <form
         id="signup-form"
@@ -32,44 +39,35 @@
         onsubmit="return false;"
       >
         <div>
-          <label for="name" class="block text-sm font-medium text-gray-700" data-i18n="name"
-            >이름</label
-          >
+          <label for="name" class="block text-sm font-medium text-gray-700">お名前</label>
           <input
             type="text"
             id="name"
             name="name"
             required
-            data-i18n-placeholder="name_placeholder"
-            placeholder="이름을 입력하세요"
+            placeholder="お名前を入力してください"
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#4B63AC] focus:border-[#4B63AC] sm:text-sm"
           />
         </div>
         <div>
-          <label for="email" class="block text-sm font-medium text-gray-700" data-i18n="email"
-            >이메일</label
-          >
+          <label for="email" class="block text-sm font-medium text-gray-700">メールアドレス</label>
           <input
             type="email"
             id="email"
             name="email"
             required
-            data-i18n-placeholder="email_placeholder"
-            placeholder="이메일을 입력하세요"
+            placeholder="メールアドレスを入力してください"
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#4B63AC] focus:border-[#4B63AC] sm:text-sm"
           />
         </div>
         <div>
-          <label for="password" class="block text-sm font-medium text-gray-700" data-i18n="password"
-            >비밀번호</label
-          >
+          <label for="password" class="block text-sm font-medium text-gray-700">パスワード</label>
           <input
             type="password"
             id="password"
             name="password"
             required
-            data-i18n-placeholder="password_placeholder"
-            placeholder="비밀번호를 입력하세요"
+            placeholder="パスワードを入力してください"
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#4B63AC] focus:border-[#4B63AC] sm:text-sm"
           />
         </div>
@@ -77,16 +75,14 @@
           <label
             for="confirm-password"
             class="block text-sm font-medium text-gray-700"
-            data-i18n="confirm_password"
-            >비밀번호 확인</label
+            >パスワード確認</label
           >
           <input
             type="password"
             id="confirm-password"
             name="confirm-password"
             required
-            data-i18n-placeholder="confirm_password_placeholder"
-            placeholder="비밀번호를 다시 입력하세요"
+            placeholder="パスワードを再入力してください"
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#4B63AC] focus:border-[#4B63AC] sm:text-sm"
           />
         </div>
@@ -100,19 +96,16 @@
           id="signup-button"
           type="submit"
           class="w-full bg-[#4B63AC] text-white px-4 py-2 rounded-lg shadow-md hover:bg-[#3A4F8B] focus:outline-none focus:ring-2 focus:ring-[#4B63AC] focus:ring-offset-2"
-          data-i18n="signup"
         >
-          회원가입
+          サインアップ
         </button>
       </form>
       <p class="mt-6 text-sm text-center text-gray-600">
-        <span data-i18n="already_account">이미 계정이 있으신가요?</span>
-        <a href="login.html" class="text-[#4B63AC] hover:underline" data-i18n="login">로그인</a>
+        <span>すでにアカウントをお持ちですか？</span>
+        <a href="login.html" class="text-[#4B63AC] hover:underline">ログイン</a>
       </p>
     </div>
     </div>
-
-    
   </body>
 </html>
 

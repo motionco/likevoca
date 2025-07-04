@@ -19,25 +19,25 @@
     <!-- 중앙: 네비게이션 메뉴 (데스크톱만) -->
     <ul id="nav-menu" class="hidden lg:flex space-x-10 items-center">
       <li>
-        <a href="vocabulary.html" class="text-xl text-white hover:text-yellow-400" data-i18n="vocabulary">词汇表</a>
+        <a href="vocabulary.html" class="text-xl text-white hover:text-yellow-400">词汇表</a>
       </li>
       <li>
-        <a href="ai-vocabulary.html" class="text-xl text-white hover:text-yellow-400" data-i18n="ai_vocabulary">AI词汇表</a>
+        <a href="ai-vocabulary.html" class="text-xl text-white hover:text-yellow-400">AI词汇表</a>
       </li>
       <li>
-        <a href="quiz.html" class="text-xl text-white hover:text-yellow-400" data-i18n="quiz">测验</a>
+        <a href="learning.html" class="text-xl text-white hover:text-yellow-400">学习</a>
       </li>
       <li>
-        <a href="games.html" class="text-xl text-white hover:text-yellow-400" data-i18n="games">游戏</a>
+        <a href="quiz.html" class="text-xl text-white hover:text-yellow-400">测验</a>
       </li>
       <li>
-        <a href="learning.html" class="text-xl text-white hover:text-yellow-400" data-i18n="learning_title">学习</a>
+        <a href="games.html" class="text-xl text-white hover:text-yellow-400">游戏</a>
       </li>
       <li>
-        <a href="progress.html" class="text-xl text-white hover:text-yellow-400" data-i18n="progress">进度</a>
+        <a href="progress.html" class="text-xl text-white hover:text-yellow-400">进度</a>
       </li>
       <li>
-        <a href="inquiry.html" class="text-xl text-white hover:text-yellow-400" data-i18n="inquiry">联系我们</a>
+        <a href="inquiry.html" class="text-xl text-white hover:text-yellow-400">联系我们</a>
       </li>
     </ul>
 
@@ -65,7 +65,6 @@
           id="login-button"
           onclick="goToLanguageSpecificPage('login.html')"
           class="border-2 border-white bg-[#4B63AC] text-white font-semibold px-4 py-1.5 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
-          data-i18n="login"
           >登录</a
         >
         <a
@@ -73,7 +72,6 @@
           id="signup-button"
           onclick="goToLanguageSpecificPage('signup.html')"
           class="border-2 border-white bg-white text-[#4B63AC] font-semibold px-4 py-1.5 text-sm rounded-lg hover:bg-[#4B63AC] hover:text-white transition duration-300"
-          data-i18n="signup"
           >注册</a
         >
     </div>
@@ -103,23 +101,18 @@
             <a
               href="my-word-list.html"
               class="block w-full text-left px-4 py-2 hover:bg-gray-100"
-              data-i18n="wordbook"
-              data-i18n-link="my-word-list.html"
             >
               我的单词本
             </a>
             <a
               href="profile.html"
               class="block w-full text-left px-4 py-2 hover:bg-gray-100"
-              data-i18n="profile"
-              data-i18n-link="profile.html"
         >
               个人资料
             </a>
         <button
           id="logout-button"
           class="block w-full text-left px-4 py-2 hover:bg-gray-100"
-          data-i18n="logout"
         >
           退出登录
         </button>
@@ -133,13 +126,13 @@
     id="mobile-menu"
     class="hidden flex flex-col items-center space-y-4 bg-[#4B63AC] text-white p-3 lg:hidden"
   >
-    <a href="vocabulary.html" class="text-lg hover:text-yellow-400" data-i18n="vocabulary">词汇表</a>
-    <a href="ai-vocabulary.html" class="text-lg hover:text-yellow-400" data-i18n="ai_vocabulary">AI词汇表</a>
-    <a href="quiz.html" class="text-lg hover:text-yellow-400" data-i18n="quiz">测验</a>
-    <a href="games.html" class="text-lg hover:text-yellow-400" data-i18n="games">游戏</a>
-    <a href="learning.html" class="text-lg hover:text-yellow-400" data-i18n="learning_title">学习</a>
-    <a href="progress.html" class="text-lg hover:text-yellow-400" data-i18n="progress">进度</a>
-    <a href="inquiry.html" class="text-lg hover:text-yellow-400" data-i18n="inquiry">联系我们</a>
+    <a href="vocabulary.html" class="text-lg hover:text-yellow-400">词汇表</a>
+    <a href="ai-vocabulary.html" class="text-lg hover:text-yellow-400">AI词汇表</a>
+    <a href="learning.html" class="text-lg hover:text-yellow-400">学习</a>
+    <a href="quiz.html" class="text-lg hover:text-yellow-400">测验</a>
+    <a href="games.html" class="text-lg hover:text-yellow-400">游戏</a>
+    <a href="progress.html" class="text-lg hover:text-yellow-400">进度</a>
+    <a href="inquiry.html" class="text-lg hover:text-yellow-400">联系我们</a>
 
     <!-- 모바일 로그인 버튼들 -->
     <div id="mobile-login-buttons" class="hidden flex space-x-3">
@@ -147,14 +140,12 @@
         href="#"
         onclick="goToLanguageSpecificPage('login.html')"
         class="border-2 border-white bg-[#4B63AC] text-white font-semibold px-5 py-2 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
-        data-i18n="login"
         >登录</a
       >
       <a
         href="#"
         onclick="goToLanguageSpecificPage('signup.html')"
         class="border-2 border-white bg-[#4B63AC] text-white font-semibold px-5 py-2 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
-        data-i18n="signup"
         >注册</a
       >
     </div>
@@ -171,23 +162,18 @@
         <a
           href="my-word-list.html"
           class="text-white hover:text-yellow-400"
-          data-i18n="wordbook"
-          data-i18n-link="my-word-list.html"
         >
           我的单词本
         </a>
         <a
           href="profile.html"
           class="text-white hover:text-yellow-400"
-          data-i18n="profile"
-          data-i18n-link="profile.html"
         >
           个人资料
         </a>
         <button
           id="mobile-logout-button"
           class="text-white hover:text-yellow-400"
-          data-i18n="logout"
         >
           退出登录
         </button>

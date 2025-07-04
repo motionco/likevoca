@@ -1,5 +1,20 @@
 import { login, googleLogin, githubLogin } from "../firebase/firebase-auth.js";
 
+// 언어별 페이지로 이동하는 함수
+function goToLanguageSpecificPage(filename) {
+  const userLanguage = localStorage.getItem("userLanguage") || "ko";
+  const isDev =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1" ||
+    window.location.port === "5500";
+
+  if (isDev) {
+    window.location.href = `/locales/${userLanguage}/${filename}`;
+  } else {
+    window.location.href = `/${userLanguage}/${filename}`;
+  }
+}
+
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const errorMessage = document.getElementById("error-message");
@@ -52,7 +67,7 @@ document
 
         const userName = user.displayName || "사용자";
         alert(`환영합니다, ${userName}님!`);
-        window.location.href = "index.html";
+        goToLanguageSpecificPage("index.html");
       }
     } catch (error) {
       console.error("Google 로그인 오류:", error);
@@ -99,7 +114,7 @@ document
               const user = await googleLogin();
               if (user) {
                 alert(`Google 계정으로 로그인되었습니다.`);
-                window.location.href = "index.html";
+                goToLanguageSpecificPage("index.html");
               }
             } catch (googleError) {
               alert(`Google 로그인 실패: ${googleError.message}`);
@@ -116,7 +131,7 @@ document
       if (user) {
         const userName = user.displayName || "사용자";
         alert(`환영합니다, ${userName}님!`);
-        window.location.href = "index.html";
+        goToLanguageSpecificPage("index.html");
       } else if (user === null) {
         // Google 로그인으로 리다이렉션된 경우 (githubLogin에서 null 반환)
         console.log("Google 로그인으로 리다이렉션됨");
@@ -161,7 +176,7 @@ document
               const user = await googleLogin();
               if (user) {
                 alert(`Google 계정으로 로그인되었습니다.`);
-                window.location.href = "index.html";
+                goToLanguageSpecificPage("index.html");
               }
             } catch (googleError) {
               alert(`Google 로그인 실패: ${googleError.message}`);
@@ -203,7 +218,7 @@ document
                 alert(
                   `Google 계정으로 로그인되었습니다. 프로필 페이지에서 GitHub 계정을 연결할 수 있습니다.`
                 );
-                window.location.href = "index.html";
+                goToLanguageSpecificPage("index.html");
               }
             } catch (googleError) {
               alert(`Google 로그인 실패: ${googleError.message}`);
@@ -236,7 +251,7 @@ document
               const user = await googleLogin();
               if (user) {
                 alert(`Google 계정으로 로그인되었습니다.`);
-                window.location.href = "index.html";
+                goToLanguageSpecificPage("index.html");
               }
             } catch (googleError) {
               alert(`Google 로그인 실패: ${googleError.message}`);
@@ -279,7 +294,7 @@ submitButton.addEventListener("click", async () => {
     const user = await login(email, password);
     console.log("로그인된 사용자: ", user);
     alert(`로그인 성공! 환영합니다. ${user.displayName || "사용자"}님!`);
-    window.location.href = "index.html";
+    goToLanguageSpecificPage("index.html");
   } catch (error) {
     console.error("로그인 실패: ", error.message);
     logAuthError("email", error.code, error.message, email);

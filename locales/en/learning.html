@@ -3,21 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>학습 - LikeVoca</title>
+    <title>Learning - LikeVoca</title>
 
     <!-- 기본 메타 태그 -->
-    <meta name="description" content="단어, 문법, 독해 학습을 통합한 종합 언어 학습 시스템" />
-    <meta name="keywords" content="언어 학습, 단어 학습, 문법 학습, 독해 학습, 플래시카드, 문법 패턴" />
+    <meta name="description" content="Comprehensive language learning system integrating vocabulary, grammar, and reading comprehension" />
+    <meta name="keywords" content="language learning, vocabulary learning, grammar learning, reading comprehension, flashcards, grammar patterns" />
     
     <!-- Open Graph / 소셜 미디어 메타 태그 -->
-    <meta property="og:title" content="LikeVoca - 학습" />
-    <meta property="og:description" content="단어, 문법, 독해 학습을 통합한 종합 언어 학습 시스템" />
+    <meta property="og:title" content="LikeVoca - Learning" />
+    <meta property="og:description" content="Comprehensive language learning system integrating vocabulary, grammar, and reading comprehension" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://likevoca.com/learning.html" />
-    <meta property="og:locale" content="ko" />
+    <meta property="og:locale" content="en" />
     
     <!-- 표준 링크 -->
-    <link rel="canonical" href="https://likevoca.com/ko/learning.html" />
+    <link rel="canonical" href="https://likevoca.com/en/learning.html" />
     
     <!-- 대체 언어 링크 (초기값) -->
     <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/learning.html" />
@@ -118,75 +118,74 @@
       <div class="mb-8">
         <!-- 제목 행 -->
         <div class="flex justify-center md:justify-start mb-4 md:mb-8">
-          <h1 class="text-3xl font-bold text-gray-800" data-i18n="learning_title">학습</h1>
+          <h1 class="text-3xl font-bold text-gray-800">Learning</h1>
         </div>
         
         <!-- 필터 행 -->
         <div class="grid grid-cols-2 md:grid-cols-7 gap-3">
           <div class="relative">
-            <label class="block text-xs font-medium mb-1" data-i18n="source_language">원본 언어</label>
+            <label class="block text-xs font-medium mb-1">Source Language</label>
             <select id="source-language" class="w-full border p-2 rounded text-sm">
-              <option value="korean" data-i18n="korean">한국어</option>
-              <option value="english" data-i18n="english">영어</option>
-              <option value="japanese" data-i18n="japanese">일본어</option>
-              <option value="chinese" data-i18n="chinese">중국어</option>
+              <option value="korean">Korean</option>
+              <option value="english">English</option>
+              <option value="japanese">Japanese</option>
+              <option value="chinese">Chinese</option>
             </select>
           </div>
           <div class="relative flex items-end justify-center">
-            <button id="swap-languages" class="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white px-3 py-2 rounded-full transition-all duration-200 transform hover:scale-110 active:scale-95 shadow-md hover:shadow-lg" title="언어 전환">
+            <button id="swap-languages" class="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white px-3 py-2 rounded-full transition-all duration-200 transform hover:scale-110 active:scale-95 shadow-md hover:shadow-lg" title="Swap Languages">
               <i class="fas fa-exchange-alt text-sm"></i>
             </button>
           </div>
           <div>
-            <label class="block text-xs font-medium mb-1" data-i18n="target_language">대상 언어</label>
+            <label class="block text-xs font-medium mb-1">Target Language</label>
             <select id="target-language" class="w-full border p-2 rounded text-sm">
-              <option value="english" data-i18n="english">영어</option>
-              <option value="korean" data-i18n="korean">한국어</option>
-              <option value="japanese" data-i18n="japanese">일본어</option>
-              <option value="chinese" data-i18n="chinese">중국어</option>
+              <option value="english">English</option>
+              <option value="korean">Korean</option>
+              <option value="japanese">Japanese</option>
+              <option value="chinese">Chinese</option>
             </select>
           </div>
           <div>
-            <label class="block text-xs font-medium mb-1" data-i18n="difficulty_level">난이도</label>
+            <label class="block text-xs font-medium mb-1">Difficulty Level</label>
             <select id="difficulty-level" class="w-full border p-2 rounded text-sm">
-              <option value="all" data-i18n="all_difficulties">전체 난이도</option>
-              <option value="basic" data-i18n="basic">기초</option>
-              <option value="intermediate" data-i18n="intermediate">중급</option>
-              <option value="advanced" data-i18n="advanced">고급</option>
-              <option value="fluent" data-i18n="fluent">유창</option>
-              <option value="technical" data-i18n="technical">전문용어</option>
+              <option value="all">All Difficulties</option>
+              <option value="basic">Basic</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="advanced">Advanced</option>
+              <option value="fluent">Fluent</option>
+              <option value="technical">Technical</option>
             </select>
           </div>
           <div>
-            <label class="block text-xs font-medium mb-1" data-i18n="domain_filter">도메인</label>
+            <label class="block text-xs font-medium mb-1">Domain</label>
             <select id="domain-filter" class="w-full border p-2 rounded text-sm">
-              <option value="all" data-i18n="all_domains">전체 도메인</option>
-              <option value="daily" data-i18n="domain_daily">일상</option>
-              <option value="food" data-i18n="domain_food">음식</option>
-              <option value="travel" data-i18n="domain_travel">여행</option>
-              <option value="business" data-i18n="domain_business">비즈니스</option>
-              <option value="education" data-i18n="domain_education">교육</option>
-              <option value="nature" data-i18n="domain_nature">자연</option>
-              <option value="technology" data-i18n="domain_technology">기술</option>
-              <option value="health" data-i18n="domain_health">건강</option>
-              <option value="sports" data-i18n="domain_sports">스포츠</option>
-              <option value="entertainment" data-i18n="domain_entertainment">엔터테인먼트</option>
-              <option value="culture" data-i18n="domain_culture">문화</option>
-
-              <option value="other" data-i18n="domain_other">기타</option>
+              <option value="all">All Domains</option>
+              <option value="daily">Daily Life</option>
+              <option value="food">Food</option>
+              <option value="travel">Travel</option>
+              <option value="business">Business</option>
+              <option value="education">Education</option>
+              <option value="nature">Nature</option>
+              <option value="technology">Technology</option>
+              <option value="health">Health</option>
+              <option value="sports">Sports</option>
+              <option value="entertainment">Entertainment</option>
+              <option value="culture">Culture</option>
+              <option value="other">Other</option>
             </select>
           </div>
           <div>
-            <label class="block text-xs font-medium mb-1" data-i18n="situation">상황</label>
+            <label class="block text-xs font-medium mb-1">Situation</label>
             <select id="situation-filter" class="w-full border p-2 rounded text-sm">
-              <option value="all" data-i18n="all_situation">전체 상황</option>
+              <option value="all">All Situations</option>
               <!-- 동적으로 생성될 옵션들 -->
             </select>
           </div>
           <div>
-            <label class="block text-xs font-medium mb-1" data-i18n="purpose">목적</label>
+            <label class="block text-xs font-medium mb-1">Purpose</label>
             <select id="purpose-filter" class="w-full border p-2 rounded text-sm">
-              <option value="all" data-i18n="all_purpose">전체 목적</option>
+              <option value="all">All Purposes</option>
               <!-- 동적으로 생성될 옵션들 -->
             </select>
           </div>
@@ -196,13 +195,13 @@
       <!-- 영역별 학습 선택 -->
       <div id="area-selection" class="bg-white rounded-lg shadow-md p-6 mb-8">
         <div class="flex justify-between items-center mb-6">
-          <h2 class="text-2xl font-bold" data-i18n="learning_dashboard">학습 대시보드</h2>
+          <h2 class="text-2xl font-bold">Learning Dashboard</h2>
           <div class="flex space-x-3">
             <button id="quick-continue" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-colors hidden">
-              <i class="fas fa-play mr-2"></i><span data-i18n="continue_learning">학습 이어하기</span>
+              <i class="fas fa-play mr-2"></i><span>Continue Learning</span>
             </button>
             <a href="quiz.html" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-              <i class="fas fa-brain mr-2"></i><span data-i18n="quiz_test">퀴즈 테스트</span>
+              <i class="fas fa-brain mr-2"></i><span>Quiz Test</span>
           </a>
         </div>
             </div>
@@ -214,7 +213,7 @@
           <div class="col-span-full mb-4">
             <h3 class="text-lg font-semibold text-blue-600 mb-3 flex items-center">
               <i class="fas fa-book mr-2"></i>
-              <span data-i18n="vocabulary_learning">단어 학습</span>
+              <span>Vocabulary Learning</span>
             </h3>
               </div>
           
@@ -225,17 +224,17 @@
               <div class="flex items-center">
                 <i class="fas fa-clone text-2xl mr-3"></i>
                 <div>
-                  <div class="font-bold text-lg" data-i18n="flashcard_mode">플래시카드</div>
-                  <div class="text-xs opacity-80" data-i18n="flashcard_quick_desc">카드 뒤집기 학습</div>
+                  <div class="font-bold text-lg">Flashcard</div>
+                  <div class="text-xs opacity-80">Flip Card Learning</div>
                 </div>
               </div>
               <div class="text-right">
-                <div class="text-xs opacity-70" data-i18n="estimated_time">예상 시간</div>
-                <div class="text-sm font-medium" data-i18n="time_10_15_min">10-15분</div>
+                <div class="text-xs opacity-70">Estimated Time</div>
+                <div class="text-sm font-medium">10-15 Minutes</div>
               </div>
             </div>
             <div class="text-xs opacity-90 bg-white bg-opacity-20 rounded px-2 py-1 inline-block">
-              <span data-i18n="vocabulary_flashcard_features">시각적 학습 • 즉시 피드백</span>
+              <span>Visual Learning • Immediate Feedback</span>
             </div>
           </div>
 
@@ -246,17 +245,17 @@
               <div class="flex items-center">
                 <i class="fas fa-keyboard text-2xl mr-3"></i>
                 <div>
-                  <div class="font-bold text-lg" data-i18n="typing_mode">타이핑</div>
-                  <div class="text-xs opacity-80" data-i18n="typing_quick_desc">직접 입력 학습</div>
+                  <div class="font-bold text-lg">Typing</div>
+                  <div class="text-xs opacity-80">Direct Input Learning</div>
             </div>
               </div>
               <div class="text-right">
-                <div class="text-xs opacity-70" data-i18n="estimated_time">예상 시간</div>
-                <div class="text-sm font-medium" data-i18n="time_15_20_min">15-20분</div>
+                <div class="text-xs opacity-70">Estimated Time</div>
+                <div class="text-sm font-medium">15-20 Minutes</div>
               </div>
             </div>
             <div class="text-xs opacity-90 bg-white bg-opacity-20 rounded px-2 py-1 inline-block">
-              <span data-i18n="vocabulary_typing_features">정확한 철자 • 기억력 강화</span>
+              <span>Accurate Spelling • Memory Enhancement</span>
             </div>
           </div>
 
@@ -267,17 +266,17 @@
               <div class="flex items-center">
                 <i class="fas fa-microphone text-2xl mr-3"></i>
                 <div>
-                  <div class="font-bold text-lg" data-i18n="pronunciation_mode">발음 연습</div>
-                  <div class="text-xs opacity-80" data-i18n="pronunciation_quick_desc">음성 인식 학습</div>
+                  <div class="font-bold text-lg">Pronunciation Practice</div>
+                  <div class="text-xs opacity-80">Speech Recognition Learning</div>
             </div>
               </div>
               <div class="text-right">
-                <div class="text-xs opacity-70" data-i18n="estimated_time">예상 시간</div>
-                <div class="text-sm font-medium" data-i18n="time_10_15_min_2">10-15분</div>
+                <div class="text-xs opacity-70">Estimated Time</div>
+                <div class="text-sm font-medium">10-15 Minutes</div>
             </div>
           </div>
             <div class="text-xs opacity-90 bg-white bg-opacity-20 rounded px-2 py-1 inline-block">
-              <span data-i18n="vocabulary_pronunciation_features">정확한 발음 • 듣기 향상</span>
+              <span>Accurate Pronunciation • Listening Improvement</span>
         </div>
       </div>
 
@@ -285,7 +284,7 @@
           <div class="col-span-full mb-4 mt-6">
             <h3 class="text-lg font-semibold text-green-600 mb-3 flex items-center">
               <i class="fas fa-language mr-2"></i>
-              <span data-i18n="grammar_learning">문법 학습</span>
+              <span>Grammar Learning</span>
             </h3>
           </div>
 
@@ -296,17 +295,17 @@
               <div class="flex items-center">
                 <i class="fas fa-search text-2xl mr-3"></i>
                 <div>
-                  <div class="font-bold text-lg" data-i18n="pattern_analysis_mode">패턴 분석</div>
-                  <div class="text-xs opacity-80" data-i18n="pattern_quick_desc">문법 구조 학습</div>
+                  <div class="font-bold text-lg">Pattern Analysis</div>
+                  <div class="text-xs opacity-80">Grammar Structure Learning</div>
                 </div>
               </div>
               <div class="text-right">
-                <div class="text-xs opacity-70" data-i18n="estimated_time">예상 시간</div>
-                <div class="text-sm font-medium" data-i18n="time_20_25_min">20-25분</div>
+                <div class="text-xs opacity-70">Estimated Time</div>
+                <div class="text-sm font-medium">20-25 Minutes</div>
               </div>
             </div>
             <div class="text-xs opacity-90 bg-white bg-opacity-20 rounded px-2 py-1 inline-block">
-              <span data-i18n="grammar_pattern_features">체계적 분석 • 구조 이해</span>
+              <span>Systematic Analysis • Structure Understanding</span>
             </div>
           </div>
 
@@ -317,17 +316,17 @@
               <div class="flex items-center">
                 <i class="fas fa-edit text-2xl mr-3"></i>
                 <div>
-                  <div class="font-bold text-lg" data-i18n="practice_mode">실습 문제</div>
-                  <div class="text-xs opacity-80" data-i18n="practice_quick_desc">문법 적용 연습</div>
+                  <div class="font-bold text-lg">Practice Problem</div>
+                  <div class="text-xs opacity-80">Grammar Application Practice</div>
                 </div>
               </div>
               <div class="text-right">
-                <div class="text-xs opacity-70" data-i18n="estimated_time">예상 시간</div>
-                <div class="text-sm font-medium" data-i18n="time_15_20_min_2">15-20분</div>
+                <div class="text-xs opacity-70">Estimated Time</div>
+                <div class="text-sm font-medium">15-20 Minutes</div>
               </div>
             </div>
             <div class="text-xs opacity-90 bg-white bg-opacity-20 rounded px-2 py-1 inline-block">
-              <span data-i18n="grammar_practice_features">실전 연습 • 응용 능력</span>
+              <span>Real Practice • Application Ability</span>
             </div>
           </div>
 
@@ -335,7 +334,7 @@
           <div class="col-span-full mb-4 mt-6">
             <h3 class="text-lg font-semibold text-purple-600 mb-3 flex items-center">
               <i class="fas fa-file-text mr-2"></i>
-              <span data-i18n="reading_learning">독해 학습</span>
+              <span>Reading Learning</span>
             </h3>
           </div>
 
@@ -346,17 +345,17 @@
               <div class="flex items-center">
                 <i class="fas fa-book-open text-2xl mr-3"></i>
                 <div>
-                  <div class="font-bold text-lg" data-i18n="example_learning_mode">예문 학습</div>
-                  <div class="text-xs opacity-80" data-i18n="example_quick_desc">문맥 이해 학습</div>
+                  <div class="font-bold text-lg">Example Learning</div>
+                  <div class="text-xs opacity-80">Context Understanding Learning</div>
                 </div>
               </div>
               <div class="text-right">
-                <div class="text-xs opacity-70" data-i18n="estimated_time">예상 시간</div>
-                <div class="text-sm font-medium" data-i18n="time_15_20_min_3">15-20분</div>
+                <div class="text-xs opacity-70">Estimated Time</div>
+                <div class="text-sm font-medium">15-20 Minutes</div>
               </div>
             </div>
             <div class="text-xs opacity-90 bg-white bg-opacity-20 rounded px-2 py-1 inline-block">
-              <span data-i18n="reading_example_features">문맥 파악 • 이해력 향상</span>
+              <span>Context Understanding • Understanding Improvement</span>
             </div>
           </div>
 
@@ -367,17 +366,17 @@
               <div class="flex items-center">
                 <i class="fas fa-bolt text-2xl mr-3"></i>
                 <div>
-                  <div class="font-bold text-lg" data-i18n="flash_mode">플래시 모드</div>
-                  <div class="text-xs opacity-80" data-i18n="flash_quick_desc">빠른 독해 연습</div>
+                  <div class="font-bold text-lg">Flash Mode</div>
+                  <div class="text-xs opacity-80">Quick Reading Practice</div>
                 </div>
               </div>
               <div class="text-right">
-                <div class="text-xs opacity-70" data-i18n="estimated_time">예상 시간</div>
-                <div class="text-sm font-medium" data-i18n="time_10_15_min_3">10-15분</div>
+                <div class="text-xs opacity-70">Estimated Time</div>
+                <div class="text-sm font-medium">10-15 Minutes</div>
               </div>
             </div>
             <div class="text-xs opacity-90 bg-white bg-opacity-20 rounded px-2 py-1 inline-block">
-              <span data-i18n="reading_flash_features">속독 연습 • 집중력 향상</span>
+              <span>Reading Practice • Concentration Improvement</span>
             </div>
           </div>
 
@@ -386,33 +385,33 @@
         <!-- 학습 통계 및 추천 -->
         <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
           <div class="bg-gray-50 rounded-lg p-4">
-            <h4 class="font-semibold text-gray-700 mb-2" data-i18n="recent_activity">최근 활동</h4>
+            <h4 class="font-semibold text-gray-700 mb-2">Recent Activity</h4>
             <div id="recent-activity" class="text-sm text-gray-600">
-              <span data-i18n="no_recent_activity">최근 학습 기록이 없습니다</span>
+              <span>No recent learning record</span>
             </div>
           </div>
           <div class="bg-gray-50 rounded-lg p-4">
-            <h4 class="font-semibold text-gray-700 mb-2" data-i18n="recommended_mode">추천 학습</h4>
+            <h4 class="font-semibold text-gray-700 mb-2">Recommended Mode</h4>
             <div id="recommended-mode" class="text-sm text-gray-600">
               <div class="space-y-2">
                 <div class="flex items-center justify-between p-2 bg-white rounded border">
                   <div class="flex items-center">
                     <i class="fas fa-clone text-blue-500 mr-2"></i>
-                    <span data-i18n="flashcard_recommended">플래시카드</span>
+                    <span>Flashcard</span>
                   </div>
-                  <span class="text-xs text-green-600 font-medium" data-i18n="recommended">추천</span>
+                  <span class="text-xs text-green-600 font-medium">Recommended</span>
                 </div>
-                <div class="text-xs text-gray-500" data-i18n="recommendation_reason">
-                  최근 학습 패턴을 기반으로 추천됩니다
+                <div class="text-xs text-gray-500">
+                  Recommended based on recent learning patterns
                 </div>
               </div>
             </div>
           </div>
           <div class="bg-gray-50 rounded-lg p-4">
-            <h4 class="font-semibold text-gray-700 mb-2" data-i18n="learning_streak">학습 연속일</h4>
+            <h4 class="font-semibold text-gray-700 mb-2">Learning Streak</h4>
             <div id="learning-streak" class="text-sm text-gray-600">
               <span class="text-2xl font-bold text-green-600">0</span>
-              <span data-i18n="days">일</span>
+              <span>Days</span>
             </div>
           </div>
         </div>
@@ -421,23 +420,23 @@
       <!-- 학습 모드 선택 (숨김 처리 - 기존 호환성 유지) -->
       <div id="mode-selection" class="bg-white rounded-lg shadow-md p-6 mb-8 hidden">
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold" id="mode-title" data-i18n="learning_modes">학습 모드</h2>
+          <h2 class="text-xl font-bold" id="mode-title">Learning Modes</h2>
           <div class="flex space-x-2">
             <button id="upload-for-mode" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hidden">
-              <i class="fas fa-upload mr-2"></i>데이터 업로드
+              <i class="fas fa-upload mr-2"></i>Data Upload
             </button>
           <button id="back-to-areas" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg">
-            <i class="fas fa-arrow-left mr-2"></i><span data-i18n="back_to_areas">영역 선택으로 돌아가기</span>
+            <i class="fas fa-arrow-left mr-2"></i><span>Back to Areas</span>
           </button>
         </div>
         </div>
         
         <!-- 인라인 업로드 UI (학습 모드 선택에서) -->
         <div id="mode-upload-section" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 hidden">
-          <h3 class="text-lg font-medium mb-3" id="mode-upload-title">데이터 업로드</h3>
+          <h3 class="text-lg font-medium mb-3" id="mode-upload-title">Data Upload</h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium mb-2">파일 선택:</label>
+              <label class="block text-sm font-medium mb-2">File Selection:</label>
               <input type="file" id="mode-file-input" accept=".csv,.json" class="w-full p-2 border rounded">
             </div>
             <div class="flex items-end space-x-2">
@@ -459,31 +458,31 @@
       <!-- 플래시카드 학습 영역 (단어) -->
       <div id="flashcard-container" class="mb-8 hidden">
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold" data-i18n="flashcards">플래시카드 학습</h2>
+          <h2 class="text-xl font-bold">Flashcards Learning</h2>
           <div class="flex space-x-2">
             <button id="upload-vocabulary-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
-              <i class="fas fa-upload mr-2"></i><span data-i18n="upload_data">데이터 업로드</span>
+              <i class="fas fa-upload mr-2"></i><span>Data Upload</span>
             </button>
           <button id="back-from-flashcard" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg">
-            <i class="fas fa-arrow-left mr-2"></i><span data-i18n="back">돌아가기</span>
+            <i class="fas fa-arrow-left mr-2"></i><span>Back</span>
           </button>
           </div>
         </div>
         
         <!-- 인라인 업로드 UI -->
         <div id="vocabulary-upload-section" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 hidden">
-          <h3 class="text-lg font-medium mb-3" data-i18n="upload_word_data">단어 데이터 업로드</h3>
+          <h3 class="text-lg font-medium mb-3">Word Data Upload</h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium mb-2" data-i18n="select_file">파일 선택:</label>
+              <label class="block text-sm font-medium mb-2">File Selection:</label>
               <input type="file" id="vocabulary-file-input" accept=".csv,.json" class="w-full p-2 border rounded">
             </div>
             <div class="flex items-end space-x-2">
               <button id="upload-vocabulary-file" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-                <span data-i18n="upload">업로드</span>
+                <span>Upload</span>
               </button>
               <button id="download-vocabulary-template" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
-                <span data-i18n="template">템플릿</span>
+                <span>Template</span>
               </button>
             </div>
           </div>
@@ -494,11 +493,11 @@
               <div id="front-emoji" class="text-6xl mb-4">📚</div>
               <h2 id="front-word" class="text-4xl font-bold mb-4"></h2>
               <p id="front-pronunciation" class="text-xl text-gray-600 mb-4"></p>
-              <p class="text-gray-500 mt-8" data-i18n="click_to_flip">(카드를 클릭하여 뒤집기)</p>
+              <p class="text-gray-500 mt-8" data-i18n="click_to_flip">(Click to flip)</p>
             </div>
             <div class="flip-card-back bg-white rounded-lg shadow-lg p-8 text-center">
               <div id="back-emoji" class="text-4xl mb-2">📚</div>
-              <div id="back-category" class="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full inline-block mb-4">카테고리</div>
+              <div id="back-category" class="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full inline-block mb-4">Category</div>
               <div id="back-word" class="text-4xl font-bold mb-4"></div>
               <p id="back-pronunciation" class="text-xl text-gray-600 mb-2"></p>
               <div id="back-meaning" class="text-lg text-gray-700 mb-6"></div>
@@ -510,13 +509,13 @@
         
         <div class="flex justify-center space-x-4 mt-6">
           <button id="prev-card" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-            <i class="fas fa-arrow-left mr-2"></i><span data-i18n="previous">이전</span>
+            <i class="fas fa-arrow-left mr-2"></i><span>Previous</span>
           </button>
           <button id="flip-card" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-            <span data-i18n="flip">뒤집기</span>
+            <span>Flip</span>
           </button>
           <button id="next-card" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-            <span data-i18n="next">다음</span><i class="fas fa-arrow-right ml-2"></i>
+            <span>Next</span><i class="fas fa-arrow-right ml-2"></i>
           </button>
         </div>
         
@@ -531,31 +530,31 @@
       <!-- 타이학 학습 영역 (단어) -->
       <div id="typing-container" class="mb-8 hidden">
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold" data-i18n="typing">타이핑 학습</h2>
+          <h2 class="text-xl font-bold">Typing Learning</h2>
           <div class="flex space-x-2">
             <button id="upload-typing-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
-              <i class="fas fa-upload mr-2"></i><span data-i18n="upload_data">데이터 업로드</span>
+              <i class="fas fa-upload mr-2"></i><span>Data Upload</span>
             </button>
           <button id="back-from-typing" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg">
-            <i class="fas fa-arrow-left mr-2"></i><span data-i18n="back">돌아가기</span>
+            <i class="fas fa-arrow-left mr-2"></i><span>Back</span>
           </button>
           </div>
         </div>
         
         <!-- 인라인 업로드 UI -->
         <div id="typing-upload-section" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 hidden">
-          <h3 class="text-lg font-medium mb-3" data-i18n="upload_word_data">단어 데이터 업로드</h3>
+          <h3 class="text-lg font-medium mb-3">Word Data Upload</h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium mb-2" data-i18n="select_file">파일 선택:</label>
+              <label class="block text-sm font-medium mb-2">File Selection:</label>
               <input type="file" id="typing-file-input" accept=".csv,.json" class="w-full p-2 border rounded">
             </div>
             <div class="flex items-end space-x-2">
               <button id="upload-typing-file" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-                <span data-i18n="upload">업로드</span>
+                <span>Upload</span>
               </button>
               <button id="download-typing-template" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
-                <span data-i18n="template">템플릿</span>
+                <span>Template</span>
               </button>
             </div>
           </div>
@@ -566,13 +565,13 @@
           <p id="typing-pronunciation" class="text-gray-600 mb-6"></p>
           
           <div class="mb-4">
-            <label for="typing-answer" class="block text-sm font-medium mb-2" data-i18n="typing_prompt">정답을 입력하세요:</label>
+            <label for="typing-answer" class="block text-sm font-medium mb-2">Enter the Answer:</label>
             <input 
               type="text" 
               id="typing-answer" 
               class="w-full p-3 border rounded-lg text-lg"
               data-i18n-placeholder="typing_placeholder"
-              placeholder="정답 입력..."
+              placeholder="Enter Answer..."
             >
           </div>
           
@@ -580,10 +579,10 @@
           
           <div class="flex justify-end mt-4">
             <button id="check-answer" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded">
-              <span data-i18n="check_answer">정답 확인</span>
+              <span>Check Answer</span>
             </button>
             <button id="next-typing" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded ml-3 hidden">
-              <span data-i18n="next_word">다음 단어</span>
+              <span>Next Word</span>
             </button>
           </div>
         </div>
@@ -591,9 +590,9 @@
         <div class="mt-6 text-center">
           <span id="typing-progress">0/0</span>
           <div class="mt-2">
-            <span id="typing-correct" class="text-green-600 font-medium"><span data-i18n="correct_count">맞춘 개수:</span> 0</span>
+            <span id="typing-correct" class="text-green-600 font-medium"><span data-i18n="correct_count">Correct Count:</span> 0</span>
             <span class="mx-2">|</span>
-            <span id="typing-wrong" class="text-red-600 font-medium"><span data-i18n="wrong_count">틀린 개수:</span> 0</span>
+            <span id="typing-wrong" class="text-red-600 font-medium"><span data-i18n="wrong_count">Wrong Count:</span> 0</span>
           </div>
         </div>
       </div>
@@ -601,9 +600,9 @@
       <!-- 문법 학습 영역 -->
       <div id="grammar-container" class="mb-8 hidden">
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold" data-i18n="grammar_pattern_learning">문법 패턴 학습</h2>
+          <h2 class="text-xl font-bold">Grammar Pattern Learning</h2>
           <button id="back-from-grammar" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg">
-            <i class="fas fa-arrow-left mr-2"></i><span data-i18n="back">돌아가기</span>
+            <i class="fas fa-arrow-left mr-2"></i><span>Back</span>
           </button>
         </div>
           <div id="grammar-pattern-container">
@@ -612,10 +611,10 @@
         
         <div class="flex justify-center space-x-4 mt-6">
           <button id="prev-grammar" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-            <i class="fas fa-arrow-left mr-2"></i><span data-i18n="previous">이전</span>
+            <i class="fas fa-arrow-left mr-2"></i><span>Previous</span>
           </button>
           <button id="next-grammar" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-            <span data-i18n="next">다음</span><i class="fas fa-arrow-right ml-2"></i>
+            <span>Next</span><i class="fas fa-arrow-right ml-2"></i>
           </button>
         </div>
         
@@ -628,10 +627,10 @@
       <div id="reading-container" class="mb-8 hidden">
         <div class="flex justify-between items-center mb-4">
           <div class="flex-1"></div>
-          <h2 id="reading-mode-title" class="text-xl font-bold text-center" data-i18n="reading_example_learning">예문 학습</h2>
+          <h2 id="reading-mode-title" class="text-xl font-bold text-center">Example Learning</h2>
           <div class="flex-1 flex justify-end">
           <button id="back-from-reading" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg">
-              <i class="fas fa-arrow-left mr-2"></i><span data-i18n="back">돌아가기</span>
+              <i class="fas fa-arrow-left mr-2"></i><span>Back</span>
           </button>
           </div>
         </div>
@@ -643,13 +642,13 @@
         
         <div class="flex justify-center space-x-4 mt-6">
           <button id="prev-reading" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-            <i class="fas fa-arrow-left mr-2"></i><span data-i18n="previous">이전</span>
+            <i class="fas fa-arrow-left mr-2"></i><span>Previous</span>
           </button>
           <button id="flip-reading-card" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-            <span data-i18n="flip">뒤집기</span>
+            <span>Flip</span>
           </button>
           <button id="next-reading" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-            <span data-i18n="next">다음</span><i class="fas fa-arrow-right ml-2"></i>
+            <span>Next</span><i class="fas fa-arrow-right ml-2"></i>
           </button>
         </div>
         
@@ -663,10 +662,10 @@
       <div id="flashcard-mode" class="hidden mb-8">
         <div class="relative">
           <button id="back-from-flashcard" class="absolute top-4 right-4 bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm z-10">
-            <i class="fas fa-arrow-left mr-1"></i><span data-i18n="back">돌아가기</span>
+            <i class="fas fa-arrow-left mr-1"></i><span>Back</span>
           </button>
           <div class="text-center mb-6">
-            <h2 class="text-2xl font-bold mb-2" data-i18n="flashcard_learning">🃏 플래시카드 학습</h2>
+            <h2 class="text-2xl font-bold mb-2">🃏 Flashcard Learning</h2>
             <div id="flashcard-mode-progress" class="text-gray-600">0 / 0</div>
           </div>
           
@@ -674,16 +673,16 @@
             <div class="flip-card-inner">
               <div class="flip-card-front bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-8">
                 <div class="text-center">
-                  <h3 id="flashcard-front-word" class="text-4xl font-bold text-gray-800 mb-4">단어</h3>
-                  <p id="flashcard-front-transcription" class="text-gray-600">발음</p>
-                  <p class="text-gray-500 mt-8 text-sm" data-i18n="click_to_check_meaning">클릭하여 의미 확인</p>
+                  <h3 id="flashcard-front-word" class="text-4xl font-bold text-gray-800 mb-4">Word</h3>
+                  <p id="flashcard-front-transcription" class="text-gray-600">Pronunciation</p>
+                  <p class="text-gray-500 mt-8 text-sm" data-i18n="click_to_check_meaning">Click to check meaning</p>
                 </div>
               </div>
               <div class="flip-card-back bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg p-8">
                 <div class="text-center">
-                  <h3 id="flashcard-back-word" class="text-3xl font-bold text-green-600 mb-4">의미</h3>
-                  <p id="flashcard-back-definition" class="text-gray-700">설명</p>
-                  <p class="text-gray-500 mt-8 text-sm" data-i18n="click_to_see_word">다시 클릭하여 단어 보기</p>
+                  <h3 id="flashcard-back-word" class="text-3xl font-bold text-green-600 mb-4">Meaning</h3>
+                  <p id="flashcard-back-definition" class="text-gray-700">Description</p>
+                  <p class="text-gray-500 mt-8 text-sm" data-i18n="click_to_see_word">Click again to see the word</p>
                 </div>
               </div>
             </div>
@@ -691,13 +690,13 @@
           
           <div class="flex justify-center space-x-4 mt-6">
             <button id="prev-flashcard-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-              <i class="fas fa-arrow-left mr-2"></i><span data-i18n="previous">이전</span>
+              <i class="fas fa-arrow-left mr-2"></i><span>Previous</span>
             </button>
             <button id="flip-flashcard-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-              <span data-i18n="flip">뒤집기</span>
+              <span>Flip</span>
             </button>
             <button id="next-flashcard-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-              <span data-i18n="next">다음</span><i class="fas fa-arrow-right ml-2"></i>
+              <span>Next</span><i class="fas fa-arrow-right ml-2"></i>
             </button>
           </div>
         </div>
@@ -707,40 +706,40 @@
       <div id="typing-mode" class="hidden mb-8">
         <div class="bg-white rounded-lg shadow-md p-6 relative">
           <button id="back-from-typing" class="absolute top-4 right-4 bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm">
-            <i class="fas fa-arrow-left mr-1"></i><span data-i18n="back">돌아가기</span>
+            <i class="fas fa-arrow-left mr-1"></i><span>Back</span>
           </button>
           <div class="text-center mb-6">
-            <h2 class="text-2xl font-bold mb-2" data-i18n="typing_learning">⌨️ 타이핑 학습</h2>
+            <h2 class="text-2xl font-bold mb-2">⌨️ Typing Learning</h2>
             <div id="typing-mode-progress" class="text-gray-600">0 / 0</div>
           </div>
           
           <div class="max-w-lg mx-auto">
             <div id="typing-mode-question" class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6 text-center">
-              <div class="text-xl font-bold mb-2" data-i18n="word">단어</div>
-              <div class="text-gray-600" data-i18n="meaning">의미</div>
+              <div class="text-xl font-bold mb-2">Word</div>
+              <div class="text-gray-600">Meaning</div>
             </div>
             
             <div class="mb-6">
               <input type="text" id="typing-mode-answer" class="w-full p-4 text-xl border rounded-lg text-center" 
                      data-i18n-placeholder="typing_answer_placeholder"
-                     placeholder="답안을 입력하세요" onkeypress="if(event.key==='Enter') checkTypingAnswer()">
+                     placeholder="Enter Answer..." onkeypress="if(event.key==='Enter') checkTypingAnswer()">
             </div>
             
             <div id="typing-mode-result" class="hidden p-3 rounded"></div>
             
             <div class="text-center mt-4">
               <button id="check-typing-answer-btn" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg">
-                <span data-i18n="check">확인</span>
+                <span>Check</span>
               </button>
             </div>
           </div>
           
           <div class="flex justify-center space-x-4 mt-6">
             <button id="prev-typing-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-              <i class="fas fa-arrow-left mr-2"></i><span data-i18n="previous">이전</span>
+              <i class="fas fa-arrow-left mr-2"></i><span>Previous</span>
             </button>
             <button id="next-typing-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-              <span data-i18n="next">다음</span><i class="fas fa-arrow-right ml-2"></i>
+              <span>Next</span><i class="fas fa-arrow-right ml-2"></i>
             </button>
           </div>
         </div>
@@ -750,11 +749,11 @@
       <div id="pronunciation-mode" class="hidden mb-8">
         <div class="bg-white rounded-lg shadow-md p-6 relative">
           <button id="back-to-dashboard-pronunciation" class="absolute top-4 right-4 bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm">
-            <i class="fas fa-arrow-left mr-1"></i><span data-i18n="back">돌아가기</span>
+            <i class="fas fa-arrow-left mr-1"></i><span>Back</span>
           </button>
           <div class="text-center">
-            <h2 class="text-2xl font-bold mb-4" data-i18n="pronunciation_practice">🎤 발음 연습</h2>
-            <p class="text-gray-600" data-i18n="pronunciation_coming_soon">발음 연습 모드는 준비 중입니다.</p>
+            <h2 class="text-2xl font-bold mb-4">🎤 Pronunciation Practice</h2>
+            <p class="text-gray-600">Pronunciation practice mode is under preparation.</p>
           </div>
         </div>
       </div>
@@ -763,24 +762,24 @@
       <div id="grammar-pattern-mode" class="hidden mb-8">
         <div class="bg-white rounded-lg shadow-md p-6 relative">
           <button id="back-to-dashboard-pattern" class="absolute top-4 right-4 bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm">
-            <i class="fas fa-arrow-left mr-1"></i><span data-i18n="back">돌아가기</span>
+            <i class="fas fa-arrow-left mr-1"></i><span>Back</span>
           </button>
           <div class="text-center mb-6">
-            <h2 class="text-2xl font-bold mb-2" data-i18n="grammar_pattern_analysis">📝 문법 패턴 분석</h2>
+            <h2 class="text-2xl font-bold mb-2">📝 Grammar Pattern Analysis</h2>
             <div id="pattern-progress" class="text-gray-600">0 / 0</div>
           </div>
           
           <div class="max-w-2xl mx-auto">
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
-              <h3 id="pattern-title" class="text-xl font-bold mb-4" data-i18n="grammar_pattern">문법 패턴</h3>
+              <h3 id="pattern-title" class="text-xl font-bold mb-4">Grammar Pattern</h3>
               <div class="text-lg font-mono bg-white p-3 rounded border mb-4">
-                <span id="pattern-structure">패턴 구조</span>
+                <span id="pattern-structure">Pattern Structure</span>
               </div>
-              <p id="pattern-explanation" class="text-gray-700 mb-4">설명</p>
+              <p id="pattern-explanation" class="text-gray-700 mb-4">Description</p>
               <div class="bg-white rounded p-4 border">
-                <h4 class="font-semibold mb-2" data-i18n="examples">예문:</h4>
+                <h4 class="font-semibold mb-2">Examples:</h4>
                 <ul id="pattern-examples" class="list-disc list-inside">
-                  <li>예문이 여기에 표시됩니다</li>
+                  <li>Example sentences will be displayed here</li>
                 </ul>
               </div>
             </div>
@@ -788,10 +787,10 @@
           
           <div class="flex justify-center space-x-4 mt-6">
             <button id="prev-pattern" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-              <i class="fas fa-arrow-left mr-2"></i><span data-i18n="previous">이전</span>
+              <i class="fas fa-arrow-left mr-2"></i><span>Previous</span>
             </button>
             <button id="next-pattern" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-              <span data-i18n="next">다음</span><i class="fas fa-arrow-right ml-2"></i>
+              <span>Next</span><i class="fas fa-arrow-right ml-2"></i>
             </button>
           </div>
           
@@ -807,28 +806,28 @@
       <div id="grammar-practice-mode" class="hidden mb-8">
         <div class="bg-white rounded-lg shadow-md p-6 relative">
           <button id="back-to-dashboard-practice" class="absolute top-4 right-4 bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm">
-            <i class="fas fa-arrow-left mr-1"></i><span data-i18n="back">돌아가기</span>
+            <i class="fas fa-arrow-left mr-1"></i><span>Back</span>
           </button>
           <div class="text-center mb-6">
-            <h2 class="text-2xl font-bold mb-2" data-i18n="grammar_practice">📚 문법 실습 연습</h2>
+            <h2 class="text-2xl font-bold mb-2">📚 Grammar Practice Practice</h2>
           </div>
           
           <div id="grammar-card" class="flip-card max-w-md mx-auto cursor-pointer">
             <div class="flip-card-inner">
               <div class="flip-card-front bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg p-8">
                 <div class="text-center">
-                  <h3 id="grammar-front-title" class="text-2xl font-bold text-green-800 mb-4" data-i18n="grammar_pattern">문법 패턴</h3>
-                  <div id="grammar-front-structure" class="text-3xl font-mono font-bold text-gray-800 mb-4">패턴</div>
-                  <p class="text-gray-500 mt-8 text-sm" data-i18n="click_to_see_explanation">클릭하여 설명 보기</p>
+                  <h3 id="grammar-front-title" class="text-2xl font-bold text-green-800 mb-4">Grammar Pattern</h3>
+                  <div id="grammar-front-structure" class="text-3xl font-mono font-bold text-gray-800 mb-4">Pattern</div>
+                  <p class="text-gray-500 mt-8 text-sm" data-i18n="click_to_see_explanation">Click to see explanation</p>
                 </div>
               </div>
               <div class="flip-card-back bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-8">
                 <div class="text-center">
-                  <p id="grammar-back-explanation" class="text-gray-700 mb-4">설명</p>
+                  <p id="grammar-back-explanation" class="text-gray-700 mb-4">Description</p>
                   <div class="bg-white rounded-lg p-4 border border-blue-300">
-                    <h4 class="font-semibold mb-2" data-i18n="examples">예문:</h4>
+                    <h4 class="font-semibold mb-2">Examples:</h4>
                     <ul id="grammar-back-examples" class="list-disc list-inside text-left">
-                      <li>예문이 여기에 표시됩니다</li>
+                      <li>Example sentences will be displayed here</li>
                     </ul>
                   </div>
                 </div>
@@ -838,13 +837,13 @@
           
           <div class="flex justify-center space-x-4 mt-6">
             <button id="prev-practice" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-              <i class="fas fa-arrow-left mr-2"></i><span data-i18n="previous">이전</span>
+              <i class="fas fa-arrow-left mr-2"></i><span>Previous</span>
             </button>
             <button id="flip-grammar-practice-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-              <span data-i18n="flip">뒤집기</span>
+              <span>Flip</span>
             </button>
             <button id="next-practice" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-              <span data-i18n="next">다음</span><i class="fas fa-arrow-right ml-2"></i>
+              <span>Next</span><i class="fas fa-arrow-right ml-2"></i>
             </button>
           </div>
           
@@ -861,7 +860,7 @@
       <div id="reading-mode" class="hidden mb-8">
         <div class="bg-white rounded-lg shadow-md p-6">
           <div class="text-center mb-6">
-            <h2 class="text-2xl font-bold mb-2" data-i18n="reading_flash_card">플래시 카드</h2>
+            <h2 class="text-2xl font-bold mb-2">Reading Flash Card</h2>
             <div id="reading-progress" class="text-gray-600">0 / 0</div>
           </div>
           
@@ -869,33 +868,33 @@
             <div class="space-y-6">
               <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
                 <h3 class="font-bold text-blue-800 text-lg mb-4">
-                  <i class="fas fa-book-open mr-2"></i><span data-i18n="original_text">원문</span>
+                  <i class="fas fa-book-open mr-2"></i><span>Original Text</span>
                 </h3>
-                <p id="reading-text" class="text-xl leading-relaxed text-gray-800">원문이 여기에 표시됩니다</p>
+                <p id="reading-text" class="text-xl leading-relaxed text-gray-800">Original text will be displayed here</p>
               </div>
               
               <div class="bg-green-50 border border-green-200 rounded-lg p-6">
                 <h3 class="font-bold text-green-800 text-lg mb-4">
-                  <i class="fas fa-language mr-2"></i><span data-i18n="translation">번역</span>
+                  <i class="fas fa-language mr-2"></i><span>Translation</span>
                 </h3>
-                <p id="reading-translation" class="text-lg text-gray-700">번역이 여기에 표시됩니다</p>
+                <p id="reading-translation" class="text-lg text-gray-700">Translation will be displayed here</p>
               </div>
               
               <div class="bg-purple-50 border border-purple-200 rounded-lg p-6">
                 <h3 class="font-bold text-purple-800 text-lg mb-4">
-                  <i class="fas fa-info-circle mr-2"></i><span data-i18n="context">상황</span>
+                  <i class="fas fa-info-circle mr-2"></i><span>Context</span>
                 </h3>
-                <p id="reading-context" class="text-gray-700">상황 설명이 여기에 표시됩니다</p>
+                <p id="reading-context" class="text-gray-700">Context description will be displayed here</p>
               </div>
             </div>
           </div>
           
           <div class="flex justify-center space-x-4 mt-6">
             <button id="prev-reading-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-              <i class="fas fa-arrow-left mr-2"></i><span data-i18n="previous">이전</span>
+              <i class="fas fa-arrow-left mr-2"></i><span>Previous</span>
             </button>
             <button id="next-reading-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-              <span data-i18n="next">다음</span><i class="fas fa-arrow-right ml-2"></i>
+              <span>Next</span><i class="fas fa-arrow-right ml-2"></i>
             </button>
           </div>
         </div>
@@ -905,12 +904,12 @@
       <div id="no-data-message" class="hidden mb-8">
         <div class="bg-white rounded-lg shadow-md p-6 relative">
           <button id="back-to-dashboard-nodata" class="absolute top-4 right-4 bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm">
-            <i class="fas fa-arrow-left mr-1"></i><span data-i18n="back">돌아가기</span>
+            <i class="fas fa-arrow-left mr-1"></i><span>Back</span>
           </button>
           <div class="text-center">
             <div class="text-6xl mb-4">📭</div>
-            <h2 class="text-2xl font-bold mb-4" data-i18n="no_data">데이터가 없습니다</h2>
-            <p class="text-gray-600 mb-6" data-i18n="no_data_description">학습할 데이터가 없습니다. 먼저 데이터를 업로드해주세요.</p>
+            <h2 class="text-2xl font-bold mb-4">No Data</h2>
+            <p class="text-gray-600 mb-6">No data to learn. Please upload data first.</p>
           </div>
         </div>
       </div>
@@ -923,20 +922,20 @@
     <div id="concept-upload-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
       <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-2xl max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold text-gray-800" data-i18n="concept_upload">개념 업로드</h2>
+          <h2 class="text-xl font-bold text-gray-800">Concept Upload</h2>
           <button id="close-concept-upload-modal" class="text-gray-500 hover:text-gray-700">
             <i class="fas fa-times text-xl"></i>
           </button>
         </div>
         <div class="text-center">
-          <p class="text-gray-600 mb-4" data-i18n="upload_csv_json_concept">CSV 또는 JSON 파일을 업로드하여 개념을 추가하세요.</p>
+          <p class="text-gray-600 mb-4">Upload CSV or JSON file to add concept.</p>
           <input type="file" id="concept-file-input" accept=".csv,.json" class="mb-4">
           <div class="flex justify-center space-x-4">
             <button id="upload-concept-file" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg">
-              <span data-i18n="upload">업로드</span>
+              <span>Upload</span>
             </button>
             <button id="download-concept-template" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg">
-              <span data-i18n="download_template">템플릿 다운로드</span>
+              <span>Download Template</span>
             </button>
           </div>
         </div>
@@ -947,20 +946,20 @@
     <div id="grammar-upload-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
       <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-2xl max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold text-gray-800" data-i18n="grammar_pattern_upload">문법 패턴 업로드</h2>
+          <h2 class="text-xl font-bold text-gray-800">Grammar Pattern Upload</h2>
           <button id="close-grammar-upload-modal" class="text-gray-500 hover:text-gray-700">
             <i class="fas fa-times text-xl"></i>
           </button>
         </div>
         <div class="text-center">
-          <p class="text-gray-600 mb-4" data-i18n="upload_csv_json_grammar">CSV 또는 JSON 파일을 업로드하여 문법 패턴을 추가하세요.</p>
+          <p class="text-gray-600 mb-4">Upload CSV or JSON file to add grammar pattern.</p>
           <input type="file" id="grammar-file-input" accept=".csv,.json" class="mb-4">
           <div class="flex justify-center space-x-4">
             <button id="upload-grammar-file" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg">
-              <span data-i18n="upload">업로드</span>
+              <span>Upload</span>
             </button>
             <button id="download-grammar-template" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg">
-              <span data-i18n="download_template">템플릿 다운로드</span>
+              <span>Download Template</span>
             </button>
           </div>
         </div>
@@ -971,20 +970,20 @@
     <div id="example-upload-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
       <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-2xl max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold text-gray-800" data-i18n="example_upload">예문 업로드</h2>
+          <h2 class="text-xl font-bold text-gray-800">Example Upload</h2>
           <button id="close-example-upload-modal" class="text-gray-500 hover:text-gray-700">
             <i class="fas fa-times text-xl"></i>
           </button>
         </div>
         <div class="text-center">
-          <p class="text-gray-600 mb-4" data-i18n="upload_csv_json_example">CSV 또는 JSON 파일을 업로드하여 예문을 추가하세요.</p>
+          <p class="text-gray-600 mb-4">Upload CSV or JSON file to add example.</p>
           <input type="file" id="example-file-input" accept=".csv,.json" class="mb-4">
           <div class="flex justify-center space-x-4">
             <button id="upload-example-file" class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-lg">
-              <span data-i18n="upload">업로드</span>
+              <span>Upload</span>
             </button>
             <button id="download-example-template" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg">
-              <span data-i18n="download_template">템플릿 다운로드</span>
+              <span>Download Template</span>
             </button>
           </div>
         </div>

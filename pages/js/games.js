@@ -2497,9 +2497,9 @@ function createMemoryCard(cardData) {
     <div class="card-back" style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden;">
       <div class="flex items-center justify-center bg-gray-300 text-gray-700 rounded-lg h-full p-2 min-h-[90px] hover:bg-gray-400">
         <span class="text-lg sm:text-2xl">❓</span>
+        </div>
       </div>
-    </div>
-  `;
+    `;
 
   card.addEventListener("click", () => flipMemoryCard(card));
 

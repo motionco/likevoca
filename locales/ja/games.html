@@ -6,25 +6,25 @@
     <title>ゲーム - LikeVoca</title>
 
     <!-- 기본 메타 태그 -->
-    <meta name="description" content="楽しいゲームで様々な言語を学びましょう。" />
+    <meta name="description" content="単語マッチング、単語シャッフル、記憶ゲームなど楽しいゲームで言語を学習しましょう" />
     <meta name="keywords" content="言語ゲーム, ゲーム, 単語ゲーム, 言語学習ゲーム, 英語, 日本語, 中国語, 韓国語" />
     
     <!-- Open Graph / 소셜 미디어 메타 태그 -->
-    <meta property="og:title" content="LikeVoca - ゲーム" />
-    <meta property="og:description" content="楽しいゲームで様々な言語を学びましょう。" />
+    <meta property="og:title" content="ゲーム - LikeVoca" />
+    <meta property="og:description" content="単語マッチング、単語シャッフル、記憶ゲームなど楽しいゲームで言語を学習しましょう" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://likevoca.com/pages/games.html" />
-    <meta property="og:locale" content="ja" />
+    <meta property="og:url" content="https://likevoca.com/ja/games" />
+    <meta property="og:locale" content="ja_JP" />
     
     <!-- 표준 링크 -->
-    <link rel="canonical" href="https://likevoca.com/ja/pages/games.html" />
+    <link rel="canonical" href="https://likevoca.com/ja/games" />
     
-    <!-- 대체 언어 링크 (초기값) -->
-    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/pages/games.html" />
-    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/pages/games.html" />
-    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/pages/games.html" />
-    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/pages/games.html" />
-    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/pages/games.html" />
+    <!-- 대체 언어 링크 -->
+    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/games" />
+    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/games" />
+    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/games" />
+    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/games" />
+    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/games" />
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link
@@ -80,7 +80,7 @@
 
     <main class="container mx-auto max-w-7xl px-4 py-8">
       <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800" data-i18n="games">ゲーム</h1>
+        <h1 class="text-3xl font-bold text-gray-800">ゲーム</h1>
         <div class="flex space-x-4">
           <select id="source-language" class="border p-2 rounded">
             <option value="korean" data-i18n="korean">韓国語</option>
@@ -96,8 +96,6 @@
           </select>
         </div>
       </div>
-
-
 
       <!-- 게임 실행 영역 -->
       <div id="game-play-area" class="hidden">
@@ -118,81 +116,81 @@
       <div id="game-selection-area">
         <!-- 게임 선택 안내 -->
         <div class="text-center mb-8">
-          <h2 class="text-2xl font-bold mb-4" data-i18n="select_game_to_play">プレイしたいゲームを選択してください</h2>
-          <p class="text-gray-600 max-w-2xl mx-auto" data-i18n="game_selection_desc">
+          <h2 class="text-2xl font-bold mb-4">プレイしたいゲームを選択してください</h2>
+          <p class="text-gray-600 max-w-2xl mx-auto">
             各ゲームをクリックするとゲームが開始されます。上で選択した元の言語と対象言語の設定がゲームにも適用されます。
           </p>
-      </div>
+        </div>
 
-      <!-- 게임 선택 카드 -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-        <div class="game-card bg-white rounded-xl p-6 shadow-lg cursor-pointer" data-game="word-matching">
-          <div class="flex flex-col h-full">
-            <div class="flex items-center justify-center text-[#9C27B0] mb-4">
-              <i class="fas fa-exchange-alt text-4xl"></i>
-            </div>
-            <h3 class="text-xl font-bold text-center mb-2" data-i18n="word_matching_title">単語マッチング</h3>
-            <p class="text-gray-600 text-center mb-4" data-i18n="word_matching_desc">
-              元言語と対象言語の単語を正しく結びつけるゲームです。
-            </p>
-            <div class="mt-auto">
-              <div class="flex justify-between text-sm text-gray-500 mb-4">
-                <span><i class="fas fa-stopwatch mr-1"></i> <span data-i18n="time_limit">制限時間</span></span>
-                <span><i class="fas fa-star mr-1"></i> <span data-i18n="beginner">初級</span></span>
+        <!-- 게임 선택 카드 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+          <div class="game-card bg-white rounded-xl p-6 shadow-lg cursor-pointer" data-game="word-matching">
+            <div class="flex flex-col h-full">
+              <div class="flex items-center justify-center text-[#9C27B0] mb-4">
+                <i class="fas fa-exchange-alt text-4xl"></i>
               </div>
-              <button class="w-full bg-[#9C27B0] text-white py-2 rounded-lg hover:bg-[#7B1FA2] transition-colors">
-                <i class="fas fa-play mr-2"></i><span data-i18n="start_game">ゲーム開始</span>
-              </button>
+              <h3 class="text-xl font-bold text-center mb-2">単語マッチング</h3>
+              <p class="text-gray-600 text-center mb-4">
+                元言語と対象言語の単語を正しく結びつけるゲームです。
+              </p>
+              <div class="mt-auto">
+                <div class="flex justify-between text-sm text-gray-500 mb-4">
+                  <span><i class="fas fa-stopwatch mr-1"></i> <span data-i18n="time_limit">制限時間</span></span>
+                  <span><i class="fas fa-star mr-1"></i> <span data-i18n="beginner">初級</span></span>
+                </div>
+                <button class="w-full bg-[#9C27B0] text-white py-2 rounded-lg hover:bg-[#7B1FA2] transition-colors">
+                  <i class="fas fa-play mr-2"></i><span data-i18n="start_game">ゲーム開始</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="game-card bg-white rounded-xl p-6 shadow-lg cursor-pointer" data-game="word-scramble">
+            <div class="flex flex-col h-full">
+              <div class="flex items-center justify-center text-[#9C27B0] mb-4">
+                <i class="fas fa-random text-4xl"></i>
+              </div>
+              <h3 class="text-xl font-bold text-center mb-2">単語シャッフル</h3>
+              <p class="text-gray-600 text-center mb-4">
+                バラバラになった文字を正しい順序に並び替えて単語を完成させてください。
+              </p>
+              <div class="mt-auto">
+                <div class="flex justify-between text-sm text-gray-500 mb-4">
+                  <span><i class="fas fa-stopwatch mr-1"></i> <span data-i18n="time_limit">制限時間</span></span>
+                  <span><i class="fas fa-star mr-1"></i><i class="fas fa-star mr-1"></i> <span data-i18n="intermediate">中級</span></span>
+                </div>
+                <button class="w-full bg-[#9C27B0] text-white py-2 rounded-lg hover:bg-[#7B1FA2] transition-colors">
+                  <i class="fas fa-play mr-2"></i><span data-i18n="start_game">ゲーム開始</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="game-card bg-white rounded-xl p-6 shadow-lg cursor-pointer" data-game="memory-game">
+            <div class="flex flex-col h-full">
+              <div class="flex items-center justify-center text-[#9C27B0] mb-4">
+                <i class="fas fa-brain text-4xl"></i>
+              </div>
+              <h3 class="text-xl font-bold text-center mb-2">単語記憶ゲーム</h3>
+              <p class="text-gray-600 text-center mb-4">
+                ペアになる単語カードを見つけてマッチングするメモリーゲームです。
+              </p>
+              <div class="mt-auto">
+                <div class="flex justify-between text-sm text-gray-500 mb-4">
+                  <span><i class="fas fa-stopwatch mr-1"></i> <span data-i18n="time_limit">制限時間</span></span>
+                  <span><i class="fas fa-star mr-1"></i><i class="fas fa-star mr-1"></i><i class="fas fa-star mr-1"></i> <span data-i18n="advanced">上級</span></span>
+                </div>
+                <button class="w-full bg-[#9C27B0] text-white py-2 rounded-lg hover:bg-[#7B1FA2] transition-colors">
+                  <i class="fas fa-play mr-2"></i><span data-i18n="start_game">ゲーム開始</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
-
-        <div class="game-card bg-white rounded-xl p-6 shadow-lg cursor-pointer" data-game="word-scramble">
-          <div class="flex flex-col h-full">
-            <div class="flex items-center justify-center text-[#9C27B0] mb-4">
-              <i class="fas fa-random text-4xl"></i>
-            </div>
-            <h3 class="text-xl font-bold text-center mb-2" data-i18n="word_scramble_title">単語シャッフル</h3>
-            <p class="text-gray-600 text-center mb-4" data-i18n="word_scramble_desc">
-              バラバラになった文字を正しい順序に並び替えて単語を完成させてください。
-            </p>
-            <div class="mt-auto">
-              <div class="flex justify-between text-sm text-gray-500 mb-4">
-                <span><i class="fas fa-stopwatch mr-1"></i> <span data-i18n="time_limit">制限時間</span></span>
-                <span><i class="fas fa-star mr-1"></i><i class="fas fa-star mr-1"></i> <span data-i18n="intermediate">中級</span></span>
-              </div>
-              <button class="w-full bg-[#9C27B0] text-white py-2 rounded-lg hover:bg-[#7B1FA2] transition-colors">
-                <i class="fas fa-play mr-2"></i><span data-i18n="start_game">ゲーム開始</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="game-card bg-white rounded-xl p-6 shadow-lg cursor-pointer" data-game="memory-game">
-          <div class="flex flex-col h-full">
-            <div class="flex items-center justify-center text-[#9C27B0] mb-4">
-              <i class="fas fa-brain text-4xl"></i>
-            </div>
-            <h3 class="text-xl font-bold text-center mb-2" data-i18n="memory_game_title">単語記憶ゲーム</h3>
-            <p class="text-gray-600 text-center mb-4" data-i18n="memory_game_desc">
-              ペアになる単語カードを見つけてマッチングするメモリーゲームです。
-            </p>
-            <div class="mt-auto">
-              <div class="flex justify-between text-sm text-gray-500 mb-4">
-                <span><i class="fas fa-stopwatch mr-1"></i> <span data-i18n="time_limit">制限時間</span></span>
-                <span><i class="fas fa-star mr-1"></i><i class="fas fa-star mr-1"></i><i class="fas fa-star mr-1"></i> <span data-i18n="advanced">上級</span></span>
-              </div>
-              <button class="w-full bg-[#9C27B0] text-white py-2 rounded-lg hover:bg-[#7B1FA2] transition-colors">
-                <i class="fas fa-play mr-2"></i><span data-i18n="start_game">ゲーム開始</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
 
         <!-- 게임 통계 -->
         <div class="bg-white rounded-xl p-6 shadow-lg">
-          <h2 class="text-xl font-bold mb-4" data-i18n="game_stats">ゲーム統計</h2>
+          <h2 class="text-xl font-bold mb-4">ゲーム統計</h2>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="text-center p-4 bg-purple-50 rounded-lg">
               <div class="text-2xl font-bold text-[#9C27B0]" id="total-games-played">0</div>
@@ -219,13 +217,5 @@
     <script type="module" src="../../components/js/navbar.js"></script>
     <!-- 게임 선택 스크립트 -->
     <script type="module" src="../../pages/js/games.js"></script>
-    <script type="module">
-      import { updateMetadata } from '../../utils/language-utils.js';
-      
-      // 페이지 로드 후 메타데이터 업데이트
-      document.addEventListener('DOMContentLoaded', async () => {
-        await updateMetadata('games');
-      });
-    </script>
   </body>
 </html> 

@@ -3,35 +3,35 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI 단어장 - LikeVoca</title>
+    <title>AI Vocabulary - LikeVoca</title>
 
     <!-- 기본 메타 태그 -->
     <meta
       name="description"
-      content="AI가 추천하는 다국어 단어장을 만들고 효과적으로 학습하세요."
+      content="Create AI-powered multilingual vocabulary and learn effectively."
     />
     <meta
       name="keywords"
-      content="AI 단어장, 다국어 단어장, 영어 단어장, 일본어 단어장, 중국어 단어장, AI 언어 학습"
+      content="AI vocabulary, multilingual vocabulary, English vocabulary, Japanese vocabulary, Chinese vocabulary, AI language learning"
     />
 
     <!-- Open Graph / 소셜 미디어 메타 태그 -->
-    <meta property="og:title" content="LikeVoca - AI 단어장" />
+    <meta property="og:title" content="LikeVoca - AI Vocabulary" />
     <meta
       property="og:description"
-      content="AI가 추천하는 다국어 단어장을 만들고 효과적으로 학습하세요."
+      content="Create AI-powered multilingual vocabulary and learn effectively."
     />
     <meta property="og:type" content="website" />
     <meta
       property="og:url"
       content="https://likevoca.com/ai-vocabulary.html"
     />
-    <meta property="og:locale" content="ko" />
+    <meta property="og:locale" content="en" />
 
     <!-- 표준 링크 -->
     <link
       rel="canonical"
-      href="https://likevoca.com/ko/ai-vocabulary.html"
+      href="https://likevoca.com/en/ai-vocabulary.html"
     />
 
     <!-- 대체 언어 링크 (초기값) -->
@@ -95,13 +95,12 @@
 
     <main class="container mx-auto max-w-7xl px-4 py-8">
       <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800" data-i18n="ai_vocabulary">
+        <h1 class="text-3xl font-bold text-gray-800">
           AI Vocabulary
         </h1>
         <button
           id="ai-add-concept"
           class="bg-[#4B63AC] text-white px-4 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300 flex items-center"
-          data-i18n="ai_recommend_concept"
         >
           <i class="fas fa-robot mr-2"></i> Get AI Concept Recommendation
         </button>
@@ -114,7 +113,6 @@
             <label
               for="search-input"
               class="hidden md:block text-sm font-medium mb-1 text-gray-700"
-              data-i18n="search"
             >Search</label>
             <div class="relative">
               <input
@@ -122,7 +120,6 @@
                 id="search-input"
                 class="w-full p-2 border rounded pl-8 h-10"
                 placeholder="Enter search term..."
-                data-i18n-placeholder="search_placeholder"
               />
               <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
             </div>
@@ -132,24 +129,22 @@
           <div class="w-full">
             <label
               class="block text-sm font-medium mb-1 text-gray-700"
-              data-i18n="language_filter"
             >Language Filter</label>
             <div class="grid grid-cols-5 gap-1 h-10">
               <select
                 id="source-language"
                 class="col-span-2 p-2 border rounded text-sm"
               >
-                <option value="korean" data-i18n="korean">Korean</option>
-                <option value="english" data-i18n="english">English</option>
-                <option value="japanese" data-i18n="japanese">Japanese</option>
-                <option value="chinese" data-i18n="chinese">Chinese</option>
+                <option value="korean">Korean</option>
+                <option value="english">English</option>
+                <option value="japanese">Japanese</option>
+                <option value="chinese">Chinese</option>
               </select>
 
               <button
                 id="swap-languages"
                 class="w-full h-full text-gray-600 hover:text-[#4B63AC] hover:bg-gray-100 rounded-lg transition duration-200 border border-gray-300 hover:border-[#4B63AC] flex items-center justify-center"
                 title="Swap Languages"
-                data-i18n-title="swap_languages"
               >
                 <i class="fas fa-exchange-alt text-sm"></i>
               </button>
@@ -158,10 +153,10 @@
                 id="target-language"
                 class="col-span-2 p-2 border rounded text-sm"
               >
-                <option value="english" data-i18n="english">English</option>
-                <option value="korean" data-i18n="korean">Korean</option>
-                <option value="japanese" data-i18n="japanese">Japanese</option>
-                <option value="chinese" data-i18n="chinese">Chinese</option>
+                <option value="english">English</option>
+                <option value="korean">Korean</option>
+                <option value="japanese">Japanese</option>
+                <option value="chinese">Chinese</option>
               </select>
             </div>
           </div>
@@ -170,30 +165,30 @@
           <div class="w-full">
             <div class="grid grid-cols-2 gap-2">
               <div>
-                <label for="domain-filter" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="domain">Domain</label>
+                <label for="domain-filter" class="block text-sm font-medium mb-1 text-gray-700">Domain</label>
                 <select id="domain-filter" class="w-full p-2 border rounded h-10 text-sm">
-                  <option value="all" data-i18n="all_domains">All Domains</option>
-                  <option value="daily" data-i18n="domain_daily">Daily Life</option>
-                  <option value="food" data-i18n="domain_food">Food</option>
-                  <option value="travel" data-i18n="domain_travel">Travel</option>
-                  <option value="business" data-i18n="domain_business">Business</option>
-                  <option value="education" data-i18n="domain_education">Education</option>
-                  <option value="nature" data-i18n="domain_nature">Nature</option>
-                  <option value="technology" data-i18n="domain_technology">Technology</option>
-                  <option value="health" data-i18n="domain_health">Health</option>
-                  <option value="sports" data-i18n="domain_sports">Sports</option>
-                  <option value="entertainment" data-i18n="domain_entertainment">Entertainment</option>
-                  <option value="culture" data-i18n="domain_culture">Culture</option>
-                  <option value="other" data-i18n="domain_other">Other</option>
+                  <option value="all">All Domains</option>
+                  <option value="daily">Daily Life</option>
+                  <option value="food">Food</option>
+                  <option value="travel">Travel</option>
+                  <option value="business">Business</option>
+                  <option value="education">Education</option>
+                  <option value="nature">Nature</option>
+                  <option value="technology">Technology</option>
+                  <option value="health">Health</option>
+                  <option value="sports">Sports</option>
+                  <option value="entertainment">Entertainment</option>
+                  <option value="culture">Culture</option>
+                  <option value="other">Other</option>
                 </select>
               </div>
               <div>
-                <label for="sort-filter" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="sort">Sort</label>
+                <label for="sort-filter" class="block text-sm font-medium mb-1 text-gray-700">Sort</label>
                 <select id="sort-filter" class="w-full p-2 border rounded h-10 text-sm">
-                  <option value="latest" data-i18n="latest">Latest</option>
-                  <option value="oldest" data-i18n="oldest">Oldest</option>
-                  <option value="alphabetical" data-i18n="alphabetical">Alphabetical</option>
-                  <option value="reverse_alphabetical" data-i18n="reverse_alphabetical">Reverse Alphabetical</option>
+                  <option value="latest">Latest</option>
+                  <option value="oldest">Oldest</option>
+                  <option value="alphabetical">Alphabetical</option>
+                  <option value="reverse_alphabetical">Reverse Alphabetical</option>
                 </select>
               </div>
             </div>

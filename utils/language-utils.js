@@ -766,7 +766,7 @@ async function applyLanguage() {
 }
 
 // 언어 설정 모달 표시
-function showLanguageSettingsModal() {
+async function showLanguageSettingsModal() {
   if (document.getElementById("language-settings-modal")) {
     document
       .getElementById("language-settings-modal")
@@ -776,11 +776,18 @@ function showLanguageSettingsModal() {
 
   const currentLang = getCurrentLanguage();
 
+  // 현재 UI 언어에 맞는 번역 가져오기
+  const userLang = await getActiveLanguage();
+  const autoDetectText = getI18nText("auto_detect", userLang) || "자동 감지";
+  const languageSettingsText =
+    getI18nText("language_settings", userLang) || "언어 설정";
+  const saveText = getI18nText("save", userLang) || "저장";
+
   const modalHTML = `
     <div id="language-settings-modal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
       <div class="bg-white rounded-lg p-6 max-w-md w-full">
         <div class="flex justify-between items-center mb-4">
-          <h3 class="text-xl font-bold" data-i18n="language_settings">언어 설정</h3>
+          <h3 class="text-xl font-bold">${languageSettingsText}</h3>
           <button id="close-language-modal" class="text-gray-500 hover:text-gray-700">
             <i class="fas fa-times"></i>
           </button>
@@ -791,7 +798,7 @@ function showLanguageSettingsModal() {
               <input type="radio" id="lang-auto" name="language" value="auto" class="mr-2" ${
                 currentLang === "auto" ? "checked" : ""
               }>
-              <label for="lang-auto">자동 감지 (Auto Detect)</label>
+              <label for="lang-auto">${autoDetectText}</label>
             </div>
             ${Object.values(SUPPORTED_LANGUAGES)
               .map(
@@ -809,7 +816,7 @@ function showLanguageSettingsModal() {
           </div>
         </div>
         <div class="flex justify-end">
-          <button id="save-language" class="bg-[#4B63AC] text-white px-4 py-2 rounded hover:bg-[#3A4F8B]" data-i18n="save">저장</button>
+          <button id="save-language" class="bg-[#4B63AC] text-white px-4 py-2 rounded hover:bg-[#3A4F8B]">${saveText}</button>
         </div>
       </div>
     </div>

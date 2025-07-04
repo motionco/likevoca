@@ -5,6 +5,21 @@ import {
   setDoc,
 } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 
+// 언어별 페이지로 이동하는 함수
+function goToLanguageSpecificPage(filename) {
+  const userLanguage = localStorage.getItem("userLanguage") || "ko";
+  const isDev =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1" ||
+    window.location.port === "5500";
+
+  if (isDev) {
+    window.location.href = `/locales/${userLanguage}/${filename}`;
+  } else {
+    window.location.href = `/${userLanguage}/${filename}`;
+  }
+}
+
 const nameInput = document.getElementById("name");
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
@@ -53,7 +68,7 @@ submitButton.addEventListener("click", async () => {
     if (typeof window.redirectToLogin === "function") {
       window.redirectToLogin();
     } else {
-      window.location.href = "login.html";
+      goToLanguageSpecificPage("login.html");
     }
     console.log("가입된 사용자: ", user);
   } catch (error) {

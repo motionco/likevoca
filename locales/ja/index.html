@@ -3,18 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LikeVoca - 다국어 학습 플랫폼</title>
+    <title>LikeVoca - 多言語学習プラットフォーム</title>
     
     <!-- 기본 메타 태그 -->
-    <meta name="description" content="체계적인 커리큘럼과 직관적인 학습 시스템으로 언어 학습을 더욱 효과적으로 만들어드립니다." />
-    <meta name="keywords" content="언어 학습, 다국어, 단어장, AI 단어장, 영어, 일본어, 중국어, 한국어" />
+    <meta name="description" content="体系的なカリキュラムと直感的な学習システムで、言語学習をより効果的にします。" />
+    <meta name="keywords" content="言語学習, 多言語, 単語帳, AI 単語帳, 英語, 日本語, 中国語, 韓国語" />
     
     <!-- Open Graph / 소셜 미디어 메타 태그 -->
-    <meta property="og:title" content="LikeVoca - 다국어 학습 플랫폼" />
-    <meta property="og:description" content="체계적인 커리큘럼과 직관적인 학습 시스템으로 언어 학습을 더욱 효과적으로 만들어드립니다." />
+    <meta property="og:title" content="LikeVoca - 多言語学習プラットフォーム" />
+    <meta property="og:description" content="体系的なカリキュラムと直感的な学習システムで、言語学習をより効果的にします。" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://likevoca.com" />
-    <meta property="og:locale" content="ko" />
+    <meta property="og:locale" content="ja" />
     
     <!-- 표준 링크 -->
     <link rel="canonical" href="https://likevoca.com" />
@@ -47,19 +47,19 @@
           <h1
             class="text-3xl md:text-4xl lg:text-6xl font-bold text-gray-800 mb-4 md:mb-6"
           >
-            <span data-i18n="learn_languages"></span><br />
-            <span class="text-[#4B63AC]" data-i18n="learn_languages_part2"></span>
+            <span>言語を学ぶ</span><br />
+            <span class="text-[#4B63AC]">効果的に</span>
           </h1>
           <p
             class="text-base md:text-lg text-gray-600 mb-6 md:mb-8 px-4 lg:px-0"
-            data-i18n="effective_learning"
           >
+            体系的なカリキュラムと直感的な学習システムで、言語学習をより効果的にします。
           </p>
           <button
             id="get-started-btn"
             class="w-full md:w-auto bg-[#4B63AC] text-white px-6 md:px-8 py-3 rounded-lg hover:bg-[#3A4F8B] transition duration-300 text-base md:text-lg font-semibold"
-            data-i18n="get_started_free"
           >
+            無料で始める
           </button>
         </div>
         <div class="lg:w-1/2 mt-8 lg:mt-0 w-full px-4 lg:px-0">
@@ -76,129 +76,144 @@
       <div
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 lg:gap-8 md:mb-16"
       >
+        <!-- 1. 나만의 단어장 -->
         <div
           class="bg-[#E6F0FF] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
         >
           <div class="h-auto md:h-48 flex flex-col justify-between space-y-4">
             <div>
-              <h3 class="text-2xl font-bold text-[#4B63AC] mb-4" data-i18n="wordbook">
+              <h3 class="text-2xl font-bold text-[#4B63AC] mb-4">
+                マイ単語帳
               </h3>
-              <p class="text-gray-700 text-sm lg:text-lg" data-i18n="multilingual_dictionary_desc">
+              <p class="text-gray-700 text-sm lg:text-lg">
+                個人的な単語コレクションを作成し、学習進捗を追跡しましょう。
               </p>
             </div>
             <a href="my-word-list.html" class="self-end">
               <button
                 class="self-end bg-[#4B63AC] text-white px-6 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300"
-                data-i18n="start"
               >
+                開始
               </button>
             </a>
           </div>
         </div>
-        <div
-          class="bg-[#E8F5E9] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
-        >
-          <div class="h-auto md:h-48 flex flex-col justify-between space-y-4">
-            <div>
-              <h3 class="text-2xl font-bold text-[#2E7D32] mb-4" data-i18n="ai_vocabulary">
-              </h3>
-              <p class="text-gray-700 text-sm lg:text-lg" data-i18n="ai_vocabulary_desc">
-              </p>
-            </div>
-            <a href="ai-vocabulary.html" class="self-end">
-              <button
-                class="self-end bg-[#2E7D32] text-white px-6 py-2 rounded-lg hover:bg-[#1B5E20] transition duration-300"
-                data-i18n="start"
-              >
-              </button>
-            </a>
-          </div>
-        </div>
-        <div
-          class="bg-[#E3F2FD] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
-        >
-          <div class="h-auto md:h-48 flex flex-col justify-between space-y-4">
-            <div>
-              <h3 class="text-2xl font-bold text-[#1565CD] mb-4" data-i18n="inquiry"></h3>
-              <p class="text-gray-700 text-sm lg:text-lg" data-i18n="inquiry_desc">
-              </p>
-            </div>
-            <a href="inquiry.html" class="self-end">
-              <button
-                class="self-end bg-[#1565CD] text-white px-6 py-2 rounded-lg hover:bg-[#0D47A1] transition duration-300"
-                data-i18n="inquiry"
-              >
-              </button>
-            </a>
-          </div>
-        </div>
+        <!-- 2. 단어장 -->
         <div
           class="bg-[#FFF3E0] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
         >
           <div class="h-auto md:h-48 flex flex-col justify-between space-y-4">
             <div>
-              <h3 class="text-2xl font-bold text-[#E65100] mb-4" data-i18n="multilingual_dictionary"></h3>
-              <p class="text-gray-700 text-sm lg:text-lg" data-i18n="multilingual_dictionary_desc">
+              <h3 class="text-2xl font-bold text-[#E65100] mb-4">単語帳</h3>
+              <p class="text-gray-700 text-sm lg:text-lg">
+                包括的な単語コレクションで多言語語彙を構築しましょう。
               </p>
             </div>
             <a href="vocabulary.html" class="self-end">
               <button
                 class="self-end bg-[#E65100] text-white px-6 py-2 rounded-lg hover:bg-[#BF360C] transition duration-300"
-                data-i18n="start"
               >
+                開始
               </button>
             </a>
           </div>
         </div>
+        <!-- 3. AI 단어장 -->
+        <div
+          class="bg-[#E8F5E9] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
+        >
+          <div class="h-auto md:h-48 flex flex-col justify-between space-y-4">
+            <div>
+              <h3 class="text-2xl font-bold text-[#2E7D32] mb-4">
+                AI 単語帳
+              </h3>
+              <p class="text-gray-700 text-sm lg:text-lg">
+                AI技術を活用した個人向け単語推薦を受けましょう。
+              </p>
+            </div>
+            <a href="ai-vocabulary.html" class="self-end">
+              <button
+                class="self-end bg-[#2E7D32] text-white px-6 py-2 rounded-lg hover:bg-[#1B5E20] transition duration-300"
+              >
+                開始
+              </button>
+            </a>
+          </div>
+        </div>
+        <!-- 4. 언어 학습 -->
         <div
           class="bg-[#E0F7FA] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
         >
           <div class="h-auto md:h-48 flex flex-col justify-between space-y-4">
             <div>
-              <h3 class="text-2xl font-bold text-[#0097A7] mb-4" data-i18n="language_learning"></h3>
-              <p class="text-gray-700 text-sm lg:text-lg" data-i18n="language_learning_desc"></p>
+              <h3 class="text-2xl font-bold text-[#0097A7] mb-4">言語学習</h3>
+              <p class="text-gray-700 text-sm lg:text-lg">インタラクティブなレッスンで言語スキルを練習し、向上させましょう。</p>
             </div>
             <a href="learning.html" class="self-end">
               <button
                 class="self-end bg-[#0097A7] text-white px-6 py-2 rounded-lg hover:bg-[#00838F] transition duration-300"
-                data-i18n="start"
               >
+                開始
               </button>
             </a>
           </div>
         </div>
-        <div
-          class="bg-[#F3E5F5] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
-        >
-          <div class="h-auto md:h-48 flex flex-col justify-between space-y-4">
-            <div>
-              <h3 class="text-2xl font-bold text-[#9C27B0] mb-4" data-i18n="language_games"></h3>
-              <p class="text-gray-700 text-sm lg:text-lg" data-i18n="language_games_desc">
-              </p>
-            </div>
-            <a href="games.html" class="self-end">
-              <button
-                class="self-end bg-[#9C27B0] text-white px-6 py-2 rounded-lg hover:bg-[#7B1FA2] transition duration-300"
-                data-i18n="start"
-              >
-              </button>
-            </a>
-          </div>
-        </div>
+        <!-- 5. 언어 퀴즈 -->
         <div
           class="bg-[#FFF8E1] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
         >
           <div class="h-auto md:h-48 flex flex-col justify-between space-y-4">
             <div>
-              <h3 class="text-2xl font-bold text-[#F57C00] mb-4" data-i18n="language_quiz"></h3>
-              <p class="text-gray-700 text-sm lg:text-lg" data-i18n="language_quiz_desc">
+              <h3 class="text-2xl font-bold text-[#F57C00] mb-4">言語クイズ</h3>
+              <p class="text-gray-700 text-sm lg:text-lg">
+                魅力的なクイズとチャレンジで知識をテストしましょう。
               </p>
             </div>
             <a href="quiz.html" class="self-end">
               <button
                 class="self-end bg-[#F57C00] text-white px-6 py-2 rounded-lg hover:bg-[#E65100] transition duration-300"
-                data-i18n="start"
               >
+                開始
+              </button>
+            </a>
+          </div>
+        </div>
+        <!-- 6. 언어 게임 -->
+        <div
+          class="bg-[#F3E5F5] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
+        >
+          <div class="h-auto md:h-48 flex flex-col justify-between space-y-4">
+            <div>
+              <h3 class="text-2xl font-bold text-[#9C27B0] mb-4">言語ゲーム</h3>
+              <p class="text-gray-700 text-sm lg:text-lg">
+                言語学習者向けに設計された楽しいインタラクティブなゲームで学習しましょう。
+              </p>
+            </div>
+            <a href="games.html" class="self-end">
+              <button
+                class="self-end bg-[#9C27B0] text-white px-6 py-2 rounded-lg hover:bg-[#7B1FA2] transition duration-300"
+              >
+                開始
+              </button>
+            </a>
+          </div>
+        </div>
+        <!-- 7. 문의하기 -->
+        <div
+          class="bg-[#E3F2FD] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
+        >
+          <div class="h-auto md:h-48 flex flex-col justify-between space-y-4">
+            <div>
+              <h3 class="text-2xl font-bold text-[#1565CD] mb-4">お問い合わせ</h3>
+              <p class="text-gray-700 text-sm lg:text-lg">
+                言語学習の旅でサポートやヘルプを受けましょう。
+              </p>
+            </div>
+            <a href="inquiry.html" class="self-end">
+              <button
+                class="self-end bg-[#1565CD] text-white px-6 py-2 rounded-lg hover:bg-[#0D47A1] transition duration-300"
+              >
+                お問い合わせ
               </button>
             </a>
           </div>
@@ -264,30 +279,7 @@
           await updateMetadata('home');
           console.log("メタデータの更新完了");
           
-          // バンヨクが正しく適用されたか確認し、再適用
-          setTimeout(async () => {
-            const testElement = document.querySelector('[data-i18n="learn_languages"]');
-            console.log("バンヨクの確認要素:", testElement?.textContent);
-            console.log("バンヨクの確認要素HTML:", testElement?.outerHTML);
-            if (testElement && testElement.textContent.trim() === '') {
-              console.log("バンヨクの再適用試行");
-              await applyLanguage();
-              
-              // 再適用後に再確認
-              setTimeout(() => {
-                console.log("再適用後のテキスト:", testElement?.textContent);
-              }, 100);
-            }
-          }, 100);
-          
-          // 追加の安全措置 - 1秒後に再確認
-          setTimeout(async () => {
-            const testElement = document.querySelector('[data-i18n="learn_languages"]');
-            if (testElement && testElement.textContent.trim() === '') {
-              console.log("バンヨクの最終再適用");
-              await applyLanguage();
-            }
-          }, 1000);
+          // ハードコーディングされたページのため、バンヨクテストコードを削除
           
           // 無料で始めるボタンのイベント処理
           const getStartedBtn = document.getElementById('get-started-btn');

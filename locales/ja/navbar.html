@@ -19,25 +19,25 @@
     <!-- 중앙: 네비게이션 메뉴 (데스크톱만) -->
     <ul id="nav-menu" class="hidden lg:flex space-x-10 items-center">
       <li>
-        <a href="vocabulary.html" class="text-xl text-white hover:text-yellow-400" data-i18n="vocabulary">単語帳</a>
+        <a href="vocabulary.html" class="text-xl text-white hover:text-yellow-400">単語帳</a>
       </li>
       <li>
-        <a href="ai-vocabulary.html" class="text-xl text-white hover:text-yellow-400" data-i18n="ai_vocabulary">AI単語帳</a>
+        <a href="ai-vocabulary.html" class="text-xl text-white hover:text-yellow-400">AI単語帳</a>
       </li>
       <li>
-        <a href="quiz.html" class="text-xl text-white hover:text-yellow-400" data-i18n="quiz">クイズ</a>
+        <a href="learning.html" class="text-xl text-white hover:text-yellow-400">学習</a>
       </li>
       <li>
-        <a href="games.html" class="text-xl text-white hover:text-yellow-400" data-i18n="games">ゲーム</a>
+        <a href="quiz.html" class="text-xl text-white hover:text-yellow-400">クイズ</a>
       </li>
       <li>
-        <a href="learning.html" class="text-xl text-white hover:text-yellow-400" data-i18n="learning_title">学習</a>
+        <a href="games.html" class="text-xl text-white hover:text-yellow-400">ゲーム</a>
       </li>
       <li>
-        <a href="progress.html" class="text-xl text-white hover:text-yellow-400" data-i18n="progress">進捗</a>
+        <a href="progress.html" class="text-xl text-white hover:text-yellow-400">進捗</a>
       </li>
       <li>
-        <a href="inquiry.html" class="text-xl text-white hover:text-yellow-400" data-i18n="inquiry">お問い合わせ</a>
+        <a href="inquiry.html" class="text-xl text-white hover:text-yellow-400">お問い合わせ</a>
       </li>
     </ul>
 
@@ -65,7 +65,6 @@
           id="login-button"
           onclick="goToLanguageSpecificPage('login.html')"
           class="border-2 border-white bg-[#4B63AC] text-white font-semibold px-4 py-1.5 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
-          data-i18n="login"
           >ログイン</a
         >
         <a
@@ -73,7 +72,6 @@
           id="signup-button"
           onclick="goToLanguageSpecificPage('signup.html')"
           class="border-2 border-white bg-white text-[#4B63AC] font-semibold px-4 py-1.5 text-sm rounded-lg hover:bg-[#4B63AC] hover:text-white transition duration-300"
-          data-i18n="signup"
           >サインアップ</a
         >
     </div>
@@ -103,21 +101,18 @@
             <a
               href="my-word-list.html"
               class="block w-full text-left px-4 py-2 hover:bg-gray-100"
-              data-i18n="wordbook"
             >
               私の単語帳
             </a>
             <a
               href="profile.html"
               class="block w-full text-left px-4 py-2 hover:bg-gray-100"
-              data-i18n="profile"
         >
               プロフィール
             </a>
         <button
           id="logout-button"
           class="block w-full text-left px-4 py-2 hover:bg-gray-100"
-          data-i18n="logout"
         >
               ログアウト
         </button>
@@ -131,13 +126,13 @@
     id="mobile-menu"
     class="hidden flex flex-col items-center space-y-4 bg-[#4B63AC] text-white p-3 lg:hidden"
   >
-    <a href="vocabulary.html" class="text-lg hover:text-yellow-400" data-i18n="vocabulary">単語帳</a>
-    <a href="ai-vocabulary.html" class="text-lg hover:text-yellow-400" data-i18n="ai_vocabulary">AI単語帳</a>
-    <a href="quiz.html" class="text-lg hover:text-yellow-400" data-i18n="quiz">クイズ</a>
-    <a href="games.html" class="text-lg hover:text-yellow-400" data-i18n="games">ゲーム</a>
-    <a href="learning.html" class="text-lg hover:text-yellow-400" data-i18n="learning_title">学習</a>
-    <a href="progress.html" class="text-lg hover:text-yellow-400" data-i18n="progress">進捗</a>
-    <a href="inquiry.html" class="text-lg hover:text-yellow-400" data-i18n="inquiry">お問い合わせ</a>
+    <a href="vocabulary.html" class="text-lg hover:text-yellow-400">単語帳</a>
+    <a href="ai-vocabulary.html" class="text-lg hover:text-yellow-400">AI単語帳</a>
+    <a href="learning.html" class="text-lg hover:text-yellow-400">学習</a>
+    <a href="quiz.html" class="text-lg hover:text-yellow-400">クイズ</a>
+    <a href="games.html" class="text-lg hover:text-yellow-400">ゲーム</a>
+    <a href="progress.html" class="text-lg hover:text-yellow-400">進捗</a>
+    <a href="inquiry.html" class="text-lg hover:text-yellow-400">お問い合わせ</a>
 
     <!-- 모바일 로그인 버튼들 -->
     <div id="mobile-login-buttons" class="hidden flex space-x-3">
@@ -145,14 +140,12 @@
         href="#"
         onclick="goToLanguageSpecificPage('login.html')"
         class="border-2 border-white bg-[#4B63AC] text-white font-semibold px-5 py-2 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
-        data-i18n="login"
         >ログイン</a
       >
       <a
         href="#"
         onclick="goToLanguageSpecificPage('signup.html')"
         class="border-2 border-white bg-[#4B63AC] text-white font-semibold px-5 py-2 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
-        data-i18n="signup"
         >サインアップ</a
       >
     </div>
@@ -169,21 +162,18 @@
         <a
           href="my-word-list.html"
           class="text-white hover:text-yellow-400"
-          data-i18n="wordbook"
         >
           私の単語帳
         </a>
         <a
           href="profile.html"
           class="text-white hover:text-yellow-400"
-          data-i18n="profile"
         >
           プロフィール
         </a>
         <button
           id="mobile-logout-button"
           class="text-white hover:text-yellow-400"
-          data-i18n="logout"
         >
           ログアウト
         </button>

@@ -1,15 +1,25 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="zh">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title data-i18n="quiz_title">LikeVoca - 퀴즈</title>
+    <title>测验 - LikeVoca</title>
+    <meta name="description" content="通过翻译、发音、匹配、填空等多种测验类型检验您的语言学习进展" />
+    <meta property="og:title" content="测验 - LikeVoca" />
+    <meta property="og:description" content="通过翻译、发音、匹配、填空等多种测验类型检验您的语言学习进展" />
+    <meta property="og:locale" content="zh_CN" />
+    <link rel="canonical" href="https://likevoca.com/zh/quiz" />
+    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/quiz" />
+    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/quiz" />
+    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/quiz" />
+    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/quiz" />
     <link rel="icon" href="../assets/favicon.ico" type="image/x-icon" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+    <link rel="stylesheet" href="../../css/style.css" />
   </head>
 
   <body class="bg-gray-50 min-h-screen">
@@ -20,25 +30,25 @@
     <main class="container mx-auto px-6 py-8">
       <!-- 페이지 헤더 -->
       <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-800 mb-2" data-i18n="quiz_title">
-          📝 퀴즈
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">
+          📝 测验
         </h1>
-        <p class="text-gray-600" data-i18n="quiz_description">
-          다양한 퀴즈를 통해 학습한 단어와 문법을 점검해보세요.
+        <p class="text-gray-600">
+          通过多种测验检验您学习的词汇和语法。
         </p>
       </div>
 
       <!-- 퀴즈 설정 섹션 -->
       <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 class="text-xl font-semibold mb-4" data-i18n="quiz_settings">
-          퀴즈 설정
+        <h2 class="text-xl font-semibold mb-4">
+          测验设置
         </h2>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <!-- 언어 설정 -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="source_language">
-              원어
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              源语言
             </label>
             <select id="quiz-source-language" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
               <option value="korean">한국어</option>
@@ -49,8 +59,8 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="target_language">
-              대상 언어
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              目标语言
             </label>
             <select id="quiz-target-language" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
               <option value="english">English</option>
@@ -62,14 +72,14 @@
 
           <!-- 퀴즈 타입 -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="quiz_type">
-              퀴즈 타입
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              测验类型
             </label>
             <select id="quiz-type" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="translation" data-i18n="quiz_translation">번역</option>
-              <option value="pronunciation" data-i18n="quiz_pronunciation">발음</option>
-              <option value="matching" data-i18n="quiz_matching">매칭</option>
-              <option value="fill_in_blank" data-i18n="quiz_fill_blank">빈칸 채우기</option>
+              <option value="translation">翻译</option>
+              <option value="pronunciation">发音</option>
+              <option value="matching">匹配</option>
+              <option value="fill_in_blank">填空</option>
             </select>
           </div>
         </div>
@@ -77,27 +87,27 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <!-- 난이도 -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="difficulty">
-              난이도
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              难度等级
             </label>
             <select id="quiz-difficulty" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="all" data-i18n="all_levels">모든 레벨</option>
-              <option value="beginner" data-i18n="beginner">초급</option>
-              <option value="intermediate" data-i18n="intermediate">중급</option>
-              <option value="advanced" data-i18n="advanced">고급</option>
+              <option value="all">所有等级</option>
+              <option value="beginner">初级</option>
+              <option value="intermediate">中级</option>
+              <option value="advanced">高级</option>
             </select>
           </div>
 
           <!-- 문제 수 -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="question_count">
-              문제 수
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              题目数量
             </label>
             <select id="quiz-question-count" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="5">5문제</option>
-              <option value="10" selected>10문제</option>
-              <option value="15">15문제</option>
-              <option value="20">20문제</option>
+              <option value="5">5道题</option>
+              <option value="10" selected>10道题</option>
+              <option value="15">15道题</option>
+              <option value="20">20道题</option>
             </select>
           </div>
         </div>
@@ -107,9 +117,8 @@
           <button 
             id="start-quiz-btn"
             class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-            data-i18n="start_quiz"
           >
-            퀴즈 시작
+            开始测验
           </button>
         </div>
       </div>
@@ -119,7 +128,7 @@
         <!-- 퀴즈 진행 헤더 -->
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
           <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-semibold" data-i18n="quiz_in_progress">퀴즈 진행 중</h2>
+            <h2 class="text-xl font-semibold">测验进行中</h2>
             <div class="text-sm text-gray-600">
               <span id="current-question">1</span> / <span id="total-questions">10</span>
             </div>
@@ -138,7 +147,7 @@
             <div id="question-category" class="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full inline-block mb-4"></div>
             
             <!-- 문제 제목 -->
-            <h3 id="question-text" class="text-3xl font-bold text-gray-800 mb-6">문제가 로딩 중입니다...</h3>
+            <h3 id="question-text" class="text-3xl font-bold text-gray-800 mb-6">加载题目中...</h3>
             
             <!-- 힌트 영역 -->
             <div id="question-hint" class="text-lg text-gray-600 mb-8 hidden">
@@ -164,9 +173,8 @@
             <button 
               id="skip-question-btn"
               class="text-gray-600 hover:text-gray-800 px-4 py-2 rounded border border-gray-300 hover:border-gray-400"
-              data-i18n="skip_question"
             >
-              건너뛰기
+              跳过
             </button>
             
             <div class="text-center">
@@ -176,9 +184,8 @@
             <button 
               id="quit-quiz-btn"
               class="text-red-600 hover:text-red-800 px-4 py-2 rounded border border-red-300 hover:border-red-400"
-              data-i18n="quit_quiz"
             >
-              퀴즈 종료
+              退出测验
             </button>
           </div>
         </div>
@@ -189,23 +196,23 @@
         <div class="bg-white rounded-lg shadow-md p-8 text-center">
           <div class="mb-6">
             <i class="fas fa-trophy text-6xl text-yellow-500 mb-4"></i>
-            <h2 class="text-2xl font-bold text-gray-800 mb-2" data-i18n="quiz_completed">퀴즈 완료!</h2>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">测验完成！</h2>
           </div>
           
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div class="bg-green-50 p-4 rounded-lg">
               <div class="text-3xl font-bold text-green-600" id="correct-answers">0</div>
-              <div class="text-sm text-gray-600" data-i18n="correct_answers">정답</div>
+              <div class="text-sm text-gray-600">正确</div>
             </div>
             
             <div class="bg-blue-50 p-4 rounded-lg">
               <div class="text-3xl font-bold text-blue-600" id="quiz-score">0%</div>
-              <div class="text-sm text-gray-600" data-i18n="score">점수</div>
+              <div class="text-sm text-gray-600">得分</div>
             </div>
             
             <div class="bg-purple-50 p-4 rounded-lg">
               <div class="text-3xl font-bold text-purple-600" id="time-taken">00:00</div>
-              <div class="text-sm text-gray-600" data-i18n="time_taken">소요 시간</div>
+              <div class="text-sm text-gray-600">时间</div>
             </div>
           </div>
           
@@ -213,17 +220,15 @@
             <button 
               id="retry-quiz-btn"
               class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-              data-i18n="retry_quiz"
             >
-              다시 도전
+              再试一次
             </button>
             
             <button 
               id="new-quiz-btn"
               class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
-              data-i18n="new_quiz"
             >
-              새 퀴즈
+              新测验
             </button>
           </div>
         </div>
@@ -231,9 +236,9 @@
 
       <!-- 최근 퀴즈 기록 -->
       <div class="bg-white rounded-lg shadow-md p-6 mt-8">
-        <h2 class="text-xl font-semibold mb-4" data-i18n="recent_quiz_history">최근 퀴즈 기록</h2>
+        <h2 class="text-xl font-semibold mb-4">最近的测验记录</h2>
         <div id="quiz-history" class="space-y-3">
-          <p class="text-gray-500 text-center py-8" data-i18n="no_quiz_history">아직 퀴즈 기록이 없습니다.</p>
+          <p class="text-gray-500 text-center py-8">还没有测验记录。</p>
         </div>
       </div>
     </main>
@@ -249,5 +254,10 @@
     
     <!-- 퀴즈 스크립트 -->
     <script type="module" src="../../pages/js/quiz.js"></script>
+
+    <!-- Firebase -->
+    <script type="module" src="../../js/firebase/firebase-init.js"></script>
+    <script type="module" src="../../utils/language-utils.js"></script>
+    <script type="module" src="../../js/language-init.js"></script>
   </body>
 </html> 
