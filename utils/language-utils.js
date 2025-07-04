@@ -1453,6 +1453,9 @@ async function loadNavbar() {
     } else if (currentPath.includes("/pages/")) {
       // pages 폴더에서는 현재 언어에 맞는 locales 폴더의 navbar.html 사용
       navbarPath = `../locales/${currentLanguage}/navbar.html`;
+    } else if (currentPath.match(/^\/[a-z]{2}\//)) {
+      // 언어 경로 패턴 (/ko/, /en/ 등)에서는 절대 경로 사용
+      navbarPath = `/locales/${currentLanguage}/navbar.html`;
     } else {
       // 루트에서는 현재 언어에 맞는 locales 폴더의 navbar.html 사용
       navbarPath = `locales/${currentLanguage}/navbar.html`;
@@ -1473,6 +1476,9 @@ async function loadNavbar() {
         fallbackPath = "../ko/navbar.html";
       } else if (currentPath.includes("/pages/")) {
         fallbackPath = "../locales/ko/navbar.html";
+      } else if (currentPath.match(/^\/[a-z]{2}\//)) {
+        // 언어 경로 패턴 (/ko/, /en/ 등)에서는 절대 경로 사용
+        fallbackPath = "/locales/ko/navbar.html";
       } else {
         fallbackPath = "locales/ko/navbar.html";
       }
