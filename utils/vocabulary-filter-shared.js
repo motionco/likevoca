@@ -498,7 +498,9 @@ export function setupVocabularyFilters(onFilterChange) {
     onDomainChange: onFilterChange,
     onSortChange: onFilterChange,
     onLanguageSwap: () => {
+      console.log("🔄 언어 전환 버튼 클릭됨 (공통 모듈)");
       filterManager.swapLanguages();
+      console.log("✅ 언어 전환 완료, 콜백 호출");
       onFilterChange();
     },
   });

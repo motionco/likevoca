@@ -51,14 +51,9 @@ async function initializeNavbar(currentLanguage) {
 
   // 로그아웃 버튼 이벤트 설정
   const logoutButton = document.getElementById("logout-button");
-  const mobileLogoutButton = document.getElementById("mobile-logout-button");
 
   if (logoutButton) {
     logoutButton.addEventListener("click", handleLogout);
-  }
-
-  if (mobileLogoutButton) {
-    mobileLogoutButton.addEventListener("click", handleLogout);
   }
 
   // 현재 페이지에 맞는 메뉴 이름 업데이트
@@ -286,9 +281,6 @@ function updateNavbarForAuthState(user) {
 
   // 모바일 요소들
   const mobileLoginButtons = document.getElementById("mobile-login-buttons");
-  const mobileUserSection = document.getElementById("mobile-user-section");
-  const mobileProfileImage = document.getElementById("mobile-profile-image");
-  const mobileUserName = document.getElementById("mobile-user-name");
 
   if (user) {
     // 로그인 상태
@@ -302,14 +294,10 @@ function updateNavbarForAuthState(user) {
       desktopUserSection.classList.add("flex", "lg:flex");
     }
 
-    // 모바일 - 로그인 버튼 숨기고 유저 섹션 보이기
+    // 모바일 - 로그인 버튼 숨기기
     if (mobileLoginButtons) {
       mobileLoginButtons.classList.add("hidden");
       mobileLoginButtons.classList.remove("flex");
-    }
-    if (mobileUserSection) {
-      mobileUserSection.classList.remove("hidden");
-      mobileUserSection.classList.add("flex");
     }
 
     // 사용자 정보 업데이트
@@ -322,11 +310,8 @@ function updateNavbarForAuthState(user) {
     if (userName) {
       userName.textContent = displayName;
     }
-    if (mobileUserName) {
-      mobileUserName.textContent = displayName;
-    }
 
-    // 프로필 이미지 설정 (데스크톱)
+    // 프로필 이미지 설정 (데스크톱만)
     if (profileImage) {
       // 이미지 로드 전에 기본 이미지로 설정
       profileImage.src = "https://www.w3schools.com/howto/img_avatar.png";
@@ -347,28 +332,6 @@ function updateNavbarForAuthState(user) {
         img.src = photoURL;
       }
     }
-
-    // 프로필 이미지 설정 (모바일)
-    if (mobileProfileImage) {
-      // 이미지 로드 전에 기본 이미지로 설정
-      mobileProfileImage.src = "https://www.w3schools.com/howto/img_avatar.png";
-      mobileProfileImage.alt = `${displayName}의 프로필`;
-
-      // Google 프로필 이미지가 있으면 로드 시도
-      if (
-        photoURL &&
-        photoURL !== "https://www.w3schools.com/howto/img_avatar.png"
-      ) {
-        const img = new Image();
-        img.onload = function () {
-          mobileProfileImage.src = photoURL;
-        };
-        img.onerror = function () {
-          // 기본 이미지는 이미 설정되어 있음
-        };
-        img.src = photoURL;
-      }
-    }
   } else {
     // 로그아웃 상태
     // 데스크톱 - 유저 프로필 숨기고 로그인 버튼 보이기
@@ -381,11 +344,7 @@ function updateNavbarForAuthState(user) {
       desktopLoginSection.classList.add("flex", "lg:flex");
     }
 
-    // 모바일 - 유저 섹션 숨기고 로그인 버튼 보이기
-    if (mobileUserSection) {
-      mobileUserSection.classList.add("hidden");
-      mobileUserSection.classList.remove("flex");
-    }
+    // 모바일 - 로그인 버튼 보이기
     if (mobileLoginButtons) {
       mobileLoginButtons.classList.remove("hidden");
       mobileLoginButtons.classList.add("flex");

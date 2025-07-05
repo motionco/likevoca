@@ -8,80 +8,14 @@ import {
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 
-// 네비게이션바 로드 함수가 준비될 때까지 기다리는 함수
-function waitForNavbarFunction() {
-  return new Promise((resolve) => {
-    const checkFunction = () => {
-      if (typeof window.loadNavbar === "function") {
-        resolve();
-      } else {
-        setTimeout(checkFunction, 100);
-      }
-    };
-    checkFunction();
-  });
-}
-
-// 프로필 드롭다운 이벤트를 수동으로 설정하는 함수
-function setupProfileDropdownEvents() {
-  console.log("🔧 프로필 드롭다운 이벤트 수동 설정 시작");
-
-  const avatarContainer = document.getElementById("avatar-container");
-  const profileDropdown = document.getElementById("profile-dropdown");
-
-  console.log("🔍 요소 확인:", {
-    avatarContainer: !!avatarContainer,
-    profileDropdown: !!profileDropdown,
-  });
-
-  if (avatarContainer && profileDropdown) {
-    // 기존 이벤트 리스너 제거 (중복 방지)
-    avatarContainer.replaceWith(avatarContainer.cloneNode(true));
-    const newAvatarContainer = document.getElementById("avatar-container");
-
-    newAvatarContainer.addEventListener("click", (e) => {
-      console.log("🖱️ 프로필 아바타 클릭됨");
-      e.stopPropagation();
-      profileDropdown.classList.toggle("hidden");
-      console.log(
-        "📋 드롭다운 상태:",
-        profileDropdown.classList.contains("hidden") ? "숨김" : "표시"
-      );
-    });
-
-    // 드롭다운 외부 클릭 시 닫기
-    document.addEventListener("click", (event) => {
-      const userProfile = document.getElementById("user-profile");
-      if (userProfile && !userProfile.contains(event.target)) {
-        profileDropdown.classList.add("hidden");
-      }
-    });
-
-    console.log("✅ 프로필 드롭다운 이벤트 설정 완료");
-  } else {
-    console.error("❌ 프로필 드롭다운 요소를 찾을 수 없습니다");
-  }
-}
-
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     console.log("📄 문의하기 페이지 초기화 시작");
 
-    // 네비게이션바 로드 함수가 준비될 때까지 기다림
-    await waitForNavbarFunction();
-
-    // 네비게이션바 로드
-    if (typeof window.loadNavbar === "function") {
-      await window.loadNavbar();
-      console.log("✅ 네비게이션바 로드 완료");
-
-      // 네비게이션바 로드 후 잠시 대기 (DOM 업데이트 시간)
-      setTimeout(() => {
-        setupProfileDropdownEvents();
-      }, 500);
-    }
+    // navbar.js가 일반 스크립트로 로드되므로 자동으로 초기화됨
+    // 별도의 네비게이션바 로딩 로직 불필요
   } catch (error) {
-    console.error("❌ 네비게이션바 로드 중 오류:", error);
+    console.error("❌ 페이지 초기화 중 오류:", error);
   }
 
   onAuthStateChanged(auth, async (user) => {
@@ -92,25 +26,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (user) {
       document.getElementById("name").value = user.email;
-
-      // 네비게이션바 인증 상태 업데이트
-      if (typeof window.updateNavbarForAuthState === "function") {
-        window.updateNavbarForAuthState(user);
-
-        // 인증 상태 업데이트 후 프로필 드롭다운 이벤트 재설정
-        setTimeout(() => {
-          setupProfileDropdownEvents();
-        }, 300);
-      }
     } else {
       alert("로그인 후 이용해주세요.");
       if (typeof window.redirectToLogin === "function") {
         window.redirectToLogin();
-      }
-
-      // 네비게이션바 인증 상태 업데이트
-      if (typeof window.updateNavbarForAuthState === "function") {
-        window.updateNavbarForAuthState(null);
       }
     }
   });

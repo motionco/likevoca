@@ -213,22 +213,16 @@ const domainTranslations = {
 
 // 개념 카드 생성 함수 (확장된 구조 지원 및 디버깅 개선)
 function createConceptCard(concept) {
-  // 단어장 페이지의 실제 요소 ID 사용
-  const sourceLanguageElement = document.getElementById("language-filter");
-  const targetLanguageElement = document.getElementById(
-    "translation-language-filter"
-  );
+  // 단어장 페이지의 실제 요소 ID 사용 (AI 단어장과 동일)
+  const sourceLanguageElement = document.getElementById("source-language");
+  const targetLanguageElement = document.getElementById("target-language");
 
   // 요소가 없는 경우 기본값 사용
   const sourceLanguage = sourceLanguageElement
-    ? sourceLanguageElement.value === "all"
-      ? "korean"
-      : sourceLanguageElement.value
+    ? sourceLanguageElement.value
     : "korean";
   const targetLanguage = targetLanguageElement
-    ? targetLanguageElement.value === "all"
-      ? "english"
-      : targetLanguageElement.value
+    ? targetLanguageElement.value
     : "english";
 
   console.log("카드 생성 - 언어 설정:", { sourceLanguage, targetLanguage });
@@ -688,6 +682,10 @@ async function fetchAndDisplayConcepts() {
       targetLanguage: document.getElementById("target-language"),
       domainFilter: document.getElementById("domain-filter"),
       sortOption: document.getElementById("sort-option"),
+      swapButton: document.getElementById("swap-languages"),
+      loadMoreButton: document.getElementById("load-more"),
+      addConceptButton: document.getElementById("add-concept-btn"),
+      bulkAddButton: document.getElementById("bulk-add-btn"),
     };
 
     handleSearch(elements);
@@ -931,64 +929,27 @@ async function loadAndDisplayExamples(
 
       const repExample = currentConcept.representative_example;
 
-      // 새로운 구조: 직접 언어별 텍스트 (translations 없음)
+      // 새로운 구조: 직접 언어별 텍스트
       if (repExample[sourceLanguage] && repExample[targetLanguage]) {
-        console.log("🔍 새로운 대표 예문 구조 (직접 언어별):", repExample);
-
-        const sourceText = repExample[sourceLanguage];
-        const targetText = repExample[targetLanguage];
-
-        console.log("📝 추출된 예문 (새 구조):", { sourceText, targetText });
-
-        if (sourceText && targetText) {
-          allExamples.push({
-            sourceText,
-            targetText,
-            priority: repExample.priority || 10,
-            context: repExample.context || "대표 예문",
-            isRepresentative: true,
-          });
-          console.log("✅ 대표 예문을 allExamples에 추가함 (새 구조)");
-        }
+        example = {
+          source: repExample[sourceLanguage],
+          target: repExample[targetLanguage],
+        };
+        console.log("✅ 카드: 새로운 대표 예문 구조 사용");
       }
-      // 기존 구조: translations 객체 포함
+      // 기존 구조: translations 객체
       else if (repExample.translations) {
-        console.log(
-          "🔍 기존 대표 예문 구조 (translations):",
-          repExample.translations
-        );
-        console.log(
-          "🔍 sourceLanguage:",
-          sourceLanguage,
-          "targetLanguage:",
-          targetLanguage
-        );
-
-        const sourceText =
-          repExample.translations[sourceLanguage]?.text ||
-          repExample.translations[sourceLanguage] ||
-          "";
-        const targetText =
-          repExample.translations[targetLanguage]?.text ||
-          repExample.translations[targetLanguage] ||
-          "";
-
-        console.log("📝 추출된 예문 (기존 구조):", { sourceText, targetText });
-
-        if (sourceText && targetText) {
-          allExamples.push({
-            sourceText,
-            targetText,
-            priority: repExample.priority || 10,
-            context: repExample.context || "대표 예문",
-            isRepresentative: true,
-          });
-          console.log("✅ 대표 예문을 allExamples에 추가함 (기존 구조)");
-        } else {
-          console.log("⚠️ sourceText 또는 targetText가 비어있음 (기존 구조)");
-        }
-      } else {
-        console.log("⚠️ 지원되지 않는 대표 예문 구조:", repExample);
+        example = {
+          source:
+            repExample.translations[sourceLanguage]?.text ||
+            repExample.translations[sourceLanguage] ||
+            "",
+          target:
+            repExample.translations[targetLanguage]?.text ||
+            repExample.translations[targetLanguage] ||
+            "",
+        };
+        console.log("✅ 카드: 기존 대표 예문 구조 사용");
       }
     }
 
@@ -1885,8 +1846,9 @@ function setupEventListeners() {
 
   // 필터 공유 모듈을 사용하여 이벤트 리스너 설정
   const filterManager = setupVocabularyFilters(() => {
-    // 필터 변경 시 실행될 콜백 함수
-    handleSearch(elements);
+    // 필터 변경 시 실행될 콜백 함수 - 언어 전환 포함
+    console.log("🔄 필터 변경 감지, 데이터 다시 로드");
+    fetchAndDisplayConcepts();
   });
 
   // 언어 변경 이벤트 (데이터 다시 로드 필요)
@@ -1898,13 +1860,8 @@ function setupEventListeners() {
     }
   });
 
-  // 언어 순서 바꾸기 이벤트 (공유 모듈 사용)
-  if (elements.swapButton) {
-    elements.swapButton.addEventListener("click", () => {
-      filterManager.swapLanguages();
-      handleSearch(elements);
-    });
-  }
+  // 언어 전환 버튼은 공통 모듈에서 처리됨 (중복 제거)
+  console.log("🔄 언어 전환 버튼은 공통 모듈에서 처리됩니다");
 
   // 더 보기 버튼 이벤트
   if (elements.loadMoreButton) {
