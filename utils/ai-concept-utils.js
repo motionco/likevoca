@@ -71,11 +71,7 @@ const PROMPTS = {
       .join(",")}
   },
   "representative_example": {
-    "translations": {
-      ${languages.map((lang) => `"${lang}": "${lang} 예문"`).join(",")}
-    },
-    "context": "daily_conversation|formal|informal|academic",
-    "difficulty": "beginner|intermediate|advanced"
+    ${languages.map((lang) => `"${lang}": "${lang} 예문"`).join(",")}
   }
 }
 
@@ -137,13 +133,9 @@ Respond in the following JSON format:
       .join(",")}
   },
   "representative_example": {
-    "translations": {
-      ${languages
-        .map((lang) => `"${lang}": "${lang} example sentence"`)
-        .join(",")}
-    },
-    "context": "daily_conversation|formal|informal|academic",
-    "difficulty": "beginner|intermediate|advanced"
+    ${languages
+      .map((lang) => `"${lang}": "${lang} example sentence"`)
+      .join(",")}
   }
 }
 
@@ -433,13 +425,8 @@ export async function handleAIConceptRecommendation(currentUser, db) {
       // 언어별 표현 (다국어 단어장과 완전히 동일한 구조)
       expressions: conceptData.expressions || {},
 
-      // 대표 예문 (다국어 단어장과 완전히 동일한 구조)
-      representative_example:
-        conceptData.representative_example ||
-        (conceptData.featured_examples &&
-        conceptData.featured_examples.length > 0
-          ? conceptData.featured_examples[0]
-          : null),
+      // 대표 예문 (다국어 단어장과 완전히 동일한 구조로 변환)
+      representative_example: conceptData.representative_example || null,
 
       // 추가 예문들 (다국어 단어장과 완전히 동일한 구조)
       examples: conceptData.examples || [],
