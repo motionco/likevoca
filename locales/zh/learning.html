@@ -116,71 +116,168 @@
     <main class="container mx-auto px-4 py-8">
       <h1 class="text-3xl font-bold text-gray-800">学习</h1>
       
-      <!-- 언어 설정 섹션 -->
-      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
-          <div>
-            <label class="block text-xs font-medium mb-1">源语言</label>
-            <select id="sourceLanguage" class="w-full p-2 border rounded text-xs">
-              <option value="korean">韩语</option>
-              <option value="english">英语</option>
-              <option value="japanese">日语</option>
-              <option value="chinese">中文</option>
+      <!-- 过滤器行 -->
+      <div class="space-y-3 md:space-y-0">
+        <!-- 移动端: 语言过滤器单独行，桌面端: 全部过滤器合并 -->
+        <div class="w-full md:hidden">
+          <label class="block text-xs font-medium mb-1" data-i18n="language_filter">语言过滤器</label>
+          <div class="grid grid-cols-5 gap-1 h-10">
+            <select id="source-language" class="col-span-2 p-2 border rounded text-sm">
+              <option value="korean" data-i18n="korean">韩语</option>
+              <option value="english" data-i18n="english">英语</option>
+              <option value="japanese" data-i18n="japanese">日语</option>
+              <option value="chinese" data-i18n="chinese">中文</option>
             </select>
+            <button id="swap-languages" class="w-full h-full text-gray-600 hover:text-blue-500 hover:bg-gray-100 rounded-lg transition duration-200 border border-gray-300 hover:border-blue-500 flex items-center justify-center" title="交换语言">
+              <i class="fas fa-exchange-alt text-sm"></i>
+            </button>
+            <select id="target-language" class="col-span-2 p-2 border rounded text-sm">
+              <option value="english" data-i18n="english">英语</option>
+              <option value="korean" data-i18n="korean">韩语</option>
+              <option value="japanese" data-i18n="japanese">日语</option>
+              <option value="chinese" data-i18n="chinese">中文</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- 桌面端: 全部过滤器1行 (flexbox布局)，移动端: 其他过滤器2行 -->
+        <div class="hidden md:flex md:gap-3 md:items-end">
+          <!-- 语言过滤器组 (flex-1, 内部5列网格) -->
+          <div class="flex-1">
+            <div class="grid grid-cols-5 gap-1">
+              <div class="col-span-2">
+                <label class="block text-xs font-medium mb-1" data-i18n="source_language">源语言</label>
+                <select id="source-language-desktop" class="w-full border p-2 rounded text-sm h-10">
+                  <option value="korean" data-i18n="korean">韩语</option>
+                  <option value="english" data-i18n="english">英语</option>
+                  <option value="japanese" data-i18n="japanese">日语</option>
+                  <option value="chinese" data-i18n="chinese">中文</option>
+                </select>
+              </div>
+              <div class="flex items-end justify-center">
+                <button id="swap-languages-desktop" class="w-full h-10 text-gray-600 hover:text-blue-500 hover:bg-gray-100 rounded-lg transition duration-200 border border-gray-300 hover:border-blue-500 flex items-center justify-center" title="切换语言">
+                  <i class="fas fa-exchange-alt text-sm"></i>
+                </button>
+              </div>
+              <div class="col-span-2">
+                <label class="block text-xs font-medium mb-1" data-i18n="target_language">目标语言</label>
+                <select id="target-language-desktop" class="w-full border p-2 rounded text-sm h-10">
+                  <option value="english" data-i18n="english">英语</option>
+                  <option value="korean" data-i18n="korean">韩语</option>
+                  <option value="japanese" data-i18n="japanese">日语</option>
+                  <option value="chinese" data-i18n="chinese">中文</option>
+                </select>
+              </div>
+            </div>
           </div>
           
-          <div>
-            <label class="block text-xs font-medium mb-1">目标语言</label>
-            <select id="targetLanguage" class="w-full p-2 border rounded text-xs">
-              <option value="english">英语</option>
-              <option value="korean">韩语</option>
-              <option value="japanese">日语</option>
-              <option value="chinese">中文</option>
-            </select>
+          <!-- 学习设置组 (flex-1, 内部2列网格) -->
+          <div class="flex-1">
+            <div class="grid grid-cols-2 gap-1">
+              <div>
+                <label class="block text-xs font-medium mb-1" data-i18n="difficulty_level">难度</label>
+                <select id="difficulty-level" class="w-full border p-2 rounded text-sm h-10">
+                  <option value="all" data-i18n="all_difficulties">全部难度</option>
+                  <option value="basic" data-i18n="basic">基础</option>
+                  <option value="intermediate" data-i18n="intermediate">中级</option>
+                  <option value="advanced" data-i18n="advanced">高级</option>
+                  <option value="fluent" data-i18n="fluent">流利</option>
+                  <option value="technical" data-i18n="technical">专业术语</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-medium mb-1" data-i18n="domain_filter">领域</label>
+                <select id="domain-filter" class="w-full border p-2 rounded text-sm h-10">
+                  <option value="all" data-i18n="all_domains">全部领域</option>
+                  <option value="daily" data-i18n="domain_daily">日常</option>
+                  <option value="food" data-i18n="domain_food">食物</option>
+                  <option value="travel" data-i18n="domain_travel">旅行</option>
+                  <option value="business" data-i18n="domain_business">商务</option>
+                  <option value="education" data-i18n="domain_education">教育</option>
+                  <option value="nature" data-i18n="domain_nature">自然</option>
+                  <option value="technology" data-i18n="domain_technology">技术</option>
+                  <option value="health" data-i18n="domain_health">健康</option>
+                  <option value="sports" data-i18n="domain_sports">体育</option>
+                  <option value="entertainment" data-i18n="domain_entertainment">娱乐</option>
+                  <option value="culture" data-i18n="domain_culture">文化</option>
+                  <option value="other" data-i18n="domain_other">其他</option>
+                </select>
+              </div>
+            </div>
           </div>
           
-          <div>
-            <label class="block text-xs font-medium mb-1">难度</label>
-            <select id="difficultyLevel" class="w-full p-2 border rounded text-xs">
-              <option value="all">全难度</option>
-              <option value="basic">基础</option>
-              <option value="intermediate">中级</option>
-              <option value="advanced">高级</option>
-              <option value="fluent">流利</option>
-              <option value="technical">专业术语</option>
-            </select>
+          <!-- 情况/目的组 (flex-1, 内部2列网格) -->
+          <div class="flex-1">
+            <div class="grid grid-cols-2 gap-1">
+              <div>
+                <label class="block text-xs font-medium mb-1" data-i18n="situation">情况</label>
+                <select id="situation-filter" class="w-full border p-2 rounded text-sm h-10">
+                  <option value="all" data-i18n="all_situation">全部情况</option>
+                  <!-- 동적으로 생성될 옵션들 -->
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-medium mb-1" data-i18n="purpose">目的</label>
+                <select id="purpose-filter" class="w-full border p-2 rounded text-sm h-10">
+                  <option value="all" data-i18n="all_purpose">全部目的</option>
+                  <!-- 동적으로 생성될 옵션들 -->
+                </select>
+              </div>
+            </div>
           </div>
-          <div>
-            <label class="block text-xs font-medium mb-1">领域</label>
-            <select id="domain-filter" class="w-full border p-2 rounded text-sm">
-              <option value="all">全领域</option>
-              <option value="daily">日常</option>
-              <option value="food">食物</option>
-              <option value="travel">旅行</option>
-              <option value="business">商务</option>
-              <option value="education">教育</option>
-              <option value="nature">自然</option>
-              <option value="technology">技术</option>
-              <option value="health">健康</option>
-              <option value="sports">体育</option>
-              <option value="entertainment">娱乐</option>
-              <option value="culture">文化</option>
-              <option value="other">其他</option>
-            </select>
+        </div>
+        
+        <!-- 移动端专用其他过滤器 -->
+        <div class="md:hidden space-y-3">
+          <!-- 难度、领域 (第1行) -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-medium mb-1">难度</label>
+              <select id="difficulty-level-mobile" class="w-full border p-2 rounded text-sm">
+                <option value="all">全部难度</option>
+                <option value="basic">基础</option>
+                <option value="intermediate">中级</option>
+                <option value="advanced">高级</option>
+                <option value="fluent">流利</option>
+                <option value="technical">专业术语</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium mb-1">领域</label>
+              <select id="domain-filter-mobile" class="w-full border p-2 rounded text-sm">
+                <option value="all">全部领域</option>
+                <option value="daily">日常</option>
+                <option value="food">食物</option>
+                <option value="travel">旅行</option>
+                <option value="business">商务</option>
+                <option value="education">教育</option>
+                <option value="nature">自然</option>
+                <option value="technology">技术</option>
+                <option value="health">健康</option>
+                <option value="sports">体育</option>
+                <option value="entertainment">娱乐</option>
+                <option value="culture">文化</option>
+                <option value="other">其他</option>
+              </select>
+            </div>
           </div>
-          <div>
-            <label class="block text-xs font-medium mb-1">情况</label>
-            <select id="situation-filter" class="w-full border p-2 rounded text-sm">
-              <option value="all">全情况</option>
-              <!-- 동적으로 생성될 옵션들 -->
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-medium mb-1">目的</label>
-            <select id="purpose-filter" class="w-full border p-2 rounded text-sm">
-              <option value="all">全目的</option>
-              <!-- 동적으로 생성될 옵션들 -->
-            </select>
+          
+          <!-- 情况、目的 (第2行) -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-medium mb-1">情况</label>
+              <select id="situation-filter-mobile" class="w-full border p-2 rounded text-sm">
+                <option value="all">全部情况</option>
+                <!-- 동적으로 생성될 옵션들 -->
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium mb-1">目的</label>
+              <select id="purpose-filter-mobile" class="w-full border p-2 rounded text-sm">
+                <option value="all">全部目的</option>
+                <!-- 동적으로 생성될 옵션들 -->
+              </select>
+            </div>
           </div>
         </div>
       </div>

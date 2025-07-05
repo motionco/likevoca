@@ -731,6 +731,14 @@ function formatDate(timestamp) {
 
 // 이벤트 리스너 설정
 function setupEventListeners() {
+  // 네비게이션바 이벤트 설정 (햄버거 메뉴 등)
+  if (typeof window.setupBasicNavbarEvents === "function") {
+    window.setupBasicNavbarEvents();
+    console.log("✅ 나만의 단어장: 네비게이션바 이벤트 설정 완료");
+  } else {
+    console.warn("⚠️ setupBasicNavbarEvents 함수를 찾을 수 없습니다.");
+  }
+
   const sourceLanguageSelect = document.getElementById("source-language");
   const targetLanguageSelect = document.getElementById("target-language");
   const loadMoreBtn = document.getElementById("load-more");

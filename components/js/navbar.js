@@ -2,26 +2,40 @@ async function initializeNavbar(currentLanguage) {
   // 실제 현재 언어 감지 (URL 우선)
   const actualCurrentLanguage = detectCurrentLanguage();
 
+  console.log("🔧 navbar.js initializeNavbar 시작");
+
   // 햄버거 메뉴 이벤트 설정
   const menuToggle = document.getElementById("menu-toggle");
   const mobileMenu = document.getElementById("mobile-menu");
 
   if (menuToggle && mobileMenu) {
-    menuToggle.addEventListener("click", () => {
+    // 기존 이벤트 리스너 제거 (중복 방지)
+    const newMenuToggle = menuToggle.cloneNode(true);
+    menuToggle.parentNode.replaceChild(newMenuToggle, menuToggle);
+
+    newMenuToggle.addEventListener("click", () => {
       mobileMenu.classList.toggle("hidden");
+      console.log("🍔 navbar.js: 햄버거 메뉴 토글");
     });
+    console.log("✅ navbar.js: 햄버거 메뉴 이벤트 설정");
   }
 
   // 언어 변경 버튼 이벤트 설정
   const languageButton = document.getElementById("language-button");
   if (languageButton) {
-    languageButton.addEventListener("click", () => {
+    // 기존 이벤트 리스너 제거 (중복 방지)
+    const newLanguageButton = languageButton.cloneNode(true);
+    languageButton.parentNode.replaceChild(newLanguageButton, languageButton);
+
+    newLanguageButton.addEventListener("click", () => {
       const currentLang = detectCurrentLanguage(); // 현재 언어 다시 감지
       showLanguageModal(currentLang);
+      console.log("🌐 navbar.js: 언어 버튼 클릭");
     });
 
     // 실제 현재 언어로 버튼 업데이트
     updateLanguageButton(actualCurrentLanguage);
+    console.log("✅ navbar.js: 언어 버튼 이벤트 설정");
   }
 
   // 언어 변경 이벤트 리스너 추가 (동적 업데이트)
@@ -35,56 +49,91 @@ async function initializeNavbar(currentLanguage) {
   const profileDropdown = document.getElementById("profile-dropdown");
 
   if (avatarContainer && profileDropdown) {
-    avatarContainer.addEventListener("click", (e) => {
+    // 기존 이벤트 리스너 제거 (중복 방지)
+    const newAvatarContainer = avatarContainer.cloneNode(true);
+    avatarContainer.parentNode.replaceChild(
+      newAvatarContainer,
+      avatarContainer
+    );
+
+    newAvatarContainer.addEventListener("click", (e) => {
       e.stopPropagation();
-      profileDropdown.classList.toggle("hidden");
+      const currentDropdown = document.getElementById("profile-dropdown");
+      if (currentDropdown) {
+        currentDropdown.classList.toggle("hidden");
+        console.log("👤 navbar.js: 프로필 드롭다운 토글");
+      }
     });
 
     // 드롭다운 외부 클릭 시 닫기
     document.addEventListener("click", (event) => {
       const userProfile = document.getElementById("user-profile");
-      if (userProfile && !userProfile.contains(event.target)) {
-        profileDropdown.classList.add("hidden");
+      const currentDropdown = document.getElementById("profile-dropdown");
+      if (
+        userProfile &&
+        currentDropdown &&
+        !userProfile.contains(event.target)
+      ) {
+        currentDropdown.classList.add("hidden");
       }
     });
+    console.log("✅ navbar.js: 프로필 드롭다운 이벤트 설정");
   }
 
   // 로그아웃 버튼 이벤트 설정
   const logoutButton = document.getElementById("logout-button");
 
   if (logoutButton) {
-    logoutButton.addEventListener("click", handleLogout);
+    // 기존 이벤트 리스너 제거 (중복 방지)
+    const newLogoutButton = logoutButton.cloneNode(true);
+    logoutButton.parentNode.replaceChild(newLogoutButton, logoutButton);
+
+    newLogoutButton.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      // 드롭다운 먼저 닫기
+      const currentDropdown = document.getElementById("profile-dropdown");
+      if (currentDropdown) {
+        currentDropdown.classList.add("hidden");
+      }
+
+      handleLogout();
+      console.log("🚪 navbar.js: 로그아웃 버튼 클릭");
+    });
+    console.log("✅ navbar.js: 로그아웃 버튼 이벤트 설정");
   }
 
   // 현재 페이지에 맞는 메뉴 이름 업데이트
   updateCurrentPageMenuName(actualCurrentLanguage);
 
-  // 네비게이션바 초기화가 완전히 끝난 후 인증 상태 확인 - 즉시 실행
-  checkAuthStatus();
+  // 인증 상태 즉시 확인 (FOUC 방지)
+  const quickAuthCheck = () => {
+    if (typeof window.auth !== "undefined" && window.auth) {
+      const currentUser = window.auth.currentUser;
+      updateNavbarForAuthState(currentUser);
 
-  // 추가 확인 - 500ms 후
-  setTimeout(() => {
-    checkAuthStatus();
-  }, 500);
-
-  // 추가 확인 - 1초 후
-  setTimeout(() => {
-    checkAuthStatus();
-  }, 1000);
-
-  // 최종 확인 - 2초 후
-  setTimeout(() => {
-    if (
-      typeof window.auth !== "undefined" &&
-      window.auth &&
-      window.auth.currentUser
-    ) {
-      updateNavbarForAuthState(window.auth.currentUser);
+      // 인증 상태 변화 감지 설정 (중복 방지)
+      if (!window.authStateListenerSet) {
+        window.auth.onAuthStateChanged((user) => {
+          updateNavbarForAuthState(user);
+        });
+        window.authStateListenerSet = true;
+      }
     } else {
-      // 로그아웃 상태로 업데이트
+      // Firebase가 아직 로드되지 않은 경우 로그아웃 상태로 표시
       updateNavbarForAuthState(null);
     }
-  }, 2000);
+  };
+
+  // 즉시 실행
+  quickAuthCheck();
+
+  // Firebase 초기화를 기다리기 위한 빠른 재확인 (100ms 후)
+  setTimeout(quickAuthCheck, 100);
+
+  // 추가 확인 (300ms 후)
+  setTimeout(quickAuthCheck, 300);
 }
 
 // 현재 언어 감지 함수 (utils/language-utils.js와 일치하도록 수정)
@@ -238,39 +287,6 @@ async function handleLogout() {
   }
 }
 
-// 인증 상태 확인
-function checkAuthStatus() {
-  // Firebase auth 객체 확인
-  if (typeof window.auth === "undefined" || !window.auth) {
-    // Firebase 초기화를 기다리기 위해 재시도
-    setTimeout(() => {
-      if (typeof window.auth !== "undefined" && window.auth) {
-        checkAuthStatus();
-      }
-    }, 500);
-    return;
-  }
-
-  // 현재 사용자 확인
-  const currentUser = window.auth.currentUser;
-
-  // 즉시 UI 업데이트
-  updateNavbarForAuthState(currentUser);
-
-  // 인증 상태 변화 감지 설정 (중복 방지)
-  if (!window.authStateListenerSet) {
-    window.auth.onAuthStateChanged((user) => {
-      updateNavbarForAuthState(user);
-    });
-    window.authStateListenerSet = true;
-  }
-
-  // checkAuthenticationStatus 함수가 있으면 호출
-  if (typeof window.checkAuthenticationStatus === "function") {
-    window.checkAuthenticationStatus();
-  }
-}
-
 // 인증 상태에 따른 네비게이션바 업데이트
 function updateNavbarForAuthState(user) {
   // 데스크톱 요소들
@@ -291,13 +307,13 @@ function updateNavbarForAuthState(user) {
     }
     if (desktopUserSection) {
       desktopUserSection.classList.remove("hidden");
-      desktopUserSection.classList.add("flex", "lg:flex");
+      desktopUserSection.classList.add("flex", "lg:flex", "items-center");
     }
 
     // 모바일 - 로그인 버튼 숨기기
     if (mobileLoginButtons) {
       mobileLoginButtons.classList.add("hidden");
-      mobileLoginButtons.classList.remove("flex");
+      mobileLoginButtons.classList.remove("flex", "space-x-3");
     }
 
     // 사용자 정보 업데이트
@@ -337,17 +353,17 @@ function updateNavbarForAuthState(user) {
     // 데스크톱 - 유저 프로필 숨기고 로그인 버튼 보이기
     if (desktopUserSection) {
       desktopUserSection.classList.add("hidden");
-      desktopUserSection.classList.remove("flex", "lg:flex");
+      desktopUserSection.classList.remove("flex", "lg:flex", "items-center");
     }
     if (desktopLoginSection) {
       desktopLoginSection.classList.remove("hidden");
-      desktopLoginSection.classList.add("flex", "lg:flex");
+      desktopLoginSection.classList.add("flex", "lg:flex", "space-x-2");
     }
 
     // 모바일 - 로그인 버튼 보이기
     if (mobileLoginButtons) {
       mobileLoginButtons.classList.remove("hidden");
-      mobileLoginButtons.classList.add("flex");
+      mobileLoginButtons.classList.add("flex", "space-x-3");
     }
   }
 }

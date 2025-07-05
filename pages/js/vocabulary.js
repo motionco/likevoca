@@ -928,10 +928,11 @@ async function loadAndDisplayExamples(
       console.log("대표 예문 발견:", currentConcept.representative_example);
 
       const repExample = currentConcept.representative_example;
+      let exampleData = null;
 
       // 새로운 구조: 직접 언어별 텍스트
       if (repExample[sourceLanguage] && repExample[targetLanguage]) {
-        example = {
+        exampleData = {
           source: repExample[sourceLanguage],
           target: repExample[targetLanguage],
         };
@@ -939,7 +940,7 @@ async function loadAndDisplayExamples(
       }
       // 기존 구조: translations 객체
       else if (repExample.translations) {
-        example = {
+        exampleData = {
           source:
             repExample.translations[sourceLanguage]?.text ||
             repExample.translations[sourceLanguage] ||
@@ -950,6 +951,17 @@ async function loadAndDisplayExamples(
             "",
         };
         console.log("✅ 카드: 기존 대표 예문 구조 사용");
+      }
+
+      // 대표 예문이 있으면 allExamples 배열에 추가
+      if (exampleData && exampleData.source && exampleData.target) {
+        allExamples.push({
+          sourceText: exampleData.source,
+          targetText: exampleData.target,
+          priority: 100, // 대표 예문은 최고 우선순위
+          context: "대표",
+          isRepresentative: true,
+        });
       }
     }
 
@@ -1818,6 +1830,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 // 이벤트 리스너 설정
 function setupEventListeners() {
   console.log("🔧 setupEventListeners 함수 시작");
+
+  // 네비게이션바 이벤트 설정 (햄버거 메뉴 등)
+  if (typeof window.setupBasicNavbarEvents === "function") {
+    window.setupBasicNavbarEvents();
+    console.log("✅ 네비게이션바 이벤트 설정 완료");
+  } else {
+    console.warn("⚠️ setupBasicNavbarEvents 함수를 찾을 수 없습니다.");
+  }
 
   const elements = {
     searchInput: document.getElementById("search-input"),

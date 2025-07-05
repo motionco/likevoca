@@ -1078,6 +1078,10 @@ if (typeof window !== "undefined") {
   window.setupLanguageStateSync = setupLanguageStateSync;
   window.reloadAndTranslateNavbar = reloadAndTranslateNavbar;
   window.loadNavbar = loadNavbar;
+  window.setupBasicNavbarEvents = setupBasicNavbarEvents;
+  console.log(
+    "✅ loadNavbar, setupBasicNavbarEvents 함수를 전역으로 노출했습니다."
+  );
 }
 
 // 언어별 링크 업데이트 함수
@@ -1516,7 +1520,7 @@ async function loadNavbar() {
     } else {
       console.warn("⚠️ initializeNavbar 함수를 찾을 수 없습니다.");
 
-      // 기본 이벤트 설정
+      // 기본 이벤트 설정 (initializeNavbar가 없을 때만)
       setupBasicNavbarEvents();
     }
 
@@ -1549,31 +1553,159 @@ async function loadNavbar() {
 function setupBasicNavbarEvents() {
   console.log("🔧 기본 네비게이션바 이벤트 설정");
 
-  // 햄버거 메뉴
-  const menuToggle = document.getElementById("menu-toggle");
-  const mobileMenu = document.getElementById("mobile-menu");
+  // 약간의 지연 후 이벤트 설정 (DOM 안정화)
+  setTimeout(() => {
+    // 햄버거 메뉴
+    const menuToggle = document.getElementById("menu-toggle");
+    const mobileMenu = document.getElementById("mobile-menu");
 
-  if (menuToggle && mobileMenu) {
-    menuToggle.addEventListener("click", () => {
-      mobileMenu.classList.toggle("hidden");
-    });
-  }
+    if (menuToggle && mobileMenu) {
+      // 기존 이벤트 리스너 제거 (중복 방지)
+      const newMenuToggle = menuToggle.cloneNode(true);
+      menuToggle.parentNode.replaceChild(newMenuToggle, menuToggle);
 
-  // 언어 버튼
-  const languageButton = document.getElementById("language-button");
-  if (languageButton) {
-    languageButton.addEventListener("click", () => {
-      if (typeof window.showLanguageSettingsModal === "function") {
-        window.showLanguageSettingsModal();
-      }
-    });
-  }
-}
+      newMenuToggle.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log("🍔 햄버거 메뉴 클릭됨");
+        // 클릭 시점에 모바일 메뉴를 다시 찾기 (DOM 변경에 대응)
+        const currentMobileMenu = document.getElementById("mobile-menu");
+        if (currentMobileMenu) {
+          currentMobileMenu.classList.toggle("hidden");
+          console.log(
+            "📱 모바일 메뉴 상태:",
+            currentMobileMenu.classList.contains("hidden") ? "숨김" : "표시"
+          );
+        } else {
+          console.warn("⚠️ 모바일 메뉴를 찾을 수 없습니다.");
+        }
+      });
+      console.log("✅ 햄버거 메뉴 이벤트 설정 완료");
 
-// loadNavbar 함수를 전역으로 노출
-if (typeof window !== "undefined") {
-  window.loadNavbar = loadNavbar;
-  console.log("✅ loadNavbar 함수를 전역으로 노출했습니다.");
+      // 모바일 메뉴 외부 클릭 시 닫기
+      document.addEventListener("click", (event) => {
+        const currentMenuToggle = document.getElementById("menu-toggle");
+        const currentMobileMenu = document.getElementById("mobile-menu");
+        if (
+          currentMenuToggle &&
+          currentMobileMenu &&
+          !currentMenuToggle.contains(event.target) &&
+          !currentMobileMenu.contains(event.target)
+        ) {
+          currentMobileMenu.classList.add("hidden");
+        }
+      });
+      console.log("✅ 햄버거 메뉴 외부 클릭 이벤트 설정 완료");
+    } else {
+      console.warn("⚠️ 햄버거 메뉴 요소를 찾을 수 없습니다:", {
+        menuToggle,
+        mobileMenu,
+      });
+    }
+
+    // 언어 버튼
+    const languageButton = document.getElementById("language-button");
+    if (languageButton) {
+      // 기존 이벤트 리스너 제거 (중복 방지)
+      const newLanguageButton = languageButton.cloneNode(true);
+      languageButton.parentNode.replaceChild(newLanguageButton, languageButton);
+
+      newLanguageButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log("🌐 언어 버튼 클릭됨");
+        if (typeof window.showLanguageSettingsModal === "function") {
+          window.showLanguageSettingsModal();
+        } else {
+          console.warn("⚠️ showLanguageSettingsModal 함수를 찾을 수 없습니다.");
+        }
+      });
+      console.log("✅ 언어 버튼 이벤트 설정 완료");
+    } else {
+      console.warn("⚠️ 언어 버튼 요소를 찾을 수 없습니다:", { languageButton });
+    }
+
+    // 프로필 드롭다운 이벤트 설정
+    const avatarContainer = document.getElementById("avatar-container");
+    const profileDropdown = document.getElementById("profile-dropdown");
+
+    if (avatarContainer && profileDropdown) {
+      // 기존 이벤트 리스너 제거 (중복 방지)
+      const newAvatarContainer = avatarContainer.cloneNode(true);
+      avatarContainer.parentNode.replaceChild(
+        newAvatarContainer,
+        avatarContainer
+      );
+
+      newAvatarContainer.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log("👤 프로필 아바타 클릭됨");
+        // 클릭 시점에 드롭다운을 다시 찾기 (DOM 변경에 대응)
+        const currentDropdown = document.getElementById("profile-dropdown");
+        if (currentDropdown) {
+          currentDropdown.classList.toggle("hidden");
+          console.log(
+            "📋 프로필 드롭다운 상태:",
+            currentDropdown.classList.contains("hidden") ? "숨김" : "표시"
+          );
+        } else {
+          console.warn("⚠️ 프로필 드롭다운을 찾을 수 없습니다.");
+        }
+      });
+      console.log("✅ 프로필 드롭다운 이벤트 설정 완료");
+
+      // 드롭다운 외부 클릭 시 닫기
+      document.addEventListener("click", (event) => {
+        const userProfile = document.getElementById("user-profile");
+        const currentDropdown = document.getElementById("profile-dropdown");
+        if (
+          userProfile &&
+          currentDropdown &&
+          !userProfile.contains(event.target)
+        ) {
+          currentDropdown.classList.add("hidden");
+        }
+      });
+      console.log("✅ 프로필 드롭다운 외부 클릭 이벤트 설정 완료");
+    } else {
+      console.warn("⚠️ 프로필 드롭다운 요소를 찾을 수 없습니다:", {
+        avatarContainer,
+        profileDropdown,
+      });
+    }
+
+    // 로그아웃 버튼 이벤트 설정
+    const logoutButton = document.getElementById("logout-button");
+    if (logoutButton) {
+      // 기존 이벤트 리스너 제거 (중복 방지)
+      const newLogoutButton = logoutButton.cloneNode(true);
+      logoutButton.parentNode.replaceChild(newLogoutButton, logoutButton);
+
+      newLogoutButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log("🚪 로그아웃 버튼 클릭됨");
+
+        // 드롭다운 먼저 닫기
+        const currentDropdown = document.getElementById("profile-dropdown");
+        if (currentDropdown) {
+          currentDropdown.classList.add("hidden");
+        }
+
+        if (typeof window.handleLogout === "function") {
+          window.handleLogout();
+        } else {
+          console.warn("⚠️ handleLogout 함수를 찾을 수 없습니다.");
+        }
+      });
+      console.log("✅ 로그아웃 버튼 이벤트 설정 완료");
+    } else {
+      console.warn("⚠️ 로그아웃 버튼 요소를 찾을 수 없습니다:", {
+        logoutButton,
+      });
+    }
+  }, 100);
 }
 
 export {

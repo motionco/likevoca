@@ -136,6 +136,14 @@ function initializeElements() {
 
 // 이벤트 리스너 등록
 function registerEventListeners() {
+  // 네비게이션바 이벤트 설정 (햄버거 메뉴 등)
+  if (typeof window.setupBasicNavbarEvents === "function") {
+    window.setupBasicNavbarEvents();
+    console.log("✅ 진도: 네비게이션바 이벤트 설정 완료");
+  } else {
+    console.warn("⚠️ setupBasicNavbarEvents 함수를 찾을 수 없습니다.");
+  }
+
   // 목표 저장 버튼
   elements.saveGoalsBtn.addEventListener("click", saveUserGoals);
 

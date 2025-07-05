@@ -314,6 +314,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 function initializeEventListeners() {
+  // 네비게이션바 이벤트 설정 (햄버거 메뉴 등)
+  if (typeof window.setupBasicNavbarEvents === "function") {
+    window.setupBasicNavbarEvents();
+    console.log("✅ AI단어장: 네비게이션바 이벤트 설정 완료");
+  } else {
+    console.warn("⚠️ setupBasicNavbarEvents 함수를 찾을 수 없습니다.");
+  }
+
   // AI 개념 추천 버튼 (모든 언어 페이지에서 통일된 ID 사용)
   const aiAddBtn = document.getElementById("ai-add-concept");
   if (aiAddBtn) {

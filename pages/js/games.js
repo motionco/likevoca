@@ -265,6 +265,14 @@ const LANGUAGE_SETTINGS_KEY = "likevoca_game_language_settings";
 
 // 페이지 초기화
 document.addEventListener("DOMContentLoaded", async () => {
+  // 네비게이션바 이벤트 설정 (햄버거 메뉴 등)
+  if (typeof window.setupBasicNavbarEvents === "function") {
+    window.setupBasicNavbarEvents();
+    console.log("✅ 게임: 네비게이션바 이벤트 설정 완료");
+  } else {
+    console.warn("⚠️ setupBasicNavbarEvents 함수를 찾을 수 없습니다.");
+  }
+
   // 인증 상태 확인
   onAuthStateChanged(auth, (user) => {
     currentUser = user;

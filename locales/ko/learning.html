@@ -122,73 +122,168 @@
         </div>
         
         <!-- 필터 행 -->
-        <div class="grid grid-cols-2 md:grid-cols-7 gap-3">
-          <div class="relative">
-            <label class="block text-xs font-medium mb-1" data-i18n="source_language">원본 언어</label>
-            <select id="source-language" class="w-full border p-2 rounded text-sm">
-              <option value="korean" data-i18n="korean">한국어</option>
-              <option value="english" data-i18n="english">영어</option>
-              <option value="japanese" data-i18n="japanese">일본어</option>
-              <option value="chinese" data-i18n="chinese">중국어</option>
-            </select>
+        <div class="space-y-3 md:space-y-0">
+          <!-- 모바일: 언어 필터 별도 행, 데스크탑: 전체 필터 통합 -->
+          <div class="w-full md:hidden">
+            <label class="block text-xs font-medium mb-1" data-i18n="language_filter">언어 필터</label>
+            <div class="grid grid-cols-5 gap-1 h-10">
+              <select id="source-language" class="col-span-2 p-2 border rounded text-sm">
+                <option value="korean" data-i18n="korean">한국어</option>
+                <option value="english" data-i18n="english">영어</option>
+                <option value="japanese" data-i18n="japanese">일본어</option>
+                <option value="chinese" data-i18n="chinese">중국어</option>
+              </select>
+              <button id="swap-languages" class="w-full h-full text-gray-600 hover:text-blue-500 hover:bg-gray-100 rounded-lg transition duration-200 border border-gray-300 hover:border-blue-500 flex items-center justify-center" title="언어 전환">
+                <i class="fas fa-exchange-alt text-sm"></i>
+              </button>
+              <select id="target-language" class="col-span-2 p-2 border rounded text-sm">
+                <option value="english" data-i18n="english">영어</option>
+                <option value="korean" data-i18n="korean">한국어</option>
+                <option value="japanese" data-i18n="japanese">일본어</option>
+                <option value="chinese" data-i18n="chinese">중국어</option>
+              </select>
+            </div>
           </div>
-          <div class="relative flex items-end justify-center">
-            <button id="swap-languages" class="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white px-3 py-2 rounded-full transition-all duration-200 transform hover:scale-110 active:scale-95 shadow-md hover:shadow-lg" title="언어 전환">
-              <i class="fas fa-exchange-alt text-sm"></i>
-            </button>
+          
+          <!-- 데스크탑: 전체 필터 1줄 (flexbox 레이아웃), 모바일: 기타 필터 2줄 -->
+          <div class="hidden md:flex md:gap-3 md:items-end">
+            <!-- 언어 필터 그룹 (flex-1, 내부 5칸 그리드) -->
+            <div class="flex-1">
+              <div class="grid grid-cols-5 gap-1">
+                <div class="col-span-2">
+                  <label class="block text-xs font-medium mb-1" data-i18n="source_language">원본 언어</label>
+                  <select id="source-language-desktop" class="w-full border p-2 rounded text-sm h-10">
+                    <option value="korean" data-i18n="korean">한국어</option>
+                    <option value="english" data-i18n="english">영어</option>
+                    <option value="japanese" data-i18n="japanese">일본어</option>
+                    <option value="chinese" data-i18n="chinese">중국어</option>
+                  </select>
+                </div>
+                <div class="flex items-end justify-center">
+                  <button id="swap-languages-desktop" class="w-full h-10 text-gray-600 hover:text-blue-500 hover:bg-gray-100 rounded-lg transition duration-200 border border-gray-300 hover:border-blue-500 flex items-center justify-center" title="언어 전환">
+                    <i class="fas fa-exchange-alt text-sm"></i>
+                  </button>
+                </div>
+                <div class="col-span-2">
+                  <label class="block text-xs font-medium mb-1" data-i18n="target_language">대상 언어</label>
+                  <select id="target-language-desktop" class="w-full border p-2 rounded text-sm h-10">
+                    <option value="english" data-i18n="english">영어</option>
+                    <option value="korean" data-i18n="korean">한국어</option>
+                    <option value="japanese" data-i18n="japanese">일본어</option>
+                    <option value="chinese" data-i18n="chinese">중국어</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 학습 설정 그룹 (flex-1, 내부 2칸 그리드) -->
+            <div class="flex-1">
+              <div class="grid grid-cols-2 gap-1">
+                <div>
+                  <label class="block text-xs font-medium mb-1" data-i18n="difficulty_level">난이도</label>
+                  <select id="difficulty-level" class="w-full border p-2 rounded text-sm h-10">
+                    <option value="all" data-i18n="all_difficulties">전체 난이도</option>
+                    <option value="basic" data-i18n="basic">기초</option>
+                    <option value="intermediate" data-i18n="intermediate">중급</option>
+                    <option value="advanced" data-i18n="advanced">고급</option>
+                    <option value="fluent" data-i18n="fluent">유창</option>
+                    <option value="technical" data-i18n="technical">전문용어</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium mb-1" data-i18n="domain_filter">도메인</label>
+                  <select id="domain-filter" class="w-full border p-2 rounded text-sm h-10">
+                    <option value="all" data-i18n="all_domains">전체 도메인</option>
+                    <option value="daily" data-i18n="domain_daily">일상</option>
+                    <option value="food" data-i18n="domain_food">음식</option>
+                    <option value="travel" data-i18n="domain_travel">여행</option>
+                    <option value="business" data-i18n="domain_business">비즈니스</option>
+                    <option value="education" data-i18n="domain_education">교육</option>
+                    <option value="nature" data-i18n="domain_nature">자연</option>
+                    <option value="technology" data-i18n="domain_technology">기술</option>
+                    <option value="health" data-i18n="domain_health">건강</option>
+                    <option value="sports" data-i18n="domain_sports">스포츠</option>
+                    <option value="entertainment" data-i18n="domain_entertainment">엔터테인먼트</option>
+                    <option value="culture" data-i18n="domain_culture">문화</option>
+                    <option value="other" data-i18n="domain_other">기타</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 상황/목적 그룹 (flex-1, 내부 2칸 그리드) -->
+            <div class="flex-1">
+              <div class="grid grid-cols-2 gap-1">
+                <div>
+                  <label class="block text-xs font-medium mb-1" data-i18n="situation">상황</label>
+                  <select id="situation-filter" class="w-full border p-2 rounded text-sm h-10">
+                    <option value="all" data-i18n="all_situation">전체 상황</option>
+                    <!-- 동적으로 생성될 옵션들 -->
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium mb-1" data-i18n="purpose">목적</label>
+                  <select id="purpose-filter" class="w-full border p-2 rounded text-sm h-10">
+                    <option value="all" data-i18n="all_purpose">전체 목적</option>
+                    <!-- 동적으로 생성될 옵션들 -->
+                  </select>
+                </div>
+              </div>
+            </div>
           </div>
-          <div>
-            <label class="block text-xs font-medium mb-1" data-i18n="target_language">대상 언어</label>
-            <select id="target-language" class="w-full border p-2 rounded text-sm">
-              <option value="english" data-i18n="english">영어</option>
-              <option value="korean" data-i18n="korean">한국어</option>
-              <option value="japanese" data-i18n="japanese">일본어</option>
-              <option value="chinese" data-i18n="chinese">중국어</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-medium mb-1" data-i18n="difficulty_level">난이도</label>
-            <select id="difficulty-level" class="w-full border p-2 rounded text-sm">
-              <option value="all" data-i18n="all_difficulties">전체 난이도</option>
-              <option value="basic" data-i18n="basic">기초</option>
-              <option value="intermediate" data-i18n="intermediate">중급</option>
-              <option value="advanced" data-i18n="advanced">고급</option>
-              <option value="fluent" data-i18n="fluent">유창</option>
-              <option value="technical" data-i18n="technical">전문용어</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-medium mb-1" data-i18n="domain_filter">도메인</label>
-            <select id="domain-filter" class="w-full border p-2 rounded text-sm">
-              <option value="all" data-i18n="all_domains">전체 도메인</option>
-              <option value="daily" data-i18n="domain_daily">일상</option>
-              <option value="food" data-i18n="domain_food">음식</option>
-              <option value="travel" data-i18n="domain_travel">여행</option>
-              <option value="business" data-i18n="domain_business">비즈니스</option>
-              <option value="education" data-i18n="domain_education">교육</option>
-              <option value="nature" data-i18n="domain_nature">자연</option>
-              <option value="technology" data-i18n="domain_technology">기술</option>
-              <option value="health" data-i18n="domain_health">건강</option>
-              <option value="sports" data-i18n="domain_sports">스포츠</option>
-              <option value="entertainment" data-i18n="domain_entertainment">엔터테인먼트</option>
-              <option value="culture" data-i18n="domain_culture">문화</option>
-
-              <option value="other" data-i18n="domain_other">기타</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-medium mb-1" data-i18n="situation">상황</label>
-            <select id="situation-filter" class="w-full border p-2 rounded text-sm">
-              <option value="all" data-i18n="all_situation">전체 상황</option>
-              <!-- 동적으로 생성될 옵션들 -->
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-medium mb-1" data-i18n="purpose">목적</label>
-            <select id="purpose-filter" class="w-full border p-2 rounded text-sm">
-              <option value="all" data-i18n="all_purpose">전체 목적</option>
-              <!-- 동적으로 생성될 옵션들 -->
-            </select>
+          
+          <!-- 모바일 전용 기타 필터 -->
+          <div class="md:hidden space-y-3">
+            <!-- 난이도, 도메인 (첫 번째 행) -->
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-medium mb-1" data-i18n="difficulty_level">난이도</label>
+                <select id="difficulty-level-mobile" class="w-full border p-2 rounded text-sm">
+                  <option value="all" data-i18n="all_difficulties">전체 난이도</option>
+                  <option value="basic" data-i18n="basic">기초</option>
+                  <option value="intermediate" data-i18n="intermediate">중급</option>
+                  <option value="advanced" data-i18n="advanced">고급</option>
+                  <option value="fluent" data-i18n="fluent">유창</option>
+                  <option value="technical" data-i18n="technical">전문용어</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-medium mb-1" data-i18n="domain_filter">도메인</label>
+                <select id="domain-filter-mobile" class="w-full border p-2 rounded text-sm">
+                  <option value="all" data-i18n="all_domains">전체 도메인</option>
+                  <option value="daily" data-i18n="domain_daily">일상</option>
+                  <option value="food" data-i18n="domain_food">음식</option>
+                  <option value="travel" data-i18n="domain_travel">여행</option>
+                  <option value="business" data-i18n="domain_business">비즈니스</option>
+                  <option value="education" data-i18n="domain_education">교육</option>
+                  <option value="nature" data-i18n="domain_nature">자연</option>
+                  <option value="technology" data-i18n="domain_technology">기술</option>
+                  <option value="health" data-i18n="domain_health">건강</option>
+                  <option value="sports" data-i18n="domain_sports">스포츠</option>
+                  <option value="entertainment" data-i18n="domain_entertainment">엔터테인먼트</option>
+                  <option value="culture" data-i18n="domain_culture">문화</option>
+                  <option value="other" data-i18n="domain_other">기타</option>
+                </select>
+              </div>
+            </div>
+            
+            <!-- 상황, 목적 (두 번째 행) -->
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-medium mb-1" data-i18n="situation">상황</label>
+                <select id="situation-filter-mobile" class="w-full border p-2 rounded text-sm">
+                  <option value="all" data-i18n="all_situation">전체 상황</option>
+                  <!-- 동적으로 생성될 옵션들 -->
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-medium mb-1" data-i18n="purpose">목적</label>
+                <select id="purpose-filter-mobile" class="w-full border p-2 rounded text-sm">
+                  <option value="all" data-i18n="all_purpose">전체 목적</option>
+                  <!-- 동적으로 생성될 옵션들 -->
+                </select>
+              </div>
+            </div>
           </div>
         </div>
       </div>

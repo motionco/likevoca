@@ -219,16 +219,39 @@ function handleFilterChange() {
 
 // 현재 필터 설정 가져오기
 function getCurrentFilters() {
+  // 데스크탑용 필터 요소들
   const domainFilter = document.getElementById("domain-filter");
   const difficultyFilter = document.getElementById("difficulty-level");
   const situationFilter = document.getElementById("situation-filter");
   const purposeFilter = document.getElementById("purpose-filter");
 
+  // 모바일용 필터 요소들
+  const domainFilterMobile = document.getElementById("domain-filter-mobile");
+  const difficultyFilterMobile = document.getElementById(
+    "difficulty-level-mobile"
+  );
+  const situationFilterMobile = document.getElementById(
+    "situation-filter-mobile"
+  );
+  const purposeFilterMobile = document.getElementById("purpose-filter-mobile");
+
   return {
-    domain: domainFilter ? domainFilter.value : "all",
-    difficulty: difficultyFilter ? difficultyFilter.value : "all",
-    situation: situationFilter ? situationFilter.value : "all",
-    purpose: purposeFilter ? purposeFilter.value : "all",
+    domain:
+      (domainFilter && domainFilter.value) ||
+      (domainFilterMobile && domainFilterMobile.value) ||
+      "all",
+    difficulty:
+      (difficultyFilter && difficultyFilter.value) ||
+      (difficultyFilterMobile && difficultyFilterMobile.value) ||
+      "all",
+    situation:
+      (situationFilter && situationFilter.value) ||
+      (situationFilterMobile && situationFilterMobile.value) ||
+      "all",
+    purpose:
+      (purposeFilter && purposeFilter.value) ||
+      (purposeFilterMobile && purposeFilterMobile.value) ||
+      "all",
   };
 }
 
@@ -768,6 +791,14 @@ function updateLanguageSelectors() {
 }
 
 function setupEventListeners() {
+  // 네비게이션바 이벤트 설정 (햄버거 메뉴 등)
+  if (typeof window.setupBasicNavbarEvents === "function") {
+    window.setupBasicNavbarEvents();
+    console.log("✅ 학습: 네비게이션바 이벤트 설정 완료");
+  } else {
+    console.warn("⚠️ setupBasicNavbarEvents 함수를 찾을 수 없습니다.");
+  }
+
   // 기존 이벤트 리스너들 제거
   document.removeEventListener("click", globalClickHandler);
 
@@ -782,12 +813,64 @@ function setupEventListeners() {
 
     // 언어 변경 이벤트 리스너
     sourceLanguageSelect.addEventListener("change", (e) => {
-      // 스왑 중인 경우 이벤트 무시
-      if (isLanguageSwapping) {
-        return;
-      }
+      handleLanguageSelectChange(e, "source");
+    });
 
-      sourceLanguage = e.target.value;
+    targetLanguageSelect.addEventListener("change", (e) => {
+      handleLanguageSelectChange(e, "target");
+    });
+  }
+
+  // 데스크탑용 언어 선택 요소들 설정
+  const sourceLanguageDesktopSelect = document.getElementById(
+    "source-language-desktop"
+  );
+  const targetLanguageDesktopSelect = document.getElementById(
+    "target-language-desktop"
+  );
+
+  if (sourceLanguageDesktopSelect && targetLanguageDesktopSelect) {
+    // 초기 값 설정
+    sourceLanguageDesktopSelect.value = sourceLanguage;
+    targetLanguageDesktopSelect.value = targetLanguage;
+
+    // 언어 변경 이벤트 리스너
+    sourceLanguageDesktopSelect.addEventListener("change", (e) => {
+      handleLanguageSelectChange(e, "source");
+    });
+
+    targetLanguageDesktopSelect.addEventListener("change", (e) => {
+      handleLanguageSelectChange(e, "target");
+    });
+  }
+
+  // 언어 전환 버튼 이벤트 리스너 (모바일용)
+  const swapButton = document.getElementById("swap-languages");
+  if (swapButton) {
+    swapButton.addEventListener("click", () => {
+      handleLanguageSwap();
+    });
+  }
+
+  // 데스크탑용 언어 전환 버튼 이벤트 리스너
+  const swapDesktopButton = document.getElementById("swap-languages-desktop");
+  if (swapDesktopButton) {
+    swapDesktopButton.addEventListener("click", () => {
+      handleLanguageSwap();
+    });
+  }
+
+  // 공통 언어 선택 변경 핸들러
+  function handleLanguageSelectChange(e, type) {
+    // 스왑 중인 경우 이벤트 무시
+    if (isLanguageSwapping) {
+      return;
+    }
+
+    const newValue = e.target.value;
+
+    if (type === "source") {
+      sourceLanguage = newValue;
       window.languageSettings.sourceLanguage = sourceLanguage;
       sessionStorage.setItem("sourceLanguage", sourceLanguage);
 
@@ -803,21 +886,17 @@ function setupEventListeners() {
           "chinese",
         ].filter((lang) => lang !== sourceLanguage);
         targetLanguage = otherLanguages[0];
-        targetLanguageSelect.value = targetLanguage;
+
+        // 모든 대상 언어 선택 요소 업데이트
+        if (targetLanguageSelect) targetLanguageSelect.value = targetLanguage;
+        if (targetLanguageDesktopSelect)
+          targetLanguageDesktopSelect.value = targetLanguage;
+
         window.languageSettings.targetLanguage = targetLanguage;
         sessionStorage.setItem("targetLanguage", targetLanguage);
       }
-
-      handleFilterChange();
-    });
-
-    targetLanguageSelect.addEventListener("change", (e) => {
-      // 스왑 중인 경우 이벤트 무시
-      if (isLanguageSwapping) {
-        return;
-      }
-
-      targetLanguage = e.target.value;
+    } else if (type === "target") {
+      targetLanguage = newValue;
       window.languageSettings.targetLanguage = targetLanguage;
       sessionStorage.setItem("targetLanguage", targetLanguage);
 
@@ -833,62 +912,55 @@ function setupEventListeners() {
           "chinese",
         ].filter((lang) => lang !== targetLanguage);
         sourceLanguage = otherLanguages[0];
-        sourceLanguageSelect.value = sourceLanguage;
+
+        // 모든 원본 언어 선택 요소 업데이트
+        if (sourceLanguageSelect) sourceLanguageSelect.value = sourceLanguage;
+        if (sourceLanguageDesktopSelect)
+          sourceLanguageDesktopSelect.value = sourceLanguage;
+
         window.languageSettings.sourceLanguage = sourceLanguage;
         sessionStorage.setItem("sourceLanguage", sourceLanguage);
       }
+    }
 
-      handleFilterChange();
-    });
+    handleFilterChange();
   }
 
-  // 언어 전환 버튼 이벤트 리스너
-  const swapButton = document.getElementById("swap-languages");
-  if (swapButton) {
-    swapButton.addEventListener("click", () => {
-      console.log("🔄 언어 스왑 버튼 클릭");
+  // 공통 언어 전환 핸들러
+  function handleLanguageSwap() {
+    console.log("🔄 언어 스왑 버튼 클릭");
 
-      // 중복 이벤트 방지 플래그 설정
-      isLanguageSwapping = true;
+    // 중복 이벤트 방지 플래그 설정
+    isLanguageSwapping = true;
 
-      // 버튼 애니메이션 효과
-      swapButton.style.transform = "scale(0.9) rotate(180deg)";
+    // 언어 전환
+    const tempLanguage = sourceLanguage;
+    sourceLanguage = targetLanguage;
+    targetLanguage = tempLanguage;
 
-      setTimeout(() => {
-        // 언어 전환
-        const tempLanguage = sourceLanguage;
-        sourceLanguage = targetLanguage;
-        targetLanguage = tempLanguage;
+    // 전역 설정 업데이트
+    window.languageSettings.sourceLanguage = sourceLanguage;
+    window.languageSettings.targetLanguage = targetLanguage;
+    sessionStorage.setItem("sourceLanguage", sourceLanguage);
+    sessionStorage.setItem("targetLanguage", targetLanguage);
 
-        // 전역 설정 업데이트
-        window.languageSettings.sourceLanguage = sourceLanguage;
-        window.languageSettings.targetLanguage = targetLanguage;
-        sessionStorage.setItem("sourceLanguage", sourceLanguage);
-        sessionStorage.setItem("targetLanguage", targetLanguage);
+    // 모든 언어 선택 요소 업데이트
+    if (sourceLanguageSelect) sourceLanguageSelect.value = sourceLanguage;
+    if (targetLanguageSelect) targetLanguageSelect.value = targetLanguage;
+    if (sourceLanguageDesktopSelect)
+      sourceLanguageDesktopSelect.value = sourceLanguage;
+    if (targetLanguageDesktopSelect)
+      targetLanguageDesktopSelect.value = targetLanguage;
 
-        // UI 업데이트 (드롭다운 값 변경)
-        const sourceLanguageSelect = document.getElementById("source-language");
-        const targetLanguageSelect = document.getElementById("target-language");
+    console.log("🔄 언어 전환:", { sourceLanguage, targetLanguage });
 
-        if (sourceLanguageSelect && targetLanguageSelect) {
-          sourceLanguageSelect.value = sourceLanguage;
-          targetLanguageSelect.value = targetLanguage;
-        }
+    // 필터 변경 처리
+    handleFilterChange();
 
-        console.log("🔄 언어 전환:", { sourceLanguage, targetLanguage });
-
-        // 버튼 애니메이션 복원
-        swapButton.style.transform = "scale(1) rotate(0deg)";
-
-        // 필터 변경 처리
-        handleFilterChange();
-
-        // 플래그 해제
-        setTimeout(() => {
-          isLanguageSwapping = false;
-        }, 100);
-      }, 150);
-    });
+    // 플래그 해제
+    setTimeout(() => {
+      isLanguageSwapping = false;
+    }, 100);
   }
 
   // 필터 이벤트 리스너 추가
@@ -897,6 +969,17 @@ function setupEventListeners() {
   const situationFilter = document.getElementById("situation-filter");
   const purposeFilter = document.getElementById("purpose-filter");
 
+  // 모바일용 필터 요소들
+  const domainFilterMobile = document.getElementById("domain-filter-mobile");
+  const difficultyFilterMobile = document.getElementById(
+    "difficulty-level-mobile"
+  );
+  const situationFilterMobile = document.getElementById(
+    "situation-filter-mobile"
+  );
+  const purposeFilterMobile = document.getElementById("purpose-filter-mobile");
+
+  // 데스크탑 필터 이벤트 리스너
   if (domainFilter) {
     domainFilter.addEventListener("change", handleFilterChange);
   }
@@ -908,6 +991,62 @@ function setupEventListeners() {
   }
   if (purposeFilter) {
     purposeFilter.addEventListener("change", handleFilterChange);
+  }
+
+  // 모바일 필터 이벤트 리스너 및 동기화
+  if (domainFilterMobile) {
+    domainFilterMobile.addEventListener("change", (e) => {
+      // 데스크탑 필터와 동기화
+      if (domainFilter) domainFilter.value = e.target.value;
+      handleFilterChange();
+    });
+  }
+  if (difficultyFilterMobile) {
+    difficultyFilterMobile.addEventListener("change", (e) => {
+      // 데스크탑 필터와 동기화
+      if (difficultyFilter) difficultyFilter.value = e.target.value;
+      handleFilterChange();
+    });
+  }
+  if (situationFilterMobile) {
+    situationFilterMobile.addEventListener("change", (e) => {
+      // 데스크탑 필터와 동기화
+      if (situationFilter) situationFilter.value = e.target.value;
+      handleFilterChange();
+    });
+  }
+  if (purposeFilterMobile) {
+    purposeFilterMobile.addEventListener("change", (e) => {
+      // 데스크탑 필터와 동기화
+      if (purposeFilter) purposeFilter.value = e.target.value;
+      handleFilterChange();
+    });
+  }
+
+  // 데스크탑 필터 변경 시 모바일 필터도 동기화
+  if (domainFilter) {
+    domainFilter.addEventListener("change", (e) => {
+      if (domainFilterMobile) domainFilterMobile.value = e.target.value;
+      handleFilterChange();
+    });
+  }
+  if (difficultyFilter) {
+    difficultyFilter.addEventListener("change", (e) => {
+      if (difficultyFilterMobile) difficultyFilterMobile.value = e.target.value;
+      handleFilterChange();
+    });
+  }
+  if (situationFilter) {
+    situationFilter.addEventListener("change", (e) => {
+      if (situationFilterMobile) situationFilterMobile.value = e.target.value;
+      handleFilterChange();
+    });
+  }
+  if (purposeFilter) {
+    purposeFilter.addEventListener("change", (e) => {
+      if (purposeFilterMobile) purposeFilterMobile.value = e.target.value;
+      handleFilterChange();
+    });
   }
 
   // 네비게이션 버튼들 - 개별 이벤트 리스너만 사용
