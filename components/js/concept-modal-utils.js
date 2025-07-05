@@ -898,9 +898,8 @@ export function collectEditFormData() {
       // 내용이 있는 예제 처리
       if (hasContent) {
         if (isRepresentative) {
-          representativeExample = {
-            translations: example,
-          };
+          // 기존 구조 유지 - translations 속성 제거
+          representativeExample = example;
           console.log("📝 편집 대표 예문 수집:", representativeExample);
         } else {
           examples.push(example);

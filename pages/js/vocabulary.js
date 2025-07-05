@@ -510,9 +510,9 @@ function displayConceptList() {
   // 더 보기 버튼 표시/숨김
   if (loadMoreBtn) {
     if (filteredConcepts.length > displayCount) {
-      loadMoreBtn.classList.remove("hidden");
+      loadMoreBtn.style.display = "block";
     } else {
-      loadMoreBtn.classList.add("hidden");
+      loadMoreBtn.style.display = "none";
     }
   }
 }

@@ -18,6 +18,23 @@ async function initializeNavbar(currentLanguage) {
       console.log("🍔 navbar.js: 햄버거 메뉴 토글");
     });
     console.log("✅ navbar.js: 햄버거 메뉴 이벤트 설정");
+
+    // 모바일 메뉴 외부 클릭 시 닫기
+    document.addEventListener("click", (event) => {
+      const currentMenuToggle = document.getElementById("menu-toggle");
+      const currentMobileMenu = document.getElementById("mobile-menu");
+      if (
+        currentMenuToggle &&
+        currentMobileMenu &&
+        !currentMenuToggle.contains(event.target) &&
+        !currentMobileMenu.contains(event.target) &&
+        !currentMobileMenu.classList.contains("hidden")
+      ) {
+        currentMobileMenu.classList.add("hidden");
+        console.log("🍔 navbar.js: 햄버거 메뉴 닫힘 (외부 클릭으로 인해)");
+      }
+    });
+    console.log("✅ navbar.js: 햄버거 메뉴 외부 클릭 이벤트 설정");
   }
 
   // 언어 변경 버튼 이벤트 설정
@@ -58,6 +75,13 @@ async function initializeNavbar(currentLanguage) {
 
     newAvatarContainer.addEventListener("click", (e) => {
       e.stopPropagation();
+
+      // 햄버거 메뉴가 열려있다면 닫기
+      const mobileMenu = document.getElementById("mobile-menu");
+      if (mobileMenu && !mobileMenu.classList.contains("hidden")) {
+        mobileMenu.classList.add("hidden");
+      }
+
       const currentDropdown = document.getElementById("profile-dropdown");
       if (currentDropdown) {
         currentDropdown.classList.toggle("hidden");

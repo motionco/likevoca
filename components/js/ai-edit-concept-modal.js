@@ -818,9 +818,8 @@ function collectFormData() {
       example.chinese
     ) {
       if (isRepresentative) {
-        representativeExample = {
-          translations: example,
-        };
+        // 기존 구조 유지 - translations 속성 제거
+        representativeExample = example;
         console.log("✅ 대표 예문 설정:", representativeExample);
       } else {
         examples.push(example);

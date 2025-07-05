@@ -860,6 +860,18 @@ async function showLanguageSettingsModal() {
     // 성공 메시지 (선택사항)
     console.log("언어 설정이 저장되었습니다:", selectedLang);
   });
+
+  // 모달 외부 클릭 시 닫기
+  document
+    .getElementById("language-settings-modal")
+    .addEventListener("click", (e) => {
+      if (e.target.id === "language-settings-modal") {
+        document
+          .getElementById("language-settings-modal")
+          .classList.add("hidden");
+        console.log("🌐 언어 설정 모달 닫힘 (외부 클릭으로 인해)");
+      }
+    });
 }
 
 // 메타데이터 업데이트 함수 (캐시된 언어 사용)
@@ -1590,9 +1602,11 @@ function setupBasicNavbarEvents() {
           currentMenuToggle &&
           currentMobileMenu &&
           !currentMenuToggle.contains(event.target) &&
-          !currentMobileMenu.contains(event.target)
+          !currentMobileMenu.contains(event.target) &&
+          !currentMobileMenu.classList.contains("hidden")
         ) {
           currentMobileMenu.classList.add("hidden");
+          console.log("🍔 햄버거 메뉴 닫힘 (외부 클릭으로 인해)");
         }
       });
       console.log("✅ 햄버거 메뉴 외부 클릭 이벤트 설정 완료");
@@ -1641,6 +1655,14 @@ function setupBasicNavbarEvents() {
         e.preventDefault();
         e.stopPropagation();
         console.log("👤 프로필 아바타 클릭됨");
+
+        // 햄버거 메뉴가 열려있다면 닫기
+        const mobileMenu = document.getElementById("mobile-menu");
+        if (mobileMenu && !mobileMenu.classList.contains("hidden")) {
+          mobileMenu.classList.add("hidden");
+          console.log("🍔 햄버거 메뉴 닫힘 (프로필 클릭으로 인해)");
+        }
+
         // 클릭 시점에 드롭다운을 다시 찾기 (DOM 변경에 대응)
         const currentDropdown = document.getElementById("profile-dropdown");
         if (currentDropdown) {
