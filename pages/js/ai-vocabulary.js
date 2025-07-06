@@ -414,14 +414,22 @@ function updateConceptCount() {
 
 async function updateUsageDisplay() {
   try {
-    // 기존 users 컬렉션의 사용량 관리 사용
-    const usage = await conceptUtils.getUsage(currentUser.uid);
+    // 로그인된 사용자인지 확인
+    if (!currentUser) {
+      console.log("로그인되지 않은 사용자입니다.");
+      return;
+    }
+
+    // 기존 users 컬렉션의 사용량 관리 사용 (이메일 사용)
+    const usage = await conceptUtils.getUsage(currentUser.email);
+    console.log("🔍 AI 단어장 사용량 정보:", usage);
+
     const usageText = document.getElementById("ai-usage-text");
     const usageBar = document.getElementById("ai-usage-bar");
 
     if (usageText && usageBar) {
       const aiUsed = usage.aiUsed || 0;
-      const aiLimit = usage.aiLimit || 100;
+      const aiLimit = usage.aiLimit || 10; // DB에서 가져온 실제 값 사용
       const percentage = Math.min((aiUsed / aiLimit) * 100, 100);
 
       usageText.textContent = `${aiUsed}/${aiLimit}`;
@@ -441,6 +449,23 @@ async function updateUsageDisplay() {
     }
   } catch (error) {
     console.error("AI 사용량 표시 업데이트 중 오류:", error);
+
+    // 권한 오류인 경우 기본값으로 표시
+    if (
+      error.code === "permission-denied" ||
+      error.message.includes("Missing or insufficient permissions")
+    ) {
+      console.log("권한 오류로 인해 기본 사용량 표시");
+      const usageText = document.getElementById("ai-usage-text");
+      const usageBar = document.getElementById("ai-usage-bar");
+
+      if (usageText && usageBar) {
+        usageText.textContent = "0/10";
+        usageBar.style.width = "0%";
+        usageBar.classList.remove("bg-red-500", "bg-yellow-500");
+        usageBar.classList.add("bg-[#4B63AC]");
+      }
+    }
   }
 }
 

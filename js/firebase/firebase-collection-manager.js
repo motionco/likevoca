@@ -2071,32 +2071,17 @@ export class CollectionManager {
       const conceptRef = doc(collection(db, "concepts"));
       const conceptId = conceptRef.id;
 
-      // concept_info가 이미 있으면 그대로 사용, 없으면 기본값 생성
-      let conceptInfo = conceptData.concept_info;
-      if (!conceptInfo) {
-        conceptInfo = {
-          domain: conceptData.domain || "general",
-          category: conceptData.category || "uncategorized",
-          difficulty: conceptData.difficulty || "basic",
-          unicode_emoji: conceptData.unicode_emoji || conceptData.emoji || "",
-          color_theme: conceptData.color_theme || "#FF6B6B",
-          situation: conceptData.situation || ["casual"],
-          purpose: conceptData.purpose || "description",
-        };
-      }
-
-      const randomFieldValue = conceptData.randomField || Math.random();
-      console.log(`🎲 randomField 값: ${randomFieldValue.toFixed(6)}`);
+      // 🎲 randomField 자동 추가 (0~1 사이의 실수)
+      const randomField = Math.random();
+      console.log("🎲 randomField 값:", randomField);
 
       const conceptDoc = {
-        concept_info: conceptInfo,
-        expressions: conceptData.expressions || {},
-        representative_example: conceptData.representative_example || null,
-        randomField: randomFieldValue, // 🎲 효율적인 랜덤 쿼리를 위한 필드
+        ...conceptData,
+        randomField: randomField, // 🎲 효율적인 랜덤 쿼리를 위한 필드
         created_at: serverTimestamp(),
       };
 
-      // 추가 예문이 있는 경우에만 examples 필드 추가
+      // 예문이 있는 경우에만 추가
       if (conceptData.examples && conceptData.examples.length > 0) {
         conceptDoc.examples = conceptData.examples;
       }
@@ -2109,6 +2094,19 @@ export class CollectionManager {
       return conceptId;
     } catch (error) {
       console.error("개념 생성 오류:", error);
+
+      // 권한 오류 처리
+      if (
+        error.code === "permission-denied" ||
+        error.message.includes("Missing or insufficient permissions")
+      ) {
+        const permissionError = new Error(
+          "개념 생성 권한이 없습니다. 관리자 권한이 필요합니다."
+        );
+        permissionError.code = "permission-denied";
+        throw permissionError;
+      }
+
       throw error;
     }
   }

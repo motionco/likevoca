@@ -300,11 +300,11 @@ export async function handleAIConceptRecommendation(currentUser, db) {
 
     // 사용량 확인 (기존 users 컬렉션 사용)
     console.log("사용량 확인 중...");
-    const usage = await conceptUtils.getUsage(currentUser.uid);
+    const usage = await conceptUtils.getUsage(currentUser.email);
     console.log("사용량 확인 완료:", usage);
 
     const aiUsed = usage.aiUsed || 0;
-    const aiLimit = usage.aiLimit || 100;
+    const aiLimit = usage.aiLimit || 10; // getUsage에서 이미 maxAiUsage 값을 반환
 
     if (aiUsed >= aiLimit) {
       alert(
@@ -448,7 +448,7 @@ export async function handleAIConceptRecommendation(currentUser, db) {
 
     // AI 사용량 업데이트 (기존 users 컬렉션 사용)
     console.log("AI 사용량 업데이트 중...");
-    await conceptUtils.updateUsage(currentUser.uid, { aiUsed: aiUsed + 1 });
+    await conceptUtils.updateUsage(currentUser.email, { aiUsed: aiUsed + 1 });
     console.log("AI 사용량 업데이트 완료");
 
     alert("AI 개념이 성공적으로 추가되었습니다!");
@@ -458,7 +458,16 @@ export async function handleAIConceptRecommendation(currentUser, db) {
   } catch (error) {
     console.error("AI 개념 추천 중 오류:", error);
     console.error("오류 스택:", error.stack);
-    alert("개념 생성 중 오류가 발생했습니다. 다시 시도해주세요.");
+
+    // 권한 오류인 경우 특별한 처리
+    if (
+      error.code === "permission-denied" ||
+      error.message.includes("Missing or insufficient permissions")
+    ) {
+      alert("권한이 없습니다. 로그인 상태를 확인하거나 관리자에게 문의하세요.");
+    } else {
+      alert("개념 생성 중 오류가 발생했습니다. 다시 시도해주세요.");
+    }
 
     // 로딩 제거 (오류 시)
     const loadingDiv = document.querySelector(".fixed.inset-0.bg-black");

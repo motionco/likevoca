@@ -262,15 +262,7 @@ async function uploadConcepts(data) {
   for (const conceptData of concepts) {
     try {
       const conceptDoc = {
-        concept_info: conceptData.concept_info || {
-          domain: conceptData.domain || "general",
-          category: conceptData.category || "uncategorized",
-          difficulty: conceptData.difficulty || "beginner",
-          unicode_emoji: conceptData.emoji || "📝",
-          color_theme: conceptData.color_theme || "#9C27B0",
-          situation: conceptData.situation || ["casual"],
-          purpose: conceptData.purpose || "description",
-        },
+        concept_info: conceptData.concept_info || {},
         expressions: conceptData.expressions || {},
         representative_example: conceptData.representative_example || null,
         randomField: Math.random(), // 🎲 효율적인 랜덤 쿼리를 위한 필드
@@ -281,6 +273,18 @@ async function uploadConcepts(data) {
       success++;
     } catch (error) {
       console.error("개념 업로드 오류:", error);
+
+      // 권한 오류 처리
+      if (
+        error.code === "permission-denied" ||
+        error.message.includes("Missing or insufficient permissions") ||
+        error.message.includes("권한이 없습니다")
+      ) {
+        // 권한 오류 발생 시 즉시 중단하고 사용자에게 알림
+        alert("개념 업로드 권한이 없습니다. 관리자 권한이 필요합니다.");
+        return { success, errors: errors + (concepts.length - success) };
+      }
+
       errors++;
     }
   }
@@ -320,6 +324,17 @@ async function uploadExamples(data) {
       success++;
     } catch (error) {
       console.error("예문 업로드 오류:", error);
+
+      // 권한 오류 처리
+      if (
+        error.code === "permission-denied" ||
+        error.message.includes("Missing or insufficient permissions") ||
+        error.message.includes("권한이 없습니다")
+      ) {
+        alert("예문 업로드 권한이 없습니다. 관리자 권한이 필요합니다.");
+        return { success, errors: errors + (examples.length - success) };
+      }
+
       errors++;
     }
   }
@@ -364,6 +379,17 @@ async function uploadGrammarPatterns(data) {
     } catch (error) {
       console.error("❌ 문법 패턴 업로드 오류:", error);
       console.error("❌ 실패한 데이터:", patternData);
+
+      // 권한 오류 처리
+      if (
+        error.code === "permission-denied" ||
+        error.message.includes("Missing or insufficient permissions") ||
+        error.message.includes("권한이 없습니다")
+      ) {
+        alert("문법 패턴 업로드 권한이 없습니다. 관리자 권한이 필요합니다.");
+        return { success, errors: errors + (patterns.length - success) };
+      }
+
       errors++;
     }
   }

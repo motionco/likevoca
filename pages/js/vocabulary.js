@@ -542,25 +542,41 @@ async function loadModals(modalPaths) {
 
 // 사용량 UI 업데이트
 async function updateUsageUI() {
+  console.log("🔧 updateUsageUI 함수 시작");
   try {
-    if (!currentUser) return;
+    if (!currentUser) {
+      console.log("❌ 현재 사용자가 없음, updateUsageUI 종료");
+      return;
+    }
 
-    // 사용자 문서 가져오기
-    const userRef = doc(db, "users", currentUser.email);
-    const userDoc = await getDoc(userRef);
+    console.log("👤 현재 사용자:", currentUser.email);
 
-    if (!userDoc.exists()) return;
+    // conceptUtils.getUsage를 사용하여 DB에서 실제 값 가져오기
+    const usage = await conceptUtils.getUsage(currentUser.email);
+    console.log("🔍 단어장 사용량 정보:", usage);
 
-    const userData = userDoc.data();
-    const conceptCount = userData.conceptCount || 0;
-    const maxConcepts = userData.maxConcepts || 100;
+    const conceptCount = usage.conceptCount || 0;
+    const maxConcepts = usage.maxWordCount || 50; // DB에서 가져온 실제 값 사용
 
-    // UI 업데이트
-    const usageText = document.getElementById("concept-usage-text");
-    const usageBar = document.getElementById("concept-usage-bar");
+    // UI 업데이트 (실제 HTML ID 사용)
+    const usageText = document.getElementById("usage-text");
+    const usageBar = document.getElementById("usage-bar");
+
+    console.log("🔍 UI 요소 확인:", {
+      usageText: !!usageText,
+      usageBar: !!usageBar,
+      conceptCount,
+      maxConcepts,
+    });
 
     if (usageText) {
       usageText.textContent = `${conceptCount}/${maxConcepts}`;
+      console.log(
+        "📊 단어장 사용량 UI 업데이트:",
+        `${conceptCount}/${maxConcepts}`
+      );
+    } else {
+      console.error("❌ usage-text 요소를 찾을 수 없음");
     }
 
     if (usageBar) {
@@ -578,16 +594,27 @@ async function updateUsageUI() {
         usageBar.classList.remove("bg-red-500", "bg-yellow-500");
         usageBar.classList.add("bg-[#4B63AC]");
       }
+      console.log(
+        "🎨 사용량 바 업데이트 완료:",
+        `${usagePercentage.toFixed(1)}%`
+      );
+    } else {
+      console.error("❌ usage-bar 요소를 찾을 수 없음");
     }
+
+    console.log("✅ updateUsageUI 함수 완료");
   } catch (error) {
-    console.error("사용량 업데이트 중 오류 발생:", error);
+    console.error("❌ updateUsageUI 사용량 업데이트 중 오류 발생:", error);
   }
 }
 
 // 개념 데이터 가져오기 (ID 포함 및 디버깅 개선)
 async function fetchAndDisplayConcepts() {
   try {
-    if (!currentUser) return;
+    console.log("📚 개념 데이터 로드 시작...", {
+      currentUser: !!currentUser,
+      userEmail: currentUser?.email || "비로그인",
+    });
 
     // 분리된 컬렉션과 통합 컬렉션 모두에서 개념 가져오기
     allConcepts = [];
@@ -1656,6 +1683,11 @@ function setupModalButtons(conceptData) {
   const deleteButton = document.getElementById("delete-concept-button");
   if (deleteButton) {
     deleteButton.onclick = async () => {
+      // 권한 체크 먼저 수행
+      if (!(await checkAdminPermission())) {
+        return;
+      }
+
       if (
         confirm(
           getTranslatedText("confirm_delete_concept") ||
@@ -1681,12 +1713,24 @@ function setupModalButtons(conceptData) {
           window.dispatchEvent(new CustomEvent("concept-saved"));
         } catch (error) {
           console.error("개념 삭제 중 오류 발생:", error);
-          alert(
-            (getTranslatedText("concept_delete_error") ||
-              "개념 삭제 중 오류가 발생했습니다") +
-              ": " +
-              error.message
-          );
+
+          // 권한 오류 처리
+          if (
+            error.code === "permission-denied" ||
+            error.message.includes("Missing or insufficient permissions")
+          ) {
+            showMessage(
+              "삭제 권한이 없습니다. 관리자 권한이 필요합니다.",
+              "error"
+            );
+          } else {
+            alert(
+              (getTranslatedText("concept_delete_error") ||
+                "개념 삭제 중 오류가 발생했습니다") +
+                ": " +
+                error.message
+            );
+          }
         }
       }
     };
@@ -1789,15 +1833,16 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (user) {
         console.log("👤 사용자 로그인 확인:", user.email);
         currentUser = user;
-        await fetchAndDisplayConcepts();
         await updateUsageUI();
         await loadUserBookmarks(); // 북마크 로드 추가
       } else {
         console.log("❌ 사용자가 로그인되지 않았습니다.");
-        alert("로그인이 필요합니다.");
-        window.redirectToLogin();
-        return;
+        currentUser = null;
+        // 로그인하지 않은 사용자도 개념 조회는 가능하도록 변경
       }
+
+      // 로그인 여부와 관계없이 개념 데이터 로드
+      await fetchAndDisplayConcepts();
     });
 
     // 네비게이션 바가 동적으로 로드된 후 번역 적용
@@ -1891,8 +1936,15 @@ function setupEventListeners() {
   // 새 개념 추가 버튼 이벤트
   if (elements.addConceptButton) {
     console.log("➕ 새 개념 추가 버튼 이벤트 리스너 등록 중...");
-    elements.addConceptButton.addEventListener("click", () => {
+    elements.addConceptButton.addEventListener("click", async (e) => {
       console.log("🖱️ 새 개념 추가 버튼 클릭됨");
+
+      // 권한 체크 (비동기)
+      const hasPermission = await checkAdminPermission();
+      if (!hasPermission) {
+        return; // 권한이 없으면 모달을 열지 않음
+      }
+
       if (window.openConceptModal) {
         console.log("✅ openConceptModal 함수 호출");
         window.openConceptModal();
@@ -1908,8 +1960,15 @@ function setupEventListeners() {
   // 대량 개념 추가 버튼 이벤트
   if (elements.bulkAddButton) {
     console.log("📦 대량 개념 추가 버튼 이벤트 리스너 등록 중...");
-    elements.bulkAddButton.addEventListener("click", () => {
+    elements.bulkAddButton.addEventListener("click", async (e) => {
       console.log("🖱️ 대량 개념 추가 버튼 클릭됨");
+
+      // 권한 체크 (비동기)
+      const hasPermission = await checkAdminPermission();
+      if (!hasPermission) {
+        return; // 권한이 없으면 모달을 열지 않음
+      }
+
       if (window.openBulkImportModal) {
         console.log("✅ openBulkImportModal 함수 호출");
         window.openBulkImportModal();
@@ -1991,7 +2050,7 @@ async function loadUserBookmarks() {
 // 북마크 토글
 async function toggleBookmark(conceptId) {
   if (!auth.currentUser) {
-    alert("로그인이 필요합니다.");
+    showMessage("북마크 기능을 사용하려면 로그인이 필요합니다.", "info");
     return;
   }
 
@@ -2203,3 +2262,41 @@ window.updateFilterUI = function () {
     window.updateDomainCategoryEmojiLanguage();
   }
 };
+
+// 관리자 권한 체크 함수
+async function checkAdminPermission() {
+  if (!auth.currentUser) {
+    showMessage("이 기능을 사용하려면 로그인이 필요합니다.", "info");
+
+    // 현재 언어 감지
+    const currentLanguage =
+      (typeof getCurrentUILanguage === "function"
+        ? getCurrentUILanguage()
+        : null) ||
+      localStorage.getItem("userLanguage") ||
+      "ko";
+
+    // 언어별 로그인 페이지로 리디렉션 (모든 언어를 locales 폴더로)
+    setTimeout(() => {
+      window.location.href = `../../locales/${currentLanguage}/login.html`;
+    }, 1500);
+    return false;
+  }
+
+  try {
+    const userEmail = auth.currentUser.email;
+    const userRef = doc(db, "users", userEmail);
+    const userDoc = await getDoc(userRef);
+
+    if (userDoc.exists() && userDoc.data().role === "admin") {
+      return true;
+    } else {
+      showMessage("관리자 권한이 필요한 기능입니다.", "error");
+      return false;
+    }
+  } catch (error) {
+    console.error("권한 확인 오류:", error);
+    showMessage("권한 확인 중 오류가 발생했습니다.", "error");
+    return false;
+  }
+}
