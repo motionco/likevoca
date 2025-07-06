@@ -23,6 +23,11 @@ const PROMPTS = {
 카테고리: ${category || "other"}
 언어: ${languages.join(", ")}
 
+⚠️ 중요: 반드시 위에서 지정한 도메인(${domain || "daily"})과 카테고리(${
+      category || "other"
+    })에 맞는 개념을 추천해주세요.
+다른 도메인이나 카테고리로 변경하지 마세요.
+
 위 도메인과 카테고리에 맞는 학습하기 좋은 개념 하나를 추천해주세요. 
 다음 도메인-카테고리 매핑을 참고하여 적절한 도메인과 카테고리를 선택해주세요:
 
@@ -45,7 +50,7 @@ const PROMPTS = {
 {
   "concept_info": {
     "domain": "${domain || "daily"}",
-    "category": "other",
+    "category": "${category || "other"}",
     "difficulty": "beginner",
     "tags": ["태그1", "태그2", "태그3"],
     "unicode_emoji": "적절한 이모지 1개",
@@ -85,6 +90,11 @@ Domain: ${domain || "daily"}
 Category: ${category || "other"}
 Languages: ${languages.join(", ")}
 
+⚠️ IMPORTANT: Please recommend a concept that matches exactly the specified domain (${
+      domain || "daily"
+    }) and category (${category || "other"}) above.
+Do not change to different domain or category.
+
 Please recommend one good concept to learn based on the above domain and category.
 Please refer to the following domain-category mapping to select appropriate domain and category:
 
@@ -107,7 +117,7 @@ Respond in the following JSON format:
 {
   "concept_info": {
     "domain": "${domain || "daily"}",
-    "category": "other",
+    "category": "${category || "other"}",
     "difficulty": "beginner",
     "tags": ["tag1", "tag2", "tag3"],
     "unicode_emoji": "appropriate emoji",
@@ -406,13 +416,18 @@ export async function handleAIConceptRecommendation(currentUser, db) {
 
     // 분리된 컬렉션 구조에 맞게 데이터 변환 (다국어 단어장과 완전히 동일한 구조)
     console.log("🔧 분리된 컬렉션 구조로 데이터 변환 중...");
+
+    // 🎯 사용자가 선택한 도메인과 카테고리로 강제 설정 (AI가 다른 값을 생성해도 사용자 선택 우선)
+    console.log("🎯 사용자 선택 값으로 도메인/카테고리 강제 설정:", {
+      domain,
+      category,
+    });
+
     const transformedConceptData = {
       // 개념 기본 정보 (다국어 단어장과 완전히 동일)
       concept_info: {
-        domain:
-          conceptData.concept_info?.domain || conceptData.domain || "general",
-        category:
-          conceptData.concept_info?.category || conceptData.category || "other",
+        domain: domain || "general", // 사용자가 선택한 도메인 사용
+        category: category || "other", // 사용자가 선택한 카테고리 사용
         difficulty: conceptData.concept_info?.difficulty || "beginner",
         unicode_emoji:
           conceptData.concept_info?.unicode_emoji ||
@@ -436,6 +451,10 @@ export async function handleAIConceptRecommendation(currentUser, db) {
     };
 
     console.log("🔧 변환된 개념 데이터:", transformedConceptData);
+    console.log("🔧 최종 도메인/카테고리:", {
+      domain: transformedConceptData.concept_info.domain,
+      category: transformedConceptData.concept_info.category,
+    });
     console.log("🔧 예문 개수:", transformedConceptData.examples.length);
 
     // ai-recommend 컬렉션에 저장 (분리된 컬렉션 구조)
