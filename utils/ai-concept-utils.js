@@ -22,13 +22,14 @@ const PROMPTS = {
 도메인: ${domain || "daily"}
 카테고리: ${category || "other"}
 언어: ${languages.join(", ")}
+랜덤 시드: ${Date.now() % 10000} (다양성을 위한 랜덤 값)
 
-⚠️ 중요: 반드시 위에서 지정한 도메인(${domain || "daily"})과 카테고리(${
-      category || "other"
-    })에 맞는 개념을 추천해주세요.
-다른 도메인이나 카테고리로 변경하지 마세요.
+위 도메인과 카테고리를 참고하여 학습하기 좋은 개념 하나를 추천해주세요.
+💡 중요: 매번 다른 흥미로운 개념을 생성해주세요. 같은 도메인/카테고리에서도 다양한 단어를 추천해주세요.
 
-위 도메인과 카테고리에 맞는 학습하기 좋은 개념 하나를 추천해주세요. 
+선택된 도메인과 카테고리에 정확히 맞는 개념이 있다면 그대로 사용하고, 
+더 적절한 도메인/카테고리가 있다면 아래 매핑을 참고하여 변경해도 됩니다.
+
 다음 도메인-카테고리 매핑을 참고하여 적절한 도메인과 카테고리를 선택해주세요:
 
 **도메인 (12개)**:
@@ -45,12 +46,17 @@ const PROMPTS = {
 - culture: 문화/전통 (tradition, customs, language, religion, heritage, ceremony, ritual, folklore, mythology, arts_crafts, etiquette, national_identity)
 - other: 기타 (hobbies, finance_personal, legal, government, politics, media, community, volunteering, charity, social_issues, philosophy_life, spirituality, creativity, innovation, science, literature, history, mathematics, research, philosophy, psychology, sociology, linguistics, thesis)
 
+🎲 다양성 가이드라인:
+- 여행 > 예약: 호텔예약, 항공예약, 레스토랑예약, 투어예약, 렌터카예약 등
+- 음식 > 과일: 사과, 바나나, 오렌지, 포도, 딸기, 키위, 망고, 복숭아 등
+- 각 카테고리에서 매번 다른 흥미로운 단어를 선택해주세요
+
 다음 JSON 형식으로 응답해주세요:
 
 {
   "concept_info": {
-    "domain": "${domain || "daily"}",
-    "category": "${category || "other"}",
+    "domain": "적절한_도메인",
+    "category": "적절한_카테고리",
     "difficulty": "beginner",
     "tags": ["태그1", "태그2", "태그3"],
     "unicode_emoji": "적절한 이모지 1개",
@@ -89,13 +95,14 @@ const PROMPTS = {
 Domain: ${domain || "daily"}
 Category: ${category || "other"}
 Languages: ${languages.join(", ")}
+Random seed: ${Date.now() % 10000} (random value for diversity)
 
-⚠️ IMPORTANT: Please recommend a concept that matches exactly the specified domain (${
-      domain || "daily"
-    }) and category (${category || "other"}) above.
-Do not change to different domain or category.
+Please recommend one good concept to learn based on the above domain and category as reference.
+💡 IMPORTANT: Please generate different interesting concepts each time. Recommend various words even within the same domain/category.
 
-Please recommend one good concept to learn based on the above domain and category.
+If there's a concept that exactly matches the selected domain and category, use it as is.
+If there's a more appropriate domain/category, feel free to change it based on the mapping below.
+
 Please refer to the following domain-category mapping to select appropriate domain and category:
 
 **Domains (12)**:
@@ -112,12 +119,17 @@ Please refer to the following domain-category mapping to select appropriate doma
 - culture: Culture/Tradition (tradition, customs, language, religion, heritage, ceremony, ritual, folklore, mythology, arts_crafts, etiquette, national_identity)
 - other: Other (hobbies, finance_personal, legal, government, politics, media, community, volunteering, charity, social_issues, philosophy_life, spirituality, creativity, innovation, science, literature, history, mathematics, research, philosophy, psychology, sociology, linguistics, thesis)
 
+🎲 Diversity Guidelines:
+- travel > booking: hotel booking, flight booking, restaurant reservation, tour booking, car rental, etc.
+- food > fruit: apple, banana, orange, grape, strawberry, kiwi, mango, peach, etc.
+- Please select different interesting words from each category every time
+
 Respond in the following JSON format:
 
 {
   "concept_info": {
-    "domain": "${domain || "daily"}",
-    "category": "${category || "other"}",
+    "domain": "appropriate_domain",
+    "category": "appropriate_category",
     "difficulty": "beginner",
     "tags": ["tag1", "tag2", "tag3"],
     "unicode_emoji": "appropriate emoji",
@@ -417,17 +429,19 @@ export async function handleAIConceptRecommendation(currentUser, db) {
     // 분리된 컬렉션 구조에 맞게 데이터 변환 (다국어 단어장과 완전히 동일한 구조)
     console.log("🔧 분리된 컬렉션 구조로 데이터 변환 중...");
 
-    // 🎯 사용자가 선택한 도메인과 카테고리로 강제 설정 (AI가 다른 값을 생성해도 사용자 선택 우선)
-    console.log("🎯 사용자 선택 값으로 도메인/카테고리 강제 설정:", {
-      domain,
-      category,
+    // AI가 생성한 도메인과 카테고리 사용 (더 정확한 매칭을 위해)
+    console.log("🎯 AI가 생성한 도메인/카테고리 사용:", {
+      aiDomain: conceptData.concept_info?.domain || conceptData.domain,
+      aiCategory: conceptData.concept_info?.category || conceptData.category,
     });
 
     const transformedConceptData = {
       // 개념 기본 정보 (다국어 단어장과 완전히 동일)
       concept_info: {
-        domain: domain || "general", // 사용자가 선택한 도메인 사용
-        category: category || "other", // 사용자가 선택한 카테고리 사용
+        domain:
+          conceptData.concept_info?.domain || conceptData.domain || "general", // AI가 생성한 도메인 사용
+        category:
+          conceptData.concept_info?.category || conceptData.category || "other", // AI가 생성한 카테고리 사용
         difficulty: conceptData.concept_info?.difficulty || "beginner",
         unicode_emoji:
           conceptData.concept_info?.unicode_emoji ||
