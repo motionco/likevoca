@@ -1,5 +1,5 @@
 /**
- * AI 단어장 전용 개념 편집 모달 관리 스크립트
+ * AI 어휘학용 개념 편집 모달 관리 스크립트
  */
 
 import {
@@ -7,7 +7,7 @@ import {
   db,
   conceptUtils,
   supportedLanguages,
-} from "../../js/firebase/firebase-init.js";
+} from "../../utils/firebase/firebase-init.js";
 import { getActiveLanguage } from "../../utils/language-utils.js";
 import { domainCategoryMapping } from "./domain-category-emoji.js";
 
@@ -17,7 +17,7 @@ let supportedLangs = { ...supportedLanguages };
 
 // AI 편집 모달 초기화
 export async function initialize() {
-  console.log("🤖 AI 개념 편집 모달 초기화");
+  console.log("🔧 AI 개념 편집 모달 초기화");
 
   editConceptId = sessionStorage.getItem("editConceptId");
 
@@ -28,7 +28,7 @@ export async function initialize() {
     return;
   }
 
-  console.log("🤖 편집 대상 AI 개념 ID:", editConceptId);
+  console.log("🔍 편집 대상 AI 개념 ID:", editConceptId);
 
   // 모달 제목 변경
   const modalTitle = document.querySelector("#edit-concept-modal h2");
@@ -36,10 +36,10 @@ export async function initialize() {
     modalTitle.textContent = "🤖 AI 개념 수정";
   }
 
-  // 언어탭 이벤트 설정
+  // 언어 탭 이벤트 설정
   setupLanguageTabs();
 
-  // 도메인/카테고리 연동 설정
+  // 도메인 카테고리 자동 설정
   setupDomainCategorySystem();
 
   // 버튼 이벤트 설정
@@ -49,7 +49,7 @@ export async function initialize() {
   await fetchAIConceptForEdit(editConceptId);
 }
 
-// 도메인/카테고리 연동 시스템 설정 (단어장 개념 수정 모달 방식 참고)
+// 도메인 카테고리 자동 시스템 설정 (일반 개념 수정 모달 방식 참고)
 function setupDomainCategorySystem() {
   const domainSelect = document.getElementById("edit-concept-domain");
   const categoryInput = document.getElementById("edit-concept-category");
@@ -61,7 +61,7 @@ function setupDomainCategorySystem() {
     categorySelect.className = "w-full p-2 border rounded";
     categoryInput.parentNode.replaceChild(categorySelect, categoryInput);
 
-    // 클론 방식으로 기존 이벤트 리스너 완전 제거 후 새로 등록
+    // 클론 방식으로 기존 이벤트 리스너 제거 후 새로 등록
     const newDomainSelect = domainSelect.cloneNode(true);
     domainSelect.parentNode.replaceChild(newDomainSelect, domainSelect);
 
@@ -81,7 +81,7 @@ function setupDomainCategorySystem() {
 function handleAIEditDomainChange(event) {
   const categorySelect = document.getElementById("edit-concept-category");
 
-  console.log("🔄 AI 편집 모달 도메인 변경:", event.target.value);
+  console.log("🔄 AI 편집 모달 도메인 변경", event.target.value);
 
   // 카테고리 옵션 업데이트
   if (typeof updateEditCategoryOptions === "function") {
@@ -91,11 +91,11 @@ function handleAIEditDomainChange(event) {
     updateCategoryOptions(event.target.value, categorySelect);
   }
 
-  // 카테고리 초기화 (첫 번째 옵션 선택) - 더 긴 지연 시간
+  // 카테고리 초기화(첫번째 옵션 선택) - 약간의 지연
   setTimeout(() => {
     if (categorySelect && categorySelect.options.length > 1) {
-      categorySelect.selectedIndex = 1; // 첫 번째 실제 옵션 선택
-      console.log("🎯 AI 편집 모달 카테고리 자동 선택:", categorySelect.value);
+      categorySelect.selectedIndex = 1; // 첫번째 실제 옵션 선택
+      console.log("🔄 AI 편집 모달 카테고리 자동 선택:", categorySelect.value);
 
       // 카테고리 변경 이벤트 트리거
       categorySelect.dispatchEvent(new Event("change"));
@@ -140,7 +140,7 @@ function updateCategoryOptions(domain, categorySelect) {
   );
 }
 
-// 언어탭 설정
+// 언어 탭 설정
 function setupLanguageTabs() {
   const tabs = document.querySelectorAll(".edit-language-tab");
   tabs.forEach((tab) => {
@@ -151,7 +151,7 @@ function setupLanguageTabs() {
     });
   });
 
-  // 기본적으로 첫 번째 탭 활성화
+  // 기본으로 첫번째 탭 활성화
   if (tabs.length > 0) {
     const firstTab = tabs[0];
     const firstLanguage = firstTab.getAttribute("data-language");
@@ -239,7 +239,7 @@ function setupEventListeners() {
 // AI 개념 데이터 가져오기
 async function fetchAIConceptForEdit(conceptId) {
   try {
-    console.log("🤖 AI 편집용 개념 데이터 가져오기:", conceptId);
+    console.log("🔍 AI 편집용 개념 데이터 가져오기", conceptId);
 
     // 메모리에서 찾기
     let conceptData = null;
@@ -276,14 +276,14 @@ async function fetchAIConceptForEdit(conceptId) {
 
     fillFormWithAIConceptData(conceptData);
   } catch (error) {
-    console.error("❌ AI 개념 정보를 가져오는 중 오류:", error);
+    console.error("❌ AI 개념 정보 가져오기 오류:", error);
     alert(error.message || "AI 개념 정보를 불러올 수 없습니다.");
   }
 }
 
 // 폼 채우기
 function fillFormWithAIConceptData(conceptData) {
-  console.log("🤖 AI 개념 폼 데이터 채우기");
+  console.log("📝 AI 개념 폼 데이터 채우기");
 
   // 기본 정보
   const domainField = document.getElementById("edit-concept-domain");
@@ -297,18 +297,18 @@ function fillFormWithAIConceptData(conceptData) {
     domainField.value = domainValue;
   }
 
-  // 도메인에 따른 카테고리 옵션 업데이트 후 카테고리 값 설정 (단어장 방식 참고)
+  // 도메인에 따른 카테고리 옵션 업데이트 후 카테고리 값 설정 (일반 방식 참고)
   if (categoryField) {
     const categoryValue =
       conceptData.concept_info?.category || conceptData.category || "other";
 
-    console.log("🔍 AI 편집 모달 설정 값:", {
+    console.log("🔧 AI 편집 모달 설정 값", {
       domainValue,
       categoryValue,
       conceptData: conceptData.concept_info || conceptData,
     });
 
-    // 도메인 변경 이벤트 트리거 (카테고리 옵션 자동 생성)
+    // 도메인 변경 이벤트 트리거(카테고리 옵션 자동 생성)
     if (domainField) {
       domainField.dispatchEvent(new Event("change"));
     }
@@ -316,9 +316,9 @@ function fillFormWithAIConceptData(conceptData) {
     // 카테고리 설정 (도메인 변경 후 충분한 지연)
     setTimeout(() => {
       categoryField.value = categoryValue;
-      console.log("🤖 카테고리 설정:", categoryValue);
+      console.log("✅ 카테고리 설정:", categoryValue);
 
-      // 카테고리 변경 이벤트 트리거 (이모지 옵션 자동 생성)
+      // 카테고리 변경 이벤트 트리거(이모지 옵션 자동 생성)
       categoryField.dispatchEvent(new Event("change"));
 
       // 이모지 설정 (카테고리 변경 후 충분한 지연)
@@ -328,16 +328,16 @@ function fillFormWithAIConceptData(conceptData) {
             conceptData.concept_info?.unicode_emoji ||
             conceptData.concept_info?.emoji ||
             conceptData.unicode_emoji ||
-            "🤖";
+            "🔤";
           emojiField.value = dbEmoji;
-          console.log("🎨 AI 편집 모달 이모지 설정:", dbEmoji);
+          console.log("✅ AI 편집 모달 이모지 설정:", dbEmoji);
 
-          // 설정 확인 및 재시도
+          // 설정 확인 후 재시도
           if (emojiField.value !== dbEmoji) {
-            console.warn("⚠️ AI 편집 모달 이모지 설정 실패, 재시도 중...");
+            console.warn("⚠️ AI 편집 모달 이모지 설정 실패, 재시도..");
             setTimeout(() => {
               emojiField.value = dbEmoji;
-              console.log("🔄 AI 편집 모달 이모지 재설정:", dbEmoji);
+              console.log("✅ AI 편집 모달 이모지 재설정", dbEmoji);
             }, 100);
           }
         }
@@ -345,13 +345,13 @@ function fillFormWithAIConceptData(conceptData) {
     }, 200);
   }
   if (emojiField) {
-    // 실제 저장된 이모지를 사용, 기본값으로 🤖 사용
+    // 실제 저장된 이모지를 사용, 기본값으로 🔤 사용
     emojiField.value =
       conceptData.concept_info?.unicode_emoji ||
       conceptData.concept_info?.emoji ||
       conceptData.unicode_emoji ||
       conceptData.emoji ||
-      "🤖";
+      "🔤";
   }
 
   // 언어별 표현
@@ -374,9 +374,9 @@ function fillFormWithAIConceptData(conceptData) {
         // 언어별 품사 매핑
         let posValue = expression.part_of_speech || "명사";
 
-        // 원본 품사를 각 언어에 맞는 형태로 변환
+        // 기본 품사값을 언어에 맞는 형태로 변환
         const posMapping = {
-          // 한국어 (그대로 유지)
+          // 한국어(그대로 유지)
           korean: {
             명사: "명사",
             동사: "동사",
@@ -392,7 +392,7 @@ function fillFormWithAIConceptData(conceptData) {
             副詞: "부사",
             名词: "명사",
             动词: "동사",
-            형容词: "형용사",
+            形容词: "형용사",
             副词: "부사",
           },
           // 영어
@@ -512,7 +512,7 @@ function fillExamples(conceptData) {
   const examplesContainer = document.getElementById("edit-examples-container");
   if (!examplesContainer) return;
 
-  console.log("🔍 예문 채우기 시작:", {
+  console.log("📝 예문 채우기 시작:", {
     representative_example: conceptData.representative_example,
     examples: conceptData.examples,
     examples_length: conceptData.examples?.length,
@@ -541,7 +541,7 @@ function fillExamples(conceptData) {
 
   // 추가 예문들
   if (conceptData.examples && Array.isArray(conceptData.examples)) {
-    console.log("🔍 추가 예문 처리:", conceptData.examples);
+    console.log("📝 추가 예문 처리:", conceptData.examples);
     conceptData.examples.forEach((example, index) => {
       console.log(`✅ 추가 예문 ${index + 1} 추가:`, example);
       addExampleField(example, false);
@@ -560,7 +560,7 @@ function fillExamples(conceptData) {
   }
 
   console.log(
-    "🔍 예문 채우기 완료. 컨테이너 내용:",
+    "✅ 예문 채우기 완료. 컨테이너 내용:",
     examplesContainer.children.length,
     "개 예문"
   );
@@ -628,13 +628,13 @@ function addExampleField(existingExample = null, isRepresentative = false) {
 // 저장
 async function saveConcept() {
   try {
-    console.log("🤖 AI 개념 수정 시작:", editConceptId);
+    console.log("💾 AI 개념 수정 시작:", editConceptId);
 
     if (!validateForm()) return;
 
     const conceptData = collectFormData();
 
-    console.log("🔍 수집된 원본 데이터:", conceptData);
+    console.log("📊 편집된 기본 데이터", conceptData);
 
     // AI 구조로 변환
     const transformedData = {
@@ -647,7 +647,7 @@ async function saveConcept() {
       concept_info: {
         domain: conceptData.concept_info.domain || "general",
         category: conceptData.concept_info.category || "common",
-        unicode_emoji: conceptData.concept_info.emoji || "🤖",
+        unicode_emoji: conceptData.concept_info.emoji || "🔤",
       },
       expressions: conceptData.expressions || {},
       representative_example: conceptData.representative_example || null,
@@ -655,7 +655,7 @@ async function saveConcept() {
       updated_at: new Date(),
     };
 
-    console.log("🔍 변환된 데이터:", transformedData);
+    console.log("🔄 변환된 데이터", transformedData);
 
     const success = await conceptUtils.updateAIConcept(
       auth.currentUser.email,
@@ -664,10 +664,10 @@ async function saveConcept() {
     );
 
     if (!success) {
-      throw new Error("AI 개념 수정에 실패했습니다.");
+      throw new Error("AI 개념 수정이 실패했습니다.");
     }
 
-    console.log("✅ 저장 성공! 저장된 데이터 검증을 위해 다시 조회합니다...");
+    console.log("✅ 저장 성공! 저장된 데이터 검증을 위해 다시 조회합니다..");
 
     // 저장된 데이터 검증
     try {
@@ -680,16 +680,16 @@ async function saveConcept() {
           c.id === editConceptId ||
           c._id === editConceptId
       );
-      console.log("🔍 저장된 개념 검증:", savedConcept);
-      console.log("🔍 저장된 예문 검증:", {
+      console.log("✅ 저장된 개념 검증", savedConcept);
+      console.log("✅ 저장된 예문 검증", {
         representative_example: savedConcept?.representative_example,
         examples: savedConcept?.examples,
       });
     } catch (verifyError) {
-      console.error("❌ 저장 검증 중 오류:", verifyError);
+      console.error("❌ 저장 검증 오류:", verifyError);
     }
 
-    alert("AI 개념이 성공적으로 수정되었습니다.");
+    alert("AI 개념이 성공적으로 수정되었습니다!");
     closeModal();
     sessionStorage.removeItem("editConceptId");
     editConceptId = null;
@@ -709,7 +709,7 @@ function validateForm() {
     ?.value.trim();
 
   if (!domain || !category) {
-    alert("도메인과 카테고리는 필수 입력항목입니다.");
+    alert("도메인과 카테고리는 필수 입력 항목입니다.");
     return false;
   }
 
@@ -725,7 +725,7 @@ function collectFormData() {
   const conceptInfo = {
     domain: domainField?.value.trim() || "",
     category: categoryField?.value.trim() || "",
-    emoji: emojiField?.value.trim() || "🤖", // 폼에서 입력된 이모지 사용
+    emoji: emojiField?.value.trim() || "🔤", // 폼에서 입력된 이모지 사용
   };
 
   // 언어별 표현 수집
@@ -794,7 +794,7 @@ function collectFormData() {
     "#edit-examples-container > div"
   );
 
-  console.log("🔍 예문 수집 시작:", exampleDivs.length, "개 예문 div 발견");
+  console.log("📝 예문 수집 시작:", exampleDivs.length, "개 예문 div 발견");
 
   exampleDivs.forEach((div, index) => {
     const isRepresentative = div
@@ -808,7 +808,7 @@ function collectFormData() {
       chinese: div.querySelector(".chinese-example")?.value.trim() || "",
     };
 
-    console.log(`🔍 예문 ${index + 1} (대표: ${isRepresentative}):`, example);
+    console.log(`📝 예문 ${index + 1} (대표: ${isRepresentative}):`, example);
 
     // 빈 예문은 제외
     if (
@@ -830,7 +830,7 @@ function collectFormData() {
     }
   });
 
-  console.log("🔍 최종 예문 수집 결과:", {
+  console.log("📊 최종 예문 수집 결과:", {
     representativeExample,
     examples: examples.length,
     allExamples: examples,
@@ -854,7 +854,7 @@ function closeModal() {
 
 // 전역 함수 - AI 편집 모달 열기
 window.openAIEditConceptModal = function (conceptId) {
-  console.log("🤖 AI 개념 편집 모달 열기:", conceptId);
+  console.log("🔧 AI 개념 편집 모달 열기:", conceptId);
   sessionStorage.setItem("editConceptId", conceptId);
   editConceptId = conceptId;
 

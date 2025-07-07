@@ -9,11 +9,11 @@ import {
 // 공통 네비게이션바 로딩 함수
 async function loadNavbar() {
   try {
-    console.log("🔄 네비게이션바 로딩 시작");
+    console.log("네비게이션바 로딩 시작");
 
-    // DOM 로드 확인
+    // DOM 로드 대기
     if (document.readyState === "loading") {
-      console.log("⏳ DOM 로딩 대기 중...");
+      console.log("DOM 로딩 대기 중..");
       await new Promise((resolve) => {
         document.addEventListener("DOMContentLoaded", resolve);
       });
@@ -21,7 +21,7 @@ async function loadNavbar() {
 
     const navbarContainer = document.getElementById("navbar-container");
     if (!navbarContainer) {
-      console.error("❌ navbar-container 요소를 찾을 수 없습니다.");
+      console.error("navbar-container 요소를 찾을 수 없습니다.");
       return;
     }
 
@@ -46,7 +46,7 @@ async function loadNavbar() {
       if (response.ok) {
         const navbarHTML = await response.text();
         navbarContainer.innerHTML = navbarHTML;
-        console.log("✅ 네비게이션바 로드 완료");
+        console.log("네비게이션바 로드 완료");
       } else {
         throw new Error(`네비게이션바 로드 실패: ${response.status}`);
       }
@@ -70,14 +70,14 @@ async function loadNavbar() {
     return new Promise((resolve, reject) => {
       script.onload = async () => {
         try {
-          console.log("✅ navbar.js 로드 완료");
+          console.log("navbar.js 로드 완료");
 
-          // 약간의 지연 후 초기화 (DOM 안정화)
+          // 잠깐의 지연 후 초기화(DOM 정착 후)
           await new Promise((r) => setTimeout(r, 100));
 
           // 현재 언어 감지
           const currentLanguage = getCurrentLanguage();
-          console.log("🌐 현재 언어:", currentLanguage);
+          console.log("현재 언어:", currentLanguage);
 
           // 네비게이션바 초기화
           if (typeof window.initializeNavbar === "function") {
@@ -100,14 +100,14 @@ async function loadNavbar() {
       };
 
       script.onerror = (error) => {
-        console.error("❌ navbar.js 로드 실패:", error);
+        console.error("navbar.js 로드 실패:", error);
         reject(error);
       };
 
       document.head.appendChild(script);
     });
   } catch (error) {
-    console.error("❌ 네비게이션바 로딩 실패:", error);
+    console.error("네비게이션바 로딩 실패:", error);
 
     // 실패 시 기본 네비게이션바 생성
     const navbarContainer = document.getElementById("navbar-container");
@@ -130,7 +130,7 @@ window.loadNavbar = loadNavbar;
 // 페이지 로드 시 자동 초기화
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    console.log("🚀 언어 초기화 시작");
+    console.log("언어 초기화 시작");
 
     // 네비게이션바 로드
     await loadNavbar();

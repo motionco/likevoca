@@ -1,10 +1,10 @@
-// Firebase 구성을 제공하는 서버리스 함수
+// Firebase 구성???�공?�는 ?�버리스 ?�수
 import dotenv from "dotenv";
 
-// 환경 변수 로드
+// ?�경 변??로드
 dotenv.config();
 
-// Firebase 설정 구성
+// Firebase ?�정 구성
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
   authDomain: "uploadfile-e6f81.firebaseapp.com",
@@ -17,7 +17,7 @@ const firebaseConfig = {
 };
 
 export default (req, res) => {
-  // CORS 헤더 설정
+  // CORS ?�더 ?�정
   res.setHeader("Access-Control-Allow-Credentials", true);
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
@@ -26,23 +26,23 @@ export default (req, res) => {
     "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
   );
 
-  // OPTIONS 요청 처리
+  // OPTIONS ?�청 처리
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
 
-  // GET 요청이 아니면 405 반환
+  // GET ?�청???�니�?405 반환
   if (req.method !== "GET") {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
 
-  // 설정이 유효한지 확인
+  // ?�정???�효?��? ?�인
   if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
-    console.error("Firebase 설정이 유효하지 않습니다:", firebaseConfig);
-    return res.status(500).json({ error: "서버 설정 오류" });
+    console.error("Firebase ?�정???�효?��? ?�습?�다:", firebaseConfig);
+    return res.status(500).json({ error: "?�버 ?�정 ?�류" });
   }
 
-  // Firebase 설정 반환
+  // Firebase ?�정 반환
   return res.status(200).json({
     firebase: firebaseConfig,
   });

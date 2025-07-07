@@ -11,10 +11,10 @@ import {
   onAuthStateChanged,
   where,
   orderBy,
-} from "../../js/firebase/firebase-init.js";
+} from "../../utils/firebase/firebase-init.js";
 
 // CollectionManager import
-import { CollectionManager } from "../../js/firebase/firebase-collection-manager.js";
+import { CollectionManager } from "../../utils/firebase/firebase-collection-manager.js";
 
 // 전역 변수
 let currentUser = null;

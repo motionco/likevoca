@@ -12,9 +12,9 @@ import {
 } from "./firebase/firebase-auth.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
-  console.log("프로필 페이지 초기화 시작");
+  console.log("?�로???�이지 초기???�작");
 
-  // DOM 요소 가져오기
+  // DOM ?�소 가?�오�?
   const displayNameInput = document.getElementById("displayName");
   const emailInput = document.getElementById("email");
   const profileForm = document.getElementById("profile-form");
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const logoutBtn = document.getElementById("logout-btn");
   const deleteAccountBtn = document.getElementById("delete-account");
 
-  console.log("DOM 요소 확인:", {
+  console.log("DOM ?�소 ?�인:", {
     authRequired: !!authRequired,
     profileContent: !!profileContent,
     displayNameInput: !!displayNameInput,
@@ -40,48 +40,48 @@ document.addEventListener("DOMContentLoaded", async () => {
     profileForm: !!profileForm,
   });
 
-  // 인증 상태 변경 감지
+  // ?�증 ?�태 변�?감�?
   onAuthStateChanged(auth, (user) => {
     console.log(
-      "Auth 상태 변경:",
-      user ? `로그인됨 (${user.email})` : "로그아웃됨"
+      "Auth ?�태 변�?",
+      user ? `로그?�됨 (${user.email})` : "로그?�웃??
     );
 
     if (user) {
-      // 사용자가 로그인된 경우
+      // ?�용?��? 로그?�된 경우
       if (authRequired) {
         authRequired.classList.add("hidden");
-        console.log("로그인 필요 메시지 숨김");
+        console.log("로그???�요 메시지 ?��?");
       }
       if (profileContent) {
         profileContent.classList.remove("hidden");
-        console.log("프로필 콘텐츠 표시");
+        console.log("?�로??콘텐�??�시");
       }
       updateUIForLoggedInUser(user);
 
-      // 네비게이션바 업데이트
+      // ?�비게이?�바 ?�데?�트
       if (typeof window.updateNavbarForAuthState === "function") {
         window.updateNavbarForAuthState(user);
       }
     } else {
-      // 사용자가 로그아웃된 경우
+      // ?�용?��? 로그?�웃??경우
       if (authRequired) {
         authRequired.classList.remove("hidden");
-        console.log("로그인 필요 메시지 표시");
+        console.log("로그???�요 메시지 ?�시");
       }
       if (profileContent) {
         profileContent.classList.add("hidden");
-        console.log("프로필 콘텐츠 숨김");
+        console.log("?�로??콘텐�??��?");
       }
 
-      // 네비게이션바 업데이트
+      // ?�비게이?�바 ?�데?�트
       if (typeof window.updateNavbarForAuthState === "function") {
         window.updateNavbarForAuthState(null);
       }
     }
   });
 
-  // 프로필 업데이트 폼
+  // ?�로???�데?�트 ??
   if (profileForm) {
     profileForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       const newDisplayName = displayNameInput.value.trim();
       if (!newDisplayName) {
-        alert("이름을 입력해주세요.");
+        alert("?�름???�력?�주?�요.");
         return;
       }
 
@@ -98,31 +98,31 @@ document.addEventListener("DOMContentLoaded", async () => {
         await updateProfile(user, {
           displayName: newDisplayName,
         });
-        alert("프로필이 업데이트되었습니다.");
+        alert("?�로?�이 ?�데?�트?�었?�니??");
       } catch (error) {
-        console.error("프로필 업데이트 오류:", error);
-        alert(`프로필 업데이트 실패: ${error.message}`);
+        console.error("?�로???�데?�트 ?�류:", error);
+        alert(`?�로???�데?�트 ?�패: ${error.message}`);
       }
     });
   }
 
-  // Google 계정 연결
+  // Google 계정 ?�결
   if (googleConnect) {
     googleConnect.addEventListener("click", async () => {
       try {
         await linkGoogleAccount();
         updateProviderStatus();
       } catch (error) {
-        console.error("Google 계정 연결 오류:", error);
-        alert(`Google 계정 연결 실패: ${error.message}`);
+        console.error("Google 계정 ?�결 ?�류:", error);
+        alert(`Google 계정 ?�결 ?�패: ${error.message}`);
       }
     });
   }
 
-  // Google 계정 연결 해제
+  // Google 계정 ?�결 ?�제
   if (googleDisconnect) {
     googleDisconnect.addEventListener("click", async () => {
-      if (!confirm("Google 계정 연결을 해제하시겠습니까?")) {
+      if (!confirm("Google 계정 ?�결???�제?�시겠습?�까?")) {
         return;
       }
 
@@ -130,29 +130,29 @@ document.addEventListener("DOMContentLoaded", async () => {
         await unlinkProvider("google.com");
         updateProviderStatus();
       } catch (error) {
-        console.error("Google 계정 연결 해제 오류:", error);
-        alert(`Google 계정 연결 해제 실패: ${error.message}`);
+        console.error("Google 계정 ?�결 ?�제 ?�류:", error);
+        alert(`Google 계정 ?�결 ?�제 ?�패: ${error.message}`);
       }
     });
   }
 
-  // GitHub 계정 연결
+  // GitHub 계정 ?�결
   if (githubConnect) {
     githubConnect.addEventListener("click", async () => {
       try {
         await linkGithubAccount();
         updateProviderStatus();
       } catch (error) {
-        console.error("GitHub 계정 연결 오류:", error);
-        alert(`GitHub 계정 연결 실패: ${error.message}`);
+        console.error("GitHub 계정 ?�결 ?�류:", error);
+        alert(`GitHub 계정 ?�결 ?�패: ${error.message}`);
       }
     });
   }
 
-  // GitHub 계정 연결 해제
+  // GitHub 계정 ?�결 ?�제
   if (githubDisconnect) {
     githubDisconnect.addEventListener("click", async () => {
-      if (!confirm("GitHub 계정 연결을 해제하시겠습니까?")) {
+      if (!confirm("GitHub 계정 ?�결???�제?�시겠습?�까?")) {
         return;
       }
 
@@ -160,13 +160,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         await unlinkProvider("github.com");
         updateProviderStatus();
       } catch (error) {
-        console.error("GitHub 계정 연결 해제 오류:", error);
-        alert(`GitHub 계정 연결 해제 실패: ${error.message}`);
+        console.error("GitHub 계정 ?�결 ?�제 ?�류:", error);
+        alert(`GitHub 계정 ?�결 ?�제 ?�패: ${error.message}`);
       }
     });
   }
 
-  // 로그아웃 버튼
+  // 로그?�웃 버튼
   if (logoutBtn) {
     logoutBtn.addEventListener("click", async () => {
       try {
@@ -177,85 +177,85 @@ document.addEventListener("DOMContentLoaded", async () => {
           window.location.href = "login.html";
         }
       } catch (error) {
-        console.error("로그아웃 오류:", error);
-        alert(`로그아웃 실패: ${error.message}`);
+        console.error("로그?�웃 ?�류:", error);
+        alert(`로그?�웃 ?�패: ${error.message}`);
       }
     });
   }
 
-  // 계정 삭제 버튼
+  // 계정 ??�� 버튼
   if (deleteAccountBtn) {
     deleteAccountBtn.addEventListener("click", async () => {
       if (
-        !confirm("정말 계정을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")
+        !confirm("?�말 계정????��?�시겠습?�까? ???�업?� ?�돌�????�습?�다.")
       ) {
         return;
       }
 
       try {
         await deleteAccount();
-        alert("계정이 삭제되었습니다.");
+        alert("계정????��?�었?�니??");
         if (typeof window.redirectToLogin === "function") {
           window.redirectToLogin();
         } else {
           window.location.href = "login.html";
         }
       } catch (error) {
-        console.error("계정 삭제 오류:", error);
-        alert(`계정 삭제 실패: ${error.message}`);
+        console.error("계정 ??�� ?�류:", error);
+        alert(`계정 ??�� ?�패: ${error.message}`);
       }
     });
   }
 
-  // 로그인한 사용자의 UI 업데이트
+  // 로그?�한 ?�용?�의 UI ?�데?�트
   function updateUIForLoggedInUser(user) {
-    console.log("사용자 UI 업데이트:", user.displayName, user.email);
+    console.log("?�용??UI ?�데?�트:", user.displayName, user.email);
 
     if (displayNameInput) {
       displayNameInput.value = user.displayName || "";
-      console.log("이름 필드 업데이트:", user.displayName);
+      console.log("?�름 ?�드 ?�데?�트:", user.displayName);
     }
 
     if (emailInput) {
       emailInput.value = user.email || "";
-      console.log("이메일 필드 업데이트:", user.email);
+      console.log("?�메???�드 ?�데?�트:", user.email);
     }
 
     updateProviderStatus();
   }
 
-  // 제공자 연결 상태 업데이트
+  // ?�공???�결 ?�태 ?�데?�트
   function updateProviderStatus() {
     const user = auth.currentUser;
     if (!user) return;
 
     const providers = user.providerData.map((provider) => provider.providerId);
-    console.log("사용자 제공자:", providers);
+    console.log("?�용???�공??", providers);
 
-    // Google 상태 업데이트
+    // Google ?�태 ?�데?�트
     if (googleStatus && googleConnect && googleDisconnect) {
       if (providers.includes("google.com")) {
-        googleStatus.textContent = "연결됨";
+        googleStatus.textContent = "?�결??;
         googleStatus.classList.add("connected");
         googleConnect.classList.add("hidden");
         googleDisconnect.classList.remove("hidden");
       } else {
-        googleStatus.textContent = "연결되지 않음";
+        googleStatus.textContent = "?�결?��? ?�음";
         googleStatus.classList.remove("connected");
         googleConnect.classList.remove("hidden");
         googleDisconnect.classList.add("hidden");
       }
     }
 
-    // GitHub 상태 업데이트
+    // GitHub ?�태 ?�데?�트
     if (githubStatus && githubConnect && githubDisconnect) {
       if (providers.includes("github.com")) {
-        githubStatus.textContent = "연결됨";
+        githubStatus.textContent = "?�결??;
         githubStatus.classList.add("connected");
         githubConnect.classList.add("hidden");
         githubDisconnect.classList.remove("hidden");
       } else {
-        githubStatus.textContent = "연결되지 않음";
+        githubStatus.textContent = "?�결?��? ?�음";
         githubStatus.classList.remove("connected");
         githubConnect.classList.remove("hidden");
         githubDisconnect.classList.add("hidden");
@@ -263,5 +263,5 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  console.log("프로필 페이지 초기화 완료");
+  console.log("?�로???�이지 초기???�료");
 });

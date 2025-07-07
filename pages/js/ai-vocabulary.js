@@ -3,11 +3,11 @@ import {
   db,
   conceptUtils,
   supportedLanguages,
-} from "../../js/firebase/firebase-init.js";
+} from "../../utils/firebase/firebase-init.js";
 import { getActiveLanguage } from "../../utils/language-utils.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
 import { showConceptModal } from "../../components/js/ai-concept-modal.js";
-import { handleAIConceptRecommendation } from "../../utils/ai-concept-utils.js";
+import { handleAIConceptRecommendation } from "../../utils/ai/ai-concept-utils.js";
 // 필터 공유 모듈 import
 import {
   VocabularyFilterBuilder,
@@ -646,15 +646,17 @@ function createConceptCard(concept, sourceLanguage, targetLanguage) {
       <div class="flex items-center">
         <span class="font-medium">${sourceExpr.word || "N/A"}</span>
       </div>
-      <p class="text-sm text-gray-600 mt-1">${targetExpr.definition || ""}</p>
+      <p class="text-sm text-gray-600 mt-1 line-clamp-2" title="${
+        targetExpr.definition || ""
+      }">${targetExpr.definition || ""}</p>
     </div>
     
     ${
       example && (example.source || example.target)
         ? `
     <div class="border-t border-gray-200 pt-3 mt-3">
-      <p class="text-sm text-gray-700 font-medium">${example.target}</p>
-      <p class="text-sm text-gray-500 italic">${example.source}</p>
+      <p class="text-sm text-gray-700 font-medium truncate" title="${example.target}">${example.target}</p>
+      <p class="text-sm text-gray-500 italic truncate" title="${example.source}">${example.source}</p>
     </div>
     `
         : ""

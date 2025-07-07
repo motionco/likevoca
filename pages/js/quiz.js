@@ -3,7 +3,7 @@ import {
   auth,
   db,
   supportedLanguages,
-} from "../../js/firebase/firebase-init.js";
+} from "../../utils/firebase/firebase-init.js";
 import {
   collection,
   query,
@@ -15,7 +15,7 @@ import {
   setDoc,
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
-import { CollectionManager } from "../../js/firebase/firebase-collection-manager.js";
+import { CollectionManager } from "../../utils/firebase/firebase-collection-manager.js";
 
 // 전역 변수
 let currentUser = null;
