@@ -17,15 +17,30 @@ const isLocalEnvironment =
 const PROMPTS = {
   korean: {
     system:
-      "당신은 다국어 학습을 도와주는 AI 어시스턴트입니다. 사용자가 요청한 주제나 카테고리에 맞는 유용한 개념을 추천해주세요.",
-    user: (domain, category, languages) => `
+      "당신은 다국어 학습을 도와주는 AI 어시스턴트입니다. 사용자가 요청한 주제나 카테고리에 맞는 유용한 개념을 추천해주세요. 매번 다른 흥미로운 단어를 생성하는 것이 매우 중요합니다.",
+    user: (domain, category, languages, excludeWords = []) => `
 도메인: ${domain || "daily"}
 카테고리: ${category || "other"}
 언어: ${languages.join(", ")}
-랜덤 시드: ${Date.now() % 10000} (다양성을 위한 랜덤 값)
+랜덤 시드: ${Date.now() % 10000}-${Math.floor(
+      Math.random() * 10000
+    )} (다양성을 위한 랜덤 값)
+
+🚫 제외할 단어들 (이미 생성된 단어들이므로 절대 사용하지 마세요):
+${
+  excludeWords.length > 0
+    ? excludeWords.map((word) => `- ${word}`).join("\n")
+    : "없음"
+}
+
+🎯 중요한 지시사항:
+1. 위 제외 목록에 있는 단어들은 절대 사용하지 마세요
+2. 매번 완전히 다른 흥미로운 개념을 생성해주세요
+3. 같은 도메인/카테고리라도 다양한 관점에서 접근해주세요
+4. 창의적이고 독특한 단어를 선택해주세요
 
 위 도메인과 카테고리를 참고하여 학습하기 좋은 개념 하나를 추천해주세요.
-💡 중요: 매번 다른 흥미로운 개념을 생성해주세요. 같은 도메인/카테고리에서도 다양한 단어를 추천해주세요.
+💡 핵심: 절대 반복되지 않는 새로운 단어를 생성해주세요!
 
 선택된 도메인과 카테고리에 정확히 맞는 개념이 있다면 그대로 사용하고, 
 더 적절한 도메인/카테고리가 있다면 아래 매핑을 참고하여 변경해도 됩니다.
@@ -46,10 +61,11 @@ const PROMPTS = {
 - culture: 문화/전통 (tradition, customs, language, religion, heritage, ceremony, ritual, folklore, mythology, arts_crafts, etiquette, national_identity)
 - other: 기타 (hobbies, finance_personal, legal, government, politics, media, community, volunteering, charity, social_issues, philosophy_life, spirituality, creativity, innovation, science, literature, history, mathematics, research, philosophy, psychology, sociology, linguistics, thesis)
 
-🎲 다양성 가이드라인:
-- 여행 > 예약: 호텔예약, 항공예약, 레스토랑예약, 투어예약, 렌터카예약 등
-- 음식 > 과일: 사과, 바나나, 오렌지, 포도, 딸기, 키위, 망고, 복숭아 등
-- 각 카테고리에서 매번 다른 흥미로운 단어를 선택해주세요
+🎲 구체적인 다양성 가이드라인:
+- 여행 > 예약: 호텔예약, 항공예약, 레스토랑예약, 투어예약, 렌터카예약, 티켓예약, 숙박예약, 교통예약, 공연예약, 스파예약
+- 음식 > 과일: 사과, 바나나, 오렌지, 포도, 딸기, 키위, 망고, 복숭아, 파인애플, 체리, 블루베리, 라즈베리, 멜론, 수박, 자두, 살구, 무화과, 석류
+- 일상 > 가구: 소파, 침대, 의자, 책상, 옷장, 서랍장, 식탁, 거울, 램프, 선반, 매트리스, 쿠션, 커튼, 카펫
+- Choose from at least 10-20 different options for each category
 
 다음 JSON 형식으로 응답해주세요:
 
@@ -90,15 +106,30 @@ const PROMPTS = {
   },
   english: {
     system:
-      "You are an AI assistant that helps with multilingual learning. Please recommend useful concepts that match the user's requested topic or category.",
-    user: (domain, category, languages) => `
+      "You are an AI assistant that helps with multilingual learning. Please recommend useful concepts that match the user's requested topic or category. It's crucial to generate different interesting words every time.",
+    user: (domain, category, languages, excludeWords = []) => `
 Domain: ${domain || "daily"}
 Category: ${category || "other"}
 Languages: ${languages.join(", ")}
-Random seed: ${Date.now() % 10000} (random value for diversity)
+Random seed: ${Date.now() % 10000}-${Math.floor(
+      Math.random() * 10000
+    )} (random value for diversity)
+
+🚫 Words to EXCLUDE (already generated words - DO NOT use these):
+${
+  excludeWords.length > 0
+    ? excludeWords.map((word) => `- ${word}`).join("\n")
+    : "None"
+}
+
+🎯 CRITICAL INSTRUCTIONS:
+1. DO NOT use any words from the exclude list above
+2. Generate completely different and interesting concepts each time
+3. Even within the same domain/category, approach from various perspectives
+4. Choose creative and unique words
 
 Please recommend one good concept to learn based on the above domain and category as reference.
-💡 IMPORTANT: Please generate different interesting concepts each time. Recommend various words even within the same domain/category.
+💡 KEY: Generate absolutely non-repetitive new words!
 
 If there's a concept that exactly matches the selected domain and category, use it as is.
 If there's a more appropriate domain/category, feel free to change it based on the mapping below.
@@ -119,10 +150,11 @@ Please refer to the following domain-category mapping to select appropriate doma
 - culture: Culture/Tradition (tradition, customs, language, religion, heritage, ceremony, ritual, folklore, mythology, arts_crafts, etiquette, national_identity)
 - other: Other (hobbies, finance_personal, legal, government, politics, media, community, volunteering, charity, social_issues, philosophy_life, spirituality, creativity, innovation, science, literature, history, mathematics, research, philosophy, psychology, sociology, linguistics, thesis)
 
-🎲 Diversity Guidelines:
-- travel > booking: hotel booking, flight booking, restaurant reservation, tour booking, car rental, etc.
-- food > fruit: apple, banana, orange, grape, strawberry, kiwi, mango, peach, etc.
-- Please select different interesting words from each category every time
+🎲 Specific Diversity Guidelines:
+- travel > booking: hotel booking, flight booking, restaurant reservation, tour booking, car rental, ticket booking, accommodation booking, transport booking, show booking, spa booking
+- food > fruit: apple, banana, orange, grape, strawberry, kiwi, mango, peach, pineapple, cherry, blueberry, raspberry, melon, watermelon, plum, apricot, fig, pomegranate
+- daily > furniture: sofa, bed, chair, desk, wardrobe, dresser, dining table, mirror, lamp, shelf, mattress, cushion, curtain, carpet
+- Choose from at least 10-20 different options for each category
 
 Respond in the following JSON format:
 
@@ -212,7 +244,7 @@ const TEST_CONCEPTS = [
         definition: "圆形的红色或绿色水果",
         part_of_speech: "名词",
         level: "beginner",
-        synonyms: ["苹子"],
+        synonyms: [],
         antonyms: [],
         word_family: ["水果", "食物"],
         compound_words: ["苹果树", "苹果汁"],
@@ -221,98 +253,420 @@ const TEST_CONCEPTS = [
       japanese: {
         word: "りんご",
         pronunciation: "ringo",
-        definition: "赤いまたは緑色の丸い果物",
+        definition: "赤いまたは緑の丸い果物",
         part_of_speech: "名詞",
         level: "beginner",
-        synonyms: ["アップル"],
+        synonyms: [],
         antonyms: [],
         word_family: ["果物", "食べ物"],
         compound_words: ["りんごの木", "りんごジュース"],
         collocations: ["赤いりんご", "新鮮なりんご"],
       },
     },
-    // 대표 예문 (다국어 단어장과 동일한 구조)
+
     representative_example: {
-      korean: "사과 주스 하나 주세요.",
-      english: "Please give me one apple juice.",
-      chinese: "请给我一杯苹果汁。",
-      japanese: "りんごジュースを一つください。",
+      korean: "나는 매일 아침 사과를 먹는다.",
+      english: "I eat an apple every morning.",
+      chinese: "我每天早上吃苹果。",
+      japanese: "私は毎朝りんごを食べます。",
     },
-    // 최소 호환성 필드들
-    domain: "food",
-    category: "fruit",
+
+    examples: [
+      {
+        korean: "이 사과는 정말 달콤하다.",
+        english: "This apple is really sweet.",
+        chinese: "这个苹果真的很甜。",
+        japanese: "このりんごは本当に甘いです。",
+      },
+    ],
   },
   {
-    // 개념 기본 정보 (다국어 단어장과 동일)
     concept_info: {
-      domain: "animal",
-      category: "pet",
-      difficulty: "beginner",
-      tags: ["pet", "common", "domestic"],
-      unicode_emoji: "🐱",
-      color_theme: "#9C27B0",
+      domain: "travel",
+      category: "booking",
+      difficulty: "intermediate",
+      tags: ["travel", "accommodation", "reservation"],
+      unicode_emoji: "🏨",
+      color_theme: "#4CAF50",
     },
 
     expressions: {
       korean: {
-        word: "고양이",
-        pronunciation: "go-yang-i",
-        definition: "작고 털이 있는 애완동물",
+        word: "항공예약",
+        pronunciation: "hang-gong-ye-yak",
+        definition: "비행기 좌석을 미리 예약하는 것",
         part_of_speech: "명사",
-        level: "beginner",
-        synonyms: ["야옹이"],
-        antonyms: ["개"],
-        word_family: ["동물", "애완동물"],
-        compound_words: ["길고양이", "고양이털"],
-        collocations: ["귀여운 고양이", "고양이를 키우다"],
+        level: "intermediate",
+        synonyms: ["항공권 예약", "비행기 예약"],
+        antonyms: ["예약 취소"],
+        word_family: ["예약", "여행", "항공"],
+        compound_words: ["항공예약시스템", "항공예약센터"],
+        collocations: ["항공예약 확인", "온라인 항공예약"],
       },
       english: {
-        word: "cat",
-        pronunciation: "/kæt/",
-        definition: "a small furry pet animal",
+        word: "flight booking",
+        pronunciation: "/flaɪt ˈbʊkɪŋ/",
+        definition: "the process of reserving a seat on an airplane",
         part_of_speech: "noun",
-        level: "beginner",
-        synonyms: ["feline", "kitty"],
-        antonyms: ["dog"],
-        word_family: ["animal", "pet"],
-        compound_words: ["housecat", "wildcat"],
-        collocations: ["cute cat", "pet a cat"],
+        level: "intermediate",
+        synonyms: ["flight reservation", "airline booking"],
+        antonyms: ["cancellation"],
+        word_family: ["booking", "travel", "flight"],
+        compound_words: ["flight booking system", "flight booking center"],
+        collocations: ["flight booking confirmation", "online flight booking"],
       },
       chinese: {
-        word: "猫",
-        pronunciation: "māo",
-        definition: "小而有毛的宠物",
+        word: "航班预订",
+        pronunciation: "háng bān yù dìng",
+        definition: "预先预订飞机座位的过程",
         part_of_speech: "名词",
-        level: "beginner",
-        synonyms: ["猫咪"],
-        antonyms: ["狗"],
-        word_family: ["动物", "宠物"],
-        compound_words: ["野猫", "小猫"],
-        collocations: ["可爱的猫", "养猫"],
+        level: "intermediate",
+        synonyms: ["机票预订", "航空预订"],
+        antonyms: ["取消预订"],
+        word_family: ["预订", "旅行", "航班"],
+        compound_words: ["航班预订系统", "航班预订中心"],
+        collocations: ["航班预订确认", "在线航班预订"],
       },
       japanese: {
-        word: "猫",
-        pronunciation: "neko",
-        definition: "小さくて毛のあるペット",
+        word: "航空予約",
+        pronunciation: "kōkū yoyaku",
+        definition: "飛行機の座席を事前に予約すること",
         part_of_speech: "名詞",
-        level: "beginner",
-        synonyms: ["ネコ", "にゃんこ"],
-        antonyms: ["犬"],
-        word_family: ["動物", "ペット"],
-        compound_words: ["野良猫", "子猫"],
-        collocations: ["かわいい猫", "猫を飼う"],
+        level: "intermediate",
+        synonyms: ["航空券予約", "フライト予約"],
+        antonyms: ["予約キャンセル"],
+        word_family: ["予約", "旅行", "航空"],
+        compound_words: ["航空予約システム", "航空予約センター"],
+        collocations: ["航空予約確認", "オンライン航空予約"],
       },
     },
-    // 대표 예문 (다국어 단어장과 동일한 구조)
+
     representative_example: {
-      korean: "그 고양이는 매우 귀엽습니다.",
-      english: "That cat is very cute.",
-      chinese: "那只猫很可爱。",
-      japanese: "その猫はとても可愛いです。",
+      korean: "온라인으로 항공예약을 했습니다.",
+      english: "I made a flight booking online.",
+      chinese: "我在网上预订了航班。",
+      japanese: "オンラインで航空予約をしました。",
     },
-    // 최소 호환성 필드들
-    domain: "animal",
-    category: "pet",
+
+    examples: [
+      {
+        korean: "항공예약 확인서를 출력해 주세요.",
+        english: "Please print the flight booking confirmation.",
+        chinese: "请打印航班预订确认书。",
+        japanese: "航空予約確認書を印刷してください。",
+      },
+    ],
+  },
+  {
+    concept_info: {
+      domain: "food",
+      category: "fruit",
+      difficulty: "beginner",
+      tags: ["tropical", "healthy", "vitamin"],
+      unicode_emoji: "🥭",
+      color_theme: "#FF9800",
+    },
+
+    expressions: {
+      korean: {
+        word: "망고",
+        pronunciation: "mang-go",
+        definition: "열대 지방의 달콤한 과일",
+        part_of_speech: "명사",
+        level: "beginner",
+        synonyms: [],
+        antonyms: [],
+        word_family: ["과일", "열대과일"],
+        compound_words: ["망고주스", "망고푸딩"],
+        collocations: ["달콤한 망고", "익은 망고"],
+      },
+      english: {
+        word: "mango",
+        pronunciation: "/ˈmæŋɡoʊ/",
+        definition: "a sweet tropical fruit",
+        part_of_speech: "noun",
+        level: "beginner",
+        synonyms: [],
+        antonyms: [],
+        word_family: ["fruit", "tropical fruit"],
+        compound_words: ["mango juice", "mango pudding"],
+        collocations: ["sweet mango", "ripe mango"],
+      },
+      chinese: {
+        word: "芒果",
+        pronunciation: "máng guǒ",
+        definition: "甜美的热带水果",
+        part_of_speech: "名词",
+        level: "beginner",
+        synonyms: [],
+        antonyms: [],
+        word_family: ["水果", "热带水果"],
+        compound_words: ["芒果汁", "芒果布丁"],
+        collocations: ["甜芒果", "熟芒果"],
+      },
+      japanese: {
+        word: "マンゴー",
+        pronunciation: "mangō",
+        definition: "甘い熱帯の果物",
+        part_of_speech: "名詞",
+        level: "beginner",
+        synonyms: [],
+        antonyms: [],
+        word_family: ["果物", "熱帯果物"],
+        compound_words: ["マンゴージュース", "マンゴープリン"],
+        collocations: ["甘いマンゴー", "熟したマンゴー"],
+      },
+    },
+
+    representative_example: {
+      korean: "이 망고는 정말 달콤하고 맛있어요.",
+      english: "This mango is really sweet and delicious.",
+      chinese: "这个芒果真的很甜很好吃。",
+      japanese: "このマンゴーは本当に甘くて美味しいです。",
+    },
+
+    examples: [
+      {
+        korean: "망고 주스를 마시고 싶어요.",
+        english: "I want to drink mango juice.",
+        chinese: "我想喝芒果汁。",
+        japanese: "マンゴージュースを飲みたいです。",
+      },
+    ],
+  },
+  {
+    concept_info: {
+      domain: "travel",
+      category: "booking",
+      difficulty: "intermediate",
+      tags: ["restaurant", "dining", "reservation"],
+      unicode_emoji: "🍽️",
+      color_theme: "#E91E63",
+    },
+
+    expressions: {
+      korean: {
+        word: "레스토랑예약",
+        pronunciation: "re-seu-to-rang-ye-yak",
+        definition: "식당에서 식사를 위해 미리 자리를 예약하는 것",
+        part_of_speech: "명사",
+        level: "intermediate",
+        synonyms: ["식당 예약", "테이블 예약"],
+        antonyms: ["예약 취소"],
+        word_family: ["예약", "식당", "식사"],
+        compound_words: ["레스토랑예약시스템", "온라인예약"],
+        collocations: ["레스토랑예약 확인", "저녁 예약"],
+      },
+      english: {
+        word: "restaurant reservation",
+        pronunciation: "/ˈrɛstərənt ˌrɛzərˈveɪʃən/",
+        definition: "booking a table at a restaurant in advance",
+        part_of_speech: "noun",
+        level: "intermediate",
+        synonyms: ["table booking", "dining reservation"],
+        antonyms: ["cancellation"],
+        word_family: ["reservation", "restaurant", "dining"],
+        compound_words: ["reservation system", "online booking"],
+        collocations: [
+          "restaurant reservation confirmation",
+          "dinner reservation",
+        ],
+      },
+      chinese: {
+        word: "餐厅预订",
+        pronunciation: "cān tīng yù dìng",
+        definition: "提前预订餐厅座位",
+        part_of_speech: "名词",
+        level: "intermediate",
+        synonyms: ["餐桌预订", "用餐预订"],
+        antonyms: ["取消预订"],
+        word_family: ["预订", "餐厅", "用餐"],
+        compound_words: ["预订系统", "在线预订"],
+        collocations: ["餐厅预订确认", "晚餐预订"],
+      },
+      japanese: {
+        word: "レストラン予約",
+        pronunciation: "resutoran yoyaku",
+        definition: "レストランで事前にテーブルを予約すること",
+        part_of_speech: "名詞",
+        level: "intermediate",
+        synonyms: ["テーブル予約", "食事予約"],
+        antonyms: ["予約キャンセル"],
+        word_family: ["予約", "レストラン", "食事"],
+        compound_words: ["予約システム", "オンライン予約"],
+        collocations: ["レストラン予約確認", "夕食予約"],
+      },
+    },
+
+    representative_example: {
+      korean: "오늘 저녁 7시에 레스토랑예약을 했어요.",
+      english: "I made a restaurant reservation for 7 PM tonight.",
+      chinese: "我预订了今晚7点的餐厅。",
+      japanese: "今夜7時にレストラン予約をしました。",
+    },
+
+    examples: [
+      {
+        korean: "레스토랑예약을 변경하고 싶습니다.",
+        english: "I'd like to change my restaurant reservation.",
+        chinese: "我想更改餐厅预订。",
+        japanese: "レストラン予約を変更したいです。",
+      },
+    ],
+  },
+  {
+    concept_info: {
+      domain: "daily",
+      category: "furniture",
+      difficulty: "beginner",
+      tags: ["home", "living room", "comfort"],
+      unicode_emoji: "🛋️",
+      color_theme: "#795548",
+    },
+
+    expressions: {
+      korean: {
+        word: "소파",
+        pronunciation: "so-pa",
+        definition: "거실에 놓는 편안한 의자",
+        part_of_speech: "명사",
+        level: "beginner",
+        synonyms: ["쇼파"],
+        antonyms: [],
+        word_family: ["가구", "의자"],
+        compound_words: ["소파베드", "가죽소파"],
+        collocations: ["편안한 소파", "큰 소파"],
+      },
+      english: {
+        word: "sofa",
+        pronunciation: "/ˈsoʊfə/",
+        definition: "a comfortable seat for more than one person",
+        part_of_speech: "noun",
+        level: "beginner",
+        synonyms: ["couch"],
+        antonyms: [],
+        word_family: ["furniture", "seat"],
+        compound_words: ["sofa bed", "leather sofa"],
+        collocations: ["comfortable sofa", "large sofa"],
+      },
+      chinese: {
+        word: "沙发",
+        pronunciation: "shā fā",
+        definition: "供多人坐的舒适座椅",
+        part_of_speech: "名词",
+        level: "beginner",
+        synonyms: ["长沙发"],
+        antonyms: [],
+        word_family: ["家具", "座椅"],
+        compound_words: ["沙发床", "皮沙发"],
+        collocations: ["舒适的沙发", "大沙发"],
+      },
+      japanese: {
+        word: "ソファー",
+        pronunciation: "sofā",
+        definition: "複数人が座れる快適な椅子",
+        part_of_speech: "名詞",
+        level: "beginner",
+        synonyms: ["ソファ"],
+        antonyms: [],
+        word_family: ["家具", "椅子"],
+        compound_words: ["ソファーベッド", "レザーソファー"],
+        collocations: ["快適なソファー", "大きなソファー"],
+      },
+    },
+
+    representative_example: {
+      korean: "새 소파를 거실에 놓았어요.",
+      english: "I put a new sofa in the living room.",
+      chinese: "我在客厅放了一个新沙发。",
+      japanese: "新しいソファーをリビングに置きました。",
+    },
+
+    examples: [
+      {
+        korean: "이 소파는 정말 편안해요.",
+        english: "This sofa is really comfortable.",
+        chinese: "这个沙发真的很舒服。",
+        japanese: "このソファーは本当に快適です。",
+      },
+    ],
+  },
+  {
+    concept_info: {
+      domain: "travel",
+      category: "booking",
+      difficulty: "intermediate",
+      tags: ["tour", "sightseeing", "guide"],
+      unicode_emoji: "🗺️",
+      color_theme: "#2196F3",
+    },
+
+    expressions: {
+      korean: {
+        word: "투어예약",
+        pronunciation: "tu-eo-ye-yak",
+        definition: "관광 투어를 미리 예약하는 것",
+        part_of_speech: "명사",
+        level: "intermediate",
+        synonyms: ["관광 예약", "여행 예약"],
+        antonyms: ["예약 취소"],
+        word_family: ["예약", "투어", "관광"],
+        compound_words: ["투어예약시스템", "온라인투어예약"],
+        collocations: ["투어예약 확인", "당일 투어예약"],
+      },
+      english: {
+        word: "tour booking",
+        pronunciation: "/tʊr ˈbʊkɪŋ/",
+        definition: "reserving a guided tour in advance",
+        part_of_speech: "noun",
+        level: "intermediate",
+        synonyms: ["tour reservation", "sightseeing booking"],
+        antonyms: ["cancellation"],
+        word_family: ["booking", "tour", "travel"],
+        compound_words: ["tour booking system", "online tour booking"],
+        collocations: ["tour booking confirmation", "day tour booking"],
+      },
+      chinese: {
+        word: "旅游预订",
+        pronunciation: "lǚ yóu yù dìng",
+        definition: "提前预订导游旅游",
+        part_of_speech: "名词",
+        level: "intermediate",
+        synonyms: ["观光预订", "旅行预订"],
+        antonyms: ["取消预订"],
+        word_family: ["预订", "旅游", "观光"],
+        compound_words: ["旅游预订系统", "在线旅游预订"],
+        collocations: ["旅游预订确认", "当日旅游预订"],
+      },
+      japanese: {
+        word: "ツアー予約",
+        pronunciation: "tsuā yoyaku",
+        definition: "ガイド付きツアーを事前に予約すること",
+        part_of_speech: "名詞",
+        level: "intermediate",
+        synonyms: ["観光予約", "旅行予約"],
+        antonyms: ["予約キャンセル"],
+        word_family: ["予約", "ツアー", "観光"],
+        compound_words: ["ツアー予約システム", "オンラインツアー予約"],
+        collocations: ["ツアー予約確認", "日帰りツアー予約"],
+      },
+    },
+
+    representative_example: {
+      korean: "내일 시티투어예약을 했습니다.",
+      english: "I made a city tour booking for tomorrow.",
+      chinese: "我预订了明天的城市旅游。",
+      japanese: "明日のシティツアー予約をしました。",
+    },
+
+    examples: [
+      {
+        korean: "투어예약을 온라인으로 할 수 있나요?",
+        english: "Can I make a tour booking online?",
+        chinese: "我可以在线预订旅游吗？",
+        japanese: "オンラインでツアー予約できますか？",
+      },
+    ],
   },
 ];
 
@@ -366,10 +720,48 @@ export async function handleAIConceptRecommendation(currentUser, db) {
 
     if (isLocalEnvironment) {
       console.log("로컬 환경에서 테스트 데이터 사용");
+
+      // 로컬 환경에서도 제외 목록 조회
+      const excludeWords = await getRecentlyGeneratedWords(
+        currentUser.email,
+        domain,
+        category,
+        10 // 최근 10개 단어 제외
+      );
+
       // 로컬 환경에서는 테스트 데이터 사용
       await new Promise((resolve) => setTimeout(resolve, 2000)); // 2초 대기
+
+      // 제외 목록을 고려한 테스트 데이터 선택
+      let availableTestConcepts = TEST_CONCEPTS.filter((testConcept) => {
+        if (excludeWords.length === 0) return true;
+
+        // 테스트 개념의 모든 단어를 확인
+        const testWords = Object.values(testConcept.expressions).map((expr) =>
+          expr.word?.toLowerCase()
+        );
+        const hasExcludedWord = excludeWords.some((excludeWord) =>
+          testWords.includes(excludeWord.toLowerCase())
+        );
+
+        return !hasExcludedWord;
+      });
+
+      // 사용 가능한 테스트 개념이 없으면 모든 개념 사용
+      if (availableTestConcepts.length === 0) {
+        console.log(
+          "⚠️ 모든 테스트 개념이 제외 목록에 있습니다. 전체 목록 사용"
+        );
+        availableTestConcepts = TEST_CONCEPTS;
+      }
+
+      console.log(
+        `🎲 사용 가능한 테스트 개념: ${availableTestConcepts.length}개`
+      );
       conceptData =
-        TEST_CONCEPTS[Math.floor(Math.random() * TEST_CONCEPTS.length)];
+        availableTestConcepts[
+          Math.floor(Math.random() * availableTestConcepts.length)
+        ];
 
       // 선택된 언어만 포함하도록 필터링
       const filteredExpressions = {};
@@ -410,10 +802,20 @@ export async function handleAIConceptRecommendation(currentUser, db) {
     } else {
       console.log("실제 환경에서 Gemini API 호출");
       // 실제 환경에서는 Gemini API 호출
+
+      // 이전 생성 기록을 조회하여 제외 목록 생성
+      const excludeWords = await getRecentlyGeneratedWords(
+        currentUser.email,
+        domain,
+        category,
+        15 // 최근 15개 단어 제외
+      );
+
       conceptData = await generateConceptWithGemini(
         domain,
         category,
-        selectedLanguages
+        selectedLanguages,
+        excludeWords
       );
     }
 
@@ -514,7 +916,56 @@ export async function handleAIConceptRecommendation(currentUser, db) {
   }
 }
 
-async function generateConceptWithGemini(domain, category, languages) {
+// 이전 생성 기록을 조회하여 제외 목록 생성
+async function getRecentlyGeneratedWords(
+  userEmail,
+  domain,
+  category,
+  limit = 10
+) {
+  try {
+    console.log(
+      `🔍 최근 생성된 단어 조회 중... (도메인: ${domain}, 카테고리: ${category})`
+    );
+
+    // ai-recommend 컬렉션에서 최근 생성된 개념들 조회
+    const recentConcepts = await conceptUtils.getRecentAIConcepts(
+      userEmail,
+      domain,
+      category,
+      limit
+    );
+
+    const excludeWords = [];
+
+    // 각 개념에서 주요 단어들 추출
+    recentConcepts.forEach((concept) => {
+      if (concept.expressions) {
+        Object.values(concept.expressions).forEach((expression) => {
+          if (expression.word) {
+            excludeWords.push(expression.word);
+          }
+        });
+      }
+    });
+
+    console.log(
+      `🚫 제외할 단어 목록 (${excludeWords.length}개):`,
+      excludeWords
+    );
+    return excludeWords;
+  } catch (error) {
+    console.error("최근 생성된 단어 조회 중 오류:", error);
+    return []; // 오류 시 빈 배열 반환
+  }
+}
+
+async function generateConceptWithGemini(
+  domain,
+  category,
+  languages,
+  excludeWords = []
+) {
   try {
     // 사용자 언어 감지
     const userLang = navigator.language.toLowerCase().startsWith("ko")
@@ -532,13 +983,13 @@ async function generateConceptWithGemini(domain, category, languages) {
               text:
                 prompt.system +
                 "\n\n" +
-                prompt.user(domain, category, languages),
+                prompt.user(domain, category, languages, excludeWords),
             },
           ],
         },
       ],
       generationConfig: {
-        temperature: 0.7,
+        temperature: 0.9, // 더 높은 창의성을 위해 증가
         topK: 40,
         topP: 0.95,
         maxOutputTokens: 2048,
@@ -546,6 +997,7 @@ async function generateConceptWithGemini(domain, category, languages) {
     };
 
     console.log("API 요청 데이터:", JSON.stringify(requestBody, null, 2));
+    console.log("제외 단어 목록:", excludeWords);
 
     // 배포 환경에서는 서버 API 엔드포인트 사용
     const response = await fetch("/api/gemini", {
@@ -589,6 +1041,25 @@ async function generateConceptWithGemini(domain, category, languages) {
     // 데이터 검증
     if (!conceptData.concept_info || !conceptData.expressions) {
       throw new Error("응답 데이터 형식이 올바르지 않습니다.");
+    }
+
+    // 생성된 단어가 제외 목록에 있는지 확인
+    const generatedWords = Object.values(conceptData.expressions).map((expr) =>
+      expr.word?.toLowerCase()
+    );
+    const hasExcludedWord = excludeWords.some((excludeWord) =>
+      generatedWords.includes(excludeWord.toLowerCase())
+    );
+
+    if (hasExcludedWord) {
+      console.warn("⚠️ 제외 목록에 있는 단어가 생성되었습니다. 재시도합니다.");
+      // 재시도 (최대 1회)
+      return generateConceptWithGemini(
+        domain,
+        category,
+        languages,
+        excludeWords
+      );
     }
 
     return conceptData;

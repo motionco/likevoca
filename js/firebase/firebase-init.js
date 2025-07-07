@@ -1142,14 +1142,18 @@ export const conceptUtils = {
 
         console.log(`📚 삭제 후 총 개념 수: ${updatedConcepts.length}`);
 
-        await updateDoc(userAIRef, {
-          concepts: updatedConcepts,
-          totalConcepts: updatedConcepts.length,
-          lastUpdated: new Date(),
-        });
-
-        console.log("✅ AI 개념 삭제 완료");
-        return true;
+        if (updatedConcepts.length < concepts.length) {
+          await updateDoc(userAIRef, {
+            concepts: updatedConcepts,
+            totalConcepts: updatedConcepts.length,
+            lastUpdated: new Date(),
+          });
+          console.log("✅ AI 개념 삭제 완료");
+          return true;
+        } else {
+          console.log("⚠️ 삭제할 개념을 찾을 수 없음");
+          return false;
+        }
       } else {
         console.log("📭 사용자 AI 개념 문서가 존재하지 않음");
         return false;
@@ -1157,6 +1161,71 @@ export const conceptUtils = {
     } catch (error) {
       console.error("❌ AI 개념 삭제 중 오류 발생:", error);
       throw error;
+    }
+  },
+
+  // 최근 생성된 AI 개념들 조회 (다양성 확보를 위한 제외 목록 생성용)
+  async getRecentAIConcepts(
+    userEmail,
+    domain = null,
+    category = null,
+    limit = 10
+  ) {
+    try {
+      console.log("🔍 최근 AI 개념 조회 시작:", {
+        userEmail,
+        domain,
+        category,
+        limit,
+      });
+
+      const userAIRef = doc(db, "ai-recommend", userEmail);
+      const userAIDoc = await getDoc(userAIRef);
+
+      if (userAIDoc.exists()) {
+        const userData = userAIDoc.data();
+        let concepts = userData.concepts || [];
+
+        console.log(`📚 총 AI 개념 수: ${concepts.length}`);
+
+        // 도메인/카테고리 필터링
+        if (domain || category) {
+          concepts = concepts.filter((concept) => {
+            const conceptDomain =
+              concept.concept_info?.domain || concept.domain;
+            const conceptCategory =
+              concept.concept_info?.category || concept.category;
+
+            let matches = true;
+            if (domain && conceptDomain !== domain) matches = false;
+            if (category && conceptCategory !== category) matches = false;
+
+            return matches;
+          });
+          console.log(
+            `📚 필터링 후 개념 수: ${concepts.length} (도메인: ${domain}, 카테고리: ${category})`
+          );
+        }
+
+        // 생성 시간 기준 정렬 (최신순)
+        concepts.sort((a, b) => {
+          const timeA = new Date(a.created_at || a.createdAt || 0);
+          const timeB = new Date(b.created_at || b.createdAt || 0);
+          return timeB - timeA;
+        });
+
+        // 제한 수만큼 반환
+        const recentConcepts = concepts.slice(0, limit);
+
+        console.log(`✅ 최근 AI 개념 ${recentConcepts.length}개 반환`);
+        return recentConcepts;
+      } else {
+        console.log("📭 사용자 AI 개념 문서가 존재하지 않음");
+        return [];
+      }
+    } catch (error) {
+      console.error("❌ 최근 AI 개념 조회 중 오류 발생:", error);
+      return [];
     }
   },
 
