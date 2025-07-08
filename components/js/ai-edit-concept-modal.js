@@ -326,29 +326,34 @@ function fillFormWithAIConceptData(conceptData) {
             conceptData.concept_info?.unicode_emoji ||
             conceptData.concept_info?.emoji ||
             conceptData.unicode_emoji ||
-            "🤖";
+            "";
 
-          if (emojiField && emojiValue) {
+          if (emojiField) {
             // 전역 저장소에 이모지 값 저장
             window.editConceptEmojiValue = emojiValue;
 
-            // select 드롭다운에서 해당 이모지 값 선택
-            const existingOption = Array.from(emojiField.options).find(
-              (option) => option.value === emojiValue
-            );
+            // 이모지 값이 있는 경우에만 설정
+            if (emojiValue && emojiValue.trim()) {
+              // select 드롭다운에서 해당 이모지 값 선택
+              const existingOption = Array.from(emojiField.options).find(
+                (option) => option.value === emojiValue
+              );
 
-            if (existingOption) {
-              emojiField.value = emojiValue;
+              if (existingOption) {
+                emojiField.value = emojiValue;
+              } else {
+                // 옵션에 없으면 새로 추가
+                const option = document.createElement("option");
+                option.value = emojiValue;
+                option.textContent = emojiValue;
+                emojiField.appendChild(option);
+                emojiField.value = emojiValue;
+              }
+
+              console.log("🎨 AI 편집 모달 이모지 설정:", emojiValue);
             } else {
-              // 옵션에 없으면 새로 추가
-              const option = document.createElement("option");
-              option.value = emojiValue;
-              option.textContent = emojiValue;
-              emojiField.appendChild(option);
-              emojiField.value = emojiValue;
+              console.log("⚠️ 이모지 값이 없어 기본값 사용하지 않음");
             }
-
-            console.log("🎨 AI 편집 모달 이모지 설정:", emojiValue);
           }
         }, 300); // 이모지 옵션 업데이트 후 충분한 시간 대기
       }
@@ -549,7 +554,7 @@ async function saveConcept() {
       concept_info: {
         domain: conceptData.concept_info.domain || "general",
         category: conceptData.concept_info.category || "common",
-        unicode_emoji: conceptData.concept_info.emoji || "🤖",
+        unicode_emoji: conceptData.concept_info.unicode_emoji || "📝",
       },
       expressions: conceptData.expressions || {},
       representative_example: conceptData.representative_example || null,
@@ -625,12 +630,17 @@ function collectFormData() {
   const emojiField = document.getElementById("edit-concept-emoji");
 
   // 이모지 값 가져오기 - select 드롭다운에서 선택된 값 우선
-  let selectedEmoji = "🤖"; // 기본값
+  let selectedEmoji = "";
 
   if (emojiField && emojiField.value && emojiField.value.trim()) {
     selectedEmoji = emojiField.value.trim();
   } else if (window.editConceptEmojiValue) {
     selectedEmoji = window.editConceptEmojiValue;
+  }
+
+  // 이모지가 선택되지 않았거나 빈 값인 경우만 기본값 설정
+  if (!selectedEmoji || selectedEmoji === "") {
+    selectedEmoji = "📝"; // 기본 이모지를 로봇 대신 메모 이모지로 변경
   }
 
   const conceptInfo = {

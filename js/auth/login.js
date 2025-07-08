@@ -1,4 +1,8 @@
-import { login, googleLogin, githubLogin } from "../firebase/firebase-auth.js";
+import {
+  login,
+  googleLogin,
+  githubLogin,
+} from "../../utils/firebase/firebase-auth.js";
 
 // 언어별 페이지로 이동하는 함수
 function goToLanguageSpecificPage(filename) {
@@ -279,7 +283,8 @@ document
     }
   });
 
-submitButton.addEventListener("click", async () => {
+// 로그인 처리 함수
+async function handleLogin() {
   hideError();
 
   const email = emailInput.value.trim();
@@ -304,5 +309,29 @@ submitButton.addEventListener("click", async () => {
     } else {
       showError(error.message);
     }
+  }
+}
+
+// 로그인 버튼 클릭 이벤트
+submitButton.addEventListener("click", handleLogin);
+
+// 로그인 폼 제출 이벤트 (Enter 키 지원)
+const loginForm = document.getElementById("login-form");
+if (loginForm) {
+  loginForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    handleLogin();
+  });
+}
+
+// Enter 키 이벤트 리스너 추가
+[emailInput, passwordInput].forEach((input) => {
+  if (input) {
+    input.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleLogin();
+      }
+    });
   }
 });

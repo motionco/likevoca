@@ -1,5 +1,5 @@
-import { db } from "../firebase/firebase-init.js";
-import { signup } from "../firebase/firebase-auth.js";
+import { db } from "../../utils/firebase/firebase-init.js";
+import { signup } from "../../utils/firebase/firebase-auth.js";
 import {
   doc,
   setDoc,

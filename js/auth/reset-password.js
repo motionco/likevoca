@@ -1,4 +1,4 @@
-import { resetPassword } from "../firebase/firebase-auth.js";
+import { resetPassword } from "../../utils/firebase/firebase-auth.js";
 
 // 언어별 페이지로 이동하는 함수
 function goToLanguageSpecificPage(filename) {
