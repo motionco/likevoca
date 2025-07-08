@@ -1,74 +1,28 @@
-// 네비게이션바 초기화 및 관리
-
-// 네비게이션바 초기화 함수
 async function initializeNavbar(currentLanguage) {
-  try {
-    console.log("네비게이션바 초기화 시작:", currentLanguage);
+  // 실제 현재 언어 감지 (URL 우선)
+  const actualCurrentLanguage = detectCurrentLanguage();
 
-    // 언어 버튼 업데이트
-    updateLanguageButton(currentLanguage);
+  console.log("🔧 navbar.js initializeNavbar 시작");
 
-    // 햄버거 메뉴 이벤트 설정
-    setupMobileMenu();
-
-    // 프로필 드롭다운 이벤트 설정
-    setupProfileDropdown();
-
-    // 언어 버튼 이벤트 설정
-    setupLanguageButton();
-
-    // 로그아웃 버튼 이벤트 설정
-    setupLogoutButton();
-
-    // 인증 상태 확인
-    await checkAuthenticationStatus();
-
-    console.log("✅ 네비게이션바 초기화 완료");
-  } catch (error) {
-    console.error("❌ 네비게이션바 초기화 실패:", error);
-  }
-}
-
-// 햄버거 메뉴 설정 (개선된 버전)
-function setupMobileMenu() {
+  // 햄버거 메뉴 이벤트 설정
   const menuToggle = document.getElementById("menu-toggle");
   const mobileMenu = document.getElementById("mobile-menu");
-
-  console.log("🍔 햄버거 메뉴 요소 확인:", {
-    menuToggle: !!menuToggle,
-    mobileMenu: !!mobileMenu,
-  });
 
   if (menuToggle && mobileMenu) {
     // 기존 이벤트 리스너 제거 (중복 방지)
     const newMenuToggle = menuToggle.cloneNode(true);
     menuToggle.parentNode.replaceChild(newMenuToggle, menuToggle);
 
-    newMenuToggle.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      console.log("🍔 햄버거 메뉴 클릭됨");
-
-      // 프로필 드롭다운이 열려있다면 닫기
-      const profileDropdown = document.getElementById("profile-dropdown");
-      if (profileDropdown && !profileDropdown.classList.contains("hidden")) {
-        profileDropdown.classList.add("hidden");
-        console.log("📋 프로필 드롭다운 닫힘 (햄버거 메뉴 클릭으로 인해)");
-      }
-
-      const currentMobileMenu = document.getElementById("mobile-menu");
-      if (currentMobileMenu) {
-        const isHidden = currentMobileMenu.classList.contains("hidden");
-        currentMobileMenu.classList.toggle("hidden");
-        console.log("📱 모바일 메뉴 상태:", isHidden ? "표시됨" : "숨겨짐");
-      }
+    newMenuToggle.addEventListener("click", () => {
+      mobileMenu.classList.toggle("hidden");
+      console.log("🍔 navbar.js: 햄버거 메뉴 토글");
     });
+    console.log("✅ navbar.js: 햄버거 메뉴 이벤트 설정");
 
-    // 외부 클릭 시 메뉴 닫기
+    // 모바일 메뉴 외부 클릭 시 닫기
     document.addEventListener("click", (event) => {
       const currentMenuToggle = document.getElementById("menu-toggle");
       const currentMobileMenu = document.getElementById("mobile-menu");
-
       if (
         currentMenuToggle &&
         currentMobileMenu &&
@@ -77,28 +31,42 @@ function setupMobileMenu() {
         !currentMobileMenu.classList.contains("hidden")
       ) {
         currentMobileMenu.classList.add("hidden");
-        console.log("🍔 햄버거 메뉴 닫힘 (외부 클릭)");
+        console.log("🍔 navbar.js: 햄버거 메뉴 닫힘 (외부 클릭으로 인해)");
       }
     });
-
-    console.log("✅ 햄버거 메뉴 이벤트 설정 완료");
-  } else {
-    console.warn("⚠️ 햄버거 메뉴 요소를 찾을 수 없습니다");
+    console.log("✅ navbar.js: 햄버거 메뉴 외부 클릭 이벤트 설정");
   }
-}
 
-// 프로필 드롭다운 설정 (새로 추가)
-function setupProfileDropdown() {
+  // 언어 변경 버튼 이벤트 설정
+  const languageButton = document.getElementById("language-button");
+  if (languageButton) {
+    // 기존 이벤트 리스너 제거 (중복 방지)
+    const newLanguageButton = languageButton.cloneNode(true);
+    languageButton.parentNode.replaceChild(newLanguageButton, languageButton);
+
+    newLanguageButton.addEventListener("click", () => {
+      const currentLang = detectCurrentLanguage(); // 현재 언어 다시 감지
+      showLanguageModal(currentLang);
+      console.log("🌐 navbar.js: 언어 버튼 클릭");
+    });
+
+    // 실제 현재 언어로 버튼 업데이트
+    updateLanguageButton(actualCurrentLanguage);
+    console.log("✅ navbar.js: 언어 버튼 이벤트 설정");
+  }
+
+  // 언어 변경 이벤트 리스너 추가 (동적 업데이트)
+  window.addEventListener("languageChanged", (event) => {
+    updateLanguageButton(event.detail.language);
+    updateCurrentPageMenuName(event.detail.language);
+  });
+
+  // 프로필 드롭다운 이벤트 설정
   const avatarContainer = document.getElementById("avatar-container");
   const profileDropdown = document.getElementById("profile-dropdown");
 
-  console.log("👤 프로필 드롭다운 요소 확인:", {
-    avatarContainer: !!avatarContainer,
-    profileDropdown: !!profileDropdown,
-  });
-
   if (avatarContainer && profileDropdown) {
-    // 기존 이벤트 리스너 제거
+    // 기존 이벤트 리스너 제거 (중복 방지)
     const newAvatarContainer = avatarContainer.cloneNode(true);
     avatarContainer.parentNode.replaceChild(
       newAvatarContainer,
@@ -106,91 +74,143 @@ function setupProfileDropdown() {
     );
 
     newAvatarContainer.addEventListener("click", (e) => {
-      e.preventDefault();
       e.stopPropagation();
-      console.log("👤 프로필 아바타 클릭됨");
 
       // 햄버거 메뉴가 열려있다면 닫기
       const mobileMenu = document.getElementById("mobile-menu");
       if (mobileMenu && !mobileMenu.classList.contains("hidden")) {
         mobileMenu.classList.add("hidden");
-        console.log("🍔 햄버거 메뉴 닫힘 (프로필 클릭으로 인해)");
       }
 
-      // 드롭다운 토글
       const currentDropdown = document.getElementById("profile-dropdown");
       if (currentDropdown) {
-        const isHidden = currentDropdown.classList.contains("hidden");
         currentDropdown.classList.toggle("hidden");
-        console.log("📋 프로필 드롭다운 상태:", isHidden ? "표시됨" : "숨겨짐");
+        console.log("👤 navbar.js: 프로필 드롭다운 토글");
       }
     });
 
-    // 외부 클릭 시 드롭다운 닫기
+    // 드롭다운 외부 클릭 시 닫기
     document.addEventListener("click", (event) => {
       const userProfile = document.getElementById("user-profile");
       const currentDropdown = document.getElementById("profile-dropdown");
-
       if (
         userProfile &&
         currentDropdown &&
-        !userProfile.contains(event.target) &&
-        !currentDropdown.classList.contains("hidden")
+        !userProfile.contains(event.target)
       ) {
         currentDropdown.classList.add("hidden");
-        console.log("📋 프로필 드롭다운 닫힘 (외부 클릭)");
       }
     });
-
-    console.log("✅ 프로필 드롭다운 이벤트 설정 완료");
-  } else {
-    console.warn("⚠️ 프로필 드롭다운 요소를 찾을 수 없습니다");
+    console.log("✅ navbar.js: 프로필 드롭다운 이벤트 설정");
   }
-}
 
-// 언어 버튼 설정
-function setupLanguageButton() {
-  const languageButton = document.getElementById("language-button");
+  // 로그아웃 버튼 이벤트 설정
+  const logoutButton = document.getElementById("logout-button");
 
-  if (languageButton) {
-    // 기존 이벤트 리스너 제거
-    const newLanguageButton = languageButton.cloneNode(true);
-    languageButton.parentNode.replaceChild(newLanguageButton, languageButton);
+  if (logoutButton) {
+    // 기존 이벤트 리스너 제거 (중복 방지)
+    const newLogoutButton = logoutButton.cloneNode(true);
+    logoutButton.parentNode.replaceChild(newLogoutButton, logoutButton);
 
-    newLanguageButton.addEventListener("click", (e) => {
+    newLogoutButton.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
-      console.log("🌐 언어 버튼 클릭됨");
 
-      // 다른 메뉴들이 열려있다면 닫기
-      const profileDropdown = document.getElementById("profile-dropdown");
-      if (profileDropdown && !profileDropdown.classList.contains("hidden")) {
-        profileDropdown.classList.add("hidden");
-        console.log("📋 프로필 드롭다운 닫힘 (언어 버튼 클릭으로 인해)");
+      // 드롭다운 먼저 닫기
+      const currentDropdown = document.getElementById("profile-dropdown");
+      if (currentDropdown) {
+        currentDropdown.classList.add("hidden");
       }
 
-      const mobileMenu = document.getElementById("mobile-menu");
-      if (mobileMenu && !mobileMenu.classList.contains("hidden")) {
-        mobileMenu.classList.add("hidden");
-        console.log("🍔 햄버거 메뉴 닫힘 (언어 버튼 클릭으로 인해)");
-      }
-
-      showLanguageModal();
+      handleLogout();
+      console.log("🚪 navbar.js: 로그아웃 버튼 클릭");
     });
-
-    console.log("✅ 언어 버튼 이벤트 설정 완료");
-  } else {
-    console.warn("⚠️ 언어 버튼 요소를 찾을 수 없습니다");
+    console.log("✅ navbar.js: 로그아웃 버튼 이벤트 설정");
   }
+
+  // 현재 페이지에 맞는 메뉴 이름 업데이트
+  updateCurrentPageMenuName(actualCurrentLanguage);
+
+  // 인증 상태 즉시 확인 (FOUC 방지)
+  const quickAuthCheck = () => {
+    if (typeof window.auth !== "undefined" && window.auth) {
+      const currentUser = window.auth.currentUser;
+      updateNavbarForAuthState(currentUser);
+
+      // 인증 상태 변화 감지 설정 (중복 방지)
+      if (!window.authStateListenerSet) {
+        window.auth.onAuthStateChanged((user) => {
+          updateNavbarForAuthState(user);
+        });
+        window.authStateListenerSet = true;
+      }
+    } else {
+      // Firebase가 아직 로드되지 않은 경우 로그아웃 상태로 표시
+      updateNavbarForAuthState(null);
+    }
+  };
+
+  // 즉시 실행
+  quickAuthCheck();
+
+  // Firebase 초기화를 기다리기 위한 빠른 재확인 (100ms 후)
+  setTimeout(quickAuthCheck, 100);
+
+  // 추가 확인 (300ms 후)
+  setTimeout(quickAuthCheck, 300);
 }
 
-// 로그아웃 버튼 설정
-function setupLogoutButton() {
-  const logoutBtn = document.getElementById("logout-button");
+// 현재 언어 감지 함수 (utils/language-utils.js와 일치하도록 수정)
+function detectCurrentLanguage() {
+  // 1. URL에서 언어 감지 (최우선) - utils/language-utils.js와 동일한 로직 사용
+  const urlLang = detectLanguageFromURL();
 
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", handleLogout);
+  // 2. localStorage에서 언어 감지
+  const storedLang =
+    localStorage.getItem("userLanguage") ||
+    localStorage.getItem("preferredLanguage");
+
+  // URL에서 감지된 언어가 있으면 최우선으로 사용하고 localStorage와 동기화
+  if (urlLang) {
+    if (storedLang !== urlLang) {
+      localStorage.setItem("userLanguage", urlLang);
+      localStorage.setItem("preferredLanguage", urlLang);
+    }
+    return urlLang;
   }
+
+  // 3. URL에서 감지되지 않으면 저장된 언어 사용
+  if (storedLang && storedLang !== "auto") {
+    return storedLang;
+  }
+
+  // 4. 기본값
+  return "ko";
+}
+
+// URL에서 언어 감지 (utils/language-utils.js와 동일한 로직)
+function detectLanguageFromURL() {
+  const path = window.location.pathname;
+
+  // locales 구조 확인
+  if (path.includes("/locales/en/") || path.includes("/en/")) {
+    return "en";
+  } else if (path.includes("/locales/ja/") || path.includes("/ja/")) {
+    return "ja";
+  } else if (path.includes("/locales/zh/") || path.includes("/zh/")) {
+    return "zh";
+  } else if (path.includes("/locales/ko/") || path.includes("/ko/")) {
+    return "ko";
+  }
+
+  // URL 파라미터에서 lang 확인
+  const urlParams = new URLSearchParams(window.location.search);
+  const langParam = urlParams.get("lang");
+  if (langParam && ["ko", "en", "ja", "zh"].includes(langParam)) {
+    return langParam;
+  }
+
+  return null;
 }
 
 // 언어 버튼 업데이트
@@ -203,24 +223,64 @@ function updateLanguageButton(language) {
   const languageInfo = {
     ko: { name: "한국어", flag: "🇰🇷" },
     en: { name: "English", flag: "🇺🇸" },
-    ja: { name: "日本語", flag: "🇯🇵" },
-    zh: { name: "中文", flag: "🇨🇳" },
+    ja: { name: "日본語", flag: "🇯🇵" },
+    zh: { name: "중문", flag: "🇨🇳" },
   };
 
   const info = languageInfo[language] || languageInfo.ko;
 
+  // 버튼 내용 업데이트 (HTML 구조 유지)
   languageButton.innerHTML = `
     <i class="fas fa-globe lg:mr-1"></i>
     <span class="inline lg:ml-1">${info.flag}</span>
   `;
 }
 
+// 현재 페이지 메뉴 이름 업데이트
+function updateCurrentPageMenuName(language) {
+  try {
+    const currentPath = window.location.pathname;
+    let menuSelector = null;
+
+    // 페이지별 메뉴 선택자 결정
+    if (currentPath.includes("ai-vocabulary.html")) {
+      menuSelector = 'a[href*="ai-vocabulary.html"]';
+    } else if (currentPath.includes("vocabulary.html")) {
+      menuSelector =
+        'a[href*="vocabulary.html"]:not([href*="ai-vocabulary.html"])';
+    } else if (currentPath.includes("learning.html")) {
+      menuSelector = 'a[href*="learning.html"]';
+    } else if (currentPath.includes("quiz.html")) {
+      menuSelector = 'a[href*="quiz.html"]';
+    } else if (currentPath.includes("progress.html")) {
+      menuSelector = 'a[href*="progress.html"]';
+    } else if (currentPath.includes("games.html")) {
+      menuSelector = 'a[href*="games.html"]';
+    }
+
+    if (menuSelector) {
+      const menuItems = document.querySelectorAll(menuSelector);
+
+      menuItems.forEach((item, index) => {
+        const i18nKey = item.getAttribute("data-i18n");
+        if (i18nKey && typeof window.getI18nText === "function") {
+          const translation = window.getI18nText(i18nKey, language);
+          if (translation && translation !== i18nKey) {
+            const previousText = item.textContent.trim();
+            item.textContent = translation;
+          }
+        }
+      });
+    }
+  } catch (error) {
+    console.error("❌ 메뉴 이름 업데이트 실패:", error);
+  }
+}
+
 // 언어 모달 표시
-function showLanguageModal() {
+function showLanguageModal(currentLanguage) {
   if (typeof window.showLanguageSettingsModal === "function") {
     window.showLanguageSettingsModal();
-  } else {
-    console.warn("언어 설정 모달 함수를 찾을 수 없습니다.");
   }
 }
 
@@ -230,6 +290,8 @@ async function handleLogout() {
     // Firebase auth를 직접 사용하여 로그아웃
     if (typeof window.auth !== "undefined" && window.auth) {
       await window.auth.signOut();
+
+      // 페이지 새로고침으로 UI 초기화
       window.location.reload();
     } else if (typeof window.signOut === "function") {
       await window.signOut();
@@ -244,7 +306,6 @@ async function handleLogout() {
       window.location.reload();
     }
   } catch (error) {
-    console.error("로그아웃 중 오류:", error);
     // 오류가 발생해도 페이지를 새로고침하여 UI 초기화
     window.location.reload();
   }
@@ -263,7 +324,7 @@ function updateNavbarForAuthState(user) {
 
   if (user) {
     // 로그인 상태
-    // 데스크톱 - 로그인 버튼 숨기고 프로필 보이기
+    // 데스크톱 - 로그인 버튼 숨기고 유저 프로필 보이기
     if (desktopLoginSection) {
       desktopLoginSection.classList.add("hidden");
       desktopLoginSection.classList.remove("flex", "lg:flex");
@@ -282,6 +343,7 @@ function updateNavbarForAuthState(user) {
     // 사용자 정보 업데이트
     const displayName =
       user.displayName || user.email?.split("@")[0] || "사용자";
+    // Google 인증의 경우 photoURL 우선 사용, 없으면 기본 이미지
     const photoURL =
       user.photoURL || "https://www.w3schools.com/howto/img_avatar.png";
 
@@ -289,11 +351,13 @@ function updateNavbarForAuthState(user) {
       userName.textContent = displayName;
     }
 
-    // 프로필 이미지 설정
+    // 프로필 이미지 설정 (데스크톱만)
     if (profileImage) {
+      // 이미지 로드 전에 기본 이미지로 설정
       profileImage.src = "https://www.w3schools.com/howto/img_avatar.png";
       profileImage.alt = `${displayName}의 프로필`;
 
+      // Google 프로필 이미지가 있으면 로드 시도
       if (
         photoURL &&
         photoURL !== "https://www.w3schools.com/howto/img_avatar.png"
@@ -303,14 +367,14 @@ function updateNavbarForAuthState(user) {
           profileImage.src = photoURL;
         };
         img.onerror = function () {
-          // 기본 이미지로 이미 설정되어 있음
+          // 기본 이미지는 이미 설정되어 있음
         };
         img.src = photoURL;
       }
     }
   } else {
     // 로그아웃 상태
-    // 데스크톱 - 사용자 프로필 숨기고 로그인 버튼 보이기
+    // 데스크톱 - 유저 프로필 숨기고 로그인 버튼 보이기
     if (desktopUserSection) {
       desktopUserSection.classList.add("hidden");
       desktopUserSection.classList.remove("flex", "lg:flex", "items-center");
@@ -328,48 +392,85 @@ function updateNavbarForAuthState(user) {
   }
 }
 
-// 인증 상태 확인
-async function checkAuthenticationStatus() {
-  try {
-    if (typeof window.auth !== "undefined" && window.auth) {
-      // Firebase auth 사용
-      window.auth.onAuthStateChanged((user) => {
-        updateNavbarForAuthState(user);
-      });
-    } else {
-      // 대체 방법 - localStorage 확인
-      const userData = localStorage.getItem("userData");
-      const authToken = localStorage.getItem("authToken");
+// checkAuthenticationStatus 함수 정의 (전역으로 노출)
+function checkAuthenticationStatus() {
+  if (typeof window.auth !== "undefined" && window.auth) {
+    const currentUser = window.auth.currentUser;
+    updateNavbarForAuthState(currentUser);
 
-      if (userData && authToken) {
-        try {
-          const user = JSON.parse(userData);
-          updateNavbarForAuthState(user);
-        } catch (error) {
-          console.error("사용자 데이터 파싱 오류:", error);
-          updateNavbarForAuthState(null);
-        }
-      } else {
-        updateNavbarForAuthState(null);
-      }
-    }
-  } catch (error) {
-    console.error("인증 상태 확인 중 오류:", error);
-    updateNavbarForAuthState(null);
+    // 인증 상태 변화 감지 설정
+    window.auth.onAuthStateChanged((user) => {
+      updateNavbarForAuthState(user);
+    });
   }
 }
 
-// 기본 네비게이션바 이벤트 설정 (다른 페이지에서 사용)
-function setupBasicNavbarEvents() {
-  setupMobileMenu();
-  setupProfileDropdown();
-  setupLanguageButton();
-  setupLogoutButton();
-}
-
-// 전역으로 노출
+// 전역 함수로 노출
+window.updateLanguageButton = updateLanguageButton;
+window.updateCurrentPageMenuName = updateCurrentPageMenuName;
+window.detectCurrentLanguage = detectCurrentLanguage;
 window.initializeNavbar = initializeNavbar;
-window.setupBasicNavbarEvents = setupBasicNavbarEvents;
+window.checkAuthenticationStatus = checkAuthenticationStatus;
 window.updateNavbarForAuthState = updateNavbarForAuthState;
 
-console.log("navbar.js 로드 완료");
+// DOMContentLoaded 이벤트에서 자동 네비게이션바 로드 및 초기화
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    console.log("🧭 네비게이션바 자동 초기화 시작");
+
+    // 네비게이션바 컨테이너 확인
+    const navbarContainer = document.getElementById("navbar-container");
+    if (!navbarContainer) {
+      console.log("❌ navbar-container를 찾을 수 없습니다");
+      return;
+    }
+
+    // 이미 네비게이션바가 로드되어 있으면 초기화만 실행
+    if (navbarContainer.innerHTML.trim() !== "") {
+      console.log("🧭 기존 네비게이션바 발견, 초기화만 실행");
+      const currentLanguage = detectCurrentLanguage();
+      await initializeNavbar(currentLanguage);
+      return;
+    }
+
+    // loadNavbar 함수가 전역에 있으면 사용
+    if (typeof window.loadNavbar === "function") {
+      console.log("🧭 전역 loadNavbar 함수 사용");
+      await window.loadNavbar();
+      const currentLanguage = detectCurrentLanguage();
+      await initializeNavbar(currentLanguage);
+    } else {
+      // 직접 네비게이션바 로드
+      console.log("🧭 직접 네비게이션바 로드");
+      const currentLanguage = detectCurrentLanguage();
+
+      // 현재 경로에 따라 네비게이션바 경로 결정
+      let navbarPath;
+      if (window.location.pathname.includes("/locales/")) {
+        // locales 폴더 내부인 경우 (예: /locales/ko/quiz.html)
+        navbarPath = "navbar.html";
+      } else {
+        // 루트 또는 다른 폴더인 경우
+        navbarPath = `locales/${currentLanguage}/navbar.html`;
+      }
+
+      console.log(`🧭 네비게이션바 경로: ${navbarPath}`);
+
+      try {
+        const response = await fetch(navbarPath);
+        if (response.ok) {
+          const navbarHTML = await response.text();
+          navbarContainer.innerHTML = navbarHTML;
+          console.log("✅ 네비게이션바 HTML 로드 완료");
+          await initializeNavbar(currentLanguage);
+        } else {
+          console.error("❌ 네비게이션바 로드 실패:", response.status);
+        }
+      } catch (error) {
+        console.error("❌ 네비게이션바 로드 오류:", error);
+      }
+    }
+  } catch (error) {
+    console.error("❌ 네비게이션바 자동 초기화 오류:", error);
+  }
+});

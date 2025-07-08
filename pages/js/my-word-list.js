@@ -1,5 +1,5 @@
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
-import { auth, db } from "../../utils/firebase/firebase-init.js";
+import { auth, db } from "../../js/firebase/firebase-init.js";
 import {
   doc,
   getDoc,
@@ -759,7 +759,8 @@ function setupEventListeners() {
   if (swapButton) {
     swapButton.addEventListener("click", () => {
       filterManager.swapLanguages();
-      handleSearch();
+      handleLanguageChange(); // 전역 변수 업데이트
+      handleSearch(); // 필터 적용
     });
   }
 

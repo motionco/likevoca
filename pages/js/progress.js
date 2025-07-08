@@ -1,5 +1,5 @@
-import { auth, db, conceptUtils } from "../../utils/firebase/firebase-init.js";
-import { CollectionManager } from "../../utils/firebase/firebase-collection-manager.js";
+import { auth, db, conceptUtils } from "../../js/firebase/firebase-init.js";
+import { CollectionManager } from "../../js/firebase/firebase-collection-manager.js";
 import {
   collection,
   query,

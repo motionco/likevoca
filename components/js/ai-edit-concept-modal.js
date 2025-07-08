@@ -1,5 +1,5 @@
 /**
- * AI 어휘학용 개념 편집 모달 관리 스크립트
+ * AI 단어장 전용 개념 편집 모달 관리 스크립트
  */
 
 import {
@@ -7,7 +7,7 @@ import {
   db,
   conceptUtils,
   supportedLanguages,
-} from "../../utils/firebase/firebase-init.js";
+} from "../../js/firebase/firebase-init.js";
 import { getActiveLanguage } from "../../utils/language-utils.js";
 import { domainCategoryMapping } from "./domain-category-emoji.js";
 
@@ -17,7 +17,7 @@ let supportedLangs = { ...supportedLanguages };
 
 // AI 편집 모달 초기화
 export async function initialize() {
-  console.log("🔧 AI 개념 편집 모달 초기화");
+  console.log("🤖 AI 개념 편집 모달 초기화");
 
   editConceptId = sessionStorage.getItem("editConceptId");
 
@@ -28,7 +28,7 @@ export async function initialize() {
     return;
   }
 
-  console.log("🔍 편집 대상 AI 개념 ID:", editConceptId);
+  console.log("🤖 편집 대상 AI 개념 ID:", editConceptId);
 
   // 모달 제목 변경
   const modalTitle = document.querySelector("#edit-concept-modal h2");
@@ -36,10 +36,10 @@ export async function initialize() {
     modalTitle.textContent = "🤖 AI 개념 수정";
   }
 
-  // 언어 탭 이벤트 설정
+  // 언어탭 이벤트 설정
   setupLanguageTabs();
 
-  // 도메인 카테고리 자동 설정
+  // 도메인/카테고리 연동 설정
   setupDomainCategorySystem();
 
   // 버튼 이벤트 설정
@@ -49,65 +49,58 @@ export async function initialize() {
   await fetchAIConceptForEdit(editConceptId);
 }
 
-// 도메인 카테고리 자동 시스템 설정 (일반 개념 수정 모달 방식 참고)
+// 도메인/카테고리 연동 시스템 설정 (단어장 개념 수정 모달 방식 참고)
 function setupDomainCategorySystem() {
   const domainSelect = document.getElementById("edit-concept-domain");
-  const categoryInput = document.getElementById("edit-concept-category");
+  const categorySelect = document.getElementById("edit-concept-category");
 
-  if (domainSelect && categoryInput) {
-    // 카테고리 입력 필드를 선택 필드로 변경
-    const categorySelect = document.createElement("select");
-    categorySelect.id = "edit-concept-category";
-    categorySelect.className = "w-full p-2 border rounded";
-    categoryInput.parentNode.replaceChild(categorySelect, categoryInput);
+  if (domainSelect) {
+    // 기존 이벤트 리스너 제거
+    domainSelect.replaceWith(domainSelect.cloneNode(true));
+    const newDomainSelect = document.getElementById("edit-concept-domain");
 
-    // 클론 방식으로 기존 이벤트 리스너 제거 후 새로 등록
-    const newDomainSelect = domainSelect.cloneNode(true);
-    domainSelect.parentNode.replaceChild(newDomainSelect, domainSelect);
-
-    const newCategorySelect = categorySelect.cloneNode(true);
-    categorySelect.parentNode.replaceChild(newCategorySelect, categorySelect);
-
-    // 새로운 이벤트 리스너 등록
+    // 새로운 이벤트 리스너 추가
     newDomainSelect.addEventListener("change", handleAIEditDomainChange);
-    newCategorySelect.addEventListener("change", handleAIEditCategoryChange);
+  }
 
-    // 초기 카테고리 옵션 설정
-    updateCategoryOptions(newDomainSelect.value, newCategorySelect);
+  if (categorySelect) {
+    // 기존 이벤트 리스너 제거
+    categorySelect.replaceWith(categorySelect.cloneNode(true));
+    const newCategorySelect = document.getElementById("edit-concept-category");
+
+    // 새로운 이벤트 리스너 추가
+    newCategorySelect.addEventListener("change", handleAIEditCategoryChange);
   }
 }
 
 // AI 편집 모달 도메인 변경 핸들러
 function handleAIEditDomainChange(event) {
-  const categorySelect = document.getElementById("edit-concept-category");
-
-  console.log("🔄 AI 편집 모달 도메인 변경", event.target.value);
+  console.log("🔄 AI 편집 모달 도메인 변경:", event.target.value);
 
   // 카테고리 옵션 업데이트
-  if (typeof updateEditCategoryOptions === "function") {
-    updateEditCategoryOptions();
-  } else {
-    // 직접 업데이트
-    updateCategoryOptions(event.target.value, categorySelect);
+  if (typeof window.updateEditCategoryOptions === "function") {
+    window.updateEditCategoryOptions();
   }
 
-  // 카테고리 초기화(첫번째 옵션 선택) - 약간의 지연
+  // 카테고리 초기화 (첫 번째 옵션 선택)
   setTimeout(() => {
+    const categorySelect = document.getElementById("edit-concept-category");
     if (categorySelect && categorySelect.options.length > 1) {
-      categorySelect.selectedIndex = 1; // 첫번째 실제 옵션 선택
-      console.log("🔄 AI 편집 모달 카테고리 자동 선택:", categorySelect.value);
+      categorySelect.selectedIndex = 1; // 첫 번째 실제 옵션 선택 (0은 플레이스홀더)
 
       // 카테고리 변경 이벤트 트리거
       categorySelect.dispatchEvent(new Event("change"));
     }
-  }, 150);
+  }, 100);
 }
 
 // AI 편집 모달 카테고리 변경 핸들러
 function handleAIEditCategoryChange(event) {
+  console.log("🔄 AI 편집 모달 카테고리 변경:", event.target.value);
+
   // 이모지 옵션 업데이트
-  if (typeof updateEditEmojiOptions === "function") {
-    updateEditEmojiOptions();
+  if (typeof window.updateEditEmojiOptions === "function") {
+    window.updateEditEmojiOptions();
   }
 }
 
@@ -140,7 +133,7 @@ function updateCategoryOptions(domain, categorySelect) {
   );
 }
 
-// 언어 탭 설정
+// 언어탭 설정
 function setupLanguageTabs() {
   const tabs = document.querySelectorAll(".edit-language-tab");
   tabs.forEach((tab) => {
@@ -151,7 +144,7 @@ function setupLanguageTabs() {
     });
   });
 
-  // 기본으로 첫번째 탭 활성화
+  // 기본적으로 첫 번째 탭 활성화
   if (tabs.length > 0) {
     const firstTab = tabs[0];
     const firstLanguage = firstTab.getAttribute("data-language");
@@ -191,6 +184,7 @@ function setupEventListeners() {
   const cancelBtn = document.getElementById("cancel-edit-concept");
   const closeBtn = document.getElementById("close-edit-concept-modal");
   const addExampleBtn = document.getElementById("edit-add-example");
+  const emojiField = document.getElementById("edit-concept-emoji");
 
   if (saveBtn) {
     // 기존 이벤트 리스너 제거 후 새로 추가
@@ -234,12 +228,23 @@ function setupEventListeners() {
       addExampleField();
     });
   }
+
+  // 이모지 선택 변경 이벤트 리스너 추가
+  if (emojiField) {
+    emojiField.addEventListener("change", (e) => {
+      const selectedEmoji = e.target.value;
+      if (selectedEmoji) {
+        window.editConceptEmojiValue = selectedEmoji;
+        console.log("🎨 이모지 선택 변경:", selectedEmoji);
+      }
+    });
+  }
 }
 
 // AI 개념 데이터 가져오기
 async function fetchAIConceptForEdit(conceptId) {
   try {
-    console.log("🔍 AI 편집용 개념 데이터 가져오기", conceptId);
+    console.log("🤖 AI 편집용 개념 데이터 가져오기:", conceptId);
 
     // 메모리에서 찾기
     let conceptData = null;
@@ -276,208 +281,112 @@ async function fetchAIConceptForEdit(conceptId) {
 
     fillFormWithAIConceptData(conceptData);
   } catch (error) {
-    console.error("❌ AI 개념 정보 가져오기 오류:", error);
+    console.error("❌ AI 개념 정보를 가져오는 중 오류:", error);
     alert(error.message || "AI 개념 정보를 불러올 수 없습니다.");
   }
 }
 
 // 폼 채우기
 function fillFormWithAIConceptData(conceptData) {
-  console.log("📝 AI 개념 폼 데이터 채우기");
+  console.log("🤖 AI 개념 폼 데이터 채우기");
 
-  // 기본 정보
-  const domainField = document.getElementById("edit-concept-domain");
-  const categoryField = document.getElementById("edit-concept-category");
-  const emojiField = document.getElementById("edit-concept-emoji");
+  // 기본 정보 채우기
+  const domainValue = conceptData.concept_info?.domain || "other";
+  const categoryValue = conceptData.concept_info?.category || "other";
+
+  console.log("🔍 AI 편집 모달 설정 값:", {
+    domainValue,
+    categoryValue,
+    conceptData,
+  });
 
   // 도메인 설정
-  const domainValue =
-    conceptData.concept_info?.domain || conceptData.domain || "daily";
+  const domainField = document.getElementById("edit-concept-domain");
   if (domainField) {
     domainField.value = domainValue;
-  }
+    console.log("🔄 AI 편집 모달 도메인 변경:", domainValue);
 
-  // 도메인에 따른 카테고리 옵션 업데이트 후 카테고리 값 설정 (일반 방식 참고)
-  if (categoryField) {
-    const categoryValue =
-      conceptData.concept_info?.category || conceptData.category || "other";
+    // 도메인 변경 이벤트 트리거 (카테고리 옵션 자동 생성)
+    domainField.dispatchEvent(new Event("change"));
 
-    console.log("🔧 AI 편집 모달 설정 값", {
-      domainValue,
-      categoryValue,
-      conceptData: conceptData.concept_info || conceptData,
-    });
-
-    // 도메인 변경 이벤트 트리거(카테고리 옵션 자동 생성)
-    if (domainField) {
-      domainField.dispatchEvent(new Event("change"));
-    }
-
-    // 카테고리 설정 (도메인 변경 후 충분한 지연)
+    // 카테고리 설정 (도메인 변경 후 지연)
     setTimeout(() => {
-      categoryField.value = categoryValue;
-      console.log("✅ 카테고리 설정:", categoryValue);
+      const categoryField = document.getElementById("edit-concept-category");
+      if (categoryField) {
+        categoryField.value = categoryValue;
+        console.log("🤖 카테고리 설정:", categoryValue);
 
-      // 카테고리 변경 이벤트 트리거(이모지 옵션 자동 생성)
-      categoryField.dispatchEvent(new Event("change"));
+        // 카테고리 변경 이벤트 트리거 (이모지 옵션 자동 생성)
+        categoryField.dispatchEvent(new Event("change"));
 
-      // 이모지 설정 (카테고리 변경 후 충분한 지연)
-      setTimeout(() => {
-        if (emojiField) {
-          const dbEmoji =
+        // 이모지 설정 (카테고리 변경 후 지연)
+        setTimeout(() => {
+          const emojiField = document.getElementById("edit-concept-emoji");
+          const emojiValue =
             conceptData.concept_info?.unicode_emoji ||
             conceptData.concept_info?.emoji ||
             conceptData.unicode_emoji ||
-            "🔤";
-          emojiField.value = dbEmoji;
-          console.log("✅ AI 편집 모달 이모지 설정:", dbEmoji);
+            "🤖";
 
-          // 설정 확인 후 재시도
-          if (emojiField.value !== dbEmoji) {
-            console.warn("⚠️ AI 편집 모달 이모지 설정 실패, 재시도..");
-            setTimeout(() => {
-              emojiField.value = dbEmoji;
-              console.log("✅ AI 편집 모달 이모지 재설정", dbEmoji);
-            }, 100);
+          if (emojiField && emojiValue) {
+            // 전역 저장소에 이모지 값 저장
+            window.editConceptEmojiValue = emojiValue;
+
+            // select 드롭다운에서 해당 이모지 값 선택
+            const existingOption = Array.from(emojiField.options).find(
+              (option) => option.value === emojiValue
+            );
+
+            if (existingOption) {
+              emojiField.value = emojiValue;
+            } else {
+              // 옵션에 없으면 새로 추가
+              const option = document.createElement("option");
+              option.value = emojiValue;
+              option.textContent = emojiValue;
+              emojiField.appendChild(option);
+              emojiField.value = emojiValue;
+            }
+
+            console.log("🎨 AI 편집 모달 이모지 설정:", emojiValue);
           }
-        }
-      }, 200);
+        }, 300); // 이모지 옵션 업데이트 후 충분한 시간 대기
+      }
     }, 200);
   }
-  if (emojiField) {
-    // 실제 저장된 이모지를 사용, 기본값으로 🔤 사용
-    emojiField.value =
-      conceptData.concept_info?.unicode_emoji ||
-      conceptData.concept_info?.emoji ||
-      conceptData.unicode_emoji ||
-      conceptData.emoji ||
-      "🔤";
-  }
 
-  // 언어별 표현
-  if (conceptData.expressions) {
-    for (const [lang, expression] of Object.entries(conceptData.expressions)) {
-      const wordField = document.getElementById(`edit-${lang}-word`);
+  // 언어별 표현 채우기
+  for (const langCode of Object.keys(supportedLangs)) {
+    const expression = conceptData.expressions?.[langCode];
+    if (expression) {
+      // 기본 필드들
+      const wordField = document.getElementById(`edit-${langCode}-word`);
       const pronunciationField = document.getElementById(
-        `edit-${lang}-pronunciation`
+        `edit-${langCode}-pronunciation`
       );
       const definitionField = document.getElementById(
-        `edit-${lang}-definition`
+        `edit-${langCode}-definition`
       );
-      const posField = document.getElementById(`edit-${lang}-pos`);
+      const posField = document.getElementById(`edit-${langCode}-pos`);
 
       if (wordField) wordField.value = expression.word || "";
       if (pronunciationField)
         pronunciationField.value = expression.pronunciation || "";
       if (definitionField) definitionField.value = expression.definition || "";
-      if (posField) {
-        // 언어별 품사 매핑
-        let posValue = expression.part_of_speech || "명사";
+      if (posField) posField.value = expression.part_of_speech || "명사";
 
-        // 기본 품사값을 언어에 맞는 형태로 변환
-        const posMapping = {
-          // 한국어(그대로 유지)
-          korean: {
-            명사: "명사",
-            동사: "동사",
-            형용사: "형용사",
-            부사: "부사",
-            noun: "명사",
-            verb: "동사",
-            adjective: "형용사",
-            adverb: "부사",
-            名詞: "명사",
-            動詞: "동사",
-            形容詞: "형용사",
-            副詞: "부사",
-            名词: "명사",
-            动词: "동사",
-            形容词: "형용사",
-            副词: "부사",
-          },
-          // 영어
-          english: {
-            명사: "noun",
-            동사: "verb",
-            형용사: "adjective",
-            부사: "adverb",
-            noun: "noun",
-            verb: "verb",
-            adjective: "adjective",
-            adverb: "adverb",
-            名詞: "noun",
-            動詞: "verb",
-            形容詞: "adjective",
-            副詞: "adverb",
-            名词: "noun",
-            动词: "verb",
-            形容词: "adjective",
-            副词: "adverb",
-          },
-          // 일본어
-          japanese: {
-            명사: "名詞",
-            동사: "動詞",
-            형용사: "形容詞",
-            부사: "副詞",
-            noun: "名詞",
-            verb: "動詞",
-            adjective: "形容詞",
-            adverb: "副詞",
-            名詞: "名詞",
-            動詞: "動詞",
-            形容詞: "形容詞",
-            副詞: "副詞",
-            名词: "名詞",
-            动词: "動詞",
-            形容词: "形容詞",
-            副词: "副詞",
-          },
-          // 중국어
-          chinese: {
-            명사: "名词",
-            동사: "动词",
-            형용사: "形容词",
-            부사: "副词",
-            noun: "名词",
-            verb: "动词",
-            adjective: "形容词",
-            adverb: "副词",
-            名詞: "名词",
-            動詞: "动词",
-            形容詞: "形容词",
-            副詞: "副词",
-            名词: "名词",
-            动词: "动词",
-            形容词: "形容词",
-            副词: "副词",
-          },
-        };
-
-        // 현재 언어에 맞는 품사 값 설정
-        const langMapping = posMapping[lang];
-        if (langMapping && langMapping[posValue]) {
-          posField.value = langMapping[posValue];
-        } else {
-          // 기본값 설정
-          const defaultValues = {
-            korean: "명사",
-            english: "noun",
-            japanese: "名詞",
-            chinese: "名词",
-          };
-          posField.value = defaultValues[lang] || "명사";
-        }
-      }
-
-      // 고급 필드들
-      const synonymsField = document.getElementById(`edit-${lang}-synonyms`);
-      const antonymsField = document.getElementById(`edit-${lang}-antonyms`);
+      // 관련 단어들
+      const synonymsField = document.getElementById(
+        `edit-${langCode}-synonyms`
+      );
+      const antonymsField = document.getElementById(
+        `edit-${langCode}-antonyms`
+      );
       const collocationsField = document.getElementById(
-        `edit-${lang}-collocations`
+        `edit-${langCode}-collocations`
       );
       const compoundWordsField = document.getElementById(
-        `edit-${lang}-compound-words`
+        `edit-${langCode}-compound-words`
       );
 
       if (synonymsField && expression.synonyms) {
@@ -503,70 +412,42 @@ function fillFormWithAIConceptData(conceptData) {
     }
   }
 
-  // 예문 처리
+  // 예문 채우기
   fillExamples(conceptData);
 }
 
-// 예문 채우기
+// 예문 채우기 (AI 편집 모달의 개별 언어별 필드에 맞게 수정)
 function fillExamples(conceptData) {
-  const examplesContainer = document.getElementById("edit-examples-container");
-  if (!examplesContainer) return;
-
-  console.log("📝 예문 채우기 시작:", {
+  console.log("🔍 AI 편집 모달 예문 채우기 시작:", {
     representative_example: conceptData.representative_example,
     examples: conceptData.examples,
     examples_length: conceptData.examples?.length,
   });
 
-  examplesContainer.innerHTML = "";
-
-  // 대표 예문 추가
+  // 대표 예문 처리 (개별 언어별 필드에 설정)
   if (conceptData.representative_example) {
-    let repExample = null;
+    console.log("✅ 대표 예문 발견:", conceptData.representative_example);
 
-    if (conceptData.representative_example.translations) {
-      repExample = conceptData.representative_example.translations;
-    } else if (
-      conceptData.representative_example.korean ||
-      conceptData.representative_example.english
-    ) {
-      repExample = conceptData.representative_example;
-    }
-
-    if (repExample) {
-      console.log("✅ 대표 예문 추가:", repExample);
-      addExampleField(repExample, true);
-    }
-  }
-
-  // 추가 예문들
-  if (conceptData.examples && Array.isArray(conceptData.examples)) {
-    console.log("📝 추가 예문 처리:", conceptData.examples);
-    conceptData.examples.forEach((example, index) => {
-      console.log(`✅ 추가 예문 ${index + 1} 추가:`, example);
-      addExampleField(example, false);
+    // 각 언어별 예문 필드에 값 설정
+    const languages = ["korean", "english", "japanese", "chinese"];
+    languages.forEach((lang) => {
+      const exampleField = document.getElementById(`edit-${lang}-example`);
+      if (exampleField && conceptData.representative_example[lang]) {
+        exampleField.value = conceptData.representative_example[lang];
+        console.log(
+          `📝 ${lang} 예문 설정:`,
+          conceptData.representative_example[lang]
+        );
+      }
     });
   } else {
-    console.log("⚠️ 추가 예문이 없거나 배열이 아닙니다:", conceptData.examples);
+    console.log("⚠️ 대표 예문이 없습니다.");
   }
 
-  // 예문이 없으면 기본 예문 필드 하나 추가
-  if (
-    !conceptData.representative_example &&
-    (!conceptData.examples || conceptData.examples.length === 0)
-  ) {
-    console.log("⚠️ 예문이 없어서 기본 예문 필드 추가");
-    addExampleField(null, true);
-  }
-
-  console.log(
-    "✅ 예문 채우기 완료. 컨테이너 내용:",
-    examplesContainer.children.length,
-    "개 예문"
-  );
+  console.log("🔍 AI 편집 모달 예문 채우기 완료");
 }
 
-// 예문 필드 추가
+// 예문 필드 추가 (보기 모달과 동일한 방식으로 단순화)
 function addExampleField(existingExample = null, isRepresentative = false) {
   const container = document.getElementById("edit-examples-container");
   if (!container) return;
@@ -576,6 +457,27 @@ function addExampleField(existingExample = null, isRepresentative = false) {
 
   const exampleIndex = container.children.length;
   const title = isRepresentative ? "대표 예문" : `예문 ${exampleIndex + 1}`;
+
+  // 기존 예문 값 추출 (보기 모달과 동일한 방식)
+  const getExampleValue = (lang) => {
+    if (!existingExample) return "";
+
+    // 직접 접근 (DB 구조에 맞게)
+    if (existingExample[lang]) {
+      return existingExample[lang];
+    }
+
+    return "";
+  };
+
+  console.log("📝 예문 필드 추가:", {
+    title,
+    existingExample,
+    korean: getExampleValue("korean"),
+    english: getExampleValue("english"),
+    japanese: getExampleValue("japanese"),
+    chinese: getExampleValue("chinese"),
+  });
 
   exampleDiv.innerHTML = `
     <div class="flex justify-between items-center mb-3">
@@ -589,27 +491,27 @@ function addExampleField(existingExample = null, isRepresentative = false) {
     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
       <div>
         <label class="block text-sm text-gray-600">한국어</label>
-        <input type="text" class="korean-example w-full p-2 border rounded" value="${
-          existingExample?.korean || ""
-        }">
+        <input type="text" class="korean-example w-full p-2 border rounded" value="${getExampleValue(
+          "korean"
+        )}">
       </div>
       <div>
         <label class="block text-sm text-gray-600">영어</label>
-        <input type="text" class="english-example w-full p-2 border rounded" value="${
-          existingExample?.english || ""
-        }">
+        <input type="text" class="english-example w-full p-2 border rounded" value="${getExampleValue(
+          "english"
+        )}">
       </div>
       <div>
         <label class="block text-sm text-gray-600">일본어</label>
-        <input type="text" class="japanese-example w-full p-2 border rounded" value="${
-          existingExample?.japanese || ""
-        }">
+        <input type="text" class="japanese-example w-full p-2 border rounded" value="${getExampleValue(
+          "japanese"
+        )}">
       </div>
       <div>
         <label class="block text-sm text-gray-600">중국어</label>
-        <input type="text" class="chinese-example w-full p-2 border rounded" value="${
-          existingExample?.chinese || ""
-        }">
+        <input type="text" class="chinese-example w-full p-2 border rounded" value="${getExampleValue(
+          "chinese"
+        )}">
       </div>
     </div>
   `;
@@ -628,13 +530,13 @@ function addExampleField(existingExample = null, isRepresentative = false) {
 // 저장
 async function saveConcept() {
   try {
-    console.log("💾 AI 개념 수정 시작:", editConceptId);
+    console.log("🤖 AI 개념 수정 시작:", editConceptId);
 
     if (!validateForm()) return;
 
     const conceptData = collectFormData();
 
-    console.log("📊 편집된 기본 데이터", conceptData);
+    console.log("🔍 수집된 원본 데이터:", conceptData);
 
     // AI 구조로 변환
     const transformedData = {
@@ -647,7 +549,7 @@ async function saveConcept() {
       concept_info: {
         domain: conceptData.concept_info.domain || "general",
         category: conceptData.concept_info.category || "common",
-        unicode_emoji: conceptData.concept_info.emoji || "🔤",
+        unicode_emoji: conceptData.concept_info.emoji || "🤖",
       },
       expressions: conceptData.expressions || {},
       representative_example: conceptData.representative_example || null,
@@ -655,7 +557,7 @@ async function saveConcept() {
       updated_at: new Date(),
     };
 
-    console.log("🔄 변환된 데이터", transformedData);
+    console.log("🔍 변환된 데이터:", transformedData);
 
     const success = await conceptUtils.updateAIConcept(
       auth.currentUser.email,
@@ -664,10 +566,10 @@ async function saveConcept() {
     );
 
     if (!success) {
-      throw new Error("AI 개념 수정이 실패했습니다.");
+      throw new Error("AI 개념 수정에 실패했습니다.");
     }
 
-    console.log("✅ 저장 성공! 저장된 데이터 검증을 위해 다시 조회합니다..");
+    console.log("✅ 저장 성공! 저장된 데이터 검증을 위해 다시 조회합니다...");
 
     // 저장된 데이터 검증
     try {
@@ -680,16 +582,16 @@ async function saveConcept() {
           c.id === editConceptId ||
           c._id === editConceptId
       );
-      console.log("✅ 저장된 개념 검증", savedConcept);
-      console.log("✅ 저장된 예문 검증", {
+      console.log("🔍 저장된 개념 검증:", savedConcept);
+      console.log("🔍 저장된 예문 검증:", {
         representative_example: savedConcept?.representative_example,
         examples: savedConcept?.examples,
       });
     } catch (verifyError) {
-      console.error("❌ 저장 검증 오류:", verifyError);
+      console.error("❌ 저장 검증 중 오류:", verifyError);
     }
 
-    alert("AI 개념이 성공적으로 수정되었습니다!");
+    alert("AI 개념이 성공적으로 수정되었습니다.");
     closeModal();
     sessionStorage.removeItem("editConceptId");
     editConceptId = null;
@@ -709,7 +611,7 @@ function validateForm() {
     ?.value.trim();
 
   if (!domain || !category) {
-    alert("도메인과 카테고리는 필수 입력 항목입니다.");
+    alert("도메인과 카테고리는 필수 입력항목입니다.");
     return false;
   }
 
@@ -722,11 +624,26 @@ function collectFormData() {
   const categoryField = document.getElementById("edit-concept-category");
   const emojiField = document.getElementById("edit-concept-emoji");
 
+  // 이모지 값 가져오기 - select 드롭다운에서 선택된 값 우선
+  let selectedEmoji = "🤖"; // 기본값
+
+  if (emojiField && emojiField.value && emojiField.value.trim()) {
+    selectedEmoji = emojiField.value.trim();
+  } else if (window.editConceptEmojiValue) {
+    selectedEmoji = window.editConceptEmojiValue;
+  }
+
   const conceptInfo = {
     domain: domainField?.value.trim() || "",
     category: categoryField?.value.trim() || "",
-    emoji: emojiField?.value.trim() || "🔤", // 폼에서 입력된 이모지 사용
+    unicode_emoji: selectedEmoji,
   };
+
+  console.log("🎨 이모지 수집:", {
+    original: window.editConceptEmojiValue,
+    selectValue: emojiField?.value.trim(),
+    final: selectedEmoji,
+  });
 
   // 언어별 표현 수집
   const expressions = {};
@@ -786,51 +703,41 @@ function collectFormData() {
     }
   }
 
-  // 예문 수집
+  // 예문 수집 (AI 편집 모달의 개별 언어별 필드에서)
   const examples = [];
   let representativeExample = null;
 
-  const exampleDivs = document.querySelectorAll(
-    "#edit-examples-container > div"
-  );
+  // AI 편집 모달의 개별 언어별 예문 필드에서 대표 예문 수집
+  const koreanExample =
+    document.getElementById("edit-korean-example")?.value.trim() || "";
+  const englishExample =
+    document.getElementById("edit-english-example")?.value.trim() || "";
+  const japaneseExample =
+    document.getElementById("edit-japanese-example")?.value.trim() || "";
+  const chineseExample =
+    document.getElementById("edit-chinese-example")?.value.trim() || "";
 
-  console.log("📝 예문 수집 시작:", exampleDivs.length, "개 예문 div 발견");
-
-  exampleDivs.forEach((div, index) => {
-    const isRepresentative = div
-      .querySelector("h4")
-      .textContent.includes("대표");
-
-    const example = {
-      korean: div.querySelector(".korean-example")?.value.trim() || "",
-      english: div.querySelector(".english-example")?.value.trim() || "",
-      japanese: div.querySelector(".japanese-example")?.value.trim() || "",
-      chinese: div.querySelector(".chinese-example")?.value.trim() || "",
-    };
-
-    console.log(`📝 예문 ${index + 1} (대표: ${isRepresentative}):`, example);
-
-    // 빈 예문은 제외
-    if (
-      example.korean ||
-      example.english ||
-      example.japanese ||
-      example.chinese
-    ) {
-      if (isRepresentative) {
-        // 기존 구조 유지 - translations 속성 제거
-        representativeExample = example;
-        console.log("✅ 대표 예문 설정:", representativeExample);
-      } else {
-        examples.push(example);
-        console.log("✅ 일반 예문 추가:", example);
-      }
-    } else {
-      console.log("⚠️ 빈 예문 건너뛰기");
-    }
+  console.log("🔍 AI 편집 모달 예문 수집:", {
+    korean: koreanExample,
+    english: englishExample,
+    japanese: japaneseExample,
+    chinese: chineseExample,
   });
 
-  console.log("📊 최종 예문 수집 결과:", {
+  // 대표 예문 설정 (최소 하나의 언어에 값이 있으면)
+  if (koreanExample || englishExample || japaneseExample || chineseExample) {
+    representativeExample = {
+      korean: koreanExample,
+      english: englishExample,
+      japanese: japaneseExample,
+      chinese: chineseExample,
+    };
+    console.log("✅ 대표 예문 설정:", representativeExample);
+  } else {
+    console.log("⚠️ 대표 예문이 비어있습니다");
+  }
+
+  console.log("🔍 최종 예문 수집 결과:", {
     representativeExample,
     examples: examples.length,
     allExamples: examples,
@@ -854,7 +761,7 @@ function closeModal() {
 
 // 전역 함수 - AI 편집 모달 열기
 window.openAIEditConceptModal = function (conceptId) {
-  console.log("🔧 AI 개념 편집 모달 열기:", conceptId);
+  console.log("🤖 AI 개념 편집 모달 열기:", conceptId);
   sessionStorage.setItem("editConceptId", conceptId);
   editConceptId = conceptId;
 

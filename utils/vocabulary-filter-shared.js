@@ -236,10 +236,13 @@ export class VocabularyFilterManager {
 
   // 모든 이벤트 리스너 설정
   setupEventListeners() {
+    console.log("🎯 필터 이벤트 리스너 설정 시작");
+
     // 검색 필터
     const searchInput = document.getElementById("search-input");
     if (searchInput && this.onSearch) {
       searchInput.addEventListener("input", this.debounce(this.onSearch, 300));
+      console.log("✅ 검색 필터 이벤트 설정 완료");
     }
 
     // 언어 필터
@@ -247,28 +250,52 @@ export class VocabularyFilterManager {
     const targetLanguage = document.getElementById("target-language");
     if (sourceLanguage && this.onLanguageChange) {
       sourceLanguage.addEventListener("change", this.onLanguageChange);
+      console.log("✅ 원본언어 필터 이벤트 설정 완료");
     }
     if (targetLanguage && this.onLanguageChange) {
       targetLanguage.addEventListener("change", this.onLanguageChange);
+      console.log("✅ 대상언어 필터 이벤트 설정 완료");
     }
 
     // 언어 교체 버튼
     const swapButton = document.getElementById("swap-languages");
-    if (swapButton && this.onLanguageSwap) {
-      swapButton.addEventListener("click", this.onLanguageSwap);
+    console.log("🔍 언어 전환 버튼 확인:", {
+      swapButton: !!swapButton,
+      onLanguageChange: !!this.onLanguageChange,
+    });
+
+    if (swapButton && this.onLanguageChange) {
+      // 기존 이벤트 리스너 제거 후 새로 추가
+      const newSwapButton = swapButton.cloneNode(true);
+      swapButton.parentNode.replaceChild(newSwapButton, swapButton);
+
+      newSwapButton.addEventListener("click", () => {
+        console.log("🔄 언어 전환 버튼 클릭됨 (공통 모듈)");
+        this.swapLanguages();
+      });
+      console.log("✅ 언어 전환 버튼 이벤트 설정 완료");
+    } else {
+      console.warn("⚠️ 언어 전환 버튼 이벤트 설정 실패:", {
+        swapButton: !!swapButton,
+        onLanguageChange: !!this.onLanguageChange,
+      });
     }
 
     // 도메인 필터
     const domainFilter = document.getElementById("domain-filter");
     if (domainFilter && this.onDomainChange) {
       domainFilter.addEventListener("change", this.onDomainChange);
+      console.log("✅ 도메인 필터 이벤트 설정 완료");
     }
 
     // 정렬 필터
     const sortOption = document.getElementById("sort-option");
     if (sortOption && this.onSortChange) {
       sortOption.addEventListener("change", this.onSortChange);
+      console.log("✅ 정렬 필터 이벤트 설정 완료");
     }
+
+    console.log("🎯 필터 이벤트 리스너 설정 완료");
   }
 
   // 현재 필터 값들 가져오기
@@ -287,15 +314,31 @@ export class VocabularyFilterManager {
 
   // 언어 교체 기능
   swapLanguages() {
+    console.log("🔄 언어 전환 함수 호출됨");
+
     const sourceSelect = document.getElementById("source-language");
     const targetSelect = document.getElementById("target-language");
 
-    if (!sourceSelect || !targetSelect) return;
+    if (!sourceSelect || !targetSelect) {
+      console.warn("⚠️ 언어 선택 요소를 찾을 수 없습니다:", {
+        sourceSelect: !!sourceSelect,
+        targetSelect: !!targetSelect,
+      });
+      return;
+    }
 
     const sourceValue = sourceSelect.value;
     const targetValue = targetSelect.value;
 
-    if (sourceValue === targetValue) return;
+    console.log("🔍 현재 언어 값:", {
+      sourceValue,
+      targetValue,
+    });
+
+    if (sourceValue === targetValue) {
+      console.warn("⚠️ 원본언어와 대상언어가 동일하여 전환하지 않습니다");
+      return;
+    }
 
     // 애니메이션 효과
     const swapButton = document.getElementById("swap-languages");
@@ -311,9 +354,17 @@ export class VocabularyFilterManager {
     sourceSelect.value = targetValue;
     targetSelect.value = sourceValue;
 
+    console.log("✅ 언어 전환 완료:", {
+      새로운_원본언어: targetValue,
+      새로운_대상언어: sourceValue,
+    });
+
     // 변경 이벤트 발생
     if (this.onLanguageChange) {
+      console.log("🔄 onLanguageChange 콜백 호출");
       this.onLanguageChange();
+    } else {
+      console.warn("⚠️ onLanguageChange 콜백이 설정되지 않았습니다");
     }
   }
 
@@ -497,12 +548,6 @@ export function setupVocabularyFilters(onFilterChange) {
     onLanguageChange: onFilterChange,
     onDomainChange: onFilterChange,
     onSortChange: onFilterChange,
-    onLanguageSwap: () => {
-      console.log("🔄 언어 전환 버튼 클릭됨 (공통 모듈)");
-      filterManager.swapLanguages();
-      console.log("✅ 언어 전환 완료, 콜백 호출");
-      onFilterChange();
-    },
   });
 
   filterManager.setupEventListeners();

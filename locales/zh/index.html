@@ -225,7 +225,7 @@
     <script src="../../components/js/navbar.js"></script>
     
     <!-- Firebase 초기화 스크립트 -->
-    <script type="module" src="../../utils/firebase/firebase-init.js"></script>
+    <script type="module" src="../../js/firebase/firebase-init.js"></script>
     
     <script type="module">
       import { applyLanguage, updateMetadata, getActiveLanguage } from '../../utils/language-utils.js';
@@ -291,8 +291,8 @@
                 console.log("当前语言:", currentLang);
                 
                 // Firebase 认证状态检查
-                const { onAuthStateChanged } = await import('../../utils/firebase/firebase-init.js');
-                const { auth } = await import('../../utils/firebase/firebase-init.js');
+                const { onAuthStateChanged } = await import('../../js/firebase/firebase-init.js');
+                const { auth } = await import('../../js/firebase/firebase-init.js');
                 
                 onAuthStateChanged(auth, (user) => {
                   if (user) {

@@ -10,10 +10,10 @@ import {
   addDoc,
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
-import { db, conceptUtils } from "../../utils/firebase/firebase-init.js";
-import { CollectionManager } from "../../utils/firebase/firebase-collection-manager.js";
+import { db, conceptUtils } from "../../js/firebase/firebase-init.js";
+import { CollectionManager } from "../../js/firebase/firebase-collection-manager.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
-import { auth } from "../../utils/firebase/firebase-init.js";
+import { auth } from "../../js/firebase/firebase-init.js";
 import { getI18nText } from "../../utils/language-utils.js";
 import { selectEmojiForWord } from "../../utils/emoji-utils.js";
 
