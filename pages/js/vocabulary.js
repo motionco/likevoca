@@ -24,6 +24,7 @@ import {
 
 import { initialize as initializeConceptModal } from "../../components/js/add-concept-modal.js";
 import { initialize as initializeBulkImportModal } from "../../components/js/bulk-import-modal.js";
+import { initializeEditModal } from "../../components/js/edit-concept-modal.js";
 import {
   initializeConceptViewModal,
   showConceptViewModal,
@@ -217,71 +218,88 @@ const domainTranslations = {
   general: { ko: "일반", en: "General", ja: "一般", zh: "一般" },
 };
 
-// ... rest of the code ...
+// 언어 이름 번역 함수 (간단 버전)
+function getTranslatedLanguageName(langCode, currentLang = "ko") {
+  const languageNames = {
+    ko: {
+      korean: "한국어",
+      english: "영어",
+      japanese: "일본어",
+      chinese: "중국어",
+    },
+    en: {
+      korean: "Korean",
+      english: "English",
+      japanese: "Japanese",
+      chinese: "Chinese",
+    },
+    ja: {
+      korean: "韓国語",
+      english: "英語",
+      japanese: "日本語",
+      chinese: "中国語",
+    },
+    zh: {
+      korean: "韩语",
+      english: "英语",
+      japanese: "日语",
+      chinese: "中文",
+    },
+  };
 
-// 개념 카드 생성 함수 (확장된 구조 지원 및 디버깅 개선)
+  return languageNames[currentLang]?.[langCode] || langCode;
+}
+
+// 개념 카드 생성 함수 (디버깅 개선)
 function createConceptCard(concept) {
-  // 단어장 페이지의 실제 요소 ID 사용 (AI 단어장과 동일)
-  const sourceLanguageElement = document.getElementById("source-language");
-  const targetLanguageElement = document.getElementById("target-language");
-
-  // 요소가 없는 경우 기본값 사용
-  const sourceLanguage = sourceLanguageElement
-    ? sourceLanguageElement.value
-    : "korean";
-  const targetLanguage = targetLanguageElement
-    ? targetLanguageElement.value
-    : "english";
-
-  console.log("카드 생성 - 언어 설정:", { sourceLanguage, targetLanguage });
-
-  // 새로운 구조와 기존 구조 모두 지원
-  const sourceExpression = concept.expressions?.[sourceLanguage] || {};
-  const targetExpression = concept.expressions?.[targetLanguage] || {};
-
-  // 빈 표현인 경우 건너뛰기
-  if (!sourceExpression.word || !targetExpression.word) {
-    console.log("카드 생성 건너뛰기 - 빈 표현:", {
-      sourceExpression,
-      targetExpression,
-    });
+  if (!concept || !concept.expressions) {
+    console.warn("개념 데이터가 유효하지 않습니다:", concept);
     return "";
   }
 
-  // concept_info 가져오기 (새 구조 우선, 기존 구조 fallback)
-  const conceptInfo = concept.concept_info || {
-    domain: concept.domain || "기타",
-    category: concept.category || "일반",
-    unicode_emoji: concept.emoji || concept.unicode_emoji || "📝",
-    color_theme: concept.color_theme || "#4B63AC",
-  };
+  // 언어 설정 가져오기
+  const sourceLanguage =
+    document.getElementById("source-language")?.value || "korean";
+  const targetLanguage =
+    document.getElementById("target-language")?.value || "english";
 
-  // 색상 테마 가져오기 (안전한 fallback)
-  const colorTheme =
-    conceptInfo.color_theme || concept.color_theme || "#4B63AC";
+  console.log("카드 생성 - 언어 설정:", {
+    sourceLanguage,
+    targetLanguage,
+  });
 
-  // 이모지 가져오기 (실제 데이터 구조에 맞게 우선순위 조정)
+  // 개념 정보 추출 (메타데이터 우선, 기본 데이터 fallback)
+  const conceptInfo = concept.metadata || concept;
+
+  // 이모지 추출 (여러 소스 확인)
   const emoji =
     conceptInfo.unicode_emoji ||
     conceptInfo.emoji ||
-    concept.emoji ||
     concept.unicode_emoji ||
+    concept.emoji ||
     "📝";
 
-  // 예문 가져오기 (concepts 컬렉션의 대표 예문 사용)
-  let example = null;
+  // 색상 테마 설정
+  const domain = conceptInfo.domain || "other";
+  const colorTheme = getDomainColor(domain);
 
-  // 1. representative_example 확인 (새 구조와 기존 구조 모두 지원)
+  // 언어별 표현 추출
+  const sourceExpression = concept.expressions[sourceLanguage] || {};
+  const targetExpression = concept.expressions[targetLanguage] || {};
+
+  console.log("✅ 카드: 새로운 대표 예문 구조 사용");
+
+  // 예시 문장 추출
+  let example = null;
   if (concept.representative_example) {
     const repExample = concept.representative_example;
 
-    // 새로운 구조: 직접 언어별 텍스트
+    // 직접 언어별 스키마 사용
     if (repExample[sourceLanguage] && repExample[targetLanguage]) {
       example = {
         source: repExample[sourceLanguage],
         target: repExample[targetLanguage],
       };
-      console.log("✅ 카드: 새로운 대표 예문 구조 사용");
     }
     // 기존 구조: translations 객체
     else if (repExample.translations) {
@@ -295,50 +313,16 @@ function createConceptCard(concept) {
           repExample.translations[targetLanguage] ||
           "",
       };
-      console.log("✅ 카드: 기존 대표 예문 구조 사용");
     }
-  }
-  // 2. featured_examples 확인 (기존 방식)
-  else if (concept.featured_examples && concept.featured_examples.length > 0) {
-    const firstExample = concept.featured_examples[0];
-    if (firstExample.translations) {
-      example = {
-        source: firstExample.translations[sourceLanguage]?.text || "",
-        target: firstExample.translations[targetLanguage]?.text || "",
-      };
-    }
-  }
-  // 3. core_examples 확인 (기존 방식 - 하위 호환성)
-  else if (concept.core_examples && concept.core_examples.length > 0) {
-    const firstExample = concept.core_examples[0];
-    // 번역 구조 확인
-    if (firstExample.translations) {
-      example = {
-        source: firstExample.translations[sourceLanguage]?.text || "",
-        target: firstExample.translations[targetLanguage]?.text || "",
-      };
-    } else {
-      // 직접 언어 속성이 있는 경우
-      example = {
-        source: firstExample[sourceLanguage] || "",
-        target: firstExample[targetLanguage] || "",
-      };
-    }
-  }
-  // 4. 기존 examples 확인 (하위 호환성)
-  else if (concept.examples && concept.examples.length > 0) {
-    const firstExample = concept.examples[0];
-    example = {
-      source: firstExample[sourceLanguage] || "",
-      target: firstExample[targetLanguage] || "",
-    };
   }
 
-  // 개념 ID 생성 (document ID 우선 사용)
+  // 개념 ID 생성
   const conceptId =
     concept.id ||
     concept._id ||
-    `${sourceExpression.word}_${targetExpression.word}`;
+    `${sourceExpression.text || sourceExpression.word}_${
+      targetExpression.text || targetExpression.word
+    }`;
 
   return `
     <div 
@@ -349,15 +333,20 @@ function createConceptCard(concept) {
       <div class="flex items-start justify-between mb-4">
         <div class="flex items-center space-x-3">
           <span class="text-3xl">${emoji}</span>
-        <div>
+          <div>
             <h3 class="text-lg font-semibold text-gray-800 mb-1">
-              ${targetExpression.word || "N/A"}
+              ${
+                targetExpression.text ||
+                targetExpression.word ||
+                targetExpression.expression ||
+                "N/A"
+              }
             </h3>
-          <p class="text-sm text-gray-500">${
-            targetExpression.pronunciation ||
-            targetExpression.romanization ||
-            ""
-          }</p>
+            <p class="text-sm text-gray-500">${
+              targetExpression.pronunciation ||
+              targetExpression.romanization ||
+              ""
+            }</p>
           </div>
         </div>
         <div class="flex items-center space-x-2">
@@ -369,27 +358,32 @@ function createConceptCard(concept) {
           >
             <i class="fas fa-bookmark text-gray-400"></i>
           </button>
-        <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-          ${getTranslatedDomainCategory(
-            conceptInfo.domain,
-            conceptInfo.category,
-            localStorage.getItem("preferredLanguage") || userLanguage || "ko"
-          )}
-        </span>
+          <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+            ${getTranslatedDomainCategory(
+              conceptInfo.domain || "other",
+              conceptInfo.category || "general",
+              localStorage.getItem("preferredLanguage") || userLanguage || "ko"
+            )}
+          </span>
         </div>
       </div>
       
       <div class="border-t border-gray-200 pt-3 mt-3">
         <div class="flex items-center">
-          <span class="font-medium">${sourceExpression.word || "N/A"}</span>
+          <span class="font-medium">${
+            sourceExpression.text ||
+            sourceExpression.word ||
+            sourceExpression.expression ||
+            "N/A"
+          }</span>
         </div>
         <p class="text-sm text-gray-600 mt-1 line-clamp-2" title="${
-          targetExpression.definition || ""
-        }">${targetExpression.definition || ""}</p>
+          targetExpression.meaning || targetExpression.definition || ""
+        }">${targetExpression.meaning || targetExpression.definition || ""}</p>
       </div>
       
       ${
-        example && example.source && example.target
+        example && (example.source || example.target)
           ? `
       <div class="border-t border-gray-200 pt-3 mt-3">
         <p class="text-sm text-gray-700 font-medium truncate" title="${example.target}">${example.target}</p>
@@ -401,7 +395,10 @@ function createConceptCard(concept) {
       
       <div class="flex justify-between text-xs text-gray-500 mt-3">
         <span class="flex items-center">
-          <i class="fas fa-language mr-1"></i> ${sourceLanguage} → ${targetLanguage}
+          <i class="fas fa-language mr-1"></i> ${getTranslatedLanguageName(
+            sourceLanguage,
+            userLanguage
+          )} → ${getTranslatedLanguageName(targetLanguage, userLanguage)}
         </span>
         <span class="flex items-center">
           <i class="fas fa-clock mr-1"></i> ${formatDate(
@@ -413,6 +410,25 @@ function createConceptCard(concept) {
       </div>
     </div>
   `;
+}
+
+// 도메인별 색상 테마 가져오기
+function getDomainColor(domain) {
+  const colorMap = {
+    daily: "#4B63AC",
+    food: "#FF6B6B",
+    travel: "#4ECDC4",
+    business: "#45B7D1",
+    education: "#96CEB4",
+    nature: "#FECA57",
+    technology: "#9C27B0",
+    health: "#FF9FF3",
+    sports: "#54A0FF",
+    entertainment: "#5F27CD",
+    culture: "#00D2D3",
+    other: "#747D8C",
+  };
+  return colorMap[domain] || "#747D8C";
 }
 
 // 언어 전환 함수
@@ -521,21 +537,104 @@ function displayConceptList() {
   }
 }
 
-// 북마크 UI 업데이트 (임시 구현)
+// 북마크 데이터 로드
+async function loadUserBookmarks() {
+  try {
+    if (!currentUser) {
+      console.log("❌ 사용자가 로그인되지 않음");
+      userBookmarks = [];
+      return;
+    }
+
+    const userEmail = currentUser.email;
+    const bookmarksRef = doc(db, "bookmarks", userEmail);
+    const bookmarkDoc = await getDoc(bookmarksRef);
+
+    if (bookmarkDoc.exists()) {
+      const bookmarkData = bookmarkDoc.data();
+      userBookmarks = bookmarkData.concept_ids || [];
+      console.log("📋 북마크 로드 완료:", userBookmarks.length);
+    } else {
+      userBookmarks = [];
+      console.log("📋 북마크 문서가 없어서 빈 배열로 초기화");
+    }
+  } catch (error) {
+    console.error("❌ 북마크 로드 실패:", error);
+    userBookmarks = [];
+  }
+}
+
+// 북마크 토글 함수
+async function toggleBookmark(conceptId) {
+  try {
+    if (!currentUser) {
+      alert("북마크 기능을 사용하려면 로그인이 필요합니다.");
+      return;
+    }
+
+    const userEmail = currentUser.email;
+    const bookmarksRef = doc(db, "bookmarks", userEmail);
+
+    // 현재 북마크 상태 확인
+    const isBookmarked = userBookmarks.includes(conceptId);
+
+    if (isBookmarked) {
+      // 북마크 제거
+      userBookmarks = userBookmarks.filter((id) => id !== conceptId);
+      console.log("📌 북마크 제거:", conceptId);
+    } else {
+      // 북마크 추가
+      userBookmarks.push(conceptId);
+      console.log("📌 북마크 추가:", conceptId);
+    }
+
+    // Firestore 업데이트
+    await setDoc(
+      bookmarksRef,
+      {
+        concept_ids: userBookmarks,
+        updated_at: Timestamp.now(),
+      },
+      { merge: true }
+    );
+
+    // UI 업데이트
+    updateBookmarkUI();
+
+    console.log("✅ 북마크 업데이트 완료");
+  } catch (error) {
+    console.error("❌ 북마크 토글 실패:", error);
+    alert("북마크 업데이트 중 오류가 발생했습니다.");
+  }
+}
+
+// 북마크 UI 업데이트 (실제 구현)
 function updateBookmarkUI() {
-  // TODO: 북마크 기능 완전 구현 필요
-  console.log("📋 북마크 UI 업데이트 (임시 구현)");
+  console.log("📋 북마크 UI 업데이트 시작");
 
   const bookmarkButtons = document.querySelectorAll(".bookmark-btn");
   bookmarkButtons.forEach((btn) => {
+    const conceptId = btn.getAttribute("onclick")?.match(/'([^']+)'/)?.[1];
     const icon = btn.querySelector("i");
-    if (icon) {
-      // 기본 북마크 아이콘 상태로 설정
-      icon.className = "fas fa-bookmark text-gray-400";
-      btn.title = "북마크 (기능 구현 중)";
+
+    if (icon && conceptId) {
+      if (userBookmarks.includes(conceptId)) {
+        // 북마크된 상태
+        icon.className = "fas fa-bookmark text-yellow-500";
+        btn.title = "북마크 제거";
+      } else {
+        // 북마크되지 않은 상태
+        icon.className = "fas fa-bookmark text-gray-400";
+        btn.title = "북마크 추가";
+      }
     }
   });
+
+  console.log("✅ 북마크 UI 업데이트 완료");
 }
+
+// 전역 함수로 노출
+window.toggleBookmark = toggleBookmark;
 
 // 더 보기 버튼 처리
 function handleLoadMore() {
@@ -1023,7 +1122,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         setCurrentUser(user); // 새로운 모달 시스템에 사용자 정보 전달
         setUserLanguage(userLanguage); // 새로운 모달 시스템에 언어 정보 전달
         await updateUsageUI();
-        // await loadUserBookmarks(); // TODO: 북마크 기능 구현 필요
+        await loadUserBookmarks();
       } else {
         console.log("❌ 사용자가 로그인되지 않았습니다.");
         currentUser = null;
@@ -1062,3 +1161,50 @@ document.addEventListener("DOMContentLoaded", async () => {
     showError("페이지를 불러오는 중 문제가 발생했습니다.", error.message);
   }
 });
+
+// 개념 삭제 함수 (전역으로 노출)
+window.deleteConcept = async function (conceptId) {
+  console.log("🗑️ 개념 삭제 시도:", conceptId);
+
+  try {
+    if (!currentUser) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    if (!conceptId) {
+      console.error("❌ 개념 ID가 없습니다.");
+      alert("삭제할 개념을 찾을 수 없습니다.");
+      return;
+    }
+
+    // Firebase conceptUtils를 사용하여 삭제
+    if (conceptUtils && conceptUtils.deleteConcept) {
+      await conceptUtils.deleteConcept(conceptId);
+      console.log("✅ 개념 삭제 완료:", conceptId);
+
+      // 로컬 데이터 업데이트
+      allConcepts = allConcepts.filter(
+        (concept) => concept.id !== conceptId && concept._id !== conceptId
+      );
+      filteredConcepts = filteredConcepts.filter(
+        (concept) => concept.id !== conceptId && concept._id !== conceptId
+      );
+
+      // 전역 변수 업데이트
+      window.allConcepts = allConcepts;
+
+      // UI 업데이트
+      displayConceptList();
+      await updateUsageUI();
+
+      alert("개념이 성공적으로 삭제되었습니다.");
+    } else {
+      console.error("❌ conceptUtils.deleteConcept 함수를 찾을 수 없습니다.");
+      alert("삭제 기능을 사용할 수 없습니다.");
+    }
+  } catch (error) {
+    console.error("❌ 개념 삭제 중 오류 발생:", error);
+    alert("개념 삭제 중 오류가 발생했습니다: " + error.message);
+  }
+};

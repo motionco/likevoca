@@ -70,7 +70,28 @@ function getTranslatedText(key) {
   }
 
   // 로컬 번역 시스템 fallback
-  return pageTranslations[currentLang][key] || pageTranslations.en[key] || key;
+  const localTranslations = {
+    ko: {
+      meaning: "의미",
+      part_of_speech: "품사",
+      examples: "예문",
+      synonyms: "유의어",
+      antonyms: "반의어",
+      updated_at: "업데이트",
+    },
+    en: {
+      meaning: "Meaning",
+      part_of_speech: "Part of Speech",
+      examples: "Examples",
+      synonyms: "Synonyms",
+      antonyms: "Antonyms",
+      updated_at: "Updated",
+    },
+  };
+
+  return (
+    localTranslations[currentLang]?.[key] || localTranslations.en[key] || key
+  );
 }
 
 // 사용자 언어 초기화
@@ -130,21 +151,21 @@ export async function showConceptModal(
     return;
   }
 
-  // 언어 순서 설정
+  // 언어 순서 설정: 원본 언어 → 대상 언어 → 나머지 언어
   const orderedLanguages = [];
 
-  // 1. 목표 언어 먼저 추가
-  if (targetLanguage && availableLanguages.includes(targetLanguage)) {
-    orderedLanguages.push(targetLanguage);
+  // 1. 원본 언어 먼저 추가
+  if (sourceLanguage && availableLanguages.includes(sourceLanguage)) {
+    orderedLanguages.push(sourceLanguage);
   }
 
-  // 2. 소스 언어 추가 (목표 언어와 다른 경우)
+  // 2. 대상 언어 추가 (원본 언어와 다른 경우)
   if (
-    sourceLanguage &&
-    availableLanguages.includes(sourceLanguage) &&
-    sourceLanguage !== targetLanguage
+    targetLanguage &&
+    availableLanguages.includes(targetLanguage) &&
+    targetLanguage !== sourceLanguage
   ) {
-    orderedLanguages.push(sourceLanguage);
+    orderedLanguages.push(targetLanguage);
   }
 
   // 3. 나머지 언어들 추가
@@ -153,6 +174,8 @@ export async function showConceptModal(
       orderedLanguages.push(lang);
     }
   });
+
+  console.log("언어 순서 (원본→대상→나머지):", orderedLanguages);
 
   // 기본 개념 정보 설정 - 첫 번째 언어 사용
   const primaryLang = orderedLanguages[0];
@@ -165,18 +188,20 @@ export async function showConceptModal(
     emojiElement.textContent = emoji;
   }
 
-  // 제목 설정
+  // 제목 설정 - 발음기호 제거
   const primaryWordElement = document.getElementById("concept-view-title");
   if (primaryWordElement) {
-    primaryWordElement.textContent = primaryExpr?.word || "N/A";
+    primaryWordElement.textContent =
+      primaryExpr?.word || primaryExpr?.text || "N/A";
   }
 
-  // 발음 설정
+  // 발음 설정 - 숨김 처리
   const primaryPronElement = document.getElementById(
     "concept-view-pronunciation"
   );
   if (primaryPronElement) {
-    primaryPronElement.textContent = primaryExpr?.pronunciation || "";
+    primaryPronElement.textContent = ""; // 발음기호 제거
+    primaryPronElement.style.display = "none"; // 완전히 숨김
   }
 
   // 카테고리와 도메인 표시
@@ -306,30 +331,61 @@ function showLanguageContent(lang, concept) {
     return;
   }
 
-  // 기본 정보 업데이트
+  // 기본 정보 업데이트 - 발음기호 제거
   const wordElement = document.getElementById("concept-view-title");
   const pronunciationElement = document.getElementById(
     "concept-view-pronunciation"
   );
 
   if (wordElement) {
-    wordElement.textContent = expression.word || "N/A";
+    wordElement.textContent = expression.word || expression.text || "N/A";
   }
 
   if (pronunciationElement) {
-    pronunciationElement.textContent = expression.pronunciation || "";
+    pronunciationElement.textContent = ""; // 발음기호 제거
+    pronunciationElement.style.display = "none"; // 완전히 숨김
   }
 
-  // 상세 내용 생성
+  // 예문 데이터 가져오기
+  const examples = concept.examples || [];
+  const langExamples = examples.filter(
+    (ex) => ex.language === lang || ex.lang === lang
+  );
+
+  // 업데이트 시간 정보
+  const updatedAt =
+    concept.updatedAt || concept.createdAt || concept.created_at;
+  let formattedDate = "";
+  if (updatedAt) {
+    try {
+      let date;
+      if (updatedAt.toDate && typeof updatedAt.toDate === "function") {
+        date = updatedAt.toDate();
+      } else if (updatedAt.seconds) {
+        date = new Date(updatedAt.seconds * 1000);
+      } else {
+        date = new Date(updatedAt);
+      }
+
+      if (date && !isNaN(date.getTime())) {
+        formattedDate = date.toLocaleDateString("ko-KR", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        });
+      }
+    } catch (error) {
+      console.error("날짜 포맷 오류:", error);
+    }
+  }
+
+  // 상세 내용 생성 - 발음기호 제거, 단어와 정의 개선
   const contentHTML = `
     <div class="space-y-4">
       <div class="flex items-center gap-2 mb-1">
-        <p class="text-lg font-medium">${expression.word || "N/A"}</p>
-        ${
-          expression.pronunciation
-            ? `<span class="text-gray-500">[${expression.pronunciation}]</span>`
-            : ""
-        }
+        <p class="text-lg font-medium">${
+          expression.word || expression.text || "N/A"
+        }</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -337,16 +393,49 @@ function showLanguageContent(lang, concept) {
           <h4 class="font-medium text-gray-700 mb-2">${getTranslatedText(
             "meaning"
           )}</h4>
-          <p class="text-gray-600">${expression.meaning || "N/A"}</p>
+          <p class="text-gray-600">${
+            expression.meaning || expression.definition || "N/A"
+          }</p>
         </div>
         
         <div>
           <h4 class="font-medium text-gray-700 mb-2">${getTranslatedText(
             "part_of_speech"
           )}</h4>
-          <p class="text-gray-600">${expression.part_of_speech || "N/A"}</p>
+          <p class="text-gray-600">${
+            expression.part_of_speech || expression.pos || "N/A"
+          }</p>
         </div>
       </div>
+
+      ${
+        langExamples.length > 0
+          ? `
+        <div>
+          <h4 class="font-medium text-gray-700 mb-2">${getTranslatedText(
+            "examples"
+          )}</h4>
+          <div class="space-y-2">
+            ${langExamples
+              .map(
+                (example) =>
+                  `<div class="bg-gray-50 p-3 rounded">
+                    <p class="text-gray-800">${
+                      example.sentence || example.text || "N/A"
+                    }</p>
+                    ${
+                      example.translation
+                        ? `<p class="text-gray-600 text-sm mt-1">${example.translation}</p>`
+                        : ""
+                    }
+                  </div>`
+              )
+              .join("")}
+          </div>
+        </div>
+      `
+          : ""
+      }
 
       ${
         expression.synonyms && expression.synonyms.length > 0
@@ -383,6 +472,18 @@ function showLanguageContent(lang, concept) {
               )
               .join("")}
           </div>
+        </div>
+      `
+          : ""
+      }
+
+      ${
+        formattedDate
+          ? `
+        <div class="pt-4 border-t border-gray-200">
+          <p class="text-sm text-gray-500">${getTranslatedText(
+            "updated_at"
+          )}: ${formattedDate}</p>
         </div>
       `
           : ""

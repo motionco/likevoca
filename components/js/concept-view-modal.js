@@ -10,8 +10,82 @@ import {
   getTranslatedLanguageName,
 } from "./concept-modal-shared.js";
 
+// 전역 변수
+let currentConcept = null;
 let currentUser = null;
 let userLanguage = "ko";
+
+// 다국어 번역 시스템
+const pageTranslations = {
+  ko: {
+    concept_detail_view: "개념 상세 보기",
+    meaning: "의미",
+    part_of_speech: "품사",
+    level: "수준",
+    examples: "예문",
+    last_updated: "마지막 업데이트",
+    edit: "편집",
+    delete: "삭제",
+    close: "닫기",
+    no_examples: "예문이 없습니다.",
+    category: "카테고리",
+    domain: "도메인",
+    word: "단어",
+    pronunciation: "발음",
+    definition: "정의",
+  },
+  en: {
+    concept_detail_view: "Concept Detail View",
+    meaning: "Meaning",
+    part_of_speech: "Part of Speech",
+    level: "Level",
+    examples: "Examples",
+    last_updated: "Last Updated",
+    edit: "Edit",
+    delete: "Delete",
+    close: "Close",
+    no_examples: "No examples available.",
+    category: "Category",
+    domain: "Domain",
+    word: "Word",
+    pronunciation: "Pronunciation",
+    definition: "Definition",
+  },
+  ja: {
+    concept_detail_view: "概念詳細表示",
+    meaning: "意味",
+    part_of_speech: "品詞",
+    level: "レベル",
+    examples: "例文",
+    last_updated: "最終更新",
+    edit: "編集",
+    delete: "削除",
+    close: "閉じる",
+    no_examples: "例文がありません。",
+    category: "カテゴリ",
+    domain: "ドメイン",
+    word: "単語",
+    pronunciation: "発音",
+    definition: "定義",
+  },
+  zh: {
+    concept_detail_view: "概念详细视图",
+    meaning: "意思",
+    part_of_speech: "词性",
+    level: "级别",
+    examples: "例句",
+    last_updated: "最后更新",
+    edit: "编辑",
+    delete: "删除",
+    close: "关闭",
+    no_examples: "没有例句。",
+    category: "类别",
+    domain: "领域",
+    word: "单词",
+    pronunciation: "发音",
+    definition: "定义",
+  },
+};
 
 /**
  * 모달 초기화
@@ -26,31 +100,466 @@ export function initializeConceptViewModal() {
   window.showConceptViewModal = showConceptViewModal;
   window.closeConceptViewModal = closeConceptViewModal;
 
+  // 모달 배경 클릭 시 닫기 이벤트 설정
+  const modal = document.getElementById("concept-view-modal");
+  if (modal) {
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        closeConceptViewModal();
+      }
+    });
+  }
+
   console.log("✅ 개념 보기 모달 초기화 완료");
 }
 
 /**
  * 개념 보기 모달 표시
- * @param {Object} conceptData - 개념 데이터
- * @param {string} sourceLanguage - 기본 언어
- * @param {string} targetLanguage - 대상 언어
  */
 export function showConceptViewModal(
   conceptData,
   sourceLanguage,
   targetLanguage
 ) {
-  console.log("📋 개념 보기 모달 표시:", conceptData);
+  console.log("📋 개념 보기 모달 표시:", {
+    conceptData,
+    sourceLanguage,
+    targetLanguage,
+  });
 
-  // 모달 채우기
-  fillConceptViewModal(conceptData, sourceLanguage, targetLanguage);
+  if (!conceptData) {
+    console.error("개념 데이터가 없습니다.");
+    return;
+  }
+
+  currentConcept = conceptData;
+
+  const modal = document.getElementById("concept-view-modal");
+  if (!modal) {
+    console.error("모달 요소를 찾을 수 없습니다.");
+    return;
+  }
+
+  // 사용 가능한 언어 확인
+  const availableLanguages = Object.keys(conceptData.expressions || {});
+  console.log("사용 가능한 언어:", availableLanguages);
+
+  if (availableLanguages.length === 0) {
+    console.error("사용 가능한 언어 표현이 없습니다.");
+    return;
+  }
+
+  // 언어 순서 설정
+  const orderedLanguages = [];
+
+  // 1. 목표 언어 먼저 추가
+  if (targetLanguage && availableLanguages.includes(targetLanguage)) {
+    orderedLanguages.push(targetLanguage);
+  }
+
+  // 2. 소스 언어 추가 (목표 언어와 다른 경우)
+  if (
+    sourceLanguage &&
+    availableLanguages.includes(sourceLanguage) &&
+    sourceLanguage !== targetLanguage
+  ) {
+    orderedLanguages.push(sourceLanguage);
+  }
+
+  // 3. 나머지 언어들 추가
+  availableLanguages.forEach((lang) => {
+    if (!orderedLanguages.includes(lang)) {
+      orderedLanguages.push(lang);
+    }
+  });
+
+  console.log("언어 순서:", orderedLanguages);
+
+  // 기본 개념 정보 설정 - 첫 번째 언어 사용
+  const primaryLang = orderedLanguages[0];
+  const primaryExpr = conceptData.expressions[primaryLang];
+
+  // 이모지 설정
+  const emoji =
+    conceptData.metadata?.unicode_emoji ||
+    conceptData.metadata?.emoji ||
+    conceptData.unicode_emoji ||
+    conceptData.emoji ||
+    "📝";
+  const emojiElement = document.getElementById("concept-view-emoji");
+  if (emojiElement) {
+    emojiElement.textContent = emoji;
+  }
+
+  // 제목 설정
+  const titleElement = document.getElementById("concept-view-title");
+  if (titleElement) {
+    titleElement.textContent =
+      primaryExpr?.text ||
+      primaryExpr?.word ||
+      primaryExpr?.expression ||
+      "N/A";
+  }
+
+  // 발음 설정
+  const pronunciationElement = document.getElementById(
+    "concept-view-pronunciation"
+  );
+  if (pronunciationElement) {
+    pronunciationElement.textContent =
+      primaryExpr?.pronunciation || primaryExpr?.romanization || "";
+  }
+
+  // 카테고리와 도메인 표시
+  const categoryDomainElement = document.getElementById(
+    "concept-category-domain"
+  );
+  if (categoryDomainElement) {
+    const domain =
+      conceptData.metadata?.domain || conceptData.domain || "other";
+    const category =
+      conceptData.metadata?.category || conceptData.category || "general";
+
+    const currentLang =
+      localStorage.getItem("preferredLanguage") || userLanguage || "ko";
+    const translatedDomainCategory = getTranslatedDomainCategory(
+      domain,
+      category,
+      currentLang
+    );
+
+    categoryDomainElement.textContent = translatedDomainCategory;
+  }
+
+  // 날짜 설정
+  const timestampElement = document.getElementById("concept-timestamp");
+  if (timestampElement) {
+    const createdDate =
+      conceptData.metadata?.created_at ||
+      conceptData.created_at ||
+      conceptData.timestamp;
+    if (createdDate) {
+      timestampElement.textContent = formatDate(createdDate);
+    }
+  }
+
+  // 언어 탭 생성
+  createLanguageTabs(orderedLanguages, conceptData);
+
+  // 예문 로드
+  loadExamples(conceptData, sourceLanguage, targetLanguage);
+
+  // 모달 버튼 설정
+  setupModalButtons(conceptData);
 
   // 모달 표시
-  const modal = document.getElementById("concept-view-modal");
-  if (modal) {
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
-    document.body.classList.add("overflow-hidden");
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+  document.body.classList.add("overflow-hidden");
+
+  console.log("✅ 개념 보기 모달 표시 완료");
+}
+
+/**
+ * 언어 탭 생성
+ */
+function createLanguageTabs(languages, conceptData) {
+  const tabsContainer = document.getElementById("language-tabs");
+  const contentContainer = document.getElementById("language-content");
+
+  if (!tabsContainer || !contentContainer) {
+    console.error("탭 또는 콘텐츠 컨테이너를 찾을 수 없습니다.");
+    return;
+  }
+
+  // 기존 내용 초기화
+  tabsContainer.innerHTML = "";
+  contentContainer.innerHTML = "";
+
+  const currentLang =
+    localStorage.getItem("preferredLanguage") || userLanguage || "ko";
+
+  languages.forEach((langCode, index) => {
+    const expression = conceptData.expressions[langCode];
+    if (!expression) return;
+
+    const isActive = index === 0;
+    const languageName = getTranslatedLanguageName(langCode, currentLang);
+
+    // 탭 생성
+    const tab = document.createElement("button");
+    tab.className = `px-4 py-2 font-medium border-b-2 transition-colors ${
+      isActive
+        ? "text-blue-600 border-blue-600"
+        : "text-gray-500 border-transparent hover:text-gray-700"
+    }`;
+    tab.textContent = languageName;
+    tab.onclick = () => showLanguageContent(langCode, conceptData);
+    tabsContainer.appendChild(tab);
+
+    // 콘텐츠 생성
+    const content = document.createElement("div");
+    content.id = `language-content-${langCode}`;
+    content.className = `language-content ${isActive ? "" : "hidden"}`;
+
+    content.innerHTML = createLanguageContentHTML(
+      langCode,
+      expression,
+      currentLang
+    );
+    contentContainer.appendChild(content);
+  });
+
+  // 전역 함수로 노출
+  window.showLanguageContent = showLanguageContent;
+}
+
+/**
+ * 언어별 콘텐츠 HTML 생성
+ */
+function createLanguageContentHTML(langCode, expression, currentLang) {
+  const getUILabels = (userLang) => {
+    const labels = {
+      ko: {
+        word: "단어:",
+        meaning: "의미:",
+        partOfSpeech: "품사:",
+        level: "수준:",
+      },
+      en: {
+        word: "Word:",
+        meaning: "Meaning:",
+        partOfSpeech: "Part of Speech:",
+        level: "Level:",
+      },
+      ja: {
+        word: "単語:",
+        meaning: "意味:",
+        partOfSpeech: "品詞:",
+        level: "レベル:",
+      },
+      zh: {
+        word: "单词:",
+        meaning: "意思:",
+        partOfSpeech: "词性:",
+        level: "级别:",
+      },
+    };
+    return labels[userLang] || labels.ko;
+  };
+
+  const labels = getUILabels(currentLang);
+
+  return `
+    <div class="bg-gray-50 p-4 rounded-lg">
+      <div class="space-y-4">
+        <!-- 단어 -->
+        <div>
+          <span class="text-sm font-medium text-gray-600">${labels.word}</span>
+          <div class="text-xl font-bold text-gray-800 mt-1">
+            ${
+              expression.text ||
+              expression.word ||
+              expression.expression ||
+              "N/A"
+            }
+          </div>
+        </div>
+
+        <!-- 의미/정의 -->
+        <div>
+          <span class="text-sm font-medium text-gray-600">${
+            labels.meaning
+          }</span>
+          <div class="text-gray-700 mt-1">
+            ${expression.meaning || expression.definition || ""}
+          </div>
+        </div>
+
+        <!-- 품사 -->
+        ${
+          expression.part_of_speech
+            ? `
+        <div>
+          <span class="text-sm font-medium text-gray-600">${
+            labels.partOfSpeech
+          }</span>
+          <div class="text-gray-700 mt-1">
+            ${getTranslatedPartOfSpeech(expression.part_of_speech, currentLang)}
+          </div>
+        </div>
+        `
+            : ""
+        }
+
+        <!-- 수준 -->
+        ${
+          expression.level
+            ? `
+        <div>
+          <span class="text-sm font-medium text-gray-600">${labels.level}</span>
+          <div class="text-gray-700 mt-1">
+            ${getTranslatedLevel(expression.level, currentLang)}
+          </div>
+        </div>
+        `
+            : ""
+        }
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * 언어 콘텐츠 표시
+ */
+function showLanguageContent(langCode, conceptData) {
+  // 모든 탭 비활성화
+  const tabs = document.querySelectorAll("#language-tabs button");
+  tabs.forEach((tab) => {
+    tab.className =
+      "px-4 py-2 font-medium border-b-2 transition-colors text-gray-500 border-transparent hover:text-gray-700";
+  });
+
+  // 모든 콘텐츠 숨기기
+  const contents = document.querySelectorAll(".language-content");
+  contents.forEach((content) => {
+    content.classList.add("hidden");
+  });
+
+  // 선택된 탭 활성화
+  const currentLang =
+    localStorage.getItem("preferredLanguage") || userLanguage || "ko";
+  const languageName = getTranslatedLanguageName(langCode, currentLang);
+  const selectedTab = Array.from(tabs).find(
+    (tab) => tab.textContent === languageName
+  );
+  if (selectedTab) {
+    selectedTab.className =
+      "px-4 py-2 font-medium border-b-2 transition-colors text-blue-600 border-blue-600";
+  }
+
+  // 선택된 콘텐츠 표시
+  const selectedContent = document.getElementById(
+    `language-content-${langCode}`
+  );
+  if (selectedContent) {
+    selectedContent.classList.remove("hidden");
+  }
+}
+
+/**
+ * 예문 로드
+ */
+function loadExamples(conceptData, sourceLanguage, targetLanguage) {
+  const examplesContainer = document.getElementById("examples-container");
+  if (!examplesContainer) {
+    console.error("예문 컨테이너를 찾을 수 없습니다.");
+    return;
+  }
+
+  let examplesHTML = "";
+  const currentLang =
+    localStorage.getItem("preferredLanguage") || userLanguage || "ko";
+
+  // 대표 예문 확인
+  if (conceptData.representative_example) {
+    const repExample = conceptData.representative_example;
+    let exampleData = null;
+
+    // 직접 언어별 스키마 사용
+    if (repExample[sourceLanguage] && repExample[targetLanguage]) {
+      exampleData = {
+        source: repExample[sourceLanguage],
+        target: repExample[targetLanguage],
+      };
+    }
+    // 기존 구조: translations 객체
+    else if (repExample.translations) {
+      exampleData = {
+        source:
+          repExample.translations[sourceLanguage]?.text ||
+          repExample.translations[sourceLanguage] ||
+          "",
+        target:
+          repExample.translations[targetLanguage]?.text ||
+          repExample.translations[targetLanguage] ||
+          "",
+      };
+    }
+
+    if (exampleData && exampleData.source && exampleData.target) {
+      examplesHTML = `
+        <div class="bg-white p-4 rounded-lg border border-gray-200">
+          <div class="space-y-3">
+            <div>
+              <div class="text-sm font-medium text-gray-600 mb-1">
+                ${getTranslatedLanguageName(sourceLanguage, currentLang)}
+              </div>
+              <div class="text-gray-800">${exampleData.source}</div>
+            </div>
+            <div>
+              <div class="text-sm font-medium text-gray-600 mb-1">
+                ${getTranslatedLanguageName(targetLanguage, currentLang)}
+              </div>
+              <div class="text-gray-800">${exampleData.target}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  if (!examplesHTML) {
+    examplesHTML = `
+      <div class="text-center py-8">
+        <i class="fas fa-file-alt text-gray-300 text-3xl mb-2"></i>
+        <p class="text-gray-500">${getTranslatedText("no_examples")}</p>
+      </div>
+    `;
+  }
+
+  examplesContainer.innerHTML = examplesHTML;
+}
+
+/**
+ * 모달 버튼 설정
+ */
+function setupModalButtons(conceptData) {
+  // 편집 버튼
+  const editButton = document.getElementById("edit-concept-button");
+  if (editButton) {
+    editButton.onclick = () => {
+      if (window.openEditConceptModal) {
+        window.openEditConceptModal(conceptData);
+      }
+      closeConceptViewModal();
+    };
+  }
+
+  // 삭제 버튼
+  const deleteButton = document.getElementById("delete-concept-button");
+  if (deleteButton) {
+    deleteButton.onclick = async () => {
+      const confirmed = confirm("정말로 이 개념을 삭제하시겠습니까?");
+      if (confirmed) {
+        try {
+          if (window.deleteConcept) {
+            await window.deleteConcept(conceptData.id || conceptData._id);
+          }
+          closeConceptViewModal();
+        } catch (error) {
+          console.error("개념 삭제 오류:", error);
+          alert("개념 삭제 중 오류가 발생했습니다.");
+        }
+      }
+    };
+  }
+
+  // 닫기 버튼
+  const closeButton = document.getElementById("close-concept-view-modal");
+  if (closeButton) {
+    closeButton.onclick = closeConceptViewModal;
   }
 }
 
@@ -67,404 +576,65 @@ export function closeConceptViewModal() {
 }
 
 /**
- * 모달 내용 채우기
- */
-function fillConceptViewModal(conceptData, sourceLanguage, targetLanguage) {
-  console.log("📝 모달 내용 채우기 시작");
-
-  // 개념 정보 우선순위: 분리된 컬렉션 메타데이터 > 기본 데이터
-  const conceptInfo = conceptData.metadata || conceptData;
-
-  // 도메인 카테고리 표시 (공통 번역 시스템 사용)
-  const domainCategoryElement = document.getElementById(
-    "concept-view-domain-category"
-  );
-  if (domainCategoryElement) {
-    const domain = conceptInfo.domain || conceptData.domain || "기타";
-    const category = conceptInfo.category || conceptData.category || "일반";
-    const currentLang =
-      localStorage.getItem("preferredLanguage") || userLanguage || "ko";
-
-    domainCategoryElement.textContent = getTranslatedDomainCategory(
-      domain,
-      category,
-      currentLang
-    );
-  }
-
-  // 이모지와 색상
-  const emoji =
-    conceptInfo.unicode_emoji ||
-    conceptInfo.emoji ||
-    conceptData.emoji ||
-    conceptData.unicode_emoji ||
-    "🔤";
-  const colorTheme = conceptInfo.color_theme || "#4B63AC";
-
-  const emojiElement = document.getElementById("concept-view-emoji");
-  if (emojiElement) {
-    emojiElement.textContent = emoji;
-  }
-
-  const headerElement = document.querySelector(".concept-view-header");
-  if (headerElement) {
-    headerElement.style.borderLeftColor = colorTheme;
-  }
-
-  // 날짜 정보
-  const createdDate =
-    conceptData.metadata?.created_at ||
-    conceptData.created_at ||
-    conceptData.timestamp;
-  const dateElement = document.getElementById("concept-updated-at");
-  if (dateElement && createdDate) {
-    dateElement.textContent = formatDate(createdDate);
-  }
-
-  // 언어별 표현 채우기
-  fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage);
-
-  // 모달 버튼 설정
-  setupModalButtons(conceptData);
-
-  // 모달 탭 한국어 번역 적용
-  setTimeout(() => {
-    applyModalTranslations();
-  }, 100);
-}
-
-/**
- * 언어별 표현 채우기
- */
-function fillLanguageExpressions(conceptData, sourceLanguage, targetLanguage) {
-  console.log("📝 언어별 표현 채우기", { sourceLanguage, targetLanguage });
-
-  // 기본 언어 표현
-  if (
-    sourceLanguage &&
-    conceptData.expressions &&
-    conceptData.expressions[sourceLanguage]
-  ) {
-    updateLanguageContent(sourceLanguage, conceptData, sourceLanguage);
-  }
-
-  // 대상 언어 표현
-  if (
-    targetLanguage &&
-    conceptData.expressions &&
-    conceptData.expressions[targetLanguage]
-  ) {
-    updateLanguageContent(targetLanguage, conceptData, targetLanguage);
-  }
-
-  // 예문 로드
-  loadAndDisplayExamples(
-    conceptData.id || conceptData._id,
-    sourceLanguage,
-    targetLanguage
-  );
-}
-
-/**
- * 언어 내용 업데이트
- */
-function updateLanguageContent(langCode, conceptData, sourceLanguage) {
-  const expression = conceptData.expressions[langCode];
-  if (!expression) return;
-
-  // UI 라벨 번역
-  const currentLang =
-    localStorage.getItem("preferredLanguage") || userLanguage || "ko";
-  const getUILabels = (userLang) => {
-    const labels = {
-      ko: {
-        meaning: "뜻:",
-        example: "예문:",
-        partOfSpeech: "품사:",
-        level: "레벨:",
-      },
-      en: {
-        meaning: "Meaning:",
-        example: "Example:",
-        partOfSpeech: "Part of Speech:",
-        level: "Level:",
-      },
-      ja: {
-        meaning: "意味:",
-        example: "例文:",
-        partOfSpeech: "品詞:",
-        level: "レベル:",
-      },
-      zh: {
-        meaning: "意思:",
-        example: "例句:",
-        partOfSpeech: "词性:",
-        level: "级度:",
-      },
-    };
-    return labels[userLang] || labels.ko;
-  };
-
-  const labels = getUILabels(currentLang);
-
-  // 언어별 컨테이너 찾기
-  const container = document.getElementById(`${langCode}-content`);
-  if (!container) return;
-
-  // 언어 이름 표시
-  const langNameElement = container.querySelector(".language-name");
-  if (langNameElement) {
-    langNameElement.textContent = getTranslatedLanguageName(
-      langCode,
-      currentLang
-    );
-  }
-
-  // 표현 텍스트 표시
-  const expressionElement = container.querySelector(".expression-text");
-  if (expressionElement) {
-    expressionElement.textContent =
-      expression.text || expression.expression || "";
-  }
-
-  // 의미 텍스트 표시
-  const meaningElement = container.querySelector(".meaning-text");
-  if (meaningElement) {
-    meaningElement.textContent = expression.meaning || "";
-  }
-
-  // 품사 텍스트 표시
-  const posElement = container.querySelector(".pos-text");
-  if (posElement && expression.part_of_speech) {
-    posElement.textContent = getTranslatedPartOfSpeech(
-      expression.part_of_speech,
-      currentLang
-    );
-  }
-
-  // 레벨 텍스트 표시
-  const levelElement = container.querySelector(".level-text");
-  if (levelElement && expression.level) {
-    levelElement.textContent = getTranslatedLevel(
-      expression.level,
-      currentLang
-    );
-  }
-}
-
-/**
- * 예문 로드 표시
- */
-async function loadAndDisplayExamples(
-  conceptId,
-  sourceLanguage,
-  targetLanguage
-) {
-  try {
-    const viewModal = document.getElementById("concept-view-modal");
-    const examplesContainer = viewModal
-      ? viewModal.querySelector("#examples-container")
-      : null;
-
-    if (!examplesContainer) {
-      console.error("개념 보기 모달에서 examples-container를 찾을 수 없습니다");
-      return;
-    }
-
-    let examplesHTML = "";
-    const allExamples = [];
-
-    // 현재 개념에서 representative_example 사용
-    const currentConcept = window.allConcepts?.find(
-      (c) => c.id === conceptId || c._id === conceptId
-    );
-
-    if (currentConcept?.representative_example) {
-      const repExample = currentConcept.representative_example;
-      let exampleData = null;
-
-      // 직접 언어별 스키마 사용
-      if (repExample[sourceLanguage] && repExample[targetLanguage]) {
-        exampleData = {
-          source: repExample[sourceLanguage],
-          target: repExample[targetLanguage],
-        };
-      }
-      // 기존 구조: translations 객체
-      else if (repExample.translations) {
-        exampleData = {
-          source:
-            repExample.translations[sourceLanguage]?.text ||
-            repExample.translations[sourceLanguage] ||
-            "",
-          target:
-            repExample.translations[targetLanguage]?.text ||
-            repExample.translations[targetLanguage] ||
-            "",
-        };
-      }
-
-      if (exampleData && exampleData.source && exampleData.target) {
-        allExamples.push({
-          sourceText: exampleData.source,
-          targetText: exampleData.target,
-          priority: 100,
-          context: "예문,",
-          isRepresentative: true,
-        });
-      }
-    }
-
-    // 예문 표시
-    if (allExamples.length > 0) {
-      allExamples.slice(0, 3).forEach((example) => {
-        examplesHTML += `
-          <div class="bg-gray-50 p-3 rounded-lg mb-3">
-            <div class="text-sm text-gray-600 mb-1">${getTranslatedLanguageName(
-              sourceLanguage,
-              userLanguage
-            )}</div>
-            <div class="font-medium mb-2 truncate">${example.sourceText}</div>
-            <div class="text-sm text-gray-600 mb-1">${getTranslatedLanguageName(
-              targetLanguage,
-              userLanguage
-            )}</div>
-            <div class="text-gray-700 truncate">${example.targetText}</div>
-          </div>
-        `;
-      });
-    } else {
-      examplesHTML = `<p class="text-gray-500 text-sm">예문을 찾을 수 없습니다.</p>`;
-    }
-
-    examplesContainer.innerHTML = examplesHTML;
-  } catch (error) {
-    console.error("예문 로드 오류:", error);
-  }
-}
-
-/**
- * 모달 버튼 설정
- */
-function setupModalButtons(conceptData) {
-  // 수정 버튼
-  const editButton = document.getElementById("edit-concept-btn");
-  if (editButton) {
-    editButton.onclick = () => {
-      console.log("🔄 개념 수정 버튼 클릭");
-      // 수정 모달 표기 (기존 기능 사용)
-      if (window.openEditConceptModal) {
-        window.openEditConceptModal(conceptData);
-      }
-      closeConceptViewModal();
-    };
-  }
-
-  // 삭제 버튼
-  const deleteButton = document.getElementById("delete-concept-btn");
-  if (deleteButton) {
-    deleteButton.onclick = async () => {
-      console.log("🗑️ 개념 삭제 버튼 클릭");
-
-      const confirmed = confirm("정말로 이 개념을 삭제하시겠습니까?");
-      if (confirmed) {
-        try {
-          // 삭제 로직 (기존 기능 사용)
-          if (window.deleteConcept) {
-            await window.deleteConcept(conceptData.id || conceptData._id);
-          }
-          closeConceptViewModal();
-        } catch (error) {
-          console.error("개념 삭제 오류:", error);
-          alert("개념 삭제 오류가 발생했습니다.");
-        }
-      }
-    };
-  }
-
-  // 닫기 버튼
-  const closeButton = document.getElementById("close-concept-view-btn");
-  if (closeButton) {
-    closeButton.onclick = closeConceptViewModal;
-  }
-}
-
-/**
- * 모달 탭 한국어 번역 적용
- */
-function applyModalTranslations() {
-  const modal = document.getElementById("concept-view-modal");
-  if (!modal) return;
-
-  modal.querySelectorAll("[data-i18n]").forEach((element) => {
-    const key = element.getAttribute("data-i18n");
-    const translatedText = getTranslatedText(key);
-    if (translatedText) {
-      element.textContent = translatedText;
-    }
-  });
-}
-
-/**
- * 번역 스크립트가 오류를 발생시키는지 확인
+ * 다국어 번역 텍스트 가져오기
  */
 function getTranslatedText(key) {
-  try {
-    if (typeof window.getI18nText === "function") {
-      const result = window.getI18nText(key);
-      if (result !== key) {
-        return result;
-      }
-    }
+  const currentLang =
+    localStorage.getItem("preferredLanguage") || userLanguage || "ko";
 
-    const currentLang = userLanguage || "ko";
-    if (
-      window.translations &&
-      window.translations[currentLang] &&
-      window.translations[currentLang][key]
-    ) {
-      return window.translations[currentLang][key];
-    }
-
-    return key;
-  } catch (error) {
-    console.error(`번역 스크립트가 오류를 발생시키는지 확인 (${key}):`, error);
-    return key;
+  // 전역 번역 시스템 사용
+  if (
+    window.translations &&
+    window.translations[currentLang] &&
+    window.translations[currentLang][key]
+  ) {
+    return window.translations[currentLang][key];
   }
+
+  // 로컬 번역 시스템 fallback
+  return (
+    pageTranslations[currentLang]?.[key] || pageTranslations.en?.[key] || key
+  );
 }
 
 /**
  * 날짜 포맷팅
  */
 function formatDate(timestamp) {
-  if (!timestamp) return "";
+  try {
+    let date;
+    if (
+      timestamp &&
+      timestamp.toDate &&
+      typeof timestamp.toDate === "function"
+    ) {
+      date = timestamp.toDate();
+    } else if (timestamp && timestamp.seconds) {
+      date = new Date(timestamp.seconds * 1000);
+    } else {
+      date = new Date(timestamp);
+    }
 
-  let date;
-  if (timestamp.toDate) {
-    date = timestamp.toDate();
-  } else if (timestamp instanceof Date) {
-    date = timestamp;
-  } else {
-    date = new Date(timestamp);
+    if (!isNaN(date.getTime())) {
+      return date.toLocaleDateString("ko-KR", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      });
+    }
+  } catch (error) {
+    console.error("날짜 포맷팅 오류:", error);
   }
-
-  return date.toLocaleDateString("ko-KR", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
+  return "";
 }
 
 /**
- * 현재 사용자 설정
+ * 사용자 설정
  */
 export function setCurrentUser(user) {
   currentUser = user;
 }
 
-/**
- * 사용자 언어 설정
- */
 export function setUserLanguage(lang) {
   userLanguage = lang;
 }
