@@ -260,68 +260,102 @@ function createConceptCard(concept) {
   // 예문 가져오기 (concepts 컬렉션의 대표 예문 사용)
   let example = null;
 
+  // 언어 코드 매핑 함수 (단어장 페이지용)
+  function getLanguageCode(langCode) {
+    const languageCodeMap = {
+      korean: "korean",
+      english: "english",
+      japanese: "japanese",
+      chinese: "chinese",
+    };
+    return languageCodeMap[langCode] || langCode;
+  }
+
+  // 언어 코드 변환
+  const sourceLanguageCode = getLanguageCode(sourceLanguage);
+  const targetLanguageCode = getLanguageCode(targetLanguage);
+
+  console.log("🔍 카드 예문 처리 시작:", {
+    conceptId: concept.id || concept._id,
+    sourceLanguage,
+    targetLanguage,
+    sourceLanguageCode,
+    targetLanguageCode,
+    hasRepresentativeExample: !!concept.representative_example,
+    representativeExample: concept.representative_example,
+  });
+
   // 1. representative_example 확인 (새 구조와 기존 구조 모두 지원)
   if (concept.representative_example) {
     const repExample = concept.representative_example;
+    console.log("✅ 대표 예문 발견:", repExample);
 
     // 새로운 구조: 직접 언어별 텍스트
-    if (repExample[sourceLanguage] && repExample[targetLanguage]) {
+    if (repExample[sourceLanguageCode] && repExample[targetLanguageCode]) {
       example = {
-        source: repExample[sourceLanguage],
-        target: repExample[targetLanguage],
+        source: repExample[sourceLanguageCode],
+        target: repExample[targetLanguageCode],
       };
-      console.log("✅ 카드: 새로운 대표 예문 구조 사용");
+      console.log("✅ 카드: 새로운 대표 예문 구조 사용", example);
     }
     // 기존 구조: translations 객체
     else if (repExample.translations) {
+      console.log("🔍 translations 구조 확인:", repExample.translations);
       example = {
         source:
-          repExample.translations[sourceLanguage]?.text ||
-          repExample.translations[sourceLanguage] ||
+          repExample.translations[sourceLanguageCode]?.text ||
+          repExample.translations[sourceLanguageCode] ||
           "",
         target:
-          repExample.translations[targetLanguage]?.text ||
-          repExample.translations[targetLanguage] ||
+          repExample.translations[targetLanguageCode]?.text ||
+          repExample.translations[targetLanguageCode] ||
           "",
       };
-      console.log("✅ 카드: 기존 대표 예문 구조 사용");
+      console.log("✅ 카드: 기존 대표 예문 구조 사용", example);
+    } else {
+      console.log("⚠️ 대표 예문 구조를 인식할 수 없음:", repExample);
     }
   }
   // 2. featured_examples 확인 (기존 방식)
   else if (concept.featured_examples && concept.featured_examples.length > 0) {
     const firstExample = concept.featured_examples[0];
+    console.log("🔍 featured_examples 사용:", firstExample);
     if (firstExample.translations) {
       example = {
-        source: firstExample.translations[sourceLanguage]?.text || "",
-        target: firstExample.translations[targetLanguage]?.text || "",
+        source: firstExample.translations[sourceLanguageCode]?.text || "",
+        target: firstExample.translations[targetLanguageCode]?.text || "",
       };
     }
   }
   // 3. core_examples 확인 (기존 방식 - 하위 호환성)
   else if (concept.core_examples && concept.core_examples.length > 0) {
     const firstExample = concept.core_examples[0];
+    console.log("🔍 core_examples 사용:", firstExample);
     // 번역 구조 확인
     if (firstExample.translations) {
       example = {
-        source: firstExample.translations[sourceLanguage]?.text || "",
-        target: firstExample.translations[targetLanguage]?.text || "",
+        source: firstExample.translations[sourceLanguageCode]?.text || "",
+        target: firstExample.translations[targetLanguageCode]?.text || "",
       };
     } else {
       // 직접 언어 속성이 있는 경우
       example = {
-        source: firstExample[sourceLanguage] || "",
-        target: firstExample[targetLanguage] || "",
+        source: firstExample[sourceLanguageCode] || "",
+        target: firstExample[targetLanguageCode] || "",
       };
     }
   }
   // 4. 기존 examples 확인 (하위 호환성)
   else if (concept.examples && concept.examples.length > 0) {
     const firstExample = concept.examples[0];
+    console.log("🔍 examples 사용:", firstExample);
     example = {
-      source: firstExample[sourceLanguage] || "",
-      target: firstExample[targetLanguage] || "",
+      source: firstExample[sourceLanguageCode] || "",
+      target: firstExample[targetLanguageCode] || "",
     };
   }
+
+  console.log("🎯 최종 예문 결과:", example);
 
   // 개념 ID 생성 (document ID 우선 사용)
   const conceptId =

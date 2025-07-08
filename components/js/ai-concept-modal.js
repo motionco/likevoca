@@ -296,21 +296,21 @@ export async function showConceptModal(
     return;
   }
 
-  // 언어 탭 순서 재정렬: 원본언어, 대상언어, 나머지 언어 순
+  // 언어 탭 순서 재정렬: 대상언어, 원본언어, 나머지 언어 순
   const orderedLanguages = [];
 
-  // 1. 원본언어 먼저 추가
-  if (sourceLanguage && availableLanguages.includes(sourceLanguage)) {
-    orderedLanguages.push(sourceLanguage);
+  // 1. 대상언어 먼저 추가
+  if (targetLanguage && availableLanguages.includes(targetLanguage)) {
+    orderedLanguages.push(targetLanguage);
   }
 
-  // 2. 대상언어 추가 (원본언어와 다른 경우)
+  // 2. 원본언어 추가 (대상언어와 다른 경우)
   if (
-    targetLanguage &&
-    availableLanguages.includes(targetLanguage) &&
-    targetLanguage !== sourceLanguage
+    sourceLanguage &&
+    availableLanguages.includes(sourceLanguage) &&
+    sourceLanguage !== targetLanguage
   ) {
-    orderedLanguages.push(targetLanguage);
+    orderedLanguages.push(sourceLanguage);
   }
 
   // 3. 나머지 언어들 추가
@@ -516,30 +516,43 @@ function getLanguageName(langCode) {
 
 // 언어별 내용 표시
 function showLanguageContent(lang, concept) {
+  const expression = concept.expressions[lang];
+  const targetExpression = concept.expressions[window.currentTargetLanguage];
+
+  if (!expression) {
+    console.error(`No expression found for language: ${lang}`);
+    return;
+  }
+
   const contentContainer = document.getElementById("language-content");
   if (!contentContainer) {
-    console.error("language-content container를 찾을 수 없습니다.");
+    console.error("Language content container not found");
     return;
   }
 
-  const expression = concept.expressions[lang];
-  if (!expression) {
-    console.error(`${lang} 언어 표현이 없습니다:`, concept.expressions);
-    return;
-  }
-
-  // 언어별 상세 정보 HTML 구성
   let contentHtml = '<div class="space-y-4">';
 
-  // 0. 현재 언어의 단어와 정의를 하나의 박스로 통합
-  const targetExpression = concept.expressions[window.currentTargetLanguage];
+  // 언어 코드를 DB 언어 코드로 변환하는 함수
+  function getLanguageCode(langCode) {
+    const languageCodeMap = {
+      ko: "korean",
+      en: "english",
+      ja: "japanese",
+      zh: "chinese",
+    };
+    return languageCodeMap[langCode] || "korean";
+  }
+
+  // 기본 정보 - 품사 옆 단어값은 환경 언어로 고정
+  const envLanguage =
+    localStorage.getItem("preferredLanguage") || userLanguage || "ko";
+  const envLanguageCode = getLanguageCode(envLanguage);
+  const displayWord = concept.expressions[envLanguageCode]?.word || "N/A";
 
   contentHtml += `
     <div class="bg-gray-50 p-4 rounded-lg">
       <div class="flex items-center gap-2 mb-3">
-        <div class="text-xl font-bold text-gray-900">${
-          expression.word || "N/A"
-        }</div>
+        <div class="text-xl font-bold text-gray-900">${displayWord}</div>
         ${
           expression.part_of_speech
             ? `<span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">${getLocalizedPartOfSpeech(
@@ -549,11 +562,11 @@ function showLanguageContent(lang, concept) {
         }
       </div>
       ${
-        targetExpression && targetExpression.definition
+        expression && expression.definition
           ? `<div class="text-sm font-medium text-blue-800 mb-2">${
               getTranslatedText("definition") || "정의"
             }</div>
-            <div class="text-gray-700">${targetExpression.definition}</div>`
+            <div class="text-gray-700">${expression.definition}</div>`
           : ""
       }
     </div>
@@ -851,21 +864,42 @@ function getLocalizedPartOfSpeech(pos) {
 
 // 모달 헤더 업데이트 함수 (언어 탭 변경시 상단 정보 업데이트)
 function updateModalHeader(lang, concept) {
-  // AI 단어장에서는 헤더(제목, 발음)를 원본언어로 고정
-  // 따라서 이 함수에서는 헤더를 변경하지 않음
+  // AI 단어장에서는 헤더(제목, 발음)를 각 언어탭과 동일하게 변경
+  console.log(`모달 헤더 업데이트 - 현재 탭: ${lang}`);
 
-  console.log(`모달 헤더는 원본언어로 고정됨 - 현재 탭: ${lang}`);
+  const expression = concept.expressions[lang];
+  if (expression) {
+    // 제목 업데이트
+    const titleElement = document.getElementById("concept-view-title");
+    if (titleElement) {
+      titleElement.textContent = expression.word || "N/A";
+    }
+
+    // 발음 업데이트
+    const pronunciationElement = document.getElementById(
+      "concept-view-pronunciation"
+    );
+    if (pronunciationElement) {
+      pronunciationElement.textContent = expression.pronunciation || "";
+    }
+  }
 
   // 도메인/카테고리 표시 (공통 번역 시스템 사용)
   const domainElement = document.getElementById("concept-view-domain-category");
-  if (domainElement && concept.domain && concept.category) {
+  if (domainElement && (concept.concept_info || concept.domain)) {
+    const categoryKey =
+      concept.concept_info?.category || concept.category || "general";
+    const domainKey =
+      concept.concept_info?.domain || concept.domain || "general";
+
     const currentLang =
       localStorage.getItem("preferredLanguage") || userLanguage || "ko";
-    domainElement.textContent = getTranslatedDomainCategory(
-      concept.domain,
-      concept.category,
+    const translatedDomainCategory = getTranslatedDomainCategory(
+      domainKey,
+      categoryKey,
       currentLang
     );
+    domainElement.textContent = translatedDomainCategory;
   }
 }
 
@@ -950,7 +984,16 @@ function showLanguageTab(lang, button) {
 
   // 언어 내용 표시
   if (currentConcept) {
+    // 헤더(제목, 발음) 업데이트
+    updateModalHeader(lang, currentConcept);
     showLanguageContent(lang, currentConcept);
+    // 예문도 해당 언어로 업데이트
+    displayExamples(
+      currentConcept,
+      lang,
+      window.currentSourceLanguage,
+      window.currentTargetLanguage
+    );
   }
 }
 
@@ -1184,6 +1227,13 @@ function displayExamples(
 
   let hasExamples = false;
 
+  console.log("AI 모달 예문 표시 시작:", {
+    currentLang,
+    sourceLanguage,
+    targetLanguage,
+    representative_example: concept.representative_example,
+  });
+
   // 1. 대표 예문 확인 (다국어 단어장 구조)
   if (concept.representative_example) {
     console.log("대표 예문 발견:", concept.representative_example);
@@ -1199,53 +1249,60 @@ function displayExamples(
     if (concept.representative_example.translations) {
       const translations = concept.representative_example.translations;
 
-      // 첫 번째 줄: 대상언어로 고정
-      const targetLanguageCode = window.currentTargetLanguage;
-      if (translations[targetLanguageCode]) {
-        languagesToShow.push({
-          code: targetLanguageCode,
-          name: getLanguageName(targetLanguageCode),
-          text: translations[targetLanguageCode],
-          isFirst: true,
-        });
-      }
-
-      // 두 번째 줄: 각 탭의 언어로 변경
-      if (translations[currentLang] && currentLang !== targetLanguageCode) {
+      // 첫 번째 줄: 각 언어탭의 언어 예문
+      if (translations[currentLang]) {
         languagesToShow.push({
           code: currentLang,
           name: getLanguageName(currentLang),
           text: translations[currentLang],
+          isFirst: true,
+        });
+      }
+
+      // 두 번째 줄: 환경 언어 예문
+      const envLanguageCode = getUserLanguageCode();
+      if (translations[envLanguageCode] && envLanguageCode !== currentLang) {
+        languagesToShow.push({
+          code: envLanguageCode,
+          name: getLanguageName(envLanguageCode),
+          text: translations[envLanguageCode],
           isFirst: false,
         });
       }
     }
     // 기존 구조 (언어 직접 접근)
     else {
-      // 첫 번째 줄: 대상언어로 고정
-      const targetLanguageCode = window.currentTargetLanguage;
-      if (concept.representative_example[targetLanguageCode]) {
-        languagesToShow.push({
-          code: targetLanguageCode,
-          name: getLanguageName(targetLanguageCode),
-          text: concept.representative_example[targetLanguageCode],
-          isFirst: true,
-        });
-      }
-
-      // 두 번째 줄: 각 탭의 언어로 변경
-      if (
-        concept.representative_example[currentLang] &&
-        currentLang !== targetLanguageCode
-      ) {
+      // 첫 번째 줄: 각 언어탭의 언어 예문
+      if (concept.representative_example[currentLang]) {
         languagesToShow.push({
           code: currentLang,
           name: getLanguageName(currentLang),
           text: concept.representative_example[currentLang],
+          isFirst: true,
+        });
+      }
+
+      // 두 번째 줄: 환경 언어 예문
+      const envLanguageCode = getUserLanguageCode();
+      if (
+        concept.representative_example[envLanguageCode] &&
+        envLanguageCode !== currentLang
+      ) {
+        languagesToShow.push({
+          code: envLanguageCode,
+          name: getLanguageName(envLanguageCode),
+          text: concept.representative_example[envLanguageCode],
           isFirst: false,
         });
       }
     }
+
+    console.log("AI 모달 예문 언어 매핑:", {
+      currentLang,
+      envLanguageCode: getUserLanguageCode(),
+      languagesToShow,
+      hasTranslations: !!concept.representative_example.translations,
+    });
 
     languagesToShow.forEach((lang, index) => {
       if (lang.isFirst) {

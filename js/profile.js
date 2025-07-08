@@ -9,7 +9,7 @@ import {
   linkGoogleAccount,
   linkGithubAccount,
   unlinkProvider,
-} from "./firebase/firebase-auth.js";
+} from "../utils/firebase/firebase-auth.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("프로필 페이지 초기화 시작");
@@ -40,12 +40,36 @@ document.addEventListener("DOMContentLoaded", async () => {
     profileForm: !!profileForm,
   });
 
+  // 초기 로딩 상태 설정 (로그인 상태 확인 중)
+  if (profileContent) {
+    profileContent.classList.add("hidden");
+  }
+  if (authRequired) {
+    authRequired.classList.add("hidden");
+  }
+
+  // 로딩 표시
+  const loadingDiv = document.createElement("div");
+  loadingDiv.id = "loading-indicator";
+  loadingDiv.className = "text-center py-8";
+  loadingDiv.innerHTML = `
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+    <p class="mt-4 text-gray-600">로그인 상태를 확인 중입니다...</p>
+  `;
+  document.body.appendChild(loadingDiv);
+
   // 인증 상태 변경 감지
   onAuthStateChanged(auth, (user) => {
     console.log(
       "Auth 상태 변경:",
       user ? `로그인됨 (${user.email})` : "로그아웃됨"
     );
+
+    // 로딩 표시 제거
+    const loadingIndicator = document.getElementById("loading-indicator");
+    if (loadingIndicator) {
+      loadingIndicator.remove();
+    }
 
     if (user) {
       // 사용자가 로그인된 경우

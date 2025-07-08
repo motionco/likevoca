@@ -543,58 +543,107 @@ function createConceptCard(concept) {
   // 예문 가져오기 (concepts 컬렉션의 대표 예문 사용)
   let example = null;
 
-  // 1. representative_example 확인 (새 구조 - 우선순위 최고)
+  // 언어 코드 매핑 함수 (나만의 단어장 페이지용)
+  function getLanguageCode(langCode) {
+    const languageCodeMap = {
+      korean: "korean",
+      english: "english",
+      japanese: "japanese",
+      chinese: "chinese",
+      // 환경 언어 코드도 지원
+      ko: "korean",
+      en: "english",
+      ja: "japanese",
+      zh: "chinese",
+    };
+    return languageCodeMap[langCode] || langCode;
+  }
+
+  // 언어 코드 변환
+  const sourceLanguageCode = getLanguageCode(sourceLanguage);
+  const targetLanguageCode = getLanguageCode(targetLanguage);
+
+  console.log("🔍 나만의 단어장 예문 처리 시작:", {
+    conceptId: concept.id,
+    sourceLanguage,
+    targetLanguage,
+    sourceLanguageCode,
+    targetLanguageCode,
+    hasRepresentativeExample: !!concept.representative_example,
+    representativeExample: concept.representative_example,
+  });
+
+  // 1. representative_example 확인 (새 구조와 기존 구조 모두 지원)
   if (concept.representative_example) {
     const repExample = concept.representative_example;
+    console.log("✅ 대표 예문 발견:", repExample);
 
-    if (repExample.translations) {
+    // 새로운 구조: 직접 언어별 텍스트
+    if (repExample[sourceLanguageCode] && repExample[targetLanguageCode]) {
+      example = {
+        source: repExample[sourceLanguageCode],
+        target: repExample[targetLanguageCode],
+      };
+      console.log("✅ 나만의 단어장: 새로운 대표 예문 구조 사용", example);
+    }
+    // 기존 구조: translations 객체
+    else if (repExample.translations) {
+      console.log("🔍 translations 구조 확인:", repExample.translations);
       example = {
         source:
-          repExample.translations[sourceLanguage]?.text ||
-          repExample.translations[sourceLanguage] ||
+          repExample.translations[sourceLanguageCode]?.text ||
+          repExample.translations[sourceLanguageCode] ||
           "",
         target:
-          repExample.translations[targetLanguage]?.text ||
-          repExample.translations[targetLanguage] ||
+          repExample.translations[targetLanguageCode]?.text ||
+          repExample.translations[targetLanguageCode] ||
           "",
       };
+      console.log("✅ 나만의 단어장: 기존 대표 예문 구조 사용", example);
+    } else {
+      console.log("⚠️ 대표 예문 구조를 인식할 수 없음:", repExample);
     }
   }
   // 2. featured_examples 확인 (기존 방식)
   else if (concept.featured_examples && concept.featured_examples.length > 0) {
     const firstExample = concept.featured_examples[0];
+    console.log("🔍 featured_examples 사용:", firstExample);
     if (firstExample.translations) {
       example = {
-        source: firstExample.translations[sourceLanguage]?.text || "",
-        target: firstExample.translations[targetLanguage]?.text || "",
+        source: firstExample.translations[sourceLanguageCode]?.text || "",
+        target: firstExample.translations[targetLanguageCode]?.text || "",
       };
     }
   }
   // 3. core_examples 확인 (기존 방식 - 하위 호환성)
   else if (concept.core_examples && concept.core_examples.length > 0) {
     const firstExample = concept.core_examples[0];
+    console.log("🔍 core_examples 사용:", firstExample);
     // 번역 구조 확인
     if (firstExample.translations) {
       example = {
-        source: firstExample.translations[sourceLanguage]?.text || "",
-        target: firstExample.translations[targetLanguage]?.text || "",
+        source: firstExample.translations[sourceLanguageCode]?.text || "",
+        target: firstExample.translations[targetLanguageCode]?.text || "",
       };
     } else {
       // 직접 언어 속성이 있는 경우
       example = {
-        source: firstExample[sourceLanguage] || "",
-        target: firstExample[targetLanguage] || "",
+        source: firstExample[sourceLanguageCode] || "",
+        target: firstExample[targetLanguageCode] || "",
       };
     }
   }
   // 4. 기존 examples 확인 (하위 호환성)
   else if (concept.examples && concept.examples.length > 0) {
     const firstExample = concept.examples[0];
+    console.log("🔍 examples 사용:", firstExample);
     example = {
-      source: firstExample[sourceLanguage] || "",
-      target: firstExample[targetLanguage] || "",
+      source: firstExample[sourceLanguageCode] || "",
+      target: firstExample[targetLanguageCode] || "",
     };
   }
+
+  console.log("🎯 나만의 단어장 최종 예문 결과:", example);
 
   // 개념 ID 생성 (document ID 우선 사용)
   const conceptId =
@@ -606,11 +655,11 @@ function createConceptCard(concept) {
 
   return `
     <div 
-      class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200 concept-card"
+      class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200 concept-card cursor-pointer"
       style="border-left: 4px solid ${colorTheme}"
     >
       <div class="flex items-start justify-between mb-4">
-        <div class="flex items-center space-x-3" onclick="openConceptViewModal('${conceptId}')">
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="openConceptViewModal('${conceptId}')">
           <span class="text-3xl">${emoji}</span>
           <div>
             <h3 class="text-lg font-semibold text-gray-800 mb-1">
@@ -644,19 +693,12 @@ function createConceptCard(concept) {
         </div>
       </div>
       
-      <div class="border-t border-gray-200 pt-3 mt-3" onclick="openConceptViewModal('${conceptId}')">
+      <div class="border-t border-gray-200 pt-3 mt-3 cursor-pointer" onclick="openConceptViewModal('${conceptId}')">
         <div class="flex items-center">
           <span class="font-medium">${(() => {
-            // 환경 언어에 해당하는 표현 찾기
-            const langMap = {
-              ko: "korean",
-              en: "english",
-              ja: "japanese",
-              zh: "chinese",
-            };
-            const envLangCode = langMap[userLanguage] || "korean";
-            const envExpression = concept.expressions[envLangCode];
-            return envExpression ? envExpression.word : displayWord;
+            // 원본 언어의 단어값 사용 (환경 언어에서 원본 언어로 변경)
+            const sourceExpression = concept.expressions[sourceLanguage];
+            return sourceExpression ? sourceExpression.word : displayWord;
           })()}</span>
         </div>
         <p class="text-sm text-gray-600 mt-1">${displayDefinition}</p>
@@ -665,7 +707,7 @@ function createConceptCard(concept) {
       ${
         example && (example.source || example.target)
           ? `
-      <div class="border-t border-gray-200 pt-3 mt-3" onclick="openConceptViewModal('${conceptId}')">
+      <div class="border-t border-gray-200 pt-3 mt-3 cursor-pointer" onclick="openConceptViewModal('${conceptId}')">
         <p class="text-sm text-gray-700 font-medium">${
           example.target || example.source
         }</p>
@@ -679,7 +721,7 @@ function createConceptCard(concept) {
           : ""
       }
       
-      <div class="flex justify-between text-xs text-gray-500 mt-3" onclick="openConceptViewModal('${conceptId}')">
+      <div class="flex justify-between text-xs text-gray-500 mt-3 cursor-pointer" onclick="openConceptViewModal('${conceptId}')">
         <span class="flex items-center">
           <i class="fas fa-bookmark mr-1 text-yellow-500"></i> ${getI18nText(
             "bookmarked"
@@ -744,25 +786,18 @@ function setupEventListeners() {
   const loadMoreBtn = document.getElementById("load-more");
 
   // 필터 공유 모듈을 사용하여 이벤트 리스너 설정
-  const filterManager = setupVocabularyFilters(handleSearch);
+  const filterManager = new VocabularyFilterManager({
+    onSearch: handleSearch,
+    onLanguageChange: handleLanguageChange,
+    onDomainChange: handleSearch,
+    onSortChange: handleSearch,
+  });
+  filterManager.setupEventListeners();
 
-  // 언어 선택 변경
-  if (sourceLanguageSelect) {
-    sourceLanguageSelect.addEventListener("change", handleLanguageChange);
-  }
-  if (targetLanguageSelect) {
-    targetLanguageSelect.addEventListener("change", handleLanguageChange);
-  }
+  // 언어 선택 변경은 공통 모듈에서 처리됨
 
-  // 언어 순서 바꾸기 (공유 모듈 사용)
-  const swapButton = document.getElementById("swap-languages");
-  if (swapButton) {
-    swapButton.addEventListener("click", () => {
-      filterManager.swapLanguages();
-      handleLanguageChange(); // 전역 변수 업데이트
-      handleSearch(); // 필터 적용
-    });
-  }
+  // 언어 전환은 공통 모듈(vocabulary-filter-shared.js)에서 처리
+  // 공통 모듈의 onLanguageChange 콜백으로 언어 변경사항 수신
 
   // 더 보기 버튼
   if (loadMoreBtn) {
@@ -791,17 +826,27 @@ function handleSearch() {
   displayConceptList();
 }
 
-// 언어 변경 처리
+// 언어 변경 처리 (공통 모듈의 onLanguageChange 콜백용)
 function handleLanguageChange() {
   const sourceLanguageSelect = document.getElementById("source-language");
   const targetLanguageSelect = document.getElementById("target-language");
 
   if (sourceLanguageSelect && targetLanguageSelect) {
+    const previousSourceLanguage = sourceLanguage;
+    const previousTargetLanguage = targetLanguage;
+
     sourceLanguage = sourceLanguageSelect.value;
     targetLanguage = targetLanguageSelect.value;
 
+    console.log("🔄 나만의 단어장 언어 변경 처리:", {
+      이전: { source: previousSourceLanguage, target: previousTargetLanguage },
+      현재: { source: sourceLanguage, target: targetLanguage },
+    });
+
     // 카드 목록 새로고침
     displayConceptList();
+  } else {
+    console.error("❌ 언어 선택 요소를 찾을 수 없습니다");
   }
 }
 
@@ -889,16 +934,42 @@ function showConceptDetailModal(concept) {
   const envLangCode = envLangMap[userLanguage] || "korean";
 
   // 대표 예문 쌍 생성
-  if (
-    concept.representative_example &&
-    concept.representative_example.translations
-  ) {
-    const selectedExample =
-      concept.representative_example.translations[firstLanguage];
-    const envExample =
-      firstLanguage !== envLangCode
-        ? concept.representative_example.translations[envLangCode]
-        : null;
+  if (concept.representative_example) {
+    console.log("🔍 보기 모달 대표 예문 처리 시작:", {
+      conceptId: concept.id,
+      firstLanguage,
+      envLangCode,
+      representative_example: concept.representative_example,
+    });
+
+    let selectedExample = null;
+    let envExample = null;
+
+    // 새로운 구조: 직접 언어별 텍스트
+    if (concept.representative_example[firstLanguage]) {
+      selectedExample = concept.representative_example[firstLanguage];
+      envExample =
+        firstLanguage !== envLangCode
+          ? concept.representative_example[envLangCode]
+          : null;
+      console.log("✅ 보기 모달: 새로운 대표 예문 구조 사용", {
+        selectedExample,
+        envExample,
+      });
+    }
+    // 기존 구조: translations 객체
+    else if (concept.representative_example.translations) {
+      selectedExample =
+        concept.representative_example.translations[firstLanguage];
+      envExample =
+        firstLanguage !== envLangCode
+          ? concept.representative_example.translations[envLangCode]
+          : null;
+      console.log("✅ 보기 모달: 기존 대표 예문 구조 사용", {
+        selectedExample,
+        envExample,
+      });
+    }
 
     if (selectedExample) {
       initialExamples.push({
@@ -906,6 +977,12 @@ function showConceptDetailModal(concept) {
         translation: envExample,
         isRepresentative: true,
       });
+      console.log("✅ 보기 모달: 대표 예문 추가됨", {
+        original: selectedExample,
+        translation: envExample,
+      });
+    } else {
+      console.log("⚠️ 보기 모달: 대표 예문을 찾을 수 없음");
     }
   }
 
@@ -1511,12 +1588,26 @@ function updateExamplesForLanguage(selectedLanguage) {
   const examples = [];
 
   // 대표 예문 처리
-  if (
-    concept.representative_example &&
-    concept.representative_example.translations
-  ) {
-    const repExample =
-      concept.representative_example.translations[selectedLanguage];
+  if (concept.representative_example) {
+    console.log("🔍 언어 탭 전환 - 대표 예문 처리:", {
+      selectedLanguage,
+      representative_example: concept.representative_example,
+    });
+
+    let repExample = null;
+
+    // 새로운 구조: 직접 언어별 텍스트
+    if (concept.representative_example[selectedLanguage]) {
+      repExample = concept.representative_example[selectedLanguage];
+      console.log("✅ 언어 탭 전환: 새로운 대표 예문 구조 사용", repExample);
+    }
+    // 기존 구조: translations 객체
+    else if (concept.representative_example.translations) {
+      repExample =
+        concept.representative_example.translations[selectedLanguage];
+      console.log("✅ 언어 탭 전환: 기존 대표 예문 구조 사용", repExample);
+    }
+
     if (repExample) {
       examples.push({
         text: repExample,
@@ -1550,12 +1641,19 @@ function updateExamplesForLanguage(selectedLanguage) {
 
   if (selectedLanguage !== envLangCode) {
     // 대표 예문의 환경 언어 번역
-    if (
-      concept.representative_example &&
-      concept.representative_example.translations
-    ) {
-      const envRepExample =
-        concept.representative_example.translations[envLangCode];
+    if (concept.representative_example) {
+      let envRepExample = null;
+
+      // 새로운 구조: 직접 언어별 텍스트
+      if (concept.representative_example[envLangCode]) {
+        envRepExample = concept.representative_example[envLangCode];
+      }
+      // 기존 구조: translations 객체
+      else if (concept.representative_example.translations) {
+        envRepExample =
+          concept.representative_example.translations[envLangCode];
+      }
+
       if (envRepExample) {
         examples.push({
           text: envRepExample,
@@ -1585,16 +1683,27 @@ function updateExamplesForLanguage(selectedLanguage) {
   const examplePairs = [];
 
   // 대표 예문 쌍 생성
-  if (
-    concept.representative_example &&
-    concept.representative_example.translations
-  ) {
-    const selectedExample =
-      concept.representative_example.translations[selectedLanguage];
-    const envExample =
-      selectedLanguage !== envLangCode
-        ? concept.representative_example.translations[envLangCode]
-        : null;
+  if (concept.representative_example) {
+    let selectedExample = null;
+    let envExample = null;
+
+    // 새로운 구조: 직접 언어별 텍스트
+    if (concept.representative_example[selectedLanguage]) {
+      selectedExample = concept.representative_example[selectedLanguage];
+      envExample =
+        selectedLanguage !== envLangCode
+          ? concept.representative_example[envLangCode]
+          : null;
+    }
+    // 기존 구조: translations 객체
+    else if (concept.representative_example.translations) {
+      selectedExample =
+        concept.representative_example.translations[selectedLanguage];
+      envExample =
+        selectedLanguage !== envLangCode
+          ? concept.representative_example.translations[envLangCode]
+          : null;
+    }
 
     if (selectedExample) {
       examplePairs.push({
