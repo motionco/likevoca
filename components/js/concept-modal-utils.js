@@ -616,16 +616,16 @@ export async function applyModalTranslations() {
 function applyPlaceholderTranslations(userLanguage) {
   const placeholderTranslations = {
     ko: {
-      category_placeholder: "예: fruit, animal",
+      category_placeholder: "카테고리 선택",
     },
     en: {
-      category_placeholder: "e.g.: fruit, animal",
+      category_placeholder: "Select Category",
     },
     ja: {
-      category_placeholder: "例: fruit, animal",
+      category_placeholder: "カテゴリー選択",
     },
     zh: {
-      category_placeholder: "例如: fruit, animal",
+      category_placeholder: "选择分类",
     },
   };
 

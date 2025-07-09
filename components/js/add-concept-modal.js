@@ -98,6 +98,16 @@ export async function initialize() {
 
   // 지원 언어 탭 초기화
   initLanguageTabEventListeners();
+
+  // 도메인 옵션 초기화 (번역 적용)
+  if (typeof window.updateAddDomainOptions === "function") {
+    window.updateAddDomainOptions();
+  }
+
+  // 도메인-카테고리 이벤트 리스너 설정
+  if (typeof window.setupModalEventListeners === "function") {
+    window.setupModalEventListeners();
+  }
 }
 
 // 편집 관련 함수들은 edit-concept-modal.js로 이동됨

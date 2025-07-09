@@ -3,18 +3,22 @@ const SUPPORTED_LANGUAGES = {
   ko: {
     name: "한국어",
     code: "ko",
+    emoji: "🇰🇷",
   },
   en: {
     name: "English",
     code: "en",
+    emoji: "🇺🇸",
   },
   ja: {
     name: "日本語",
     code: "ja",
+    emoji: "🇯🇵",
   },
   zh: {
     name: "中文",
     code: "zh",
+    emoji: "🇨🇳",
   },
 };
 
@@ -809,7 +813,10 @@ async function showLanguageSettingsModal() {
                 }" name="language" value="${lang.code}" class="mr-2" ${
                     currentLang === lang.code ? "checked" : ""
                   }>
-                <label for="lang-${lang.code}">${lang.name}</label>
+                <label for="lang-${lang.code}" class="flex items-center">
+                  <span class="mr-2">${lang.emoji}</span>
+                  <span>${lang.name}</span>
+                </label>
               </div>`
               )
               .join("")}

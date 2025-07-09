@@ -198,7 +198,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (typeof window.redirectToLogin === "function") {
           window.redirectToLogin();
         } else {
-          window.location.href = "login.html";
+          // 현재 언어 감지
+          const currentLanguage =
+            (typeof getCurrentUILanguage === "function"
+              ? getCurrentUILanguage()
+              : null) ||
+            localStorage.getItem("userLanguage") ||
+            "ko";
+
+          // 언어별 로그인 페이지로 리디렉션
+          window.location.href = `../locales/${currentLanguage}/login.html`;
         }
       } catch (error) {
         console.error("로그아웃 오류:", error);
@@ -222,7 +231,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (typeof window.redirectToLogin === "function") {
           window.redirectToLogin();
         } else {
-          window.location.href = "login.html";
+          // 현재 언어 감지
+          const currentLanguage =
+            (typeof getCurrentUILanguage === "function"
+              ? getCurrentUILanguage()
+              : null) ||
+            localStorage.getItem("userLanguage") ||
+            "ko";
+
+          // 언어별 로그인 페이지로 리디렉션
+          window.location.href = `../locales/${currentLanguage}/login.html`;
         }
       } catch (error) {
         console.error("계정 삭제 오류:", error);

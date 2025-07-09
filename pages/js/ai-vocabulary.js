@@ -304,8 +304,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         await initializePage();
       } else {
         console.log("❌ 사용자가 로그인되지 않았습니다.");
-        alert("로그인이 필요합니다.");
-        window.redirectToLogin();
+        // alert 메시지 제거하고 바로 리디렉션
+        if (typeof window.redirectToLogin === "function") {
+          window.redirectToLogin();
+        } else {
+          // 대체 방법: 직접 언어별 로그인 페이지로 리디렉션
+          const currentLanguage = localStorage.getItem("userLanguage") || "ko";
+          window.location.href = `/locales/${currentLanguage}/login.html`;
+        }
       }
     });
   } catch (error) {
@@ -337,6 +343,9 @@ function initializeEventListeners() {
     // 필터 변경 시 실행될 콜백 함수
     applyFiltersAndSort();
   });
+
+  // AI 단어장 언어 필터 기본값 설정
+  initializeAILanguageFilters();
 
   // 더 보기 버튼
   const loadMoreBtn = document.getElementById("load-more");
@@ -372,6 +381,49 @@ function detectCurrentLanguage() {
   }
 
   return "ko"; // 기본값
+}
+
+// AI 단어장 언어 필터 기본값 설정
+function initializeAILanguageFilters() {
+  console.log("🔧 AI 단어장: 언어 필터 기본값 설정 시작");
+
+  // 환경 언어 감지
+  const currentLang = detectCurrentLanguage();
+  console.log("🌐 현재 환경 언어:", currentLang);
+
+  // 언어 코드 매핑
+  const languageMap = {
+    ko: "korean",
+    en: "english",
+    ja: "japanese",
+    zh: "chinese",
+  };
+
+  // 원본 언어는 환경 언어로 설정
+  const sourceLanguage = languageMap[currentLang] || "korean";
+
+  // 대상 언어는 기본적으로 영어, 원본이 영어인 경우 한국어
+  const targetLanguage = sourceLanguage === "english" ? "korean" : "english";
+
+  console.log("📊 AI 단어장: 언어 필터 기본값:", {
+    sourceLanguage,
+    targetLanguage,
+    environmentLang: currentLang,
+  });
+
+  // 언어 필터 요소 찾기
+  const sourceSelect = document.getElementById("source-language");
+  const targetSelect = document.getElementById("target-language");
+
+  if (sourceSelect && targetSelect) {
+    // 기본값 설정
+    sourceSelect.value = sourceLanguage;
+    targetSelect.value = targetLanguage;
+
+    console.log("✅ AI 단어장: 언어 필터 기본값 설정 완료");
+  } else {
+    console.warn("⚠️ AI 단어장: 언어 필터 요소를 찾을 수 없습니다");
+  }
 }
 
 async function initializePage() {

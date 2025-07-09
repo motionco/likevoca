@@ -104,6 +104,16 @@ export async function initialize() {
   // 예문 추가 버튼 이벤트 설정 (중복 방지)
   setupEditModalAddExampleButton();
 
+  // 도메인 옵션 초기화 (번역 적용)
+  if (typeof window.updateEditDomainOptions === "function") {
+    window.updateEditDomainOptions();
+  }
+
+  // 도메인-카테고리 이벤트 리스너 설정 (추가 안전장치)
+  if (typeof window.setupModalEventListeners === "function") {
+    window.setupModalEventListeners();
+  }
+
   // 개념 데이터 로드 및 폼 채우기
   await fetchConceptForEdit(editConceptId);
 }

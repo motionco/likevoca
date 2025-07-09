@@ -750,39 +750,23 @@ async function loadModals(modalPaths) {
 
 // 사용량 UI 업데이트
 async function updateUsageUI() {
-  console.log("🔧 updateUsageUI 함수 시작");
   try {
     if (!currentUser) {
-      console.log("❌ 현재 사용자가 없음, updateUsageUI 종료");
       return;
     }
 
-    console.log("👤 현재 사용자:", currentUser.email);
-
     // conceptUtils.getUsage를 사용하여 DB에서 실제 값 가져오기
     const usage = await conceptUtils.getUsage(currentUser.email);
-    console.log("🔍 단어장 사용량 정보:", usage);
 
-    const conceptCount = usage.conceptCount || 0;
+    const conceptCount = usage.wordCount || 0;
     const maxConcepts = usage.maxWordCount || 50; // DB에서 가져온 실제 값 사용
 
     // UI 업데이트 (실제 HTML ID 사용)
     const usageText = document.getElementById("usage-text");
     const usageBar = document.getElementById("usage-bar");
 
-    console.log("🔍 UI 요소 확인:", {
-      usageText: !!usageText,
-      usageBar: !!usageBar,
-      conceptCount,
-      maxConcepts,
-    });
-
     if (usageText) {
       usageText.textContent = `${conceptCount}/${maxConcepts}`;
-      console.log(
-        "📊 단어장 사용량 UI 업데이트:",
-        `${conceptCount}/${maxConcepts}`
-      );
     } else {
       console.error("❌ usage-text 요소를 찾을 수 없음");
     }
@@ -802,15 +786,9 @@ async function updateUsageUI() {
         usageBar.classList.remove("bg-red-500", "bg-yellow-500");
         usageBar.classList.add("bg-[#4B63AC]");
       }
-      console.log(
-        "🎨 사용량 바 업데이트 완료:",
-        `${usagePercentage.toFixed(1)}%`
-      );
     } else {
       console.error("❌ usage-bar 요소를 찾을 수 없음");
     }
-
-    console.log("✅ updateUsageUI 함수 완료");
   } catch (error) {
     console.error("❌ updateUsageUI 사용량 업데이트 중 오류 발생:", error);
   }
@@ -819,17 +797,11 @@ async function updateUsageUI() {
 // 개념 데이터 가져오기 (ID 포함 및 디버깅 개선)
 async function fetchAndDisplayConcepts() {
   try {
-    console.log("📚 개념 데이터 로드 시작...", {
-      currentUser: !!currentUser,
-      userEmail: currentUser?.email || "비로그인",
-    });
-
     // 분리된 컬렉션과 통합 컬렉션 모두에서 개념 가져오기
     allConcepts = [];
 
     try {
       const conceptsRef = collection(db, "concepts");
-      console.log("📚 concepts 컬렉션에서 데이터 로드 시작...");
 
       // Firebase 연결 상태 확인
       if (!db) {
@@ -838,7 +810,6 @@ async function fetchAndDisplayConcepts() {
 
       // 전체 조회 후 필터링 (더 안전한 방식)
       const querySnapshot = await getDocs(conceptsRef);
-      console.log(`📊 concepts 컬렉션에서 ${querySnapshot.size}개 문서 발견`);
 
       querySnapshot.forEach((doc) => {
         const data = doc.data();
@@ -849,22 +820,11 @@ async function fetchAndDisplayConcepts() {
 
         // AI 생성 개념 제외하고 모든 개념 포함 (분리된 컬렉션과 기존 구조 모두)
         if (!data.isAIGenerated) {
-          console.log(`✅ 개념 추가: ${doc.id}`, {
-            hasMetadata: !!data.metadata,
-            hasCreatedAt: !!data.created_at,
-            hasExpressions: !!data.expressions,
-            expressionKeys: Object.keys(data.expressions || {}),
-          });
           allConcepts.push(data);
-        } else {
-          console.log(`⏭️ AI 생성 개념 제외: ${doc.id}`);
         }
       });
 
-      console.log(`📋 총 로드된 개념 수: ${allConcepts.length}개`);
-
       if (allConcepts.length === 0) {
-        console.warn("⚠️ 로드된 개념이 없습니다. 데이터베이스를 확인하세요.");
         // 빈 상태 표시
         const conceptList = document.getElementById("concept-list");
         if (conceptList) {
@@ -1155,9 +1115,6 @@ function setupEventListeners() {
   // 네비게이션바 이벤트 설정 (햄버거 메뉴 등)
   if (typeof window.setupBasicNavbarEvents === "function") {
     window.setupBasicNavbarEvents();
-    console.log("✅ 단어장: 네비게이션바 이벤트 설정 완료");
-  } else {
-    console.warn("⚠️ setupBasicNavbarEvents 함수를 찾을 수 없습니다.");
   }
 
   // 새 개념 추가 버튼 이벤트
@@ -1197,7 +1154,6 @@ function setupEventListeners() {
   // 필터 공유 모듈을 사용하여 이벤트 리스너 설정 (언어 전환 버튼 포함)
   const filterManager = setupVocabularyFilters(() => {
     // 필터 변경 시 실행될 콜백 함수
-    console.log("🔄 단어장: 필터 변경 감지, 검색 실행");
     handleSearch();
   });
 
@@ -1220,8 +1176,6 @@ function setupEventListeners() {
       handleSearch();
     });
   }
-
-  console.log("✅ 단어장: 이벤트 리스너 설정 완료");
 }
 
 // 오류 메시지 표시
@@ -1271,17 +1225,27 @@ async function initializePage() {
 
         // 개념 로드 및 표시
         await fetchAndDisplayConcepts();
+
+        // 사용자 로그인 후 사용량 UI 업데이트
+        await updateUsageUI();
       } else {
         console.log("사용자 로그아웃됨");
-        // 로그인 페이지로 리디렉션
-        if (window.location.pathname !== "/login.html") {
-          window.location.href = "/login.html";
+        // 현재 언어 감지
+        const currentLanguage =
+          (typeof getCurrentUILanguage === "function"
+            ? getCurrentUILanguage()
+            : null) ||
+          localStorage.getItem("userLanguage") ||
+          "ko";
+
+        // 언어별 로그인 페이지로 리디렉션
+        if (
+          window.location.pathname !== `/locales/${currentLanguage}/login.html`
+        ) {
+          window.location.href = `../../locales/${currentLanguage}/login.html`;
         }
       }
     });
-
-    // 초기 UI 업데이트
-    await updateUsageUI();
   } catch (error) {
     console.error("페이지 초기화 실패:", error);
     showError(

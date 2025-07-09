@@ -881,31 +881,29 @@ export const conceptUtils = {
   // 사용자 사용량 정보 가져오기
   async getUsage(userId) {
     try {
-      console.log("🔍 사용량 정보 조회 시작:", userId);
       const userRef = doc(db, "users", userId);
       const userDoc = await getDoc(userRef);
 
       if (userDoc.exists()) {
         const userData = userDoc.data();
-        console.log("📊 DB에서 가져온 사용자 데이터:", userData);
 
         const result = {
           aiUsed: userData.aiUsed || 0,
           aiLimit: userData.maxAiUsage || userData.aiLimit || 10, // maxAiUsage 우선 사용
           conceptCount: userData.conceptCount || 0,
+          wordCount: userData.wordCount || userData.conceptCount || 0, // wordCount 필드 추가
           maxWordCount: userData.maxWordCount || 50, // 단어장 최대 개수
         };
 
-        console.log("✅ 반환할 사용량 정보:", result);
         return result;
       } else {
-        console.log("📝 사용자 문서가 없어 기본값으로 생성");
         // 사용자 문서가 없으면 기본값으로 생성
         const defaultData = {
           aiUsed: 0,
           maxAiUsage: 10, // 기본 AI 사용량
           aiLimit: 10, // 호환성을 위해 유지
           conceptCount: 0,
+          wordCount: 0, // wordCount 필드 추가
           maxWordCount: 50, // 기본 단어장 최대 개수
           createdAt: new Date(),
         };
@@ -916,6 +914,7 @@ export const conceptUtils = {
           aiUsed: 0,
           aiLimit: 10,
           conceptCount: 0,
+          wordCount: 0,
           maxWordCount: 50,
         };
       }

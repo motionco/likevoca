@@ -893,6 +893,7 @@ export const conceptUtils = {
           aiUsed: userData.aiUsed || 0,
           aiLimit: userData.maxAiUsage || userData.aiLimit || 10, // maxAiUsage 우선 사용
           conceptCount: userData.conceptCount || 0,
+          wordCount: userData.wordCount || userData.conceptCount || 0, // wordCount 필드 추가
           maxWordCount: userData.maxWordCount || 50, // 단어장 최대 개수
         };
 
@@ -906,6 +907,7 @@ export const conceptUtils = {
           maxAiUsage: 10, // 기본 AI 사용량
           aiLimit: 10, // 호환성을 위해 유지
           conceptCount: 0,
+          wordCount: 0, // wordCount 필드 추가
           maxWordCount: 50, // 기본 단어장 최대 개수
           createdAt: new Date(),
         };
@@ -916,6 +918,7 @@ export const conceptUtils = {
           aiUsed: 0,
           aiLimit: 10,
           conceptCount: 0,
+          wordCount: 0,
           maxWordCount: 50,
         };
       }

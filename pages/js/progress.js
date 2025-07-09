@@ -204,8 +204,14 @@ function registerEventListeners() {
       checkGameCompletionUpdate();
     } else {
       console.log("❌ 사용자가 로그인되지 않았습니다.");
-      alert("로그인이 필요합니다.");
-      window.redirectToLogin();
+      // alert 메시지 제거하고 바로 리디렉션
+      if (typeof window.redirectToLogin === "function") {
+        window.redirectToLogin();
+      } else {
+        // 대체 방법: 직접 언어별 로그인 페이지로 리디렉션
+        const currentLanguage = localStorage.getItem("userLanguage") || "ko";
+        window.location.href = `/locales/${currentLanguage}/login.html`;
+      }
     }
   });
 }

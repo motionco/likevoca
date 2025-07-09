@@ -1,9 +1,10 @@
-import { db } from "../../utils/firebase/firebase-init.js";
+import { db, auth } from "../../utils/firebase/firebase-init.js";
 import { signup } from "../../utils/firebase/firebase-auth.js";
 import {
   doc,
   setDoc,
 } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
 
 // 언어별 페이지로 이동하는 함수
 function goToLanguageSpecificPage(filename) {
@@ -74,5 +75,13 @@ submitButton.addEventListener("click", async () => {
   } catch (error) {
     console.error("회원가입 실패: ", error.message);
     showError(`회원가입 실패: ${error.message}`);
+  }
+});
+
+// 로그인 상태 체크 - 이미 로그인되어 있으면 홈으로 리디렉션
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    console.log("이미 로그인되어 있습니다. 홈으로 리디렉션합니다.");
+    goToLanguageSpecificPage("index.html");
   }
 });

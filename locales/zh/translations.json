@@ -40,7 +40,7 @@
   "domain": "领域",
   "select_domain": "选择领域",
   "category": "类别",
-  "category_placeholder": "例如：fruit, animal",
+  "category_placeholder": "选择类别",
   "emoji": "表情符号",
   "language_expressions": "语言表达",
   "word": "单词",
@@ -679,5 +679,6 @@
   "avg_session_quality": "学习效率:",
   "learning_efficiency": "学习效率",
   "session_quality_desc": "基于学习时间、准确性和专注度的综合效率评分。",
-  "learning_title": "学习"
+  "learning_title": "学习",
+  "domain_placeholder": "选择域"
 } 

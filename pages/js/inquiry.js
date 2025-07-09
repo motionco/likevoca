@@ -27,9 +27,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (user) {
       document.getElementById("name").value = user.email;
     } else {
-      alert("로그인 후 이용해주세요.");
+      // alert 메시지 제거하고 바로 리디렉션
       if (typeof window.redirectToLogin === "function") {
         window.redirectToLogin();
+      } else {
+        // 대체 방법: 직접 언어별 로그인 페이지로 리디렉션
+        const currentLanguage = localStorage.getItem("userLanguage") || "ko";
+        window.location.href = `/locales/${currentLanguage}/login.html`;
       }
     }
   });
@@ -41,9 +45,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     const user = auth.currentUser;
     if (!user) {
       console.log("❌ 사용자가 로그인되지 않았습니다.");
-      alert("로그인이 필요합니다.");
+      // alert 메시지 제거하고 바로 리디렉션
       if (typeof window.redirectToLogin === "function") {
         window.redirectToLogin();
+      } else {
+        // 대체 방법: 직접 언어별 로그인 페이지로 리디렉션
+        const currentLanguage = localStorage.getItem("userLanguage") || "ko";
+        window.location.href = `/locales/${currentLanguage}/login.html`;
       }
       return;
     }

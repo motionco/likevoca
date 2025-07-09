@@ -1171,10 +1171,10 @@ async function showAIConceptSelectionModal() {
       zh: {
         title: "AI概念推荐设置",
         step1: "1. 选择领域",
-        step2: "2. 选择类别",
+        step2: "2. 选择分类",
         step3: "3. 选择学习语言（至少2种）",
         selectDomain: "请选择领域",
-        selectCategory: "请选择类别",
+        selectCategory: "请选择分类",
         selectDomainFirst: "请先选择领域",
         cancel: "取消",
         generate: "生成AI概念",

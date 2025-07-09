@@ -42,6 +42,11 @@ export async function initialize() {
   // 도메인/카테고리 연동 설정
   setupDomainCategorySystem();
 
+  // 도메인 옵션 초기화 (번역 적용)
+  if (typeof window.updateEditDomainOptions === "function") {
+    window.updateEditDomainOptions();
+  }
+
   // 버튼 이벤트 설정
   setupEventListeners();
 
@@ -114,23 +119,105 @@ function updateCategoryOptions(domain, categorySelect) {
 
   categorySelect.innerHTML = "";
 
-  // 플레이스홀더 옵션 추가
+  // 현재 언어 감지
+  const currentLang = localStorage.getItem("userLanguage") || "ko";
+
+  // 플레이스홀더 옵션 추가 (번역 적용)
   const placeholderOption = document.createElement("option");
   placeholderOption.value = "";
-  placeholderOption.textContent = "카테고리 선택";
+  placeholderOption.textContent = getCategoryTranslation(
+    "category_placeholder",
+    currentLang
+  );
   placeholderOption.style.display = "none";
   categorySelect.appendChild(placeholderOption);
 
   categories.forEach((category) => {
     const option = document.createElement("option");
     option.value = category;
-    option.textContent = category;
+    option.textContent = getCategoryTranslation(category, currentLang);
     categorySelect.appendChild(option);
   });
 
   console.log(
     `✅ 카테고리 옵션 업데이트 완료: ${domain} -> ${categories.length}개`
   );
+}
+
+// 카테고리 번역 함수
+function getCategoryTranslation(key, lang) {
+  const categoryTranslations = {
+    ko: {
+      category_placeholder: "카테고리 선택",
+      fruit: "과일",
+      food: "음식",
+      animal: "동물",
+      daily: "일상",
+      travel: "여행",
+      business: "비즈니스",
+      education: "교육",
+      nature: "자연",
+      technology: "기술",
+      health: "건강",
+      sports: "스포츠",
+      entertainment: "엔터테인먼트",
+      culture: "문화",
+      other: "기타",
+    },
+    en: {
+      category_placeholder: "Select Category",
+      fruit: "Fruit",
+      food: "Food",
+      animal: "Animal",
+      daily: "Daily",
+      travel: "Travel",
+      business: "Business",
+      education: "Education",
+      nature: "Nature",
+      technology: "Technology",
+      health: "Health",
+      sports: "Sports",
+      entertainment: "Entertainment",
+      culture: "Culture",
+      other: "Other",
+    },
+    ja: {
+      category_placeholder: "カテゴリー選択",
+      fruit: "果物",
+      food: "食べ物",
+      animal: "動物",
+      daily: "日常",
+      travel: "旅行",
+      business: "ビジネス",
+      education: "教育",
+      nature: "自然",
+      technology: "技術",
+      health: "健康",
+      sports: "スポーツ",
+      entertainment: "エンターテイメント",
+      culture: "文化",
+      other: "その他",
+    },
+    zh: {
+      category_placeholder: "选择分类",
+      fruit: "水果",
+      food: "食物",
+      animal: "动物",
+      daily: "日常",
+      travel: "旅行",
+      business: "商务",
+      education: "教育",
+      nature: "自然",
+      technology: "技术",
+      health: "健康",
+      sports: "体育",
+      entertainment: "娱乐",
+      culture: "文化",
+      other: "其他",
+    },
+  };
+
+  return categoryTranslations[lang]?.[key] || key;
 }
 
 // 언어탭 설정

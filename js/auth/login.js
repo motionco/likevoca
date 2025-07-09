@@ -4,6 +4,9 @@ import {
   githubLogin,
 } from "../../utils/firebase/firebase-auth.js";
 
+import { auth } from "../../utils/firebase/firebase-init.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
+
 // 언어별 페이지로 이동하는 함수
 function goToLanguageSpecificPage(filename) {
   const userLanguage = localStorage.getItem("userLanguage") || "ko";
@@ -333,5 +336,13 @@ if (loginForm) {
         handleLogin();
       }
     });
+  }
+});
+
+// 로그인 상태 체크 - 이미 로그인되어 있으면 홈으로 리디렉션
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    console.log("이미 로그인되어 있습니다. 홈으로 리디렉션합니다.");
+    goToLanguageSpecificPage("index.html");
   }
 });

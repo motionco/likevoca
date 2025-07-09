@@ -229,10 +229,10 @@ function updateLanguageButton(language) {
 
   const info = languageInfo[language] || languageInfo.ko;
 
-  // 버튼 내용 업데이트 (HTML 구조 유지)
+  // 버튼 내용 업데이트 (HTML 구조 유지 - 모바일에서 국기 이모지 숨김)
   languageButton.innerHTML = `
     <i class="fas fa-globe lg:mr-1"></i>
-    <span class="inline lg:ml-1">${info.flag}</span>
+    <span class="hidden lg:inline lg:ml-1">${info.flag}</span>
   `;
 }
 
