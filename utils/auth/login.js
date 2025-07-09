@@ -292,7 +292,7 @@ submitButton.addEventListener("click", async () => {
 
   try {
     const user = await login(email, password);
-    console.log("로그인된 사용자: ", user);
+
     alert(`로그인 성공! 환영합니다. ${user.displayName || "사용자"}님!`);
     goToLanguageSpecificPage("index.html");
   } catch (error) {

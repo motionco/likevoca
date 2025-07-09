@@ -295,7 +295,6 @@ async function loadTranslations() {
     // 전역 객체에 설정
     window.translations = translations;
 
-    console.log("✅ 번역 파일 로드 완료:", Object.keys(translations));
     console.log("🔍 한국어 번역 샘플:", {
       learn_languages: translations.ko?.learn_languages,
       wordbook: translations.ko?.wordbook,
@@ -371,15 +370,6 @@ function translateDomainCategory(domain, category, userLanguage = null) {
     langCode = "ko";
   }
 
-  console.log(
-    "🌐 도메인/카테고리 번역 - 언어:",
-    langCode,
-    "도메인:",
-    domain,
-    "카테고리:",
-    category
-  );
-
   // window.translations에서 번역 찾기 (우선)
   let domainText = domain;
   let categoryText = category;
@@ -388,27 +378,18 @@ function translateDomainCategory(domain, category, userLanguage = null) {
     const translations = window.translations[langCode];
     domainText = translations[`domain_${domain}`] || domain;
     categoryText = translations[`category_${category}`] || category;
-    console.log("✅ window.translations에서 번역 찾음:", {
-      도메인: `${domain} -> ${domainText}`,
-      카테고리: `${category} -> ${categoryText}`,
-    });
   } else {
     // 내장 번역에서 찾기 (fallback)
     const texts = translations[langCode] || translations.ko;
     if (texts) {
       domainText = texts[`domain_${domain}`] || domain;
       categoryText = texts[`category_${category}`] || category;
-      console.log("✅ 내장 translations에서 번역 찾음:", {
-        도메인: `${domain} -> ${domainText}`,
-        카테고리: `${category} -> ${categoryText}`,
-      });
     } else {
       console.warn("⚠️ 번역 데이터를 찾을 수 없음, 원본 텍스트 사용");
     }
   }
 
   const result = `${domainText} > ${categoryText}`;
-  console.log("✅ 최종 번역 결과:", result);
   return result;
 }
 
@@ -724,18 +705,13 @@ async function applyLanguage() {
 
     // 페이지의 모든 번역 요소 업데이트
     const elements = document.querySelectorAll("[data-i18n]");
-    console.log("📝 번역 요소 개수:", elements.length);
 
-    elements.forEach((element, index) => {
+    elements.forEach((element) => {
       const key = element.getAttribute("data-i18n");
       const translation = currentTranslations ? currentTranslations[key] : null;
 
       if (translation && translation !== element.textContent.trim()) {
-        const previousText = element.textContent.trim();
         element.textContent = translation;
-        console.log(
-          `✅ 번역 적용 [${index}]: ${key} -> "${translation}" (이전: "${previousText}")`
-        );
       }
     });
 
@@ -1192,8 +1168,6 @@ function applyI18nToPage(lang = null) {
         element.placeholder = translation;
       }
     });
-
-    console.log("✅ 페이지 번역 적용 완료");
   } catch (error) {
     console.error("페이지 번역 적용 중 오류:", error);
   }
@@ -1328,8 +1302,6 @@ async function forceApplyTranslations(language) {
         element.placeholder = translation;
       }
     });
-
-    console.log("✅ 강제 번역 적용 완료");
   } catch (error) {
     console.error("❌ 강제 번역 적용 실패:", error);
   }

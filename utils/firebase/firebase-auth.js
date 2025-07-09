@@ -69,7 +69,6 @@ export const login = async (email, password) => {
       throw new Error("이메일 인증이 필요합니다. 이메일을 확인해주세요.");
     }
 
-    console.log("로그인 성공: ", userCredential.user);
     return userCredential.user;
   } catch (error) {
     if (error.code === "auth/invalid-credential") {
@@ -141,7 +140,6 @@ export const googleLogin = async () => {
       }
     }
 
-    console.log("google 로그인 성공: ", user);
     return user;
   } catch (error) {
     console.error("Google 로그인 오류:", error);
@@ -206,7 +204,6 @@ export const githubLogin = async () => {
 
     await saveUserData(user);
 
-    console.log("Github 로그인 성공: ", user);
     return user;
   } catch (error) {
     console.error("Github 로그인 오류:", error);

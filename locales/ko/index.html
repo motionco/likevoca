@@ -216,18 +216,14 @@
       
       document.addEventListener('DOMContentLoaded', async () => {
         try {
-          console.log("메인 페이지 초기화 시작");
-          
           // 페이지 로드 시 리디렉션 플래그 정리
           if (sessionStorage.getItem("redirecting")) {
-            console.log("이전 리디렉션 플래그 정리");
             sessionStorage.removeItem("redirecting");
           }
           
           // 네비게이션바 로드 (language-utils.js에서 import된 함수 사용)
           if (typeof window.loadNavbar === 'function') {
             await window.loadNavbar();
-            console.log("네비게이션바 로드 완료");
           } else {
             console.warn("window.loadNavbar 함수를 찾을 수 없습니다. 직접 로드 시도...");
             
@@ -238,12 +234,10 @@
               const navbarContainer = document.getElementById('navbar-container');
               if (navbarContainer) {
                 navbarContainer.innerHTML = navbarHTML;
-                console.log("네비게이션바 직접 로드 완료");
                 
                 // navbar.js 스크립트 이미 로드되어 있으므로 초기화만 실행
                 if (typeof window.initializeNavbar === 'function') {
                   await window.initializeNavbar('ko');
-                  console.log("네비게이션바 초기화 완료");
                 } else {
                   console.warn("initializeNavbar 함수를 찾을 수 없습니다.");
                 }
@@ -255,13 +249,10 @@
           
           // 번역 즉시 적용
           await applyLanguage();
-          console.log("번역 적용 완료");
           
           const currentLang = await getActiveLanguage();
-          console.log("현재 언어:", currentLang);
           
           await updateMetadata('home');
-          console.log("메타데이터 업데이트 완료");
           
           // 하드코딩된 페이지이므로 번역 테스트 코드 제거됨
           
@@ -272,7 +263,6 @@
               try {
                 // 현재 언어 확인
                 const currentLang = await getActiveLanguage();
-                console.log("현재 언어:", currentLang);
                 
                 // Firebase 인증 상태 확인
                 const { onAuthStateChanged } = await import('../../js/firebase/firebase-init.js');

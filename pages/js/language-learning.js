@@ -148,7 +148,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       currentUser = user;
-      console.log("사용자 로그인됨:", user.email);
+
       console.log("다국어 학습 페이지에서 로그인 상태 확인됨");
 
       // 로그인된 상태에서 바로 초기화

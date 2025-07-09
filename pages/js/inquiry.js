@@ -10,8 +10,6 @@ import {
 
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    console.log("📄 문의하기 페이지 초기화 시작");
-
     // navbar.js가 일반 스크립트로 로드되므로 자동으로 초기화됨
     // 별도의 네비게이션바 로딩 로직 불필요
   } catch (error) {
@@ -19,11 +17,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   onAuthStateChanged(auth, async (user) => {
-    console.log(
-      "🔐 인증 상태 변경:",
-      user ? `로그인됨 (${user.email})` : "로그아웃됨"
-    );
-
     if (user) {
       document.getElementById("name").value = user.email;
     } else {
@@ -44,7 +37,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const user = auth.currentUser;
     if (!user) {
-      console.log("❌ 사용자가 로그인되지 않았습니다.");
       // alert 메시지 제거하고 바로 리디렉션
       if (typeof window.redirectToLogin === "function") {
         window.redirectToLogin();
@@ -65,8 +57,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     try {
-      console.log("📝 문의 등록 시작:", { title, message, email: user.email });
-
       const inquirySnapshot = await getDocs(collection(db, "inquiries"));
       const newInquiryId = inquirySnapshot.size + 1;
 
@@ -81,7 +71,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       await setDoc(doc(db, "inquiries", newInquiryId.toString()), inquiryData);
 
-      console.log("✅ 문의 등록 성공:", inquiryData);
       alert(`문의가 성공적으로 등록되었습니다. (문의번호: ${newInquiryId})`);
 
       // 폼 리셋

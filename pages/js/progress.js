@@ -283,8 +283,6 @@ async function loadUserProgressData() {
 
     // 🎮 게임 통계 로드
     await loadGameStats();
-
-    console.log("✅ 사용자 진도 데이터 로드 완료:", userProgressData);
   } catch (error) {
     console.error("❌ 사용자 진도 데이터 로드 중 오류:", error);
   }

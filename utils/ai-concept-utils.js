@@ -703,8 +703,6 @@ const TEST_CONCEPTS = [
 
 export async function handleAIConceptRecommendation(currentUser, db) {
   try {
-    console.log("AI 개념 추천 시작", { currentUser: currentUser?.uid, db });
-
     // 사용량 확인 (기존 users 컬렉션 사용)
     console.log("사용량 확인 중...");
     const usage = await conceptUtils.getUsage(currentUser.email);

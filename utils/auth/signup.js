@@ -70,7 +70,6 @@ submitButton.addEventListener("click", async () => {
     } else {
       goToLanguageSpecificPage("login.html");
     }
-    console.log("가입된 사용자: ", user);
   } catch (error) {
     console.error("회원가입 실패: ", error.message);
     showError(`회원가입 실패: ${error.message}`);

@@ -2196,8 +2196,6 @@ function checkScrambleAnswer() {
     .map((btn) => btn.textContent)
     .join("");
 
-  console.log("단어 섞기 답안 확인:", userAnswer, "정답:", correctAnswer);
-
   if (userAnswer === correctAnswer) {
     // 정답
     score += 10;
@@ -2683,7 +2681,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     onAuthStateChanged(auth, (user) => {
       currentUser = user;
       if (user) {
-        console.log("사용자 로그인 확인됨:", user.email);
         loadGameStats();
       } else {
         console.log("사용자 로그아웃 상태");

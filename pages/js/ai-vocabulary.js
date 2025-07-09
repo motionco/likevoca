@@ -101,8 +101,6 @@ async function initializeUserLanguage() {
 function setupLanguageChangeListener() {
   // 언어 변경 이벤트 감지
   window.addEventListener("languageChanged", (event) => {
-    console.log("🌐 AI단어장: 언어 변경 감지", event.detail.language);
-
     // 개념 카드들을 다시 렌더링
     if (displayedConcepts && displayedConcepts.length > 0) {
       renderConcepts();
@@ -113,8 +111,6 @@ function setupLanguageChangeListener() {
       window.updateDomainCategoryEmojiLanguage();
     }
   });
-
-  console.log("✅ AI단어장: 언어 변경 리스너 설정 완료");
 }
 
 // 전역 함수로 내보내기
@@ -122,16 +118,8 @@ window.showConceptModal = showConceptModal;
 
 // 전역 렌더링 함수들 (언어 동기화에서 사용)
 window.renderAIConceptCards = function () {
-  console.log("🔄 AI단어장: 개념 카드 다시 렌더링");
-  console.log("📊 현재 상태:", {
-    allConcepts: allConcepts?.length || 0,
-    displayedConcepts: displayedConcepts?.length || 0,
-    filteredConcepts: filteredConcepts?.length || 0,
-  });
-
   // 표시할 개념이 없으면 전체 개념으로 다시 설정
   if (!displayedConcepts || displayedConcepts.length === 0) {
-    console.log("⚠️ 표시된 개념이 없음, 필터 적용 후 다시 로드");
     if (allConcepts && allConcepts.length > 0) {
       applyFiltersAndSort();
     }
@@ -141,7 +129,6 @@ window.renderAIConceptCards = function () {
 };
 
 window.updateFilterUI = function () {
-  console.log("🔄 AI단어장: 필터 UI 업데이트");
   if (typeof window.updateDomainCategoryEmojiLanguage === "function") {
     window.updateDomainCategoryEmojiLanguage();
   }
@@ -159,7 +146,6 @@ async function loadConceptViewModal() {
       modalPath = "../../components/concept-view-modal.html";
     }
 
-    console.log("개념 보기 모달 로드 경로:", modalPath);
     const response = await fetch(modalPath);
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -214,7 +200,6 @@ async function loadEditConceptModal() {
       scriptPath = "../../components/js/ai-edit-concept-modal.js";
     }
 
-    console.log("AI 개념 편집 모달 로드 경로:", modalPath);
     const response = await fetch(modalPath);
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -238,7 +223,7 @@ async function loadEditConceptModal() {
     editModalScript.type = "module";
     editModalScript.src = scriptPath;
     editModalScript.onload = () => {
-      console.log("✅ AI 편집 모달 스크립트 로드 완료");
+      // 스크립트 로드 완료
     };
     editModalScript.onerror = (error) => {
       console.error("❌ AI 전용 개념 편집 모달 스크립트 로드 실패:", error);
@@ -303,7 +288,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         currentUser = user;
         await initializePage();
       } else {
-        console.log("❌ 사용자가 로그인되지 않았습니다.");
         // alert 메시지 제거하고 바로 리디렉션
         if (typeof window.redirectToLogin === "function") {
           window.redirectToLogin();
@@ -323,7 +307,6 @@ function initializeEventListeners() {
   // 네비게이션바 이벤트 설정 (햄버거 메뉴 등)
   if (typeof window.setupBasicNavbarEvents === "function") {
     window.setupBasicNavbarEvents();
-    console.log("✅ AI단어장: 네비게이션바 이벤트 설정 완료");
   } else {
     console.warn("⚠️ setupBasicNavbarEvents 함수를 찾을 수 없습니다.");
   }
@@ -385,11 +368,8 @@ function detectCurrentLanguage() {
 
 // AI 단어장 언어 필터 기본값 설정
 function initializeAILanguageFilters() {
-  console.log("🔧 AI 단어장: 언어 필터 기본값 설정 시작");
-
   // 환경 언어 감지
   const currentLang = detectCurrentLanguage();
-  console.log("🌐 현재 환경 언어:", currentLang);
 
   // 언어 코드 매핑
   const languageMap = {
@@ -405,12 +385,6 @@ function initializeAILanguageFilters() {
   // 대상 언어는 기본적으로 영어, 원본이 영어인 경우 한국어
   const targetLanguage = sourceLanguage === "english" ? "korean" : "english";
 
-  console.log("📊 AI 단어장: 언어 필터 기본값:", {
-    sourceLanguage,
-    targetLanguage,
-    environmentLang: currentLang,
-  });
-
   // 언어 필터 요소 찾기
   const sourceSelect = document.getElementById("source-language");
   const targetSelect = document.getElementById("target-language");
@@ -419,8 +393,6 @@ function initializeAILanguageFilters() {
     // 기본값 설정
     sourceSelect.value = sourceLanguage;
     targetSelect.value = targetLanguage;
-
-    console.log("✅ AI 단어장: 언어 필터 기본값 설정 완료");
   } else {
     console.warn("⚠️ AI 단어장: 언어 필터 요소를 찾을 수 없습니다");
   }
@@ -459,13 +431,11 @@ async function updateUsageDisplay() {
   try {
     // 로그인된 사용자인지 확인
     if (!currentUser) {
-      console.log("로그인되지 않은 사용자입니다.");
       return;
     }
 
     // 기존 users 컬렉션의 사용량 관리 사용 (이메일 사용)
     const usage = await conceptUtils.getUsage(currentUser.email);
-    console.log("🔍 AI 단어장 사용량 정보:", usage);
 
     const usageText = document.getElementById("ai-usage-text");
     const usageBar = document.getElementById("ai-usage-bar");
@@ -498,7 +468,6 @@ async function updateUsageDisplay() {
       error.code === "permission-denied" ||
       error.message.includes("Missing or insufficient permissions")
     ) {
-      console.log("권한 오류로 인해 기본 사용량 표시");
       const usageText = document.getElementById("ai-usage-text");
       const usageBar = document.getElementById("ai-usage-bar");
 
@@ -515,24 +484,15 @@ async function updateUsageDisplay() {
 // 필터 관련 함수들은 공유 모듈로 대체됨
 
 function applyFiltersAndSort() {
-  console.log("🔄 AI 단어장: 필터 및 정렬 적용 시작");
-
   // 필터 공유 모듈을 사용하여 현재 필터 값들 가져오기
   const filterManager = new VocabularyFilterManager();
   const filters = filterManager.getCurrentFilters();
-
-  console.log("🔍 AI 단어장: 현재 필터 값들:", filters);
 
   // 필터 공유 모듈을 사용하여 필터링 및 정렬 수행
   filteredConcepts = VocabularyFilterProcessor.processFilters(
     allConcepts,
     filters
   );
-
-  console.log("📊 AI 단어장: 필터링 결과:", {
-    전체개념수: allConcepts.length,
-    필터링된개념수: filteredConcepts.length,
-  });
 
   // 필터된 개념 수 업데이트
   const filteredCountElement = document.getElementById("filtered-count");
@@ -551,21 +511,15 @@ function applyFiltersAndSort() {
   }
 
   loadMoreConcepts();
-
-  console.log("✅ AI 단어장: 필터 및 정렬 적용 완료");
 }
 
 // 더 많은 개념 로드 (페이지네이션)
 function loadMoreConcepts() {
-  console.log("📄 더 많은 개념 로드 중...");
-
   // 필터 공유 모듈을 사용하여 현재 언어 값 가져오기
   const filterManager = new VocabularyFilterManager();
   const filters = filterManager.getCurrentFilters();
   const sourceLanguage = filters.sourceLanguage || "korean";
   const targetLanguage = filters.targetLanguage || "english";
-
-  console.log("🔍 현재 언어 설정:", { sourceLanguage, targetLanguage });
 
   const conceptList = document.getElementById("concept-list");
   const loadMoreBtn = document.getElementById("load-more");
@@ -595,16 +549,10 @@ function loadMoreConcepts() {
     loadMoreBtn.style.display =
       displayedConcepts.length < filteredConcepts.length ? "block" : "none";
   }
-
-  console.log(
-    `📊 개념 로드 완료: ${displayedConcepts.length}/${filteredConcepts.length}`
-  );
 }
 
 // 개념 렌더링 (초기 로드 시)
 function renderConcepts() {
-  console.log("🎨 개념 렌더링 시작");
-
   const conceptList = document.getElementById("concept-list");
   if (!conceptList) return;
 
@@ -613,8 +561,6 @@ function renderConcepts() {
   const filters = filterManager.getCurrentFilters();
   const sourceLanguage = filters.sourceLanguage || "korean";
   const targetLanguage = filters.targetLanguage || "english";
-
-  console.log("🔍 렌더링 언어 설정:", { sourceLanguage, targetLanguage });
 
   if (currentPage === 1) {
     conceptList.innerHTML = "";

@@ -486,12 +486,10 @@ async function toggleBookmark(conceptId) {
       if (isCurrentlyBookmarked) {
         // 북마크 제거
         updatedBookmarks = currentBookmarks.filter((id) => id !== conceptId);
-        console.log("✅ 북마크 제거:", conceptId);
         showMessage("북마크가 해제되었습니다.", "success");
       } else {
         // 북마크 추가
         updatedBookmarks = [...currentBookmarks, conceptId];
-        console.log("✅ 북마크 추가:", conceptId);
         showMessage("북마크가 추가되었습니다.", "success");
       }
 
@@ -1000,15 +998,8 @@ if (document.readyState === "loading") {
 
 // 전역 렌더링 함수들 (언어 동기화에서 사용)
 window.renderConceptCards = function () {
-  console.log("🔄 단어장: 개념 카드 다시 렌더링");
-  console.log("📊 현재 상태:", {
-    allConcepts: allConcepts?.length || 0,
-    filteredConcepts: filteredConcepts?.length || 0,
-  });
-
   // 필터링된 개념이 없으면 전체 개념으로 다시 설정
   if (!filteredConcepts || filteredConcepts.length === 0) {
-    console.log("⚠️ 필터링된 개념이 없음, 전체 개념 사용");
     filteredConcepts = [...allConcepts];
   }
 

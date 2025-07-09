@@ -232,18 +232,14 @@
       
       document.addEventListener('DOMContentLoaded', async () => {
         try {
-          console.log("메인 페이지 초기화 시작");
-          
           // 페이지 로드 시 리디렉션 플래그 정리
           if (sessionStorage.getItem("redirecting")) {
-            console.log("이전 리디렉션 플래그 정리");
             sessionStorage.removeItem("redirecting");
           }
           
           // 네비게이션바 로드 (language-utils.js에서 import된 함수 사용)
           if (typeof window.loadNavbar === 'function') {
             await window.loadNavbar();
-            console.log("네비게이션바 로드 완료");
           } else {
             console.warn("window.loadNavbar 함수를 찾을 수 없습니다. 직접 로드 시도...");
             
@@ -254,12 +250,10 @@
               const navbarContainer = document.getElementById('navbar-container');
               if (navbarContainer) {
                 navbarContainer.innerHTML = navbarHTML;
-                console.log("네비게이션바 직접 로드 완료");
                 
                 // navbar.js 스크립트 이미 로드되어 있으므로 초기화만 실행
                 if (typeof window.initializeNavbar === 'function') {
                   await window.initializeNavbar('en');
-                  console.log("네비게이션바 초기화 완료");
                 } else {
                   console.warn("initializeNavbar 함수를 찾을 수 없습니다.");
                 }
@@ -271,13 +265,10 @@
           
           // Apply translation immediately
           await applyLanguage();
-          console.log("Translation applied successfully");
           
           const currentLang = await getActiveLanguage();
-          console.log("Current language:", currentLang);
           
           await updateMetadata('home');
-          console.log("Metadata updated successfully");
           
           // Hardcoded page - translation test code removed
           
@@ -288,7 +279,6 @@
               try {
                 // 현재 언어 확인
                 const currentLang = await getActiveLanguage();
-                console.log("현재 언어:", currentLang);
                 
                 // Firebase 인증 상태 확인
                 const { onAuthStateChanged } = await import('../../js/firebase/firebase-init.js');

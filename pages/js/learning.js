@@ -113,7 +113,6 @@ document.addEventListener("DOMContentLoaded", function () {
   onAuthStateChanged(auth, (user) => {
     if (user) {
       currentUser = user;
-      console.log("👤 사용자 로그인됨:", user.email);
     } else {
       console.log("❌ 사용자 로그인되지 않음");
     }

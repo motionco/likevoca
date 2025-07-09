@@ -375,8 +375,6 @@ function convertLanguageToCode(language) {
 
 // 언어 탭 전환
 export function switchLanguageTab(langCode) {
-  console.log("🔄 언어 탭 전환:", langCode);
-
   // 모든 탭 버튼 비활성화
   document
     .querySelectorAll("#edit-language-tabs .edit-language-tab")
@@ -399,7 +397,6 @@ export function switchLanguageTab(langCode) {
   if (selectedTab) {
     selectedTab.classList.remove("border-transparent", "text-gray-500");
     selectedTab.classList.add("border-blue-500", "text-blue-600");
-    console.log("✅ 탭 활성화됨:", langCode);
   } else {
     console.error("❌ 탭을 찾을 수 없음:", langCode);
   }
@@ -408,7 +405,6 @@ export function switchLanguageTab(langCode) {
   const selectedContent = document.getElementById(`${langCode}-content`);
   if (selectedContent) {
     selectedContent.classList.remove("hidden");
-    console.log("✅ 콘텐츠 표시됨:", langCode);
   } else {
     console.error("❌ 콘텐츠를 찾을 수 없음:", `${langCode}-content`);
   }
@@ -435,13 +431,6 @@ export function addExampleFields(
   }
 
   const containerFound = openModal.querySelector("#examples-container");
-  console.log("📝 addExampleFields 호출:", {
-    existingExample,
-    isRepresentative,
-    containerFound: !!containerFound,
-    currentChildrenCount: containerFound?.children.length,
-    modalId: openModal.id,
-  });
 
   if (!containerFound) {
     console.error("❌ examples-container를 찾을 수 없습니다");
@@ -450,7 +439,6 @@ export function addExampleFields(
 
   // 현재 예문 개수 확인 (대표 예문 제외하고 계산)
   const currentExampleCount = containerFound.children.length;
-  console.log("🔍 현재 예문 컨테이너 자식 요소 개수:", currentExampleCount);
 
   const exampleItem = document.createElement("div");
   exampleItem.className = "example-item border rounded-lg p-4 mb-4";

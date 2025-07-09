@@ -1027,16 +1027,12 @@ export const conceptUtils = {
   // 사용자의 AI 개념 목록 가져오기 (분리된 컬렉션 구조)
   async getUserAIConcepts(userEmail) {
     try {
-      console.log("🔍 사용자 AI 개념 조회 시작:", userEmail);
-
       const userAIRef = doc(db, "ai-recommend", userEmail);
       const userAIDoc = await getDoc(userAIRef);
 
       if (userAIDoc.exists()) {
         const userData = userAIDoc.data();
         const concepts = userData.concepts || [];
-
-        console.log(`📚 AI 개념 ${concepts.length}개 발견`);
 
         // 원본 데이터 구조 디버깅
         if (concepts.length > 0) {
@@ -1120,8 +1116,6 @@ export const conceptUtils = {
   // AI 개념 삭제 (분리된 컬렉션 구조)
   async deleteAIConcept(userEmail, conceptId) {
     try {
-      console.log("🗑️ AI 개념 삭제 시작:", { userEmail, conceptId });
-
       const userAIRef = doc(db, "ai-recommend", userEmail);
       const userAIDoc = await getDoc(userAIRef);
 
@@ -1231,8 +1225,6 @@ export const conceptUtils = {
   // AI 개념 수정 (분리된 컬렉션 구조)
   async updateAIConcept(userEmail, conceptId, updatedData) {
     try {
-      console.log("✏️ AI 개념 수정 시작:", { userEmail, conceptId });
-
       const userAIRef = doc(db, "ai-recommend", userEmail);
       const userAIDoc = await getDoc(userAIRef);
 

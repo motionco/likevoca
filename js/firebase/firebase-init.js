@@ -881,13 +881,12 @@ export const conceptUtils = {
   // 사용자 사용량 정보 가져오기
   async getUsage(userId) {
     try {
-      console.log("🔍 사용량 정보 조회 시작:", userId);
+      // console.log("🔍 사용량 정보 조회 시작:", userId); // 개인정보 노출 방지로 주석 처리
       const userRef = doc(db, "users", userId);
       const userDoc = await getDoc(userRef);
 
       if (userDoc.exists()) {
         const userData = userDoc.data();
-        console.log("📊 DB에서 가져온 사용자 데이터:", userData);
 
         const result = {
           aiUsed: userData.aiUsed || 0,
@@ -897,10 +896,8 @@ export const conceptUtils = {
           maxWordCount: userData.maxWordCount || 50, // 단어장 최대 개수
         };
 
-        console.log("✅ 반환할 사용량 정보:", result);
         return result;
       } else {
-        console.log("📝 사용자 문서가 없어 기본값으로 생성");
         // 사용자 문서가 없으면 기본값으로 생성
         const defaultData = {
           aiUsed: 0,
@@ -1031,16 +1028,12 @@ export const conceptUtils = {
   // 사용자의 AI 개념 목록 가져오기 (분리된 컬렉션 구조)
   async getUserAIConcepts(userEmail) {
     try {
-      console.log("🔍 사용자 AI 개념 조회 시작:", userEmail);
-
       const userAIRef = doc(db, "ai-recommend", userEmail);
       const userAIDoc = await getDoc(userAIRef);
 
       if (userAIDoc.exists()) {
         const userData = userAIDoc.data();
         const concepts = userData.concepts || [];
-
-        console.log(`📚 AI 개념 ${concepts.length}개 발견`);
 
         // 원본 데이터 구조 디버깅
         if (concepts.length > 0) {
@@ -1124,8 +1117,6 @@ export const conceptUtils = {
   // AI 개념 삭제 (분리된 컬렉션 구조)
   async deleteAIConcept(userEmail, conceptId) {
     try {
-      console.log("🗑️ AI 개념 삭제 시작:", { userEmail, conceptId });
-
       const userAIRef = doc(db, "ai-recommend", userEmail);
       const userAIDoc = await getDoc(userAIRef);
 
@@ -1235,8 +1226,6 @@ export const conceptUtils = {
   // AI 개념 수정 (분리된 컬렉션 구조)
   async updateAIConcept(userEmail, conceptId, updatedData) {
     try {
-      console.log("✏️ AI 개념 수정 시작:", { userEmail, conceptId });
-
       const userAIRef = doc(db, "ai-recommend", userEmail);
       const userAIDoc = await getDoc(userAIRef);
 

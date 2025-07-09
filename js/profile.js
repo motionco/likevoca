@@ -12,8 +12,6 @@ import {
 } from "../utils/firebase/firebase-auth.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
-  console.log("프로필 페이지 초기화 시작");
-
   // DOM 요소 가져오기
   const displayNameInput = document.getElementById("displayName");
   const emailInput = document.getElementById("email");
@@ -31,14 +29,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const logoutBtn = document.getElementById("logout-btn");
   const deleteAccountBtn = document.getElementById("delete-account");
-
-  console.log("DOM 요소 확인:", {
-    authRequired: !!authRequired,
-    profileContent: !!profileContent,
-    displayNameInput: !!displayNameInput,
-    emailInput: !!emailInput,
-    profileForm: !!profileForm,
-  });
 
   // 초기 로딩 상태 설정 (로그인 상태 확인 중)
   if (profileContent) {
@@ -60,11 +50,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // 인증 상태 변경 감지
   onAuthStateChanged(auth, (user) => {
-    console.log(
-      "Auth 상태 변경:",
-      user ? `로그인됨 (${user.email})` : "로그아웃됨"
-    );
-
     // 로딩 표시 제거
     const loadingIndicator = document.getElementById("loading-indicator");
     if (loadingIndicator) {
@@ -75,11 +60,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       // 사용자가 로그인된 경우
       if (authRequired) {
         authRequired.classList.add("hidden");
-        console.log("로그인 필요 메시지 숨김");
       }
       if (profileContent) {
         profileContent.classList.remove("hidden");
-        console.log("프로필 콘텐츠 표시");
       }
       updateUIForLoggedInUser(user);
 
@@ -91,11 +74,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       // 사용자가 로그아웃된 경우
       if (authRequired) {
         authRequired.classList.remove("hidden");
-        console.log("로그인 필요 메시지 표시");
       }
       if (profileContent) {
         profileContent.classList.add("hidden");
-        console.log("프로필 콘텐츠 숨김");
       }
 
       // 네비게이션바 업데이트
@@ -251,16 +232,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // 로그인한 사용자의 UI 업데이트
   function updateUIForLoggedInUser(user) {
-    console.log("사용자 UI 업데이트:", user.displayName, user.email);
-
     if (displayNameInput) {
       displayNameInput.value = user.displayName || "";
-      console.log("이름 필드 업데이트:", user.displayName);
     }
 
     if (emailInput) {
       emailInput.value = user.email || "";
-      console.log("이메일 필드 업데이트:", user.email);
     }
 
     updateProviderStatus();
@@ -272,7 +249,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!user) return;
 
     const providers = user.providerData.map((provider) => provider.providerId);
-    console.log("사용자 제공자:", providers);
 
     // Google 상태 업데이트
     if (googleStatus && googleConnect && googleDisconnect) {
@@ -304,6 +280,4 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
   }
-
-  console.log("프로필 페이지 초기화 완료");
 });

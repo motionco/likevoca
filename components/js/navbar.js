@@ -2,8 +2,6 @@ async function initializeNavbar(currentLanguage) {
   // 실제 현재 언어 감지 (URL 우선)
   const actualCurrentLanguage = detectCurrentLanguage();
 
-  console.log("🔧 navbar.js initializeNavbar 시작");
-
   // 햄버거 메뉴 이벤트 설정
   const menuToggle = document.getElementById("menu-toggle");
   const mobileMenu = document.getElementById("mobile-menu");
@@ -15,9 +13,7 @@ async function initializeNavbar(currentLanguage) {
 
     newMenuToggle.addEventListener("click", () => {
       mobileMenu.classList.toggle("hidden");
-      console.log("🍔 navbar.js: 햄버거 메뉴 토글");
     });
-    console.log("✅ navbar.js: 햄버거 메뉴 이벤트 설정");
 
     // 모바일 메뉴 외부 클릭 시 닫기
     document.addEventListener("click", (event) => {
@@ -31,10 +27,8 @@ async function initializeNavbar(currentLanguage) {
         !currentMobileMenu.classList.contains("hidden")
       ) {
         currentMobileMenu.classList.add("hidden");
-        console.log("🍔 navbar.js: 햄버거 메뉴 닫힘 (외부 클릭으로 인해)");
       }
     });
-    console.log("✅ navbar.js: 햄버거 메뉴 외부 클릭 이벤트 설정");
   }
 
   // 언어 변경 버튼 이벤트 설정
@@ -47,12 +41,10 @@ async function initializeNavbar(currentLanguage) {
     newLanguageButton.addEventListener("click", () => {
       const currentLang = detectCurrentLanguage(); // 현재 언어 다시 감지
       showLanguageModal(currentLang);
-      console.log("🌐 navbar.js: 언어 버튼 클릭");
     });
 
     // 실제 현재 언어로 버튼 업데이트
     updateLanguageButton(actualCurrentLanguage);
-    console.log("✅ navbar.js: 언어 버튼 이벤트 설정");
   }
 
   // 언어 변경 이벤트 리스너 추가 (동적 업데이트)
@@ -85,7 +77,6 @@ async function initializeNavbar(currentLanguage) {
       const currentDropdown = document.getElementById("profile-dropdown");
       if (currentDropdown) {
         currentDropdown.classList.toggle("hidden");
-        console.log("👤 navbar.js: 프로필 드롭다운 토글");
       }
     });
 
@@ -101,7 +92,6 @@ async function initializeNavbar(currentLanguage) {
         currentDropdown.classList.add("hidden");
       }
     });
-    console.log("✅ navbar.js: 프로필 드롭다운 이벤트 설정");
   }
 
   // 로그아웃 버튼 이벤트 설정
@@ -123,9 +113,7 @@ async function initializeNavbar(currentLanguage) {
       }
 
       handleLogout();
-      console.log("🚪 navbar.js: 로그아웃 버튼 클릭");
     });
-    console.log("✅ navbar.js: 로그아웃 버튼 이벤트 설정");
   }
 
   // 현재 페이지에 맞는 메뉴 이름 업데이트
@@ -416,8 +404,6 @@ window.updateNavbarForAuthState = updateNavbarForAuthState;
 // DOMContentLoaded 이벤트에서 자동 네비게이션바 로드 및 초기화
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    console.log("🧭 네비게이션바 자동 초기화 시작");
-
     // 네비게이션바 컨테이너 확인
     const navbarContainer = document.getElementById("navbar-container");
     if (!navbarContainer) {
@@ -427,7 +413,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // 이미 네비게이션바가 로드되어 있으면 초기화만 실행
     if (navbarContainer.innerHTML.trim() !== "") {
-      console.log("🧭 기존 네비게이션바 발견, 초기화만 실행");
       const currentLanguage = detectCurrentLanguage();
       await initializeNavbar(currentLanguage);
       return;
@@ -435,13 +420,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // loadNavbar 함수가 전역에 있으면 사용
     if (typeof window.loadNavbar === "function") {
-      console.log("🧭 전역 loadNavbar 함수 사용");
       await window.loadNavbar();
       const currentLanguage = detectCurrentLanguage();
       await initializeNavbar(currentLanguage);
     } else {
       // 직접 네비게이션바 로드
-      console.log("🧭 직접 네비게이션바 로드");
       const currentLanguage = detectCurrentLanguage();
 
       // 현재 경로에 따라 네비게이션바 경로 결정
@@ -454,14 +437,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         navbarPath = `locales/${currentLanguage}/navbar.html`;
       }
 
-      console.log(`🧭 네비게이션바 경로: ${navbarPath}`);
-
       try {
         const response = await fetch(navbarPath);
         if (response.ok) {
           const navbarHTML = await response.text();
           navbarContainer.innerHTML = navbarHTML;
-          console.log("✅ 네비게이션바 HTML 로드 완료");
           await initializeNavbar(currentLanguage);
         } else {
           console.error("❌ 네비게이션바 로드 실패:", response.status);

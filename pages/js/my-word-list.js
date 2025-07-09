@@ -419,19 +419,9 @@ function displayConceptList() {
 
 // 개념 카드 생성 (다국어 단어장과 동일한 스타일)
 function createConceptCard(concept) {
-  console.log("🎨 개념 카드 생성 중:", concept.id, concept);
-
   // 새로운 구조와 기존 구조 모두 지원
   const sourceExpression = concept.expressions?.[sourceLanguage] || {};
   const targetExpression = concept.expressions?.[targetLanguage] || {};
-
-  console.log("📝 표현 데이터:", {
-    sourceLanguage,
-    targetLanguage,
-    sourceExpression,
-    targetExpression,
-    allExpressions: concept.expressions,
-  });
 
   // 조건을 완화: 최소한 하나의 언어에 단어가 있으면 표시
   const hasSourceWord = sourceExpression.word;
@@ -442,8 +432,6 @@ function createConceptCard(concept) {
   const availableWords = Object.values(allExpressions)
     .filter((expr) => expr && expr.word)
     .map((expr) => expr.word);
-
-  console.log("🔍 사용 가능한 단어들:", availableWords);
 
   if (availableWords.length === 0) {
     console.warn("⚠️ 사용 가능한 단어가 없어서 카드 생성 건너뜀:", concept.id);
@@ -463,12 +451,6 @@ function createConceptCard(concept) {
     Object.values(allExpressions).find((expr) => expr?.definition)
       ?.definition ||
     "";
-
-  console.log("✅ 카드 생성 진행:", {
-    displayWord,
-    displayDefinition,
-    conceptId: concept.id,
-  });
 
   // concept_info 가져오기 (새 구조 우선, 기존 구조 fallback)
   const conceptInfo = concept.concept_info || {
@@ -786,11 +768,6 @@ function handleLanguageChange() {
 
     sourceLanguage = sourceLanguageSelect.value;
     targetLanguage = targetLanguageSelect.value;
-
-    console.log("🔄 나만의 단어장 언어 변경 처리:", {
-      이전: { source: previousSourceLanguage, target: previousTargetLanguage },
-      현재: { source: sourceLanguage, target: targetLanguage },
-    });
 
     // 카드 목록 새로고침
     displayConceptList();
@@ -1515,23 +1492,16 @@ function updateExamplesForLanguage(selectedLanguage) {
 
   // 대표 예문 처리
   if (concept.representative_example) {
-    console.log("🔍 언어 탭 전환 - 대표 예문 처리:", {
-      selectedLanguage,
-      representative_example: concept.representative_example,
-    });
-
     let repExample = null;
 
     // 새로운 구조: 직접 언어별 텍스트
     if (concept.representative_example[selectedLanguage]) {
       repExample = concept.representative_example[selectedLanguage];
-      console.log("✅ 언어 탭 전환: 새로운 대표 예문 구조 사용", repExample);
     }
     // 기존 구조: translations 객체
     else if (concept.representative_example.translations) {
       repExample =
         concept.representative_example.translations[selectedLanguage];
-      console.log("✅ 언어 탭 전환: 기존 대표 예문 구조 사용", repExample);
     }
 
     if (repExample) {

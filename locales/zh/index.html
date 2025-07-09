@@ -232,18 +232,14 @@
       
       document.addEventListener('DOMContentLoaded', async () => {
         try {
-          console.log("主页初始化开始");
-          
           // 页面加载时清理重定向标志
           if (sessionStorage.getItem("redirecting")) {
-            console.log("清理之前的重定向标志");
             sessionStorage.removeItem("redirecting");
           }
           
           // 导航栏加载 (使用从language-utils.js导入的函数)
           if (typeof window.loadNavbar === 'function') {
             await window.loadNavbar();
-            console.log("导航栏加载完成");
           } else {
             console.warn("找不到window.loadNavbar函数，尝试直接加载...");
             
@@ -254,12 +250,10 @@
               const navbarContainer = document.getElementById('navbar-container');
               if (navbarContainer) {
                 navbarContainer.innerHTML = navbarHTML;
-                console.log("导航栏直接加载完成");
                 
                 // navbar.js 脚本已经加载，只需初始化
                 if (typeof window.initializeNavbar === 'function') {
                   await window.initializeNavbar('zh');
-                  console.log("导航栏初始化完成");
                 } else {
                   console.warn("找不到initializeNavbar函数");
                 }
@@ -271,13 +265,10 @@
           
           // 翻译即时应用
           await applyLanguage();
-          console.log("翻译应用完成");
           
           const currentLang = await getActiveLanguage();
-          console.log("当前语言:", currentLang);
           
           await updateMetadata('home');
-          console.log("元数据更新完成");
           
           // 硬编码页面 - 翻译测试代码已移除
           
@@ -288,7 +279,6 @@
               try {
                 // 检查当前语言
                 const currentLang = await getActiveLanguage();
-                console.log("当前语言:", currentLang);
                 
                 // Firebase 认证状态检查
                 const { onAuthStateChanged } = await import('../../js/firebase/firebase-init.js');
