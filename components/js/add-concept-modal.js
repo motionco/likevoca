@@ -38,8 +38,6 @@ let supportedLangs = { ...supportedLanguages };
 // 중복된 유틸리티 함수들은 concept-modal-utils.js로 이동됨
 
 export async function initialize() {
-  console.log("개념 추가 모달 초기화");
-
   // 모달 요소
   const modal = document.getElementById("concept-modal");
   const closeBtn = document.getElementById("close-concept-modal");
@@ -56,7 +54,7 @@ export async function initialize() {
   if (saveBtn) {
     saveBtn.addEventListener("click", (event) => {
       event.preventDefault(); // 폼 기본 제출 동작 방지
-      console.log("💾 저장 버튼 클릭됨, 기본 동작 방지됨");
+
       saveConcept();
     });
   }
@@ -66,7 +64,7 @@ export async function initialize() {
   if (conceptForm) {
     conceptForm.addEventListener("submit", (event) => {
       event.preventDefault(); // 폼 제출 방지
-      console.log("📝 폼 제출 시도됨, 기본 동작 방지됨");
+
       saveConcept();
     });
   }
@@ -81,7 +79,6 @@ export async function initialize() {
 
   if (addExampleBtn) {
     addExampleBtn.addEventListener("click", () => {
-      console.log("➕ 예문 추가 버튼 클릭");
       addExampleFields(null, false); // false = 일반 예문 (삭제 가능)
     });
   }
@@ -91,7 +88,6 @@ export async function initialize() {
 
   // 현재 사용자의 환경 설정 언어 가져오기
   const userLanguage = await getActiveLanguage();
-  console.log("🌍 사용자 환경 설정 언어:", userLanguage);
 
   // HTML 정적 레이블들을 환경 설정 언어로 업데이트
   await updateStaticLabels(userLanguage);
@@ -116,35 +112,27 @@ export async function initialize() {
 
 async function saveConcept() {
   try {
-    console.log("➕ 새 개념 추가 시작");
-
     if (!validateForm()) {
-      console.log("❌ 폼 검증 실패");
       return;
     }
 
-    console.log("✅ 폼 검증 통과");
     const conceptData = collectFormData();
-    console.log("📋 수집된 데이터:", conceptData);
 
     try {
       await conceptUtils.createConcept(conceptData);
-      console.log("✅ 개념 추가 성공");
+
       alert("새 개념이 성공적으로 추가되었습니다.");
 
       resetForm();
       closeModal();
 
       // 화면 업데이트를 위한 이벤트 발생
-      console.log("🔔 새 개념 추가 완료 - 화면 업데이트 이벤트 발생");
       if (window.dispatchEvent) {
         window.dispatchEvent(new CustomEvent("concept-saved"));
-        console.log("✅ concept-saved 이벤트 발생 완료");
       }
 
       // 추가 확인을 위한 짧은 지연 후 재확인
       setTimeout(() => {
-        console.log("🔄 추가 화면 업데이트 요청");
         if (window.dispatchEvent) {
           window.dispatchEvent(new CustomEvent("concept-saved"));
         }
@@ -173,8 +161,6 @@ async function saveConcept() {
 
 // 개념 추가 모달 열기 (전역 함수)
 window.openConceptModal = async function () {
-  console.log("➕ 새 개념 추가 모달 열기");
-
   resetForm();
 
   const modal = document.getElementById("concept-modal");

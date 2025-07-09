@@ -222,18 +222,12 @@ function createConceptCard(concept) {
   const sourceLanguage = filters.sourceLanguage || "korean";
   const targetLanguage = filters.targetLanguage || "english";
 
-  console.log("카드 생성 - 언어 설정:", { sourceLanguage, targetLanguage });
-
   // 새로운 구조와 기존 구조 모두 지원
   const sourceExpression = concept.expressions?.[sourceLanguage] || {};
   const targetExpression = concept.expressions?.[targetLanguage] || {};
 
   // 빈 표현인 경우 건너뛰기
   if (!sourceExpression.word || !targetExpression.word) {
-    console.log("카드 생성 건너뛰기 - 빈 표현:", {
-      sourceExpression,
-      targetExpression,
-    });
     return "";
   }
 
@@ -275,20 +269,9 @@ function createConceptCard(concept) {
   const sourceLanguageCode = getLanguageCode(sourceLanguage);
   const targetLanguageCode = getLanguageCode(targetLanguage);
 
-  console.log("🔍 카드 예문 처리 시작:", {
-    conceptId: concept.id || concept._id,
-    sourceLanguage,
-    targetLanguage,
-    sourceLanguageCode,
-    targetLanguageCode,
-    hasRepresentativeExample: !!concept.representative_example,
-    representativeExample: concept.representative_example,
-  });
-
   // 1. representative_example 확인 (새 구조와 기존 구조 모두 지원)
   if (concept.representative_example) {
     const repExample = concept.representative_example;
-    console.log("✅ 대표 예문 발견:", repExample);
 
     // 새로운 구조: 직접 언어별 텍스트
     if (repExample[sourceLanguageCode] && repExample[targetLanguageCode]) {
@@ -296,11 +279,9 @@ function createConceptCard(concept) {
         source: repExample[sourceLanguageCode],
         target: repExample[targetLanguageCode],
       };
-      console.log("✅ 카드: 새로운 대표 예문 구조 사용", example);
     }
     // 기존 구조: translations 객체
     else if (repExample.translations) {
-      console.log("🔍 translations 구조 확인:", repExample.translations);
       example = {
         source:
           repExample.translations[sourceLanguageCode]?.text ||
@@ -311,15 +292,11 @@ function createConceptCard(concept) {
           repExample.translations[targetLanguageCode] ||
           "",
       };
-      console.log("✅ 카드: 기존 대표 예문 구조 사용", example);
-    } else {
-      console.log("⚠️ 대표 예문 구조를 인식할 수 없음:", repExample);
     }
   }
   // 2. featured_examples 확인 (기존 방식)
   else if (concept.featured_examples && concept.featured_examples.length > 0) {
     const firstExample = concept.featured_examples[0];
-    console.log("🔍 featured_examples 사용:", firstExample);
     if (firstExample.translations) {
       example = {
         source: firstExample.translations[sourceLanguageCode]?.text || "",
@@ -330,7 +307,6 @@ function createConceptCard(concept) {
   // 3. core_examples 확인 (기존 방식 - 하위 호환성)
   else if (concept.core_examples && concept.core_examples.length > 0) {
     const firstExample = concept.core_examples[0];
-    console.log("🔍 core_examples 사용:", firstExample);
     // 번역 구조 확인
     if (firstExample.translations) {
       example = {
@@ -348,14 +324,11 @@ function createConceptCard(concept) {
   // 4. 기존 examples 확인 (하위 호환성)
   else if (concept.examples && concept.examples.length > 0) {
     const firstExample = concept.examples[0];
-    console.log("🔍 examples 사용:", firstExample);
     example = {
       source: firstExample[sourceLanguageCode] || "",
       target: firstExample[targetLanguageCode] || "",
     };
   }
-
-  console.log("🎯 최종 예문 결과:", example);
 
   // 개념 ID 생성 (document ID 우선 사용)
   const conceptId =
@@ -479,8 +452,6 @@ async function toggleBookmark(conceptId) {
       return;
     }
 
-    console.log("북마크 토글:", conceptId);
-
     // 현재 북마크 상태 확인
     const bookmarkButton = document.querySelector(
       `.bookmark-btn[data-concept-id="${conceptId}"]`
@@ -583,8 +554,6 @@ window.toggleBookmark = toggleBookmark;
 
 // 검색 및 필터링 함수 (공유 모듈 사용)
 function handleSearch() {
-  console.log("🔄 단어장: 검색 및 필터링 시작");
-
   displayCount = 12;
   lastVisibleConcept = null;
   firstVisibleConcept = null;
@@ -593,23 +562,14 @@ function handleSearch() {
   const filterManager = new VocabularyFilterManager();
   const filters = filterManager.getCurrentFilters();
 
-  console.log("🔍 단어장: 현재 필터 값들:", filters);
-
   // 필터 공유 모듈을 사용하여 필터링 및 정렬 수행
   filteredConcepts = VocabularyFilterProcessor.processFilters(
     allConcepts,
     filters
   );
 
-  console.log("📊 단어장: 필터링 결과:", {
-    전체개념수: allConcepts.length,
-    필터링된개념수: filteredConcepts.length,
-  });
-
   // 표시
   displayConceptList();
-
-  console.log("✅ 단어장: 검색 및 필터링 완료");
 }
 
 // 정렬 함수는 공유 모듈로 대체됨
@@ -703,8 +663,6 @@ async function updateBookmarkStates() {
         button.title = "북마크";
       }
     });
-
-    console.log("✅ 북마크 상태 업데이트 완료:", bookmarkedIds.length);
   } catch (error) {
     console.error("북마크 상태 업데이트 실패:", error);
   }
@@ -736,7 +694,6 @@ async function loadModals(modalPaths) {
       script.type = "module";
       script.onload = () => {
         window.editConceptModalLoaded = true;
-        console.log("✅ 편집 모달 스크립트 로드 완료");
       };
       script.onerror = () => {
         console.error("❌ 편집 모달 스크립트 로드 실패");
@@ -1020,7 +977,6 @@ window.openConceptViewModal = async function (conceptId) {
 function setupLanguageChangeListener() {
   // 언어 변경 이벤트 감지
   window.addEventListener("languageChanged", async (event) => {
-    console.log("🌐 단어장: 언어 변경 감지", event.detail.language);
     userLanguage = event.detail.language;
 
     // 개념 카드들을 다시 렌더링
@@ -1033,8 +989,6 @@ function setupLanguageChangeListener() {
       window.updateDomainCategoryEmojiLanguage();
     }
   });
-
-  console.log("✅ 단어장: 언어 변경 리스너 설정 완료");
 }
 
 // 페이지 로드 시 언어 변경 리스너 설정
@@ -1066,7 +1020,6 @@ window.renderConceptCards = function () {
 };
 
 window.updateFilterUI = function () {
-  console.log("🔄 단어장: 필터 UI 업데이트");
   if (typeof window.updateDomainCategoryEmojiLanguage === "function") {
     window.updateDomainCategoryEmojiLanguage();
   }
@@ -1176,6 +1129,24 @@ function setupEventListeners() {
       handleSearch();
     });
   }
+
+  // 개념 추가/수정 완료 이벤트 리스너 (다중 등록)
+  const handleConceptSaved = async (event) => {
+    try {
+      // 개념 목록 다시 로드 및 표시
+      await fetchAndDisplayConcepts();
+
+      // 메시지 표시
+      showMessage("새 개념이 추가되었습니다!", "success");
+    } catch (error) {
+      console.error("❌ 단어장 목록 업데이트 실패:", error);
+      showMessage("목록 업데이트 중 오류가 발생했습니다.", "error");
+    }
+  };
+
+  // document와 window 모두에 이벤트 리스너 등록
+  document.addEventListener("concept-saved", handleConceptSaved);
+  window.addEventListener("concept-saved", handleConceptSaved);
 }
 
 // 오류 메시지 표시
@@ -1221,7 +1192,6 @@ async function initializePage() {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUser = user;
-        console.log("사용자 로그인됨:", user.email);
 
         // 개념 로드 및 표시
         await fetchAndDisplayConcepts();
@@ -1229,7 +1199,6 @@ async function initializePage() {
         // 사용자 로그인 후 사용량 UI 업데이트
         await updateUsageUI();
       } else {
-        console.log("사용자 로그아웃됨");
         // 현재 언어 감지
         const currentLanguage =
           (typeof getCurrentUILanguage === "function"

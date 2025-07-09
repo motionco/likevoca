@@ -204,50 +204,130 @@ export const domainCategoryMapping = {
 // 카테고리 이모지 매핑
 export const categoryEmojiMapping = {
   // daily 도메인
-  household: ["🏠", "🛋️", "🪑", "🛏️", "🚪", "🪟"],
-  family: ["👨‍👩‍👧‍👦", "👶", "👵", "👴", "👨‍👧", "👩‍👧"],
-  routine: ["⏰", "🛌", "🚿", "🍽️", "🚌", "💼"],
-  clothing: ["👕", "👖", "👗", "👔", "👚", "👠"],
-  furniture: ["🛋️", "🪑", "🛏️", "🗄️", "📚", "🪞"],
-  shopping: ["🛍️", "🛒", "💳", "💰", "🏪", "🏬"],
-  communication: ["📞", "📱", "💬", "📧", "📮", "📬"],
-  personal_care: ["🧴", "🧽", "🪥", "🧼", "💄", "💅"],
-  leisure: ["📺", "🎮", "📖", "🎵", "🎨", "🎲"],
-  relationships: ["💕", "👫", "👬", "👭", "💑", "💏"],
-  emotions: ["😊", "😢", "😡", "😴", "😍", "🤔"],
-  time: ["⏰", "⏱️", "⏲️", "🕐", "📅", "📆"],
-  weather_talk: ["☀️", "🌧️", "⛅", "❄️", "🌈", "⛈️"],
+  household: ["🏠", "🛋️", "🪑", "🛏️", "🚪", "🪟", "🧹", "🧽", "🧴"],
+  family: ["👨‍👩‍👧‍👦", "👶", "👵", "👴", "👨‍👧", "👩‍👧", "👪", "👨‍👩‍👦", "👨‍👩‍👧", "👨‍👩‍👦‍👦", "👨‍👩‍👧‍👧"],
+  routine: ["⏰", "🛌", "🚿", "🍽️", "🚌", "💼", "☕", "📰", "🪥"],
+  clothing: ["👕", "👖", "👗", "👔", "👚", "👠", "👢", "👟", "🧥", "👒", "🧢"],
+  furniture: ["🛋️", "🪑", "🛏️", "🗄️", "📚", "🪞", "🪆", "🛏", "🪜"],
+  shopping: ["🛍️", "🛒", "💳", "💰", "🏪", "🏬", "🎁", "📦", "🏷️"],
+  communication: ["📞", "📱", "💬", "📧", "📮", "📬", "📯", "📢", "💌"],
+  personal_care: ["🧴", "🧽", "🪥", "🧼", "💄", "💅", "🧴", "🪒", "💆"],
+  leisure: ["📺", "🎮", "📖", "🎵", "🎨", "🎲", "🎪", "🎭", "🎬"],
+  relationships: ["💕", "👫", "👬", "👭", "💑", "💏", "💍", "💒", "👰"],
+  emotions: [
+    "😊",
+    "😢",
+    "😡",
+    "😴",
+    "😍",
+    "🤔",
+    "😂",
+    "😭",
+    "😤",
+    "😌",
+    "🥰",
+    "😟",
+    "😮",
+    "🤗",
+    "😎",
+  ],
+  time: ["⏰", "⏱️", "⏲️", "🕐", "📅", "📆", "🕑", "🕒", "🕓"],
+  weather_talk: ["☀️", "🌧️", "⛅", "❄️", "🌈", "⛈️", "🌤️", "🌦️", "🌪️", "🌫️"],
 
   // food 도메인
-  fruit: ["🍎", "🍌", "🍇", "🍓", "🍑", "🍒"],
-  vegetable: ["🥕", "🥬", "🥒", "🍅", "🥔", "🧅"],
-  meat: ["🥩", "🍖", "🍗", "🥓", "🍤", "🦐"],
-  drink: ["💧", "🥛", "☕", "🍵", "🥤", "🧃"],
-  snack: ["🍪", "🍰", "🧁", "🍩", "🍿", "🥨"],
-  grain: ["🌾", "🍞", "🥖", "🥐", "🥯", "🍚"],
-  seafood: ["🐟", "🦐", "🦀", "🐙", "🦑", "🐠"],
-  dairy: ["🥛", "🧀", "🧈", "🥚", "🍳", "🥞"],
-  cooking: ["🍳", "🥘", "🍲", "🥗", "🍱", "🍜"],
-  dining: ["🍽️", "🥄", "🍴", "🥢", "🍷", "🥂"],
-  restaurant: ["🏪", "🍕", "🍔", "🌮", "🍜", "🍣"],
-  kitchen_utensils: ["🔪", "🥄", "🍴", "🥢", "🍳", "🥘"],
-  spices: ["🧄", "🌶️", "🧂", "🌿", "🍯", "🫒"],
-  dessert: ["🍰", "🧁", "🍪", "🍩", "🍫", "🍬"],
+  fruit: [
+    "🍎",
+    "🍌",
+    "🍇",
+    "🍓",
+    "🍑",
+    "🍒",
+    "🍊",
+    "🥭",
+    "🍍",
+    "🥝",
+    "🥥",
+    "🫐",
+  ],
+  vegetable: [
+    "🥕",
+    "🥬",
+    "🥒",
+    "🍅",
+    "🥔",
+    "🧅",
+    "🥦",
+    "🌽",
+    "🥑",
+    "🫑",
+    "🍆",
+    "🫒",
+  ],
+  meat: ["🥩", "🍖", "🍗", "🥓", "🍤", "🦐", "🍖", "🥩", "🦴"],
+  drink: ["💧", "🥛", "☕", "🍵", "🥤", "🧃", "🍺", "🍷", "🥂", "🧋", "🧊"],
+  snack: ["🍪", "🍰", "🧁", "🍩", "🍿", "🥨", "🍘", "🍙", "🍚"],
+  grain: ["🌾", "🍞", "🥖", "🥐", "🥯", "🍚", "🥣", "🌾", "🍜"],
+  seafood: ["🐟", "🦐", "🦀", "🐙", "🦑", "🐠", "🦞", "🐡", "🐚", "🦈"],
+  dairy: ["🥛", "🧀", "🧈", "🥚", "🍳", "🥞", "🧈", "🥛"],
+  cooking: ["🍳", "🥘", "🍲", "🥗", "🍱", "🍜", "🥟", "🍛", "🍚"],
+  dining: ["🍽️", "🥄", "🍴", "🥢", "🍷", "🥂", "🍾", "🥃"],
+  restaurant: ["🏪", "🍕", "🍔", "🌮", "🍜", "🍣", "🥘", "🍱", "🍲"],
+  kitchen_utensils: ["🔪", "🥄", "🍴", "🥢", "🍳", "🥘", "🥣", "🍶"],
+  spices: ["🧄", "🌶️", "🧂", "🌿", "🍯", "🫒", "🌶️", "🧂"],
+  dessert: ["🍰", "🧁", "🍪", "🍩", "🍫", "🍬", "🍭", "🍮", "🎂", "🍨", "🍧"],
 
   // travel 도메인
-  transportation: ["🚗", "🚙", "🚐", "🚛", "🚌", "🚎"],
-  accommodation: ["🏨", "🏩", "🏠", "🏡", "🏢", "🏣"],
-  tourist_attraction: ["🏛️", "🏰", "🗼", "🎡", "🎢", "🎠"],
-  luggage: ["🧳", "🎒", "👜", "💼", "🛍️", "📦"],
-  direction: ["🧭", "🗺️", "📍", "🚩", "⬆️", "⬇️"],
-  booking: ["📅", "📋", "💳", "🎫", "📄", "✅"],
-  currency: ["💰", "💵", "💴", "💶", "💷", "🪙"],
-  culture: ["🏛️", "🎭", "🎨", "📚", "🗿", "⛩️"],
-  emergency: ["🚨", "🆘", "🚑", "🚒", "👮", "🏥"],
-  documents: ["📄", "📋", "🆔", "📘", "📗", "📙"],
-  sightseeing: ["📸", "🔭", "👀", "🗺️", "🎯", "🎪"],
-  local_food: ["🍜", "🍱", "🍣", "🥟", "🌮", "🍕"],
-  souvenir: ["🎁", "🛍️", "🏺", "🖼️", "📿", "🎀"],
+  transportation: [
+    "🚗",
+    "🚙",
+    "🚐",
+    "🚛",
+    "🚌",
+    "🚎",
+    "✈️",
+    "🚂",
+    "🚇",
+    "🚢",
+    "🚁",
+    "🛺",
+  ],
+  accommodation: ["🏨", "🏩", "🏠", "🏡", "🏢", "🏣", "🏕️", "🏖️", "🏛️"],
+  tourist_attraction: [
+    "🏛️",
+    "🏰",
+    "🗼",
+    "🎡",
+    "🎢",
+    "🎠",
+    "🗽",
+    "🎪",
+    "🎭",
+    "🎨",
+    "🏖️",
+    "🏔️",
+  ],
+  luggage: ["🧳", "🎒", "👜", "💼", "🛍️", "📦", "🎒", "🧳"],
+  direction: ["🧭", "🗺️", "📍", "🚩", "⬆️", "⬇️", "➡️", "⬅️", "🔄"],
+  booking: ["📅", "📋", "💳", "🎫", "📄", "✅", "🏨", "✈️"],
+  currency: ["💰", "💵", "💴", "💶", "💷", "🪙", "💳", "🏦"],
+  culture: ["🏛️", "🎭", "🎨", "📚", "🗿", "⛩️", "🎪", "🎵", "🎸"],
+  emergency: ["🚨", "🆘", "🚑", "🚒", "👮", "🏥", "📞", "🚨"],
+  documents: ["📄", "📋", "🆔", "📘", "📗", "📙", "🛂", "📑"],
+  sightseeing: ["📸", "🔭", "👀", "🗺️", "🎯", "🎪", "🌅", "🌄", "🖼️"],
+  local_food: [
+    "🍜",
+    "🍱",
+    "🍣",
+    "🥟",
+    "🌮",
+    "🍕",
+    "🥘",
+    "🍛",
+    "🍲",
+    "🥗",
+    "🍝",
+  ],
+  souvenir: ["🎁", "🛍️", "🏺", "🖼️", "📿", "🎀", "🧸", "🎭"],
 
   // business 도메인
   meeting: ["👥", "📋", "💼", "📊", "⏰", "🤝"],
@@ -284,35 +364,77 @@ export const categoryEmojiMapping = {
   philosophy: ["🤔", "💭", "📚", "🧠", "💡", "🌟"],
 
   // nature 도메인
-  animal: ["🐶", "🐱", "🐭", "🐹", "🐰", "🦊"],
-  plant: ["🌱", "🌿", "🌳", "🌲", "🌴", "🌵"],
-  weather: ["☀️", "🌧️", "⛅", "❄️", "🌈", "⛈️"],
-  geography: ["🏔️", "🏞️", "🏜️", "🏖️", "🌋", "🗻"],
-  environment: ["🌍", "🌱", "♻️", "🌿", "🌊", "🌳"],
-  ecosystem: ["🌳", "🐝", "🦋", "🌸", "🍄", "🌿"],
-  conservation: ["♻️", "🌱", "🌍", "🛡️", "💚", "🌿"],
-  climate: ["🌡️", "❄️", "☀️", "🌧️", "🌪️", "🌊"],
-  natural_disaster: ["🌪️", "🌋", "⛈️", "🌊", "🔥", "❄️"],
-  landscape: ["🏔️", "🏞️", "🌅", "🌄", "🏖️", "🏜️"],
-  marine_life: ["🐠", "🐟", "🦈", "🐙", "🦀", "🐚"],
-  forest: ["🌳", "🌲", "🌿", "🦌", "🐿️", "🍄"],
-  mountain: ["🏔️", "⛰️", "🗻", "🧗", "🏕️", "🦅"],
+  animal: [
+    "🐶",
+    "🐱",
+    "🐭",
+    "🐹",
+    "🐰",
+    "🦊",
+    "🐻",
+    "🐼",
+    "🐨",
+    "🐯",
+    "🦁",
+    "🐮",
+    "🐷",
+    "🐸",
+    "🦆",
+  ],
+  plant: [
+    "🌱",
+    "🌿",
+    "🌳",
+    "🌲",
+    "🌴",
+    "🌵",
+    "🌸",
+    "🌺",
+    "🌻",
+    "🌷",
+    "🌹",
+    "🌼",
+  ],
+  weather: [
+    "☀️",
+    "🌧️",
+    "⛅",
+    "❄️",
+    "🌈",
+    "⛈️",
+    "🌤️",
+    "🌦️",
+    "🌪️",
+    "🌫️",
+    "🌨️",
+    "❄️",
+  ],
+  geography: ["🏔️", "🏞️", "🏜️", "🏖️", "🌋", "🗻", "🏕️", "🏝️", "🌊"],
+  environment: ["🌍", "🌱", "♻️", "🌿", "🌊", "🌳", "🌎", "🌏", "💚"],
+  ecosystem: ["🌳", "🐝", "🦋", "🌸", "🍄", "🌿", "🐛", "🦗", "🕷️"],
+  conservation: ["♻️", "🌱", "🌍", "🛡️", "💚", "🌿", "🌳", "🌊"],
+  climate: ["🌡️", "❄️", "☀️", "🌧️", "🌪️", "🌊", "🌨️", "🌤️"],
+  natural_disaster: ["🌪️", "🌋", "⛈️", "🌊", "🔥", "❄️", "💥", "🌀"],
+  landscape: ["🏔️", "🏞️", "🌅", "🌄", "🏖️", "🏜️", "🌋", "🗻", "🏕️"],
+  marine_life: ["🐠", "🐟", "🦈", "🐙", "🦀", "🐚", "🐳", "🐋", "🦑", "🐡"],
+  forest: ["🌳", "🌲", "🌿", "🦌", "🐿️", "🍄", "🌲", "🌿", "🦋"],
+  mountain: ["🏔️", "⛰️", "🗻", "🧗", "🏕️", "🦅", "🏔️", "🎿"],
 
   // technology 도메인
-  computer: ["💻", "🖥️", "⌨️", "🖱️", "💾", "💿"],
-  software: ["💻", "📱", "⚙️", "🔧", "💾", "🖥️"],
-  internet: ["🌐", "📡", "💻", "📱", "🔗", "📧"],
-  mobile: ["📱", "📞", "💬", "📧", "📷", "🎵"],
-  ai: ["🤖", "🧠", "💡", "⚙️", "🔮", "🌟"],
-  programming: ["💻", "⌨️", "🖥️", "🔧", "⚙️", "💾"],
-  cybersecurity: ["🔒", "🛡️", "🔐", "🚨", "💻", "🔑"],
-  database: ["💾", "📊", "🗄️", "💻", "🔍", "📋"],
-  robotics: ["🤖", "⚙️", "🔧", "💻", "🦾", "🦿"],
-  blockchain: ["🔗", "💰", "🔐", "💻", "📊", "🌐"],
-  cloud: ["☁️", "💻", "🌐", "📊", "💾", "🔗"],
-  social_media: ["📱", "💬", "📸", "👥", "🌐", "❤️"],
-  gaming: ["🎮", "🕹️", "🎯", "🏆", "🎪", "🎲"],
-  innovation: ["💡", "🚀", "⚡", "🌟", "🔬", "🧪"],
+  computer: ["💻", "🖥️", "⌨️", "🖱️", "💾", "💿", "📱", "💻", "🖥️"],
+  software: ["💻", "📱", "⚙️", "🔧", "💾", "🖥️", "📱", "💾", "🔧"],
+  internet: ["🌐", "📡", "💻", "📱", "🔗", "📧", "🌐", "📶", "📡"],
+  mobile: ["📱", "📞", "💬", "📧", "📷", "🎵", "📱", "📞", "💬"],
+  ai: ["🤖", "🧠", "💡", "⚙️", "🔮", "🌟", "🤖", "🧠", "💡"],
+  programming: ["💻", "⌨️", "🖥️", "🔧", "⚙️", "💾", "💻", "⌨️", "🖥️"],
+  cybersecurity: ["🔒", "🛡️", "🔐", "🚨", "💻", "🔑", "🔒", "🛡️"],
+  database: ["💾", "📊", "🗄️", "💻", "🔍", "📋", "💾", "📊"],
+  robotics: ["🤖", "⚙️", "🔧", "💻", "🦾", "🦿", "🤖", "⚙️"],
+  blockchain: ["🔗", "💰", "🔐", "💻", "📊", "🌐", "🔗", "💰"],
+  cloud: ["☁️", "💻", "🌐", "📊", "💾", "🔗", "☁️", "💻"],
+  social_media: ["📱", "💬", "📸", "👥", "🌐", "❤️", "📱", "💬", "📸"],
+  gaming: ["🎮", "🕹️", "🎯", "🏆", "🎪", "🎲", "🎮", "🕹️", "🎯"],
+  innovation: ["💡", "🚀", "⚡", "🌟", "🔬", "🧪", "💡", "🚀"],
 
   // health 도메인
   exercise: ["🏃", "💪", "🏋️", "🚴", "🏊", "🧘"],
@@ -378,17 +500,32 @@ export const categoryEmojiMapping = {
   national_identity: ["🏛️", "🏳️", "🎭", "📜", "🌟", "🏆"],
 
   // other 도메인
-  hobbies: ["🎨", "📚", "🎵", "🎮", "🧶", "🎲"],
-  finance_personal: ["💰", "💳", "🏦", "📊", "💵", "📈"],
-  legal: ["⚖️", "📋", "👨‍💼", "🏛️", "📄", "✍️"],
-  government: ["🏛️", "🗳️", "👨‍💼", "📋", "⚖️", "🏳️"],
-  politics: ["🗳️", "🏛️", "📢", "👥", "📊", "🎯"],
-  media: ["📺", "📰", "📻", "📱", "📸", "🎙️"],
-  community: ["👥", "🏘️", "🤝", "🎪", "🏛️", "💚"],
-  volunteering: ["🤝", "💚", "👥", "🌟", "🎯", "❤️"],
-  charity: ["💚", "❤️", "🤝", "🎁", "🌟", "💰"],
-  philosophy: ["🤔", "💭", "📚", "🧠", "💡", "🌟"],
-  other: ["📝", "❓", "🔍", "💡", "⭐", "🎯"],
+  hobbies: [
+    "🎨",
+    "📚",
+    "🎵",
+    "🎮",
+    "🧶",
+    "🎲",
+    "🎯",
+    "🎪",
+    "🎭",
+    "🎪",
+    "🎨",
+    "🎸",
+    "🎹",
+    "🎺",
+  ],
+  finance_personal: ["💰", "💳", "🏦", "📊", "💵", "📈", "💰", "💸", "🏦"],
+  legal: ["⚖️", "📋", "👨‍💼", "🏛️", "📄"],
+  government: ["🏛️", "🗳️", "👨‍💼", "📋", "⚖️"],
+  politics: ["🗳️", "🏛️", "📢", "👥", "📊"],
+  media: ["📺", "📰", "📻", "📱", "📸", "🎙️", "📹", "📡"],
+  community: ["👥", "🏘️", "🤝", "🎪", "🏛️", "💚", "🏘️", "🏠", "🏢"],
+  volunteering: ["🤝", "💚", "👥", "🌟", "🎯", "❤️", "🙋", "🤲"],
+  charity: ["💚", "❤️", "🤝", "🎁", "🌟", "💰", "🎗️", "🤲"],
+  philosophy: ["🤔", "💭", "📚", "🧠", "💡"],
+  other: ["📝", "❓", "🔍", "💡", "⭐"],
 };
 
 // 도메인 이모지 매핑
@@ -466,9 +603,7 @@ function updateCategoryOptions() {
 }
 
 // 도메인 카테고리 이모지 언어 업데이트 함수
-function updateDomainCategoryEmojiLanguage() {
-  console.log("도메인 카테고리 이모지 언어 업데이트 완료");
-}
+function updateDomainCategoryEmojiLanguage() {}
 
 // 개념 추가 모달용 카테고리 옵션 업데이트 함수
 function updateAddCategoryOptions() {
@@ -484,12 +619,6 @@ function updateAddCategoryOptions() {
 
   const selectedDomain = domainSelect.value;
   const categories = domainCategoryMapping[selectedDomain] || [];
-
-  console.log(
-    "🔄 개념 추가 모달 카테고리 옵션 업데이트:",
-    selectedDomain,
-    categories
-  );
 
   // 현재 언어 감지
   const currentLang = localStorage.getItem("userLanguage") || "ko";
@@ -665,6 +794,58 @@ function getTranslatedText(key, lang) {
       pharmacy: "약국",
       rehabilitation: "재활",
       medical_equipment: "의료장비",
+      // sports 카테고리들
+      football: "축구",
+      basketball: "농구",
+      swimming: "수영",
+      running: "달리기",
+      equipment: "장비",
+      olympics: "올림픽",
+      tennis: "테니스",
+      baseball: "야구",
+      golf: "골프",
+      martial_arts: "무술",
+      team_sports: "팀스포츠",
+      individual_sports: "개인스포츠",
+      coaching: "코칭",
+      competition: "경쟁",
+      // entertainment 카테고리들
+      movie: "영화",
+      game: "게임",
+      book: "책",
+      theater: "극장",
+      concert: "콘서트",
+      festival: "축제",
+      celebrity: "유명인",
+      tv_show: "TV쇼",
+      comedy: "코미디",
+      drama: "드라마",
+      animation: "애니메이션",
+      photography: "사진",
+      // culture 카테고리들
+      tradition: "전통",
+      customs: "관습",
+      language: "언어",
+      religion: "종교",
+      heritage: "유산",
+      ceremony: "의식",
+      ritual: "의례",
+      folklore: "민속",
+      mythology: "신화",
+      arts_crafts: "예술공예",
+      etiquette: "예절",
+      national_identity: "국가정체성",
+      // other 카테고리들
+      hobbies: "취미",
+      finance_personal: "개인재정",
+      legal: "법률",
+      government: "정부",
+      politics: "정치",
+      media: "미디어",
+      community: "커뮤니티",
+      volunteering: "자원봉사",
+      charity: "자선",
+      philosophy: "철학",
     },
     en: {
       domain_placeholder: "Select Domain",
@@ -803,6 +984,58 @@ function getTranslatedText(key, lang) {
       pharmacy: "Pharmacy",
       rehabilitation: "Rehabilitation",
       medical_equipment: "Medical Equipment",
+      // sports 카테고리들
+      football: "Football",
+      basketball: "Basketball",
+      swimming: "Swimming",
+      running: "Running",
+      equipment: "Equipment",
+      olympics: "Olympics",
+      tennis: "Tennis",
+      baseball: "Baseball",
+      golf: "Golf",
+      martial_arts: "Martial Arts",
+      team_sports: "Team Sports",
+      individual_sports: "Individual Sports",
+      coaching: "Coaching",
+      competition: "Competition",
+      // entertainment 카테고리들
+      movie: "Movie",
+      game: "Game",
+      book: "Book",
+      theater: "Theater",
+      concert: "Concert",
+      festival: "Festival",
+      celebrity: "Celebrity",
+      tv_show: "TV Show",
+      comedy: "Comedy",
+      drama: "Drama",
+      animation: "Animation",
+      photography: "Photography",
+      // culture 카테고리들
+      tradition: "Tradition",
+      customs: "Customs",
+      language: "Language",
+      religion: "Religion",
+      heritage: "Heritage",
+      ceremony: "Ceremony",
+      ritual: "Ritual",
+      folklore: "Folklore",
+      mythology: "Mythology",
+      arts_crafts: "Arts and Crafts",
+      etiquette: "Etiquette",
+      national_identity: "National Identity",
+      // other 카테고리들
+      hobbies: "Hobbies",
+      finance_personal: "Personal Finance",
+      legal: "Legal",
+      government: "Government",
+      politics: "Politics",
+      media: "Media",
+      community: "Community",
+      volunteering: "Volunteering",
+      charity: "Charity",
+      philosophy: "Philosophy",
     },
     ja: {
       domain_placeholder: "ドメインを選択",
@@ -941,6 +1174,58 @@ function getTranslatedText(key, lang) {
       pharmacy: "薬局",
       rehabilitation: "リハビリテーション",
       medical_equipment: "医療機器",
+      // sports 카테고리들
+      football: "サッカー",
+      basketball: "バスケットボール",
+      swimming: "水泳",
+      running: "ランニング",
+      equipment: "装備",
+      olympics: "オリンピック",
+      tennis: "テニス",
+      baseball: "野球",
+      golf: "ゴルフ",
+      martial_arts: "武術",
+      team_sports: "チームスポーツ",
+      individual_sports: "個人スポーツ",
+      coaching: "コーチング",
+      competition: "競争",
+      // entertainment 카테고리들
+      movie: "映画",
+      game: "ゲーム",
+      book: "本",
+      theater: "劇場",
+      concert: "コンサート",
+      festival: "祭り",
+      celebrity: "有名人",
+      tv_show: "TV番組",
+      comedy: "コメディ",
+      drama: "ドラマ",
+      animation: "アニメ",
+      photography: "写真",
+      // culture 카테고리들
+      tradition: "伝統",
+      customs: "習慣",
+      language: "言語",
+      religion: "宗教",
+      heritage: "遺産",
+      ceremony: "儀式",
+      ritual: "儀礼",
+      folklore: "民俗",
+      mythology: "神話",
+      arts_crafts: "芸術工芸",
+      etiquette: "礼儀",
+      national_identity: "国家統一感",
+      // other 카테고리들
+      hobbies: "趣味",
+      finance_personal: "個人金融",
+      legal: "法律",
+      government: "政府",
+      politics: "政治",
+      media: "メディア",
+      community: "コミュニティ",
+      volunteering: "ボランティア",
+      charity: "慈善",
+      philosophy: "哲学",
     },
     zh: {
       domain_placeholder: "选择域",
@@ -1079,6 +1364,58 @@ function getTranslatedText(key, lang) {
       pharmacy: "药店",
       rehabilitation: "康复",
       medical_equipment: "医疗设备",
+      // sports 카테고리들
+      football: "足球",
+      basketball: "篮球",
+      swimming: "游泳",
+      running: "跑步",
+      equipment: "装备",
+      olympics: "奥运会",
+      tennis: "网球",
+      baseball: "棒球",
+      golf: "高尔夫",
+      martial_arts: "武术",
+      team_sports: "团队运动",
+      individual_sports: "个人运动",
+      coaching: "教练",
+      competition: "竞争",
+      // entertainment 카테고리들
+      movie: "电影",
+      game: "游戏",
+      book: "书",
+      theater: "剧院",
+      concert: "音乐会",
+      festival: "节日",
+      celebrity: "名人",
+      tv_show: "电视节目",
+      comedy: "喜剧",
+      drama: "戏剧",
+      animation: "动画",
+      photography: "摄影",
+      // culture 카테고리들
+      tradition: "传统",
+      customs: "习俗",
+      language: "语言",
+      religion: "宗教",
+      heritage: "遗产",
+      ceremony: "仪式",
+      ritual: "礼仪",
+      folklore: "民俗",
+      mythology: "神话",
+      arts_crafts: "艺术手工艺",
+      etiquette: "礼仪",
+      national_identity: "国家统一感",
+      // other 카테고리들
+      hobbies: "爱好",
+      finance_personal: "个人金融",
+      legal: "法律",
+      government: "政府",
+      politics: "政治",
+      media: "媒体",
+      community: "社区",
+      volunteering: "志愿服务",
+      charity: "慈善",
+      philosophy: "哲学",
     },
   };
 
@@ -1100,12 +1437,6 @@ function updateAddEmojiOptions() {
 
   const selectedDomain = domainSelect.value;
   const selectedCategory = categorySelect.value;
-
-  console.log(
-    "🎨 개념 추가 모달 이모지 옵션 업데이트:",
-    selectedDomain,
-    selectedCategory
-  );
 
   // 현재 언어 감지
   const currentLang = localStorage.getItem("userLanguage") || "ko";
@@ -1180,12 +1511,6 @@ function updateEditCategoryOptions() {
   const selectedDomain = domainSelect.value;
   const categories = domainCategoryMapping[selectedDomain] || [];
 
-  console.log(
-    "🔄 편집 모달 카테고리 옵션 업데이트:",
-    selectedDomain,
-    categories
-  );
-
   // 현재 언어 감지
   const currentLang = localStorage.getItem("userLanguage") || "ko";
 
@@ -1222,12 +1547,6 @@ function updateEditEmojiOptions() {
 
   const selectedDomain = domainSelect.value;
   const selectedCategory = categorySelect.value;
-
-  console.log(
-    "🎨 편집 모달 이모지 옵션 업데이트:",
-    selectedDomain,
-    selectedCategory
-  );
 
   // 현재 언어 감지
   const currentLang = localStorage.getItem("userLanguage") || "ko";
@@ -1303,8 +1622,6 @@ function updateEditEmojiOptions() {
       emojiSelect.appendChild(option);
       emojiSelect.value = emojiValue;
     }
-
-    console.log("🎯 편집 모달 이모지 값 설정:", emojiValue);
   }
 }
 
@@ -1388,28 +1705,24 @@ function setupModalEventListeners() {
   const addDomainSelect = document.getElementById("concept-domain");
   if (addDomainSelect) {
     addDomainSelect.addEventListener("change", updateAddCategoryOptions);
-    console.log("✅ 개념 추가 모달 도메인 선택 이벤트 리스너 설정 완료");
   }
 
   // 개념 추가 모달용 카테고리 선택 이벤트 리스너
   const addCategorySelect = document.getElementById("concept-category");
   if (addCategorySelect) {
     addCategorySelect.addEventListener("change", updateAddEmojiOptions);
-    console.log("✅ 개념 추가 모달 카테고리 선택 이벤트 리스너 설정 완료");
   }
 
   // 편집 모달용 도메인 선택 이벤트 리스너
   const editDomainSelect = document.getElementById("edit-concept-domain");
   if (editDomainSelect) {
     editDomainSelect.addEventListener("change", updateEditCategoryOptions);
-    console.log("✅ 편집 모달 도메인 선택 이벤트 리스너 설정 완료");
   }
 
   // 편집 모달용 카테고리 선택 이벤트 리스너
   const editCategorySelect = document.getElementById("edit-concept-category");
   if (editCategorySelect) {
     editCategorySelect.addEventListener("change", updateEditEmojiOptions);
-    console.log("✅ 편집 모달 카테고리 선택 이벤트 리스너 설정 완료");
   }
 }
 

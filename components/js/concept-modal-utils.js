@@ -92,8 +92,6 @@ export function validateForm() {
 
 // 폼 데이터 수집
 export function collectFormData() {
-  console.log("📊 데이터 수집 시작");
-
   // 개념 정보
   const domainField = document.getElementById("concept-domain");
   const categoryField = document.getElementById("concept-category");
@@ -115,8 +113,6 @@ export function collectFormData() {
     situation: situations.length > 0 ? situations : ["casual"], // 기본값 설정
     purpose: purposeField ? purposeField.value.trim() : "description", // 기본값 설정
   };
-
-  console.log("🏷️ 개념 정보 수집:", conceptInfo);
 
   // 언어별 표현 수집
   const expressions = {};
@@ -182,8 +178,6 @@ export function collectFormData() {
                 .filter((s) => s)
             : [],
       };
-
-      console.log(`🌍 ${langCode} 표현 수집:`, expressions[langCode]);
     }
   }
 
@@ -191,30 +185,39 @@ export function collectFormData() {
   const examples = [];
   let representativeExample = {};
 
-  document.querySelectorAll(".example-item").forEach((item, index) => {
+  // 현재 열린 모달 찾기
+  const openModal = document.querySelector("#concept-modal:not(.hidden)");
+  if (!openModal) {
+    console.error("❌ 열린 모달을 찾을 수 없습니다");
+    return null;
+  }
+
+  const exampleItems = openModal.querySelectorAll(".example-item");
+
+  exampleItems.forEach((item, index) => {
     const example = {};
     let hasContent = false;
 
     // 첫 번째 예문은 항상 대표 예문으로 처리 (UI에서 대표 예문으로 표시됨)
     const isRepresentative = index === 0;
-
     // 각 언어별 예제 수집
     for (const langCode of Object.keys(supportedLangs)) {
       const exampleField = item.querySelector(`.${langCode}-example`);
-      if (exampleField && exampleField.value.trim()) {
-        example[langCode] = exampleField.value.trim();
-        hasContent = true;
+      if (exampleField) {
+        const value = exampleField.value.trim();
+        if (value) {
+          example[langCode] = value;
+          hasContent = true;
+        }
       }
     }
 
     // 내용이 있는 예제 처리
     if (hasContent) {
       if (isRepresentative) {
-        representativeExample = example; // 직접 언어별 예문 객체로 저장
-        console.log("📝 대표 예문 수집:", representativeExample);
+        representativeExample = example; // 대표 예문으로 저장
       } else {
         examples.push(example);
-        console.log("📝 일반 예문 수집:", example);
       }
     }
   });
@@ -233,14 +236,6 @@ export function collectFormData() {
   if (examples.length > 0) {
     result.examples = examples;
   }
-
-  console.log("📋 최종 수집된 데이터:", result);
-  console.log("🔍 데이터 검증:", {
-    hasExpressions: Object.keys(expressions).length > 0,
-    hasConceptInfo: !!conceptInfo.domain && !!conceptInfo.category,
-    hasRepresentativeExample: !!representativeExample,
-    expressionCount: Object.keys(expressions).length,
-  });
 
   return result;
 }
@@ -298,9 +293,17 @@ export function resetForm() {
   }
 
   // 예제 초기화
-  const examplesContainer = document.getElementById("examples-container");
+  // 현재 열린 모달 찾기
+  const openModal = document.querySelector("#concept-modal:not(.hidden)");
+  if (!openModal) {
+    console.error("❌ 열린 모달을 찾을 수 없습니다");
+    return;
+  }
+
+  const examplesContainer = openModal.querySelector("#examples-container");
   if (examplesContainer) {
     examplesContainer.innerHTML = "";
+
     // 기본 대표 예문 필드를 HTML로 직접 추가
     const representativeExampleHTML = `
       <div class="example-item border-2 border-blue-300 bg-blue-50 p-4 rounded mb-4">
@@ -353,7 +356,7 @@ export function initLanguageTabEventListeners() {
       // data-language 속성에서 언어를 가져오고 언어 코드로 변환
       const language = button.dataset.language;
       const langCode = convertLanguageToCode(language);
-      console.log("🖱️ 언어 탭 클릭:", { language, langCode });
+
       switchLanguageTab(langCode);
     });
   });
@@ -424,11 +427,20 @@ export function addExampleFields(
   existingExample = null,
   isRepresentative = false
 ) {
-  const containerFound = document.getElementById("examples-container");
+  // 현재 열린 모달 찾기
+  const openModal = document.querySelector("#concept-modal:not(.hidden)");
+  if (!openModal) {
+    console.error("❌ 열린 모달을 찾을 수 없습니다");
+    return;
+  }
+
+  const containerFound = openModal.querySelector("#examples-container");
   console.log("📝 addExampleFields 호출:", {
     existingExample,
     isRepresentative,
     containerFound: !!containerFound,
+    currentChildrenCount: containerFound?.children.length,
+    modalId: openModal.id,
   });
 
   if (!containerFound) {
@@ -436,13 +448,15 @@ export function addExampleFields(
     return;
   }
 
+  // 현재 예문 개수 확인 (대표 예문 제외하고 계산)
+  const currentExampleCount = containerFound.children.length;
+  console.log("🔍 현재 예문 컨테이너 자식 요소 개수:", currentExampleCount);
+
   const exampleItem = document.createElement("div");
   exampleItem.className = "example-item border rounded-lg p-4 mb-4";
 
-  // 예제 레이블 (대표 예문 레이블 제거)
-  const labelText = isRepresentative
-    ? ""
-    : `예문 ${containerFound.children.length + 1}`;
+  // 예제 레이블 (대표 예문이 아닌 경우에만 삭제 버튼 표시)
+  const labelText = isRepresentative ? "" : `예문 ${currentExampleCount}`;
 
   let exampleHTML = `
     ${
@@ -487,6 +501,8 @@ export function addExampleFields(
 
   exampleHTML += "</div>";
   exampleItem.innerHTML = exampleHTML;
+
+  // DOM에 추가
   containerFound.appendChild(exampleItem);
 }
 
@@ -557,11 +573,8 @@ export async function updateStaticLabels(userLanguage) {
 export async function applyModalTranslations() {
   try {
     const userLanguage = await getActiveLanguage();
-    console.log("🌍 모달 번역 적용:", userLanguage);
-
     // localStorage에도 언어 설정 저장
     localStorage.setItem("preferredLanguage", userLanguage);
-    console.log("💾 preferredLanguage 저장:", userLanguage);
 
     // data-i18n 속성이 있는 모든 요소에 번역 적용
     await applyLanguage();
@@ -573,7 +586,6 @@ export async function applyModalTranslations() {
     applyPlaceholderTranslations(userLanguage);
 
     // 도메인-카테고리-이모지 옵션 업데이트 (여러 번의 시도로 확실하게)
-    console.log("🔄 도메인-카테고리 번역 시작");
 
     // 즉시 한 번 실행
     if (typeof window.updateDomainCategoryEmojiLanguage === "function") {
@@ -772,8 +784,6 @@ export function validateEditForm() {
 
 // 편집 폼 데이터 수집
 export function collectEditFormData() {
-  console.log("📊 편집 폼 데이터 수집 시작");
-
   // 개념 정보
   const domainField = document.getElementById("edit-concept-domain");
   const categoryField = document.getElementById("edit-concept-category");
@@ -795,8 +805,6 @@ export function collectEditFormData() {
     situation: situations.length > 0 ? situations : ["casual"], // 기본값 설정
     purpose: purposeField ? purposeField.value.trim() : "description", // 기본값 설정
   };
-
-  console.log("🏷️ 편집 개념 정보 수집:", conceptInfo);
 
   // 언어별 표현 수집
   const expressions = {};
@@ -868,8 +876,6 @@ export function collectEditFormData() {
                 .filter((s) => s)
             : [],
       };
-
-      console.log(`🌍 편집 ${langCode} 표현 수집:`, expressions[langCode]);
     }
   }
 
@@ -900,10 +906,8 @@ export function collectEditFormData() {
         if (isRepresentative) {
           // 기존 구조 유지 - translations 속성 제거
           representativeExample = example;
-          console.log("📝 편집 대표 예문 수집:", representativeExample);
         } else {
           examples.push(example);
-          console.log("📝 편집 일반 예문 수집:", example);
         }
       }
     });
@@ -922,7 +926,6 @@ export function collectEditFormData() {
     // updated_at은 Firebase에서 서버 타임스탬프로 처리
   };
 
-  console.log("📋 편집 폼 최종 수집된 데이터:", result);
   return result;
 }
 
@@ -998,10 +1001,6 @@ export function closeEditModal() {
 
   // 전역 저장소 정리
   if (window.editConceptEmojiValue) {
-    console.log(
-      "🧹 편집 모달 닫기 시 전역 저장소 정리:",
-      window.editConceptEmojiValue
-    );
     delete window.editConceptEmojiValue;
   }
 }
@@ -1012,11 +1011,6 @@ export function addEditExampleFields(
   isRepresentative = false
 ) {
   const containerFound = document.getElementById("edit-examples-container");
-  console.log("📝 편집 모달 addExampleFields 호출:", {
-    existingExample,
-    isRepresentative,
-    containerFound: !!containerFound,
-  });
 
   if (!containerFound) {
     console.error("❌ edit-examples-container를 찾을 수 없습니다");

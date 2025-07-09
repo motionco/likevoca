@@ -67,7 +67,6 @@ function updateDynamicTranslations() {
 function setupLanguageChangeListener() {
   // 언어 변경 이벤트 리스너
   document.addEventListener("languageChanged", (event) => {
-    console.log("언어 변경 감지:", event.detail);
     userLanguage = event.detail.language;
 
     // 동적 번역 업데이트
@@ -142,7 +141,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         updateBookmarkUI();
       }, 500);
     } else {
-      console.log("❌ 사용자가 로그인되지 않았습니다.");
       // alert 메시지 제거하고 바로 리디렉션
       if (typeof window.redirectToLogin === "function") {
         window.redirectToLogin();
@@ -211,7 +209,6 @@ function setInitialLanguageSelections() {
 // 북마크된 개념들 로드
 async function loadBookmarkedConcepts() {
   if (!currentUser) {
-    console.log("❌ 사용자가 로그인되지 않음");
     return;
   }
 
@@ -228,31 +225,17 @@ async function loadBookmarkedConcepts() {
     bookmarkChangesPending = false;
   }
 
-  console.log("🔄 북마크 pending 상태 정리 완료:", {
-    남은pending: Array.from(pendingUnbookmarks),
-    변경사항있음: bookmarkChangesPending,
-  });
-
   // 페이지 로드 시 pending 상태 초기화 (새로고침 등으로 인한 페이지 재로드 시)
   pendingUnbookmarks.clear();
   bookmarkChangesPending = false;
-  console.log("🔄 북마크 pending 상태 초기화");
 
   try {
     const userEmail = currentUser.email;
-    console.log("📚 북마크 로드 시작:", userEmail);
-
     // 1. 사용자의 북마크 목록 가져오기
     const bookmarksRef = doc(db, "bookmarks", userEmail);
-    console.log("🔍 북마크 문서 참조:", bookmarksRef.path);
-
     const bookmarkDoc = await getDoc(bookmarksRef);
-    console.log("📄 북마크 문서 존재 여부:", bookmarkDoc.exists());
 
     if (!bookmarkDoc.exists()) {
-      console.log(
-        "📝 북마크 문서가 존재하지 않음 - 새 사용자이거나 아직 북마크하지 않음"
-      );
       userBookmarks = [];
       bookmarkedConcepts = [];
       updateUI(); // UI 업데이트 추가
@@ -260,14 +243,9 @@ async function loadBookmarkedConcepts() {
     }
 
     const bookmarkData = bookmarkDoc.data();
-    console.log("📋 북마크 문서 원본 데이터:", bookmarkData);
-
     userBookmarks = bookmarkData.concept_ids || [];
-    console.log("🔖 사용자 북마크 목록:", userBookmarks);
-    console.log("📊 북마크 개수:", userBookmarks.length);
 
     if (userBookmarks.length === 0) {
-      console.log("📭 북마크된 개념이 없음");
       bookmarkedConcepts = [];
       updateUI(); // UI 업데이트 추가
       return;
@@ -276,23 +254,19 @@ async function loadBookmarkedConcepts() {
     // 2. 북마크된 개념들의 세부 정보 가져오기
     bookmarkedConcepts = [];
     const invalidBookmarkIds = []; // 존재하지 않는 북마크 ID 추적
-    console.log("🔄 북마크된 개념들의 세부 정보 로딩 시작...");
 
     // 배치로 처리하여 성능 향상
     const batchSize = 10;
     for (let i = 0; i < userBookmarks.length; i += batchSize) {
       const batch = userBookmarks.slice(i, i + batchSize);
-      console.log(`📦 배치 ${Math.floor(i / batchSize) + 1} 처리 중:`, batch);
 
       const conceptPromises = batch.map(async (conceptId) => {
         try {
-          console.log(`🔍 개념 로딩 중: ${conceptId}`);
           const conceptRef = doc(db, "concepts", conceptId);
           const conceptDoc = await getDoc(conceptRef);
 
           if (conceptDoc.exists()) {
             const conceptData = { id: conceptDoc.id, ...conceptDoc.data() };
-            console.log(`✅ 개념 로딩 성공: ${conceptId}`);
             return conceptData;
           } else {
             console.warn(`⚠️ 개념을 찾을 수 없음: ${conceptId}`);
@@ -308,25 +282,12 @@ async function loadBookmarkedConcepts() {
 
       const batchResults = await Promise.all(conceptPromises);
       const validConcepts = batchResults.filter((concept) => concept !== null);
-      console.log(
-        `📊 배치 결과 - 성공: ${validConcepts.length}, 실패: ${
-          batchResults.length - validConcepts.length
-        }`
-      );
 
       bookmarkedConcepts.push(...validConcepts);
     }
 
-    console.log("📈 총 로딩된 개념 수:", bookmarkedConcepts.length);
-    console.log("🗑️ 존재하지 않는 북마크 ID 수:", invalidBookmarkIds.length);
-
     // 3. 존재하지 않는 북마크 ID들을 정리
     if (invalidBookmarkIds.length > 0) {
-      console.log(
-        "🧹 존재하지 않는 북마크 ID들을 정리합니다:",
-        invalidBookmarkIds
-      );
-
       const validBookmarkIds = userBookmarks.filter(
         (id) => !invalidBookmarkIds.includes(id)
       );
@@ -338,17 +299,6 @@ async function loadBookmarkedConcepts() {
         });
 
         userBookmarks = validBookmarkIds;
-        console.log(
-          "✅ 북마크 정리 완료. 유효한 북마크 수:",
-          validBookmarkIds.length
-        );
-
-        // 사용자에게 알림 (선택적)
-        if (invalidBookmarkIds.length > 0) {
-          console.info(
-            `📢 ${invalidBookmarkIds.length}개의 오래된 북마크가 자동으로 정리되었습니다.`
-          );
-        }
       } catch (cleanupError) {
         console.error("❌ 북마크 정리 중 오류:", cleanupError);
       }
@@ -363,12 +313,6 @@ async function loadBookmarkedConcepts() {
 
     // 필터링된 개념 초기화
     filteredConcepts = [...bookmarkedConcepts];
-    console.log("✅ 북마크 로드 완료:", {
-      총개념수: bookmarkedConcepts.length,
-      필터링된개념수: filteredConcepts.length,
-      북마크ID목록: userBookmarks,
-      정리된ID수: invalidBookmarkIds.length,
-    });
 
     // UI 업데이트
     updateUI();
@@ -569,20 +513,9 @@ function createConceptCard(concept) {
   const sourceLanguageCode = getLanguageCode(sourceLanguage);
   const targetLanguageCode = getLanguageCode(targetLanguage);
 
-  console.log("🔍 나만의 단어장 예문 처리 시작:", {
-    conceptId: concept.id,
-    sourceLanguage,
-    targetLanguage,
-    sourceLanguageCode,
-    targetLanguageCode,
-    hasRepresentativeExample: !!concept.representative_example,
-    representativeExample: concept.representative_example,
-  });
-
   // 1. representative_example 확인 (새 구조와 기존 구조 모두 지원)
   if (concept.representative_example) {
     const repExample = concept.representative_example;
-    console.log("✅ 대표 예문 발견:", repExample);
 
     // 새로운 구조: 직접 언어별 텍스트
     if (repExample[sourceLanguageCode] && repExample[targetLanguageCode]) {
@@ -590,11 +523,9 @@ function createConceptCard(concept) {
         source: repExample[sourceLanguageCode],
         target: repExample[targetLanguageCode],
       };
-      console.log("✅ 나만의 단어장: 새로운 대표 예문 구조 사용", example);
     }
     // 기존 구조: translations 객체
     else if (repExample.translations) {
-      console.log("🔍 translations 구조 확인:", repExample.translations);
       example = {
         source:
           repExample.translations[sourceLanguageCode]?.text ||
@@ -605,15 +536,11 @@ function createConceptCard(concept) {
           repExample.translations[targetLanguageCode] ||
           "",
       };
-      console.log("✅ 나만의 단어장: 기존 대표 예문 구조 사용", example);
-    } else {
-      console.log("⚠️ 대표 예문 구조를 인식할 수 없음:", repExample);
     }
   }
   // 2. featured_examples 확인 (기존 방식)
   else if (concept.featured_examples && concept.featured_examples.length > 0) {
     const firstExample = concept.featured_examples[0];
-    console.log("🔍 featured_examples 사용:", firstExample);
     if (firstExample.translations) {
       example = {
         source: firstExample.translations[sourceLanguageCode]?.text || "",
@@ -624,7 +551,6 @@ function createConceptCard(concept) {
   // 3. core_examples 확인 (기존 방식 - 하위 호환성)
   else if (concept.core_examples && concept.core_examples.length > 0) {
     const firstExample = concept.core_examples[0];
-    console.log("🔍 core_examples 사용:", firstExample);
     // 번역 구조 확인
     if (firstExample.translations) {
       example = {
@@ -642,14 +568,11 @@ function createConceptCard(concept) {
   // 4. 기존 examples 확인 (하위 호환성)
   else if (concept.examples && concept.examples.length > 0) {
     const firstExample = concept.examples[0];
-    console.log("🔍 examples 사용:", firstExample);
     example = {
       source: firstExample[sourceLanguageCode] || "",
       target: firstExample[targetLanguageCode] || "",
     };
   }
-
-  console.log("🎯 나만의 단어장 최종 예문 결과:", example);
 
   // 개념 ID 생성 (document ID 우선 사용)
   const conceptId =
@@ -782,7 +705,6 @@ function setupEventListeners() {
   // 네비게이션바 이벤트 설정 (햄버거 메뉴 등)
   if (typeof window.setupBasicNavbarEvents === "function") {
     window.setupBasicNavbarEvents();
-    console.log("✅ 나만의 단어장: 네비게이션바 이벤트 설정 완료");
   } else {
     console.warn("⚠️ setupBasicNavbarEvents 함수를 찾을 수 없습니다.");
   }
@@ -812,6 +734,27 @@ function setupEventListeners() {
       displayConceptList();
     });
   }
+
+  // 개념 추가/수정 완료 이벤트 리스너 (다중 등록)
+  const handleConceptSaved = async (event) => {
+    try {
+      // 북마크된 개념 목록 다시 로드
+      await loadBookmarkedConcepts();
+
+      // 현재 필터 상태 유지하면서 표시 업데이트
+      applyFiltersAndSort();
+
+      // 메시지 표시
+      showMessage("새 개념이 추가되었습니다!", "success");
+    } catch (error) {
+      console.error("❌ 단어장 목록 업데이트 실패:", error);
+      showMessage("목록 업데이트 중 오류가 발생했습니다.", "error");
+    }
+  };
+
+  // document와 window 모두에 이벤트 리스너 등록
+  document.addEventListener("concept-saved", handleConceptSaved);
+  window.addEventListener("concept-saved", handleConceptSaved);
 }
 
 // 검색 처리 (공유 모듈 사용)
@@ -860,8 +803,6 @@ function handleLanguageChange() {
 
 // 개념 상세보기 모달 열기
 window.openConceptViewModal = function (conceptId) {
-  console.log(`${getI18nText("concept_detail_view")} ${conceptId}`);
-
   const concept = bookmarkedConcepts.find((c) => (c.id || c._id) === conceptId);
   if (!concept) {
     console.error("개념을 찾을 수 없습니다:", conceptId);
@@ -941,13 +882,6 @@ function showConceptDetailModal(concept) {
 
   // 대표 예문 쌍 생성
   if (concept.representative_example) {
-    console.log("🔍 보기 모달 대표 예문 처리 시작:", {
-      conceptId: concept.id,
-      firstLanguage,
-      envLangCode,
-      representative_example: concept.representative_example,
-    });
-
     let selectedExample = null;
     let envExample = null;
 
@@ -958,10 +892,6 @@ function showConceptDetailModal(concept) {
         firstLanguage !== envLangCode
           ? concept.representative_example[envLangCode]
           : null;
-      console.log("✅ 보기 모달: 새로운 대표 예문 구조 사용", {
-        selectedExample,
-        envExample,
-      });
     }
     // 기존 구조: translations 객체
     else if (concept.representative_example.translations) {
@@ -971,10 +901,6 @@ function showConceptDetailModal(concept) {
         firstLanguage !== envLangCode
           ? concept.representative_example.translations[envLangCode]
           : null;
-      console.log("✅ 보기 모달: 기존 대표 예문 구조 사용", {
-        selectedExample,
-        envExample,
-      });
     }
 
     if (selectedExample) {
@@ -983,12 +909,6 @@ function showConceptDetailModal(concept) {
         translation: envExample,
         isRepresentative: true,
       });
-      console.log("✅ 보기 모달: 대표 예문 추가됨", {
-        original: selectedExample,
-        translation: envExample,
-      });
-    } else {
-      console.log("⚠️ 보기 모달: 대표 예문을 찾을 수 없음");
     }
   }
 
@@ -2005,8 +1925,6 @@ function generateDomainSortFilters() {
       </div>
     </div>
   `;
-
-  console.log("✅ 나만의 단어장 도메인 및 정렬 필터 동적 생성 완료");
 }
 
 // 북마크 토글 (나만의 단어장용)
@@ -2016,8 +1934,6 @@ async function toggleBookmark(conceptId) {
     return;
   }
 
-  console.log("🔖 북마크 토글 시작:", conceptId);
-
   const isCurrentlyBookmarked = userBookmarks.includes(conceptId);
   const isPendingUnbookmark = pendingUnbookmarks.has(conceptId);
 
@@ -2026,13 +1942,13 @@ async function toggleBookmark(conceptId) {
     await removeBookmarkImmediately(conceptId);
     pendingUnbookmarks.add(conceptId);
     bookmarkChangesPending = true;
-    console.log("✅ 북마크 해제 완료 (DB), UI는 그레이 상태:", conceptId);
+
     showMessage("북마크가 해제되었습니다.", "success");
   } else if (!isCurrentlyBookmarked && isPendingUnbookmark) {
     // 해제 취소 - 다시 북마크 추가
     await addBookmarkImmediately(conceptId);
     pendingUnbookmarks.delete(conceptId);
-    console.log("🔄 북마크 해제 취소, 다시 추가:", conceptId);
+
     showMessage("북마크가 다시 추가되었습니다.", "success");
 
     // 변경사항이 없으면 플래그 해제
@@ -2067,7 +1983,6 @@ async function addBookmarkImmediately(conceptId) {
     await setDoc(bookmarksRef, bookmarkData);
     userBookmarks = updatedBookmarks;
 
-    console.log("✅ 북마크 추가 완료:", conceptId);
     showMessage("북마크가 추가되었습니다.", "success");
 
     // 개념 목록 새로고침 (새로 추가된 북마크 반영)
@@ -2094,8 +2009,6 @@ async function removeBookmarkImmediately(conceptId) {
 
     await setDoc(bookmarksRef, bookmarkData);
     userBookmarks = updatedBookmarks;
-
-    console.log("✅ 북마크 제거 완료:", conceptId);
   } catch (error) {
     console.error("❌ 북마크 제거 오류:", error);
     showMessage("북마크 제거 중 오류가 발생했습니다.", "error");
@@ -2122,11 +2035,6 @@ async function processPendingUnbookmarks() {
     };
 
     await setDoc(bookmarksRef, bookmarkData);
-
-    console.log(
-      "✅ 지연된 북마크 해제 처리 완료:",
-      Array.from(pendingUnbookmarks)
-    );
 
     // 상태 초기화
     pendingUnbookmarks.clear();
