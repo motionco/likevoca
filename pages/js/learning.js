@@ -126,6 +126,40 @@ document.addEventListener("DOMContentLoaded", function () {
   setTimeout(() => {
     // 언어 선택 요소들 초기화
     updateLanguageSelectors();
+
+    // 언어 필터 강제 초기화
+    import("../../utils/language-utils.js").then((module) => {
+      const { initializeLanguageFilterSync } = module;
+
+      // 모바일 언어 필터 초기화
+      const mobileSettings = initializeLanguageFilterSync(
+        "source-language",
+        "target-language",
+        "learningLanguageFilter"
+      );
+
+      // 데스크탑 언어 필터 초기화
+      const desktopSettings = initializeLanguageFilterSync(
+        "source-language-desktop",
+        "target-language-desktop",
+        "learningLanguageFilter"
+      );
+
+      // 전역 변수 업데이트
+      sourceLanguage = mobileSettings.sourceLanguage;
+      targetLanguage = mobileSettings.targetLanguage;
+
+      if (window.languageSettings) {
+        window.languageSettings.sourceLanguage = sourceLanguage;
+        window.languageSettings.targetLanguage = targetLanguage;
+      }
+
+      console.log("🔄 언어 필터 강제 초기화 완료:", {
+        sourceLanguage,
+        targetLanguage,
+      });
+    });
+
     showAreaSelection();
 
     // 초기 번역 적용
@@ -135,16 +169,45 @@ document.addEventListener("DOMContentLoaded", function () {
     startDataPreloading();
   }, 100);
 
-  // 언어 변경 핸들러 초기화
-  handleLanguageChange();
+  // 언어 변경 핸들러는 제거 (중복 방지)
+  // handleLanguageChange();
 
   // 언어 변경 이벤트 리스너 추가
-  window.addEventListener("languageChanged", () => {
+  window.addEventListener("languageChanged", (event) => {
     console.log("🌐 언어 변경 이벤트 수신 - 학습 페이지 업데이트");
 
-    // 사용자 언어 설정 다시 가져오기
-    const userLanguage = localStorage.getItem("userLanguage") || "ko";
-    currentUILanguage = userLanguage === "auto" ? "ko" : userLanguage;
+    // 변경된 언어 가져오기
+    const newUILanguage =
+      event.detail?.language || localStorage.getItem("userLanguage") || "ko";
+    currentUILanguage = newUILanguage === "auto" ? "ko" : newUILanguage;
+
+    // 언어 필터 초기화 (환경 언어 변경 시 기존 설정 무시)
+    import("../../utils/language-utils.js").then((module) => {
+      const { updateLanguageFilterOnUIChange, loadLanguageFilterSettings } =
+        module;
+
+      // 환경 언어 변경에 따른 언어 필터 초기화
+      updateLanguageFilterOnUIChange(currentUILanguage);
+
+      // 새로운 언어 설정 로드 및 전역 변수 업데이트
+      const newSettings = loadLanguageFilterSettings("learningLanguageFilter");
+      sourceLanguage = newSettings.sourceLanguage;
+      targetLanguage = newSettings.targetLanguage;
+
+      if (window.languageSettings) {
+        window.languageSettings.sourceLanguage = sourceLanguage;
+        window.languageSettings.targetLanguage = targetLanguage;
+      }
+
+      // 언어 선택 요소 업데이트
+      updateLanguageSelectors();
+
+      console.log("🔄 환경 언어 변경에 따른 언어 필터 초기화:", {
+        newUILanguage: currentUILanguage,
+        sourceLanguage,
+        targetLanguage,
+      });
+    });
 
     // 번역 다시 적용
     if (typeof window.applyLanguage === "function") {
@@ -154,10 +217,50 @@ document.addEventListener("DOMContentLoaded", function () {
     // 필터 옵션 언어 업데이트
     updateFilterOptionsLanguage();
 
-    // 현재 화면 다시 렌더링
+    // 현재 학습 중인 내용이 있으면 실시간 업데이트
     if (currentLearningArea && currentLearningMode) {
-      updateCurrentView();
+      console.log("🔄 언어 변경으로 인한 학습 내용 실시간 업데이트:", {
+        area: currentLearningArea,
+        mode: currentLearningMode,
+      });
+
+      // 각 학습 모드별로 업데이트
+      switch (currentLearningArea) {
+        case "vocabulary":
+          switch (currentLearningMode) {
+            case "flashcard":
+              updateFlashcard();
+              break;
+            case "typing":
+              updateTyping();
+              break;
+          }
+          break;
+
+        case "grammar":
+          switch (currentLearningMode) {
+            case "pattern":
+              updateGrammarPatterns();
+              break;
+            case "practice":
+              updateGrammarPractice();
+              break;
+          }
+          break;
+
+        case "reading":
+          switch (currentLearningMode) {
+            case "example":
+              updateReadingExample();
+              break;
+            case "flash":
+              updateReadingFlash();
+              break;
+          }
+          break;
+      }
     } else {
+      // 현재 화면 다시 렌더링
       showAreaSelection();
     }
   });
@@ -172,35 +275,55 @@ function initializeLanguageSettings() {
   // 사용자 언어 설정 가져오기
   const userLanguage = localStorage.getItem("userLanguage") || "ko";
 
-  // 언어 설정 초기화
-  if (!window.languageSettings) {
-    window.languageSettings = {
-      sourceLanguage: sessionStorage.getItem("sourceLanguage") || "korean",
-      targetLanguage: sessionStorage.getItem("targetLanguage") || "english",
-      currentUILanguage: userLanguage === "auto" ? "ko" : userLanguage,
-    };
-  }
+  // 언어 필터 설정 임포트 및 초기화
+  import("../../utils/language-utils.js").then((module) => {
+    const { loadLanguageFilterSettings, saveLanguageFilterSettings } = module;
 
-  // 전역 변수 업데이트
-  sourceLanguage = window.languageSettings.sourceLanguage;
-  targetLanguage = window.languageSettings.targetLanguage;
-  currentUILanguage = window.languageSettings.currentUILanguage;
+    // 언어 필터 설정 로드 (시스템 언어 기반 초기값 사용)
+    const filterSettings = loadLanguageFilterSettings("learningLanguageFilter");
 
-  // 같은 언어 선택 방지
-  if (sourceLanguage === targetLanguage) {
-    const otherLanguages = ["korean", "english", "japanese", "chinese"].filter(
-      (lang) => lang !== sourceLanguage
-    );
-    targetLanguage = otherLanguages[0];
-    window.languageSettings.targetLanguage = targetLanguage;
-    sessionStorage.setItem("targetLanguage", targetLanguage);
-  }
+    // 언어 설정 초기화
+    if (!window.languageSettings) {
+      window.languageSettings = {
+        sourceLanguage: filterSettings.sourceLanguage,
+        targetLanguage: filterSettings.targetLanguage,
+        currentUILanguage: userLanguage === "auto" ? "ko" : userLanguage,
+      };
+    }
 
-  console.log("🌐 언어 설정 초기화:", {
-    sourceLanguage,
-    targetLanguage,
-    currentUILanguage,
-    userLanguage,
+    // 전역 변수 업데이트
+    sourceLanguage = window.languageSettings.sourceLanguage;
+    targetLanguage = window.languageSettings.targetLanguage;
+    currentUILanguage = window.languageSettings.currentUILanguage;
+
+    // 같은 언어 선택 방지
+    if (sourceLanguage === targetLanguage) {
+      const otherLanguages = [
+        "korean",
+        "english",
+        "japanese",
+        "chinese",
+      ].filter((lang) => lang !== sourceLanguage);
+      targetLanguage = otherLanguages[0];
+      window.languageSettings.targetLanguage = targetLanguage;
+
+      // 언어 필터 설정도 업데이트
+      const updatedSettings = {
+        sourceLanguage,
+        targetLanguage,
+      };
+      saveLanguageFilterSettings(updatedSettings, "learningLanguageFilter");
+    }
+
+    console.log("🌐 언어 설정 초기화:", {
+      sourceLanguage,
+      targetLanguage,
+      currentUILanguage,
+      userLanguage,
+    });
+
+    // 언어 선택 요소 즉시 초기화
+    updateLanguageSelectors();
   });
 }
 
@@ -349,134 +472,10 @@ function applyFilters(data) {
   return filteredData;
 }
 
-// 언어 변경 핸들러
+// 언어 변경 핸들러 (사용하지 않음 - 중복 방지)
 function handleLanguageChange() {
-  // UI 언어 변경 이벤트 리스너
-  document.addEventListener("languageChanged", function (event) {
-    console.log("🌐 UI 언어 변경 감지:", event.detail.language);
-    currentUILanguage = event.detail.language;
-
-    // 언어 선택 요소들 업데이트
-    updateLanguageSelectors();
-
-    // 번역 적용
-    applyTranslations();
-    applyAdditionalTranslations();
-
-    // 현재 학습 중인 내용이 있으면 실시간 업데이트
-    if (currentLearningArea && currentLearningMode) {
-      console.log("🔄 언어 변경으로 인한 학습 내용 실시간 업데이트:", {
-        area: currentLearningArea,
-        mode: currentLearningMode,
-      });
-
-      // 각 학습 모드별로 업데이트
-      switch (currentLearningArea) {
-        case "vocabulary":
-          switch (currentLearningMode) {
-            case "flashcard":
-              updateFlashcard();
-              break;
-            case "typing":
-              updateTyping();
-              break;
-          }
-          break;
-
-        case "grammar":
-          switch (currentLearningMode) {
-            case "pattern":
-              updateGrammarPatterns();
-              break;
-            case "practice":
-              updateGrammarPractice();
-              break;
-          }
-          break;
-
-        case "reading":
-          switch (currentLearningMode) {
-            case "example":
-              updateReadingExample();
-              break;
-            case "flash":
-              updateReadingFlash();
-              break;
-          }
-          break;
-      }
-    }
-  });
-
-  // 중복된 언어 스왑 버튼 이벤트 리스너 제거됨 - setupEventListeners 함수 하단에 올바른 버전 존재
-
-  // 언어 선택 드롭다운 변경 이벤트
-  const sourceSelect = document.getElementById("source-language");
-  const targetSelect = document.getElementById("target-language");
-
-  if (sourceSelect) {
-    sourceSelect.addEventListener("change", (e) => {
-      // 스왑 중인 경우 이벤트 무시
-      if (isLanguageSwapping) {
-        return;
-      }
-
-      sourceLanguage = e.target.value;
-      window.languageSettings.sourceLanguage = sourceLanguage;
-      sessionStorage.setItem("sourceLanguage", sourceLanguage);
-
-      console.log("🌐 원본 언어 변경:", sourceLanguage);
-
-      // 같은 언어 선택 방지
-      if (sourceLanguage === targetLanguage) {
-        // 대상 언어를 다른 언어로 자동 변경
-        const otherLanguages = [
-          "korean",
-          "english",
-          "japanese",
-          "chinese",
-        ].filter((lang) => lang !== sourceLanguage);
-        targetLanguage = otherLanguages[0];
-        targetLanguageSelect.value = targetLanguage;
-        window.languageSettings.targetLanguage = targetLanguage;
-        sessionStorage.setItem("targetLanguage", targetLanguage);
-      }
-
-      handleFilterChange();
-    });
-  }
-
-  if (targetSelect) {
-    targetSelect.addEventListener("change", (e) => {
-      // 스왑 중인 경우 이벤트 무시
-      if (isLanguageSwapping) {
-        return;
-      }
-
-      targetLanguage = e.target.value;
-      window.languageSettings.targetLanguage = targetLanguage;
-      sessionStorage.setItem("targetLanguage", targetLanguage);
-
-      console.log("🌐 대상 언어 변경:", targetLanguage);
-
-      // 같은 언어 선택 방지
-      if (sourceLanguage === targetLanguage) {
-        // 원본 언어를 다른 언어로 자동 변경
-        const otherLanguages = [
-          "korean",
-          "english",
-          "japanese",
-          "chinese",
-        ].filter((lang) => lang !== targetLanguage);
-        sourceLanguage = otherLanguages[0];
-        sourceLanguageSelect.value = sourceLanguage;
-        window.languageSettings.sourceLanguage = sourceLanguage;
-        sessionStorage.setItem("sourceLanguage", sourceLanguage);
-      }
-
-      handleFilterChange();
-    });
-  }
+  // 이 함수는 더 이상 사용하지 않습니다.
+  // 언어 변경 처리는 window.addEventListener("languageChanged")에서 통합 처리합니다.
 }
 
 // 번역 적용 함수
@@ -778,11 +777,28 @@ function getCurrentLanguage() {
 function updateLanguageSelectors() {
   const sourceLanguageSelect = document.getElementById("source-language");
   const targetLanguageSelect = document.getElementById("target-language");
+  const sourceLanguageDesktopSelect = document.getElementById(
+    "source-language-desktop"
+  );
+  const targetLanguageDesktopSelect = document.getElementById(
+    "target-language-desktop"
+  );
 
+  // 모바일 언어 선택 요소
   if (sourceLanguageSelect && targetLanguageSelect) {
     sourceLanguageSelect.value = sourceLanguage;
     targetLanguageSelect.value = targetLanguage;
-    console.log("🔄 언어 선택 요소 업데이트:", {
+    console.log("🔄 모바일 언어 선택 요소 업데이트:", {
+      sourceLanguage,
+      targetLanguage,
+    });
+  }
+
+  // 데스크탑 언어 선택 요소
+  if (sourceLanguageDesktopSelect && targetLanguageDesktopSelect) {
+    sourceLanguageDesktopSelect.value = sourceLanguage;
+    targetLanguageDesktopSelect.value = targetLanguage;
+    console.log("🔄 데스크탑 언어 선택 요소 업데이트:", {
       sourceLanguage,
       targetLanguage,
     });
@@ -871,7 +887,6 @@ function setupEventListeners() {
     if (type === "source") {
       sourceLanguage = newValue;
       window.languageSettings.sourceLanguage = sourceLanguage;
-      sessionStorage.setItem("sourceLanguage", sourceLanguage);
 
       console.log("🌐 원본 언어 변경:", sourceLanguage);
 
@@ -892,12 +907,10 @@ function setupEventListeners() {
           targetLanguageDesktopSelect.value = targetLanguage;
 
         window.languageSettings.targetLanguage = targetLanguage;
-        sessionStorage.setItem("targetLanguage", targetLanguage);
       }
     } else if (type === "target") {
       targetLanguage = newValue;
       window.languageSettings.targetLanguage = targetLanguage;
-      sessionStorage.setItem("targetLanguage", targetLanguage);
 
       console.log("🌐 대상 언어 변경:", targetLanguage);
 
@@ -918,9 +931,18 @@ function setupEventListeners() {
           sourceLanguageDesktopSelect.value = sourceLanguage;
 
         window.languageSettings.sourceLanguage = sourceLanguage;
-        sessionStorage.setItem("sourceLanguage", sourceLanguage);
       }
     }
+
+    // 언어 설정 저장
+    import("../../utils/language-utils.js").then((module) => {
+      const { saveLanguageFilterSettings } = module;
+      const settings = {
+        sourceLanguage,
+        targetLanguage,
+      };
+      saveLanguageFilterSettings(settings, "learningLanguageFilter");
+    });
 
     handleFilterChange();
   }
@@ -940,8 +962,6 @@ function setupEventListeners() {
     // 전역 설정 업데이트
     window.languageSettings.sourceLanguage = sourceLanguage;
     window.languageSettings.targetLanguage = targetLanguage;
-    sessionStorage.setItem("sourceLanguage", sourceLanguage);
-    sessionStorage.setItem("targetLanguage", targetLanguage);
 
     // 모든 언어 선택 요소 업데이트
     if (sourceLanguageSelect) sourceLanguageSelect.value = sourceLanguage;
@@ -952,6 +972,16 @@ function setupEventListeners() {
       targetLanguageDesktopSelect.value = targetLanguage;
 
     console.log("🔄 언어 전환:", { sourceLanguage, targetLanguage });
+
+    // 언어 설정 저장
+    import("../../utils/language-utils.js").then((module) => {
+      const { saveLanguageFilterSettings } = module;
+      const settings = {
+        sourceLanguage,
+        targetLanguage,
+      };
+      saveLanguageFilterSettings(settings, "learningLanguageFilter");
+    });
 
     // 필터 변경 처리
     handleFilterChange();

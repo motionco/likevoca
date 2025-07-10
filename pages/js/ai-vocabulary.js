@@ -15,6 +15,17 @@ import {
   VocabularyFilterProcessor,
   setupVocabularyFilters,
 } from "../../utils/vocabulary-filter-shared.js";
+// 언어 필터 초기화 유틸리티 import
+import {
+  getSystemLanguage,
+  getInitialLanguageSettings,
+  loadLanguageFilterSettings,
+  saveLanguageFilterSettings,
+  initializeLanguageFilterElements,
+  updateLanguageFilterElements,
+  updateLanguageFilterOnUIChange,
+  initializeLanguageFilterSync,
+} from "../../utils/language-utils.js";
 // 공통 번역 유틸리티 import
 // translation-utils.js 제거됨 - language-utils.js의 번역 시스템 사용
 // 도메인 필터 언어 초기화는 vocabulary-filter-shared.js에서 처리됨
@@ -100,7 +111,13 @@ async function initializeUserLanguage() {
 // 언어 변경 이벤트 리스너 설정
 function setupLanguageChangeListener() {
   // 언어 변경 이벤트 감지
-  window.addEventListener("languageChanged", (event) => {
+  window.addEventListener("languageChanged", async (event) => {
+    // 환경 언어 변경 시 언어 필터 리셋
+    await updateLanguageFilterOnUIChange(
+      event.detail.language,
+      "aiVocabularyLanguageFilter"
+    );
+
     // 개념 카드들을 다시 렌더링
     if (displayedConcepts && displayedConcepts.length > 0) {
       renderConcepts();
@@ -327,8 +344,38 @@ function initializeEventListeners() {
     applyFiltersAndSort();
   });
 
-  // AI 단어장 언어 필터 기본값 설정
-  initializeAILanguageFilters();
+  // 언어 필터 초기화 (새로고침 시 설정 유지) - DOM 로드 후 실행
+  setTimeout(() => {
+    initializeLanguageFilterElements(
+      "source-language",
+      "target-language",
+      "aiVocabularyLanguageFilter"
+    );
+
+    // 언어 필터 변경 시 설정 저장 이벤트 리스너 추가
+    const sourceLanguageSelect = document.getElementById("source-language");
+    const targetLanguageSelect = document.getElementById("target-language");
+
+    if (sourceLanguageSelect) {
+      sourceLanguageSelect.addEventListener("change", () => {
+        saveLanguageFilterSettings(
+          sourceLanguageSelect.value,
+          targetLanguageSelect.value,
+          "aiVocabularyLanguageFilter"
+        );
+      });
+    }
+
+    if (targetLanguageSelect) {
+      targetLanguageSelect.addEventListener("change", () => {
+        saveLanguageFilterSettings(
+          sourceLanguageSelect.value,
+          targetLanguageSelect.value,
+          "aiVocabularyLanguageFilter"
+        );
+      });
+    }
+  }, 100);
 
   // 더 보기 버튼
   const loadMoreBtn = document.getElementById("load-more");
@@ -364,38 +411,6 @@ function detectCurrentLanguage() {
   }
 
   return "ko"; // 기본값
-}
-
-// AI 단어장 언어 필터 기본값 설정
-function initializeAILanguageFilters() {
-  // 환경 언어 감지
-  const currentLang = detectCurrentLanguage();
-
-  // 언어 코드 매핑
-  const languageMap = {
-    ko: "korean",
-    en: "english",
-    ja: "japanese",
-    zh: "chinese",
-  };
-
-  // 원본 언어는 환경 언어로 설정
-  const sourceLanguage = languageMap[currentLang] || "korean";
-
-  // 대상 언어는 기본적으로 영어, 원본이 영어인 경우 한국어
-  const targetLanguage = sourceLanguage === "english" ? "korean" : "english";
-
-  // 언어 필터 요소 찾기
-  const sourceSelect = document.getElementById("source-language");
-  const targetSelect = document.getElementById("target-language");
-
-  if (sourceSelect && targetSelect) {
-    // 기본값 설정
-    sourceSelect.value = sourceLanguage;
-    targetSelect.value = targetLanguage;
-  } else {
-    console.warn("⚠️ AI 단어장: 언어 필터 요소를 찾을 수 없습니다");
-  }
 }
 
 async function initializePage() {

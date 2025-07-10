@@ -68,6 +68,27 @@ function initializeElements() {
     newQuizBtn: document.getElementById("new-quiz-btn"),
     quizHistory: document.getElementById("quiz-history"),
   };
+
+  // 언어 필터 초기화
+  setTimeout(() => {
+    initializeLanguageFilters();
+  }, 100);
+}
+
+// 언어 필터 초기화
+function initializeLanguageFilters() {
+  import("../../utils/language-utils.js").then((module) => {
+    const { initializeLanguageFilterElements } = module;
+
+    // 언어 필터 요소 초기화
+    initializeLanguageFilterElements(
+      "quiz-source-language",
+      "quiz-target-language",
+      "quizLanguageFilter"
+    );
+
+    console.log("🎯 퀴즈 페이지 언어 필터 초기화 완료");
+  });
 }
 
 // 이벤트 리스너 등록
@@ -115,6 +136,33 @@ function registerEventListeners() {
         const currentLanguage = localStorage.getItem("userLanguage") || "ko";
         window.location.href = `/locales/${currentLanguage}/login.html`;
       }
+    }
+  });
+
+  // 언어 변경 이벤트 리스너 추가
+  window.addEventListener("languageChanged", (event) => {
+    console.log("🌐 언어 변경 이벤트 수신 - 퀴즈 페이지 업데이트");
+
+    // 변경된 언어 가져오기
+    const newUILanguage =
+      event.detail?.language || localStorage.getItem("userLanguage") || "ko";
+    const currentUILanguage = newUILanguage === "auto" ? "ko" : newUILanguage;
+
+    // 언어 필터 초기화 (환경 언어 변경 시 기존 설정 무시)
+    import("../../utils/language-utils.js").then((module) => {
+      const { updateLanguageFilterOnUIChange } = module;
+
+      // 환경 언어 변경에 따른 언어 필터 초기화
+      updateLanguageFilterOnUIChange(currentUILanguage);
+
+      console.log("🔄 환경 언어 변경에 따른 퀴즈 페이지 언어 필터 초기화:", {
+        newUILanguage: currentUILanguage,
+      });
+    });
+
+    // 번역 다시 적용
+    if (typeof window.applyLanguage === "function") {
+      window.applyLanguage();
     }
   });
 }

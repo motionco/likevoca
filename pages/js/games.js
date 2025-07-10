@@ -289,21 +289,72 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // 게임 카드 클릭 이벤트 리스너
   setupGameCards();
+
+  // 언어 변경 이벤트 리스너 추가
+  window.addEventListener("languageChanged", (event) => {
+    console.log("🌐 언어 변경 이벤트 수신 - 게임 페이지 업데이트");
+
+    // 변경된 언어 가져오기
+    const newUILanguage =
+      event.detail?.language || localStorage.getItem("userLanguage") || "ko";
+    const currentUILanguage = newUILanguage === "auto" ? "ko" : newUILanguage;
+
+    // 언어 필터 초기화 (환경 언어 변경 시 기존 설정 무시)
+    import("../../utils/language-utils.js").then((module) => {
+      const { updateLanguageFilterOnUIChange, loadLanguageFilterSettings } =
+        module;
+
+      // 환경 언어 변경에 따른 언어 필터 초기화
+      updateLanguageFilterOnUIChange(currentUILanguage);
+
+      // 새로운 언어 설정 로드 및 전역 변수 업데이트
+      const newSettings = loadLanguageFilterSettings("gameLanguageFilter");
+      sourceLanguage = newSettings.sourceLanguage;
+      targetLanguage = newSettings.targetLanguage;
+
+      console.log("🔄 환경 언어 변경에 따른 게임 페이지 언어 필터 초기화:", {
+        newUILanguage: currentUILanguage,
+        sourceLanguage,
+        targetLanguage,
+      });
+    });
+
+    // 번역 다시 적용
+    if (typeof window.applyLanguage === "function") {
+      window.applyLanguage();
+    }
+  });
 });
 
 // 저장된 언어 설정 불러오기
 function loadLanguageSettings() {
   try {
-    const savedSettings = localStorage.getItem(LANGUAGE_SETTINGS_KEY);
-    if (savedSettings) {
-      const settings = JSON.parse(savedSettings);
-      sourceLanguage = settings.sourceLanguage || "korean";
-      targetLanguage = settings.targetLanguage || "english";
+    // 언어 필터 설정 임포트 및 초기화
+    import("../../utils/language-utils.js").then((module) => {
+      const { loadLanguageFilterSettings } = module;
+
+      // 언어 필터 설정 로드 (시스템 언어 기반 초기값 사용)
+      const filterSettings = loadLanguageFilterSettings("gameLanguageFilter");
+
+      sourceLanguage = filterSettings.sourceLanguage;
+      targetLanguage = filterSettings.targetLanguage;
+
+      console.log("🌐 게임 페이지 언어 설정 로드:", {
+        sourceLanguage,
+        targetLanguage,
+      });
 
       // UI 업데이트
-      document.getElementById("source-language").value = sourceLanguage;
-      document.getElementById("target-language").value = targetLanguage;
-    }
+      const sourceElement = document.getElementById("source-language");
+      const targetElement = document.getElementById("target-language");
+
+      if (sourceElement) {
+        sourceElement.value = sourceLanguage;
+      }
+      if (targetElement) {
+        targetElement.value = targetLanguage;
+      }
+    });
   } catch (error) {
     console.error("언어 설정 불러오기 오류:", error);
   }
@@ -312,13 +363,18 @@ function loadLanguageSettings() {
 // 언어 설정 저장
 function saveLanguageSettings() {
   try {
-    const settings = {
-      sourceLanguage,
-      targetLanguage,
-      lastUpdated: new Date().toISOString(),
-    };
-    localStorage.setItem(LANGUAGE_SETTINGS_KEY, JSON.stringify(settings));
-    console.log("언어 설정 저장됨:", settings);
+    // 언어 필터 설정 임포트 및 저장
+    import("../../utils/language-utils.js").then((module) => {
+      const { saveLanguageFilterSettings } = module;
+
+      const settings = {
+        sourceLanguage,
+        targetLanguage,
+      };
+
+      saveLanguageFilterSettings(settings, "gameLanguageFilter");
+      console.log("언어 설정 저장됨:", settings);
+    });
   } catch (error) {
     console.error("언어 설정 저장 오류:", error);
   }
@@ -334,7 +390,13 @@ function setupLanguageSelectors() {
       sourceLanguage = e.target.value;
       // 같은 언어 선택 방지
       if (sourceLanguage === targetLanguage) {
-        targetLanguage = sourceLanguage === "korean" ? "english" : "korean";
+        const otherLanguages = [
+          "korean",
+          "english",
+          "japanese",
+          "chinese",
+        ].filter((lang) => lang !== sourceLanguage);
+        targetLanguage = otherLanguages[0];
         targetSelect.value = targetLanguage;
       }
       saveLanguageSettings();
@@ -347,7 +409,13 @@ function setupLanguageSelectors() {
       targetLanguage = e.target.value;
       // 같은 언어 선택 방지
       if (targetLanguage === sourceLanguage) {
-        sourceLanguage = targetLanguage === "korean" ? "english" : "korean";
+        const otherLanguages = [
+          "korean",
+          "english",
+          "japanese",
+          "chinese",
+        ].filter((lang) => lang !== targetLanguage);
+        sourceLanguage = otherLanguages[0];
         sourceSelect.value = sourceLanguage;
       }
       saveLanguageSettings();

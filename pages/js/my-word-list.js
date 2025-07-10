@@ -29,6 +29,17 @@ import {
   VocabularyFilterProcessor,
   setupVocabularyFilters,
 } from "../../utils/vocabulary-filter-shared.js";
+// 언어 필터 초기화 유틸리티 import
+import {
+  getSystemLanguage,
+  getInitialLanguageSettings,
+  loadLanguageFilterSettings,
+  saveLanguageFilterSettings,
+  initializeLanguageFilterElements,
+  updateLanguageFilterElements,
+  updateLanguageFilterOnUIChange,
+  initializeLanguageFilterSync,
+} from "../../utils/language-utils.js";
 // 공통 번역 유틸리티 import
 // translation-utils.js 제거됨 - language-utils.js의 번역 시스템 사용
 
@@ -66,8 +77,15 @@ function updateDynamicTranslations() {
 // 언어 변경 리스너 설정
 function setupLanguageChangeListener() {
   // 언어 변경 이벤트 리스너
-  document.addEventListener("languageChanged", (event) => {
+  window.addEventListener("languageChanged", async (event) => {
+    console.log("🔄 나만의 단어장: languageChanged 이벤트 수신:", event.detail);
     userLanguage = event.detail.language;
+
+    // 환경 언어 변경 시 언어 필터 리셋
+    await updateLanguageFilterOnUIChange(
+      event.detail.language,
+      "myWordListLanguageFilter"
+    );
 
     // 동적 번역 업데이트
     updateDynamicTranslations();
@@ -703,6 +721,36 @@ function setupEventListeners() {
     onSortChange: handleSearch,
   });
   filterManager.setupEventListeners();
+
+  // 언어 필터 초기화 (새로고침 시 설정 유지) - DOM 로드 후 실행
+  setTimeout(() => {
+    initializeLanguageFilterElements(
+      "source-language",
+      "target-language",
+      "myWordListLanguageFilter"
+    );
+
+    // 언어 필터 변경 시 설정 저장 이벤트 리스너 추가
+    if (sourceLanguageSelect) {
+      sourceLanguageSelect.addEventListener("change", () => {
+        saveLanguageFilterSettings(
+          sourceLanguageSelect.value,
+          targetLanguageSelect.value,
+          "myWordListLanguageFilter"
+        );
+      });
+    }
+
+    if (targetLanguageSelect) {
+      targetLanguageSelect.addEventListener("change", () => {
+        saveLanguageFilterSettings(
+          sourceLanguageSelect.value,
+          targetLanguageSelect.value,
+          "myWordListLanguageFilter"
+        );
+      });
+    }
+  }, 100);
 
   // 언어 선택 변경은 공통 모듈에서 처리됨
 

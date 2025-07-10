@@ -581,6 +581,12 @@ function setLanguage(langCode) {
     }
     console.log("네비게이션바 언어 버튼 즉시 업데이트:", detectedLang);
 
+    // 언어 변경 이벤트 발생 (리디렉션 전에)
+    const languageChangeEvent = new CustomEvent("languageChanged", {
+      detail: { language: detectedLang, source: "navigation" },
+    });
+    window.dispatchEvent(languageChangeEvent);
+
     // 100ms 지연 후 리디렉션 (사용자가 변경을 확인할 수 있도록)
     setTimeout(() => {
       redirectToLanguagePage(detectedLang, true);
@@ -597,6 +603,12 @@ function setLanguage(langCode) {
     console.log("네비게이션바 언어 버튼 즉시 업데이트:", langCode);
 
     console.log("언어 설정이 저장되었습니다:", langCode);
+
+    // 언어 변경 이벤트 발생 (리디렉션 전에)
+    const languageChangeEvent = new CustomEvent("languageChanged", {
+      detail: { language: langCode, source: "navigation" },
+    });
+    window.dispatchEvent(languageChangeEvent);
 
     // 100ms 지연 후 리디렉션 (사용자가 변경을 확인할 수 있도록)
     setTimeout(() => {
@@ -1728,3 +1740,294 @@ export {
   reloadAndTranslateNavbar,
   loadNavbar,
 };
+
+/**
+ * 시스템 언어를 감지하고 지원하는 언어 형식으로 변환
+ * @returns {string} 지원하는 언어 코드 (korean, english, japanese, chinese)
+ */
+export function getSystemLanguage() {
+  const browserLanguage = navigator.language || navigator.userLanguage;
+  const languageCode = browserLanguage.toLowerCase();
+
+  // 시스템 언어를 지원하는 언어 형식으로 매핑
+  const languageMapping = {
+    ko: "korean",
+    "ko-kr": "korean",
+    en: "english",
+    "en-us": "english",
+    "en-gb": "english",
+    ja: "japanese",
+    "ja-jp": "japanese",
+    zh: "chinese",
+    "zh-cn": "chinese",
+    "zh-tw": "chinese",
+    "zh-hk": "chinese",
+  };
+
+  // 정확한 매칭을 먼저 시도
+  if (languageMapping[languageCode]) {
+    return languageMapping[languageCode];
+  }
+
+  // 언어 코드의 첫 번째 부분만 매칭
+  const primaryLanguage = languageCode.split("-")[0];
+  if (languageMapping[primaryLanguage]) {
+    return languageMapping[primaryLanguage];
+  }
+
+  // 기본값은 한국어
+  return "korean";
+}
+
+/**
+ * 초기 언어 설정을 반환 (시스템 언어 기반)
+ * @returns {Object} {sourceLanguage, targetLanguage}
+ */
+export function getInitialLanguageSettings() {
+  const systemLanguage = getSystemLanguage();
+  let sourceLanguage = systemLanguage;
+  let targetLanguage = "english";
+
+  // 시스템 언어가 영어인 경우 대상 언어를 다른 언어로 설정
+  if (systemLanguage === "english") {
+    targetLanguage = "korean";
+  }
+
+  return {
+    sourceLanguage,
+    targetLanguage,
+  };
+}
+
+/**
+ * 언어 필터 설정을 로드하고 초기화
+ * @param {string} storageKey - 스토리지 키 (기본값: 'languageFilter')
+ * @returns {Object} {sourceLanguage, targetLanguage}
+ */
+export function loadLanguageFilterSettings(storageKey = "languageFilter") {
+  try {
+    // 기존 설정 확인
+    const savedSettings = sessionStorage.getItem(storageKey);
+
+    if (savedSettings) {
+      const parsed = JSON.parse(savedSettings);
+      // 저장된 설정이 유효한지 확인
+      if (parsed.sourceLanguage && parsed.targetLanguage) {
+        return parsed;
+      }
+    }
+
+    // 저장된 설정이 없거나 유효하지 않은 경우 초기 설정 사용
+    const initialSettings = getInitialLanguageSettings();
+    saveLanguageFilterSettings(initialSettings, storageKey);
+    return initialSettings;
+  } catch (error) {
+    console.error("언어 필터 설정 로드 실패:", error);
+    // 오류 발생 시 기본 설정 반환
+    const initialSettings = getInitialLanguageSettings();
+    saveLanguageFilterSettings(
+      initialSettings.sourceLanguage,
+      initialSettings.targetLanguage,
+      storageKey
+    );
+    return initialSettings;
+  }
+}
+
+/**
+ * 언어 필터 설정을 저장
+ * @param {string} sourceLanguage - 원본 언어
+ * @param {string} targetLanguage - 대상 언어
+ * @param {string} storageKey - 스토리지 키 (기본값: 'languageFilter')
+ */
+export function saveLanguageFilterSettings(
+  sourceLanguage,
+  targetLanguage,
+  storageKey = "languageFilter"
+) {
+  try {
+    const settings = {
+      sourceLanguage,
+      targetLanguage,
+    };
+    sessionStorage.setItem(storageKey, JSON.stringify(settings));
+  } catch (error) {
+    console.error("언어 필터 설정 저장 실패:", error);
+  }
+}
+
+/**
+ * 언어 필터 DOM 요소들을 초기화
+ * @param {string} sourceElementId - 원본 언어 선택 요소 ID
+ * @param {string} targetElementId - 대상 언어 선택 요소 ID
+ * @param {string} storageKey - 스토리지 키 (기본값: 'languageFilter')
+ */
+export function initializeLanguageFilterElements(
+  sourceElementId,
+  targetElementId,
+  storageKey = "languageFilter"
+) {
+  const sourceElement = document.getElementById(sourceElementId);
+  const targetElement = document.getElementById(targetElementId);
+
+  if (!sourceElement || !targetElement) {
+    console.warn(
+      "언어 필터 요소를 찾을 수 없습니다:",
+      sourceElementId,
+      targetElementId
+    );
+    return;
+  }
+
+  // 저장된 설정 또는 초기 설정 로드
+  const settings = loadLanguageFilterSettings(storageKey);
+
+  // DOM 요소에 값 설정
+  sourceElement.value = settings.sourceLanguage;
+  targetElement.value = settings.targetLanguage;
+
+  // 변경 이벤트 리스너 추가
+  const saveCurrentSettings = () => {
+    const currentSettings = {
+      sourceLanguage: sourceElement.value,
+      targetLanguage: targetElement.value,
+    };
+    saveLanguageFilterSettings(currentSettings, storageKey);
+  };
+
+  sourceElement.addEventListener("change", saveCurrentSettings);
+  targetElement.addEventListener("change", saveCurrentSettings);
+
+  console.log("언어 필터 초기화 완료:", settings);
+}
+
+/**
+ * 네비게이션 언어 변경 시 언어 필터 업데이트
+ * @param {string} newUILanguage - 새로운 UI 언어 (ko, en, ja, zh)
+ * @param {string} storageKey - 스토리지 키
+ */
+export function updateLanguageFilterOnUIChange(newUILanguage, storageKey) {
+  console.log("🔄 updateLanguageFilterOnUIChange 호출됨:", newUILanguage);
+
+  // UI 언어를 언어 필터 형식으로 변환
+  const uiLanguageToFilterLanguage = {
+    ko: "korean",
+    en: "english",
+    ja: "japanese",
+    zh: "chinese",
+  };
+
+  // 새로운 UI 언어에 맞는 원본 언어 설정
+  const newSourceLanguage =
+    uiLanguageToFilterLanguage[newUILanguage] || "korean";
+  let newTargetLanguage = "english";
+
+  // 원본 언어가 영어인 경우 대상 언어를 한국어로 설정
+  if (newSourceLanguage === "english") {
+    newTargetLanguage = "korean";
+  }
+
+  const newSettings = {
+    sourceLanguage: newSourceLanguage,
+    targetLanguage: newTargetLanguage,
+  };
+
+  console.log("🔄 새로운 언어 필터 설정:", newSettings);
+
+  // 현재 페이지의 언어 필터 설정 업데이트 (환경 언어 변경 시 기존 설정 무시)
+  if (storageKey) {
+    saveLanguageFilterSettings(
+      newSourceLanguage,
+      newTargetLanguage,
+      storageKey
+    );
+    console.log(`🔄 ${storageKey} 스토리지 업데이트 완료`);
+  }
+
+  // 현재 페이지의 언어 필터 DOM 요소 업데이트
+  updateLanguageFilterElements(newSettings);
+
+  console.log("🔄 언어 필터 DOM 업데이트 완료:", newSettings);
+
+  console.log("✅ 네비게이션 언어 변경에 따른 언어 필터 초기화 완료:", {
+    newUILanguage,
+    newSourceLanguage,
+    newTargetLanguage,
+  });
+}
+
+/**
+ * 언어 필터 DOM 요소들을 업데이트
+ * @param {Object} settings - {sourceLanguage, targetLanguage}
+ */
+export function updateLanguageFilterElements(settings) {
+  // 모든 가능한 언어 필터 요소 ID들
+  const elementIds = [
+    // 학습 페이지
+    ["source-language", "target-language"],
+    ["source-language-desktop", "target-language-desktop"],
+    // 퀴즈 페이지
+    ["quiz-source-language", "quiz-target-language"],
+    // 게임 페이지 (source-language, target-language는 학습 페이지와 동일)
+  ];
+
+  elementIds.forEach(([sourceId, targetId]) => {
+    const sourceElement = document.getElementById(sourceId);
+    const targetElement = document.getElementById(targetId);
+
+    if (sourceElement && targetElement) {
+      sourceElement.value = settings.sourceLanguage;
+      targetElement.value = settings.targetLanguage;
+      console.log(`언어 필터 DOM 업데이트: ${sourceId}, ${targetId}`, settings);
+    }
+  });
+
+  // 전역 변수 업데이트 (페이지별로 존재할 수 있음)
+  if (typeof window.sourceLanguage !== "undefined") {
+    window.sourceLanguage = settings.sourceLanguage;
+  }
+  if (typeof window.targetLanguage !== "undefined") {
+    window.targetLanguage = settings.targetLanguage;
+  }
+
+  // 학습 페이지 전역 설정 업데이트
+  if (window.languageSettings) {
+    window.languageSettings.sourceLanguage = settings.sourceLanguage;
+    window.languageSettings.targetLanguage = settings.targetLanguage;
+  }
+}
+
+/**
+ * 언어 필터 초기화를 동기적으로 처리
+ * @param {string} sourceElementId - 원본 언어 선택 요소 ID
+ * @param {string} targetElementId - 대상 언어 선택 요소 ID
+ * @param {string} storageKey - 스토리지 키 (기본값: 'languageFilter')
+ * @returns {Object} {sourceLanguage, targetLanguage}
+ */
+export function initializeLanguageFilterSync(
+  sourceElementId,
+  targetElementId,
+  storageKey = "languageFilter"
+) {
+  const sourceElement = document.getElementById(sourceElementId);
+  const targetElement = document.getElementById(targetElementId);
+
+  if (!sourceElement || !targetElement) {
+    console.warn(
+      "언어 필터 요소를 찾을 수 없습니다:",
+      sourceElementId,
+      targetElementId
+    );
+    return getInitialLanguageSettings();
+  }
+
+  // 저장된 설정 또는 초기 설정 로드
+  const settings = loadLanguageFilterSettings(storageKey);
+
+  // DOM 요소에 값 설정
+  sourceElement.value = settings.sourceLanguage;
+  targetElement.value = settings.targetLanguage;
+
+  console.log("언어 필터 동기 초기화 완료:", settings);
+  return settings;
+}

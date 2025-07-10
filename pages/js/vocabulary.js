@@ -37,6 +37,17 @@ import {
   VocabularyFilterProcessor,
   setupVocabularyFilters,
 } from "../../utils/vocabulary-filter-shared.js";
+// 언어 필터 초기화 유틸리티 import
+import {
+  getSystemLanguage,
+  getInitialLanguageSettings,
+  loadLanguageFilterSettings,
+  saveLanguageFilterSettings,
+  initializeLanguageFilterElements,
+  updateLanguageFilterElements,
+  updateLanguageFilterOnUIChange,
+  initializeLanguageFilterSync,
+} from "../../utils/language-utils.js";
 
 // 전역 변수
 let allConcepts = [];
@@ -977,6 +988,12 @@ function setupLanguageChangeListener() {
   window.addEventListener("languageChanged", async (event) => {
     userLanguage = event.detail.language;
 
+    // 환경 언어 변경 시 언어 필터 리셋
+    await updateLanguageFilterOnUIChange(
+      event.detail.language,
+      "vocabularyLanguageFilter"
+    );
+
     // 개념 카드들을 다시 렌더링
     if (allConcepts && allConcepts.length > 0) {
       displayConceptList();
@@ -1100,6 +1117,39 @@ function setupEventListeners() {
     // 필터 변경 시 실행될 콜백 함수
     handleSearch();
   });
+
+  // 언어 필터 초기화 (새로고침 시 설정 유지) - DOM 로드 후 실행
+  setTimeout(() => {
+    initializeLanguageFilterElements(
+      "source-language",
+      "target-language",
+      "vocabularyLanguageFilter"
+    );
+
+    // 언어 필터 변경 시 설정 저장 이벤트 리스너 추가
+    const sourceLanguageSelect = document.getElementById("source-language");
+    const targetLanguageSelect = document.getElementById("target-language");
+
+    if (sourceLanguageSelect) {
+      sourceLanguageSelect.addEventListener("change", () => {
+        saveLanguageFilterSettings(
+          sourceLanguageSelect.value,
+          targetLanguageSelect.value,
+          "vocabularyLanguageFilter"
+        );
+      });
+    }
+
+    if (targetLanguageSelect) {
+      targetLanguageSelect.addEventListener("change", () => {
+        saveLanguageFilterSettings(
+          sourceLanguageSelect.value,
+          targetLanguageSelect.value,
+          "vocabularyLanguageFilter"
+        );
+      });
+    }
+  }, 100);
 
   // 필터 초기화 버튼
   const resetFiltersBtn = document.getElementById("reset-filters");
