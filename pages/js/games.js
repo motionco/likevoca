@@ -305,7 +305,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         module;
 
       // 환경 언어 변경에 따른 언어 필터 초기화
-      updateLanguageFilterOnUIChange(currentUILanguage);
+      updateLanguageFilterOnUIChange(currentUILanguage, "gameLanguageFilter");
 
       // 새로운 언어 설정 로드 및 전역 변수 업데이트
       const newSettings = loadLanguageFilterSettings("gameLanguageFilter");
@@ -367,12 +367,11 @@ function saveLanguageSettings() {
     import("../../utils/language-utils.js").then((module) => {
       const { saveLanguageFilterSettings } = module;
 
-      const settings = {
+      saveLanguageFilterSettings(
         sourceLanguage,
         targetLanguage,
-      };
-
-      saveLanguageFilterSettings(settings, "gameLanguageFilter");
+        "gameLanguageFilter"
+      );
       console.log("언어 설정 저장됨:", settings);
     });
   } catch (error) {

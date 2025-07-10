@@ -202,6 +202,12 @@ function registerEventListeners() {
 
       // 🎮 게임 완료 상태 확인 및 자동 업데이트
       checkGameCompletionUpdate();
+
+      // 📚 학습 완료 상태 확인 및 자동 업데이트
+      checkLearningCompletionUpdate();
+
+      // 📚 학습 완료 상태 확인 및 자동 업데이트
+      checkLearningCompletionUpdate();
     } else {
       console.log("❌ 사용자가 로그인되지 않았습니다.");
       // alert 메시지 제거하고 바로 리디렉션
@@ -369,6 +375,29 @@ async function refreshGameStats() {
 // 외부에서 호출 가능하도록 window 객체에 등록
 window.refreshProgressGameStats = refreshGameStats;
 
+// 📚 학습 통계 실시간 새로고침 (학습 완료 후 호출)
+async function refreshLearningStats() {
+  try {
+    console.log("🔄 학습 통계 실시간 새로고침 시작");
+
+    // 상세 진도 데이터 다시 로드
+    await loadDetailedProgressData();
+
+    // 성취도 표시 업데이트
+    updateAchievements();
+
+    // 차트도 새로고침 (학습 활동이 반영될 수 있음)
+    createCharts();
+
+    console.log("✅ 학습 통계 실시간 새로고침 완료");
+  } catch (error) {
+    console.error("❌ 학습 통계 새로고침 중 오류:", error);
+  }
+}
+
+// 외부에서 호출 가능하도록 window 객체에 등록
+window.refreshProgressLearningStats = refreshLearningStats;
+
 // 🎮 게임 완료 상태 확인 및 자동 업데이트
 function checkGameCompletionUpdate() {
   try {
@@ -400,6 +429,41 @@ function checkGameCompletionUpdate() {
     }
   } catch (error) {
     console.error("❌ 게임 완료 상태 확인 중 오류:", error);
+  }
+}
+
+// 📚 학습 완료 상태 확인 및 자동 업데이트
+function checkLearningCompletionUpdate() {
+  try {
+    const learningCompletionData = localStorage.getItem(
+      "learningCompletionUpdate"
+    );
+
+    if (learningCompletionData) {
+      const data = JSON.parse(learningCompletionData);
+
+      // 현재 사용자의 학습 완료 데이터인지 확인
+      if (data.userId === currentUser?.uid) {
+        console.log("📚 학습 완료 데이터 감지됨:", data);
+
+        // 학습 통계 자동 업데이트 (팝업 없이)
+        console.log("📚 학습 완료 감지됨, 통계 새로고침 시작");
+        setTimeout(async () => {
+          try {
+            await refreshLearningStats();
+            console.log("✅ 학습 완료 후 진도 페이지 자동 업데이트 완료");
+          } catch (error) {
+            console.error("❌ 학습 완료 후 자동 업데이트 중 오류:", error);
+          }
+        }, 1000); // 1초 후 업데이트 (페이지 로딩 완료 후)
+
+        // localStorage에서 제거 (한 번만 처리)
+        localStorage.removeItem("learningCompletionUpdate");
+        console.log("🗑️ 학습 완료 데이터 localStorage에서 제거");
+      }
+    }
+  } catch (error) {
+    console.error("❌ 학습 완료 상태 확인 중 오류:", error);
   }
 }
 
@@ -521,7 +585,7 @@ async function loadDetailedProgressData() {
     const learningQuery = query(
       collection(db, "learning_records"),
       where("user_email", "==", currentUser.email),
-      limit(50)
+      limit(100)
     );
     const learningSnapshot = await getDocs(learningQuery);
 
@@ -532,6 +596,18 @@ async function loadDetailedProgressData() {
 
     learningSnapshot.docs.forEach((doc) => {
       const data = doc.data();
+      console.log("📚 학습 기록 데이터:", {
+        id: doc.id,
+        user_email: data.user_email,
+        type: data.type,
+        concepts_studied: data.concepts_studied,
+        session_duration: data.session_duration,
+        correct_answers: data.correct_answers,
+        total_interactions: data.total_interactions,
+        session_quality: data.session_quality,
+        timestamp: data.timestamp,
+      });
+
       totalStudyTime += data.session_duration || 0;
 
       // 학습 품질 계산 (다양한 요소 고려)
@@ -541,9 +617,13 @@ async function loadDetailedProgressData() {
       const correctAnswers = data.correct_answers || 0;
       const totalInteractions = data.total_interactions || conceptsStudied;
 
-      if (conceptsStudied > 0 || sessionDuration > 0) {
-        let sessionQuality = 0;
+      // 이미 계산된 session_quality가 있으면 사용, 없으면 계산
+      let sessionQuality = data.session_quality || 0;
 
+      if (
+        sessionQuality === 0 &&
+        (conceptsStudied > 0 || sessionDuration > 0)
+      ) {
         // 1. 개념 수 점수 (40%) - 학습 범위
         const conceptScore = Math.min(40, conceptsStudied * 4);
 
@@ -611,6 +691,24 @@ async function loadDetailedProgressData() {
     userProgressData.achievements.totalStudyTime = Math.round(totalStudyTime);
     userProgressData.achievements.completionRate = completionRate;
     userProgressData.achievements.averageAccuracy = avgQuizAccuracy;
+
+    console.log("📊 학습 세션 통계:", {
+      totalLearningSessions: learningSnapshot.size,
+      avgSessionQuality,
+      totalStudyTime: Math.round(totalStudyTime),
+      learningRecordsCount: learningSnapshot.docs.length,
+      sampleLearningRecords: learningSnapshot.docs.slice(0, 3).map((doc) => ({
+        id: doc.id,
+        type: doc.data().type,
+        activity_type: doc.data().activity_type,
+        concepts_studied: doc.data().concepts_studied,
+        session_duration: doc.data().session_duration,
+        correct_answers: doc.data().correct_answers,
+        total_interactions: doc.data().total_interactions,
+        user_email: doc.data().user_email,
+        completed_at: doc.data().completed_at,
+      })),
+    });
 
     // 연속 학습 일수 계산
     userProgressData.studyStreak = await calculateStudyStreak();
@@ -1105,7 +1203,17 @@ function updateAchievements() {
       }%`;
     }
 
-    console.log("✅ 성취도 업데이트 완료");
+    console.log("✅ 성취도 업데이트 완료:", {
+      totalQuizzes: userProgressData.achievements?.totalQuizzes || 0,
+      avgQuizAccuracy: userProgressData.achievements?.avgQuizAccuracy || 0,
+      totalGames: userProgressData.achievements?.totalGames || 0,
+      avgGameScore: userProgressData.achievements?.avgGameScore || 0,
+      totalLearningSessions:
+        userProgressData.achievements?.totalLearningSessions || 0,
+      avgSessionQuality: userProgressData.achievements?.avgSessionQuality || 0,
+      totalStudyTime: userProgressData.achievements?.totalStudyTime || 0,
+      completionRate: userProgressData.achievements?.completionRate || 0,
+    });
   } catch (error) {
     console.error("❌ 성취도 업데이트 중 오류:", error);
   }

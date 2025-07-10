@@ -153,7 +153,7 @@ function registerEventListeners() {
       const { updateLanguageFilterOnUIChange } = module;
 
       // 환경 언어 변경에 따른 언어 필터 초기화
-      updateLanguageFilterOnUIChange(currentUILanguage);
+      updateLanguageFilterOnUIChange(currentUILanguage, "quizLanguageFilter");
 
       console.log("🔄 환경 언어 변경에 따른 퀴즈 페이지 언어 필터 초기화:", {
         newUILanguage: currentUILanguage,

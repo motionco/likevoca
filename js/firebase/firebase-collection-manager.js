@@ -2659,6 +2659,7 @@ export class CollectionManager {
 
       const activityDoc = {
         user_email: userEmail,
+        type: activityData.type, // "vocabulary", "grammar", "reading" - 진도 페이지 호환성
         activity_type: activityData.type, // "vocabulary", "grammar", "reading"
         concept_ids: activityData.conceptIds || [],
 

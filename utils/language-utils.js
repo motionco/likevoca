@@ -1888,11 +1888,11 @@ export function initializeLanguageFilterElements(
 
   // 변경 이벤트 리스너 추가
   const saveCurrentSettings = () => {
-    const currentSettings = {
-      sourceLanguage: sourceElement.value,
-      targetLanguage: targetElement.value,
-    };
-    saveLanguageFilterSettings(currentSettings, storageKey);
+    saveLanguageFilterSettings(
+      sourceElement.value,
+      targetElement.value,
+      storageKey
+    );
   };
 
   sourceElement.addEventListener("change", saveCurrentSettings);
@@ -1961,17 +1961,37 @@ export function updateLanguageFilterOnUIChange(newUILanguage, storageKey) {
  * @param {Object} settings - {sourceLanguage, targetLanguage}
  */
 export function updateLanguageFilterElements(settings) {
-  // 모든 가능한 언어 필터 요소 ID들
-  const elementIds = [
-    // 학습 페이지
+  // 현재 페이지의 언어 필터 요소만 업데이트
+  const currentPageElementIds = [
+    // 기본 언어 필터 요소 (대부분의 페이지에서 사용)
     ["source-language", "target-language"],
-    ["source-language-desktop", "target-language-desktop"],
-    // 퀴즈 페이지
-    ["quiz-source-language", "quiz-target-language"],
-    // 게임 페이지 (source-language, target-language는 학습 페이지와 동일)
   ];
 
-  elementIds.forEach(([sourceId, targetId]) => {
+  // 현재 페이지 경로에 따라 추가 요소 ID들 추가
+  const currentPath = window.location.pathname;
+
+  if (
+    currentPath.includes("/learning") ||
+    currentPath.includes("learning.html")
+  ) {
+    // 학습 페이지 추가 요소
+    currentPageElementIds.push([
+      "source-language-desktop",
+      "target-language-desktop",
+    ]);
+  } else if (
+    currentPath.includes("/quiz") ||
+    currentPath.includes("quiz.html")
+  ) {
+    // 퀴즈 페이지 추가 요소
+    currentPageElementIds.push([
+      "quiz-source-language",
+      "quiz-target-language",
+    ]);
+  }
+  // 게임 페이지는 기본 요소만 사용
+
+  currentPageElementIds.forEach(([sourceId, targetId]) => {
     const sourceElement = document.getElementById(sourceId);
     const targetElement = document.getElementById(targetId);
 

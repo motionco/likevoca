@@ -187,7 +187,10 @@ document.addEventListener("DOMContentLoaded", function () {
         module;
 
       // 환경 언어 변경에 따른 언어 필터 초기화
-      updateLanguageFilterOnUIChange(currentUILanguage);
+      updateLanguageFilterOnUIChange(
+        currentUILanguage,
+        "learningLanguageFilter"
+      );
 
       // 새로운 언어 설정 로드 및 전역 변수 업데이트
       const newSettings = loadLanguageFilterSettings("learningLanguageFilter");
@@ -937,11 +940,11 @@ function setupEventListeners() {
     // 언어 설정 저장
     import("../../utils/language-utils.js").then((module) => {
       const { saveLanguageFilterSettings } = module;
-      const settings = {
+      saveLanguageFilterSettings(
         sourceLanguage,
         targetLanguage,
-      };
-      saveLanguageFilterSettings(settings, "learningLanguageFilter");
+        "learningLanguageFilter"
+      );
     });
 
     handleFilterChange();
@@ -976,11 +979,11 @@ function setupEventListeners() {
     // 언어 설정 저장
     import("../../utils/language-utils.js").then((module) => {
       const { saveLanguageFilterSettings } = module;
-      const settings = {
+      saveLanguageFilterSettings(
         sourceLanguage,
         targetLanguage,
-      };
-      saveLanguageFilterSettings(settings, "learningLanguageFilter");
+        "learningLanguageFilter"
+      );
     });
 
     // 필터 변경 처리
@@ -5138,14 +5141,22 @@ async function completeLearningSession() {
     return;
   }
 
-  // 🎯 최소 학습 조건 확인 (5개 이상 개념 학습 또는 10분 이상 학습)
+  // 🚫 중복 실행 방지
+  if (learningSessionData.isCompleting) {
+    console.log("⚠️ 학습 세션 완료 중, 중복 실행 방지");
+    return;
+  }
+
+  learningSessionData.isCompleting = true;
+
+  // 🎯 최소 학습 조건 확인 (5개 이상 개념 학습 또는 1분 이상 학습)
   const conceptsCount = learningSessionData.conceptsStudied.size;
   const endTime = new Date();
   const duration = Math.round(
     (endTime - learningSessionData.startTime) / 1000 / 60
   ); // 분 단위
 
-  const shouldSaveSession = conceptsCount >= 5 || duration >= 10;
+  const shouldSaveSession = conceptsCount >= 5 || duration >= 1;
 
   if (!shouldSaveSession) {
     console.log("📊 세션 저장 조건 미달:", {
@@ -5160,7 +5171,7 @@ async function completeLearningSession() {
   const activityData = {
     type: learningSessionData.area,
     conceptIds: Array.from(learningSessionData.conceptsStudied),
-    session_duration: duration,
+    session_duration: Math.max(duration, 1), // 최소 1분으로 설정
     concepts_studied: conceptsCount,
     correct_answers: learningSessionData.correctAnswers,
     total_interactions: learningSessionData.totalInteractions,
@@ -5180,13 +5191,18 @@ async function completeLearningSession() {
   };
 
   try {
+    console.log("[DEBUG] updateLearningActivity 호출 직전", {
+      user_email: currentUser?.email,
+      activityData,
+      currentUser,
+    });
     await collectionManager.updateLearningActivity(
       currentUser.email,
       activityData
     );
     console.log("✅ 학습 세션 저장 완료:", {
       conceptsCount,
-      duration,
+      duration: Math.max(duration, 1),
       interactions: learningSessionData.totalInteractions,
       accuracy: `${Math.round(
         (learningSessionData.correctAnswers /
@@ -5195,27 +5211,60 @@ async function completeLearningSession() {
       )}%`,
       sessionQuality: Math.round(activityData.session_quality),
     });
+
+    // 📚 학습 완료 데이터를 localStorage에 저장 (진도 페이지 자동 업데이트용)
+    const learningCompletionData = {
+      userId: currentUser?.uid,
+      userEmail: currentUser?.email,
+      area: learningSessionData.area,
+      mode: learningSessionData.mode,
+      conceptsCount,
+      duration: Math.max(duration, 1),
+      interactions: learningSessionData.totalInteractions,
+      accuracy: Math.round(
+        (learningSessionData.correctAnswers /
+          Math.max(learningSessionData.totalInteractions, 1)) *
+          100
+      ),
+      sessionQuality: Math.round(activityData.session_quality),
+      timestamp: new Date().toISOString(),
+    };
+
+    localStorage.setItem(
+      "learningCompletionUpdate",
+      JSON.stringify(learningCompletionData)
+    );
+    console.log(
+      "📚 학습 완료 데이터 localStorage에 저장:",
+      learningCompletionData
+    );
   } catch (error) {
     console.error("❌ 학습 세션 저장 실패:", error);
   }
 
   // 세션 초기화
   learningSessionData.sessionActive = false;
+  learningSessionData.isCompleting = false;
 }
 
 // 📚 학습 세션 자동 완료 체크 (10개 개념 학습 시)
 function checkSessionCompletion() {
   const conceptsCount = learningSessionData.conceptsStudied.size;
 
-  if (conceptsCount >= 10) {
+  if (conceptsCount >= 10 && learningSessionData.sessionActive) {
     console.log("🎯 10개 개념 학습 완료 - 세션 자동 종료");
     completeLearningSession();
 
     // 🔄 새로운 세션 시작 (연속 학습 지원)
-    if (learningSessionData.sessionActive === false) {
-      console.log("🔄 새로운 학습 세션 시작");
-      startLearningSession(learningSessionData.area, learningSessionData.mode);
-    }
+    setTimeout(() => {
+      if (!learningSessionData.sessionActive) {
+        console.log("🔄 새로운 학습 세션 시작");
+        startLearningSession(
+          learningSessionData.area,
+          learningSessionData.mode
+        );
+      }
+    }, 1000); // 1초 후 새 세션 시작
   } else if (conceptsCount % 5 === 0 && conceptsCount > 0) {
     console.log(`📊 진행 상황: ${conceptsCount}개 개념 학습 완료`);
   }
@@ -5260,8 +5309,10 @@ window.addEventListener("beforeunload", () => {
 async function showLearningComplete() {
   console.log("🎉 학습 완료!");
 
-  // 현재 세션 완료 처리
-  await completeLearningSession();
+  // 현재 세션 완료 처리 (이미 완료된 경우 스킵)
+  if (learningSessionData.sessionActive) {
+    await completeLearningSession();
+  }
 
   // 학습 통계 계산
   const sessionStats = calculateSessionStats();
