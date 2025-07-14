@@ -263,8 +263,6 @@ async function loadTranslations() {
       basePath = ".";
     }
 
-    console.log("🌐 번역 파일 로드 시작, 기본 경로:", basePath);
-
     // 절대 경로로 번역 파일 로드 (Vercel 배포 환경 대응)
     const rootPath = window.location.origin;
 
@@ -294,12 +292,6 @@ async function loadTranslations() {
 
     // 전역 객체에 설정
     window.translations = translations;
-
-    console.log("🔍 한국어 번역 샘플:", {
-      learn_languages: translations.ko?.learn_languages,
-      wordbook: translations.ko?.wordbook,
-      start: translations.ko?.start,
-    });
   } catch (error) {
     console.error("❌ 번역 파일 로드 실패:", error);
 
@@ -527,18 +519,15 @@ async function getActiveLanguage() {
     const savedLang = localStorage.getItem("userLanguage");
 
     if (savedLang && savedLang !== "auto" && SUPPORTED_LANGUAGES[savedLang]) {
-      console.log("저장된 언어 사용:", savedLang);
       cachedLanguage = savedLang;
       localStorage.setItem("preferredLanguage", savedLang); // 도메인-카테고리-이모지용 언어 설정도 동기화
       return savedLang;
     }
 
     // 3. 자동 설정이거나 저장된 언어가 없는 경우
-    console.log("자동 언어 감지 시도...");
 
     // 브라우저 언어 사용
     if (SUPPORTED_LANGUAGES[browserLang]) {
-      console.log("브라우저 언어 사용:", browserLang);
       cachedLanguage = browserLang;
       localStorage.setItem("preferredLanguage", browserLang); // 도메인-카테고리-이모지용 언어 설정도 동기화
       return browserLang;
@@ -689,30 +678,18 @@ function redirectToLanguagePage(langCode, forceRedirect = false) {
 async function applyLanguage() {
   try {
     const langCode = await getActiveLanguage();
-    console.log("🌐 번역 적용 시작, 언어:", langCode);
 
     // HTML lang 속성 변경
     document.documentElement.lang = langCode;
 
     // 번역 적용 (리다이렉트 없이)
     await loadTranslations();
-    console.log("📚 번역 파일 로드 완료");
-
-    // 현재 번역 객체 확인
-    console.log("🔍 현재 번역 객체:", translations);
-    console.log("🔍 번역 객체 키들:", Object.keys(translations));
-    console.log("🔍 현재 언어 번역 데이터:", translations[langCode]);
 
     // 실제 번역 데이터 확인
     const currentTranslations = translations[langCode];
-    if (currentTranslations) {
-      console.log(
-        "🔍 learn_languages 번역:",
-        currentTranslations["learn_languages"]
-      );
-      console.log("🔍 wordbook 번역:", currentTranslations["wordbook"]);
-    } else {
+    if (!currentTranslations) {
       console.error("❌ 현재 언어의 번역 데이터가 없습니다:", langCode);
+      return;
     }
 
     // 페이지의 모든 번역 요소 업데이트

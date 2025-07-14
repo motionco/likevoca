@@ -2661,13 +2661,23 @@ export class CollectionManager {
         user_email: userEmail,
         type: activityData.type, // "vocabulary", "grammar", "reading" - 진도 페이지 호환성
         activity_type: activityData.type, // "vocabulary", "grammar", "reading"
+        learning_mode: activityData.learning_mode, // 🆕 세부 학습 모드 ("flashcard", "typing", "pattern", "flash" 등)
         concept_ids: activityData.conceptIds || [],
 
         // 🔄 품질 계산에 필요한 필드들 (progress.js와 동기화)
-        session_duration: activityData.duration || 0, // 분 단위
-        concepts_studied: activityData.wordsStudied || 0,
-        correct_answers: activityData.correctAnswers || 0,
-        total_interactions: activityData.totalInteractions || 0,
+        session_duration:
+          activityData.session_duration || activityData.duration || 0, // 분 단위
+        concepts_studied:
+          activityData.concepts_studied ||
+          activityData.conceptsStudied ||
+          activityData.wordsStudied ||
+          0,
+        correct_answers:
+          activityData.correct_answers || activityData.correctAnswers || 0,
+        total_interactions:
+          activityData.total_interactions ||
+          activityData.totalInteractions ||
+          0,
 
         completed_at: serverTimestamp(),
         score: activityData.score || null,
@@ -2677,6 +2687,9 @@ export class CollectionManager {
           target: activityData.targetLanguage || "english",
         },
 
+        // 세션 품질 추가
+        session_quality: activityData.session_quality || 0,
+
         // 추가 메타데이터
         metadata: {
           // 🔄 호환성을 위한 기존 필드들 유지
@@ -2684,6 +2697,7 @@ export class CollectionManager {
           words_studied: activityData.wordsStudied || 0,
           concepts_mastered: activityData.conceptsMastered || 0,
           session_quality: activityData.sessionQuality || "good",
+          learning_mode: activityData.learning_mode, // 메타데이터에도 저장
 
           // 🎯 정확도 계산
           accuracy_rate:
@@ -2694,6 +2708,19 @@ export class CollectionManager {
       };
 
       await setDoc(learningActivityRef, activityDoc);
+
+      console.log("✅ 학습 활동 기록 저장 완료:", {
+        docId: learningActivityRef.id,
+        savedData: {
+          session_duration: activityDoc.session_duration,
+          concepts_studied: activityDoc.concepts_studied,
+          correct_answers: activityDoc.correct_answers,
+          total_interactions: activityDoc.total_interactions,
+          session_quality: activityDoc.session_quality,
+          type: activityDoc.type,
+          conceptIds: activityDoc.concept_ids.length,
+        },
+      });
 
       // 각 개념별 진도 업데이트
       if (activityData.conceptIds && activityData.conceptIds.length > 0) {
@@ -2742,7 +2769,7 @@ export class CollectionManager {
             (currentProgress.vocabulary_mastery?.study_count || 0) + 1,
           "vocabulary_mastery.learning_time":
             (currentProgress.vocabulary_mastery?.learning_time || 0) +
-            (learningData.duration || 5), // 기본 5분
+            (learningData.session_duration || learningData.duration || 5), // 기본 5분
 
           "overall_mastery.last_interaction": serverTimestamp(),
           "overall_mastery.level": Math.min(
@@ -2762,11 +2789,24 @@ export class CollectionManager {
             ? "learning"
             : "not_started";
 
+        console.log(`📊 개념 ${conceptId} 진도 업데이트:`, {
+          previousLevel: currentProgress.overall_mastery?.level || 0,
+          newLevel: newLevel,
+          status: updatedData["overall_mastery.status"],
+          exposureCount: updatedData["vocabulary_mastery.exposure_count"],
+          studyCount: updatedData["vocabulary_mastery.study_count"],
+        });
+
         batch.update(progressRef, updatedData);
       }
 
       await batch.commit();
-      console.log("✅ 학습 기반 진도 업데이트 완료");
+      console.log("✅ 학습 기반 진도 업데이트 완료:", {
+        updatedConceptsCount: updatedConcepts.size,
+        conceptIds: Array.from(updatedConcepts),
+        sessionDuration: learningData.session_duration || learningData.duration,
+        conceptsStudied: learningData.concepts_studied,
+      });
     } catch (error) {
       console.error("❌ 학습 기반 진도 업데이트 중 오류:", error);
     }

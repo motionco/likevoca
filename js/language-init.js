@@ -9,11 +9,8 @@ import {
 // 공통 네비게이션바 로딩 함수
 async function loadNavbar() {
   try {
-    console.log("🔄 네비게이션바 로딩 시작");
-
     // DOM 로드 확인
     if (document.readyState === "loading") {
-      console.log("⏳ DOM 로딩 대기 중...");
       await new Promise((resolve) => {
         document.addEventListener("DOMContentLoaded", resolve);
       });
@@ -70,14 +67,11 @@ async function loadNavbar() {
     return new Promise((resolve, reject) => {
       script.onload = async () => {
         try {
-          console.log("✅ navbar.js 로드 완료");
-
           // 약간의 지연 후 초기화 (DOM 안정화)
           await new Promise((r) => setTimeout(r, 100));
 
           // 현재 언어 감지
           const currentLanguage = getCurrentLanguage();
-          console.log("🌐 현재 언어:", currentLanguage);
 
           // 네비게이션바 초기화
           if (typeof window.initializeNavbar === "function") {
@@ -91,7 +85,6 @@ async function loadNavbar() {
           // 네비게이션바 로드 완료 플래그
           window.navbarLoaded = true;
 
-          console.log("🎉 네비게이션바 로딩 완료");
           resolve();
         } catch (error) {
           console.error("❌ 네비게이션바 초기화 실패:", error);
@@ -130,18 +123,12 @@ window.loadNavbar = loadNavbar;
 // 페이지 로드 시 자동 초기화
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    console.log("🚀 언어 초기화 시작");
-
     // 네비게이션바 로드
     await loadNavbar();
 
     // 언어 상태 동기화 설정
     setupLanguageStateSync();
-
-    console.log("✅ 언어 초기화 완료");
   } catch (error) {
     console.error("❌ 언어 초기화 실패:", error);
   }
 });
-
-console.log("📦 language-init.js 로드 완료");

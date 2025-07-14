@@ -1498,6 +1498,33 @@ function globalClickHandler(e) {
 
   // 독해 플래시 카드 뒤집기
   if (e.target.closest("#reading-flash-card")) {
+    // 정답/오답 버튼 클릭 처리
+    if (e.target.classList.contains("reading-flash-answer-btn")) {
+      e.preventDefault();
+      e.stopPropagation();
+      const isCorrect = e.target.getAttribute("data-correct") === "true";
+      console.log(
+        "📝 독해 플래시 정답/오답 선택:",
+        isCorrect ? "정답" : "오답"
+      );
+
+      // 학습 상호작용 추적
+      const currentData = getCurrentData();
+      if (currentData && currentData[currentIndex]) {
+        const concept = currentData[currentIndex];
+        const conceptId =
+          concept.id || concept.example_id || `reading_${currentIndex}`;
+        trackLearningInteraction(conceptId, isCorrect, "reading_answer");
+      }
+
+      // 다음 카드로 이동
+      setTimeout(() => {
+        nextExample();
+      }, 500);
+      return;
+    }
+
+    // 카드 뒤집기 (정답/오답 버튼이 아닌 경우에만)
     e.preventDefault();
     e.stopPropagation();
     console.log("🔄 독해 플래시 카드 클릭");
@@ -3124,6 +3151,10 @@ function updateFlashcard() {
   if (flashcardElement) {
     flashcardElement.classList.remove("flipped");
   }
+
+  // 📊 학습 상호작용 추적 (플래시카드 표시)
+  const conceptId = concept.id || concept.concept_id || `vocab_${currentIndex}`;
+  trackLearningInteraction(conceptId, true, "view");
 }
 
 function flipCard() {
@@ -3248,6 +3279,10 @@ function updateTyping() {
   if (pronunciationElement) {
     pronunciationElement.textContent = sourcePronunciation;
   }
+
+  // 📊 학습 상호작용 추적 (타이핑 문제 표시)
+  const conceptId = concept.id || concept.concept_id || `vocab_${currentIndex}`;
+  trackLearningInteraction(conceptId, true, "view");
 
   // 카테고리/도메인 정보 표시
   const categoryElement = document.getElementById("typing-category");
@@ -3453,6 +3488,11 @@ function updateGrammarPatterns() {
       </button>
     `;
   }
+
+  // 📊 학습 상호작용 추적 (문법 패턴 표시)
+  const conceptId =
+    pattern.id || pattern.concept_id || `grammar_${currentIndex}`;
+  trackLearningInteraction(conceptId, true, "view");
 }
 
 function showGrammarPracticeMode() {
@@ -3530,6 +3570,11 @@ function updateGrammarPractice() {
     progress.textContent = `${currentIndex + 1} / ${currentData.length}`;
   }
 
+  // 📊 학습 상호작용 추적 (문법 실습 표시)
+  const conceptId =
+    pattern.id || pattern.concept_id || `grammar_${currentIndex}`;
+  trackLearningInteraction(conceptId, true, "view");
+
   // 삭제 버튼 추가
   const deleteButtonContainer = document.getElementById(
     "grammar-delete-container"
@@ -3554,7 +3599,20 @@ function updateGrammarPractice() {
 function flipGrammarCard() {
   const card = document.getElementById("grammar-card");
   if (card) {
+    const wasFlipped = card.classList.contains("flipped");
     card.classList.toggle("flipped");
+    const isNowFlipped = card.classList.contains("flipped");
+
+    // 📊 학습 상호작용 추적 (카드가 뒤집혔을 때만)
+    if (!wasFlipped && isNowFlipped) {
+      const currentData = getCurrentData();
+      if (currentData && currentData[currentIndex]) {
+        const concept = currentData[currentIndex];
+        const conceptId =
+          concept.id || concept.concept_id || `grammar_${currentIndex}`;
+        trackLearningInteraction(conceptId, true, "grammar_flip");
+      }
+    }
   }
 }
 
@@ -3698,6 +3756,11 @@ function updateReadingExample() {
   if (progress) {
     progress.textContent = `${currentIndex + 1} / ${currentData.length}`;
   }
+
+  // 📊 학습 상호작용 추적 (독해 예문 표시)
+  const conceptId =
+    example.id || example.concept_id || `reading_${currentIndex}`;
+  trackLearningInteraction(conceptId, false, "view"); // view는 단순 조회이므로 정답으로 계산하지 않음
 }
 
 function updateReadingFlash() {
@@ -3763,6 +3826,18 @@ function updateReadingFlash() {
                 📍 ${situationInfo}
               </span>
             </div>
+            
+            <!-- 정답/오답 선택 버튼 -->
+            <div class="mt-6 flex gap-4 justify-center">
+              <button class="reading-flash-answer-btn bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg font-semibold transition-colors" 
+                      data-correct="true">
+                ✅ 정답
+              </button>
+              <button class="reading-flash-answer-btn bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg font-semibold transition-colors" 
+                      data-correct="false">
+                ❌ 오답
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -3782,6 +3857,11 @@ function updateReadingFlash() {
   if (progress) {
     progress.textContent = `${currentIndex + 1} / ${currentData.length}`;
   }
+
+  // 📊 학습 상호작용 추적 (독해 플래시 표시)
+  const conceptId =
+    example.id || example.concept_id || `reading_${currentIndex}`;
+  trackLearningInteraction(conceptId, false, "view"); // view는 단순 조회이므로 정답으로 계산하지 않음
 }
 
 function navigateContent(direction) {
@@ -3814,10 +3894,21 @@ function navigateContent(direction) {
 
     // 🎯 다음 버튼 클릭 시 카드 뒤집기 여부 확인
     const isFlashcardMode = currentLearningMode === "flashcard";
-    const wasFlipped = isFlashcardMode ? isFlipped : true; // 플래시카드 모드가 아니면 항상 true
+    const isReadingFlashMode =
+      currentLearningArea === "reading" && currentLearningMode === "flash";
 
-    if (isFlashcardMode && !wasFlipped) {
-      // 플래시카드를 뒤집지 않고 다음 버튼 누른 경우 (부분 학습)
+    let wasFlipped = true; // 기본값
+
+    if (isFlashcardMode) {
+      wasFlipped = isFlipped;
+    } else if (isReadingFlashMode) {
+      // 독해 플래시 모드에서는 카드가 뒤집혔는지 확인
+      const card = document.getElementById("reading-flash-card");
+      wasFlipped = card ? card.classList.contains("flipped") : false;
+    }
+
+    if ((isFlashcardMode || isReadingFlashMode) && !wasFlipped) {
+      // 카드를 뒤집지 않고 다음 버튼 누른 경우 (부분 학습)
       trackLearningInteraction(conceptId, false, "navigate_unflipped");
     } else {
       // 정상적인 학습 완료 후 다음 버튼 누른 경우
@@ -4927,14 +5018,15 @@ function flipReadingCard() {
 
     console.log("🔄 뒤집기 후 클래스:", card.className);
 
-    // 📊 학습 상호작용 추적 (카드가 뒤집혔을 때만)
+    // 카드를 처음 뒤집었을 때만 학습 참여로 추적
     if (!wasFlipped && isNowFlipped) {
       const currentData = getCurrentData();
       if (currentData && currentData[currentIndex]) {
         const concept = currentData[currentIndex];
         const conceptId =
-          concept.id || concept.example_id || `reading_${currentIndex}`;
-        trackLearningInteraction(conceptId, true, "reading_flip");
+          concept.id || concept.concept_id || `reading_${currentIndex}`;
+        trackLearningInteraction(conceptId, true, "flip"); // 뒤집기는 적극적인 학습 참여
+        console.log("📊 독해 플래시 카드 뒤집기 추적됨:", conceptId);
       }
     }
 
@@ -5149,20 +5241,20 @@ async function completeLearningSession() {
 
   learningSessionData.isCompleting = true;
 
-  // 🎯 최소 학습 조건 확인 (5개 이상 개념 학습 또는 1분 이상 학습)
+  // 🎯 최소 학습 조건 확인 (2개 이상 개념 학습 또는 1분 이상 학습)
   const conceptsCount = learningSessionData.conceptsStudied.size;
   const endTime = new Date();
   const duration = Math.round(
     (endTime - learningSessionData.startTime) / 1000 / 60
   ); // 분 단위
 
-  const shouldSaveSession = conceptsCount >= 5 || duration >= 1;
+  const shouldSaveSession = conceptsCount >= 2 || duration >= 1;
 
   if (!shouldSaveSession) {
     console.log("📊 세션 저장 조건 미달:", {
       conceptsCount,
       duration,
-      message: "최소 5개 개념 또는 10분 이상 학습 필요",
+      message: "최소 2개 개념 또는 1분 이상 학습 필요",
     });
     learningSessionData.sessionActive = false;
     return;
@@ -5170,6 +5262,7 @@ async function completeLearningSession() {
 
   const activityData = {
     type: learningSessionData.area,
+    learning_mode: learningSessionData.mode, // 🆕 세부 학습 모드 추가
     conceptIds: Array.from(learningSessionData.conceptsStudied),
     session_duration: Math.max(duration, 1), // 최소 1분으로 설정
     concepts_studied: conceptsCount,
@@ -5191,11 +5284,19 @@ async function completeLearningSession() {
   };
 
   try {
-    console.log("[DEBUG] updateLearningActivity 호출 직전", {
+    console.log("[DEBUG] updateLearningActivity 호출 직전 데이터 검증:", {
       user_email: currentUser?.email,
-      activityData,
-      currentUser,
+      activityData: {
+        type: activityData.type,
+        conceptIds_count: activityData.conceptIds.length,
+        session_duration: activityData.session_duration,
+        concepts_studied: activityData.concepts_studied,
+        correct_answers: activityData.correct_answers,
+        total_interactions: activityData.total_interactions,
+        session_quality: activityData.session_quality,
+      },
     });
+
     await collectionManager.updateLearningActivity(
       currentUser.email,
       activityData
@@ -5291,8 +5392,8 @@ window.addEventListener("beforeunload", () => {
       (new Date() - learningSessionData.startTime) / 1000 / 60
     );
 
-    // 최소 조건 충족 시에만 저장
-    if (conceptsCount >= 5 || duration >= 10) {
+    // 최소 조건 충족 시에만 저장 (2개 개념 또는 1분 이상)
+    if (conceptsCount >= 2 || duration >= 1) {
       console.log("🔄 페이지 이탈 시 세션 저장:", { conceptsCount, duration });
       completeLearningSession();
     } else {
