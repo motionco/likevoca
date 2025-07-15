@@ -527,9 +527,6 @@ let learningDataCache = {
     this.data = null;
     this.lastUpdate = null;
   },
-  getTimestamp() {
-    return this.lastUpdate;
-  },
 };
 
 // 📚 학습 완료 상태 확인 및 자동 업데이트
@@ -556,18 +553,6 @@ async function checkLearningCompletionUpdate() {
             learningDataCache.clear();
             console.log("🗑️ 학습 데이터 캐시 초기화");
 
-            // 1.5. 캐시 무효화 확인
-            console.log("🔍 캐시 상태 확인:", {
-              isCacheValid: learningDataCache.isValid(),
-              cacheTimestamp: learningDataCache.getTimestamp(),
-              currentTime: Date.now(),
-            });
-
-            // 1.7. 강제 캐시 무효화 (더블 체크)
-            learningDataCache.data = null;
-            learningDataCache.lastUpdate = null;
-            console.log("🔨 강제 캐시 무효화 완료");
-
             // 2. 최신 학습 기록 강제 재로드 (2초 지연 후)
             await new Promise((resolve) => setTimeout(resolve, 2000));
             console.log("🔄 2초 후 최신 학습 기록 강제 재로드 시작");
@@ -584,7 +569,7 @@ async function checkLearningCompletionUpdate() {
                 concepts: [],
               };
 
-              await loadDetailedProgressData(true); // 강제 재로드
+              await loadDetailedProgressData();
               console.log("🔄 전체 진도 데이터 완전 재로드 완료");
             } catch (reloadError) {
               console.error("❌ 진도 데이터 재로드 실패:", reloadError);
@@ -592,7 +577,7 @@ async function checkLearningCompletionUpdate() {
               userProgressData.achievements = {
                 avgSessionQuality: 0,
                 totalLearningSessions: 0,
-                totalStudyTime: 0,
+                totalStudyTime: 0
               };
             }
 
@@ -755,44 +740,8 @@ function calculateGameStats(gameResults) {
 }
 
 // 기존 상세 진도 데이터 로드 (호환성 위해 유지) - 인덱스 오류 임시 방지
-async function loadDetailedProgressData(forceReload = false) {
+async function loadDetailedProgressData() {
   try {
-    // 🔍 캐시 확인 - 유효한 캐시가 있고 강제 재로드가 아닌 경우에만 사용
-    if (!forceReload && learningDataCache.isValid()) {
-      console.log("💾 유효한 캐시 데이터 사용 중, 새로운 로드 생략");
-      const cachedData = learningDataCache.data;
-
-      // 캐시된 데이터로 userProgressData 업데이트
-      if (cachedData && userProgressData.achievements) {
-        userProgressData.achievements.totalLearningSessions =
-          cachedData.validLearningSessionsCount || 0;
-        userProgressData.achievements.avgSessionQuality =
-          cachedData.avgSessionQuality || 75;
-        userProgressData.achievements.totalStudyTime = Math.round(
-          cachedData.totalStudyTime || 0
-        );
-
-        console.log("💾 캐시에서 복원된 학습 통계:", {
-          totalSessions: cachedData.validLearningSessionsCount,
-          avgQuality: cachedData.avgSessionQuality,
-          totalTime: Math.round(cachedData.totalStudyTime),
-          cacheAge: Date.now() - learningDataCache.getTimestamp(),
-        });
-
-        // 🔄 캐시 데이터로 UI 업데이트 강제 실행
-        console.log("🔄 캐시 데이터 기반 UI 업데이트 실행");
-        updateAchievements();
-      }
-
-      return; // 캐시 사용으로 조기 반환
-    }
-
-    if (forceReload) {
-      console.log("🔄 강제 재로드 모드: 캐시 무시하고 새로운 데이터 로드");
-    } else {
-      console.log("🔄 캐시 무효 또는 없음, 새로운 데이터 로드 시작");
-    }
-
     // 1. 전체 개념 수 조회
     let allConceptsSnapshot;
     try {
@@ -993,68 +942,29 @@ async function loadDetailedProgressData(forceReload = false) {
     const avgQuizAccuracy =
       totalQuestions > 0
         ? Math.round((totalCorrect / totalQuestions) * 100)
-        : 0; // 4. 학습 활동 데이터 로드 (최적화된 쿼리)
-    let learningSnapshot = { docs: [] };
-    let totalLearningSessionsCount = 0;
+        : 0;
 
+    // 4. 학습 활동 데이터 로드 (임시 비활성화 - 인덱스 오류 방지)
+    let learningSnapshot = { docs: [] };
+    console.log("⚠️ 학습 기록 쿼리 임시 비활성화 (인덱스 오류 방지)");
+    /* 
     try {
       console.log("🔍 학습 기록 쿼리 시작...");
-
-      // 4.1. 안전한 방법: 50개 세션만 로드하고 이를 총 세션수로 사용
-      // (읽기 비용 절약 및 인덱스 오류 방지)
       const learningQuery = query(
         collection(db, "learning_records"),
         where("user_email", "==", currentUser.email),
         limit(50)
       );
       learningSnapshot = await getDocs(learningQuery);
-
-      // 클라이언트 측에서 시간순 정렬 (최신순)
-      if (learningSnapshot.docs.length > 0) {
-        learningSnapshot.docs.sort((a, b) => {
-          const timestampA =
-            a.data().timestamp?.toDate?.() || new Date(a.data().timestamp || 0);
-          const timestampB =
-            b.data().timestamp?.toDate?.() || new Date(b.data().timestamp || 0);
-          return timestampB.getTime() - timestampA.getTime(); // 최신순 정렬
-        });
-      }
-
-      // 실제 총 세션 수 추정 시도 (선택적)
-      try {
-        const countQuery = query(
-          collection(db, "learning_records"),
-          where("user_email", "==", currentUser.email),
-          limit(100) // 안전한 제한으로 추정
-        );
-        const countSnapshot = await getDocs(countQuery);
-        totalLearningSessionsCount = countSnapshot.docs.length;
-        console.log(
-          `🔢 추정 학습 세션 수 (최대 100개): ${totalLearningSessionsCount}개`
-        );
-
-        if (totalLearningSessionsCount === 100) {
-          console.log("⚠️ 실제 세션 수는 100개 이상일 수 있습니다.");
-        }
-      } catch (countError) {
-        console.warn("⚠️ 세션 카운트 실패, 로드된 세션 수 사용:", countError);
-        totalLearningSessionsCount = learningSnapshot.docs.length;
-      }
-
       console.log("✅ 학습 기록 쿼리 성공");
     } catch (learningError) {
       console.error("❌ 학습 기록 쿼리 실패:", learningError);
-      console.error("❌ 학습 기록 쿼리 실패 상세:", {
-        errorMessage: learningError.message,
-        errorCode: learningError.code,
-        queryDetails: "user_email + limit(50/100) + client-side sort",
-      });
       learningSnapshot = { docs: [] };
-      totalLearningSessionsCount = 0;
     }
+    */
 
     console.log(
-      `📊 학습 기록 로드: ${learningSnapshot.docs.length}개 세션 (분석용), 추정 총 ${totalLearningSessionsCount}개 세션`
+      `📊 학습 기록 로드: ${learningSnapshot.docs.length}개 세션 (인덱스 최적화)`
     );
 
     // 캐시 업데이트를 위한 결과 저장 준비
@@ -1075,13 +985,22 @@ async function loadDetailedProgressData(forceReload = false) {
     learningResults.totalInteractions = 0;
     learningResults.validLearningSessionsCount = 0;
 
-    // 학습 시간 및 학습 효율 계산 (활성화)
-    console.log("📊 학습 효율 계산 시작:", {
-      learningRecordsCount: learningSnapshot.docs.length,
+    // 학습 시간 및 학습 효율 계산 (임시 비활성화)
+    console.log("⚠️ 학습 효율 계산 임시 비활성화 - 기본값 사용");
+    
+    // 기본값으로 통계 설정
+    learningResults.avgSessionQuality = 75;
+    learningResults.qualityCount = 1;
+
+    console.log("📊 학습 효율 계산 (임시 기본값):", {
+      totalSessions: learningResults.qualityCount,
+      averageQuality: learningResults.avgSessionQuality,
+      totalStudyTime: Math.round(learningResults.totalStudyTime),
+      cacheStatus: "임시 기본값 사용"
     });
 
-    // 학습 데이터 처리 루프 (활성화)
-    learningSnapshot.docs.forEach((doc) => {
+    // 캐시에 결과 저장
+    learningDataCache.set(learningResults);
       const data = doc.data();
 
       // 유효한 학습 세션인지 확인 - 더 포괄적인 기준 적용
@@ -1190,23 +1109,23 @@ async function loadDetailedProgressData(forceReload = false) {
       // 저장된 session_quality 사용 (학습 페이지에서 계산되어 저장된 값)
       let sessionQuality = data.session_quality || 0;
 
-      // 학습 효율 디버깅 (최신 5개 세션)
-      if (learningSnapshot.docs.indexOf(doc) < 5) {
-        console.log("🔍 학습 세션 효율 분석:", {
+      // 최신 학습 세션 디버깅 (docId가 RuRuXT7J4tvK3kGbE8nI인 경우)
+      if (
+        doc.id === "RuRuXT7J4tvK3kGbE8nI" ||
+        learningSnapshot.docs.indexOf(doc) < 3
+      ) {
+        console.log("🔍 최신 학습 세션 분석:", {
           docId: doc.id,
-          type: activityType,
-          learning_mode: data.learning_mode,
-          storedSessionQuality: data.session_quality,
-          currentSessionQuality: sessionQuality,
+          sessionQuality: data.session_quality,
+          rawSessionQuality: data.session_quality,
           conceptsStudied,
           sessionDuration: adjustedSessionDuration,
-          correctAnswers,
-          totalInteractions: recordInteractions,
           hasSessionQuality:
             data.session_quality !== undefined && data.session_quality !== null,
-          willCalculate:
-            sessionQuality === 0 &&
-            (conceptsStudied > 0 || adjustedSessionDuration > 0),
+          dataFields: Object.keys(data).filter(
+            (key) => key.includes("quality") || key.includes("session")
+          ),
+          allFields: Object.keys(data), // 전체 필드 확인
         });
       }
 
@@ -1251,57 +1170,59 @@ async function loadDetailedProgressData(forceReload = false) {
       }
 
       // 모든 세션의 학습 효율 점수를 누적 (평균 계산을 위해)
-      // 저장된 session_quality 우선 사용, 없으면 계산된 값 사용
-      const finalSessionQuality = data.session_quality || sessionQuality;
-
-      if (finalSessionQuality > 0) {
-        learningResults.avgSessionQuality += finalSessionQuality;
+      if (sessionQuality > 0) {
+        learningResults.avgSessionQuality += sessionQuality;
         learningResults.qualityCount++;
 
-        // 최신 5개 세션의 품질 점수 로깅
+        // 최근 세션 로그 (최근 5개만)
         if (learningSnapshot.docs.indexOf(doc) < 5) {
-          console.log(
-            `✅ 세션 품질 점수 누적: ${doc.id} = ${finalSessionQuality.toFixed(
-              1
-            )}% (저장됨: ${
-              data.session_quality || "없음"
-            }, 계산됨: ${sessionQuality.toFixed(1)}%)`
-          );
+          console.log("🎯 최근 세션:", {
+            docId: doc.id,
+            session_quality: sessionQuality,
+            runningTotal: learningResults.avgSessionQuality,
+            sessionCount: learningResults.qualityCount
+          });
         }
       }
+
+      // 전체 정확도와 상호작용 수 누적
+      learningResults.totalCorrectAnswers += correctAnswers;
+      learningResults.totalInteractions += sessionInteractions;
     });
 
-    // 평균 학습 효율 계산
-    if (learningResults.qualityCount > 1) {
+    // 퀴즈 시간도 추가
+    quizSnapshot.docs.forEach((doc) => {
+      const data = doc.data();
+      learningResults.totalStudyTime += data.time_spent || 0;
+    });
+
+    // 평균 학습 효율 계산 (저장된 session_quality 값들의 단순 평균)
+    if (learningResults.qualityCount > 0) {
       learningResults.avgSessionQuality = Math.round(
         learningResults.avgSessionQuality / learningResults.qualityCount
       );
-    } else if (learningResults.qualityCount === 0) {
-      learningResults.avgSessionQuality = 75; // 기본값
-      learningResults.qualityCount = 1;
+
+      console.log("📊 학습 효율 계산 (최적화):", {
+        totalSessions: learningResults.qualityCount,
+        averageQuality: learningResults.avgSessionQuality,
+        totalStudyTime: Math.round(learningResults.totalStudyTime),
+        totalCorrectAnswers: learningResults.totalCorrectAnswers,
+        totalInteractions: learningResults.totalInteractions,
+        recentSessionsCount: learningSnapshot.docs.length,
+        accuracyRate:
+          learningResults.totalInteractions > 0
+            ? Math.round((learningResults.totalCorrectAnswers / learningResults.totalInteractions) * 100)
+            : 0,
+        cacheStatus: "새로 계산됨"
+      });
+
+      // 캐시에 결과 저장
+      learningDataCache.set(learningResults);
+    } else {
+      learningResults.avgSessionQuality = 0;
     }
 
-    console.log("📊 학습 효율 계산 완료:", {
-      totalSessions: learningSnapshot.docs.length,
-      validSessions: learningResults.validLearningSessionsCount,
-      averageQuality: learningResults.avgSessionQuality,
-      totalStudyTime: Math.round(learningResults.totalStudyTime),
-      qualityCount: learningResults.qualityCount,
-      totalQualityScore:
-        learningResults.avgSessionQuality * learningResults.qualityCount,
-    });
-
-    // 캐시에 결과 저장
-    learningDataCache.set(learningResults);
-    console.log("💾 새로운 학습 데이터 캐시 저장:", {
-      validSessions: learningResults.validLearningSessionsCount,
-      avgQuality: learningResults.avgSessionQuality,
-      totalTime: Math.round(learningResults.totalStudyTime),
-      cacheTimestamp: learningDataCache.getTimestamp(),
-      cacheDuration: learningDataCache.cacheDuration / 1000 + "초",
-    });
-
-    // 완료율 계산
+    // 완료율 계산 (100%를 초과하지 않도록 제한)
     const completionRate =
       totalConcepts > 0
         ? Math.min(100, Math.round((masteredCount / totalConcepts) * 100))
@@ -1311,8 +1232,41 @@ async function loadDetailedProgressData(forceReload = false) {
     userProgressData.totalConcepts = totalConcepts;
     userProgressData.studiedConcepts = progressSnapshot.size;
     userProgressData.masteredConcepts = masteredCount;
-    userProgressData.totalWords = totalConcepts;
-    userProgressData.masteredWords = masteredCount;
+    userProgressData.totalWords = totalConcepts; // 호환성을 위해
+    userProgressData.masteredWords = masteredCount; // 호환성을 위해
+    userProgressData.quizAccuracy = avgQuizAccuracy;
+        totalCorrectAnswers: learningResults.totalCorrectAnswers,
+        totalInteractions: learningResults.totalInteractions,
+        recentSessionsCount: learningSnapshot.docs.length,
+        accuracyRate:
+          learningResults.totalInteractions > 0
+            ? Math.round(
+                (learningResults.totalCorrectAnswers /
+                  learningResults.totalInteractions) *
+                  100
+              )
+            : 0,
+        cacheStatus: "새로 계산됨",
+      });
+
+      // 캐시에 결과 저장
+      learningDataCache.set(learningResults);
+    } else {
+      learningResults.avgSessionQuality = 0;
+    }
+
+    // 완료율 계산 (100%를 초과하지 않도록 제한)
+    const completionRate =
+      totalConcepts > 0
+        ? Math.min(100, Math.round((masteredCount / totalConcepts) * 100))
+        : 0;
+
+    // 통계 계산 및 설정
+    userProgressData.totalConcepts = totalConcepts;
+    userProgressData.studiedConcepts = progressSnapshot.size;
+    userProgressData.masteredConcepts = masteredCount;
+    userProgressData.totalWords = totalConcepts; // 호환성을 위해
+    userProgressData.masteredWords = masteredCount; // 호환성을 위해
     userProgressData.quizAccuracy = avgQuizAccuracy;
 
     // 게임 통계 로드 및 계산 (읽기 용량 최적화: 50개로 제한)
@@ -1341,7 +1295,7 @@ async function loadDetailedProgressData(forceReload = false) {
     userProgressData.achievements.totalGames = gameStats.totalGames;
     userProgressData.achievements.avgGameScore = gameStats.avgScore;
     userProgressData.achievements.totalLearningSessions =
-      totalLearningSessionsCount; // 정확한 총 세션 수 사용
+      learningResults.validLearningSessionsCount;
     userProgressData.achievements.avgSessionQuality =
       learningResults.avgSessionQuality;
     userProgressData.achievements.totalStudyTime = Math.round(
@@ -1351,11 +1305,11 @@ async function loadDetailedProgressData(forceReload = false) {
     userProgressData.achievements.averageAccuracy = avgQuizAccuracy;
 
     console.log("📊 학습 세션 통계 (최적화):", {
-      estimatedTotalSessions: totalLearningSessionsCount, // 추정 총 세션 수
-      analyzedSessions: learningSnapshot.docs.length, // 분석된 세션 수
+      totalLearningSessions: learningResults.validLearningSessionsCount,
+      totalRawRecords: learningSnapshot.size,
       avgSessionQuality: learningResults.avgSessionQuality,
       totalStudyTime: Math.round(learningResults.totalStudyTime),
-      validAnalyzedSessions: learningResults.validLearningSessionsCount,
+      loadedRecordsCount: learningSnapshot.docs.length,
       cacheUsed: learningDataCache.isValid(),
     });
 
@@ -1374,10 +1328,9 @@ async function loadDetailedProgressData(forceReload = false) {
       masteredConcepts: masteredCount,
       quizAccuracy: avgQuizAccuracy,
       totalQuizzes,
-      estimatedTotalSessions: totalLearningSessionsCount, // 추정 총 세션 수
-      analyzedLearningSessions: learningSnapshot.docs.length, // 분석된 세션 수
-      avgSessionQuality: learningResults.avgSessionQuality,
-      totalStudyTime: Math.round(learningResults.totalStudyTime),
+      totalLearningSessions: learningSnapshot.size,
+      avgSessionQuality,
+      totalStudyTime: Math.round(totalStudyTime),
       completionRate,
       recentActivitiesCount: userProgressData.recentActivities.length,
       weeklyActivity: userProgressData.weeklyActivity,
@@ -1610,7 +1563,7 @@ async function calculateStudyStreak() {
       streak,
       studyDatesCount: studyDates.size,
       quizRecords: quizSnapshot.size,
-      learningRecords: learningSnapshot.docs.length,
+      learningRecords: learningSnapshot.size,
       gameRecords: gameSnapshot.size,
       studyDates: Array.from(studyDates).slice(0, 10), // 최근 10개 날짜만 로그
     });

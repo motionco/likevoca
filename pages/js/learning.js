@@ -1239,6 +1239,23 @@ function setupEventListeners() {
     flipFlashcardBtn.addEventListener("click", flipCard);
   }
 
+  // 학습 종료 버튼들 설정
+  const finishLearningButtons = [
+    "finish-learning-flashcard",
+    "finish-learning-typing",
+    "finish-learning-grammar",
+    "finish-learning-grammar-practice",
+    "finish-learning-reading",
+  ];
+
+  finishLearningButtons.forEach((buttonId) => {
+    const button = document.getElementById(buttonId);
+    if (button) {
+      button.removeEventListener("click", finishLearningHandler);
+      button.addEventListener("click", finishLearningHandler);
+    }
+  });
+
   // 타이핑 모드 버튼들
   const prevTypingBtnNew = document.getElementById("prev-typing-btn");
   const nextTypingBtnNew = document.getElementById("next-typing-btn");
@@ -1426,6 +1443,167 @@ function backToAreasHandler(e) {
   showAreaSelection();
 }
 
+// 학습 종료 핸들러 - 중간에 학습을 완전히 종료하고 진도에 반영
+async function finishLearningHandler(e) {
+  e.preventDefault();
+  e.stopPropagation();
+
+  console.log("🏁 학습 종료 버튼 클릭 - 현재 진도 저장 후 종료");
+
+  // 현재 학습 세션 상태 확인
+  console.log("🔍 현재 학습 세션 상태:", {
+    sessionActive: learningSessionData?.sessionActive,
+    area: learningSessionData?.area,
+    mode: learningSessionData?.mode,
+    conceptsStudied: learningSessionData?.conceptsStudied?.size || 0,
+    totalInteractions: learningSessionData?.totalInteractions || 0,
+    correctAnswers: learningSessionData?.correctAnswers || 0,
+    startTime: learningSessionData?.startTime,
+  });
+
+  // 현재 학습 세션 완료 처리
+  if (typeof learningSessionData !== "undefined" && learningSessionData.area) {
+    console.log("💾 학습 세션 완료 처리 중:", learningSessionData);
+
+    // 세션 종료 시간 기록
+    learningSessionData.endTime = new Date();
+    learningSessionData.duration =
+      learningSessionData.endTime - learningSessionData.startTime;
+
+    // 🎯 중간 종료 시에는 최소 조건 무시하고 강제 저장
+    const conceptsCount = learningSessionData.conceptsStudied.size;
+    console.log(`💾 강제 세션 완료 처리: ${conceptsCount}개 개념 학습됨`);
+
+    // learningSessionData 최소값 보장
+    if (learningSessionData.totalInteractions === 0 && conceptsCount > 0) {
+      learningSessionData.totalInteractions = conceptsCount;
+      learningSessionData.correctAnswers = Math.floor(conceptsCount * 0.7); // 70% 정답률 가정
+    }
+
+    // 학습 세션 완료 처리 (기존 함수 활용)
+    try {
+      await completeLearningSession(true); // forceComplete = true
+      console.log("✅ 학습 세션 완료 처리 성공");
+    } catch (error) {
+      console.error("❌ 학습 세션 완료 처리 실패:", error);
+
+      // completeLearningSession이 실패하면 직접 저장 시도
+      if (conceptsCount > 0) {
+        try {
+          const duration =
+            Math.round(
+              (learningSessionData.endTime - learningSessionData.startTime) /
+                1000 /
+                60
+            ) || 1;
+          const activityData = {
+            type: learningSessionData.area,
+            learning_mode: learningSessionData.mode,
+            conceptIds: Array.from(learningSessionData.conceptsStudied),
+            session_duration: Math.max(duration, 1),
+            concepts_studied: conceptsCount,
+            correct_answers: learningSessionData.correctAnswers,
+            total_interactions: learningSessionData.totalInteractions,
+            sourceLanguage: sourceLanguage || "korean",
+            targetLanguage: targetLanguage || "english",
+            session_quality: Math.min(100, conceptsCount * 10), // 간단한 품질 계산
+          };
+
+          if (
+            typeof collectionManager !== "undefined" &&
+            collectionManager.updateLearningActivity
+          ) {
+            await collectionManager.updateLearningActivity(
+              currentUser.email,
+              activityData
+            );
+            console.log("✅ 직접 학습 기록 저장 성공");
+          }
+        } catch (directSaveError) {
+          console.error("❌ 직접 학습 기록 저장도 실패:", directSaveError);
+        }
+      }
+    }
+  }
+
+  // 학습한 개념 수 계산
+  const conceptsCount = learningSessionData.conceptsStudied.size;
+
+  // 학습 완료 팝업 표시 (세션 완료 후)
+  if (conceptsCount > 0) {
+    console.log("🎉 학습 종료 - 완료 팝업 표시");
+
+    // 완료 팝업에 필요한 통계 계산
+    const duration =
+      Math.round(
+        (learningSessionData.endTime - learningSessionData.startTime) /
+          1000 /
+          60
+      ) || 1;
+
+    // 학습 효율 계산 (저장된 계산과 동일한 방식)
+    const baseScore = Math.min(60, conceptsCount * 6);
+
+    const conceptsPerMinute = conceptsCount / Math.max(duration, 1);
+    let timeScore = 0;
+    if (conceptsPerMinute >= 1 && conceptsPerMinute <= 10) {
+      timeScore = 20;
+    } else if (conceptsPerMinute > 10) {
+      timeScore = Math.max(5, 20 - (conceptsPerMinute - 10) * 1);
+    } else {
+      timeScore = Math.max(5, conceptsPerMinute * 20);
+    }
+
+    const meaningfulInteractions = learningSessionData.correctAnswers;
+    const participationScore = Math.min(
+      20,
+      (meaningfulInteractions / conceptsCount) * 20
+    );
+
+    const sessionStats = {
+      conceptsCount,
+      duration,
+      interactions: learningSessionData.totalInteractions,
+      efficiency: Math.min(
+        100,
+        Math.round(baseScore + timeScore + participationScore)
+      ),
+    };
+
+    await showLearningCompleteWithStats(sessionStats);
+  } else {
+    console.log("🏁 학습 종료 - 학습한 개념이 없어 바로 영역 선택으로 이동");
+    // 🔄 학습 데이터 초기화
+    console.log("🔄 학습 데이터 초기화: 학습 종료 후 초기화");
+    areaData = {
+      vocabulary: [],
+      grammar: [],
+      reading: [],
+    };
+
+    // 🔧 모든 학습 상태 변수 초기화
+    currentLearningArea = null;
+    currentLearningMode = null;
+    currentIndex = 0;
+    isFlipped = false;
+    isNavigating = false;
+
+    // 🧹 학습 세션 데이터 초기화
+    if (typeof learningSessionData !== "undefined") {
+      learningSessionData = {
+        area: null,
+        mode: null,
+        startTime: null,
+        conceptsStudied: new Set(),
+        totalInteractions: 0,
+        correctAnswers: 0,
+      };
+    }
+
+    showAreaSelection();
+  }
+}
+
 // 전역 클릭 핸들러
 function globalClickHandler(e) {
   // 돌아가기 버튼 처리 (우선순위 높음)
@@ -1498,33 +1676,7 @@ function globalClickHandler(e) {
 
   // 독해 플래시 카드 뒤집기
   if (e.target.closest("#reading-flash-card")) {
-    // 정답/오답 버튼 클릭 처리
-    if (e.target.classList.contains("reading-flash-answer-btn")) {
-      e.preventDefault();
-      e.stopPropagation();
-      const isCorrect = e.target.getAttribute("data-correct") === "true";
-      console.log(
-        "📝 독해 플래시 정답/오답 선택:",
-        isCorrect ? "정답" : "오답"
-      );
-
-      // 학습 상호작용 추적
-      const currentData = getCurrentData();
-      if (currentData && currentData[currentIndex]) {
-        const concept = currentData[currentIndex];
-        const conceptId =
-          concept.id || concept.example_id || `reading_${currentIndex}`;
-        trackLearningInteraction(conceptId, isCorrect, "reading_answer");
-      }
-
-      // 다음 카드로 이동
-      setTimeout(() => {
-        nextExample();
-      }, 500);
-      return;
-    }
-
-    // 카드 뒤집기 (정답/오답 버튼이 아닌 경우에만)
+    // 카드 뒤집기
     e.preventDefault();
     e.stopPropagation();
     console.log("🔄 독해 플래시 카드 클릭");
@@ -3154,7 +3306,7 @@ function updateFlashcard() {
 
   // 📊 학습 상호작용 추적 (플래시카드 표시)
   const conceptId = concept.id || concept.concept_id || `vocab_${currentIndex}`;
-  trackLearningInteraction(conceptId, true, "view");
+  trackLearningInteraction(conceptId, false, "view"); // view는 단순 조회이므로 정답으로 계산하지 않음
 }
 
 function flipCard() {
@@ -3826,18 +3978,6 @@ function updateReadingFlash() {
                 📍 ${situationInfo}
               </span>
             </div>
-            
-            <!-- 정답/오답 선택 버튼 -->
-            <div class="mt-6 flex gap-4 justify-center">
-              <button class="reading-flash-answer-btn bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg font-semibold transition-colors" 
-                      data-correct="true">
-                ✅ 정답
-              </button>
-              <button class="reading-flash-answer-btn bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg font-semibold transition-colors" 
-                      data-correct="false">
-                ❌ 오답
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -3856,6 +3996,12 @@ function updateReadingFlash() {
   const progress = document.getElementById("reading-progress");
   if (progress) {
     progress.textContent = `${currentIndex + 1} / ${currentData.length}`;
+  }
+
+  // 독해 플래시 카드 뒤집기 상태 초기화 (새 카드는 앞면부터 시작)
+  const flashCard = document.getElementById("reading-flash-card");
+  if (flashCard) {
+    flashCard.classList.remove("flipped");
   }
 
   // 📊 학습 상호작용 추적 (독해 플래시 표시)
@@ -3933,12 +4079,32 @@ function navigateContent(direction) {
 
   // 현재 모드에 따라 업데이트
   try {
+    // 모든 카드 타입의 뒤집기 상태 초기화 (새 카드는 항상 앞면부터 시작)
+    isFlipped = false;
+
+    // 일반 플래시카드 뒤집기 상태 초기화 (정확한 ID 사용)
+    const flashcardModeCard = document.getElementById("flashcard-mode-card");
+    if (flashcardModeCard) {
+      flashcardModeCard.classList.remove("flipped");
+      console.log("🔄 플래시카드 뒤집기 상태 초기화: flipped 클래스 제거");
+    }
+
+    // 다른 방식의 플래시카드도 확인
+    const flashcardElement = document.querySelector(".flashcard");
+    if (flashcardElement) {
+      flashcardElement.classList.remove("flipped");
+    }
+
+    // 독해 플래시카드 뒤집기 상태 초기화
+    const readingFlashCard = document.getElementById("reading-flash-card");
+    if (readingFlashCard) {
+      readingFlashCard.classList.remove("flipped");
+    }
+
     switch (currentLearningArea) {
       case "vocabulary":
         switch (currentLearningMode) {
           case "flashcard":
-            // 플래시카드 뒤집기 상태 초기화 (새로운 카드로 넘어감)
-            isFlipped = false;
             updateFlashcard();
             break;
           case "typing":
@@ -5188,6 +5354,22 @@ function trackLearningInteraction(
 ) {
   if (!learningSessionData.sessionActive) return;
 
+  // 🎯 개념 학습 추적 (카드를 봤다면 학습한 것으로 간주)
+  if (conceptId) {
+    learningSessionData.conceptsStudied.add(conceptId);
+  }
+
+  // 🎯 플래시카드 모드에서는 뒤집기만 의미 있는 상호작용으로 계산
+  const isFlashcardMode = learningSessionData.mode === "flashcard";
+  const isMeaningfulInteraction = isFlashcardMode
+    ? interactionType === "flip" || interactionType === "grammar_flip"
+    : true; // 다른 모드에서는 모든 상호작용 허용
+
+  if (isFlashcardMode && !isMeaningfulInteraction) {
+    // 비의미적 상호작용은 무시 (로그 제거)
+    return;
+  }
+
   // 🎯 중복 방지: 같은 개념의 같은 상호작용 타입은 1회만 계산
   const interactionKey = `${conceptId}_${interactionType}`;
 
@@ -5197,7 +5379,7 @@ function trackLearningInteraction(
 
   // 이미 추적된 상호작용인지 확인 (중복 방지)
   if (learningSessionData.trackedInteractions.has(interactionKey)) {
-    console.log(`🔄 중복 상호작용 무시: ${conceptId} (${interactionType})`);
+    // 중복 상호작용 무시 (로그 제거)
     return;
   }
 
@@ -5208,23 +5390,18 @@ function trackLearningInteraction(
     learningSessionData.correctAnswers++;
   }
 
-  if (conceptId) {
-    learningSessionData.conceptsStudied.add(conceptId);
+  // 간소화된 상호작용 추적 로그 (5개 단위로만)
+  if (learningSessionData.totalInteractions % 5 === 0) {
+    console.log("📊 학습 상호작용 추적:", {
+      totalInteractions: learningSessionData.totalInteractions,
+      correctAnswers: learningSessionData.correctAnswers,
+      conceptsCount: learningSessionData.conceptsStudied.size,
+    });
   }
-
-  console.log("📊 학습 상호작용 추적:", {
-    conceptId: conceptId,
-    interactionType: interactionType,
-    isCorrect: isCorrect,
-    totalInteractions: learningSessionData.totalInteractions,
-    correctAnswers: learningSessionData.correctAnswers,
-    conceptsCount: learningSessionData.conceptsStudied.size,
-    uniqueInteractions: learningSessionData.trackedInteractions.size,
-  });
 }
 
 // �� 학습 세션 완료 (10개 학습 후 또는 영역 전환 시)
-async function completeLearningSession() {
+async function completeLearningSession(forceComplete = false) {
   if (
     !learningSessionData.sessionActive ||
     !currentUser ||
@@ -5248,17 +5425,21 @@ async function completeLearningSession() {
     (endTime - learningSessionData.startTime) / 1000 / 60
   ); // 분 단위
 
-  const shouldSaveSession = conceptsCount >= 2 || duration >= 1;
+  const shouldSaveSession =
+    forceComplete || conceptsCount >= 2 || duration >= 1;
 
   if (!shouldSaveSession) {
-    console.log("📊 세션 저장 조건 미달:", {
-      conceptsCount,
-      duration,
-      message: "최소 2개 개념 또는 1분 이상 학습 필요",
-    });
+    // 세션 저장 조건 미달 (로그 제거)
     learningSessionData.sessionActive = false;
     return;
   }
+
+  console.log("📊 세션 저장 조건:", {
+    conceptsCount,
+    duration,
+    forceComplete,
+    shouldSaveSession,
+  });
 
   const activityData = {
     type: learningSessionData.area,
@@ -5270,17 +5451,43 @@ async function completeLearningSession() {
     total_interactions: learningSessionData.totalInteractions,
     sourceLanguage: sourceLanguage,
     targetLanguage: targetLanguage,
-    // 세션 품질 계산 (0-100점)
-    session_quality: Math.min(
-      100,
-      Math.min(40, conceptsCount * 4) + // 개념 수 점수 (40%)
-        Math.min(30, (conceptsCount / Math.max(duration, 1)) * 60) + // 집중도 점수 (30%)
-        (learningSessionData.totalInteractions > 0
-          ? (learningSessionData.correctAnswers /
-              learningSessionData.totalInteractions) *
-            30
-          : 24) // 정확도 점수 (30%)
-    ),
+    // 학습 효율 계산 (0-100점) - 더 합리적인 계산
+    session_quality: (() => {
+      // 1. 기본 학습 점수 (60%) - 개념 수 기반
+      const baseScore = Math.min(60, conceptsCount * 6);
+
+      // 2. 시간 효율 점수 (20%) - 적절한 학습 속도 보상
+      const conceptsPerMinute = conceptsCount / Math.max(duration, 1);
+      let timeScore = 0;
+      if (conceptsPerMinute >= 1 && conceptsPerMinute <= 10) {
+        // 분당 1-10개가 적절한 학습 속도
+        timeScore = 20;
+      } else if (conceptsPerMinute > 10) {
+        // 너무 빠르면 점수 감소
+        timeScore = Math.max(5, 20 - (conceptsPerMinute - 10) * 1);
+      } else {
+        // 너무 느리면 점수 감소
+        timeScore = Math.max(5, conceptsPerMinute * 20);
+      }
+
+      // 3. 학습 참여도 점수 (20%) - 플래시카드 뒤집기 등 실제 학습 행위
+      const meaningfulInteractions = learningSessionData.correctAnswers; // flip 등의 의미있는 상호작용
+      const participationScore = Math.min(
+        20,
+        (meaningfulInteractions / conceptsCount) * 20
+      );
+
+      const totalQuality = baseScore + timeScore + participationScore;
+
+      // 간소화된 학습 효율 계산 로그
+      console.log("📊 학습 효율:", {
+        conceptsCount,
+        duration,
+        finalQuality: Math.min(100, Math.round(totalQuality)),
+      });
+
+      return Math.min(100, Math.round(totalQuality));
+    })(),
   };
 
   try {
@@ -5288,16 +5495,20 @@ async function completeLearningSession() {
       user_email: currentUser?.email,
       activityData: {
         type: activityData.type,
+        learning_mode: activityData.learning_mode,
         conceptIds_count: activityData.conceptIds.length,
         session_duration: activityData.session_duration,
         concepts_studied: activityData.concepts_studied,
         correct_answers: activityData.correct_answers,
         total_interactions: activityData.total_interactions,
         session_quality: activityData.session_quality,
+        hasSessionQuality:
+          activityData.session_quality !== undefined &&
+          activityData.session_quality !== null,
       },
     });
 
-    await collectionManager.updateLearningActivity(
+    const docRef = await collectionManager.updateLearningActivity(
       currentUser.email,
       activityData
     );
@@ -5305,12 +5516,7 @@ async function completeLearningSession() {
       conceptsCount,
       duration: Math.max(duration, 1),
       interactions: learningSessionData.totalInteractions,
-      accuracy: `${Math.round(
-        (learningSessionData.correctAnswers /
-          Math.max(learningSessionData.totalInteractions, 1)) *
-          100
-      )}%`,
-      sessionQuality: Math.round(activityData.session_quality),
+      learningEfficiency: Math.round(activityData.session_quality),
     });
 
     // 📚 학습 완료 데이터를 localStorage에 저장 (진도 페이지 자동 업데이트용)
@@ -5322,23 +5528,22 @@ async function completeLearningSession() {
       conceptsCount,
       duration: Math.max(duration, 1),
       interactions: learningSessionData.totalInteractions,
-      accuracy: Math.round(
-        (learningSessionData.correctAnswers /
-          Math.max(learningSessionData.totalInteractions, 1)) *
-          100
-      ),
-      sessionQuality: Math.round(activityData.session_quality),
-      timestamp: new Date().toISOString(),
+      learningEfficiency: Math.round(activityData.session_quality),
+      timestamp: Date.now(), // 더 정확한 타임스탬프
+      docId: docRef?.id || null, // 저장된 문서 ID 추가 (null 체크 추가)
+      sessionQuality: activityData.session_quality, // 정확한 효율 점수
     };
 
     localStorage.setItem(
       "learningCompletionUpdate",
       JSON.stringify(learningCompletionData)
     );
-    console.log(
-      "📚 학습 완료 데이터 localStorage에 저장:",
-      learningCompletionData
-    );
+
+    console.log("📤 Progress 페이지 업데이트 신호 전송:", {
+      efficiency: Math.round(activityData.session_quality),
+      docId: docRef?.id || null,
+      concepts: conceptsCount,
+    });
   } catch (error) {
     console.error("❌ 학습 세션 저장 실패:", error);
   }
@@ -5348,12 +5553,22 @@ async function completeLearningSession() {
   learningSessionData.isCompleting = false;
 }
 
-// 📚 학습 세션 자동 완료 체크 (10개 개념 학습 시)
+// 📚 학습 세션 자동 완료 체크 (동적 완료 조건)
 function checkSessionCompletion() {
   const conceptsCount = learningSessionData.conceptsStudied.size;
+  const currentData = getCurrentData();
+  const totalAvailableData = currentData ? currentData.length : 0;
 
-  if (conceptsCount >= 10 && learningSessionData.sessionActive) {
-    console.log("🎯 10개 개념 학습 완료 - 세션 자동 종료");
+  // 동적 완료 조건: 10개 또는 사용 가능한 전체 데이터를 모두 학습했을 때
+  const completionThreshold = Math.min(10, totalAvailableData);
+
+  if (
+    conceptsCount >= completionThreshold &&
+    learningSessionData.sessionActive
+  ) {
+    console.log(
+      `🎯 ${conceptsCount}개 개념 학습 완료 - 세션 자동 종료 (전체: ${totalAvailableData}개)`
+    );
     completeLearningSession();
 
     // 🔄 새로운 세션 시작 (연속 학습 지원)
@@ -5367,7 +5582,9 @@ function checkSessionCompletion() {
       }
     }, 1000); // 1초 후 새 세션 시작
   } else if (conceptsCount % 5 === 0 && conceptsCount > 0) {
-    console.log(`📊 진행 상황: ${conceptsCount}개 개념 학습 완료`);
+    console.log(
+      `📊 진행 상황: ${conceptsCount}개 개념 학습 완료 (목표: ${completionThreshold}개)`
+    );
   }
 }
 
@@ -5406,17 +5623,9 @@ window.addEventListener("beforeunload", () => {
   }
 });
 
-// 📚 학습 완료 UI 표시
-async function showLearningComplete() {
-  console.log("🎉 학습 완료!");
-
-  // 현재 세션 완료 처리 (이미 완료된 경우 스킵)
-  if (learningSessionData.sessionActive) {
-    await completeLearningSession();
-  }
-
-  // 학습 통계 계산
-  const sessionStats = calculateSessionStats();
+// 📚 학습 완료 UI 표시 (외부 통계 전달)
+async function showLearningCompleteWithStats(sessionStats) {
+  console.log("🎉 학습 완료! (통계 전달됨)");
 
   // 현재 학습 모드와 영역에 따라 다른 완료 메시지 표시
   const completionMessage = generateCompletionMessage(sessionStats);
@@ -5432,7 +5641,7 @@ async function showLearningComplete() {
         </div>
         
         <div class="bg-gray-50 rounded-lg p-4 mb-6">
-          <div class="grid grid-cols-2 gap-4 text-sm">
+          <div class="grid grid-cols-3 gap-4 text-sm">
             <div>
               <div class="text-gray-500">학습한 개념</div>
               <div class="font-bold text-lg">${
@@ -5449,9 +5658,13 @@ async function showLearningComplete() {
                 sessionStats.interactions
               }회</div>
             </div>
-            <div>
-              <div class="text-gray-500">학습 효율</div>
-              <div class="font-bold text-lg">${sessionStats.efficiency}점</div>
+          </div>
+          <div class="mt-4 pt-4 border-t border-gray-200">
+            <div class="text-center">
+              <div class="text-gray-500 text-sm">학습 효율</div>
+              <div class="font-bold text-2xl text-blue-600">${Math.round(
+                sessionStats.efficiency
+              )}점</div>
             </div>
           </div>
         </div>
@@ -5483,6 +5696,15 @@ async function showLearningComplete() {
     currentIndex = 0;
     isFlipped = false;
     isNavigating = false;
+    currentLearningArea = null;
+    currentLearningMode = null;
+
+    // 🔄 학습 데이터 초기화
+    areaData = {
+      vocabulary: [],
+      grammar: [],
+      reading: [],
+    };
 
     // 🧹 학습 세션 데이터 초기화
     if (typeof learningSessionData !== "undefined") {
@@ -5493,6 +5715,120 @@ async function showLearningComplete() {
         conceptsStudied: new Set(),
         totalInteractions: 0,
         correctAnswers: 0,
+        sessionActive: false,
+      };
+    }
+
+    console.log("🏠 영역 선택으로 돌아가기 - 학습 상태 초기화 완료");
+
+    removeCompletionOverlay();
+    showAreaSelection();
+  });
+
+  console.log("✅ 학습 완료 화면 표시 완료");
+}
+
+// 📚 학습 완료 UI 표시
+async function showLearningComplete() {
+  console.log("🎉 학습 완료!");
+
+  // 현재 세션 완료 처리 (모든 카드를 본 경우 강제 완료)
+  if (learningSessionData.sessionActive) {
+    await completeLearningSession(true); // forceComplete = true
+  }
+
+  // 학습 통계 계산
+  const sessionStats = calculateSessionStats();
+
+  // 현재 학습 모드와 영역에 따라 다른 완료 메시지 표시
+  const completionMessage = generateCompletionMessage(sessionStats);
+
+  // 완료 화면 HTML 생성
+  const completionHTML = `
+    <div class="learning-completion-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg p-8 max-w-md mx-4 text-center shadow-2xl">
+        <div class="mb-6">
+          <div class="text-6xl mb-4">🎉</div>
+          <h2 class="text-2xl font-bold text-gray-800 mb-2">학습 완료!</h2>
+          <p class="text-gray-600">${completionMessage}</p>
+        </div>
+        
+        <div class="bg-gray-50 rounded-lg p-4 mb-6">
+          <div class="grid grid-cols-3 gap-4 text-sm">
+            <div>
+              <div class="text-gray-500">학습한 개념</div>
+              <div class="font-bold text-lg">${
+                sessionStats.conceptsCount
+              }개</div>
+            </div>
+            <div>
+              <div class="text-gray-500">학습 시간</div>
+              <div class="font-bold text-lg">${sessionStats.duration}분</div>
+            </div>
+            <div>
+              <div class="text-gray-500">상호작용</div>
+              <div class="font-bold text-lg">${
+                sessionStats.interactions
+              }회</div>
+            </div>
+          </div>
+          <div class="mt-4 pt-4 border-t border-gray-200">
+            <div class="text-center">
+              <div class="text-gray-500 text-sm">학습 효율</div>
+              <div class="font-bold text-2xl text-blue-600">${
+                sessionStats.efficiency
+              }점</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="space-y-3">
+          <button id="restart-learning-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-lg font-medium transition-colors">
+            ${getRestartButtonText(learningSessionData.area)}
+          </button>
+          <button id="back-to-areas-btn" class="w-full bg-gray-500 hover:bg-gray-600 text-white py-2 px-6 rounded-lg font-medium transition-colors">
+            🏠 영역 선택으로 돌아가기
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // 완료 화면을 DOM에 추가
+  document.body.insertAdjacentHTML("beforeend", completionHTML);
+
+  // 이벤트 리스너 등록
+  document
+    .getElementById("restart-learning-btn")
+    .addEventListener("click", async () => {
+      await restartLearningWithNewData();
+    });
+
+  document.getElementById("back-to-areas-btn").addEventListener("click", () => {
+    // 🔧 학습 상태 초기화 (영역 선택으로 돌아갈 때)
+    currentIndex = 0;
+    isFlipped = false;
+    isNavigating = false;
+    currentLearningArea = null;
+    currentLearningMode = null;
+
+    // 🔄 학습 데이터 초기화
+    areaData = {
+      vocabulary: [],
+      grammar: [],
+      reading: [],
+    };
+
+    // 🧹 학습 세션 데이터 초기화
+    if (typeof learningSessionData !== "undefined") {
+      learningSessionData = {
+        area: null,
+        mode: null,
+        startTime: null,
+        conceptsStudied: new Set(),
+        totalInteractions: 0,
+        correctAnswers: 0,
+        sessionActive: false,
       };
     }
 
@@ -5512,31 +5848,36 @@ function calculateSessionStats() {
     (new Date() - learningSessionData.startTime) / 1000 / 60
   );
   const interactions = learningSessionData.totalInteractions;
-  const accuracy =
-    learningSessionData.totalInteractions > 0
-      ? Math.round(
-          (learningSessionData.correctAnswers /
-            learningSessionData.totalInteractions) *
-            100
-        )
-      : 0;
 
-  // 학습 효율 계산 (0-100점)
+  // 학습 효율 계산 (저장된 계산과 동일한 방식)
+  const baseScore = Math.min(60, conceptsCount * 6);
+
+  const conceptsPerMinute = conceptsCount / Math.max(duration, 1);
+  let timeScore = 0;
+  if (conceptsPerMinute >= 1 && conceptsPerMinute <= 10) {
+    timeScore = 20;
+  } else if (conceptsPerMinute > 10) {
+    timeScore = Math.max(5, 20 - (conceptsPerMinute - 10) * 1);
+  } else {
+    timeScore = Math.max(5, conceptsPerMinute * 20);
+  }
+
+  const meaningfulInteractions = learningSessionData.correctAnswers;
+  const participationScore = Math.min(
+    20,
+    (meaningfulInteractions / Math.max(conceptsCount, 1)) * 20
+  );
+
   const efficiency = Math.min(
     100,
-    Math.min(40, conceptsCount * 4) + // 개념 수 점수 (40%)
-      Math.min(30, (conceptsCount / Math.max(duration, 1)) * 60) + // 집중도 점수 (30%)
-      (interactions > 0
-        ? (learningSessionData.correctAnswers / interactions) * 30
-        : 24) // 정확도 점수 (30%)
+    Math.round(baseScore + timeScore + participationScore)
   );
 
   return {
     conceptsCount,
     duration: Math.max(duration, 1),
     interactions,
-    accuracy,
-    efficiency: Math.round(efficiency),
+    efficiency,
   };
 }
 

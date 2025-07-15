@@ -757,9 +757,14 @@
       <!-- 플래시카드 모드 -->
       <div id="flashcard-mode" class="hidden mb-8">
         <div class="relative">
-          <button id="back-from-flashcard" class="absolute top-4 right-4 bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm z-10">
-            <i class="fas fa-arrow-left mr-1"></i><span data-i18n="back">돌아가기</span>
-          </button>
+          <div class="absolute top-4 right-4 flex gap-2 z-10">
+            <button id="finish-learning-flashcard" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-sm">
+              <i class="fas fa-stop mr-1"></i><span data-i18n="finish_learning">학습 종료</span>
+            </button>
+            <button id="back-from-flashcard" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm">
+              <i class="fas fa-arrow-left mr-1"></i><span data-i18n="back">돌아가기</span>
+            </button>
+          </div>
           <div class="text-center mb-6">
             <h2 class="text-2xl font-bold mb-2" data-i18n="flashcard_learning">🃏 플래시카드 학습</h2>
             <div id="flashcard-mode-progress" class="text-gray-600">0 / 0</div>
@@ -801,9 +806,14 @@
       <!-- 타이학 학습 영역 -->
       <div id="typing-mode" class="hidden mb-8">
         <div class="bg-white rounded-lg shadow-md p-6 relative">
-          <button id="back-from-typing" class="absolute top-4 right-4 bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm">
-            <i class="fas fa-arrow-left mr-1"></i><span data-i18n="back">돌아가기</span>
-          </button>
+          <div class="absolute top-4 right-4 flex gap-2">
+            <button id="finish-learning-typing" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-sm">
+              <i class="fas fa-stop mr-1"></i><span data-i18n="finish_learning">학습 종료</span>
+            </button>
+            <button id="back-from-typing" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm">
+              <i class="fas fa-arrow-left mr-1"></i><span data-i18n="back">돌아가기</span>
+            </button>
+          </div>
           <div class="text-center mb-6">
             <h2 class="text-2xl font-bold mb-2" data-i18n="typing_learning">⌨️ 타이핑 학습</h2>
             <div id="typing-mode-progress" class="text-gray-600">0 / 0</div>
@@ -857,9 +867,14 @@
       <!-- 문법 패턴 모드 -->
       <div id="grammar-pattern-mode" class="hidden mb-8">
         <div class="bg-white rounded-lg shadow-md p-6 relative">
-          <button id="back-to-dashboard-pattern" class="absolute top-4 right-4 bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm">
-            <i class="fas fa-arrow-left mr-1"></i><span data-i18n="back">돌아가기</span>
-          </button>
+          <div class="absolute top-4 right-4 flex gap-2">
+            <button id="finish-learning-grammar" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-sm">
+              <i class="fas fa-stop mr-1"></i><span data-i18n="finish_learning">학습 종료</span>
+            </button>
+            <button id="back-to-dashboard-pattern" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm">
+              <i class="fas fa-arrow-left mr-1"></i><span data-i18n="back">돌아가기</span>
+            </button>
+          </div>
           <div class="text-center mb-6">
             <h2 class="text-2xl font-bold mb-2" data-i18n="grammar_pattern_analysis">📝 문법 패턴 분석</h2>
             <div id="pattern-progress" class="text-gray-600">0 / 0</div>
@@ -901,9 +916,14 @@
       <!-- 문법 실습 모드 -->
       <div id="grammar-practice-mode" class="hidden mb-8">
         <div class="bg-white rounded-lg shadow-md p-6 relative">
-          <button id="back-to-dashboard-practice" class="absolute top-4 right-4 bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm">
-            <i class="fas fa-arrow-left mr-1"></i><span data-i18n="back">돌아가기</span>
-          </button>
+          <div class="absolute top-4 right-4 flex gap-2">
+            <button id="finish-learning-grammar-practice" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-sm">
+              <i class="fas fa-stop mr-1"></i><span data-i18n="finish_learning">학습 종료</span>
+            </button>
+            <button id="back-to-dashboard-practice" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm">
+              <i class="fas fa-arrow-left mr-1"></i><span data-i18n="back">돌아가기</span>
+            </button>
+          </div>
           <div class="text-center mb-6">
             <h2 class="text-2xl font-bold mb-2" data-i18n="grammar_practice">📚 문법 실습 연습</h2>
           </div>
@@ -954,7 +974,15 @@
 
       <!-- 독해 모드 -->
       <div id="reading-mode" class="hidden mb-8">
-        <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="bg-white rounded-lg shadow-md p-6 relative">
+          <div class="absolute top-4 right-4 flex gap-2">
+            <button id="finish-learning-reading" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-sm">
+              <i class="fas fa-stop mr-1"></i><span data-i18n="finish_learning">학습 종료</span>
+            </button>
+            <button id="back-to-dashboard-reading" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm">
+              <i class="fas fa-arrow-left mr-1"></i><span data-i18n="back">돌아가기</span>
+            </button>
+          </div>
           <div class="text-center mb-6">
             <h2 class="text-2xl font-bold mb-2" data-i18n="reading_flash_card">플래시 카드</h2>
             <div id="reading-progress" class="text-gray-600">0 / 0</div>

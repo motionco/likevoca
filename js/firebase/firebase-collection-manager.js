@@ -2718,7 +2718,11 @@ export class CollectionManager {
           total_interactions: activityDoc.total_interactions,
           session_quality: activityDoc.session_quality,
           type: activityDoc.type,
+          learning_mode: activityDoc.learning_mode,
           conceptIds: activityDoc.concept_ids.length,
+          hasSessionQuality:
+            activityDoc.session_quality !== undefined &&
+            activityDoc.session_quality !== null,
         },
       });
 
@@ -2728,8 +2732,10 @@ export class CollectionManager {
       }
 
       console.log("✅ 학습 활동 추적 완료");
+      return learningActivityRef; // 문서 참조 반환
     } catch (error) {
       console.error("❌ 학습 활동 추적 중 오류:", error);
+      return null;
     }
   }
 
