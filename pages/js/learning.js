@@ -1160,18 +1160,36 @@ function setupEventListeners() {
     nextFlashcardBtn.setAttribute("data-listener-added", "true");
   }
 
-  // 독해 학습 네비게이션 버튼들
-  const prevReadingBtn = document.getElementById("prev-reading");
-  const nextReadingBtn = document.getElementById("next-reading");
+  // 독해 예문 학습 네비게이션 버튼들
+  const prevReadingExampleBtn = document.getElementById(
+    "prev-reading-example-btn"
+  );
+  const nextReadingExampleBtn = document.getElementById(
+    "next-reading-example-btn"
+  );
 
-  if (prevReadingBtn) {
-    prevReadingBtn.removeEventListener("click", prevReadingHandler);
-    prevReadingBtn.addEventListener("click", prevReadingHandler);
+  if (prevReadingExampleBtn) {
+    prevReadingExampleBtn.removeEventListener("click", prevReadingHandler);
+    prevReadingExampleBtn.addEventListener("click", prevReadingHandler);
   }
 
-  if (nextReadingBtn) {
-    nextReadingBtn.removeEventListener("click", nextReadingHandler);
-    nextReadingBtn.addEventListener("click", nextReadingHandler);
+  if (nextReadingExampleBtn) {
+    nextReadingExampleBtn.removeEventListener("click", nextReadingHandler);
+    nextReadingExampleBtn.addEventListener("click", nextReadingHandler);
+  }
+
+  // 독해 플래시 학습 네비게이션 버튼들
+  const prevReadingFlashBtn = document.getElementById("prev-reading-flash-btn");
+  const nextReadingFlashBtn = document.getElementById("next-reading-flash-btn");
+
+  if (prevReadingFlashBtn) {
+    prevReadingFlashBtn.removeEventListener("click", prevReadingHandler);
+    prevReadingFlashBtn.addEventListener("click", prevReadingHandler);
+  }
+
+  if (nextReadingFlashBtn) {
+    nextReadingFlashBtn.removeEventListener("click", nextReadingHandler);
+    nextReadingFlashBtn.addEventListener("click", nextReadingHandler);
   }
 
   // 타이핑 관련 버튼들
@@ -1213,6 +1231,8 @@ function setupEventListeners() {
     "back-to-dashboard-pronunciation",
     "back-to-dashboard-pattern",
     "back-to-dashboard-practice",
+    "back-to-dashboard-reading-example",
+    "back-to-dashboard-reading-flash",
     "back-to-dashboard-nodata",
   ];
 
@@ -1245,7 +1265,8 @@ function setupEventListeners() {
     "finish-learning-typing",
     "finish-learning-grammar",
     "finish-learning-grammar-practice",
-    "finish-learning-reading",
+    "finish-learning-reading-example",
+    "finish-learning-reading-flash",
   ];
 
   finishLearningButtons.forEach((buttonId) => {
@@ -1271,16 +1292,6 @@ function setupEventListeners() {
   if (checkTypingAnswerBtn) {
     checkTypingAnswerBtn.removeEventListener("click", checkTypingAnswer);
     checkTypingAnswerBtn.addEventListener("click", checkTypingAnswer);
-  }
-
-  // 독해 모드 버튼들 (기존 변수 사용)
-  if (prevReadingBtn) {
-    prevReadingBtn.removeEventListener("click", () => navigateContent(-1));
-    prevReadingBtn.addEventListener("click", () => navigateContent(-1));
-  }
-  if (nextReadingBtn) {
-    nextReadingBtn.removeEventListener("click", () => navigateContent(1));
-    nextReadingBtn.addEventListener("click", () => navigateContent(1));
   }
 
   // 문법 실습 뒤집기 버튼
@@ -1317,10 +1328,10 @@ function setupEventListeners() {
   document.addEventListener("click", globalClickHandler);
 
   // 독해 플래시카드 뒤집기 버튼
-  const flipReadingCardBtn = document.getElementById("flip-reading-card");
-  if (flipReadingCardBtn) {
-    flipReadingCardBtn.removeEventListener("click", flipReadingCard);
-    flipReadingCardBtn.addEventListener("click", (e) => {
+  const flipReadingFlashBtn = document.getElementById("flip-reading-flash-btn");
+  if (flipReadingFlashBtn) {
+    flipReadingFlashBtn.removeEventListener("click", flipReadingCard);
+    flipReadingFlashBtn.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
       // 플래시 모드일 때만 뒤집기 기능 작동
@@ -1397,13 +1408,9 @@ function nextTypingHandler(e) {
   e.stopPropagation();
   navigateContent(1);
   // 결과 숨기기
-  const resultDiv = document.getElementById("typing-result");
+  const resultDiv = document.getElementById("typing-mode-result");
   if (resultDiv) {
     resultDiv.classList.add("hidden");
-  }
-  const nextBtn = document.getElementById("next-typing");
-  if (nextBtn) {
-    nextBtn.classList.add("hidden");
   }
 }
 
@@ -3147,16 +3154,13 @@ function hideAllSections() {
   const sections = [
     "area-selection",
     "mode-selection",
-    "flashcard-container",
-    "typing-container",
-    "grammar-container",
-    "reading-container",
     "flashcard-mode",
     "typing-mode",
     "pronunciation-mode",
     "grammar-pattern-mode",
     "grammar-practice-mode",
-    "reading-mode",
+    "reading-example-mode",
+    "reading-flash-mode",
     "no-data-message",
   ];
 
@@ -3173,16 +3177,13 @@ function hideAllSections() {
 function hideLearningModeSections() {
   // 학습 모드 섹션들만 숨김 (영역 선택과 모드 선택은 유지)
   const learningModeSections = [
-    "flashcard-container",
-    "typing-container",
-    "grammar-container",
-    "reading-container",
     "flashcard-mode",
     "typing-mode",
     "pronunciation-mode",
     "grammar-pattern-mode",
     "grammar-practice-mode",
-    "reading-mode",
+    "reading-example-mode",
+    "reading-flash-mode",
     "no-data-message",
   ];
 
@@ -3348,7 +3349,7 @@ function flipCard() {
 
 function showTypingMode() {
   console.log("⌨️ 타이핑 모드 시작");
-  const typingMode = document.getElementById("typing-container");
+  const typingMode = document.getElementById("typing-mode");
   if (typingMode) {
     typingMode.classList.remove("hidden");
     updateTyping();
@@ -3359,7 +3360,7 @@ function showTypingMode() {
     }, 50);
 
     // 엔터키 이벤트 리스너 추가
-    const answerInput = document.getElementById("typing-answer");
+    const answerInput = document.getElementById("typing-mode-answer");
     if (answerInput) {
       answerInput.addEventListener("keypress", (e) => {
         if (e.key === "Enter") {
@@ -3388,8 +3389,8 @@ function updateTyping() {
 
   const wordElement = document.getElementById("typing-word");
   const pronunciationElement = document.getElementById("typing-pronunciation");
-  const answerInput = document.getElementById("typing-answer");
-  const resultDiv = document.getElementById("typing-result");
+  const answerInput = document.getElementById("typing-mode-answer");
+  const resultDiv = document.getElementById("typing-mode-result");
 
   let sourceText = "";
   let sourcePronunciation = "";
@@ -3432,9 +3433,9 @@ function updateTyping() {
     pronunciationElement.textContent = sourcePronunciation;
   }
 
-  // 📊 학습 상호작용 추적 (타이핑 문제 표시)
-  const conceptId = concept.id || concept.concept_id || `vocab_${currentIndex}`;
-  trackLearningInteraction(conceptId, true, "view");
+  // 📊 학습 상호작용 추적 (타이핑 문제 표시) - 단순 조회는 카운트하지 않음
+  // const conceptId = concept.id || concept.concept_id || `vocab_${currentIndex}`;
+  // trackLearningInteraction(conceptId, false, "view"); // 중복 방지를 위해 주석 처리
 
   // 카테고리/도메인 정보 표시
   const categoryElement = document.getElementById("typing-category");
@@ -3486,7 +3487,7 @@ function updateTyping() {
   }
 
   // 진행 상황 업데이트 (HTML에서 타이핑 진행 상황 요소가 있는지 확인 필요)
-  const progress = document.getElementById("typing-progress");
+  const progress = document.getElementById("typing-mode-progress");
   if (progress) {
     progress.textContent = `${currentIndex + 1} / ${currentData.length}`;
   }
@@ -3518,8 +3519,8 @@ function updateTyping() {
 }
 
 function checkTypingAnswer() {
-  const answerInput = document.getElementById("typing-answer");
-  const resultDiv = document.getElementById("typing-result");
+  const answerInput = document.getElementById("typing-mode-answer");
+  const resultDiv = document.getElementById("typing-mode-result");
 
   if (!answerInput || !resultDiv) return;
 
@@ -3770,68 +3771,38 @@ function flipGrammarCard() {
 
 function showReadingExampleMode() {
   console.log("📖 예문 독해 모드 시작");
-  const readingContainer = document.getElementById("reading-container");
+  const readingContainer = document.getElementById("reading-example-mode");
   if (readingContainer) {
     readingContainer.classList.remove("hidden");
 
-    // 모드 제목 업데이트
-    const modeTitle = document.getElementById("reading-mode-title");
-    if (modeTitle) {
-      const translatedTitle =
-        getTranslatedText("reading_example_learning") || "예문 학습";
-      modeTitle.textContent = translatedTitle;
-      modeTitle.setAttribute("data-i18n", "reading_example_learning");
-    }
-
     updateReadingExample();
-
-    // 예문 모드에서는 뒤집기 버튼 숨김
-    const flipBtn = document.getElementById("flip-reading-card");
-    if (flipBtn) {
-      flipBtn.style.display = "none";
-    }
 
     // 번역 적용
     setTimeout(() => {
       applyTranslations();
     }, 50);
   } else {
-    console.error("❌ 독해 모드 요소를 찾을 수 없음");
-    alert("독해 모드를 시작할 수 없습니다.");
+    console.error("❌ 독해 예문 모드 요소를 찾을 수 없음");
+    alert("독해 예문 모드를 시작할 수 없습니다.");
     showAreaSelection();
   }
 }
 
 function showReadingFlashMode() {
   console.log("⚡ 플래시 독해 모드 시작");
-  const readingContainer = document.getElementById("reading-container");
+  const readingContainer = document.getElementById("reading-flash-mode");
   if (readingContainer) {
     readingContainer.classList.remove("hidden");
 
-    // 모드 제목 업데이트
-    const modeTitle = document.getElementById("reading-mode-title");
-    if (modeTitle) {
-      const translatedTitle =
-        getTranslatedText("reading_flash_mode") || "플래시 모드";
-      modeTitle.textContent = translatedTitle;
-      modeTitle.setAttribute("data-i18n", "reading_flash_mode");
-    }
-
     updateReadingFlash();
-
-    // 플래시 모드에서는 뒤집기 버튼 표시
-    const flipBtn = document.getElementById("flip-reading-card");
-    if (flipBtn) {
-      flipBtn.style.display = "inline-block";
-    }
 
     // 번역 적용
     setTimeout(() => {
       applyTranslations();
     }, 50);
   } else {
-    console.error("❌ 독해 모드 요소를 찾을 수 없음");
-    alert("독해 모드를 시작할 수 없습니다.");
+    console.error("❌ 독해 플래시 모드 요소를 찾을 수 없음");
+    alert("독해 플래시 모드를 시작할 수 없습니다.");
     showAreaSelection();
   }
 }
@@ -3904,7 +3875,7 @@ function updateReadingExample() {
   `;
 
   // 진행 상황 업데이트
-  const progress = document.getElementById("reading-progress");
+  const progress = document.getElementById("reading-example-progress");
   if (progress) {
     progress.textContent = `${currentIndex + 1} / ${currentData.length}`;
   }
@@ -3923,77 +3894,43 @@ function updateReadingFlash() {
   const sourceLanguage = window.languageSettings?.sourceLanguage || "korean";
   const targetLanguage = window.languageSettings?.targetLanguage || "english";
 
-  const container = document.getElementById("reading-example-container");
-  if (!container) return;
+  // 플래시 카드 요소들 직접 업데이트
+  const frontText = document.getElementById("reading-flash-front-text");
+  const backTranslation = document.getElementById(
+    "reading-flash-back-translation"
+  );
+  const backContext = document.getElementById("reading-flash-back-context");
 
   // 디버깅 로그 추가
   console.log("🔍 updateReadingFlash - example 데이터:", example);
   console.log("🔍 example.situation:", example.situation);
-  console.log(
-    "🔍 Array.isArray(example.situation):",
-    Array.isArray(example.situation)
-  );
-  console.log(
-    "🔍 situation 값:",
-    Array.isArray(example.situation) && example.situation.length > 0
-      ? example.situation[0]
-      : example.situation || "플래시 모드"
-  );
 
-  // 상황 정보 준비
-  const situationInfo =
-    Array.isArray(example.situation) && example.situation.length > 0
-      ? example.situation.join(", ")
-      : example.situation || "일반";
+  if (frontText) {
+    frontText.textContent =
+      example.translations?.[sourceLanguage] ||
+      example[sourceLanguage] ||
+      example.original ||
+      "원문";
+  }
 
-  // 플래시 모드 - 간단한 카드 형태
-  container.innerHTML = `
-    <div class="flip-card w-full max-w-lg mx-auto" id="reading-flash-card">
-      <div class="flip-card-inner">
-        <div class="flip-card-front bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg shadow-lg p-8">
-          <div class="text-center">
-            <h3 class="text-2xl font-bold mb-4">
-              ${
-                example.translations?.[sourceLanguage] ||
-                example[sourceLanguage] ||
-                example.original ||
-                "원문"
-              }
-            </h3>
-            <p class="text-purple-100 mt-8">(카드를 클릭하여 번역 보기)</p>
-          </div>
-        </div>
-        <div class="flip-card-back bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg shadow-lg p-8">
-          <div class="text-center">
-            <h3 class="text-2xl font-bold mb-4">
-              ${
-                example.translations?.[targetLanguage] ||
-                example[targetLanguage] ||
-                example.translation ||
-                "번역"
-              }
-            </h3>
-            <div class="flex flex-wrap gap-2 justify-center mt-4">
-              <span class="text-sm text-blue-100 bg-blue-400 bg-opacity-30 px-3 py-1 rounded-full">
-                📍 ${situationInfo}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <div class="mt-6 text-center" id="reading-flash-delete-container">
-      <button class="delete-btn bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm" 
-              data-item-id="${example.id}" 
-              data-item-type="reading">
-        🗑️ 삭제
-      </button>
-    </div>
-  `;
+  if (backTranslation) {
+    backTranslation.textContent =
+      example.translations?.[targetLanguage] ||
+      example[targetLanguage] ||
+      example.translation ||
+      "번역";
+  }
+
+  if (backContext) {
+    const situationInfo =
+      Array.isArray(example.situation) && example.situation.length > 0
+        ? example.situation.join(", ")
+        : example.situation || "일반";
+    backContext.textContent = situationInfo;
+  }
 
   // 진행 상황 업데이트
-  const progress = document.getElementById("reading-progress");
+  const progress = document.getElementById("reading-flash-progress");
   if (progress) {
     progress.textContent = `${currentIndex + 1} / ${currentData.length}`;
   }
@@ -4004,10 +3941,9 @@ function updateReadingFlash() {
     flashCard.classList.remove("flipped");
   }
 
-  // 📊 학습 상호작용 추적 (독해 플래시 표시)
-  const conceptId =
-    example.id || example.concept_id || `reading_${currentIndex}`;
-  trackLearningInteraction(conceptId, false, "view"); // view는 단순 조회이므로 정답으로 계산하지 않음
+  // 📊 학습 상호작용 추적 (독해 플래시 표시) - 단순 조회는 카운트하지 않음
+  // const conceptId = example.id || example.concept_id || `reading_${currentIndex}`;
+  // trackLearningInteraction(conceptId, false, "view"); // 중복 방지를 위해 주석 처리
 }
 
 function navigateContent(direction) {
@@ -4038,27 +3974,45 @@ function navigateContent(direction) {
       currentItem.concept_id ||
       `${currentLearningArea}_${currentIndex}`;
 
-    // 🎯 다음 버튼 클릭 시 카드 뒤집기 여부 확인
-    const isFlashcardMode = currentLearningMode === "flashcard";
-    const isReadingFlashMode =
-      currentLearningArea === "reading" && currentLearningMode === "flash";
+    // 🎯 타이핑 모드에서 답변하지 않고 다음으로 넘어가는 경우 처리
+    if (currentLearningMode === "typing") {
+      const answerInput = document.getElementById("typing-mode-answer");
+      const resultDiv = document.getElementById("typing-mode-result");
 
-    let wasFlipped = true; // 기본값
-
-    if (isFlashcardMode) {
-      wasFlipped = isFlipped;
-    } else if (isReadingFlashMode) {
-      // 독해 플래시 모드에서는 카드가 뒤집혔는지 확인
-      const card = document.getElementById("reading-flash-card");
-      wasFlipped = card ? card.classList.contains("flipped") : false;
-    }
-
-    if ((isFlashcardMode || isReadingFlashMode) && !wasFlipped) {
-      // 카드를 뒤집지 않고 다음 버튼 누른 경우 (부분 학습)
-      trackLearningInteraction(conceptId, false, "navigate_unflipped");
+      // 입력값이 있지만 결과가 표시되지 않았다면 (정답 확인 안 함)
+      if (
+        answerInput &&
+        answerInput.value.trim() &&
+        resultDiv &&
+        resultDiv.classList.contains("hidden")
+      ) {
+        // 답변은 했지만 확인하지 않은 경우 - 타이핑 모드에서는 상호작용으로 계산하지 않음
+        console.log(`⚠️ 타이핑 모드: 답변했지만 확인하지 않음 - 상호작용 무시`);
+      } else if (answerInput && !answerInput.value.trim()) {
+        // 아예 답변하지 않은 경우 - 타이핑 모드에서는 상호작용으로 계산하지 않음
+        console.log(`⚠️ 타이핑 모드: 답변하지 않음 - 상호작용 무시`);
+      }
+      // 이미 정답 확인을 했다면 checkTypingAnswer에서 이미 추적했으므로 중복 추적하지 않음
     } else {
-      // 정상적인 학습 완료 후 다음 버튼 누른 경우
-      trackLearningInteraction(conceptId, true, "navigate_completed");
+      // 다른 모드들의 기존 로직
+      // 🎯 다음 버튼 클릭 시 카드 뒤집기 여부 확인
+      const isFlashcardMode = currentLearningMode === "flashcard";
+      const isReadingFlashMode =
+        currentLearningArea === "reading" && currentLearningMode === "flash";
+
+      if (isFlashcardMode) {
+        // 플래시카드 모드: 카드를 뒤집지 않고 다음 버튼 누른 경우만 추적
+        if (!isFlipped) {
+          trackLearningInteraction(conceptId, false, "navigate_unflipped");
+        }
+        // 카드를 뒤집었다면 flip 시점에서 이미 추적했으므로 중복 추적하지 않음
+      } else if (isReadingFlashMode) {
+        // 독해 플래시 모드에서는 뒤집기 여부를 추적하지 않음
+        // flipReadingCard 함수에서만 상호작용을 추적하여 중복 방지
+      } else {
+        // 다른 모드들: 기본적으로 정상 완료로 처리
+        trackLearningInteraction(conceptId, true, "navigate_completed");
+      }
     }
 
     checkSessionCompletion();
@@ -5191,9 +5145,12 @@ function flipReadingCard() {
         const concept = currentData[currentIndex];
         const conceptId =
           concept.id || concept.concept_id || `reading_${currentIndex}`;
-        trackLearningInteraction(conceptId, true, "flip"); // 뒤집기는 적극적인 학습 참여
+        trackLearningInteraction(conceptId, true, "flip"); // 뒤집기는 적극적인 학습 참여로 추적
         console.log("📊 독해 플래시 카드 뒤집기 추적됨:", conceptId);
       }
+    } else if (wasFlipped && !isNowFlipped) {
+      // 카드를 다시 앞면으로 뒤집은 경우는 추가 카운트하지 않음
+      console.log("🔄 카드를 앞면으로 뒤집음 - 추가 카운트하지 않음");
     }
 
     console.log("✅ 독해 플래시 카드 뒤집기 완료");
@@ -5354,20 +5311,75 @@ function trackLearningInteraction(
 ) {
   if (!learningSessionData.sessionActive) return;
 
-  // 🎯 개념 학습 추적 (카드를 봤다면 학습한 것으로 간주)
+  console.log(`🔍 상호작용 추적 시도:`, {
+    conceptId,
+    isCorrect,
+    interactionType,
+    mode: learningSessionData.mode,
+    area: learningSessionData.area,
+  });
+
+  // 🎯 개념 학습 추적 (실제 학습 행동이 있을 때만)
   if (conceptId) {
-    learningSessionData.conceptsStudied.add(conceptId);
+    // 타이핑 모드: 정답 확인 시에만 학습한 것으로 간주
+    if (learningSessionData.mode === "typing" && interactionType === "typing") {
+      learningSessionData.conceptsStudied.add(conceptId);
+    }
+    // 플래시카드/플래시 모드: 뒤집기 시에만 학습한 것으로 간주
+    else if (
+      (learningSessionData.mode === "flashcard" ||
+        learningSessionData.mode === "flash") &&
+      (interactionType === "flip" || interactionType === "grammar_flip")
+    ) {
+      learningSessionData.conceptsStudied.add(conceptId);
+    }
+    // 기타 모드: 기존 방식 유지
+    else if (
+      !["typing", "flashcard", "flash"].includes(learningSessionData.mode)
+    ) {
+      learningSessionData.conceptsStudied.add(conceptId);
+    }
   }
 
-  // 🎯 플래시카드 모드에서는 뒤집기만 의미 있는 상호작용으로 계산
+  // 🎯 의미 있는 상호작용만 계산
   const isFlashcardMode = learningSessionData.mode === "flashcard";
-  const isMeaningfulInteraction = isFlashcardMode
-    ? interactionType === "flip" || interactionType === "grammar_flip"
-    : true; // 다른 모드에서는 모든 상호작용 허용
+  const isTypingMode = learningSessionData.mode === "typing";
+  const isFlashMode = learningSessionData.mode === "flash";
 
-  if (isFlashcardMode && !isMeaningfulInteraction) {
-    // 비의미적 상호작용은 무시 (로그 제거)
+  // 각 모드별 의미 있는 상호작용 정의
+  let isMeaningfulInteraction = false;
+
+  if (isFlashcardMode || isFlashMode) {
+    // 플래시카드/플래시 모드: 뒤집기만 의미 있는 상호작용
+    isMeaningfulInteraction =
+      interactionType === "flip" || interactionType === "grammar_flip";
+  } else if (isTypingMode) {
+    // 타이핑 모드: 정답 확인만 의미 있는 상호작용 (네비게이션 제외)
+    isMeaningfulInteraction = interactionType === "typing";
+  } else {
+    // 기타 모드: 모든 상호작용 허용
+    isMeaningfulInteraction = true;
+  }
+
+  if (!isMeaningfulInteraction) {
+    console.log(
+      `🚫 ${learningSessionData.mode} 모드에서 비의미적 상호작용 무시: ${interactionType}`
+    );
     return;
+  }
+
+  // 🎯 타이핑 모드 중복 방지: 같은 개념에 대해 정답 확인 후 skip은 무시
+  if (isTypingMode && interactionType === "typing_skip") {
+    const typingKey = `${conceptId}_typing`;
+    if (
+      learningSessionData.trackedInteractions &&
+      learningSessionData.trackedInteractions.has(typingKey)
+    ) {
+      console.log(
+        `🚫 타이핑 모드 중복 상호작용 무시: 이미 ${conceptId}에 대해 정답 확인함`
+      );
+      return;
+    }
   }
 
   // 🎯 중복 방지: 같은 개념의 같은 상호작용 타입은 1회만 계산
@@ -5379,7 +5391,7 @@ function trackLearningInteraction(
 
   // 이미 추적된 상호작용인지 확인 (중복 방지)
   if (learningSessionData.trackedInteractions.has(interactionKey)) {
-    // 중복 상호작용 무시 (로그 제거)
+    console.log(`🚫 중복 상호작용 무시: ${interactionKey}`);
     return;
   }
 
@@ -5389,6 +5401,23 @@ function trackLearningInteraction(
   if (isCorrect) {
     learningSessionData.correctAnswers++;
   }
+
+  console.log(`✅ 상호작용 추적됨:`, {
+    interactionKey,
+    totalInteractions: learningSessionData.totalInteractions,
+    correctAnswers: learningSessionData.correctAnswers,
+    mode: learningSessionData.mode,
+    area: learningSessionData.area,
+  });
+
+  // 상세한 상호작용 추적 로그 (개발/디버깅용)
+  console.log(`🔍 상호작용 상세:`, {
+    conceptId,
+    interactionType,
+    isCorrect,
+    totalTracked: learningSessionData.trackedInteractions.size,
+    sessionActive: learningSessionData.sessionActive,
+  });
 
   // 간소화된 상호작용 추적 로그 (5개 단위로만)
   if (learningSessionData.totalInteractions % 5 === 0) {
@@ -5419,14 +5448,15 @@ async function completeLearningSession(forceComplete = false) {
   learningSessionData.isCompleting = true;
 
   // 🎯 최소 학습 조건 확인 (2개 이상 개념 학습 또는 1분 이상 학습)
-  const conceptsCount = learningSessionData.conceptsStudied.size;
+  const studiedConceptsCount = learningSessionData.conceptsStudied.size; // 실제 학습한 개념 수
+  const totalAvailableData = getCurrentData()?.length || 0; // 전체 제시된 데이터 수
   const endTime = new Date();
   const duration = Math.round(
     (endTime - learningSessionData.startTime) / 1000 / 60
   ); // 분 단위
 
   const shouldSaveSession =
-    forceComplete || conceptsCount >= 2 || duration >= 1;
+    forceComplete || studiedConceptsCount >= 2 || duration >= 1;
 
   if (!shouldSaveSession) {
     // 세션 저장 조건 미달 (로그 제거)
@@ -5435,7 +5465,8 @@ async function completeLearningSession(forceComplete = false) {
   }
 
   console.log("📊 세션 저장 조건:", {
-    conceptsCount,
+    studiedConceptsCount,
+    totalAvailableData,
     duration,
     forceComplete,
     shouldSaveSession,
@@ -5446,43 +5477,135 @@ async function completeLearningSession(forceComplete = false) {
     learning_mode: learningSessionData.mode, // 🆕 세부 학습 모드 추가
     conceptIds: Array.from(learningSessionData.conceptsStudied),
     session_duration: Math.max(duration, 1), // 최소 1분으로 설정
-    concepts_studied: conceptsCount,
+    concepts_studied: studiedConceptsCount, // 실제 학습한 개념 수
     correct_answers: learningSessionData.correctAnswers,
     total_interactions: learningSessionData.totalInteractions,
     sourceLanguage: sourceLanguage,
     targetLanguage: targetLanguage,
     // 학습 효율 계산 (0-100점) - 더 합리적인 계산
     session_quality: (() => {
-      // 1. 기본 학습 점수 (60%) - 개념 수 기반
-      const baseScore = Math.min(60, conceptsCount * 6);
+      // 1. 기본 학습 점수 - 모드별 차별화
+      let baseScore = 0;
 
-      // 2. 시간 효율 점수 (20%) - 적절한 학습 속도 보상
-      const conceptsPerMinute = conceptsCount / Math.max(duration, 1);
-      let timeScore = 0;
-      if (conceptsPerMinute >= 1 && conceptsPerMinute <= 10) {
-        // 분당 1-10개가 적절한 학습 속도
-        timeScore = 20;
-      } else if (conceptsPerMinute > 10) {
-        // 너무 빠르면 점수 감소
-        timeScore = Math.max(5, 20 - (conceptsPerMinute - 10) * 1);
+      if (currentLearningMode === "typing") {
+        // 타이핑 모드: 정답률에 따른 기본 점수 (최대 60점)
+        const actualCorrect = learningSessionData.correctAnswers || 0;
+        // 실제 상호작용 수를 기준으로 정답률 계산
+        const actualAttempts =
+          learningSessionData.totalInteractions || totalAvailableData;
+        const accuracyRate = actualCorrect / Math.max(actualAttempts, 1);
+        baseScore = accuracyRate * 60; // 정답률 기반 기본 점수
+
+        console.log("📊 타이핑 모드 정답률 상세:", {
+          actualCorrect,
+          actualAttempts,
+          studiedConceptsCount,
+          totalAvailableData,
+          accuracyRate: (accuracyRate * 100).toFixed(1) + "%",
+          baseScore: baseScore.toFixed(1),
+        });
+      } else if (
+        currentLearningMode === "flash" &&
+        currentLearningArea === "reading"
+      ) {
+        // 독해 플래시 모드: 실제 학습한 개념 수에 따른 기본 점수 (최대 60점)
+        baseScore = Math.min(
+          60,
+          (studiedConceptsCount / totalAvailableData) * 60
+        );
+
+        console.log("📊 독해 플래시 모드 기본 점수:", {
+          studiedConceptsCount,
+          totalAvailableData,
+          completionRate:
+            ((studiedConceptsCount / totalAvailableData) * 100).toFixed(1) +
+            "%",
+          baseScore: baseScore.toFixed(1),
+        });
       } else {
-        // 너무 느리면 점수 감소
-        timeScore = Math.max(5, conceptsPerMinute * 20);
+        // 다른 모드: 기존 방식 (최대 60점)
+        baseScore = Math.min(60, studiedConceptsCount * 6);
       }
 
-      // 3. 학습 참여도 점수 (20%) - 플래시카드 뒤집기 등 실제 학습 행위
-      const meaningfulInteractions = learningSessionData.correctAnswers; // flip 등의 의미있는 상호작용
-      const participationScore = Math.min(
-        20,
-        (meaningfulInteractions / conceptsCount) * 20
-      );
+      // 2. 시간 효율 점수 - 전체 데이터 기준으로 계산
+      let timeScore = 0;
+      const conceptsPerMinute = totalAvailableData / Math.max(duration, 1);
+
+      if (currentLearningMode === "typing") {
+        // 타이핑 모드: 시간 점수 (최대 20점)
+        if (conceptsPerMinute >= 1 && conceptsPerMinute <= 10) {
+          timeScore = 20;
+        } else if (conceptsPerMinute > 10) {
+          timeScore = Math.max(5, 20 - (conceptsPerMinute - 10) * 1);
+        } else {
+          timeScore = Math.max(5, conceptsPerMinute * 20);
+        }
+      } else {
+        // 다른 모드: 기존 방식 (최대 20점)
+        if (conceptsPerMinute >= 1 && conceptsPerMinute <= 10) {
+          timeScore = 20;
+        } else if (conceptsPerMinute > 10) {
+          timeScore = Math.max(5, 20 - (conceptsPerMinute - 10) * 1);
+        } else {
+          timeScore = Math.max(5, conceptsPerMinute * 20);
+        }
+      }
+
+      // 3. 학습 참여도 점수 - 전체 데이터 기준으로 계산
+      let participationScore = 0;
+
+      if (currentLearningMode === "typing") {
+        // 타이핑 모드: 실제 답변 시도 기준으로 참여도 계산 (최대 20점)
+        const actualAttempts = learningSessionData.totalInteractions || 0;
+        const participationRate =
+          actualAttempts / Math.max(totalAvailableData, 1);
+        participationScore = Math.min(20, participationRate * 20);
+
+        console.log("📊 타이핑 모드 참여도:", {
+          actualAttempts,
+          studiedConceptsCount,
+          totalAvailableData,
+          participationRate: (participationRate * 100).toFixed(1) + "%",
+          participationScore: participationScore.toFixed(1),
+        });
+      } else if (
+        currentLearningMode === "flash" &&
+        currentLearningArea === "reading"
+      ) {
+        // 독해 플래시 모드: 카드 뒤집기 참여도 기반 계산 (최대 20점)
+        const meaningfulInteractions = learningSessionData.correctAnswers; // flip 액션 카운트
+        const maxPossibleFlips = totalAvailableData; // 각 카드당 최대 1번 뒤집기
+        const participationRate = meaningfulInteractions / maxPossibleFlips;
+        participationScore = participationRate * 20;
+
+        console.log("📊 독해 플래시 모드 참여도:", {
+          flips: meaningfulInteractions,
+          maxPossibleFlips,
+          participationRate: (participationRate * 100).toFixed(1) + "%",
+          participationScore: participationScore.toFixed(1),
+        });
+      } else {
+        // 다른 모드: 기존 방식 (상호작용 기반, 최대 20점)
+        const meaningfulInteractions = learningSessionData.correctAnswers;
+        participationScore = Math.min(
+          20,
+          (meaningfulInteractions / totalAvailableData) * 20
+        );
+      }
 
       const totalQuality = baseScore + timeScore + participationScore;
 
-      // 간소화된 학습 효율 계산 로그
-      console.log("📊 학습 효율:", {
-        conceptsCount,
+      // 상세한 학습 효율 계산 로그
+      console.log("📊 학습 효율 상세 계산:", {
+        mode: currentLearningMode,
+        area: currentLearningArea,
+        studiedConceptsCount,
+        totalAvailableData,
         duration,
+        baseScore: baseScore.toFixed(1),
+        timeScore: timeScore.toFixed(1),
+        participationScore: participationScore.toFixed(1),
+        totalQuality: totalQuality.toFixed(1),
         finalQuality: Math.min(100, Math.round(totalQuality)),
       });
 
@@ -5559,28 +5682,32 @@ function checkSessionCompletion() {
   const currentData = getCurrentData();
   const totalAvailableData = currentData ? currentData.length : 0;
 
-  // 동적 완료 조건: 10개 또는 사용 가능한 전체 데이터를 모두 학습했을 때
-  const completionThreshold = Math.min(10, totalAvailableData);
+  // 🎯 모드별 완료 조건 정의 - 모든 모드에서 10개 개념 기준
+  let completionThreshold = Math.min(10, totalAvailableData); // 기본값: 10개 또는 전체 데이터
+  let shouldAutoComplete = false;
 
   if (
-    conceptsCount >= completionThreshold &&
-    learningSessionData.sessionActive
+    learningSessionData.mode === "flashcard" ||
+    learningSessionData.mode === "flash"
   ) {
+    // 플래시카드/플래시 모드: 실제 뒤집은 카드 수가 10개 이상이어야 완료
+    shouldAutoComplete = conceptsCount >= completionThreshold;
+  } else if (learningSessionData.mode === "typing") {
+    // 타이핑 모드: 실제 정답 확인한 개념 수가 10개 이상이어야 완료
+    shouldAutoComplete = conceptsCount >= completionThreshold;
+  } else {
+    // 기타 모드: 기존 방식 (10개 또는 전체 데이터)
+    shouldAutoComplete = conceptsCount >= completionThreshold;
+  }
+
+  if (shouldAutoComplete && learningSessionData.sessionActive) {
     console.log(
-      `🎯 ${conceptsCount}개 개념 학습 완료 - 세션 자동 종료 (전체: ${totalAvailableData}개)`
+      `🎯 ${conceptsCount}개 개념 학습 완료 - 세션 자동 종료 (${learningSessionData.mode} 모드, 목표: ${completionThreshold}개)`
     );
     completeLearningSession();
 
-    // 🔄 새로운 세션 시작 (연속 학습 지원)
-    setTimeout(() => {
-      if (!learningSessionData.sessionActive) {
-        console.log("🔄 새로운 학습 세션 시작");
-        startLearningSession(
-          learningSessionData.area,
-          learningSessionData.mode
-        );
-      }
-    }, 1000); // 1초 후 새 세션 시작
+    // 🔄 새로운 세션 자동 시작 비활성화 (사용자가 명시적으로 새 세션 시작하도록)
+    console.log("✅ 학습 세션 완료 - 새 세션 자동 시작 안함");
   } else if (conceptsCount % 5 === 0 && conceptsCount > 0) {
     console.log(
       `📊 진행 상황: ${conceptsCount}개 개념 학습 완료 (목표: ${completionThreshold}개)`
@@ -5664,7 +5791,7 @@ async function showLearningCompleteWithStats(sessionStats) {
               <div class="text-gray-500 text-sm">학습 효율</div>
               <div class="font-bold text-2xl text-blue-600">${Math.round(
                 sessionStats.efficiency
-              )}점</div>
+              )}%</div>
             </div>
           </div>
         </div>
@@ -5777,7 +5904,7 @@ async function showLearningComplete() {
               <div class="text-gray-500 text-sm">학습 효율</div>
               <div class="font-bold text-2xl text-blue-600">${
                 sessionStats.efficiency
-              }점</div>
+              }%</div>
             </div>
           </div>
         </div>
@@ -5843,16 +5970,45 @@ async function showLearningComplete() {
 
 // 📊 세션 통계 계산
 function calculateSessionStats() {
-  const conceptsCount = learningSessionData.conceptsStudied.size;
+  const studiedConceptsCount = learningSessionData.conceptsStudied.size; // 실제 학습한 개념 수
+  const totalAvailableData = getCurrentData()?.length || 0; // 전체 제시된 데이터 수
   const duration = Math.round(
     (new Date() - learningSessionData.startTime) / 1000 / 60
   );
   const interactions = learningSessionData.totalInteractions;
 
   // 학습 효율 계산 (저장된 계산과 동일한 방식)
-  const baseScore = Math.min(60, conceptsCount * 6);
+  let baseScore = 0;
 
-  const conceptsPerMinute = conceptsCount / Math.max(duration, 1);
+  if (currentLearningMode === "typing") {
+    // 타이핑 모드: 정답률에 따른 기본 점수 (최대 60점)
+    const actualCorrect = learningSessionData.correctAnswers || 0;
+    const actualAttempts =
+      learningSessionData.totalInteractions || totalAvailableData;
+    const accuracyRate = actualCorrect / Math.max(actualAttempts, 1);
+    baseScore = accuracyRate * 60; // 정답률 기반 기본 점수
+
+    console.log("📊 완료 화면 - 타이핑 모드 정답률 계산:", {
+      actualCorrect,
+      actualAttempts,
+      studiedConceptsCount,
+      totalAvailableData,
+      accuracyRate: (accuracyRate * 100).toFixed(1) + "%",
+      baseScore: baseScore.toFixed(1),
+    });
+  } else if (
+    currentLearningMode === "flash" &&
+    currentLearningArea === "reading"
+  ) {
+    // 독해 플래시 모드: 실제 학습한 개념 수에 따른 기본 점수 (최대 60점)
+    baseScore = Math.min(60, (studiedConceptsCount / totalAvailableData) * 60);
+  } else {
+    // 다른 모드: 기존 방식 (최대 60점)
+    baseScore = Math.min(60, studiedConceptsCount * 6);
+  }
+
+  // 시간 효율 점수 계산 - 전체 데이터 기준
+  const conceptsPerMinute = totalAvailableData / Math.max(duration, 1);
   let timeScore = 0;
   if (conceptsPerMinute >= 1 && conceptsPerMinute <= 10) {
     timeScore = 20;
@@ -5862,25 +6018,62 @@ function calculateSessionStats() {
     timeScore = Math.max(5, conceptsPerMinute * 20);
   }
 
-  const meaningfulInteractions = learningSessionData.correctAnswers;
-  const participationScore = Math.min(
-    20,
-    (meaningfulInteractions / Math.max(conceptsCount, 1)) * 20
-  );
+  // 참여도 점수 계산 - 전체 데이터 기준
+  let participationScore = 0;
+  if (currentLearningMode === "typing") {
+    // 타이핑 모드: 실제 답변 시도 기준으로 참여도 계산 (최대 20점)
+    const actualAttempts = learningSessionData.totalInteractions || 0;
+    const participationRate = actualAttempts / Math.max(totalAvailableData, 1);
+    participationScore = Math.min(20, participationRate * 20);
+
+    console.log("📊 완료 화면 - 타이핑 모드 참여도 계산:", {
+      actualAttempts,
+      studiedConceptsCount,
+      totalAvailableData,
+      participationRate: (participationRate * 100).toFixed(1) + "%",
+      participationScore: participationScore.toFixed(1),
+    });
+  } else if (
+    currentLearningMode === "flash" &&
+    currentLearningArea === "reading"
+  ) {
+    // 독해 플래시 모드: 카드 뒤집기 참여도 기반 계산 (최대 20점)
+    const meaningfulInteractions = learningSessionData.correctAnswers; // flip 액션 카운트
+    const maxPossibleFlips = totalAvailableData; // 각 카드당 최대 1번 뒤집기
+    const participationRate = meaningfulInteractions / maxPossibleFlips;
+    participationScore = participationRate * 20;
+  } else {
+    // 다른 모드: 기존 방식 (상호작용 기반, 최대 20점)
+    const meaningfulInteractions = learningSessionData.correctAnswers;
+    participationScore = Math.min(
+      20,
+      (meaningfulInteractions / Math.max(totalAvailableData, 1)) * 20
+    );
+  }
 
   const efficiency = Math.min(
     100,
     Math.round(baseScore + timeScore + participationScore)
   );
 
+  console.log("📊 완료 화면 - 최종 효율 계산:", {
+    mode: currentLearningMode,
+    area: currentLearningArea,
+    studiedConceptsCount,
+    totalAvailableData,
+    baseScore: baseScore.toFixed(1),
+    timeScore: timeScore.toFixed(1),
+    participationScore: participationScore.toFixed(1),
+    efficiency,
+  });
+
   return {
-    conceptsCount,
+    conceptsCount: studiedConceptsCount, // 화면 표시용 (실제 학습한 개념 수)
     duration: Math.max(duration, 1),
     interactions,
     efficiency,
   };
 }
-
 // 💬 완료 메시지 생성
 function generateCompletionMessage(stats) {
   const area = learningSessionData.area;

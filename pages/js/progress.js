@@ -767,7 +767,7 @@ async function loadDetailedProgressData(forceReload = false) {
         userProgressData.achievements.totalLearningSessions =
           cachedData.validLearningSessionsCount || 0;
         userProgressData.achievements.avgSessionQuality =
-          cachedData.avgSessionQuality || 75;
+          cachedData.avgSessionQuality || 0; // 세션이 없으면 0%
         userProgressData.achievements.totalStudyTime = Math.round(
           cachedData.totalStudyTime || 0
         );
@@ -924,12 +924,19 @@ async function loadDetailedProgressData(forceReload = false) {
       // 마스터된 개념 카운트 기준:
       // 1. 학습 레벨 50% 이상 (충분히 학습한 상태)
       // 2. 또는 노출 횟수 3회 이상 (반복 학습한 상태)
+      // 3. 또는 학습 횟수 3회 이상 (반복 학습한 상태)
+
+      // vocabulary_mastery에서 데이터 가져오기 (실제 저장 위치)
       const masteryLevel = data.overall_mastery?.level || 0;
-      const exposureCount = data.overall_mastery?.exposure_count || 0;
-      const studyCount = data.overall_mastery?.study_count || 0;
+      const exposureCount = data.vocabulary_mastery?.exposure_count || 0;
+      const studyCount = data.vocabulary_mastery?.study_count || 0;
+      const recognition = data.vocabulary_mastery?.recognition || 0;
 
       const isMastered =
-        masteryLevel >= 50 || exposureCount >= 3 || studyCount >= 3;
+        masteryLevel >= 50 ||
+        exposureCount >= 3 ||
+        studyCount >= 3 ||
+        recognition >= 50; // 단어 인식률도 마스터 기준에 추가
 
       if (isMastered) {
         masteredConceptIds.add(data.concept_id || doc.id);
@@ -1069,8 +1076,8 @@ async function loadDetailedProgressData(forceReload = false) {
 
     // 학습 결과 저장 준비 (기본값으로 설정)
     learningResults.totalStudyTime = 0;
-    learningResults.avgSessionQuality = 75; // 기본값
-    learningResults.qualityCount = 1;
+    learningResults.avgSessionQuality = 0; // 기본값 (세션이 없으면 0%)
+    learningResults.qualityCount = 0;
     learningResults.totalCorrectAnswers = 0;
     learningResults.totalInteractions = 0;
     learningResults.validLearningSessionsCount = 0;
@@ -1277,8 +1284,8 @@ async function loadDetailedProgressData(forceReload = false) {
         learningResults.avgSessionQuality / learningResults.qualityCount
       );
     } else if (learningResults.qualityCount === 0) {
-      learningResults.avgSessionQuality = 75; // 기본값
-      learningResults.qualityCount = 1;
+      learningResults.avgSessionQuality = 0; // 세션이 없으면 0%
+      learningResults.qualityCount = 0;
     }
 
     console.log("📊 학습 효율 계산 완료:", {

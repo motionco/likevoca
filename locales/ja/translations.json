@@ -280,6 +280,7 @@
   "grammar_learning_desc": "文法パターンを体系的に学習しましょう",
   "reading_learning": "読解学習",
   "reading_learning_desc": "実際の文脈で言語を理解しましょう",
+  "reading_flash_mode": "読解フラッシュモード",
   "flashcard_mode": "フラッシュカードモード",
   "typing_mode": "タイピングモード",
   "pronunciation_mode": "発音モード",
