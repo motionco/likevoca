@@ -5508,18 +5508,14 @@ async function completeLearningSession(forceComplete = false) {
         currentLearningMode === "flash" &&
         currentLearningArea === "reading"
       ) {
-        // 독해 플래시 모드: 실제 학습한 개념 수에 따른 기본 점수 (최대 60점)
-        baseScore = Math.min(
-          60,
-          (studiedConceptsCount / totalAvailableData) * 60
-        );
+        // 독해 플래시 모드: 모든 카드를 본 것을 기준으로 기본 점수 (최대 60점)
+        // 카드를 모두 넘어가며 보는 것 자체가 학습이므로 전체 데이터 기준으로 계산
+        baseScore = 60; // 모든 개념을 제시받았으므로 기본 점수 만점
 
         console.log("📊 독해 플래시 모드 기본 점수:", {
           studiedConceptsCount,
           totalAvailableData,
-          completionRate:
-            ((studiedConceptsCount / totalAvailableData) * 100).toFixed(1) +
-            "%",
+          allConceptsPresented: true,
           baseScore: baseScore.toFixed(1),
         });
       } else {
@@ -5636,7 +5632,8 @@ async function completeLearningSession(forceComplete = false) {
       activityData
     );
     console.log("✅ 학습 세션 저장 완료:", {
-      conceptsCount,
+      studiedConceptsCount,
+      totalAvailableData,
       duration: Math.max(duration, 1),
       interactions: learningSessionData.totalInteractions,
       learningEfficiency: Math.round(activityData.session_quality),
@@ -5648,7 +5645,8 @@ async function completeLearningSession(forceComplete = false) {
       userEmail: currentUser?.email,
       area: learningSessionData.area,
       mode: learningSessionData.mode,
-      conceptsCount,
+      conceptsCount: studiedConceptsCount,
+      totalAvailableData,
       duration: Math.max(duration, 1),
       interactions: learningSessionData.totalInteractions,
       learningEfficiency: Math.round(activityData.session_quality),
@@ -5665,7 +5663,8 @@ async function completeLearningSession(forceComplete = false) {
     console.log("📤 Progress 페이지 업데이트 신호 전송:", {
       efficiency: Math.round(activityData.session_quality),
       docId: docRef?.id || null,
-      concepts: conceptsCount,
+      studiedConcepts: studiedConceptsCount,
+      totalConcepts: totalAvailableData,
     });
   } catch (error) {
     console.error("❌ 학습 세션 저장 실패:", error);
@@ -5770,7 +5769,7 @@ async function showLearningCompleteWithStats(sessionStats) {
         <div class="bg-gray-50 rounded-lg p-4 mb-6">
           <div class="grid grid-cols-3 gap-4 text-sm">
             <div>
-              <div class="text-gray-500">학습한 개념</div>
+              <div class="text-gray-500">제시된 개념</div>
               <div class="font-bold text-lg">${
                 sessionStats.conceptsCount
               }개</div>
@@ -5883,7 +5882,7 @@ async function showLearningComplete() {
         <div class="bg-gray-50 rounded-lg p-4 mb-6">
           <div class="grid grid-cols-3 gap-4 text-sm">
             <div>
-              <div class="text-gray-500">학습한 개념</div>
+              <div class="text-gray-500">제시된 개념</div>
               <div class="font-bold text-lg">${
                 sessionStats.conceptsCount
               }개</div>
@@ -6000,8 +5999,9 @@ function calculateSessionStats() {
     currentLearningMode === "flash" &&
     currentLearningArea === "reading"
   ) {
-    // 독해 플래시 모드: 실제 학습한 개념 수에 따른 기본 점수 (최대 60점)
-    baseScore = Math.min(60, (studiedConceptsCount / totalAvailableData) * 60);
+    // 독해 플래시 모드: 모든 카드를 본 것을 기준으로 기본 점수 (최대 60점)
+    // 카드를 모두 넘어가며 보는 것 자체가 학습이므로 전체 데이터 기준으로 계산
+    baseScore = 60; // 모든 개념을 제시받았으므로 기본 점수 만점
   } else {
     // 다른 모드: 기존 방식 (최대 60점)
     baseScore = Math.min(60, studiedConceptsCount * 6);
@@ -6068,7 +6068,8 @@ function calculateSessionStats() {
   });
 
   return {
-    conceptsCount: studiedConceptsCount, // 화면 표시용 (실제 학습한 개념 수)
+    conceptsCount: totalAvailableData, // 화면 표시용 (총 제시된 개념 수)
+    studiedConceptsCount, // 실제 상호작용한 개념 수
     duration: Math.max(duration, 1),
     interactions,
     efficiency,
