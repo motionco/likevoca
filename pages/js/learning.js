@@ -3352,10 +3352,43 @@ function showTypingMode() {
   const typingMode = document.getElementById("typing-mode");
   if (typingMode) {
     typingMode.classList.remove("hidden");
-    updateTyping();
+    
+    // 타이핑 모드 요소들의 번역 속성 제거 (번역 시스템이 콘텐츠를 덮어쓰지 않도록)
+    const typingElements = ['typing-word', 'typing-pronunciation', 'typing-meaning'];
+    typingElements.forEach(id => {
+      const element = document.getElementById(id);
+      if (element) {
+        element.removeAttribute('data-i18n');
+      }
+    });
+    
+    // 데이터가 로드되었는지 확인 후 UI 업데이트
+    const currentData = getCurrentData();
+    if (currentData && currentData.length > 0) {
+      updateTyping();
+    } else {
+      console.warn("⚠️ 타이핑 모드: 데이터가 아직 로드되지 않음, 잠시 후 재시도");
+      // 데이터가 로드될 때까지 잠시 대기 후 재시도
+      setTimeout(() => {
+        const retryData = getCurrentData();
+        if (retryData && retryData.length > 0) {
+          updateTyping();
+        } else {
+          console.error("❌ 타이핑 모드: 데이터 로드 실패");
+        }
+      }, 100);
+    }
 
-    // 번역 적용
+    // 번역 적용 (타이핑 모드 콘텐츠 제외)
     setTimeout(() => {
+      // 타이핑 모드의 핵심 요소들을 번역에서 제외
+      const excludeElements = ['typing-word', 'typing-pronunciation', 'typing-meaning'];
+      excludeElements.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.removeAttribute('data-i18n');
+        }
+      });
       applyTranslations();
     }, 50);
 
@@ -3377,9 +3410,22 @@ function showTypingMode() {
 
 function updateTyping() {
   const currentData = getCurrentData();
-  if (!currentData || currentData.length === 0) return;
+  if (!currentData || currentData.length === 0) {
+    console.warn("⚠️ updateTyping: 데이터가 없음");
+    return;
+  }
 
   const concept = currentData[currentIndex];
+  if (!concept) {
+    console.warn("⚠️ updateTyping: 현재 인덱스의 개념이 없음", { currentIndex, dataLength: currentData.length });
+    return;
+  }
+
+  console.log("🔄 타이핑 모드 업데이트:", {
+    conceptId: concept.id,
+    currentIndex,
+    concept: concept
+  });
 
   // 최신 언어 설정 사용
   const currentSourceLanguage =
@@ -3389,11 +3435,13 @@ function updateTyping() {
 
   const wordElement = document.getElementById("typing-word");
   const pronunciationElement = document.getElementById("typing-pronunciation");
+  const meaningElement = document.getElementById("typing-meaning");
   const answerInput = document.getElementById("typing-mode-answer");
   const resultDiv = document.getElementById("typing-mode-result");
 
   let sourceText = "";
   let sourcePronunciation = "";
+  let targetMeaning = "";
   let correctAnswer = "";
 
   // 1. concepts 데이터 구조 (expressions 있음)
@@ -3404,6 +3452,7 @@ function updateTyping() {
     if (sourceExpr && targetExpr) {
       sourceText = sourceExpr.word || "";
       sourcePronunciation = sourceExpr.pronunciation || "";
+      targetMeaning = targetExpr.word || "";
       correctAnswer = targetExpr.word.toLowerCase();
       console.log("✅ 타이핑 모드: concepts 데이터 구조 사용");
     } else {
@@ -3417,6 +3466,7 @@ function updateTyping() {
   else if (concept[currentSourceLanguage] && concept[currentTargetLanguage]) {
     sourceText = concept[currentSourceLanguage];
     sourcePronunciation = concept.pronunciation || "";
+    targetMeaning = concept[currentTargetLanguage];
     correctAnswer = concept[currentTargetLanguage].toLowerCase();
     console.log("✅ 타이핑 모드: examples 데이터 구조 사용");
   }
@@ -3428,9 +3478,25 @@ function updateTyping() {
 
   if (wordElement) {
     wordElement.textContent = sourceText;
+    // data-i18n 속성 제거하여 번역 시스템이 덮어쓰지 않도록 함
+    wordElement.removeAttribute('data-i18n');
+    console.log("✅ 타이핑 모드 UI 업데이트:", {
+      sourceText,
+      sourcePronunciation,
+      targetMeaning,
+      correctAnswer
+    });
+  } else {
+    console.error("❌ typing-word 요소를 찾을 수 없음");
   }
   if (pronunciationElement) {
     pronunciationElement.textContent = sourcePronunciation;
+    pronunciationElement.removeAttribute('data-i18n');
+  }
+  if (meaningElement) {
+    // 의미 표시를 숨김 (타이핑 모드에서는 정답을 미리 보여주지 않음)
+    meaningElement.style.display = 'none';
+    meaningElement.removeAttribute('data-i18n');
   }
 
   // 📊 학습 상호작용 추적 (타이핑 문제 표시) - 단순 조회는 카운트하지 않음
@@ -5518,6 +5584,17 @@ async function completeLearningSession(forceComplete = false) {
           allConceptsPresented: true,
           baseScore: baseScore.toFixed(1),
         });
+      } else if (currentLearningMode === "flashcard") {
+        // 단어 플래시카드 모드: 모든 카드를 본 것을 기준으로 기본 점수 (최대 60점)
+        // 카드를 모두 넘어가며 보는 것 자체가 학습이므로 전체 데이터 기준으로 계산
+        baseScore = 60; // 모든 개념을 제시받았으므로 기본 점수 만점
+
+        console.log("📊 단어 플래시카드 모드 기본 점수:", {
+          studiedConceptsCount,
+          totalAvailableData,
+          allConceptsPresented: true,
+          baseScore: baseScore.toFixed(1),
+        });
       } else {
         // 다른 모드: 기존 방식 (최대 60점)
         baseScore = Math.min(60, studiedConceptsCount * 6);
@@ -5575,6 +5652,19 @@ async function completeLearningSession(forceComplete = false) {
         participationScore = participationRate * 20;
 
         console.log("📊 독해 플래시 모드 참여도:", {
+          flips: meaningfulInteractions,
+          maxPossibleFlips,
+          participationRate: (participationRate * 100).toFixed(1) + "%",
+          participationScore: participationScore.toFixed(1),
+        });
+      } else if (currentLearningMode === "flashcard") {
+        // 단어 플래시카드 모드: 카드 뒤집기 참여도 기반 계산 (최대 20점)
+        const meaningfulInteractions = learningSessionData.correctAnswers; // flip 액션 카운트
+        const maxPossibleFlips = totalAvailableData; // 각 카드당 최대 1번 뒤집기
+        const participationRate = meaningfulInteractions / maxPossibleFlips;
+        participationScore = participationRate * 20;
+
+        console.log("📊 단어 플래시카드 모드 참여도:", {
           flips: meaningfulInteractions,
           maxPossibleFlips,
           participationRate: (participationRate * 100).toFixed(1) + "%",
@@ -6002,6 +6092,10 @@ function calculateSessionStats() {
     // 독해 플래시 모드: 모든 카드를 본 것을 기준으로 기본 점수 (최대 60점)
     // 카드를 모두 넘어가며 보는 것 자체가 학습이므로 전체 데이터 기준으로 계산
     baseScore = 60; // 모든 개념을 제시받았으므로 기본 점수 만점
+  } else if (currentLearningMode === "flashcard") {
+    // 단어 플래시카드 모드: 모든 카드를 본 것을 기준으로 기본 점수 (최대 60점)
+    // 카드를 모두 넘어가며 보는 것 자체가 학습이므로 전체 데이터 기준으로 계산
+    baseScore = 60; // 모든 개념을 제시받았으므로 기본 점수 만점
   } else {
     // 다른 모드: 기존 방식 (최대 60점)
     baseScore = Math.min(60, studiedConceptsCount * 6);
@@ -6038,6 +6132,12 @@ function calculateSessionStats() {
     currentLearningArea === "reading"
   ) {
     // 독해 플래시 모드: 카드 뒤집기 참여도 기반 계산 (최대 20점)
+    const meaningfulInteractions = learningSessionData.correctAnswers; // flip 액션 카운트
+    const maxPossibleFlips = totalAvailableData; // 각 카드당 최대 1번 뒤집기
+    const participationRate = meaningfulInteractions / maxPossibleFlips;
+    participationScore = participationRate * 20;
+  } else if (currentLearningMode === "flashcard") {
+    // 단어 플래시카드 모드: 카드 뒤집기 참여도 기반 계산 (최대 20점)
     const meaningfulInteractions = learningSessionData.correctAnswers; // flip 액션 카운트
     const maxPossibleFlips = totalAvailableData; // 각 카드당 최대 1번 뒤집기
     const participationRate = meaningfulInteractions / maxPossibleFlips;
