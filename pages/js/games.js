@@ -37,6 +37,28 @@ let autoCheckTimer = null;
 let memoryPairs = 0;
 let currentUser = null;
 let collectionManager = new CollectionManager();
+
+// ✅ 캐싱 시스템 추가
+let cachedGameData = {
+  data: null,
+  timestamp: null,
+  settings: null
+};
+const CACHE_DURATION = 10 * 60 * 1000; // 10분
+
+// ✅ Firebase 읽기 비용 모니터링
+let firebaseReadCount = 0;
+
+// Firebase 읽기 추적 함수
+function trackFirebaseRead(queryName, docCount) {
+  firebaseReadCount += docCount;
+  console.log(`📊 Firebase 읽기: ${queryName} (+${docCount}), 총 ${firebaseReadCount}회`);
+  
+  if (firebaseReadCount > 30) {
+    console.warn("⚠️ Firebase 읽기 횟수가 많습니다:", firebaseReadCount);
+  }
+}
+
 let gameResults = {
   totalGames: 0,
   totalScore: 0,
@@ -839,16 +861,38 @@ async function loadGameWords() {
     const gameType = gameTypeMap[currentGameType] || "matching";
     const languages = [sourceLanguage, targetLanguage];
     const limit = gameWordCount[currentGameType] || 8;
-    // Firebase 조회 시에는 더 많이 가져와서 무작위 선택
-    const fetchLimit = 50;
+    // ✅ Firebase 조회 시 최적화: 50개에서 20개로 감소
+    const fetchLimit = 20;
 
     console.log("🔍 개념 조회 파라미터:", {
       gameType: "matching", // 단어 섞기도 같은 조회 함수 사용
       gameDifficulty,
       languages: [sourceLanguage, targetLanguage],
-      fetchLimit: fetchLimit, // Firebase 비용 최적화: 50개 조회 후 무작위 선택
+      fetchLimit: fetchLimit, // ✅ Firebase 비용 최적화: 20개 조회 후 무작위 선택
       actualGameLimit: limit, // 실제 게임에서 사용할 단어 수
     });
+
+    // ✅ 캐시된 데이터가 있고 유효하면 사용
+    const now = Date.now();
+    const currentSettings = JSON.stringify({
+      sourceLanguage,
+      targetLanguage,
+      gameDifficulty,
+      fetchLimit,
+      currentGameType
+    });
+    
+    if (cachedGameData.data && 
+        (now - cachedGameData.timestamp) < CACHE_DURATION &&
+        cachedGameData.settings === currentSettings) {
+      console.log(`⚡ 게임 캐시된 데이터 사용: ${cachedGameData.data.length}개`);
+      gameWords = cachedGameData.data.slice(0, limit);
+      trackFirebaseRead("게임 캐시 사용", 0); // 캐시 사용 시 읽기 비용 0
+      updateWordCount();
+      return;
+    }
+
+    console.log("🔄 게임 새로운 데이터 로드 중...");
 
     console.log("🔍 conceptUtils 확인:", {
       conceptUtilsExists: !!conceptUtils,
@@ -868,10 +912,11 @@ async function loadGameWords() {
         "matching", // gameType은 항상 matching으로 통일
         gameDifficulty,
         [sourceLanguage, targetLanguage],
-        fetchLimit // Firebase에서는 50개 조회
+        fetchLimit // ✅ Firebase에서는 20개 조회 (최적화)
       );
 
       console.log(`Firebase에서 ${concepts.length}개 개념 로딩 완료`, concepts);
+      trackFirebaseRead("게임 개념 조회", concepts.length);
 
       // Firebase에서 가져온 개념이 1개 이상이면 사용 (최소 요구사항 완화)
       if (concepts.length >= 1) {
@@ -967,6 +1012,28 @@ async function loadGameWords() {
   }
 
   console.log("📝 최종 gameWords:", gameWords);
+
+  // ✅ 최종 게임 데이터 캐시 저장 (기본 단어 사용 시에도)
+  if (gameWords.length > 0) {
+    const currentSettings = JSON.stringify({
+      sourceLanguage,
+      targetLanguage,
+      gameDifficulty,
+      fetchLimit: 20,
+      currentGameType
+    });
+    
+    cachedGameData = {
+      data: [...gameWords], // 깊은 복사
+      timestamp: Date.now(),
+      settings: currentSettings
+    };
+    console.log(`💾 최종 게임 데이터 캐시 저장: ${gameWords.length}개`);
+  }
+
+  // 단어 수 업데이트
+  updateWordCount();
+  
   return gameWords;
 }
 
@@ -1190,6 +1257,7 @@ async function completeGame(finalScore, timeSpent) {
               sourceLanguage: sourceLanguage,
               targetLanguage: targetLanguage,
               conceptIds: conceptIds,
+              accuracy: accuracy, // 🎯 정확도 필드 추가
               accuracyRate: accuracy / 100, // 0-1 범위로 변환
               performanceRating:
                 accuracy >= 90

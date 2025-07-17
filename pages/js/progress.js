@@ -2093,6 +2093,18 @@ async function loadRecentActivities() {
                     ? "发音练习"
                     : "발음 연습";
                 break;
+              case "listening":
+                modeDisplayName =
+                  userLanguage === "ko"
+                    ? "듣기 연습"
+                    : userLanguage === "en"
+                    ? "Listening Practice"
+                    : userLanguage === "ja"
+                    ? "聴解練習"
+                    : userLanguage === "zh"
+                    ? "听力练习"
+                    : "듣기 연습";
+                break;
               default:
                 modeDisplayName =
                   userLanguage === "ko"

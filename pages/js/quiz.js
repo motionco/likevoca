@@ -24,6 +24,27 @@ let timerInterval = null;
 let elements = {};
 let collectionManager = new CollectionManager();
 
+// ✅ 캐싱 시스템 추가
+let cachedQuizData = {
+  data: null,
+  timestamp: null,
+  settings: null
+};
+const CACHE_DURATION = 10 * 60 * 1000; // 10분
+
+// ✅ Firebase 읽기 비용 모니터링
+let firebaseReadCount = 0;
+
+// Firebase 읽기 추적 함수
+function trackFirebaseRead(queryName, docCount) {
+  firebaseReadCount += docCount;
+  console.log(`📊 Firebase 읽기: ${queryName} (+${docCount}), 총 ${firebaseReadCount}회`);
+  
+  if (firebaseReadCount > 30) {
+    console.warn("⚠️ Firebase 읽기 횟수가 많습니다:", firebaseReadCount);
+  }
+}
+
 // 페이지 초기화
 document.addEventListener("DOMContentLoaded", async () => {
   try {
@@ -246,47 +267,56 @@ async function generateQuizQuestions(settings) {
       throw new Error("사용자가 로그인되지 않았습니다.");
     }
 
-    console.log("🔍 사용자 정보:", {
-      uid: currentUser.uid,
-      email: currentUser.email,
-    });
-
-    // 🎯 개념 데이터 조회 (간단한 방법으로 임시 변경)
+    // 🎯 개념 데이터 조회 (최적화된 캐싱 방법)
     let personalizedConcepts = [];
 
     try {
-      // 우선 간단하게 모든 개념 조회
-      console.log("📚 전체 개념 조회 시작");
-      const allConcepts = await collectionManager.getConceptsOnly(50);
-      console.log(`📚 전체 개념 조회 결과: ${allConcepts.length}개`);
+      // ✅ 캐시된 데이터가 있고 유효하면 사용
+      const now = Date.now();
+      const currentSettings = JSON.stringify(settings);
+      
+      if (cachedQuizData.data && 
+          (now - cachedQuizData.timestamp) < CACHE_DURATION &&
+          cachedQuizData.settings === currentSettings) {
+        personalizedConcepts = cachedQuizData.data;
+        trackFirebaseRead("퀴즈 캐시 사용", 0); // 캐시 사용 시 읽기 비용 0
+      } else {
+        // ✅ 캐시가 없거나 만료된 경우에만 DB 조회 (개수 최적화: 50 → 20)
+        const allConcepts = await collectionManager.getConceptsOnly(20); // ✅ 50개에서 20개로 감소
+        trackFirebaseRead("퀴즈 개념 조회", allConcepts.length);
 
-      // 개념 데이터를 퀴즈용 형식으로 변환
-      personalizedConcepts = allConcepts
-        .filter((concept) => {
-          const hasSourceLang =
-            concept.expressions?.[settings.sourceLanguage]?.word;
-          const hasTargetLang =
-            concept.expressions?.[settings.targetLanguage]?.word;
-          return hasSourceLang && hasTargetLang;
-        })
-        .map((concept) => ({
-          id: concept.id,
-          conceptInfo: concept.concept_info,
-          fromExpression: concept.expressions[settings.sourceLanguage],
-          toExpression: concept.expressions[settings.targetLanguage],
-          representativeExample: null,
-          media: concept.media,
-          created_at: concept.metadata?.created_at || concept.created_at,
-        }));
+        // 개념 데이터를 퀴즈용 형식으로 변환
+        personalizedConcepts = allConcepts
+          .filter((concept) => {
+            const hasSourceLang =
+              concept.expressions?.[settings.sourceLanguage]?.word;
+            const hasTargetLang =
+              concept.expressions?.[settings.targetLanguage]?.word;
+            return hasSourceLang && hasTargetLang;
+          })
+          .map((concept) => ({
+            id: concept.id,
+            conceptInfo: concept.concept_info,
+            fromExpression: concept.expressions[settings.sourceLanguage],
+            toExpression: concept.expressions[settings.targetLanguage],
+            representativeExample: null,
+            media: concept.media,
+            created_at: concept.metadata?.created_at || concept.created_at,
+          }));
 
-      console.log(`🎯 필터링된 개념: ${personalizedConcepts.length}개`);
+        // ✅ 조회된 데이터를 캐시에 저장
+        cachedQuizData = {
+          data: [...personalizedConcepts], // 깊은 복사
+          timestamp: now,
+          settings: currentSettings
+        };
+      }
     } catch (error) {
       console.error("❌ 개념 조회 실패:", error);
       personalizedConcepts = [];
     }
 
     if (personalizedConcepts.length === 0) {
-      console.log("❌ 사용 가능한 개념이 없습니다 - 테스트 데이터로 대체");
 
       // 🚨 테스트용 더미 데이터 (실제 개념이 없을 때만 사용)
       personalizedConcepts = [
@@ -381,8 +411,6 @@ async function generateQuizQuestions(settings) {
           },
         },
       ];
-
-      console.log(`🧪 테스트 데이터 사용: ${personalizedConcepts.length}개`);
     }
 
     // 🎓 난이도 필터링 (difficulty 설정이 'all'이 아닌 경우)
@@ -394,14 +422,9 @@ async function generateQuizQuestions(settings) {
 
       // 특정 난이도의 개념이 부족하면 전체 개념 사용
       if (filteredConcepts.length < settings.questionCount) {
-        console.log(
-          `⚠️ ${settings.difficulty} 난이도 개념 부족, 전체 개념 사용`
-        );
         filteredConcepts = personalizedConcepts;
       }
     }
-
-    console.log(`✅ 최종 필터링된 개념: ${filteredConcepts.length}개`);
 
     // 🎲 퀴즈 문제 생성
     const questions = [];
@@ -451,7 +474,6 @@ async function generateQuizQuestions(settings) {
       }
     }
 
-    console.log(`🎯 최종 생성된 문제: ${questions.length}개`);
     return questions;
   } catch (error) {
     console.error("❌ 퀴즈 문제 생성 중 오류:", error);

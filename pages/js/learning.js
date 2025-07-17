@@ -28,6 +28,26 @@ let sourceLanguage = "korean";
 let targetLanguage = "english";
 let currentUILanguage = "korean";
 
+// ✅ 캐싱 시스템 추가
+let cachedData = {
+  vocabulary: { data: null, timestamp: null },
+  grammar: { data: null, timestamp: null },
+  reading: { data: null, timestamp: null }
+};
+const CACHE_DURATION = 10 * 60 * 1000; // 10분
+
+// ✅ Firebase 읽기 비용 모니터링
+let firebaseReadCount = 0;
+
+// Firebase 읽기 추적 함수
+function trackFirebaseRead(queryName, docCount) {
+  firebaseReadCount += docCount;
+  
+  if (firebaseReadCount > 50) {
+    console.warn("⚠️ Firebase 읽기 횟수가 많습니다:", firebaseReadCount);
+  }
+}
+
 // 📚 학습 활동 추적을 위한 변수들
 let collectionManager = null;
 let learningSessionData = {
@@ -78,9 +98,6 @@ function getCurrentData() {
 function setCurrentData(data) {
   if (currentLearningArea) {
     areaData[currentLearningArea] = data;
-    console.log(
-      `📝 setCurrentData: area=${currentLearningArea}, length=${data.length}`
-    );
   } else {
     console.warn(`⚠️ setCurrentData: currentLearningArea가 설정되지 않음`);
   }
@@ -91,10 +108,8 @@ async function waitForFirebaseInit() {
   return new Promise((resolve) => {
     const checkFirebase = () => {
       if (window.firebaseInit && window.firebaseInit.db) {
-        console.log("✅ Firebase 초기화 완료");
         resolve();
       } else {
-        console.log("⏳ Firebase 초기화 대기 중...");
         setTimeout(checkFirebase, 100);
       }
     };
@@ -104,8 +119,6 @@ async function waitForFirebaseInit() {
 
 // DOM 로드 완료 시 초기화
 document.addEventListener("DOMContentLoaded", function () {
-  console.log("📚 학습 페이지 초기화");
-
   // CollectionManager 초기화
   collectionManager = new CollectionManager();
 
@@ -332,13 +345,28 @@ function initializeLanguageSettings() {
 
 // 필터 변경 핸들러
 function handleFilterChange() {
-  console.log("🔍 필터 변경 감지");
+  console.log("🔍 필터 변경 감지 - 클라이언트 측 필터링");
 
-  // 현재 학습 중인 경우 데이터 다시 로드
+  // 현재 학습 중인 경우 기존 데이터에 필터만 적용 (DB 재조회 없음)
   if (currentLearningArea && currentLearningMode) {
-    console.log("🔄 필터 변경으로 인한 데이터 재로드");
-    currentIndex = 0; // 인덱스 초기화
-    startLearningMode(currentLearningArea, currentLearningMode);
+    console.log("🔄 필터 변경 - 기존 데이터 활용");
+    
+    // ✅ DB 재조회 없이 기존 데이터에 필터만 적용
+    if (preloadedData[currentLearningArea] && preloadedData[currentLearningArea].length > 0) {
+      const filteredData = applyFilters(preloadedData[currentLearningArea]);
+      areaData[currentLearningArea] = filteredData;
+      currentIndex = 0; // 인덱스 초기화
+      
+      console.log(`✅ 클라이언트 필터링 완료: ${filteredData.length}개`);
+      
+      // UI만 업데이트
+      updateCurrentView();
+    } else {
+      // 프리로드된 데이터가 없는 경우에만 DB 조회
+      console.log("⚠️ 프리로드 데이터 없음 - DB 재조회");
+      currentIndex = 0;
+      startLearningMode(currentLearningArea, currentLearningMode);
+    }
   }
 }
 
@@ -509,6 +537,7 @@ function applyAdditionalTranslations() {
       typing_answer_placeholder: "답안을 입력하세요",
       check: "확인",
       pronunciation_coming_soon: "발음 연습 모드는 준비 중입니다.",
+      play_pronunciation: "발음 듣기",
       click_to_see_explanation: "클릭하여 설명 보기",
       original_text: "원문",
       translation: "번역",
@@ -534,6 +563,8 @@ function applyAdditionalTranslations() {
       flashcard_mode_desc: "카드를 뒤집어가며 단어와 의미 학습",
       typing_mode: "타이핑",
       typing_mode_desc: "듣고 정확하게 타이핑하여 스펠링 연습",
+      listening_mode: "듣기 연습",
+      listening_mode_desc: "음성 듣기 학습",
       pronunciation_mode: "발음 연습",
       pronunciation_mode_desc: "음성 인식으로 정확한 발음 훈련",
       pattern_analysis_mode: "패턴 분석",
@@ -555,6 +586,7 @@ function applyAdditionalTranslations() {
     en: {
       flashcard_learning: "🃏 Flashcard Learning",
       typing_learning: "⌨️ Typing Learning",
+      listening_practice: "🎧 Listening Practice",
       pronunciation_practice: "🎤 Pronunciation Practice",
       grammar_pattern_analysis: "📝 Grammar Pattern Analysis",
       grammar_practice: "📚 Grammar Practice",
@@ -565,6 +597,8 @@ function applyAdditionalTranslations() {
       typing_answer_placeholder: "Enter your answer",
       check: "Check",
       pronunciation_coming_soon: "Pronunciation practice mode is coming soon.",
+      listening_coming_soon: "Listening practice mode is coming soon.",
+      play_pronunciation: "Play Pronunciation",
       click_to_see_explanation: "Click to see explanation",
       original_text: "Original Text",
       translation: "Translation",
@@ -622,6 +656,7 @@ function applyAdditionalTranslations() {
       typing_answer_placeholder: "答えを入力してください",
       check: "確認",
       pronunciation_coming_soon: "発音練習モードは準備中です。",
+      play_pronunciation: "発音を聞く",
       click_to_see_explanation: "クリックして説明を見る",
       original_text: "原文",
       translation: "翻訳",
@@ -647,6 +682,8 @@ function applyAdditionalTranslations() {
       flashcard_mode_desc: "カードをめくって単語と意味を学習",
       typing_mode: "タイピング",
       typing_mode_desc: "聞いて正確にタイピングしてスペリング練習",
+      listening_mode: "聴解練習",
+      listening_mode_desc: "音声聞き取り学習",
       pronunciation_mode: "発音練習",
       pronunciation_mode_desc: "音声認識で正確な発音を訓練",
       pattern_analysis_mode: "パターン分析",
@@ -678,6 +715,7 @@ function applyAdditionalTranslations() {
       typing_answer_placeholder: "请输入您的答案",
       check: "检查",
       pronunciation_coming_soon: "发音练习模式即将推出。",
+      play_pronunciation: "播放发音",
       click_to_see_explanation: "点击查看解释",
       original_text: "原文",
       translation: "翻译",
@@ -699,6 +737,8 @@ function applyAdditionalTranslations() {
       flashcard_mode_desc: "翻转卡片学习单词和含义",
       typing_mode: "打字",
       typing_mode_desc: "听写并准确打字练习拼写",
+      listening_mode: "听力练习",
+      listening_mode_desc: "语音听力学习",
       pronunciation_mode: "发音练习",
       pronunciation_mode_desc: "通过语音识别训练准确发音",
       pattern_analysis_mode: "模式分析",
@@ -1228,6 +1268,7 @@ function setupEventListeners() {
     "back-from-reading",
     "back-from-flashcard",
     "back-from-typing",
+    "back-to-dashboard-listening",
     "back-to-dashboard-pronunciation",
     "back-to-dashboard-pattern",
     "back-to-dashboard-practice",
@@ -1263,6 +1304,7 @@ function setupEventListeners() {
   const finishLearningButtons = [
     "finish-learning-flashcard",
     "finish-learning-typing",
+    "finish-learning-listening",
     "finish-learning-grammar",
     "finish-learning-grammar-practice",
     "finish-learning-reading-example",
@@ -1292,6 +1334,18 @@ function setupEventListeners() {
   if (checkTypingAnswerBtn) {
     checkTypingAnswerBtn.removeEventListener("click", checkTypingAnswer);
     checkTypingAnswerBtn.addEventListener("click", checkTypingAnswer);
+  }
+
+  // 듣기 모드 버튼들
+  const prevListeningBtn = document.getElementById("prev-listening-btn");
+  const nextListeningBtn = document.getElementById("next-listening-btn");
+  if (prevListeningBtn) {
+    prevListeningBtn.removeEventListener("click", () => navigateContent(-1));
+    prevListeningBtn.addEventListener("click", () => navigateContent(-1));
+  }
+  if (nextListeningBtn) {
+    nextListeningBtn.removeEventListener("click", () => navigateContent(1));
+    nextListeningBtn.addEventListener("click", () => navigateContent(1));
   }
 
   // 문법 실습 뒤집기 버튼
@@ -1481,10 +1535,11 @@ async function finishLearningHandler(e) {
     const conceptsCount = learningSessionData.conceptsStudied.size;
     console.log(`💾 강제 세션 완료 처리: ${conceptsCount}개 개념 학습됨`);
 
-    // learningSessionData 최소값 보장
+    // learningSessionData 최소값 보장 - 실제 상호작용 수 사용
     if (learningSessionData.totalInteractions === 0 && conceptsCount > 0) {
-      learningSessionData.totalInteractions = conceptsCount;
-      learningSessionData.correctAnswers = Math.floor(conceptsCount * 0.7); // 70% 정답률 가정
+      // 상호작용이 전혀 없었다면 최소 1회로 설정 (세션이 시작되었다는 의미)
+      learningSessionData.totalInteractions = 1;
+      learningSessionData.correctAnswers = 1;
     }
 
     // 학습 세션 완료 처리 (기존 함수 활용)
@@ -1539,6 +1594,16 @@ async function finishLearningHandler(e) {
   // 학습 완료 팝업 표시 (세션 완료 후)
   if (conceptsCount > 0) {
     console.log("🎉 학습 종료 - 완료 팝업 표시");
+    console.log("📊 학습 완료 통계:", {
+      conceptsCount,
+      duration: Math.round(
+        (learningSessionData.endTime - learningSessionData.startTime) /
+          1000 /
+          60
+      ) || 1,
+      interactions: learningSessionData.totalInteractions,
+      correctAnswers: learningSessionData.correctAnswers,
+    });
 
     // 완료 팝업에 필요한 통계 계산
     const duration =
@@ -1548,8 +1613,27 @@ async function finishLearningHandler(e) {
           60
       ) || 1;
 
-    // 학습 효율 계산 (저장된 계산과 동일한 방식)
-    const baseScore = Math.min(60, conceptsCount * 6);
+    // 전체 데이터 수 가져오기 (저장 시 계산과 동일하게)
+    const currentData = getCurrentData();
+    const totalAvailableData = currentData ? currentData.length : conceptsCount;
+
+    // 학습 효율 계산 (Firebase 저장과 동일한 방식)
+    let baseScore;
+    if (currentLearningArea === "reading" && currentLearningMode === "flash") {
+      // 독해 플래시 모드: 모든 카드를 본 것을 기준으로 기본 점수
+      const allConceptsPresented = conceptsCount >= Math.min(10, totalAvailableData);
+      baseScore = allConceptsPresented ? 60 : (conceptsCount / totalAvailableData) * 60;
+    } else if (
+      learningSessionData.mode === "flashcard" ||
+      learningSessionData.mode === "listening" ||
+      learningSessionData.mode === "example"
+    ) {
+      // presentation 기반 모드: 실제 비율로 계산
+      baseScore = Math.min(60, (conceptsCount / totalAvailableData) * 60);
+    } else {
+      // 기존 방식 (typing, pattern, practice 등): 실제 학습한 개념 수 기준
+      baseScore = Math.min(60, conceptsCount * 6);
+    }
 
     const conceptsPerMinute = conceptsCount / Math.max(duration, 1);
     let timeScore = 0;
@@ -1561,11 +1645,19 @@ async function finishLearningHandler(e) {
       timeScore = Math.max(5, conceptsPerMinute * 20);
     }
 
-    const meaningfulInteractions = learningSessionData.correctAnswers;
-    const participationScore = Math.min(
-      20,
-      (meaningfulInteractions / conceptsCount) * 20
-    );
+    // 참여 점수 계산 (Firebase 저장과 동일한 방식)
+    let participationScore;
+    const meaningfulInteractions = learningSessionData.totalInteractions; // 총 상호작용 수
+    
+    if (currentLearningArea === "reading" && currentLearningMode === "flash") {
+      // 독해 플래시 모드: 카드 뒤집기 참여도 기반 계산
+      const flips = meaningfulInteractions; // flip 상호작용 수
+      const maxPossibleFlips = totalAvailableData;
+      participationScore = Math.min(20, (flips / maxPossibleFlips) * 20);
+    } else {
+      // 다른 모드: 상호작용 기반, 최대 20점
+      participationScore = Math.min(20, (meaningfulInteractions / totalAvailableData) * 20);
+    }
 
     const sessionStats = {
       conceptsCount,
@@ -1577,7 +1669,9 @@ async function finishLearningHandler(e) {
       ),
     };
 
+    console.log("📋 학습 완료 팝업 데이터:", sessionStats);
     await showLearningCompleteWithStats(sessionStats);
+    console.log("✅ 학습 완료 팝업 표시 완료 - 함수 종료");
   } else {
     console.log("🏁 학습 종료 - 학습한 개념이 없어 바로 영역 선택으로 이동");
     // 🔄 학습 데이터 초기화
@@ -2644,6 +2738,9 @@ window.startLearningMode = async function startLearningMode(area, mode) {
         case "pronunciation":
           showPronunciationMode();
           break;
+        case "listening":
+          showListeningMode();
+          break;
         default:
           console.error(`❌ 알 수 없는 단어 학습 모드: ${mode}`);
           showAreaSelection();
@@ -2688,6 +2785,24 @@ async function loadLearningData(area) {
   console.log(`📚 ${area} 학습 데이터 로드 시작`);
 
   try {
+    // ✅ 프리로드된 데이터가 있으면 우선 사용
+    if (preloadedData[area] && preloadedData[area].length > 0) {
+      console.log(`⚡ ${area} 프리로드된 데이터 사용: ${preloadedData[area].length}개`);
+      areaData[area] = applyFilters(preloadedData[area]);
+      return;
+    }
+
+    // ✅ 캐시된 데이터가 있고 유효하면 사용
+    const now = Date.now();
+    if (cachedData[area].data && 
+        (now - cachedData[area].timestamp) < CACHE_DURATION) {
+      console.log(`⚡ ${area} 캐시된 데이터 사용: ${cachedData[area].data.length}개`);
+      areaData[area] = applyFilters(cachedData[area].data);
+      return;
+    }
+
+    // ✅ 캐시가 없거나 만료된 경우에만 DB 조회
+    console.log(`🔄 ${area} DB에서 새로운 데이터 로드`);
     switch (area) {
       case "vocabulary":
         await loadVocabularyData();
@@ -2703,6 +2818,15 @@ async function loadLearningData(area) {
 
       default:
         console.error(`❌ 알 수 없는 학습 영역: ${area}`);
+    }
+
+    // ✅ 로드된 데이터를 캐시에 저장
+    if (areaData[area] && areaData[area].length > 0) {
+      cachedData[area] = {
+        data: [...areaData[area]], // 깊은 복사
+        timestamp: now
+      };
+      console.log(`💾 ${area} 데이터 캐시 저장: ${areaData[area].length}개`);
     }
 
     const currentData = getCurrentData();
@@ -2756,8 +2880,9 @@ async function loadVocabularyData() {
           ...doc.data(),
         }));
         console.log(
-          `💰 효율적인 조회 성공: ${data.length}개 단어 (비용 절약!)`
+          `💰 효율적인 조회 성공: ${data.length}개 단어 (1개 쿼리)`
         );
+        trackFirebaseRead("단어 랜덤 조회", randomSnapshot.size); // ✅ 읽기 추적
       } else {
         // 충분하지 않은 경우 추가 조회
         const additionalQuery = window.firebaseInit.query(
@@ -2782,6 +2907,7 @@ async function loadVocabularyData() {
 
         data = [...firstBatch, ...secondBatch];
         console.log(`💰 효율적인 조회 성공: ${data.length}개 단어 (2개 쿼리)`);
+        trackFirebaseRead("단어 추가 조회", randomSnapshot.size + additionalSnapshot.size); // ✅ 읽기 추적
       }
 
       // Fisher-Yates 셔플 적용
@@ -2862,7 +2988,7 @@ async function loadGrammarData() {
       const randomQuery = window.firebaseInit.query(
         grammarRef,
         window.firebaseInit.where("randomField", ">=", randomValue),
-        window.firebaseInit.limit(20)
+        window.firebaseInit.limit(10) // ✅ 20개에서 10개로 최적화
       );
 
       const randomSnapshot = await window.firebaseInit.getDocs(randomQuery);
@@ -2881,13 +3007,14 @@ async function loadGrammarData() {
             ...docData,
           };
         });
-        console.log(`💰 문법 패턴 효율적인 조회 성공: ${grammarData.length}개`);
+        console.log(`💰 문법 패턴 효율적인 조회 성공: ${grammarData.length}개 (1개 쿼리)`);
+        trackFirebaseRead("문법 패턴 랜덤 조회", randomSnapshot.size); // ✅ 읽기 추적
       } else {
         // 충분하지 않은 경우 추가 조회
         const additionalQuery = window.firebaseInit.query(
           grammarRef,
           window.firebaseInit.where("randomField", "<", randomValue),
-          window.firebaseInit.limit(20 - randomSnapshot.size)
+          window.firebaseInit.limit(10 - randomSnapshot.size) // ✅ 20에서 10으로 최적화
         );
 
         const additionalSnapshot = await window.firebaseInit.getDocs(
@@ -2924,6 +3051,7 @@ async function loadGrammarData() {
         console.log(
           `💰 문법 패턴 효율적인 조회 성공: ${grammarData.length}개 (2개 쿼리)`
         );
+        trackFirebaseRead("문법 패턴 추가 조회", randomSnapshot.size + additionalSnapshot.size); // ✅ 읽기 추적
       }
 
       // Fisher-Yates 셔플 적용
@@ -2988,12 +3116,12 @@ async function loadReadingData() {
     try {
       console.log("🚀 독해 예문 - randomField를 활용한 효율적인 조회...");
 
-      // 효율적인 랜덤 쿼리 (최대 15개만 읽음)
+      // 효율적인 랜덤 쿼리 (최대 10개만 읽음)
       const randomValue = Math.random();
       const randomQuery = window.firebaseInit.query(
         examplesRef,
         window.firebaseInit.where("randomField", ">=", randomValue),
-        window.firebaseInit.limit(15)
+        window.firebaseInit.limit(10) // ✅ 15개에서 10개로 최적화
       );
 
       const randomSnapshot = await window.firebaseInit.getDocs(randomQuery);
@@ -3026,13 +3154,14 @@ async function loadReadingData() {
           })
           .filter(Boolean);
 
-        console.log(`💰 독해 예문 효율적인 조회 성공: ${exampleData.length}개`);
+        console.log(`💰 독해 예문 효율적인 조회 성공: ${exampleData.length}개 (1개 쿼리)`);
+        trackFirebaseRead("독해 예문 랜덤 조회", randomSnapshot.size); // ✅ 읽기 추적
       } else {
         // 충분하지 않은 경우 추가 조회
         const additionalQuery = window.firebaseInit.query(
           examplesRef,
           window.firebaseInit.where("randomField", "<", randomValue),
-          window.firebaseInit.limit(15 - randomSnapshot.size)
+          window.firebaseInit.limit(10 - randomSnapshot.size) // ✅ 15에서 10으로 최적화
         );
 
         const additionalSnapshot = await window.firebaseInit.getDocs(
@@ -3083,6 +3212,7 @@ async function loadReadingData() {
         console.log(
           `💰 독해 예문 효율적인 조회 성공: ${exampleData.length}개 (2개 쿼리)`
         );
+        trackFirebaseRead("독해 예문 추가 조회", randomSnapshot.size + additionalSnapshot.size); // ✅ 읽기 추적
       }
 
       // Fisher-Yates 셔플 적용
@@ -3157,6 +3287,7 @@ function hideAllSections() {
     "flashcard-mode",
     "typing-mode",
     "pronunciation-mode",
+    "listening-mode",
     "grammar-pattern-mode",
     "grammar-practice-mode",
     "reading-example-mode",
@@ -3180,6 +3311,7 @@ function hideLearningModeSections() {
     "flashcard-mode",
     "typing-mode",
     "pronunciation-mode",
+    "listening-mode",
     "grammar-pattern-mode",
     "grammar-practice-mode",
     "reading-example-mode",
@@ -3638,6 +3770,175 @@ function showPronunciationMode() {
   }
 }
 
+function showListeningMode() {
+  console.log("🎧 듣기 연습 모드 시작");
+
+  const listeningMode = document.getElementById("listening-mode");
+  if (listeningMode) {
+    listeningMode.classList.remove("hidden");
+
+    // 듣기 모드 초기화
+    updateListeningMode();
+
+    // 번역 적용
+    setTimeout(() => {
+      applyTranslations();
+    }, 50);
+  } else {
+    console.error("❌ 듣기 연습 모드 요소를 찾을 수 없음");
+    alert("듣기 연습 모드를 시작할 수 없습니다.");
+    showAreaSelection();
+  }
+}
+
+// 🎧 브라우저 내장 음성 합성을 사용한 발음 재생
+function playWordAudio(text, language = "korean") {
+  if (!text) {
+    console.warn("⚠️ 재생할 텍스트가 없습니다.");
+    return;
+  }
+
+  // 음성 합성 지원 확인
+  if (!window.speechSynthesis) {
+    console.warn("⚠️ 이 브라우저는 음성 합성을 지원하지 않습니다.");
+    alert("이 브라우저는 음성 재생을 지원하지 않습니다.");
+    return;
+  }
+
+  try {
+    // 기존 음성 중지
+    window.speechSynthesis.cancel();
+
+    // 새 음성 생성
+    const utterance = new SpeechSynthesisUtterance(text);
+    
+    // 언어별 설정
+    const languageMap = {
+      korean: "ko-KR",
+      english: "en-US", 
+      japanese: "ja-JP",
+      chinese: "zh-CN"
+    };
+
+    // 기존 음성 재생 중지 (중복 방지)
+    window.speechSynthesis.cancel();
+
+    utterance.lang = languageMap[language] || "ko-KR";
+    utterance.rate = 0.8; // 속도 (0.1 ~ 10)
+    utterance.pitch = 1; // 음높이 (0 ~ 2)
+    utterance.volume = 1; // 볼륨 (0 ~ 1)
+
+    // 재생 이벤트
+    utterance.onstart = () => {
+      console.log(`🎧 음성 재생 시작: "${text}" (${language})`);
+    };
+
+    utterance.onend = () => {
+      console.log(`✅ 음성 재생 완료: "${text}"`);
+    };
+
+    utterance.onerror = (event) => {
+      console.error("❌ 음성 재생 오류:", event.error);
+    };
+
+    // 음성 재생
+    window.speechSynthesis.speak(utterance);
+
+  } catch (error) {
+    console.error("❌ 음성 재생 중 오류 발생:", error);
+    alert("음성 재생 중 오류가 발생했습니다.");
+  }
+}
+
+function updateListeningMode() {
+  const currentData = getCurrentData();
+  if (!currentData || currentData.length === 0) return;
+
+  const concept = currentData[currentIndex];
+  console.log("🎧 듣기 연습 데이터:", concept);
+
+  // 듣기 모드 요소들
+  const listeningWord = document.getElementById("listening-word");
+  const listeningPronunciation = document.getElementById("listening-pronunciation");
+  const listeningMeaning = document.getElementById("listening-meaning");
+  const listeningCategory = document.getElementById("listening-category");
+  const listeningProgress = document.getElementById("listening-progress");
+  const playAudioBtn = document.getElementById("play-audio-btn");
+
+  // 언어 설정 가져오기 (다른 모드와 동일)
+  const currentSourceLanguage =
+    document.getElementById("source-language")?.value ||
+    document.getElementById("source-language-desktop")?.value ||
+    "korean";
+  const currentTargetLanguage =
+    document.getElementById("target-language")?.value ||
+    document.getElementById("target-language-desktop")?.value ||
+    "english";
+
+  // 개념 데이터 추출 (듣기 모드 특성에 맞게 수정)
+  // 듣기 모드: 대상 언어 단어를 듣고 원본 언어 의미를 확인
+  let sourceWord = "단어"; // 화면에 표시될 대상 언어 단어
+  let targetWord = "의미"; // 화면에 표시될 원본 언어 의미
+  let pronunciation = "";
+  let category = "카테고리";
+
+  if (concept.expressions) {
+    // 듣기 모드에서는 대상 언어를 듣고 원본 언어 의미를 확인
+    const listenLanguageExpr = concept.expressions[currentTargetLanguage]; // 들을 언어
+    const meaningLanguageExpr = concept.expressions[currentSourceLanguage]; // 의미를 확인할 언어
+    
+    if (listenLanguageExpr) {
+      sourceWord = listenLanguageExpr.word || listenLanguageExpr.expression || "단어";
+      pronunciation = listenLanguageExpr.pronunciation || listenLanguageExpr.transcription || "";
+    }
+    
+    if (meaningLanguageExpr) {
+      targetWord = meaningLanguageExpr.word || meaningLanguageExpr.expression || "의미";
+    }
+  }
+
+  // 카테고리 추출
+  category = concept.category || concept.concept_info?.category || "일반";
+
+  // UI 업데이트
+  if (listeningWord) listeningWord.textContent = sourceWord;
+  if (listeningPronunciation) listeningPronunciation.textContent = pronunciation;
+  if (listeningMeaning) listeningMeaning.textContent = targetWord;
+  if (listeningCategory) listeningCategory.textContent = category;
+
+  // 진행 상황 업데이트
+  if (listeningProgress) {
+    listeningProgress.textContent = `${currentIndex + 1} / ${currentData.length}`;
+  }
+
+  // 발음 버튼 이벤트 설정
+  if (playAudioBtn) {
+    playAudioBtn.onclick = () => {
+      // 듣기 모드에서는 대상 언어(듣는 언어)로 재생
+      playWordAudio(sourceWord, currentTargetLanguage);
+      // 📊 학습 상호작용 추적 (발음 듣기)
+      const conceptId = concept.id || concept.concept_id || `listening_${currentIndex}`;
+      trackLearningInteraction(conceptId, true, "listen");
+    };
+  }
+
+  // 📊 학습 상호작용 추적 (듣기 모드 표시)
+  const conceptId = concept.id || concept.concept_id || `listening_${currentIndex}`;
+  trackLearningInteraction(conceptId, true, "view");
+
+  // 삭제 버튼 추가
+  const deleteButtonContainer = document.getElementById("listening-delete-container");
+  if (deleteButtonContainer) {
+    deleteButtonContainer.innerHTML = `
+      <button class="delete-btn bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm" 
+              data-item-id="${concept.id}" 
+              data-item-type="vocabulary">
+        🗑️ 삭제
+      </button>
+    `;
+  }
+}
+
 function showGrammarPatternMode() {
   console.log("📝 문법 패턴 모드 시작");
   const patternMode = document.getElementById("grammar-pattern-mode");
@@ -3708,10 +4009,9 @@ function updateGrammarPatterns() {
     `;
   }
 
-  // 📊 학습 상호작용 추적 (문법 패턴 표시)
-  const conceptId =
-    pattern.id || pattern.concept_id || `grammar_${currentIndex}`;
-  trackLearningInteraction(conceptId, true, "view");
+  // 📊 학습 상호작용 추적 (문법 패턴 표시) - view 상호작용 제거
+  // const conceptId = pattern.id || pattern.concept_id || `grammar_${currentIndex}`;
+  // trackLearningInteraction(conceptId, true, "view"); // 주석 처리 - navigate_completed만 사용
 }
 
 function showGrammarPracticeMode() {
@@ -3789,10 +4089,9 @@ function updateGrammarPractice() {
     progress.textContent = `${currentIndex + 1} / ${currentData.length}`;
   }
 
-  // 📊 학습 상호작용 추적 (문법 실습 표시)
-  const conceptId =
-    pattern.id || pattern.concept_id || `grammar_${currentIndex}`;
-  trackLearningInteraction(conceptId, true, "view");
+  // 📊 학습 상호작용 추적 (문법 실습 표시) - view 상호작용 제거
+  // const conceptId = pattern.id || pattern.concept_id || `grammar_${currentIndex}`;
+  // trackLearningInteraction(conceptId, true, "view"); // 주석 처리 - grammar_flip만 사용
 
   // 삭제 버튼 추가
   const deleteButtonContainer = document.getElementById(
@@ -3946,10 +4245,7 @@ function updateReadingExample() {
     progress.textContent = `${currentIndex + 1} / ${currentData.length}`;
   }
 
-  // 📊 학습 상호작용 추적 (독해 예문 표시)
-  const conceptId =
-    example.id || example.concept_id || `reading_${currentIndex}`;
-  trackLearningInteraction(conceptId, false, "view"); // view는 단순 조회이므로 정답으로 계산하지 않음
+  // 📊 view 상호작용 추적 제거 - 독해 예문은 단순 조회이므로 상호작용으로 계산하지 않음
 }
 
 function updateReadingFlash() {
@@ -4074,7 +4370,8 @@ function navigateContent(direction) {
         // 카드를 뒤집었다면 flip 시점에서 이미 추적했으므로 중복 추적하지 않음
       } else if (isReadingFlashMode) {
         // 독해 플래시 모드에서는 뒤집기 여부를 추적하지 않음
-        // flipReadingCard 함수에서만 상호작용을 추적하여 중복 방지
+        // 하지만 개념 제시는 추적해야 함
+        trackLearningInteraction(conceptId, true, "navigate_completed");
       } else {
         // 다른 모드들: 기본적으로 정상 완료로 처리
         trackLearningInteraction(conceptId, true, "navigate_completed");
@@ -4129,6 +4426,9 @@ function navigateContent(direction) {
             break;
           case "typing":
             updateTyping();
+            break;
+          case "listening":
+            updateListeningMode();
             break;
         }
         break;
@@ -5369,13 +5669,30 @@ function startLearningSession(area, mode) {
   });
 }
 
-// 📚 학습 상호작용 추적 (개선된 버전)
+// 📚 학습 상호작용 추적 (개선된 버전) - 제시된 개념과 상호작용 분리
 function trackLearningInteraction(
   conceptId,
   isCorrect = true,
   interactionType = "view"
 ) {
   if (!learningSessionData.sessionActive) return;
+
+  // 🎯 제시된 개념 추적 (상호작용과 무관하게 모든 제시된 개념)
+  if (conceptId) {
+    learningSessionData.conceptsStudied.add(conceptId);
+    console.log(`📚 개념 제시 추가: ${conceptId} (총 ${learningSessionData.conceptsStudied.size}개)`);
+  }
+
+  // 🚫 view는 상호작용으로 계산하지 않음
+  if (interactionType === "view") {
+    console.log(`�️ view 이벤트는 상호작용으로 계산하지 않음:`, {
+      conceptId,
+      interactionType,
+      mode: learningSessionData.mode,
+      area: learningSessionData.area,
+    });
+    return;
+  }
 
   console.log(`🔍 상호작용 추적 시도:`, {
     conceptId,
@@ -5385,52 +5702,37 @@ function trackLearningInteraction(
     area: learningSessionData.area,
   });
 
-  // 🎯 개념 학습 추적 (실제 학습 행동이 있을 때만)
-  if (conceptId) {
-    // 타이핑 모드: 정답 확인 시에만 학습한 것으로 간주
-    if (learningSessionData.mode === "typing" && interactionType === "typing") {
-      learningSessionData.conceptsStudied.add(conceptId);
-    }
-    // 플래시카드/플래시 모드: 뒤집기 시에만 학습한 것으로 간주
-    else if (
-      (learningSessionData.mode === "flashcard" ||
-        learningSessionData.mode === "flash") &&
-      (interactionType === "flip" || interactionType === "grammar_flip")
-    ) {
-      learningSessionData.conceptsStudied.add(conceptId);
-    }
-    // 기타 모드: 기존 방식 유지
-    else if (
-      !["typing", "flashcard", "flash"].includes(learningSessionData.mode)
-    ) {
-      learningSessionData.conceptsStudied.add(conceptId);
-    }
-  }
-
-  // 🎯 의미 있는 상호작용만 계산
+  // 🎯 의미 있는 상호작용만 계산 (view는 이미 제외됨)
   const isFlashcardMode = learningSessionData.mode === "flashcard";
   const isTypingMode = learningSessionData.mode === "typing";
   const isFlashMode = learningSessionData.mode === "flash";
+  const isGrammarPracticeMode = learningSessionData.mode === "practice";
+  const isListeningMode = learningSessionData.mode === "listening";
 
   // 각 모드별 의미 있는 상호작용 정의
   let isMeaningfulInteraction = false;
 
-  if (isFlashcardMode || isFlashMode) {
-    // 플래시카드/플래시 모드: 뒤집기만 의미 있는 상호작용
-    isMeaningfulInteraction =
-      interactionType === "flip" || interactionType === "grammar_flip";
+  if (isFlashcardMode) {
+    // 플래시카드 모드: 뒤집기와 네비게이션 모두 상호작용
+    isMeaningfulInteraction = interactionType === "flip" || interactionType === "navigate_completed";
+  } else if (isFlashMode) {
+    // 독해 플래시 모드: 뒤집기만 상호작용 (navigate_completed 제외)
+    isMeaningfulInteraction = interactionType === "flip";
+  } else if (isGrammarPracticeMode) {
+    // 문법실습 모드: 뒤집기만 상호작용
+    isMeaningfulInteraction = interactionType === "grammar_flip";
   } else if (isTypingMode) {
-    // 타이핑 모드: 정답 확인만 의미 있는 상호작용 (네비게이션 제외)
+    // 타이핑 모드: 정답 확인만 상호작용 (view는 제외)
     isMeaningfulInteraction = interactionType === "typing";
+  } else if (isListeningMode) {
+    // 듣기 모드: 발음 듣기만 상호작용 (view는 제외)
+    isMeaningfulInteraction = interactionType === "listen";
   } else {
-    // 기타 모드: 모든 상호작용 허용
-    isMeaningfulInteraction = true;
+    // 기타 모드 (예문 학습 등): navigate_completed를 포함한 실제 상호작용 (view는 제외)
+    isMeaningfulInteraction = interactionType !== "view";
   }
 
   if (!isMeaningfulInteraction) {
-    console.log(
-      `🚫 ${learningSessionData.mode} 모드에서 비의미적 상호작용 무시: ${interactionType}`
-    );
     return;
   }
 
@@ -5441,9 +5743,6 @@ function trackLearningInteraction(
       learningSessionData.trackedInteractions &&
       learningSessionData.trackedInteractions.has(typingKey)
     ) {
-      console.log(
-        `🚫 타이핑 모드 중복 상호작용 무시: 이미 ${conceptId}에 대해 정답 확인함`
-      );
       return;
     }
   }
@@ -5457,7 +5756,6 @@ function trackLearningInteraction(
 
   // 이미 추적된 상호작용인지 확인 (중복 방지)
   if (learningSessionData.trackedInteractions.has(interactionKey)) {
-    console.log(`🚫 중복 상호작용 무시: ${interactionKey}`);
     return;
   }
 
@@ -5467,23 +5765,6 @@ function trackLearningInteraction(
   if (isCorrect) {
     learningSessionData.correctAnswers++;
   }
-
-  console.log(`✅ 상호작용 추적됨:`, {
-    interactionKey,
-    totalInteractions: learningSessionData.totalInteractions,
-    correctAnswers: learningSessionData.correctAnswers,
-    mode: learningSessionData.mode,
-    area: learningSessionData.area,
-  });
-
-  // 상세한 상호작용 추적 로그 (개발/디버깅용)
-  console.log(`🔍 상호작용 상세:`, {
-    conceptId,
-    interactionType,
-    isCorrect,
-    totalTracked: learningSessionData.trackedInteractions.size,
-    sessionActive: learningSessionData.sessionActive,
-  });
 
   // 간소화된 상호작용 추적 로그 (5개 단위로만)
   if (learningSessionData.totalInteractions % 5 === 0) {
@@ -5595,6 +5876,29 @@ async function completeLearningSession(forceComplete = false) {
           allConceptsPresented: true,
           baseScore: baseScore.toFixed(1),
         });
+      } else if (currentLearningMode === "practice") {
+        // 문법 실습 모드: 제시된 개념 수 기준으로 기본 점수 (최대 60점)
+        // 패턴 분석과 동일한 계산 방식 적용
+        baseScore = Math.min(60, totalAvailableData * 6);
+
+        console.log("📊 문법 실습 모드 기본 점수:", {
+          studiedConceptsCount,
+          totalAvailableData,
+          presentedConceptsCount: totalAvailableData, // 제시된 개념 수 (실제 계산 기준)
+          baseScore: baseScore.toFixed(1),
+        });
+      } else if (currentLearningMode === "listening") {
+        // 듣기 연습 모드: 모든 개념을 본 것을 기준으로 기본 점수 (최대 60점)
+        // 모든 개념을 순차적으로 보는 것 자체가 학습이므로 전체 데이터 기준으로 계산
+        baseScore = 60; // 모든 개념을 제시받았으므로 기본 점수 만점
+
+        console.log("📊 듣기 연습 모드 기본 점수:", {
+          studiedConceptsCount,
+          totalAvailableData,
+          presentedConceptsCount: totalAvailableData, // 제시된 개념 수 (실제 계산 기준)
+          allConceptsPresented: true,
+          baseScore: baseScore.toFixed(1),
+        });
       } else {
         // 다른 모드: 기존 방식 (최대 60점)
         baseScore = Math.min(60, studiedConceptsCount * 6);
@@ -5606,6 +5910,20 @@ async function completeLearningSession(forceComplete = false) {
 
       if (currentLearningMode === "typing") {
         // 타이핑 모드: 시간 점수 (최대 20점)
+        if (conceptsPerMinute >= 1 && conceptsPerMinute <= 10) {
+          timeScore = 20;
+        } else if (conceptsPerMinute > 10) {
+          timeScore = Math.max(5, 20 - (conceptsPerMinute - 10) * 1);
+        } else {
+          timeScore = Math.max(5, conceptsPerMinute * 20);
+        }
+      } else if (
+        currentLearningMode === "practice" ||
+        currentLearningMode === "listening" ||
+        currentLearningMode === "flashcard" ||
+        (currentLearningMode === "flash" && currentLearningArea === "reading")
+      ) {
+        // 플래시카드 기반 모드들: 전체 데이터 기준 시간 점수 (최대 20점)
         if (conceptsPerMinute >= 1 && conceptsPerMinute <= 10) {
           timeScore = 20;
         } else if (conceptsPerMinute > 10) {
@@ -5667,6 +5985,34 @@ async function completeLearningSession(forceComplete = false) {
         console.log("📊 단어 플래시카드 모드 참여도:", {
           flips: meaningfulInteractions,
           maxPossibleFlips,
+          participationRate: (participationRate * 100).toFixed(1) + "%",
+          participationScore: participationScore.toFixed(1),
+        });
+      } else if (currentLearningMode === "practice") {
+        // 문법 실습 모드: 일반 상호작용 기반 참여도 계산 (최대 20점)
+        // 패턴 분석과 동일한 계산 방식 적용
+        const meaningfulInteractions = learningSessionData.correctAnswers;
+        participationScore = Math.min(
+          20,
+          (meaningfulInteractions / totalAvailableData) * 20
+        );
+
+        console.log("📊 문법 실습 모드 참여도:", {
+          flips: meaningfulInteractions,
+          totalAvailableData,
+          participationScore: participationScore.toFixed(1),
+        });
+      } else if (currentLearningMode === "listening") {
+        // 듣기 모드: 발음 듣기 상호작용 기준 참여도 계산 (최대 20점)
+        const meaningfulInteractions = learningSessionData.correctAnswers; // listen 액션만 카운트
+        const maxPossibleListens = totalAvailableData; // 각 개념당 최대 1번 듣기
+        const participationRate = meaningfulInteractions / maxPossibleListens;
+        participationScore = participationRate * 20;
+
+        console.log("📊 듣기 모드 참여도:", {
+          interactions: meaningfulInteractions,
+          maxPossibleListens,
+          totalConcepts: totalAvailableData,
           participationRate: (participationRate * 100).toFixed(1) + "%",
           participationScore: participationScore.toFixed(1),
         });
@@ -5841,10 +6187,18 @@ window.addEventListener("beforeunload", () => {
 
 // 📚 학습 완료 UI 표시 (외부 통계 전달)
 async function showLearningCompleteWithStats(sessionStats) {
-  console.log("🎉 학습 완료! (통계 전달됨)");
+  console.log("🎉 학습 완료! (통계 전달됨)", sessionStats);
+
+  // 기존 완료 화면이 있다면 제거
+  const existingOverlay = document.querySelector(".learning-completion-overlay");
+  if (existingOverlay) {
+    existingOverlay.remove();
+    console.log("🗑️ 기존 완료 화면 제거됨");
+  }
 
   // 현재 학습 모드와 영역에 따라 다른 완료 메시지 표시
   const completionMessage = generateCompletionMessage(sessionStats);
+  console.log("📝 완료 메시지 생성:", completionMessage);
 
   // 완료 화면 HTML 생성
   const completionHTML = `
@@ -5899,6 +6253,16 @@ async function showLearningCompleteWithStats(sessionStats) {
 
   // 완료 화면을 DOM에 추가
   document.body.insertAdjacentHTML("beforeend", completionHTML);
+  console.log("🎨 완료 화면 DOM에 추가됨");
+
+  // 추가된 요소 확인
+  const addedOverlay = document.querySelector(".learning-completion-overlay");
+  if (addedOverlay) {
+    console.log("✅ 완료 화면 요소 확인됨:", addedOverlay);
+  } else {
+    console.error("❌ 완료 화면 요소를 찾을 수 없습니다!");
+    return;
+  }
 
   // 이벤트 리스너 등록
   document
@@ -6092,6 +6456,14 @@ function calculateSessionStats() {
     // 독해 플래시 모드: 모든 카드를 본 것을 기준으로 기본 점수 (최대 60점)
     // 카드를 모두 넘어가며 보는 것 자체가 학습이므로 전체 데이터 기준으로 계산
     baseScore = 60; // 모든 개념을 제시받았으므로 기본 점수 만점
+  } else if (currentLearningMode === "practice") {
+    // 문법 실습 모드: 제시된 개념 수 기준으로 기본 점수 (최대 60점)
+    // 패턴 분석과 동일한 계산 방식 적용
+    baseScore = Math.min(60, totalAvailableData * 6);
+  } else if (currentLearningMode === "listening") {
+    // 듣기 연습 모드: 모든 개념을 본 것을 기준으로 기본 점수 (최대 60점)
+    // 모든 개념을 순차적으로 보는 것 자체가 학습이므로 전체 데이터 기준으로 계산
+    baseScore = 60; // 모든 개념을 제시받았으므로 기본 점수 만점
   } else if (currentLearningMode === "flashcard") {
     // 단어 플래시카드 모드: 모든 카드를 본 것을 기준으로 기본 점수 (최대 60점)
     // 카드를 모두 넘어가며 보는 것 자체가 학습이므로 전체 데이터 기준으로 계산
@@ -6135,6 +6507,20 @@ function calculateSessionStats() {
     const meaningfulInteractions = learningSessionData.correctAnswers; // flip 액션 카운트
     const maxPossibleFlips = totalAvailableData; // 각 카드당 최대 1번 뒤집기
     const participationRate = meaningfulInteractions / maxPossibleFlips;
+    participationScore = participationRate * 20;
+  } else if (currentLearningMode === "practice") {
+    // 문법 실습 모드: 일반 상호작용 기반 참여도 계산 (최대 20점)
+    // 패턴 분석과 동일한 계산 방식 적용
+    const meaningfulInteractions = learningSessionData.correctAnswers;
+    participationScore = Math.min(
+      20,
+      (meaningfulInteractions / Math.max(totalAvailableData, 1)) * 20
+    );
+  } else if (currentLearningMode === "listening") {
+    // 듣기 모드: 발음 듣기 상호작용 기준 참여도 계산 (최대 20점)
+    const meaningfulInteractions = learningSessionData.correctAnswers; // listen 액션만 카운트
+    const maxPossibleListens = totalAvailableData; // 각 개념당 최대 1번 듣기
+    const participationRate = meaningfulInteractions / maxPossibleListens;
     participationScore = participationRate * 20;
   } else if (currentLearningMode === "flashcard") {
     // 단어 플래시카드 모드: 카드 뒤집기 참여도 기반 계산 (최대 20점)
@@ -6238,7 +6624,13 @@ async function restartLearningWithNewData() {
     const area = learningSessionData.area;
     const mode = learningSessionData.mode;
 
-    console.log(`🔄 ${area} 영역의 새로운 데이터 로드 중...`);
+    console.log(`🔄 ${area} 영역의 완전히 새로운 데이터 로드...`);
+
+    // ✅ 캐시 무효화 - 새로운 데이터 강제 로드
+    preloadedData[area] = null;
+    if (window.cachedData) {
+      window.cachedData[area] = null;
+    }
 
     // 영역별 새로운 데이터 로드
     await loadLearningData(area);
