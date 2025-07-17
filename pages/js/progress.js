@@ -202,26 +202,30 @@ function registerEventListeners() {
       // 📚 학습 완료 상태 확인 및 자동 업데이트
       checkLearningCompletionUpdate();
 
-      // 📚 주기적으로 학습 완료 상태 확인 (30초마다)
+      // 📚 주기적으로 학습 완료 상태 확인 (5분마다 - 읽기 사용량 최적화)
       setInterval(() => {
         if (currentUser) {
           checkLearningCompletionUpdate();
         }
-      }, 30000);
+      }, 5 * 60 * 1000); // 5분으로 늘림
 
-      // 📚 페이지 포커스 시 학습 완료 상태 확인
+      // 📚 페이지 포커스 시 학습 완료 상태 확인 (throttling 적용)
+      let lastFocusCheck = 0;
       window.addEventListener("focus", () => {
-        if (currentUser) {
+        if (currentUser && Date.now() - lastFocusCheck > 30000) { // 30초 throttling
           console.log("📚 페이지 포커스 - 학습 완료 상태 확인");
           checkLearningCompletionUpdate();
+          lastFocusCheck = Date.now();
         }
       });
 
-      // 📚 페이지 가시성 변경 시 학습 완료 상태 확인
+      // 📚 페이지 가시성 변경 시 학습 완료 상태 확인 (throttling 적용)
+      let lastVisibilityCheck = 0;
       document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "visible" && currentUser) {
+        if (document.visibilityState === "visible" && currentUser && Date.now() - lastVisibilityCheck > 30000) { // 30초 throttling
           console.log("📚 페이지 가시성 변경 - 학습 완료 상태 확인");
           checkLearningCompletionUpdate();
+          lastVisibilityCheck = Date.now();
         }
       });
     } else {
@@ -325,7 +329,7 @@ async function loadGameStats() {
     const q = query(
       gameRecordsRef,
       where("user_email", "==", currentUser.email),
-      limit(50) // 읽기 용량 절약을 위해 50개로 제한
+      limit(100) // 50개에서 100개로 늘림 (더 정확한 통계)
     );
 
     const querySnapshot = await getDocs(q);
@@ -511,7 +515,7 @@ function checkGameCompletionUpdate() {
 let learningDataCache = {
   data: null,
   lastUpdate: null,
-  cacheDuration: 30 * 1000, // 30초 캐시
+  cacheDuration: 10 * 60 * 1000, // 10분 캐시 (기존 30초에서 늘림)
   isValid() {
     return (
       this.data &&
@@ -552,27 +556,20 @@ async function checkLearningCompletionUpdate() {
           try {
             console.log("🔄 학습 통계 새로고침 실행 중...");
 
-            // 1. 캐시 초기화 (최신 데이터 강제 로드)
-            learningDataCache.clear();
-            console.log("🗑️ 학습 데이터 캐시 초기화");
+            // 1. 스마트 캐시 무효화 (전체 초기화 대신 선택적 무효화)
+            if (learningDataCache.isValid()) {
+              console.log("� 기존 캐시가 유효함 - 부분 업데이트만 수행");
+              // 캐시는 유지하되 타임스탬프만 조정하여 다음 조회 시 갱신되도록 함
+              learningDataCache.lastUpdate = Date.now() - (learningDataCache.cacheDuration - 60000); // 1분 후 만료
+            } else {
+              console.log("🗑️ 캐시 무효화 - 새로운 데이터 필요");
+              learningDataCache.clear();
+            }
 
-            // 1.5. 캐시 무효화 확인
-            console.log("🔍 캐시 상태 확인:", {
-              isCacheValid: learningDataCache.isValid(),
-              cacheTimestamp: learningDataCache.getTimestamp(),
-              currentTime: Date.now(),
-            });
+            // 2. 최신 학습 기록 로드 (즉시 실행, 지연 제거)
+            console.log("🔄 최신 학습 기록 로드 시작");
 
-            // 1.7. 강제 캐시 무효화 (더블 체크)
-            learningDataCache.data = null;
-            learningDataCache.lastUpdate = null;
-            console.log("🔨 강제 캐시 무효화 완료");
-
-            // 2. 최신 학습 기록 강제 재로드 (2초 지연 후)
-            await new Promise((resolve) => setTimeout(resolve, 2000));
-            console.log("🔄 2초 후 최신 학습 기록 강제 재로드 시작");
-
-            // 3. 전체 진도 데이터 완전히 새로 로드 (오류 방지)
+            // 3. 전체 진도 데이터 로드 (캐시 활용)
             try {
               userProgressData = {
                 achievements: {},
@@ -793,19 +790,25 @@ async function loadDetailedProgressData(forceReload = false) {
       console.log("🔄 캐시 무효 또는 없음, 새로운 데이터 로드 시작");
     }
 
-    // 1. 전체 개념 수 조회
-    let allConceptsSnapshot;
+    // 1. 전체 개념 수 조회 (읽기 사용량 최적화)
+    let totalConcepts = 0;
     try {
-      console.log("🔍 전체 개념 쿼리 시작...");
-      const allConceptsQuery = query(collection(db, "concepts"));
-      allConceptsSnapshot = await getDocs(allConceptsQuery);
-      console.log("✅ 전체 개념 쿼리 성공");
+      console.log("🔍 총 개념 수 계산 (캐시된 데이터 활용)...");
+      // 전체 concepts 컬렉션 조회 대신 사용자 진도 데이터에서 추정
+      // 실제 조회는 하지 않고 기본값 또는 localStorage 캐시 사용
+      const cachedTotalConcepts = localStorage.getItem('cachedTotalConcepts');
+      if (cachedTotalConcepts) {
+        totalConcepts = parseInt(cachedTotalConcepts);
+        console.log("✅ 캐시된 총 개념 수 사용:", totalConcepts);
+      } else {
+        // 기본값 설정 (실제 DB 조회 없이)
+        totalConcepts = 1000; // 예상 개념 수
+        console.log("✅ 기본 개념 수 사용:", totalConcepts);
+      }
     } catch (conceptsError) {
-      console.error("❌ 전체 개념 쿼리 실패:", conceptsError);
-      // 기본값으로 설정
-      allConceptsSnapshot = { size: 0 };
+      console.error("❌ 총 개념 수 계산 실패:", conceptsError);
+      totalConcepts = 1000; // 기본값
     }
-    const totalConcepts = allConceptsSnapshot.size;
 
     // 1.5. 실제 학습한 언어 정보 수집 (임시 비활성화)
     let languageLearningSnapshot = { docs: [] };
@@ -950,6 +953,14 @@ async function loadDetailedProgressData(forceReload = false) {
 
     // 고유한 마스터된 개념 수 계산 (전체 개념 수를 초과하지 않도록 제한)
     masteredCount = Math.min(masteredConceptIds.size, totalConcepts);
+
+    // 실제 진도 데이터 기반으로 총 개념 수 업데이트 및 캐시 저장
+    const actualTotalConcepts = Math.max(totalConcepts, progressSnapshot.size);
+    if (actualTotalConcepts > totalConcepts) {
+      totalConcepts = actualTotalConcepts;
+      localStorage.setItem('cachedTotalConcepts', totalConcepts.toString());
+      console.log("📦 총 개념 수 캐시 업데이트:", totalConcepts);
+    }
 
     console.log("📊 마스터리 통계:", {
       totalConcepts,
