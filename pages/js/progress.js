@@ -14,6 +14,7 @@ import {
   serverTimestamp,
   Timestamp,
   startAfter,
+  getCountFromServer,
 } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
 
@@ -158,18 +159,18 @@ function registerEventListeners() {
       "클릭하여 마스터한 단어 목록 및 마스터리 현황 보기";
   }
 
-  // 🔥 연속 학습 카드 클릭 이벤트 (전체 카드 영역)
+  // 🔥 연속 학습 카드 클릭 이벤트
   const studyStreakCard = document.getElementById("study-streak-card");
   if (studyStreakCard) {
     studyStreakCard.addEventListener("click", showStudyStreakDetails);
     studyStreakCard.title = "클릭하여 연속 학습 현황 보기";
   }
 
-  // 🎯 퀴즈 정확도 카드 클릭 이벤트 (전체 카드 영역)
+  // 🎯 퀴즈 정확도 카드 클릭 이벤트
   const quizAccuracyCard = document.getElementById("quiz-accuracy-card");
   if (quizAccuracyCard) {
     quizAccuracyCard.addEventListener("click", showQuizAccuracyDetails);
-    quizAccuracyCard.title = "클릭하여 퀴즈 성과 상세 보기";
+    quizAccuracyCard.title = "클릭하여 퀴즈 정확도 상세 보기";
   }
 
   // 🎮 게임 통계 카드 클릭 이벤트
@@ -790,25 +791,40 @@ async function loadDetailedProgressData(forceReload = false) {
       console.log("🔄 캐시 무효 또는 없음, 새로운 데이터 로드 시작");
     }
 
-    // 1. 전체 개념 수 조회 (읽기 사용량 최적화)
-    let totalConcepts = 0;
+    // 1. 각 컬렉션별 개념 수 계산 (count() 함수 사용으로 읽기 사용량 최소화)
+    let conceptCounts = {
+      vocabulary: 0,
+      examples: 0,
+      grammar: 0,
+      total: 0
+    };
+    
     try {
-      console.log("🔍 총 개념 수 계산 (캐시된 데이터 활용)...");
-      // 전체 concepts 컬렉션 조회 대신 사용자 진도 데이터에서 추정
-      // 실제 조회는 하지 않고 기본값 또는 localStorage 캐시 사용
-      const cachedTotalConcepts = localStorage.getItem('cachedTotalConcepts');
-      if (cachedTotalConcepts) {
-        totalConcepts = parseInt(cachedTotalConcepts);
-        console.log("✅ 캐시된 총 개념 수 사용:", totalConcepts);
-      } else {
-        // 기본값 설정 (실제 DB 조회 없이)
-        totalConcepts = 1000; // 예상 개념 수
-        console.log("✅ 기본 개념 수 사용:", totalConcepts);
-      }
+      console.log("🔍 사용자가 학습한 개념 수 계산 시작...");
+      
+      // 실제 학습한 개념 수는 progress 기록에서 계산
+      // 전체 DB 개념 수가 아닌 사용자가 실제 학습한 개념들만 카운트
+      conceptCounts = {
+        vocabulary: 0,
+        examples: 0, 
+        grammar: 0,
+        total: 0
+      };
+      
+      // 실제 학습한 개념 수는 사용자 진도 기록에서 동적으로 계산
+      console.log("📊 사용자가 실제 학습한 개념 수는 진도 기록에서 계산됩니다");
     } catch (conceptsError) {
-      console.error("❌ 총 개념 수 계산 실패:", conceptsError);
-      totalConcepts = 1000; // 기본값
+      console.error("❌ 개념 수 계산 실패:", conceptsError);
+      // 기본값 설정
+      conceptCounts = {
+        vocabulary: 0,
+        examples: 0,
+        grammar: 0,
+        total: 0
+      };
     }
+    
+    let totalConcepts = conceptCounts.total;
 
     // 1.5. 실제 학습한 언어 정보 수집 (임시 비활성화)
     let languageLearningSnapshot = { docs: [] };
@@ -915,6 +931,24 @@ async function loadDetailedProgressData(forceReload = false) {
     }
     let masteredCount = 0;
     const masteredConceptIds = new Set(); // 고유한 마스터된 개념 ID 추적
+    
+    // 각 컬렉션별 개념 수 및 마스터 수 추적
+    const actualConceptCounts = {
+      vocabulary: 0,
+      examples: 0,
+      grammar: 0,
+      total: 0
+    };
+    
+    const masteredCountsByType = {
+      vocabulary: 0,
+      examples: 0,
+      grammar: 0,
+      total: 0
+    };
+
+    // 중복 제거를 위한 개념 ID 추적
+    const studiedConceptIds = new Set();
 
     // 진도 데이터 처리
     for (const doc of progressSnapshot.docs) {
@@ -924,16 +958,39 @@ async function loadDetailedProgressData(forceReload = false) {
         ...data,
       });
 
+      // 개념 ID 추출 (중복 제거용)
+      const conceptId = data.concept_id || doc.id;
+      
+      // 이미 처리된 개념은 스킵 (중복 제거)
+      if (studiedConceptIds.has(conceptId)) {
+        continue;
+      }
+      studiedConceptIds.add(conceptId);
+
+      // 개념 유형 판별 (collection_type 또는 concept_type으로 구분)
+      const conceptType = data.collection_type || data.concept_type || 'vocabulary';
+      
+      // 각 컬렉션별 개념 수 증가
+      if (conceptType === 'vocabulary' || conceptType === 'concepts') {
+        actualConceptCounts.vocabulary++;
+      } else if (conceptType === 'examples') {
+        actualConceptCounts.examples++;
+      } else if (conceptType === 'grammar') {
+        actualConceptCounts.grammar++;
+      }
+      actualConceptCounts.total++;
+
       // 마스터된 개념 카운트 기준:
       // 1. 학습 레벨 50% 이상 (충분히 학습한 상태)
-      // 2. 또는 노출 횟수 3회 이상 (반복 학습한 상태)
-      // 3. 또는 학습 횟수 3회 이상 (반복 학습한 상태)
+      // 2. 또는 노출 횟수 3회 이상 (학습 세션에서 단어가 나타난 횟수)
+      // 3. 또는 학습 횟수 3회 이상 (사용자가 실제로 학습한 횟수)
+      // 4. 또는 인식률 50% 이상 (퀴즈나 게임에서 올바르게 인식한 비율)
 
       // vocabulary_mastery에서 데이터 가져오기 (실제 저장 위치)
       const masteryLevel = data.overall_mastery?.level || 0;
-      const exposureCount = data.vocabulary_mastery?.exposure_count || 0;
-      const studyCount = data.vocabulary_mastery?.study_count || 0;
-      const recognition = data.vocabulary_mastery?.recognition || 0;
+      const exposureCount = data.vocabulary_mastery?.exposure_count || 0; // 학습 세션에서 노출된 횟수
+      const studyCount = data.vocabulary_mastery?.study_count || 0; // 실제 학습한 횟수
+      const recognition = data.vocabulary_mastery?.recognition || 0; // 퀴즈/게임에서 인식 성공률
 
       const isMastered =
         masteryLevel >= 50 ||
@@ -942,32 +999,48 @@ async function loadDetailedProgressData(forceReload = false) {
         recognition >= 50; // 단어 인식률도 마스터 기준에 추가
 
       if (isMastered) {
-        masteredConceptIds.add(data.concept_id || doc.id);
+        masteredConceptIds.add(conceptId);
+        
+        // 각 컬렉션별 마스터 수 증가
+        if (conceptType === 'vocabulary' || conceptType === 'concepts') {
+          masteredCountsByType.vocabulary++;
+        } else if (conceptType === 'examples') {
+          masteredCountsByType.examples++;
+        } else if (conceptType === 'grammar') {
+          masteredCountsByType.grammar++;
+        }
+        masteredCountsByType.total++;
       }
 
       // 언어별, 카테고리별 분류를 위한 개념 정보 처리
-      const conceptId = data.concept_id || doc.id;
       const studiedLanguages = conceptLanguageMap.get(conceptId) || new Set();
       await processConceptProgress(data, userProgressData, studiedLanguages);
     }
 
-    // 고유한 마스터된 개념 수 계산 (전체 개념 수를 초과하지 않도록 제한)
-    masteredCount = Math.min(masteredConceptIds.size, totalConcepts);
+    // 실제 개념 수 업데이트 (사용자가 학습한 개념들만)
+    conceptCounts = actualConceptCounts;
+    totalConcepts = conceptCounts.total;
+    masteredCount = masteredCountsByType.total;
+    
+    console.log("📊 실제 학습한 개념 수 업데이트:", conceptCounts);
+    console.log("� 마스터한 개념 수 업데이트:", masteredCountsByType);
 
-    // 실제 진도 데이터 기반으로 총 개념 수 업데이트 및 캐시 저장
-    const actualTotalConcepts = Math.max(totalConcepts, progressSnapshot.size);
-    if (actualTotalConcepts > totalConcepts) {
-      totalConcepts = actualTotalConcepts;
-      localStorage.setItem('cachedTotalConcepts', totalConcepts.toString());
-      console.log("📦 총 개념 수 캐시 업데이트:", totalConcepts);
-    }
+    // 사용자 진도 데이터에 상세 정보 저장
+    userProgressData.conceptCounts = conceptCounts;
+    userProgressData.masteredCountsByType = masteredCountsByType;
+    userProgressData.totalConcepts = totalConcepts;
+    userProgressData.studiedConcepts = progressSnapshot.size;
+    userProgressData.masteredConcepts = masteredCount;
+    userProgressData.totalWords = conceptCounts.vocabulary; // 순수 단어 수
+    userProgressData.masteredWords = masteredCountsByType.vocabulary; // 마스터한 단어 수
 
     console.log("📊 마스터리 통계:", {
+      conceptCounts,
+      masteredCountsByType,
       totalConcepts,
       masteredCount,
       masteredConceptIds: Array.from(masteredConceptIds),
       progressSnapshot: progressSnapshot.size,
-      rawMasteredCount: masteredConceptIds.size, // 원래 계산된 값
       completionRate:
         totalConcepts > 0
           ? Math.min(100, Math.round((masteredCount / totalConcepts) * 100))
@@ -981,26 +1054,42 @@ async function loadDetailedProgressData(forceReload = false) {
       },
     });
 
-    // 3. 퀴즈 데이터 로드 및 정확도 계산
-    let quizSnapshot;
-    try {
-      console.log("🔍 퀴즈 기록 쿼리 시작...");
-      const quizQuery = query(
-        collection(db, "quiz_records"),
-        where("user_email", "==", currentUser.email),
-        limit(50)
-      );
-      quizSnapshot = await getDocs(quizQuery);
-      console.log("✅ 퀴즈 기록 쿼리 성공");
-    } catch (quizError) {
-      console.error("❌ 퀴즈 기록 쿼리 실패:", quizError);
-      throw quizError;
-    }
-
+    // 3-5. 모든 활동 기록을 한 번에 로드 (읽기 사용량 최적화)
+    let [quizSnapshot, learningSnapshot, gameSnapshot] = [null, null, null];
     let totalQuizzes = 0;
     let totalCorrect = 0;
     let totalQuestions = 0;
+    let totalLearningSessionsCount = 0;
 
+    try {
+      console.log("🔍 모든 활동 기록 병렬 로드 시작...");
+      
+      // 모든 활동 기록을 병렬로 로드 (읽기 사용량 최적화)
+      [quizSnapshot, learningSnapshot, gameSnapshot] = await Promise.all([
+        getDocs(query(
+          collection(db, "quiz_records"),
+          where("user_email", "==", currentUser.email),
+          limit(50)
+        )),
+        getDocs(query(
+          collection(db, "learning_records"),
+          where("user_email", "==", currentUser.email),
+          limit(100)
+        )),
+        getDocs(query(
+          collection(db, "game_records"),
+          where("user_email", "==", currentUser.email),
+          limit(100)
+        ))
+      ]);
+      
+      console.log("✅ 모든 활동 기록 로드 완료");
+    } catch (error) {
+      console.error("❌ 활동 기록 로드 실패:", error);
+      throw error;
+    }
+
+    // 퀴즈 데이터 처리
     quizSnapshot.docs.forEach((doc) => {
       const data = doc.data();
       totalQuizzes++;
@@ -1011,65 +1100,24 @@ async function loadDetailedProgressData(forceReload = false) {
     const avgQuizAccuracy =
       totalQuestions > 0
         ? Math.round((totalCorrect / totalQuestions) * 100)
-        : 0; // 4. 학습 활동 데이터 로드 (최적화된 쿼리)
-    let learningSnapshot = { docs: [] };
-    let totalLearningSessionsCount = 0;
+        : 0;
 
-    try {
-      console.log("🔍 학습 기록 쿼리 시작...");
+    // 학습 데이터 처리
+    console.log("� 학습 기록 처리 시작...");
+    totalLearningSessionsCount = learningSnapshot.docs.length;
 
-      // 4.1. 안전한 방법: 50개 세션만 로드하고 이를 총 세션수로 사용
-      // (읽기 비용 절약 및 인덱스 오류 방지)
-      const learningQuery = query(
-        collection(db, "learning_records"),
-        where("user_email", "==", currentUser.email),
-        limit(50)
-      );
-      learningSnapshot = await getDocs(learningQuery);
-
-      // 클라이언트 측에서 시간순 정렬 (최신순)
-      if (learningSnapshot.docs.length > 0) {
-        learningSnapshot.docs.sort((a, b) => {
-          const timestampA =
-            a.data().timestamp?.toDate?.() || new Date(a.data().timestamp || 0);
-          const timestampB =
-            b.data().timestamp?.toDate?.() || new Date(b.data().timestamp || 0);
-          return timestampB.getTime() - timestampA.getTime(); // 최신순 정렬
-        });
-      }
-
-      // 실제 총 세션 수 추정 시도 (선택적)
-      try {
-        const countQuery = query(
-          collection(db, "learning_records"),
-          where("user_email", "==", currentUser.email),
-          limit(100) // 안전한 제한으로 추정
-        );
-        const countSnapshot = await getDocs(countQuery);
-        totalLearningSessionsCount = countSnapshot.docs.length;
-        console.log(
-          `🔢 추정 학습 세션 수 (최대 100개): ${totalLearningSessionsCount}개`
-        );
-
-        if (totalLearningSessionsCount === 100) {
-          console.log("⚠️ 실제 세션 수는 100개 이상일 수 있습니다.");
-        }
-      } catch (countError) {
-        console.warn("⚠️ 세션 카운트 실패, 로드된 세션 수 사용:", countError);
-        totalLearningSessionsCount = learningSnapshot.docs.length;
-      }
-
-      console.log("✅ 학습 기록 쿼리 성공");
-    } catch (learningError) {
-      console.error("❌ 학습 기록 쿼리 실패:", learningError);
-      console.error("❌ 학습 기록 쿼리 실패 상세:", {
-        errorMessage: learningError.message,
-        errorCode: learningError.code,
-        queryDetails: "user_email + limit(50/100) + client-side sort",
+    // 클라이언트 측에서 시간순 정렬 (최신순)
+    if (learningSnapshot.docs.length > 0) {
+      learningSnapshot.docs.sort((a, b) => {
+        const timestampA =
+          a.data().timestamp?.toDate?.() || new Date(a.data().timestamp || 0);
+        const timestampB =
+          b.data().timestamp?.toDate?.() || new Date(b.data().timestamp || 0);
+        return timestampB.getTime() - timestampA.getTime(); // 최신순 정렬
       });
-      learningSnapshot = { docs: [] };
-      totalLearningSessionsCount = 0;
     }
+
+    console.log("✅ 학습 기록 처리 완료");
 
     console.log(
       `📊 학습 기록 로드: ${learningSnapshot.docs.length}개 세션 (분석용), 추정 총 ${totalLearningSessionsCount}개 세션`
@@ -1325,30 +1373,15 @@ async function loadDetailedProgressData(forceReload = false) {
         ? Math.min(100, Math.round((masteredCount / totalConcepts) * 100))
         : 0;
 
-    // 통계 계산 및 설정
+    // 통계 계산 및 설정 (수정된 부분)
     userProgressData.totalConcepts = totalConcepts;
     userProgressData.studiedConcepts = progressSnapshot.size;
     userProgressData.masteredConcepts = masteredCount;
-    userProgressData.totalWords = totalConcepts;
-    userProgressData.masteredWords = masteredCount;
+    userProgressData.totalWords = conceptCounts.vocabulary; // 순수 단어 수
+    userProgressData.masteredWords = masteredCountsByType.vocabulary; // 마스터한 단어 수
     userProgressData.quizAccuracy = avgQuizAccuracy;
 
-    // 게임 통계 로드 및 계산 (읽기 용량 최적화: 50개로 제한)
-    let gameSnapshot;
-    try {
-      console.log("🔍 게임 기록 쿼리 시작...");
-      const gameQuery = query(
-        collection(db, "game_records"),
-        where("user_email", "==", currentUser.email),
-        limit(50) // 100개에서 50개로 감소
-      );
-      gameSnapshot = await getDocs(gameQuery);
-      console.log("✅ 게임 기록 쿼리 성공");
-    } catch (gameError) {
-      console.error("❌ 게임 기록 쿼리 실패:", gameError);
-      throw gameError;
-    }
-
+    // 게임 통계 로드 및 계산 (이미 로드된 데이터 사용)
     const gameStats = calculateGameStats(
       gameSnapshot.docs.map((doc) => doc.data())
     );
@@ -2458,29 +2491,30 @@ async function displayAllData() {
 
 // 통계 요약 업데이트
 function updateStatsSummary() {
-  // 📊 개선된 총 단어수 표시 (학습한 수 / 전체 수)
+  // 📊 개선된 통계 요약 업데이트 (단어/예문/문법 구분)
   console.log("📊 통계 요약 업데이트:", {
+    conceptCounts: userProgressData.conceptCounts,
+    masteredCountsByType: userProgressData.masteredCountsByType,
     studiedConcepts: userProgressData.studiedConcepts,
     totalConcepts: userProgressData.totalConcepts,
     masteredConcepts: userProgressData.masteredConcepts,
   });
 
-  // 🔧 잘못된 데이터 수정
-  const studiedCount = Math.min(
-    userProgressData.studiedConcepts || 0,
-    userProgressData.totalConcepts || 0
-  );
-
-  if (userProgressData.studiedConcepts !== undefined) {
-    elements.totalWordsCount.textContent = `${studiedCount}/${userProgressData.totalConcepts}`;
-    elements.totalWordsCount.title = `학습한 개념: ${studiedCount}개 / 전체 개념: ${userProgressData.totalConcepts}개`;
+  // 🔧 단어 수 정확히 표시 (순수 단어 수)
+  const vocabularyCount = userProgressData.conceptCounts?.vocabulary || 0;
+  const totalConceptsCount = userProgressData.totalConcepts || 0;
+  
+  if (vocabularyCount > 0) {
+    elements.totalWordsCount.textContent = `${vocabularyCount}/${totalConceptsCount}`;
+    elements.totalWordsCount.title = `단어: ${vocabularyCount}개 / 전체 개념: ${totalConceptsCount}개 (예문: ${userProgressData.conceptCounts?.examples || 0}개, 문법: ${userProgressData.conceptCounts?.grammar || 0}개)`;
   } else {
-    elements.totalWordsCount.textContent = userProgressData.totalConcepts;
+    elements.totalWordsCount.textContent = `0/${totalConceptsCount}`;
   }
 
-  // 📈 개선된 마스터리 기준으로 표시
-  elements.masteredWordsCount.textContent = userProgressData.masteredConcepts;
-  elements.masteredWordsCount.title = `마스터리 60% 이상 달성한 개념 수 (기존 80% → 60%로 조정)`;
+  // 📈 마스터한 단어 수 정확히 표시
+  const masteredWords = userProgressData.masteredCountsByType?.vocabulary || 0;
+  elements.masteredWordsCount.textContent = masteredWords;
+  elements.masteredWordsCount.title = `마스터한 단어: ${masteredWords}개 / 전체 마스터: ${userProgressData.masteredConcepts}개 (예문: ${userProgressData.masteredCountsByType?.examples || 0}개, 문법: ${userProgressData.masteredCountsByType?.grammar || 0}개)`;
 
   const daysText = getTranslatedText("days_suffix") || "일";
   elements.studyStreakCount.textContent = `${userProgressData.studyStreak}${daysText}`;
@@ -3104,6 +3138,98 @@ function showSuccess(message) {
   alert(message);
 }
 
+// 개념 카드 생성 함수 (실제 개념 정보 가져오기)
+async function generateConceptCard(concept) {
+  const masteryLevel = concept.overall_mastery?.level || 0;
+  
+  let bgColor = "from-red-50 to-red-100";
+  let borderColor = "border-red-400";
+  let badgeColor = "bg-red-500";
+
+  if (masteryLevel >= 60) {
+    bgColor = "from-green-50 to-green-100";
+    borderColor = "border-green-400";
+    badgeColor = "bg-green-500";
+  } else if (masteryLevel >= 30) {
+    bgColor = "from-yellow-50 to-yellow-100";
+    borderColor = "border-yellow-400";
+    badgeColor = "bg-yellow-500";
+  } else if (masteryLevel >= 1) {
+    bgColor = "from-blue-50 to-blue-100";
+    borderColor = "border-blue-400";
+    badgeColor = "bg-blue-500";
+  }
+
+  // concept_id를 사용해서 실제 개념 정보 가져오기
+  let conceptInfo = {
+    korean: "단어",
+    english: "",
+    japanese: "",
+    chinese: "",
+    domain: "일반",
+    difficulty: "초급"
+  };
+
+  if (concept.concept_id) {
+    try {
+      // 개념 유형에 따라 적절한 컬렉션에서 정보 가져오기
+      const conceptType = concept.collection_type || concept.concept_type || 'vocabulary';
+      let collectionName = 'concepts'; // 기본값
+      
+      if (conceptType === 'examples') {
+        collectionName = 'examples';
+      } else if (conceptType === 'grammar') {
+        collectionName = 'grammar';
+      }
+
+      const conceptDoc = await getDoc(doc(db, collectionName, concept.concept_id));
+      if (conceptDoc.exists()) {
+        const data = conceptDoc.data();
+        
+        // 다양한 데이터 구조 지원
+        if (data.expressions) {
+          conceptInfo.korean = data.expressions.korean?.word || data.expressions.korean || conceptInfo.korean;
+          conceptInfo.english = data.expressions.english?.word || data.expressions.english || "";
+          conceptInfo.japanese = data.expressions.japanese?.word || data.expressions.japanese || "";
+          conceptInfo.chinese = data.expressions.chinese?.word || data.expressions.chinese || "";
+        } else {
+          // 구버전 데이터 구조 지원
+          conceptInfo.korean = data.korean || data.word || conceptInfo.korean;
+          conceptInfo.english = data.english || "";
+          conceptInfo.japanese = data.japanese || "";
+          conceptInfo.chinese = data.chinese || "";
+        }
+        
+        conceptInfo.domain = data.domain || conceptInfo.domain;
+        conceptInfo.difficulty = data.concept_info?.difficulty || data.difficulty || conceptInfo.difficulty;
+      }
+    } catch (error) {
+      console.warn(`개념 정보 가져오기 실패: ${concept.concept_id}`, error);
+    }
+  }
+
+  return `
+    <div class="bg-gradient-to-r ${bgColor} border-l-4 ${borderColor} p-4 rounded-lg">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-lg font-semibold text-gray-800">
+          ${conceptInfo.korean}
+        </span>
+        <span class="${badgeColor} text-white px-2 py-1 rounded-full text-xs font-bold">
+          ${Math.round(masteryLevel)}%
+        </span>
+      </div>
+      <div class="text-sm text-gray-600 space-y-1">
+        ${conceptInfo.english ? `<div>🇺🇸 ${conceptInfo.english}</div>` : ""}
+        ${conceptInfo.japanese ? `<div>🇯🇵 ${conceptInfo.japanese}</div>` : ""}
+        ${conceptInfo.chinese ? `<div>🇨🇳 ${conceptInfo.chinese}</div>` : ""}
+        <div class="text-gray-500 text-xs mt-2">
+          ${conceptInfo.domain} • ${conceptInfo.difficulty}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 // 🏆 마스터한 단어 목록 표시
 async function showMasteredWordsList() {
   try {
@@ -3111,33 +3237,28 @@ async function showMasteredWordsList() {
 
     if (!currentUser) return;
 
-    // 개념별 진도 데이터에서 마스터한 개념들 조회
+    // 마스터한 개념들은 userProgressData에서 가져오기
     const masteredConcepts = [];
-
-    // userProgressData.conceptProgressMap에서 마스터한 개념들 찾기
-    if (userProgressData && userProgressData.conceptProgressMap) {
-      for (const [conceptId, progressData] of Object.entries(
-        userProgressData.conceptProgressMap
-      )) {
-        // 마스터리 레벨이 60 이상이거나 상태가 'mastered'인 경우
-        const masteryLevel = progressData.masteryLevel || 0;
-        const status = progressData.status || "";
-
-        if (masteryLevel >= 60 || status === "mastered") {
-          // 개념 정보 조회
-          const conceptRef = doc(db, "concepts", conceptId);
-          const conceptDoc = await getDoc(conceptRef);
-          if (conceptDoc.exists()) {
-            const conceptData = conceptDoc.data();
-            masteredConcepts.push({
-              id: conceptId,
-              masteryLevel,
-              status,
-              ...conceptData,
-            });
-          }
+    
+    if (userProgressData && userProgressData.concepts) {
+      userProgressData.concepts.forEach(concept => {
+        const masteryLevel = concept.overall_mastery?.level || 0;
+        const exposureCount = concept.vocabulary_mastery?.exposure_count || 0;
+        const studyCount = concept.vocabulary_mastery?.study_count || 0;
+        const recognition = concept.vocabulary_mastery?.recognition || 0;
+        
+        // 마스터 기준 체크
+        const isMastered = masteryLevel >= 50 || exposureCount >= 3 || studyCount >= 3 || recognition >= 50;
+        
+        if (isMastered) {
+          masteredConcepts.push({
+            id: concept.concept_id || concept.id,
+            masteryLevel,
+            status: 'mastered',
+            ...concept
+          });
         }
-      }
+      });
     }
 
     // 마스터리 레벨 순으로 정렬
@@ -3149,7 +3270,7 @@ async function showMasteredWordsList() {
         <div class="bg-white rounded-lg max-w-6xl w-full mx-4 max-h-[85vh] overflow-hidden">
           <div class="flex justify-between items-center p-6 border-b">
             <h2 class="text-2xl font-bold text-gray-800">
-              🏆 마스터한 단어 목록 (${masteredConcepts.length}개)
+              🏆 마스터한 단어 목록 (${userProgressData.masteredCountsByType?.vocabulary || 0}개)
             </h2>
             <button id="close-mastered-modal" class="text-gray-500 hover:text-gray-700 text-2xl">
               ✕
@@ -3162,21 +3283,27 @@ async function showMasteredWordsList() {
                 <h3 class="font-semibold text-green-800 mb-3">🎯 마스터리 현황</h3>
                 <div class="space-y-2">
                   <div class="flex justify-between">
-                    <span class="text-gray-600">마스터한 개념:</span>
+                    <span class="text-gray-600">마스터한 단어:</span>
                     <span class="font-medium text-green-600">${
-                      userProgressData.masteredConcepts
+                      userProgressData.masteredCountsByType?.vocabulary || 0
                     }개</span>
                   </div>
                   <div class="flex justify-between">
-                    <span class="text-gray-600">연습 필요:</span>
-                    <span class="font-medium text-yellow-600">${
-                      userProgressData.practiceNeeded
+                    <span class="text-gray-600">마스터한 예문:</span>
+                    <span class="font-medium text-green-600">${
+                      userProgressData.masteredCountsByType?.examples || 0
                     }개</span>
                   </div>
                   <div class="flex justify-between">
-                    <span class="text-gray-600">학습 중:</span>
-                    <span class="font-medium text-blue-600">${
-                      userProgressData.learning
+                    <span class="text-gray-600">마스터한 문법:</span>
+                    <span class="font-medium text-green-600">${
+                      userProgressData.masteredCountsByType?.grammar || 0
+                    }개</span>
+                  </div>
+                  <div class="flex justify-between border-t pt-2">
+                    <span class="text-gray-600 font-medium">총 마스터:</span>
+                    <span class="font-medium text-green-600">${
+                      userProgressData.masteredConcepts || 0
                     }개</span>
                   </div>
                 </div>
@@ -3186,16 +3313,57 @@ async function showMasteredWordsList() {
                 <h3 class="font-semibold text-gray-800 mb-3">📈 마스터리 기준</h3>
                 <div class="grid grid-cols-1 gap-3 text-sm">
                   <div class="bg-green-100 rounded p-3">
-                    <div class="font-medium text-green-800">마스터 (60% 이상)</div>
-                    <div class="text-green-600">완전히 익힌 상태</div>
-                  </div>
-                  <div class="bg-yellow-100 rounded p-3">
-                    <div class="font-medium text-yellow-800">연습 필요 (30-59%)</div>
-                    <div class="text-yellow-600">복습이 필요한 상태</div>
+                    <div class="font-medium text-green-800">마스터 조건 (다음 중 하나)</div>
+                    <ul class="text-green-600 mt-2 space-y-1">
+                      <li>• 학습 레벨 50% 이상</li>
+                      <li>• 노출 횟수 3회 이상 (학습 세션에서 등장)</li>
+                      <li>• 학습 횟수 3회 이상 (실제 학습 활동)</li>
+                      <li>• 인식률 50% 이상 (퀴즈/게임 정답률)</li>
+                    </ul>
                   </div>
                   <div class="bg-blue-100 rounded p-3">
-                    <div class="font-medium text-blue-800">학습 중 (30% 미만)</div>
-                    <div class="text-blue-600">아직 학습 중인 상태</div>
+                    <div class="font-medium text-blue-800">📊 집계 방식 상세</div>
+                    <ul class="text-blue-600 mt-2 space-y-1">
+                      <li>• <strong>학습 레벨</strong>: 학습 활동 완료 시 5%씩 증가</li>
+                      <li>• <strong>노출 횟수</strong>: 플래시카드/리스닝에서 정답/오답 상관없이 단어 노출 시 +1</li>
+                      <li>• <strong>학습 횟수</strong>: 타이핑/퀴즈에서 <u>정답일 때만</u> +1 (오답은 카운트 안 함)</li>
+                      <li>• <strong>인식률</strong>: (정답 횟수 / 총 시도 횟수) × 100% (퀴즈/게임 기준)</li>
+                    </ul>
+                  </div>
+                  <div class="bg-orange-100 rounded p-3">
+                    <div class="font-medium text-orange-800">🎯 학습 단계별 의미</div>
+                    <div class="text-orange-600 mt-2 space-y-1">
+                      <div class="text-sm">
+                        <strong>1단계 (노출)</strong>: 단어 보기/듣기 → 시각적/청각적 익숙함
+                      </div>
+                      <div class="text-sm">
+                        <strong>2단계 (학습)</strong>: 타이핑/퀴즈 정답 → 능동적 사용 능력
+                      </div>
+                      <div class="text-sm">
+                        <strong>3단계 (마스터)</strong>: 두 단계 모두 높아야 진정한 마스터
+                      </div>
+                    </div>
+                  </div>
+                  <div class="bg-yellow-100 rounded p-3">
+                    <div class="font-medium text-yellow-800">마스터리 레벨별 색상</div>
+                    <div class="text-yellow-600 mt-2 space-y-1">
+                      <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 bg-green-500 rounded"></div>
+                        <span>60% 이상 (완전 마스터)</span>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 bg-yellow-500 rounded"></div>
+                        <span>30-59% (연습 필요)</span>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 bg-blue-500 rounded"></div>
+                        <span>1-29% (학습 초기)</span>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 bg-red-500 rounded"></div>
+                        <span>0% (미학습)</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -3207,49 +3375,11 @@ async function showMasteredWordsList() {
               ${
                 masteredConcepts.length === 0
                   ? '<div class="text-center py-8 text-gray-500">아직 마스터한 단어가 없습니다. 계속 학습해보세요! 🚀</div>'
-                  : `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                     ${masteredConcepts
-                       .map(
-                         (concept) => `
-                       <div class="bg-gradient-to-r from-yellow-50 to-yellow-100 border-l-4 border-yellow-400 p-4 rounded-lg">
-                         <div class="flex items-center justify-between mb-2">
-                           <span class="text-lg font-semibold text-gray-800">
-                             ${
-                               concept.expressions?.korean?.word ||
-                               concept.expressions?.english?.word ||
-                               "단어"
-                             }
-                           </span>
-                           <span class="bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-bold">
-                             ${Math.round(concept.masteryLevel)}%
-                           </span>
-                         </div>
-                         <div class="text-sm text-gray-600 space-y-1">
-                           ${
-                             concept.expressions?.english?.word
-                               ? `<div>🇺🇸 ${concept.expressions.english.word}</div>`
-                               : ""
-                           }
-                           ${
-                             concept.expressions?.japanese?.word
-                               ? `<div>🇯🇵 ${concept.expressions.japanese.word}</div>`
-                               : ""
-                           }
-                           ${
-                             concept.expressions?.chinese?.word
-                               ? `<div>🇨🇳 ${concept.expressions.chinese.word}</div>`
-                               : ""
-                           }
-                           <div class="text-gray-500 text-xs mt-2">
-                             ${concept.domain || "일반"} • ${
-                           concept.concept_info?.difficulty || "초급"
-                         }
-                           </div>
-                         </div>
-                       </div>
-                     `
-                       )
-                       .join("")}
+                  : `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="mastered-concepts-container">
+                     <div class="col-span-full text-center py-4">
+                       <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-500 mx-auto"></div>
+                       <div class="text-sm text-gray-500 mt-2">마스터한 단어 정보를 불러오는 중...</div>
+                     </div>
                    </div>`
               }
             </div>
@@ -3260,6 +3390,26 @@ async function showMasteredWordsList() {
 
     // 모달 표시
     document.body.insertAdjacentHTML("beforeend", modalHTML);
+
+    // 마스터한 개념들의 실제 정보를 비동기적으로 로드
+    if (masteredConcepts.length > 0) {
+      const container = document.getElementById("mastered-concepts-container");
+      
+      try {
+        // 각 개념의 실제 정보를 가져와서 카드 생성
+        const conceptCards = [];
+        for (const concept of masteredConcepts) {
+          const card = await generateConceptCard(concept);
+          conceptCards.push(card);
+        }
+        
+        // 모든 카드 표시
+        container.innerHTML = conceptCards.join("");
+      } catch (error) {
+        console.error("❌ 마스터한 개념 카드 생성 중 오류:", error);
+        container.innerHTML = '<div class="col-span-full text-center py-8 text-red-500">마스터한 단어 정보를 불러오는 중 오류가 발생했습니다.</div>';
+      }
+    }
 
     // 닫기 이벤트
     document
@@ -3293,42 +3443,38 @@ async function showTotalWordsDetails() {
 
     if (!currentUser) return;
 
-    // 사용자가 학습한 개념들 조회
-    const progressQuery = query(
-      collection(db, "user_progress"),
-      where("user_email", "==", currentUser.email)
-    );
+    // 실제 학습한 개념들은 userProgressData에 이미 저장되어 있음
+    const studiedConcepts = userProgressData.concepts || [];
 
-    const progressSnapshot = await getDocs(progressQuery);
-    const studiedConcepts = [];
+    // 개념 유형별로 분류
+    const conceptsByType = {
+      vocabulary: studiedConcepts.filter(c => 
+        (c.collection_type || c.concept_type || 'vocabulary') === 'vocabulary' ||
+        (c.collection_type || c.concept_type || 'vocabulary') === 'concepts'
+      ),
+      examples: studiedConcepts.filter(c => 
+        (c.collection_type || c.concept_type) === 'examples'
+      ),
+      grammar: studiedConcepts.filter(c => 
+        (c.collection_type || c.concept_type) === 'grammar'
+      )
+    };
 
-    // 학습한 개념들 수집
-    for (const docSnapshot of progressSnapshot.docs) {
-      const progressData = docSnapshot.data();
-
-      // 개념 정보 조회
-      const conceptRef = doc(db, "concepts", progressData.concept_id);
-      const conceptDoc = await getDoc(conceptRef);
-      if (conceptDoc.exists()) {
-        const conceptData = conceptDoc.data();
-        const masteryLevel = progressData.overall_mastery?.level || 0;
-        studiedConcepts.push({
-          id: progressData.concept_id,
-          masteryLevel,
-          ...conceptData,
-        });
-      }
-    }
-
-    // 마스터리 레벨 순으로 정렬
-    studiedConcepts.sort((a, b) => b.masteryLevel - a.masteryLevel);
+    // 각 타입별 마스터리 레벨 순으로 정렬
+    Object.keys(conceptsByType).forEach(type => {
+      conceptsByType[type].sort((a, b) => {
+        const aLevel = a.overall_mastery?.level || 0;
+        const bLevel = b.overall_mastery?.level || 0;
+        return bLevel - aLevel;
+      });
+    });
 
     const modalHTML = `
       <div id="total-words-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white rounded-lg max-w-5xl w-full mx-4 max-h-[85vh] overflow-hidden">
           <div class="flex justify-between items-center p-6 border-b">
             <h2 class="text-2xl font-bold text-gray-800">
-              📊 총 단어수 및 학습 현황 (${studiedConcepts.length}개)
+              📊 학습 현황 (단어: ${userProgressData.conceptCounts?.vocabulary || 0}개, 예문: ${userProgressData.conceptCounts?.examples || 0}개, 문법: ${userProgressData.conceptCounts?.grammar || 0}개)
             </h2>
             <button id="close-total-words-modal" class="text-gray-500 hover:text-gray-700 text-2xl">
               ✕
@@ -3345,6 +3491,31 @@ async function showTotalWordsDetails() {
                   }</div>
                   <div class="text-sm text-gray-600">데이터베이스 총 개념</div>
                 </div>
+                <div class="text-center">
+                  <div class="text-2xl font-bold text-blue-600">${
+                    userProgressData.conceptCounts?.vocabulary || 0
+                  }</div>
+                  <div class="text-sm text-gray-600">단어</div>
+                </div>
+                <div class="text-center">
+                  <div class="text-2xl font-bold text-green-600">${
+                    userProgressData.conceptCounts?.examples || 0
+                  }</div>
+                  <div class="text-sm text-gray-600">예문</div>
+                </div>
+                <div class="text-center">
+                  <div class="text-2xl font-bold text-purple-600">${
+                    userProgressData.conceptCounts?.grammar || 0
+                  }</div>
+                  <div class="text-sm text-gray-600">문법</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 학습 진행률 -->
+            <div class="bg-purple-50 rounded-lg p-4 mb-6">
+              <h3 class="font-semibold text-purple-800 mb-3">📈 학습 진행률</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="text-center">
                   <div class="text-2xl font-bold text-green-600">${
                     userProgressData.studiedConcepts
@@ -3372,67 +3543,11 @@ async function showTotalWordsDetails() {
               ${
                 studiedConcepts.length === 0
                   ? '<div class="text-center py-8 text-gray-500">아직 학습을 시작한 단어가 없습니다. 학습을 시작해보세요! 📚</div>'
-                  : `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                     ${studiedConcepts
-                       .map((concept) => {
-                         let bgColor = "from-red-50 to-red-100";
-                         let borderColor = "border-red-400";
-                         let badgeColor = "bg-red-500";
-
-                         if (concept.masteryLevel >= 60) {
-                           bgColor = "from-green-50 to-green-100";
-                           borderColor = "border-green-400";
-                           badgeColor = "bg-green-500";
-                         } else if (concept.masteryLevel >= 30) {
-                           bgColor = "from-yellow-50 to-yellow-100";
-                           borderColor = "border-yellow-400";
-                           badgeColor = "bg-yellow-500";
-                         } else if (concept.masteryLevel >= 1) {
-                           bgColor = "from-blue-50 to-blue-100";
-                           borderColor = "border-blue-400";
-                           badgeColor = "bg-blue-500";
-                         }
-
-                         return `
-                           <div class="bg-gradient-to-r ${bgColor} border-l-4 ${borderColor} p-4 rounded-lg">
-                             <div class="flex items-center justify-between mb-2">
-                               <span class="text-lg font-semibold text-gray-800">
-                                 ${
-                                   concept.expressions?.korean?.word ||
-                                   concept.expressions?.english?.word ||
-                                   "단어"
-                                 }
-                               </span>
-                               <span class="${badgeColor} text-white px-2 py-1 rounded-full text-xs font-bold">
-                                 ${Math.round(concept.masteryLevel)}%
-                               </span>
-                             </div>
-                             <div class="text-sm text-gray-600 space-y-1">
-                               ${
-                                 concept.expressions?.english?.word
-                                   ? `<div>🇺🇸 ${concept.expressions.english.word}</div>`
-                                   : ""
-                               }
-                               ${
-                                 concept.expressions?.japanese?.word
-                                   ? `<div>🇯🇵 ${concept.expressions.japanese.word}</div>`
-                                   : ""
-                               }
-                               ${
-                                 concept.expressions?.chinese?.word
-                                   ? `<div>🇨🇳 ${concept.expressions.chinese.word}</div>`
-                                   : ""
-                               }
-                               <div class="text-gray-500 text-xs mt-2">
-                                 ${concept.domain || "일반"} • ${
-                           concept.concept_info?.difficulty || "초급"
-                         }
-                               </div>
-                             </div>
-                           </div>
-                         `;
-                       })
-                       .join("")}
+                  : `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="studied-concepts-container">
+                     <div class="col-span-full text-center py-4">
+                       <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                       <div class="text-sm text-gray-500 mt-2">학습한 단어 정보를 불러오는 중...</div>
+                     </div>
                    </div>`
               }
             </div>
@@ -3442,6 +3557,26 @@ async function showTotalWordsDetails() {
     `;
 
     document.body.insertAdjacentHTML("beforeend", modalHTML);
+
+    // 학습한 개념들의 실제 정보를 비동기적으로 로드
+    if (studiedConcepts.length > 0) {
+      const container = document.getElementById("studied-concepts-container");
+      
+      try {
+        // 각 타입별로 개념 카드들을 생성
+        const conceptCards = [];
+        for (const concept of studiedConcepts) {
+          const card = await generateConceptCard(concept);
+          conceptCards.push(card);
+        }
+        
+        // 모든 카드 표시
+        container.innerHTML = conceptCards.join("");
+      } catch (error) {
+        console.error("❌ 개념 카드 생성 중 오류:", error);
+        container.innerHTML = '<div class="col-span-full text-center py-8 text-red-500">개념 정보를 불러오는 중 오류가 발생했습니다.</div>';
+      }
+    }
 
     // 닫기 이벤트
     document
@@ -3462,6 +3597,145 @@ async function showTotalWordsDetails() {
   } catch (error) {
     console.error("❌ 총 단어수 상세 정보 조회 중 오류:", error);
     showError("단어 현황을 불러오는 중 오류가 발생했습니다.");
+  }
+}
+
+// 🎯 퀴즈 정확도 상세 정보 표시
+async function showQuizAccuracyDetails() {
+  try {
+    console.log("🎯 퀴즈 정확도 상세 정보 조회 중...");
+
+    if (!currentUser) return;
+
+    const quizAccuracy = userProgressData.quizAccuracy || 0;
+    const totalQuizzes = userProgressData.totalQuizzes || 0;
+    const avgGameScore = userProgressData.avgGameScore || 0;
+    const totalGames = userProgressData.totalGames || 0;
+
+    const modalHTML = `
+      <div id="quiz-accuracy-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg max-w-3xl w-full mx-4 max-h-[80vh] overflow-hidden">
+          <div class="flex justify-between items-center p-6 border-b">
+            <h2 class="text-2xl font-bold text-gray-800">
+              🎯 퀴즈 & 게임 성과
+            </h2>
+            <button id="close-quiz-accuracy-modal" class="text-gray-500 hover:text-gray-700 text-2xl">
+              ✕
+            </button>
+          </div>
+          <div class="p-6 overflow-y-auto max-h-[70vh]">
+            
+            <!-- 📊 현재 성과 요약 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div class="bg-purple-50 rounded-lg p-4">
+                <h3 class="font-semibold text-purple-800 mb-3">📝 퀴즈 성과</h3>
+                <div class="space-y-2">
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">총 퀴즈 수:</span>
+                    <span class="font-medium text-purple-600">${totalQuizzes}개</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">평균 정확도:</span>
+                    <span class="font-medium text-purple-600">${quizAccuracy}%</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">성과 등급:</span>
+                    <span class="font-medium ${quizAccuracy >= 80 ? 'text-green-600' : quizAccuracy >= 60 ? 'text-yellow-600' : 'text-red-600'}">
+                      ${quizAccuracy >= 80 ? '🏆 우수' : quizAccuracy >= 60 ? '🥈 양호' : '🥉 노력 필요'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="bg-blue-50 rounded-lg p-4">
+                <h3 class="font-semibold text-blue-800 mb-3">🎮 게임 성과</h3>
+                <div class="space-y-2">
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">총 게임 수:</span>
+                    <span class="font-medium text-blue-600">${totalGames}개</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">평균 점수:</span>
+                    <span class="font-medium text-blue-600">${avgGameScore}점</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">성과 등급:</span>
+                    <span class="font-medium ${avgGameScore >= 80 ? 'text-green-600' : avgGameScore >= 60 ? 'text-yellow-600' : 'text-red-600'}">
+                      ${avgGameScore >= 80 ? '🏆 우수' : avgGameScore >= 60 ? '🥈 양호' : '🥉 노력 필요'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 📈 성과 향상 팁 -->
+            <div class="bg-gray-50 rounded-lg p-4">
+              <h3 class="font-semibold text-gray-800 mb-3">💡 성과 향상 팁</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-purple-100 rounded p-3">
+                  <div class="font-medium text-purple-800 mb-2">📝 퀴즈 향상</div>
+                  <ul class="text-sm text-purple-600 space-y-1">
+                    <li>• 단어 복습을 통해 어휘력 향상</li>
+                    <li>• 문법 패턴 학습으로 구조 이해</li>
+                    <li>• 예문을 통한 실용적 학습</li>
+                  </ul>
+                </div>
+                <div class="bg-blue-100 rounded p-3">
+                  <div class="font-medium text-blue-800 mb-2">🎮 게임 향상</div>
+                  <ul class="text-sm text-blue-600 space-y-1">
+                    <li>• 반복 학습으로 반응 속도 향상</li>
+                    <li>• 다양한 게임 모드 도전</li>
+                    <li>• 틀린 문제 복습하기</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- 🎯 개인 목표 설정 -->
+            <div class="bg-green-50 rounded-lg p-4 mt-4">
+              <h3 class="font-semibold text-green-800 mb-3">🎯 추천 목표</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="text-sm">
+                  <div class="font-medium text-green-700">단기 목표 (이번 주)</div>
+                  <ul class="text-green-600 mt-1 space-y-1">
+                    <li>• 퀴즈 정확도 ${Math.min(quizAccuracy + 10, 100)}% 달성</li>
+                    <li>• 게임 평균 점수 ${Math.min(avgGameScore + 5, 100)}점 달성</li>
+                    <li>• 매일 최소 1회 퀴즈 도전</li>
+                  </ul>
+                </div>
+                <div class="text-sm">
+                  <div class="font-medium text-green-700">장기 목표 (이번 달)</div>
+                  <ul class="text-green-600 mt-1 space-y-1">
+                    <li>• 퀴즈 정확도 85% 이상 유지</li>
+                    <li>• 게임 고득점 신기록 달성</li>
+                    <li>• 모든 학습 영역 균형 있게 도전</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML("beforeend", modalHTML);
+
+    // 닫기 이벤트
+    document.getElementById("close-quiz-accuracy-modal").addEventListener("click", () => {
+      document.getElementById("quiz-accuracy-modal").remove();
+    });
+
+    document.getElementById("quiz-accuracy-modal").addEventListener("click", (e) => {
+      if (e.target.id === "quiz-accuracy-modal") {
+        document.getElementById("quiz-accuracy-modal").remove();
+      }
+    });
+
+    console.log("✅ 퀴즈 정확도 상세 정보 표시 완료");
+  } catch (error) {
+    console.error("❌ 퀴즈 정확도 상세 정보 조회 중 오류:", error);
+    showError("퀴즈 정확도 정보를 불러오는 중 오류가 발생했습니다.");
   }
 }
 
@@ -3572,123 +3846,7 @@ async function showStudyStreakDetails() {
   }
 }
 
-// 🎯 퀴즈 정확도 상세 정보 표시
-async function showQuizAccuracyDetails() {
-  try {
-    console.log("🎯 퀴즈 정확도 상세 정보 조회 중...");
-
-    const accuracy = userProgressData.quizStats?.averageAccuracy || 0;
-    const totalQuizzes = userProgressData.totalQuizzes || 0;
-
-    const modalHTML = `
-      <div id="quiz-accuracy-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden">
-          <div class="flex justify-between items-center p-6 border-b">
-            <h2 class="text-2xl font-bold text-gray-800">
-              🎯 퀴즈 성과 상세
-            </h2>
-            <button id="close-quiz-accuracy-modal" class="text-gray-500 hover:text-gray-700 text-2xl">
-              ✕
-            </button>
-          </div>
-          <div class="p-6">
-            <div class="text-center mb-6">
-              <div class="text-5xl font-bold text-purple-600 mb-2">${accuracy}%</div>
-              <div class="text-gray-600">평균 정확도</div>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="bg-purple-50 rounded-lg p-4">
-                <h3 class="font-semibold text-purple-800 mb-3">📊 퀴즈 통계</h3>
-                <div class="space-y-2">
-                  <div class="flex justify-between">
-                    <span class="text-gray-600">총 퀴즈 횟수:</span>
-                    <span class="font-medium">${totalQuizzes}회</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span class="text-gray-600">평균 정확도:</span>
-                    <span class="font-medium text-purple-600">${accuracy}%</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span class="text-gray-600">성취 등급:</span>
-                    <span class="font-medium">${
-                      accuracy >= 90
-                        ? "🏆 우수"
-                        : accuracy >= 70
-                        ? "🥈 양호"
-                        : accuracy >= 50
-                        ? "🥉 보통"
-                        : "📚 연습 필요"
-                    }</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="bg-blue-50 rounded-lg p-4">
-                <h3 class="font-semibold text-blue-800 mb-3">🎯 성취도 기준</h3>
-                <div class="space-y-2 text-sm">
-                  <div class="flex items-center">
-                    <span class="w-6">🏆</span>
-                    <span class="text-gray-600">90% 이상: 우수</span>
-                  </div>
-                  <div class="flex items-center">
-                    <span class="w-6">🥈</span>
-                    <span class="text-gray-600">70-89%: 양호</span>
-                  </div>
-                  <div class="flex items-center">
-                    <span class="w-6">🥉</span>
-                    <span class="text-gray-600">50-69%: 보통</span>
-                  </div>
-                  <div class="flex items-center">
-                    <span class="w-6">📚</span>
-                    <span class="text-gray-600">50% 미만: 연습 필요</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="mt-6 bg-gray-50 rounded-lg p-4">
-              <h3 class="font-semibold text-gray-800 mb-2">💡 학습 팁</h3>
-              <div class="text-sm text-gray-600">
-                ${
-                  accuracy >= 80
-                    ? "훌륭한 성과입니다! 더 어려운 단계에 도전해보세요."
-                    : accuracy >= 60
-                    ? "좋은 진전이 있습니다. 틀린 문제를 다시 복습해보세요."
-                    : "기초를 탄탄히 다지는 것이 중요합니다. 천천히 반복 학습을 해보세요."
-                }
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    document.body.insertAdjacentHTML("beforeend", modalHTML);
-
-    // 닫기 이벤트
-    document
-      .getElementById("close-quiz-accuracy-modal")
-      .addEventListener("click", () => {
-        document.getElementById("quiz-accuracy-modal").remove();
-      });
-
-    document
-      .getElementById("quiz-accuracy-modal")
-      .addEventListener("click", (e) => {
-        if (e.target.id === "quiz-accuracy-modal") {
-          document.getElementById("quiz-accuracy-modal").remove();
-        }
-      });
-
-    console.log("✅ 퀴즈 정확도 상세 정보 표시 완료");
-  } catch (error) {
-    console.error("❌ 퀴즈 정확도 상세 정보 조회 중 오류:", error);
-    showError("퀴즈 성과를 불러오는 중 오류가 발생했습니다.");
-  }
-}
-
-// 🎮 게임 통계 상세 모달 표시
+//  게임 통계 상세 모달 표시
 async function showGameStatsDetails() {
   try {
     console.log("🎮 게임 통계 상세 정보 표시");
