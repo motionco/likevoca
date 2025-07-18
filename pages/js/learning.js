@@ -1544,8 +1544,20 @@ async function finishLearningHandler(e) {
 
     // 학습 세션 완료 처리 (기존 함수 활용)
     try {
-      await completeLearningSession(true); // forceComplete = true
+      const savedSessionData = await completeLearningSession(true); // forceComplete = true
       console.log("✅ 학습 세션 완료 처리 성공");
+      
+      // 모달에 표시할 데이터 (저장된 세션 데이터 사용)
+      const sessionStats = {
+        conceptsCount,
+        duration: savedSessionData?.duration || 1,
+        interactions: savedSessionData?.interactions || learningSessionData.totalInteractions,
+        efficiency: savedSessionData?.session_quality || 0, // 저장된 효율 값 사용
+      };
+
+      console.log("📋 학습 완료 팝업 데이터:", sessionStats);
+      await showLearningCompleteWithStats(sessionStats);
+      console.log("✅ 학습 완료 팝업 표시 완료 - 함수 종료");
     } catch (error) {
       console.error("❌ 학습 세션 완료 처리 실패:", error);
 
@@ -1635,43 +1647,6 @@ async function finishLearningHandler(e) {
       baseScore = Math.min(60, conceptsCount * 6);
     }
 
-    const conceptsPerMinute = conceptsCount / Math.max(duration, 1);
-    let timeScore = 0;
-    if (conceptsPerMinute >= 1 && conceptsPerMinute <= 10) {
-      timeScore = 20;
-    } else if (conceptsPerMinute > 10) {
-      timeScore = Math.max(5, 20 - (conceptsPerMinute - 10) * 1);
-    } else {
-      timeScore = Math.max(5, conceptsPerMinute * 20);
-    }
-
-    // 참여 점수 계산 (Firebase 저장과 동일한 방식)
-    let participationScore;
-    const meaningfulInteractions = learningSessionData.totalInteractions; // 총 상호작용 수
-    
-    if (currentLearningArea === "reading" && currentLearningMode === "flash") {
-      // 독해 플래시 모드: 카드 뒤집기 참여도 기반 계산
-      const flips = meaningfulInteractions; // flip 상호작용 수
-      const maxPossibleFlips = totalAvailableData;
-      participationScore = Math.min(20, (flips / maxPossibleFlips) * 20);
-    } else {
-      // 다른 모드: 상호작용 기반, 최대 20점
-      participationScore = Math.min(20, (meaningfulInteractions / totalAvailableData) * 20);
-    }
-
-    const sessionStats = {
-      conceptsCount,
-      duration,
-      interactions: learningSessionData.totalInteractions,
-      efficiency: Math.min(
-        100,
-        Math.round(baseScore + timeScore + participationScore)
-      ),
-    };
-
-    console.log("📋 학습 완료 팝업 데이터:", sessionStats);
-    await showLearningCompleteWithStats(sessionStats);
-    console.log("✅ 학습 완료 팝업 표시 완료 - 함수 종료");
   } else {
     console.log("🏁 학습 종료 - 학습한 개념이 없어 바로 영역 선택으로 이동");
     // 🔄 학습 데이터 초기화
@@ -5829,219 +5804,39 @@ async function completeLearningSession(forceComplete = false) {
     total_interactions: learningSessionData.totalInteractions,
     sourceLanguage: sourceLanguage,
     targetLanguage: targetLanguage,
-    // 학습 효율 계산 (0-100점) - 더 합리적인 계산
+    // 학습 효율 계산 (0-100점) - 사용자 제시 공식 적용
     session_quality: (() => {
-      // 1. 기본 학습 점수 - 모드별 차별화
-      let baseScore = 0;
+      // 1. 개념 점수 - 학습한 개념 수 × 6점 (최대 60점)
+      const conceptScore = Math.min(60, studiedConceptsCount * 6);
 
-      if (currentLearningMode === "typing") {
-        // 타이핑 모드: 정답률에 따른 기본 점수 (최대 60점)
-        const actualCorrect = learningSessionData.correctAnswers || 0;
-        // 실제 상호작용 수를 기준으로 정답률 계산
-        const actualAttempts =
-          learningSessionData.totalInteractions || totalAvailableData;
-        const accuracyRate = actualCorrect / Math.max(actualAttempts, 1);
-        baseScore = accuracyRate * 60; // 정답률 기반 기본 점수
-
-        console.log("📊 타이핑 모드 정답률 상세:", {
-          actualCorrect,
-          actualAttempts,
-          studiedConceptsCount,
-          totalAvailableData,
-          accuracyRate: (accuracyRate * 100).toFixed(1) + "%",
-          baseScore: baseScore.toFixed(1),
-        });
-      } else if (
-        currentLearningMode === "flash" &&
-        currentLearningArea === "reading"
-      ) {
-        // 독해 플래시 모드: 모든 카드를 본 것을 기준으로 기본 점수 (최대 60점)
-        // 카드를 모두 넘어가며 보는 것 자체가 학습이므로 전체 데이터 기준으로 계산
-        baseScore = 60; // 모든 개념을 제시받았으므로 기본 점수 만점
-
-        console.log("📊 독해 플래시 모드 기본 점수:", {
-          studiedConceptsCount,
-          totalAvailableData,
-          allConceptsPresented: true,
-          baseScore: baseScore.toFixed(1),
-        });
-      } else if (currentLearningMode === "flashcard") {
-        // 단어 플래시카드 모드: 모든 카드를 본 것을 기준으로 기본 점수 (최대 60점)
-        // 카드를 모두 넘어가며 보는 것 자체가 학습이므로 전체 데이터 기준으로 계산
-        baseScore = 60; // 모든 개념을 제시받았으므로 기본 점수 만점
-
-        console.log("📊 단어 플래시카드 모드 기본 점수:", {
-          studiedConceptsCount,
-          totalAvailableData,
-          allConceptsPresented: true,
-          baseScore: baseScore.toFixed(1),
-        });
-      } else if (currentLearningMode === "practice") {
-        // 문법 실습 모드: 제시된 개념 수 기준으로 기본 점수 (최대 60점)
-        // 패턴 분석과 동일한 계산 방식 적용
-        baseScore = Math.min(60, totalAvailableData * 6);
-
-        console.log("📊 문법 실습 모드 기본 점수:", {
-          studiedConceptsCount,
-          totalAvailableData,
-          presentedConceptsCount: totalAvailableData, // 제시된 개념 수 (실제 계산 기준)
-          baseScore: baseScore.toFixed(1),
-        });
-      } else if (currentLearningMode === "listening") {
-        // 듣기 연습 모드: 모든 개념을 본 것을 기준으로 기본 점수 (최대 60점)
-        // 모든 개념을 순차적으로 보는 것 자체가 학습이므로 전체 데이터 기준으로 계산
-        baseScore = 60; // 모든 개념을 제시받았으므로 기본 점수 만점
-
-        console.log("📊 듣기 연습 모드 기본 점수:", {
-          studiedConceptsCount,
-          totalAvailableData,
-          presentedConceptsCount: totalAvailableData, // 제시된 개념 수 (실제 계산 기준)
-          allConceptsPresented: true,
-          baseScore: baseScore.toFixed(1),
-        });
-      } else {
-        // 다른 모드: 기존 방식 (최대 60점)
-        baseScore = Math.min(60, studiedConceptsCount * 6);
+      // 2. 시간 점수 - 1분까지 20점 만점, 1분 초과 시 감점 (최대 20점)
+      let timeScore = 20;
+      if (duration > 1) {
+        // 1분 초과 시 적절히 감점 (분당 2점씩 감점)
+        timeScore = Math.max(5, 20 - (duration - 1) * 2);
       }
 
-      // 2. 시간 효율 점수 - 전체 데이터 기준으로 계산
-      let timeScore = 0;
-      const conceptsPerMinute = totalAvailableData / Math.max(duration, 1);
+      // 3. 상호작용 점수 - 상호작용 회수 × 2점 (최대 20점)
+      const interactionScore = Math.min(20, learningSessionData.totalInteractions * 2);
 
-      if (currentLearningMode === "typing") {
-        // 타이핑 모드: 시간 점수 (최대 20점)
-        if (conceptsPerMinute >= 1 && conceptsPerMinute <= 10) {
-          timeScore = 20;
-        } else if (conceptsPerMinute > 10) {
-          timeScore = Math.max(5, 20 - (conceptsPerMinute - 10) * 1);
-        } else {
-          timeScore = Math.max(5, conceptsPerMinute * 20);
-        }
-      } else if (
-        currentLearningMode === "practice" ||
-        currentLearningMode === "listening" ||
-        currentLearningMode === "flashcard" ||
-        (currentLearningMode === "flash" && currentLearningArea === "reading")
-      ) {
-        // 플래시카드 기반 모드들: 전체 데이터 기준 시간 점수 (최대 20점)
-        if (conceptsPerMinute >= 1 && conceptsPerMinute <= 10) {
-          timeScore = 20;
-        } else if (conceptsPerMinute > 10) {
-          timeScore = Math.max(5, 20 - (conceptsPerMinute - 10) * 1);
-        } else {
-          timeScore = Math.max(5, conceptsPerMinute * 20);
-        }
-      } else {
-        // 다른 모드: 기존 방식 (최대 20점)
-        if (conceptsPerMinute >= 1 && conceptsPerMinute <= 10) {
-          timeScore = 20;
-        } else if (conceptsPerMinute > 10) {
-          timeScore = Math.max(5, 20 - (conceptsPerMinute - 10) * 1);
-        } else {
-          timeScore = Math.max(5, conceptsPerMinute * 20);
-        }
-      }
-
-      // 3. 학습 참여도 점수 - 전체 데이터 기준으로 계산
-      let participationScore = 0;
-
-      if (currentLearningMode === "typing") {
-        // 타이핑 모드: 실제 답변 시도 기준으로 참여도 계산 (최대 20점)
-        const actualAttempts = learningSessionData.totalInteractions || 0;
-        const participationRate =
-          actualAttempts / Math.max(totalAvailableData, 1);
-        participationScore = Math.min(20, participationRate * 20);
-
-        console.log("📊 타이핑 모드 참여도:", {
-          actualAttempts,
-          studiedConceptsCount,
-          totalAvailableData,
-          participationRate: (participationRate * 100).toFixed(1) + "%",
-          participationScore: participationScore.toFixed(1),
-        });
-      } else if (
-        currentLearningMode === "flash" &&
-        currentLearningArea === "reading"
-      ) {
-        // 독해 플래시 모드: 카드 뒤집기 참여도 기반 계산 (최대 20점)
-        const meaningfulInteractions = learningSessionData.correctAnswers; // flip 액션 카운트
-        const maxPossibleFlips = totalAvailableData; // 각 카드당 최대 1번 뒤집기
-        const participationRate = meaningfulInteractions / maxPossibleFlips;
-        participationScore = participationRate * 20;
-
-        console.log("📊 독해 플래시 모드 참여도:", {
-          flips: meaningfulInteractions,
-          maxPossibleFlips,
-          participationRate: (participationRate * 100).toFixed(1) + "%",
-          participationScore: participationScore.toFixed(1),
-        });
-      } else if (currentLearningMode === "flashcard") {
-        // 단어 플래시카드 모드: 카드 뒤집기 참여도 기반 계산 (최대 20점)
-        const meaningfulInteractions = learningSessionData.correctAnswers; // flip 액션 카운트
-        const maxPossibleFlips = totalAvailableData; // 각 카드당 최대 1번 뒤집기
-        const participationRate = meaningfulInteractions / maxPossibleFlips;
-        participationScore = participationRate * 20;
-
-        console.log("📊 단어 플래시카드 모드 참여도:", {
-          flips: meaningfulInteractions,
-          maxPossibleFlips,
-          participationRate: (participationRate * 100).toFixed(1) + "%",
-          participationScore: participationScore.toFixed(1),
-        });
-      } else if (currentLearningMode === "practice") {
-        // 문법 실습 모드: 일반 상호작용 기반 참여도 계산 (최대 20점)
-        // 패턴 분석과 동일한 계산 방식 적용
-        const meaningfulInteractions = learningSessionData.correctAnswers;
-        participationScore = Math.min(
-          20,
-          (meaningfulInteractions / totalAvailableData) * 20
-        );
-
-        console.log("📊 문법 실습 모드 참여도:", {
-          flips: meaningfulInteractions,
-          totalAvailableData,
-          participationScore: participationScore.toFixed(1),
-        });
-      } else if (currentLearningMode === "listening") {
-        // 듣기 모드: 발음 듣기 상호작용 기준 참여도 계산 (최대 20점)
-        const meaningfulInteractions = learningSessionData.correctAnswers; // listen 액션만 카운트
-        const maxPossibleListens = totalAvailableData; // 각 개념당 최대 1번 듣기
-        const participationRate = meaningfulInteractions / maxPossibleListens;
-        participationScore = participationRate * 20;
-
-        console.log("📊 듣기 모드 참여도:", {
-          interactions: meaningfulInteractions,
-          maxPossibleListens,
-          totalConcepts: totalAvailableData,
-          participationRate: (participationRate * 100).toFixed(1) + "%",
-          participationScore: participationScore.toFixed(1),
-        });
-      } else {
-        // 다른 모드: 기존 방식 (상호작용 기반, 최대 20점)
-        const meaningfulInteractions = learningSessionData.correctAnswers;
-        participationScore = Math.min(
-          20,
-          (meaningfulInteractions / totalAvailableData) * 20
-        );
-      }
-
-      const totalQuality = baseScore + timeScore + participationScore;
+      const totalQuality = conceptScore + timeScore + interactionScore;
 
       // 상세한 학습 효율 계산 로그
-      console.log("📊 학습 효율 상세 계산:", {
+      console.log("📊 학습 효율 상세 계산 (사용자 공식):", {
         mode: currentLearningMode,
         area: currentLearningArea,
         studiedConceptsCount,
-        totalAvailableData,
         duration,
-        baseScore: baseScore.toFixed(1),
+        totalInteractions: learningSessionData.totalInteractions,
+        conceptScore: conceptScore.toFixed(1),
         timeScore: timeScore.toFixed(1),
-        participationScore: participationScore.toFixed(1),
+        interactionScore: interactionScore.toFixed(1),
         totalQuality: totalQuality.toFixed(1),
-        finalQuality: Math.min(100, Math.round(totalQuality)),
+        finalQuality: Math.min(100, totalQuality),
       });
 
-      return Math.min(100, Math.round(totalQuality));
+      // 최종 점수 반환 (100점 만점)
+      return Math.min(100, totalQuality);
     })(),
   };
 
@@ -6072,7 +5867,7 @@ async function completeLearningSession(forceComplete = false) {
       totalAvailableData,
       duration: Math.max(duration, 1),
       interactions: learningSessionData.totalInteractions,
-      learningEfficiency: Math.round(activityData.session_quality),
+      learningEfficiency: activityData.session_quality, // 원본 값 그대로 표시
     });
 
     // 📚 학습 완료 데이터를 localStorage에 저장 (진도 페이지 자동 업데이트용)
@@ -6085,10 +5880,8 @@ async function completeLearningSession(forceComplete = false) {
       totalAvailableData,
       duration: Math.max(duration, 1),
       interactions: learningSessionData.totalInteractions,
-      learningEfficiency: Math.round(activityData.session_quality),
-      timestamp: Date.now(), // 더 정확한 타임스탬프
-      docId: docRef?.id || null, // 저장된 문서 ID 추가 (null 체크 추가)
-      sessionQuality: activityData.session_quality, // 정확한 효율 점수
+      efficiency: activityData.session_quality, // 통일된 효율 값 사용
+      timestamp: new Date().toISOString(),
     };
 
     localStorage.setItem(
@@ -6097,13 +5890,22 @@ async function completeLearningSession(forceComplete = false) {
     );
 
     console.log("📤 Progress 페이지 업데이트 신호 전송:", {
-      efficiency: Math.round(activityData.session_quality),
+      efficiency: activityData.session_quality, // 반올림 제거
       docId: docRef?.id || null,
       studiedConcepts: studiedConceptsCount,
       totalConcepts: totalAvailableData,
     });
+    
+    // 세션 데이터 반환 (모달에서 사용)
+    return {
+      session_quality: activityData.session_quality,
+      concepts_studied: studiedConceptsCount,
+      duration: Math.max(duration, 1),
+      interactions: learningSessionData.totalInteractions,
+    };
   } catch (error) {
     console.error("❌ 학습 세션 저장 실패:", error);
+    return null;
   }
 
   // 세션 초기화
