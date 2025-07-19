@@ -1134,6 +1134,10 @@ function updateAllUI() {
   try {
     console.log("🔄 모든 UI 업데이트 시작");
     
+    // 연속 학습일수 계산 및 업데이트
+    const calculatedStreak = calculateStudyStreak();
+    userProgressData.studyStreak = calculatedStreak;
+    
     updateStatsSummary();
     updateAchievements();
     displayRecentActivities();
@@ -1707,7 +1711,6 @@ function updateTotalWordsModalContent(modalBody) {
     let modalContent = `
       <div class="space-y-4">
         <div class="text-center">
-          <h3 class="text-lg font-semibold text-gray-900">학습 진행 상황</h3>
           <p class="text-sm text-gray-600">전체: ${userProgressData.conceptCounts.total}개</p>
         </div>
         
@@ -1734,7 +1737,7 @@ function updateTotalWordsModalContent(modalBody) {
         <div class="mt-6">
           <h4 class="font-semibold text-gray-900 mb-3">최근 활동한 개념 (${userProgressData.recentStudied.length}개)</h4>
           <p class="text-xs text-gray-500 mb-3">마스터 기준 미달로 계속 학습이 필요한 개념들</p>
-          <div class="space-y-2 max-h-60 overflow-y-auto">
+          <div class="space-y-2">
       `;
       
       userProgressData.recentStudied.slice(0, 15).forEach(concept => {
@@ -1852,12 +1855,171 @@ function closeMasteredWordsModal() {
   }
 }
 
+// 📊 퀴즈 정확도 상세 정보 모달 표시
+function showQuizAccuracyDetails() {
+  try {
+    console.log("📊 퀴즈 정확도 모달 표시");
+    
+    // 모달 생성 또는 가져오기
+    let modal = document.getElementById('quizAccuracyModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'quizAccuracyModal';
+      modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+      modal.innerHTML = `
+        <div class="bg-white rounded-lg p-6 w-11/12 max-w-md max-h-96 overflow-y-auto">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">퀴즈 정확도 분석</h3>
+            <button onclick="closeQuizAccuracyModal()" class="text-gray-400 hover:text-gray-600">
+              <span class="text-xl">&times;</span>
+            </button>
+          </div>
+          <div id="quizAccuracyModalBody">
+            <div class="text-center py-8">
+              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p class="text-gray-600">정확도 분석 중...</p>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+
+    const modalBody = document.getElementById('quizAccuracyModalBody');
+    
+    // 퀴즈 통계 계산
+    const totalQuizzes = userProgressData.achievements.totalQuizzes || 0;
+    const avgAccuracy = Math.round(userProgressData.achievements.avgQuizAccuracy || 0);
+    const bestScore = userProgressData.achievements.bestQuizScore || 0;
+    const totalTime = userProgressData.achievements.totalQuizTime || 0;
+    
+    // 최근 퀴즈 활동들
+    const recentQuizzes = userProgressData.recentActivities
+      .filter(activity => activity.type === 'quiz')
+      .slice(0, 5);
+    
+    let modalContent = `
+      <div class="space-y-4">
+        <div class="text-center">
+          <div class="text-4xl font-bold text-blue-600">${avgAccuracy}%</div>
+          <p class="text-gray-600 mt-1">평균 정확도</p>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-4 text-center">
+          <div class="bg-purple-50 p-3 rounded-lg">
+            <div class="text-xl font-semibold text-purple-600">${totalQuizzes}회</div>
+            <div class="text-sm text-gray-600">총 퀴즈 수</div>
+          </div>
+          <div class="bg-green-50 p-3 rounded-lg">
+            <div class="text-xl font-semibold text-green-600">${bestScore}점</div>
+            <div class="text-sm text-gray-600">최고 점수</div>
+          </div>
+        </div>
+        
+        <div class="bg-gray-50 p-3 rounded-lg text-center">
+          <div class="text-lg font-semibold text-gray-700">${Math.round(totalTime / 60)}분</div>
+          <div class="text-sm text-gray-600">총 퀴즈 시간</div>
+        </div>
+    `;
+
+    if (recentQuizzes.length > 0) {
+      modalContent += `
+        <div class="mt-4">
+          <h4 class="font-medium text-gray-900 mb-2">최근 퀴즈 결과</h4>
+          <div class="space-y-2">
+      `;
+      
+      recentQuizzes.forEach(quiz => {
+        const accuracy = Math.round(quiz.accuracy || 0);
+        const date = quiz.timestamp?.toDate() || new Date();
+        const timeAgo = getTimeAgo(date);
+        
+        modalContent += `
+          <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
+            <div>
+              <span class="text-sm font-medium">${accuracy}% 정확도</span>
+              <span class="text-xs text-gray-500 ml-2">${quiz.correctCount || 0}/${quiz.totalCount || 5} 정답</span>
+            </div>
+            <span class="text-xs text-gray-400">${timeAgo}</span>
+          </div>
+        `;
+      });
+      
+      modalContent += `
+          </div>
+        </div>
+      `;
+    }
+
+    if (avgAccuracy >= 80) {
+      modalContent += `
+        <div class="bg-green-50 border border-green-200 p-3 rounded-lg">
+          <div class="flex items-center">
+            <span class="text-green-600 text-xl mr-2">🎉</span>
+            <div>
+              <p class="text-sm font-medium text-green-800">훌륭한 정확도!</p>
+              <p class="text-xs text-green-600">퀴즈 마스터 수준입니다.</p>
+            </div>
+          </div>
+        </div>
+      `;
+    } else if (avgAccuracy >= 60) {
+      modalContent += `
+        <div class="bg-yellow-50 border border-yellow-200 p-3 rounded-lg">
+          <div class="flex items-center">
+            <span class="text-yellow-600 text-xl mr-2">💪</span>
+            <div>
+              <p class="text-sm font-medium text-yellow-800">좋은 성과!</p>
+              <p class="text-xs text-yellow-600">조금 더 노력하면 완벽해요.</p>
+            </div>
+          </div>
+        </div>
+      `;
+    } else if (totalQuizzes > 0) {
+      modalContent += `
+        <div class="bg-blue-50 border border-blue-200 p-3 rounded-lg">
+          <div class="flex items-center">
+            <span class="text-blue-600 text-xl mr-2">📚</span>
+            <div>
+              <p class="text-sm font-medium text-blue-800">계속 도전하세요!</p>
+              <p class="text-xs text-blue-600">연습하면 더 나은 결과를 얻을 수 있어요.</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    modalContent += `
+      </div>
+    `;
+
+    modalBody.innerHTML = modalContent;
+    modal.style.display = 'flex';
+    
+  } catch (error) {
+    console.error("❌ 퀴즈 정확도 모달 표시 중 오류:", error);
+  }
+}
+
+// 퀴즈 정확도 모달 닫기
+function closeQuizAccuracyModal() {
+  const modal = document.getElementById('quizAccuracyModal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
 // 전역 함수로 등록
 window.showTotalWordsList = showTotalWordsList;
 window.closeTotalWordsModal = closeTotalWordsModal;
 window.showMasteredWordsList = showMasteredWordsList;
 window.closeMasteredWordsModal = closeMasteredWordsModal;
+window.showStudyStreakDetails = showStudyStreakDetails;
+window.closeStudyStreakModal = closeStudyStreakModal;
+window.showQuizAccuracyDetails = showQuizAccuracyDetails;
+window.closeQuizAccuracyModal = closeQuizAccuracyModal;
 window.updateAchievements = updateAchievements;
+window.saveGoals = saveGoals;
 
 // 📊 이벤트 리스너 설정
 function setupEventListeners() {
@@ -2096,8 +2258,202 @@ function updateMasteredWordsModalContent(modalBody) {
   }
 }
 
-// 연속 학습 상세 정보 표시
+// 📊 연속 학습일수 계산
+function calculateStudyStreak() {
+  try {
+    if (!userProgressData.recentActivities || userProgressData.recentActivities.length === 0) {
+      return 0;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    let streak = 0;
+    let currentDate = new Date(today);
+    
+    // 각 날짜별로 활동이 있었는지 확인
+    for (let i = 0; i < 365; i++) { // 최대 1년간 확인
+      const dateStr = currentDate.toISOString().split('T')[0];
+      
+      // 해당 날짜에 학습 활동이 있는지 확인
+      const hasActivity = userProgressData.recentActivities.some(activity => {
+        let activityDate = new Date();
+        if (activity.timestamp) {
+          if (typeof activity.timestamp.toDate === 'function') {
+            activityDate = activity.timestamp.toDate();
+          } else if (activity.timestamp instanceof Date) {
+            activityDate = activity.timestamp;
+          } else {
+            activityDate = new Date(activity.timestamp);
+          }
+        }
+        activityDate.setHours(0, 0, 0, 0);
+        return activityDate.getTime() === currentDate.getTime();
+      });
+      
+      if (hasActivity) {
+        streak++;
+        currentDate.setDate(currentDate.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+    
+    return streak;
+  } catch (error) {
+    console.error("연속 학습일수 계산 중 오류:", error);
+    return 0;
+  }
+}
+
+// 연속 학습 상세 정보 표시 (모달로 변경)
 function showStudyStreakDetails() {
+  try {
+    // 연속 학습일수 재계산
+    const calculatedStreak = calculateStudyStreak();
+    userProgressData.studyStreak = calculatedStreak;
+    
+    // 모달 생성 또는 가져오기
+    let modal = document.getElementById('studyStreakModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'studyStreakModal';
+      modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center';
+      modal.style.display = 'none';
+      modal.innerHTML = `
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+          <div class="flex items-center justify-between p-6 border-b">
+            <h2 class="text-xl font-bold text-gray-900">📈 연속 학습</h2>
+            <button onclick="closeStudyStreakModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+          </div>
+          <div id="studyStreakModalBody" class="p-6">
+            <!-- 모달 내용이 여기에 동적으로 추가됩니다 -->
+          </div>
+          <div class="p-6 border-t bg-gray-50 text-center">
+            <button onclick="closeStudyStreakModal()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+              닫기
+            </button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+
+    const modalBody = document.getElementById('studyStreakModalBody');
+    
+    let modalContent = `
+      <div class="text-center">
+        <div class="text-4xl font-bold text-blue-600 mb-4">${calculatedStreak}일</div>
+        <div class="text-lg text-gray-700 mb-6">연속 학습 기록</div>
+        
+        <div class="text-left space-y-4">
+    `;
+    
+    if (calculatedStreak === 0) {
+      modalContent += `
+        <div class="bg-yellow-50 p-4 rounded-lg">
+          <p class="text-yellow-800">아직 연속 학습 기록이 없습니다.</p>
+          <p class="text-yellow-700 mt-2">오늘부터 시작해보세요!</p>
+        </div>
+      `;
+    } else if (calculatedStreak < 7) {
+      modalContent += `
+        <div class="bg-blue-50 p-4 rounded-lg">
+          <p class="text-blue-800">좋은 시작입니다!</p>
+          <p class="text-blue-700 mt-2">일주일 연속 학습을 목표로 해보세요.</p>
+        </div>
+      `;
+    } else if (calculatedStreak < 30) {
+      modalContent += `
+        <div class="bg-green-50 p-4 rounded-lg">
+          <p class="text-green-800">훌륭합니다!</p>
+          <p class="text-green-700 mt-2">한 달 연속 학습까지 조금 더 화이팅!</p>
+        </div>
+      `;
+    } else {
+      modalContent += `
+        <div class="bg-purple-50 p-4 rounded-lg">
+          <p class="text-purple-800">대단합니다!</p>
+          <p class="text-purple-700 mt-2">꾸준한 학습의 힘을 보여주고 있어요.</p>
+        </div>
+      `;
+    }
+    
+    // 최근 7일간의 학습 활동 표시
+    modalContent += `
+      <div class="mt-6">
+        <h5 class="font-semibold text-gray-900 mb-3">최근 7일간 학습 활동</h5>
+        <div class="grid grid-cols-7 gap-1 text-center">
+    `;
+    
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      date.setHours(0, 0, 0, 0);
+      
+      const hasActivity = userProgressData.recentActivities.some(activity => {
+        let activityDate = new Date();
+        if (activity.timestamp) {
+          if (typeof activity.timestamp.toDate === 'function') {
+            activityDate = activity.timestamp.toDate();
+          } else if (activity.timestamp instanceof Date) {
+            activityDate = activity.timestamp;
+          } else {
+            activityDate = new Date(activity.timestamp);
+          }
+        }
+        activityDate.setHours(0, 0, 0, 0);
+        return activityDate.getTime() === date.getTime();
+      });
+      
+      const dayName = date.toLocaleDateString('ko-KR', { weekday: 'short' });
+      const dayNumber = date.getDate();
+      
+      modalContent += `
+        <div class="p-2">
+          <div class="text-xs text-gray-600">${dayName}</div>
+          <div class="w-8 h-8 rounded-full ${hasActivity ? 'bg-green-500' : 'bg-gray-200'} flex items-center justify-center text-xs text-white font-medium">
+            ${dayNumber}
+          </div>
+        </div>
+      `;
+    }
+    
+    modalContent += `
+        </div>
+        <div class="text-xs text-gray-500 mt-2 text-center">
+          <span class="inline-flex items-center"><span class="w-2 h-2 bg-green-500 rounded-full mr-1"></span> 학습함</span>
+          <span class="inline-flex items-center ml-3"><span class="w-2 h-2 bg-gray-200 rounded-full mr-1"></span> 학습 안함</span>
+        </div>
+      </div>
+        </div>
+      </div>
+    `;
+    
+    modalBody.innerHTML = modalContent;
+    modal.style.display = 'flex';
+    
+    // 통계 요약도 업데이트
+    const studyStreakElement = document.getElementById('study-streak-count');
+    if (studyStreakElement) {
+      studyStreakElement.textContent = `${calculatedStreak}일`;
+    }
+    
+  } catch (error) {
+    console.error("연속 학습 상세 정보 표시 중 오류:", error);
+  }
+}
+
+// 연속 학습 모달 닫기
+function closeStudyStreakModal() {
+  const modal = document.getElementById('studyStreakModal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+// 연속 학습 상세 정보 표시 (기존 alert 버전 - 삭제 예정)
+function showStudyStreakDetailsOld() {
   try {
     const streak = userProgressData.studyStreak || 0;
     let message = '연속 학습: ' + streak + '일\n\n';
@@ -2115,33 +2471,6 @@ function showStudyStreakDetails() {
     alert(message);
   } catch (error) {
     console.error("연속 학습 상세 정보 표시 중 오류:", error);
-  }
-}
-
-// 퀴즈 정확도 상세 정보 표시
-function showQuizAccuracyDetails() {
-  try {
-    const accuracy = userProgressData.quizAccuracy || 0;
-    const totalQuizzes = userProgressData.achievements.totalQuizzes || 0;
-    
-    let message = '퀴즈 정확도: ' + Math.round(accuracy) + '%\n';
-    message += '총 퀴즈 횟수: ' + totalQuizzes + '회\n\n';
-    
-    if (accuracy >= 90) {
-      message += "완벽합니다! 최고 수준의 정확도를 유지하고 있어요.";
-    } else if (accuracy >= 80) {
-      message += "훌륭합니다! 높은 정확도를 보여주고 있어요.";
-    } else if (accuracy >= 70) {
-      message += "좋습니다! 조금 더 집중하면 더 높은 점수를 받을 수 있어요.";
-    } else if (accuracy >= 60) {
-      message += "괜찮습니다! 복습을 통해 정확도를 높여보세요.";
-    } else {
-      message += "더 많은 학습이 필요합니다. 천천히 꾸준히 해보세요!";
-    }
-
-    alert(message);
-  } catch (error) {
-    console.error("퀴즈 정확도 상세 정보 표시 중 오류:", error);
   }
 }
 
@@ -2192,23 +2521,34 @@ async function saveGoals() {
         studyDays: parseInt(weeklyDaysGoal),
         masteryWords: parseInt(weeklyMasteryGoal)
       },
-      lastUpdated: firebaseInit.serverTimestamp()
+      lastUpdated: new Date()
     };
 
-    // Firestore에 저장
+    console.log("💾 목표 저장 중:", goals);
+
+    // user_records 컬렉션에 goals 필드로 저장 (권한 문제 해결)
     if (currentUser) {
-      const userGoalsRef = firebaseInit.doc(firebaseInit.db, "user_goals", currentUser.email);
-      await firebaseInit.setDoc(userGoalsRef, goals, { merge: true });
+      const userRecordsRef = firebaseInit.doc(firebaseInit.db, "user_records", currentUser.email);
+      await firebaseInit.setDoc(userRecordsRef, { 
+        goals: goals,
+        last_updated: new Date()
+      }, { merge: true });
       
       // 로컬 데이터 업데이트
       userProgressData.goals = goals;
       
+      // 목표 저장 후 즉시 진행률 업데이트
+      updateGoalProgress();
+      
       alert("목표가 성공적으로 저장되었습니다!");
-      console.log("✅ 목표 저장 완료:", goals);
+      console.log("✅ 목표 저장 및 진행률 업데이트 완료:", goals);
+    } else {
+      console.error("❌ 사용자가 로그인되지 않았습니다.");
+      alert("목표 저장을 위해 로그인이 필요합니다.");
     }
   } catch (error) {
-    console.error("❌ 목표 저장 중 오류:", error);
-    alert("목표 저장에 실패했습니다.");
+    console.error("목표 저장 중 오류:", error);
+    alert(`목표 저장에 실패했습니다: ${error.message}`);
   }
 }
 
@@ -2234,30 +2574,81 @@ function updateDailyGoalProgress() {
       return activityDate && activityDate.toDateString() === today;
     });
 
-    // 일일 단어 학습 진행률
+    // 일일 단어 학습 진행률 - 실제 학습한 개념 수로 계산
     const dailyWordsProgress = document.getElementById('daily-words-progress');
     const dailyWordsBar = document.getElementById('daily-words-bar');
-    const dailyWordsGoal = parseInt(document.getElementById('daily-words-goal')?.value || 10);
     
-    const todayWords = todayActivities.filter(a => a.type === 'learning').length;
-    const wordsProgress = Math.min(100, (todayWords / dailyWordsGoal) * 100);
+    // 목표값을 user_records의 goals에서 가져오기 (저장된 목표 우선)
+    let dailyWordsGoal = 10; // 기본값
+    if (userProgressData.goals && userProgressData.goals.daily && userProgressData.goals.daily.words) {
+      dailyWordsGoal = userProgressData.goals.daily.words;
+    } else {
+      // 폴백: HTML 입력값에서 가져오기
+      const goalInput = document.getElementById('daily-words-goal');
+      if (goalInput && goalInput.value) {
+        dailyWordsGoal = parseInt(goalInput.value) || 10;
+      }
+    }
+    
+    // 오늘 학습한 실제 개념 수 계산 (세션별 concepts_studied 합계)
+    let todayWordsCount = 0;
+    todayActivities.filter(a => a.type === 'learning').forEach(activity => {
+      if (activity.sessionData && activity.sessionData.conceptsStudied) {
+        todayWordsCount += activity.sessionData.conceptsStudied;
+      } else {
+        // 폴백: 기본값 1개씩
+        todayWordsCount += 1;
+      }
+    });
+    
+    const wordsProgress = Math.min(100, (todayWordsCount / dailyWordsGoal) * 100);
+    
+    // HTML 입력 필드도 저장된 목표로 업데이트
+    const goalInput = document.getElementById('daily-words-goal');
+    if (goalInput && goalInput.value != dailyWordsGoal) {
+      goalInput.value = dailyWordsGoal;
+    }
     
     if (dailyWordsProgress) {
-      dailyWordsProgress.textContent = `${todayWords}/${dailyWordsGoal}`;
+      dailyWordsProgress.textContent = `${todayWordsCount}/${dailyWordsGoal}`;
     }
     if (dailyWordsBar) {
       dailyWordsBar.style.width = `${wordsProgress}%`;
     }
 
+    console.log("📊 일일 단어 목표 진행률:", {
+      goal: dailyWordsGoal,
+      todayCount: todayWordsCount,
+      progress: Math.round(wordsProgress) + '%',
+      todayActivities: todayActivities.filter(a => a.type === 'learning').length
+    });
+
     // 일일 퀴즈 시간 진행률 (게임 + 퀴즈 시간으로 계산)
     const dailyQuizProgress = document.getElementById('daily-quiz-progress');
     const dailyQuizBar = document.getElementById('daily-quiz-bar');
-    const dailyQuizGoal = parseInt(document.getElementById('daily-quiz-goal')?.value || 20);
+    
+    // 목표값을 user_records의 goals에서 가져오기 (저장된 목표 우선)
+    let dailyQuizGoal = 20; // 기본값
+    if (userProgressData.goals && userProgressData.goals.daily && userProgressData.goals.daily.quizMinutes) {
+      dailyQuizGoal = userProgressData.goals.daily.quizMinutes;
+    } else {
+      // 폴백: HTML 입력값에서 가져오기
+      const goalInput = document.getElementById('daily-quiz-goal');
+      if (goalInput && goalInput.value) {
+        dailyQuizGoal = parseInt(goalInput.value) || 20;
+      }
+    }
     
     const todayGameTime = todayActivities.filter(a => a.type === 'game').length * 5; // 게임당 5분 가정
     const todayQuizTime = todayActivities.filter(a => a.type === 'quiz').length * 3; // 퀴즈당 3분 가정
     const totalQuizTime = todayGameTime + todayQuizTime;
     const quizProgress = Math.min(100, (totalQuizTime / dailyQuizGoal) * 100);
+    
+    // HTML 입력 필드도 저장된 목표로 업데이트
+    const quizGoalInput = document.getElementById('daily-quiz-goal');
+    if (quizGoalInput && quizGoalInput.value != dailyQuizGoal) {
+      quizGoalInput.value = dailyQuizGoal;
+    }
     
     if (dailyQuizProgress) {
       dailyQuizProgress.textContent = `${totalQuizTime}/${dailyQuizGoal}분`;
@@ -2275,11 +2666,28 @@ function updateWeeklyGoalProgress() {
   try {
     const weeklyDaysProgress = document.getElementById('weekly-days-progress');
     const weeklyDaysBar = document.getElementById('weekly-days-bar');
-    const weeklyDaysGoal = parseInt(document.getElementById('weekly-days-goal')?.value || 5);
+    
+    // 목표값을 user_records의 goals에서 가져오기 (저장된 목표 우선)
+    let weeklyDaysGoal = 5; // 기본값
+    if (userProgressData.goals && userProgressData.goals.weekly && userProgressData.goals.weekly.studyDays) {
+      weeklyDaysGoal = userProgressData.goals.weekly.studyDays;
+    } else {
+      // 폴백: HTML 입력값에서 가져오기
+      const goalInput = document.getElementById('weekly-days-goal');
+      if (goalInput && goalInput.value) {
+        weeklyDaysGoal = parseInt(goalInput.value) || 5;
+      }
+    }
     
     // 이번 주 학습 일수 계산
     const thisWeekDays = userProgressData.weeklyActivity.filter(day => day.totalActivities > 0).length;
     const daysProgress = Math.min(100, (thisWeekDays / weeklyDaysGoal) * 100);
+    
+    // HTML 입력 필드도 저장된 목표로 업데이트
+    const daysGoalInput = document.getElementById('weekly-days-goal');
+    if (daysGoalInput && daysGoalInput.value != weeklyDaysGoal) {
+      daysGoalInput.value = weeklyDaysGoal;
+    }
     
     if (weeklyDaysProgress) {
       weeklyDaysProgress.textContent = `${thisWeekDays}/${weeklyDaysGoal}일`;
@@ -2291,7 +2699,18 @@ function updateWeeklyGoalProgress() {
     // 주간 마스터 목표 진행률
     const weeklyMasteryProgress = document.getElementById('weekly-mastery-progress');
     const weeklyMasteryBar = document.getElementById('weekly-mastery-bar');
-    const weeklyMasteryGoal = parseInt(document.getElementById('weekly-mastery-goal')?.value || 30);
+    
+    // 목표값을 user_records의 goals에서 가져오기 (저장된 목표 우선)
+    let weeklyMasteryGoal = 30; // 기본값
+    if (userProgressData.goals && userProgressData.goals.weekly && userProgressData.goals.weekly.masteryWords) {
+      weeklyMasteryGoal = userProgressData.goals.weekly.masteryWords;
+    } else {
+      // 폴백: HTML 입력값에서 가져오기
+      const goalInput = document.getElementById('weekly-mastery-goal');
+      if (goalInput && goalInput.value) {
+        weeklyMasteryGoal = parseInt(goalInput.value) || 30;
+      }
+    }
     
     // 이번 주 마스터한 단어 수 (최근 7일 기준)
     const oneWeekAgo = new Date();
@@ -2319,12 +2738,23 @@ function updateWeeklyGoalProgress() {
     
     const masteryProgress = Math.min(100, (thisWeekMastery / weeklyMasteryGoal) * 100);
     
+    // HTML 입력 필드도 저장된 목표로 업데이트
+    const masteryGoalInput = document.getElementById('weekly-mastery-goal');
+    if (masteryGoalInput && masteryGoalInput.value != weeklyMasteryGoal) {
+      masteryGoalInput.value = weeklyMasteryGoal;
+    }
+    
     if (weeklyMasteryProgress) {
       weeklyMasteryProgress.textContent = `${thisWeekMastery}/${weeklyMasteryGoal}개`;
     }
     if (weeklyMasteryBar) {
       weeklyMasteryBar.style.width = `${masteryProgress}%`;
     }
+    
+    console.log("📊 주간 목표 진행률:", {
+      studyDays: { goal: weeklyDaysGoal, current: thisWeekDays },
+      mastery: { goal: weeklyMasteryGoal, current: thisWeekMastery }
+    });
   } catch (error) {
     console.error("❌ 주간 목표 진행률 업데이트 중 오류:", error);
   }
@@ -2335,38 +2765,56 @@ async function loadUserGoals() {
   try {
     if (!currentUser) return;
 
-    const userGoalsRef = firebaseInit.doc(firebaseInit.db, "user_goals", currentUser.email);
-    const goalsDoc = await firebaseInit.getDoc(userGoalsRef);
+    // user_records에서 goals 필드를 읽어옴
+    const userRecordsRef = firebaseInit.doc(firebaseInit.db, "user_records", currentUser.email);
+    const userDoc = await firebaseInit.getDoc(userRecordsRef);
 
-    if (goalsDoc.exists()) {
-      const goalsData = goalsDoc.data();
-      userProgressData.goals = goalsData;
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+      const goalsData = userData.goals;
 
-      // 목표 입력 필드에 값 설정
-      const dailyWordsGoal = document.getElementById('daily-words-goal');
-      const dailyQuizGoal = document.getElementById('daily-quiz-goal');
-      const weeklyDaysGoal = document.getElementById('weekly-days-goal');
-      const weeklyMasteryGoal = document.getElementById('weekly-mastery-goal');
+      if (goalsData) {
+        userProgressData.goals = goalsData;
 
-      if (dailyWordsGoal && goalsData.daily?.words) {
-        dailyWordsGoal.value = goalsData.daily.words;
-      }
-      if (dailyQuizGoal && goalsData.daily?.quizMinutes) {
-        dailyQuizGoal.value = goalsData.daily.quizMinutes;
-      }
-      if (weeklyDaysGoal && goalsData.weekly?.studyDays) {
-        weeklyDaysGoal.value = goalsData.weekly.studyDays;
-      }
-      if (weeklyMasteryGoal && goalsData.weekly?.masteryWords) {
-        weeklyMasteryGoal.value = goalsData.weekly.masteryWords;
-      }
+        // 목표 입력 필드에 값 설정
+        const dailyWordsGoal = document.getElementById('daily-words-goal');
+        const dailyQuizGoal = document.getElementById('daily-quiz-goal');
+        const weeklyDaysGoal = document.getElementById('weekly-days-goal');
+        const weeklyMasteryGoal = document.getElementById('weekly-mastery-goal');
 
-      console.log("✅ 사용자 목표 로드 완료:", goalsData);
+        if (dailyWordsGoal && goalsData.daily?.words) {
+          dailyWordsGoal.value = goalsData.daily.words;
+        }
+        if (dailyQuizGoal && goalsData.daily?.quizMinutes) {
+          dailyQuizGoal.value = goalsData.daily.quizMinutes;
+        }
+        if (weeklyDaysGoal && goalsData.weekly?.studyDays) {
+          weeklyDaysGoal.value = goalsData.weekly.studyDays;
+        }
+        if (weeklyMasteryGoal && goalsData.weekly?.masteryWords) {
+          weeklyMasteryGoal.value = goalsData.weekly.masteryWords;
+        }
+
+        console.log("✅ 사용자 목표 로드 완료:", goalsData);
+      } else {
+        console.log("⚠️ 사용자 목표 데이터가 없습니다. 기본값 사용");
+        // 기본값 설정
+        userProgressData.goals = {
+          daily: { words: 10, quizMinutes: 20 },
+          weekly: { studyDays: 5, masteryWords: 30 }
+        };
+      }
     } else {
-      console.log("⚠️ 사용자 목표 데이터가 없습니다. 기본값 사용");
+      console.log("⚠️ user_records 문서가 없습니다. 기본값 사용");
+      // 기본값 설정
+      userProgressData.goals = {
+        daily: { words: 10, quizMinutes: 20 },
+        weekly: { studyDays: 5, masteryWords: 30 }
+      };
     }
+
   } catch (error) {
-    console.error("❌ 사용자 목표 로드 중 오류:", error);
+    console.error("사용자 목표 로드 중 오류:", error);
   }
 }
 
