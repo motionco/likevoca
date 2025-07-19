@@ -348,6 +348,26 @@
     </div>
   </main>
 
+  <!-- 📊 총 단어 목록 모달 -->
+  <div id="totalWordsModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+    style="display: none;">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden">
+      <div class="flex items-center justify-between p-6 border-b">
+        <h2 class="text-xl font-bold text-gray-900">📊 학습 진행 상황</h2>
+        <button onclick="closeTotalWordsModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+      </div>
+      <div id="totalWordsModalBody" class="p-6 overflow-y-auto max-h-96">
+        <!-- 모달 내용이 여기에 동적으로 추가됩니다 -->
+      </div>
+      <div class="p-6 border-t bg-gray-50 text-center">
+        <button onclick="closeTotalWordsModal()"
+          class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+          닫기
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Navbar -->
   <script type="module" src="../../components/js/navbar.js"></script>
 

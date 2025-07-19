@@ -8,6 +8,7 @@ import {
   collection,
   query,
   getDocs,
+  getDoc,
   orderBy,
   where,
   limit,
@@ -1024,7 +1025,7 @@ function selectAnswer(answer, optionElement) {
   // 답안 기록
   quizData.userAnswers.push({
     questionId: question.id,
-    conceptId: question.conceptId, // 🎯 user_progress 업데이트를 위한 conceptId 추가
+    concept_id: question.conceptId, // concept_id로 통일
     questionType: question.type,
     userAnswer: answer,
     correctAnswer: question.correctAnswer,
@@ -1134,7 +1135,7 @@ function skipQuestion() {
 
   quizData.userAnswers.push({
     questionId: question.id,
-    conceptId: question.conceptId, // 🎯 user_progress 업데이트를 위한 conceptId 추가
+    concept_id: question.conceptId, // concept_id로 통일
     questionType: question.type,
     userAnswer: null,
     correctAnswer: question.correctAnswer,
@@ -1204,8 +1205,8 @@ async function saveQuizResult(result) {
   try {
     console.log("💾 퀴즈 결과 저장 시작:", result);
 
-    // 1. 퀴즈 결과 저장 (자동 ID 사용)
-    const resultDoc = {
+    // 1. 🎯 quiz_records 컬렉션에 상세 퀴즈 기록 저장
+    const quizRecord = {
       user_email: currentUser.email,
       quiz_type: result.settings.quizType,
       source_language: result.settings.sourceLanguage,
@@ -1214,34 +1215,52 @@ async function saveQuizResult(result) {
       score: result.score,
       correct_answers: result.correctCount,
       total_questions: result.totalCount,
+      accuracy: Math.round((result.correctCount / result.totalCount) * 100),
       time_spent: result.totalTime,
       answers: result.answers,
-      completed_at: serverTimestamp(),
+      completed_at: new Date(),
+      timestamp: new Date(),
+      metadata: {
+        created_at: new Date(),
+        question_count: result.totalCount,
+        settings: result.settings
+      }
     };
 
+    // quiz_records에 저장
     const quizRef = doc(collection(db, "quiz_records"));
-    await setDoc(quizRef, resultDoc);
-    console.log("✅ 퀴즈 결과 저장 완료");
+    await setDoc(quizRef, quizRecord);
+    console.log("✅ quiz_records에 퀴즈 기록 저장 완료");
 
-    // 2. 🎯 개인 학습 진도 업데이트
+    // 2. 🎯 user_records에 통합 통계 업데이트
     try {
       await collectionManager.updateUserProgressFromQuiz(currentUser.email, {
         answers: result.answers,
         totalTime: result.totalTime,
         score: result.score,
+        accuracy: quizRecord.accuracy,
+        correctCount: result.correctCount,
+        totalCount: result.totalCount
       });
-      console.log("✅ 학습 진도 업데이트 완료");
+      console.log("✅ user_records 퀴즈 통계 업데이트 완료");
     } catch (progressError) {
-      console.error(
-        "⚠️ 학습 진도 업데이트 실패 (퀴즈 결과는 저장됨):",
-        progressError
-      );
+      console.error("❌ user_records 업데이트 실패:", progressError);
+      // quiz_records는 저장되었으므로 계속 진행
     }
 
-    // 3. 퀴즈 기록 새로고침
-    await loadQuizHistory();
+    // 진도 페이지 자동 업데이트를 위한 localStorage 신호
+    localStorage.setItem("quizCompletionUpdate", JSON.stringify({
+      userId: currentUser.uid,
+      timestamp: new Date().toISOString(),
+      score: result.score,
+      correctCount: result.correctCount,
+      totalCount: result.totalCount
+    }));
+
+    console.log("✅ 퀴즈 결과 저장 및 진도 업데이트 완료");
   } catch (error) {
     console.error("❌ 퀴즈 결과 저장 중 오류:", error);
+    throw error;
   }
 }
 
@@ -1288,50 +1307,66 @@ async function loadQuizHistory() {
   try {
     if (!currentUser) return;
 
-    // quiz_records 컬렉션에서 퀴즈 기록 조회
-    const historyQuery = query(
-      collection(db, "quiz_records"),
+    // 📊 quiz_records 컬렉션에서 퀴즈 기록 로드 (인덱스 오류 방지를 위해 단순화)
+    const quizRecordsRef = collection(db, "quiz_records");
+    const q = query(
+      quizRecordsRef,
       where("user_email", "==", currentUser.email),
       limit(10)
     );
 
-    const historySnapshot = await getDocs(historyQuery);
+    const querySnapshot = await getDocs(q);
 
-    if (historySnapshot.empty) {
+    if (querySnapshot.empty) {
       elements.quizHistory.innerHTML = `
         <p class="text-gray-500 text-center py-8">아직 퀴즈 기록이 없습니다.</p>
       `;
       return;
     }
 
-    // JavaScript로 정렬
-    const sortedResults = historySnapshot.docs
-      .map((doc) => ({ id: doc.id, ...doc.data() }))
-      .sort((a, b) => {
-        const aTime = a.completed_at?.toDate?.() || new Date(a.completed_at);
-        const bTime = b.completed_at?.toDate?.() || new Date(b.completed_at);
-        return bTime.getTime() - aTime.getTime(); // 최신순
-      })
-      .slice(0, 10); // 상위 10개만
+    // 📊 데이터를 가져온 후 클라이언트에서 정렬
+    const quizRecords = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      quizRecords.push({
+        id: doc.id,
+        ...data,
+        // completed_at 필드 정규화
+        sortDate: data.completed_at?.toDate?.() || data.timestamp?.toDate?.() || new Date()
+      });
+    });
+
+    // 클라이언트에서 날짜순 정렬 (최신순)
+    quizRecords.sort((a, b) => b.sortDate - a.sortDate);
 
     let historyHTML = "";
-    sortedResults.forEach((data) => {
+    quizRecords.slice(0, 10).forEach((data) => {
+      const accuracy = data.accuracy || Math.round((data.correct_answers / data.total_questions) * 100) || 0;
+      const score = data.score || 0;
+      const questions = data.total_questions || 5;
+      const completedDate = data.sortDate;
+      
       historyHTML += `
         <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
           <div>
-            <span class="font-medium">${data.quiz_type} 퀴즈</span>
+            <span class="font-medium">${data.quiz_type || '어휘'} 퀴즈</span>
             <span class="text-sm text-gray-600 ml-2">
-              ${data.source_language} → ${data.target_language}
+              ${data.source_language || '한국어'} → ${data.target_language || '영어'} (${questions}문제)
             </span>
           </div>
           <div class="text-right">
             <div class="font-medium text-${
-              data.score >= 80 ? "green" : data.score >= 60 ? "yellow" : "red"
+              accuracy >= 80 ? "green" : accuracy >= 60 ? "yellow" : "red"
             }-600">
-              ${data.score}%
+              ${accuracy}%
             </div>
             <div class="text-xs text-gray-500">
-              ${data.completed_at ? formatDate(data.completed_at.toDate()) : ""}
+              ${completedDate.toLocaleDateString('ko-KR', { 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              })}
             </div>
           </div>
         </div>
@@ -1340,9 +1375,9 @@ async function loadQuizHistory() {
 
     elements.quizHistory.innerHTML = historyHTML;
   } catch (error) {
-    console.error("퀴즈 기록 로드 중 오류:", error);
+    console.error("❌ 퀴즈 기록 로드 중 오류:", error);
     elements.quizHistory.innerHTML = `
-      <p class="text-red-500 text-center py-8">기록을 불러올 수 없습니다.</p>
+      <p class="text-red-500 text-center py-8">퀴즈 기록을 불러오는 중 오류가 발생했습니다.</p>
     `;
   }
 }

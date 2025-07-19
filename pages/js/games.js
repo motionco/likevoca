@@ -662,7 +662,7 @@ export async function saveGameResult(
         source: sourceLanguage,
         target: targetLanguage,
       },
-      accuracy: Math.round((score / 100) * 100) || 0,
+      accuracy: score, // Firebase 통계용 (score와 동일값, UI에서는 score만 표시)
       success: score >= 70,
       timestamp: serverTimestamp(), // 진도 페이지용
       completed_at: serverTimestamp(), // 활동용
@@ -1256,7 +1256,7 @@ async function completeGame(finalScore, timeSpent) {
               difficulty: gameDifficulty || "basic",
               sourceLanguage: sourceLanguage,
               targetLanguage: targetLanguage,
-              conceptIds: conceptIds,
+              conceptId: conceptIds, // concept_id로 통일
               accuracy: accuracy, // 🎯 정확도 필드 추가
               accuracyRate: accuracy / 100, // 0-1 범위로 변환
               performanceRating:
@@ -1299,37 +1299,27 @@ async function completeGame(finalScore, timeSpent) {
         console.warn("게임 통계 새로고침 중 오류:", error);
       }
 
-      // 🔄 진도 페이지의 게임 성취도도 업데이트 (있는 경우)
+      // 🔄 진도 페이지에서 감지할 수 있도록 localStorage에 게임 완료 정보 저장
       try {
-        if (typeof window.refreshProgressGameStats === "function") {
-          console.log("🎯 진도 페이지 게임 성취도 업데이트 시작...");
-          await window.refreshProgressGameStats();
-          console.log("🎯 진도 페이지 게임 성취도 업데이트 완료");
-        } else {
-          console.warn(
-            "⚠️ 진도 페이지가 로드되지 않아 localStorage로 게임 완료 상태 저장"
-          );
-          // localStorage에 게임 완료 정보 저장 (진도 페이지에서 감지용)
-          const gameCompletionData = {
-            gameType: currentGameType,
-            score: finalScore,
-            accuracy: accuracy,
-            totalTime: totalTime,
-            conceptsUpdated: updatedConceptsCount,
-            completedAt: new Date().toISOString(),
-            userId: currentUser.uid,
-          };
-          localStorage.setItem(
-            "gameCompletionUpdate",
-            JSON.stringify(gameCompletionData)
-          );
-          console.log(
-            "📦 localStorage에 게임 완료 데이터 저장:",
-            gameCompletionData
-          );
-        }
+        const gameCompletionData = {
+          gameType: currentGameType,
+          score: finalScore,
+          accuracy: accuracy,
+          totalTime: totalTime,
+          conceptsUpdated: updatedConceptsCount,
+          completedAt: new Date().toISOString(),
+          userId: currentUser.uid,
+        };
+        localStorage.setItem(
+          "gameCompletionUpdate",
+          JSON.stringify(gameCompletionData)
+        );
+        console.log(
+          "📦 localStorage에 게임 완료 데이터 저장:",
+          gameCompletionData
+        );
       } catch (error) {
-        console.warn("진도 페이지 게임 성취도 업데이트 중 오류:", error);
+        console.warn("게임 완료 데이터 저장 중 오류:", error);
       }
 
       // 게임 결과 표시
@@ -1958,7 +1948,22 @@ function checkWordMatch(card1, card2) {
     );
     if (remainingCards.length === 0) {
       setTimeout(() => {
-        completeGame(score);
+        // 시간 보너스 계산 (10초 이내 20점, 10초 초과시 초당 0.5점 차감)
+        const gameEndTime = Date.now();
+        const totalTimeInSeconds = Math.round((gameEndTime - gameState.startTime) / 1000);
+        let finalScore = score;
+        
+        let timeBonus = 0;
+        if (totalTimeInSeconds <= 10) {
+          timeBonus = 20; // 1~10초: 20점
+        } else if (totalTimeInSeconds <= 30) {
+          timeBonus = 20 - Math.round((totalTimeInSeconds - 10) * 0.5); // 10초 초과시 초당 0.5점 차감
+        }
+        
+        finalScore += timeBonus;
+        console.log(`🏆 시간 보너스: ${timeBonus}점 (${totalTimeInSeconds}초 완료)`);
+        
+        completeGame(finalScore, totalTimeInSeconds);
       }, 500);
     }
   } else {

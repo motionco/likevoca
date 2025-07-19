@@ -2160,104 +2160,136 @@ export class CollectionManager {
   /**
    * 퀴즈 결과를 바탕으로 사용자 진도 업데이트
    */
-  async updateUserProgressFromQuiz(userEmail, quizResults) {
+  async updateUserProgressFromQuiz(userEmail, quizData) {
     try {
       console.log("📊 퀴즈 결과 기반 사용자 진도 업데이트 시작");
 
-      const batch = writeBatch(db);
-      const updatedConcepts = new Set();
-
-      // 📊 각 퀴즈 답변에 대해 진도 업데이트 (중복 개념도 개별 처리)
-      for (const answer of quizResults.answers) {
-        const conceptId = answer.conceptId;
-        if (!conceptId) continue;
-
-        // 🎯 중복 개념도 처리하되, 같은 개념에 대해서는 한 번만 진도 업데이트
-        const progressKey = `${conceptId}_${answer.questionIndex || 0}`;
-        if (updatedConcepts.has(conceptId)) {
-          // 이미 처리된 개념이지만, 추가 노출 횟수는 증가
-          continue;
+      // 📊 user_records 문서 참조 및 현재 데이터 확인
+      const userRecordRef = doc(db, "user_records", userEmail);
+      const userDoc = await getDoc(userRecordRef);
+      
+      let currentRecord = {};
+      if (userDoc.exists()) {
+        currentRecord = userDoc.data();
+        
+        // recent_studied가 객체인 경우 배열로 마이그레이션
+        if (currentRecord.recent_studied && !Array.isArray(currentRecord.recent_studied)) {
+          console.log("🔄 recent_studied 데이터 마이그레이션: 객체 → 배열");
+          currentRecord.recent_studied = [];
         }
-
-        updatedConcepts.add(conceptId);
-        const progressId = `${userEmail}_${conceptId}`;
-        const progressRef = doc(db, "user_records", progressId);
-
-        // 기존 진도 확인
-        const progressDoc = await getDoc(progressRef);
-        let currentProgress = {};
-
-        if (progressDoc.exists()) {
-          currentProgress = progressDoc.data();
-        } else {
-          // 진도가 없으면 초기화
-          await this.initializeUserProgress(conceptId, userEmail);
-          const newProgressDoc = await getDoc(progressRef);
-          currentProgress = newProgressDoc.data();
-        }
-
-        // 새로운 성과 계산
-        const conceptAnswers = quizResults.answers.filter(
-          (a) => a.conceptId === conceptId
-        );
-        const correctAnswers = conceptAnswers.filter((a) => a.isCorrect).length;
-        const totalAnswers = conceptAnswers.length;
-        const accuracy = totalAnswers > 0 ? correctAnswers / totalAnswers : 0;
-
-        // 진도 업데이트 데이터 준비
-        const updatedData = {
-          // 퀴즈 성과 업데이트
-          "quiz_performance.total_attempts":
-            (currentProgress.quiz_performance?.total_attempts || 0) +
-            totalAnswers,
-          "quiz_performance.correct_answers":
-            (currentProgress.quiz_performance?.correct_answers || 0) +
-            correctAnswers,
-          "quiz_performance.average_time": Math.round(
-            ((currentProgress.quiz_performance?.average_time || 0) +
-              quizResults.totalTime) /
-              2
-          ),
-
-          // 어휘 마스터리 업데이트 (정확도 기반)
-          "vocabulary_mastery.recognition": Math.min(
-            100,
-            (currentProgress.vocabulary_mastery?.recognition || 0) +
-              accuracy * 20
-          ),
-          "vocabulary_mastery.last_studied": serverTimestamp(),
-          "vocabulary_mastery.study_count":
-            (currentProgress.vocabulary_mastery?.study_count || 0) + 1,
-
-          // 전체 마스터리 레벨 계산
-          "overall_mastery.last_interaction": serverTimestamp(),
-          "overall_mastery.level": this.calculateOverallMastery(
-            currentProgress,
-            accuracy
-          ),
-          "overall_mastery.status": this.calculateMasteryStatus(
-            currentProgress,
-            accuracy
-          ),
-        };
-
-        // 연속 정답 기록 업데이트
-        if (correctAnswers === totalAnswers && totalAnswers > 0) {
-          const currentStreak =
-            currentProgress.quiz_performance?.best_streak || 0;
-          updatedData["quiz_performance.best_streak"] = Math.max(
-            currentStreak,
-            totalAnswers
-          );
-        }
-
-        batch.update(progressRef, updatedData);
       }
 
-      await batch.commit();
-      console.log("✅ 사용자 진도 업데이트 완료");
+      // 📊 퀴즈 통계 계산 (NaN 방지를 위한 안전한 처리)
+      const correctCount = Number(quizData.correctCount) || 0;
+      const totalCount = Number(quizData.totalCount) || 1; // 최소 1로 설정하여 0으로 나누기 방지
+      const accuracy = quizData.accuracy || (totalCount > 0 ? Math.round((correctCount / totalCount) * 100) : 0);
+      const score = Number(quizData.score) || 0;
+      const timeSpent = Number(quizData.totalTime) || 0;
+
+      // 📊 현재 퀴즈 통계 가져오기 (NaN 방지를 위한 안전한 기본값)
+      const currentQuizStats = currentRecord.quiz_stats || {
+        total_quizzes: 0,
+        total_questions: 0,
+        correct_answers: 0,
+        avg_accuracy: 0,
+        best_accuracy: 0,
+        total_time: 0,
+        avg_time_per_quiz: 0,
+        best_score: 0,
+        recent_scores: []
+      };
+
+      const currentStats = currentRecord.stats || {};
+
+      // 📊 새로운 퀴즈 통계 계산 (안전한 숫자 처리)
+      const newTotalQuizzes = (Number(currentQuizStats.total_quizzes) || 0) + 1;
+      const newTotalQuestions = (Number(currentQuizStats.total_questions) || 0) + totalCount;
+      const newCorrectAnswers = (Number(currentQuizStats.correct_answers) || 0) + correctCount;
+      const newTotalTime = (Number(currentQuizStats.total_time) || 0) + timeSpent;
+      
+      // NaN 방지를 위한 안전한 나눗셈 처리
+      const newAvgAccuracy = newTotalQuestions > 0 ? Math.round(((newCorrectAnswers / newTotalQuestions) * 100) * 100) / 100 : 0;
+      const newBestAccuracy = Math.max(Number(currentQuizStats.best_accuracy) || 0, accuracy);
+      const newAvgTimePerQuiz = newTotalQuizzes > 0 ? Math.round(newTotalTime / newTotalQuizzes) : 0;
+      const newBestScore = Math.max(Number(currentQuizStats.best_score) || 0, score);
+
+      // 최근 점수 기록 (최대 10개)
+      const recentScores = [...(currentQuizStats.recent_scores || []), score];
+      if (recentScores.length > 10) {
+        recentScores.shift();
+      }
+
+      // 📊 업데이트할 데이터 준비 (NaN 방지를 위한 안전한 검증)
+      const now = new Date();
+      
+      // 모든 수치 데이터에 대해 NaN 체크 및 안전한 처리
+      const safeAvgAccuracy = isNaN(newAvgAccuracy) ? 0 : newAvgAccuracy;
+      const safeBestAccuracy = isNaN(newBestAccuracy) ? 0 : newBestAccuracy;
+      const safeAvgTimePerQuiz = isNaN(newAvgTimePerQuiz) ? 0 : newAvgTimePerQuiz;
+      
+      const updatedData = {
+        // 퀴즈 통계 업데이트
+        quiz_stats: {
+          total_quizzes: newTotalQuizzes,
+          total_questions: newTotalQuestions,
+          correct_answers: newCorrectAnswers,
+          avg_accuracy: Math.round(safeAvgAccuracy * 100) / 100,
+          best_accuracy: Math.round(safeBestAccuracy * 100) / 100,
+          total_time: newTotalTime,
+          avg_time_per_quiz: Math.round(safeAvgTimePerQuiz),
+          best_score: newBestScore,
+          recent_scores: recentScores,
+          last_quiz_date: now
+        },
+
+        // 전체 통계 업데이트
+        stats: {
+          ...currentStats,
+          quiz_accuracy: Math.round(safeAvgAccuracy * 100) / 100,
+          total_quiz_time: newTotalTime,
+          last_activity: now
+        },
+
+        // 마지막 업데이트 시간
+        last_updated: now
+      };
+
+      // 📊 Firestore 업데이트 (문서가 없으면 생성, 있으면 업데이트)
+      if (userDoc.exists()) {
+        await updateDoc(userRecordRef, updatedData);
+      } else {
+        // 새 사용자 문서 생성
+        const newUserRecord = {
+          user_email: userEmail,
+          ...updatedData,
+          mastered_concepts: [],
+          recent_studied: [],
+          learning_stats: {
+            total_sessions: 0,
+            total_time: 0,
+            concepts_learned: 0,
+            avg_accuracy: 0,
+            last_session_date: null
+          },
+          game_stats: {
+            total_games: 0,
+            total_time: 0,
+            avg_score: 0,
+            best_score: 0,
+            last_game_date: null
+          }
+        };
+        await setDoc(userRecordRef, newUserRecord);
+      }
+
+      console.log("✅ 사용자 퀴즈 진도 업데이트 완료:", {
+        quiz: newTotalQuizzes,
+        accuracy: Math.round(newAvgAccuracy * 100) / 100,
+        score: score
+      });
+
     } catch (error) {
-      console.error("❌ 사용자 진도 업데이트 중 오류:", error);
+      console.error("❌ 사용자 퀴즈 진도 업데이트 중 오류:", error);
     }
   }
 
@@ -2649,12 +2681,13 @@ export class CollectionManager {
   }
 
   /**
-   * 📚 학습 활동 추적 (학습 페이지용)
+   * 📚 학습 활동 추적 (학습 페이지용) - 퀴즈와 동일한 분산 저장 구조
    */
   async updateLearningActivity(userEmail, activityData) {
     try {
       console.log("📚 학습 활동 추적 시작:", activityData);
 
+      // 1. 🎯 learning_records 컬렉션에 상세 학습 기록 저장
       const learningActivityRef = doc(collection(db, "learning_records"));
 
       const activityDoc = {
@@ -2662,7 +2695,7 @@ export class CollectionManager {
         type: activityData.type, // "vocabulary", "grammar", "reading" - 진도 페이지 호환성
         activity_type: activityData.type, // "vocabulary", "grammar", "reading"
         learning_mode: activityData.learning_mode, // 🆕 세부 학습 모드 ("flashcard", "typing", "pattern", "flash" 등)
-        concept_ids: activityData.conceptIds || [],
+        concept_id: activityData.conceptIds || [], // concept_id로 통일
 
         // 🔄 품질 계산에 필요한 필드들 (progress.js와 동기화)
         session_duration:
@@ -2679,7 +2712,8 @@ export class CollectionManager {
           activityData.totalInteractions ||
           0,
 
-        completed_at: serverTimestamp(),
+        completed_at: new Date(),
+        timestamp: new Date(),
         score: activityData.score || null,
         difficulty: activityData.difficulty || "beginner",
         language_pair: {
@@ -2708,27 +2742,23 @@ export class CollectionManager {
       };
 
       await setDoc(learningActivityRef, activityDoc);
+      console.log("✅ learning_records에 학습 기록 저장 완료");
 
-      console.log("✅ 학습 활동 기록 저장 완료:", {
-        docId: learningActivityRef.id,
-        savedData: {
-          session_duration: activityDoc.session_duration,
-          concepts_studied: activityDoc.concepts_studied,
-          correct_answers: activityDoc.correct_answers,
-          total_interactions: activityDoc.total_interactions,
-          session_quality: activityDoc.session_quality,
-          type: activityDoc.type,
-          learning_mode: activityDoc.learning_mode,
-          conceptIds: activityDoc.concept_ids.length,
-          hasSessionQuality:
-            activityDoc.session_quality !== undefined &&
-            activityDoc.session_quality !== null,
-        },
-      });
-
-      // 각 개념별 진도 업데이트
-      if (activityData.conceptIds && activityData.conceptIds.length > 0) {
-        await this.updateUserProgressFromLearning(userEmail, activityData);
+      // 2. 🎯 user_records에 통합 통계 업데이트
+      try {
+        await this.updateUserProgressFromLearning(userEmail, {
+          conceptIds: activityData.conceptIds || [],
+          session_duration: activityData.session_duration || activityData.duration || 0,
+          concepts_studied: activityData.concepts_studied || activityData.conceptsStudied || 0,
+          correct_answers: activityData.correct_answers || activityData.correctAnswers || 0,
+          total_interactions: activityData.total_interactions || activityData.totalInteractions || 0,
+          session_quality: activityData.session_quality || 0,
+          activity_type: activityData.type
+        });
+        console.log("✅ user_records 학습 통계 업데이트 완료");
+      } catch (progressError) {
+        console.error("❌ user_records 업데이트 실패:", progressError);
+        // learning_records는 저장되었으므로 계속 진행
       }
 
       console.log("✅ 학습 활동 추적 완료");
@@ -2740,81 +2770,309 @@ export class CollectionManager {
   }
 
   /**
-   * 📚 학습 활동 기반 진도 업데이트
+   * 📚 학습 활동 기반 사용자 진도 업데이트 (퀴즈와 동일한 구조)
    */
   async updateUserProgressFromLearning(userEmail, learningData) {
     try {
-      const batch = writeBatch(db);
-      const updatedConcepts = new Set();
+      console.log("📊 학습 결과 기반 사용자 진도 업데이트 시작");
 
-      for (const conceptId of learningData.conceptIds || []) {
-        if (updatedConcepts.has(conceptId)) continue;
-        updatedConcepts.add(conceptId);
-
-        const progressId = `${userEmail}_${conceptId}`;
-        const progressRef = doc(db, "user_records", progressId);
-
-        // 기존 진도 확인
-        const progressDoc = await getDoc(progressRef);
-        let currentProgress = {};
-
-        if (progressDoc.exists()) {
-          currentProgress = progressDoc.data();
-        } else {
-          await this.initializeUserProgress(conceptId, userEmail);
-          const newProgressDoc = await getDoc(progressRef);
-          currentProgress = newProgressDoc.data();
-        }
-
-        // 학습 활동 기반 진도 업데이트
-        const updatedData = {
-          "vocabulary_mastery.exposure_count":
-            (currentProgress.vocabulary_mastery?.exposure_count || 0) + 1,
-          "vocabulary_mastery.last_studied": serverTimestamp(),
-          "vocabulary_mastery.study_count":
-            (currentProgress.vocabulary_mastery?.study_count || 0) + 1,
-          "vocabulary_mastery.learning_time":
-            (currentProgress.vocabulary_mastery?.learning_time || 0) +
-            (learningData.session_duration || learningData.duration || 5), // 기본 5분
-
-          "overall_mastery.last_interaction": serverTimestamp(),
-          "overall_mastery.level": Math.min(
-            100,
-            (currentProgress.overall_mastery?.level || 0) + 5
-          ), // 학습시 5점 증가
-        };
-
-        // 마스터리 상태 재계산
-        const newLevel = updatedData["overall_mastery.level"];
-        updatedData["overall_mastery.status"] =
-          newLevel >= 60
-            ? "mastered"
-            : newLevel >= 30
-            ? "practiced"
-            : newLevel > 0
-            ? "learning"
-            : "not_started";
-
-        console.log(`📊 개념 ${conceptId} 진도 업데이트:`, {
-          previousLevel: currentProgress.overall_mastery?.level || 0,
-          newLevel: newLevel,
-          status: updatedData["overall_mastery.status"],
-          exposureCount: updatedData["vocabulary_mastery.exposure_count"],
-          studyCount: updatedData["vocabulary_mastery.study_count"],
-        });
-
-        batch.update(progressRef, updatedData);
+      // 📊 user_records 문서 참조 및 현재 데이터 확인
+      const userRecordRef = doc(db, "user_records", userEmail);
+      const userDoc = await getDoc(userRecordRef);
+      
+      let currentRecord = {};
+      if (userDoc.exists()) {
+        currentRecord = userDoc.data();
       }
 
-      await batch.commit();
-      console.log("✅ 학습 기반 진도 업데이트 완료:", {
-        updatedConceptsCount: updatedConcepts.size,
-        conceptIds: Array.from(updatedConcepts),
-        sessionDuration: learningData.session_duration || learningData.duration,
-        conceptsStudied: learningData.concepts_studied,
+      // 📊 학습 통계 계산 (NaN 방지를 위한 안전한 처리)
+      const conceptsStudied = Number(learningData.concepts_studied) || 0;
+      const sessionDuration = Number(learningData.session_duration) || 0;
+      const correctAnswers = Number(learningData.correct_answers) || 0;
+      const totalInteractions = Number(learningData.total_interactions) || 1; // 최소 1로 설정
+      const sessionQuality = Number(learningData.session_quality) || 0;
+
+      // 📊 현재 학습 통계 가져오기 (NaN 방지를 위한 안전한 기본값)
+      const currentLearningStats = currentRecord.learning_stats || {
+        total_sessions: 0,
+        total_time: 0,
+        concepts_learned: 0,
+        avg_accuracy: 0,
+        avg_quality: 0,
+        last_session_date: null
+      };
+
+      const currentStats = currentRecord.stats || {};
+
+      // 📊 새로운 학습 통계 계산 (안전한 숫자 처리)
+      const newTotalSessions = (Number(currentLearningStats.total_sessions) || 0) + 1;
+      const newTotalTime = (Number(currentLearningStats.total_time) || 0) + sessionDuration;
+      const newConceptsLearned = (Number(currentLearningStats.concepts_learned) || 0) + conceptsStudied;
+      
+      // NaN 방지를 위한 안전한 나눗셈 처리
+      const newAvgAccuracy = totalInteractions > 0 ? Math.round(((correctAnswers / totalInteractions) * 100) * 100) / 100 : 0;
+      const currentAvgAccuracy = Number(currentLearningStats.avg_accuracy) || 0;
+      const combinedAvgAccuracy = newTotalSessions > 0 ? 
+        Math.round(((currentAvgAccuracy * (newTotalSessions - 1) + newAvgAccuracy) / newTotalSessions) * 100) / 100 : 0;
+      
+      const newAvgQuality = sessionQuality;
+      const currentAvgQuality = Number(currentLearningStats.avg_quality) || 0;
+      const combinedAvgQuality = newTotalSessions > 0 ? 
+        Math.round(((currentAvgQuality * (newTotalSessions - 1) + newAvgQuality) / newTotalSessions) * 100) / 100 : 0;
+
+      // 📊 업데이트할 데이터 준비 (NaN 방지를 위한 안전한 검증)
+      const now = new Date();
+      
+      // 모든 수치 데이터에 대해 NaN 체크 및 안전한 처리
+      const safeAvgAccuracy = isNaN(combinedAvgAccuracy) ? 0 : combinedAvgAccuracy;
+      const safeAvgQuality = isNaN(combinedAvgQuality) ? 0 : combinedAvgQuality;
+      
+      const updatedData = {
+        // 학습 통계 업데이트
+        learning_stats: {
+          total_sessions: newTotalSessions,
+          total_time: newTotalTime,
+          concepts_learned: newConceptsLearned,
+          avg_accuracy: safeAvgAccuracy,
+          avg_quality: safeAvgQuality,
+          last_session_date: now
+        },
+
+        // 전체 통계 업데이트
+        stats: {
+          ...currentStats,
+          learning_accuracy: safeAvgAccuracy,
+          total_learning_time: newTotalTime,
+          last_activity: now
+        },
+
+        // 마지막 업데이트 시간
+        last_updated: now
+      };
+
+      // 📊 Firestore 업데이트 (문서가 없으면 생성, 있으면 업데이트)
+      if (userDoc.exists()) {
+        await updateDoc(userRecordRef, updatedData);
+      } else {
+        // 새 사용자 문서 생성
+        const newUserRecord = {
+          user_email: userEmail,
+          ...updatedData,
+          mastered_concepts: [],
+          recent_studied: [],
+          quiz_stats: {
+            total_quizzes: 0,
+            total_questions: 0,
+            correct_answers: 0,
+            avg_accuracy: 0,
+            best_accuracy: 0,
+            total_time: 0,
+            avg_time_per_quiz: 0,
+            best_score: 0,
+            recent_scores: []
+          },
+          game_stats: {
+            total_games: 0,
+            total_time: 0,
+            avg_score: 0,
+            best_score: 0,
+            last_game_date: null
+          }
+        };
+        await setDoc(userRecordRef, newUserRecord);
+      }
+
+      console.log("✅ 사용자 학습 진도 업데이트 완료:", {
+        sessions: newTotalSessions,
+        accuracy: safeAvgAccuracy,
+        quality: safeAvgQuality,
+        conceptsLearned: newConceptsLearned
       });
+
     } catch (error) {
-      console.error("❌ 학습 기반 진도 업데이트 중 오류:", error);
+      console.error("❌ 사용자 학습 진도 업데이트 중 오류:", error);
+    }
+  }
+
+  /**
+   * 🎯 통합 사용자 기록 업데이트 (새로운 구조)
+   * ❌ 더 이상 사용하지 않음 - 각 활동별 전용 함수로 대체됨
+   * - updateUserProgressFromQuiz()
+   * - updateUserProgressFromLearning()
+   * - updateUserProgressFromGame()
+   */
+  /*
+  async updateUnifiedUserRecord(userEmail, learningData) {
+    try {
+      console.log("🎯 통합 사용자 기록 업데이트 시작:", learningData);
+      
+      const userRecordRef = doc(db, "user_records", userEmail);
+      const userRecordDoc = await getDoc(userRecordRef);
+      
+      let currentData = {};
+      if (userRecordDoc.exists()) {
+        currentData = userRecordDoc.data();
+      }
+      
+      // 📊 통계 업데이트
+      const updatedStats = {
+        ...currentData.stats,
+        study_streak: (currentData.stats?.study_streak || 0) + 1,
+        quiz_accuracy: learningData.quiz_accuracy || currentData.stats?.quiz_accuracy || 0,
+        overall_mastery_rate: learningData.overall_mastery_rate || currentData.stats?.overall_mastery_rate || 0
+      };
+      
+      // 학습 타입별 카운트 업데이트
+      const activityType = learningData.type || learningData.activity_type || 'vocabulary';
+      if (activityType === 'vocabulary') {
+        updatedStats.total_vocabulary = (updatedStats.total_vocabulary || 0) + (learningData.concepts_studied || 0);
+      } else if (activityType === 'grammar') {
+        updatedStats.total_grammar = (updatedStats.total_grammar || 0) + (learningData.concepts_studied || 0);
+      } else if (activityType === 'examples') {
+        updatedStats.total_examples = (updatedStats.total_examples || 0) + (learningData.concepts_studied || 0);
+      }
+      
+      // 🏆 마스터한 개념들 업데이트 (concept_snapshot 포함)
+      const masteredConcepts = currentData.mastered_concepts || {};
+      const recentStudied = currentData.recent_studied || {};
+      
+      // 개념 데이터 병렬 로드
+      const conceptPromises = (learningData.conceptIds || []).map(async (conceptId) => {
+        try {
+          const conceptSnapshot = await this.getConceptSnapshot(conceptId, activityType);
+          return { conceptId, conceptSnapshot };
+        } catch (error) {
+          console.warn(`개념 스냅샷 로드 실패: ${conceptId}`, error);
+          return { conceptId, conceptSnapshot: null };
+        }
+      });
+      
+      const conceptResults = await Promise.all(conceptPromises);
+      
+      conceptResults.forEach(({ conceptId, conceptSnapshot }) => {
+        const conceptData = {
+          type: activityType,
+          current_level: 5, // 기본 학습 레벨
+          last_studied: new Date().toISOString(),
+          concept_snapshot: conceptSnapshot,
+          updated_at: new Date().toISOString()
+        };
+        
+        // 마스터리 레벨에 따라 분류
+        if (conceptData.current_level >= 60) {
+          masteredConcepts[conceptId] = {
+            ...conceptData,
+            mastery_level: conceptData.current_level,
+            mastered_date: new Date().toISOString()
+          };
+        } else {
+          recentStudied[conceptId] = conceptData;
+        }
+      });
+      
+      // 📚 학습 통계 업데이트
+      const learningStats = {
+        ...currentData.learning_stats,
+        total_sessions: (currentData.learning_stats?.total_sessions || 0) + 1,
+        avg_quality: learningData.session_quality || currentData.learning_stats?.avg_quality || 0,
+        total_time: (currentData.learning_stats?.total_time || 0) + (learningData.session_duration || 0)
+      };
+      
+      // 🎮 게임 통계 업데이트 (게임 활동인 경우)
+      let gameStats = currentData.game_stats || {};
+      if (learningData.activity_type === 'game') {
+        gameStats = {
+          ...gameStats,
+          total_games: (gameStats.total_games || 0) + 1,
+          avg_score: learningData.score || gameStats.avg_score || 0,
+          best_score: Math.max(gameStats.best_score || 0, learningData.score || 0),
+          total_time: (gameStats.total_time || 0) + (learningData.duration || 0)
+        };
+      }
+      
+      // 🎯 퀴즈 통계 업데이트 (퀴즈 활동인 경우)
+      let quizStats = currentData.quiz_stats || {};
+      if (learningData.activity_type === 'quiz') {
+        quizStats = {
+          ...quizStats,
+          total_quizzes: (quizStats.total_quizzes || 0) + 1,
+          avg_accuracy: learningData.accuracy || quizStats.avg_accuracy || 0,
+          total_time: (quizStats.total_time || 0) + (learningData.duration || 0)
+        };
+      }
+      
+      // 🔄 통합 문서 업데이트
+      const updateData = {
+        user_email: userEmail,
+        stats: updatedStats,
+        mastered_concepts: masteredConcepts,
+        recent_studied: recentStudied,
+        learning_stats: learningStats,
+        game_stats: gameStats,
+        quiz_stats: quizStats,
+        last_updated: serverTimestamp()
+      };
+      
+      await setDoc(userRecordRef, updateData, { merge: true });
+      console.log("✅ 통합 사용자 기록 업데이트 완료:", {
+        conceptsUpdated: conceptResults.length,
+        statsUpdated: Object.keys(updatedStats).length,
+        masteredCount: Object.keys(masteredConcepts).length,
+        recentCount: Object.keys(recentStudied).length
+      });
+      
+    } catch (error) {
+      console.error("❌ 통합 사용자 기록 업데이트 중 오류:", error);
+    }
+  }
+  */
+  
+  /**
+   * 📋 개념 스냅샷 생성 (추가 DB 조회 없이 모든 정보 포함)
+   */
+  async getConceptSnapshot(conceptId, conceptType = 'vocabulary') {
+    try {
+      let collectionName = 'concepts';
+      if (conceptType === 'grammar') collectionName = 'grammar';
+      else if (conceptType === 'examples') collectionName = 'examples';
+      
+      const conceptDoc = await getDoc(doc(db, collectionName, conceptId));
+      if (!conceptDoc.exists()) {
+        return null;
+      }
+      
+      const data = conceptDoc.data();
+      
+      // 데이터 구조에 따라 스냅샷 생성
+      let snapshot = {
+        korean: '',
+        english: '',
+        japanese: '',
+        chinese: '',
+        domain: data.domain || '일반',
+        difficulty: data.difficulty || '초급',
+        type: conceptType
+      };
+      
+      if (data.expressions) {
+        // 다국어 표현 구조
+        snapshot.korean = data.expressions.korean?.word || data.expressions.korean || '';
+        snapshot.english = data.expressions.english?.word || data.expressions.english || '';
+        snapshot.japanese = data.expressions.japanese?.word || data.expressions.japanese || '';
+        snapshot.chinese = data.expressions.chinese?.word || data.expressions.chinese || '';
+      } else {
+        // 단일 언어 구조
+        snapshot.korean = data.korean || data.word || '';
+        snapshot.english = data.english || '';
+        snapshot.japanese = data.japanese || '';
+        snapshot.chinese = data.chinese || '';
+      }
+      
+      return snapshot;
+      
+    } catch (error) {
+      console.warn(`개념 스냅샷 생성 실패: ${conceptId}`, error);
+      return null;
     }
   }
 
@@ -2918,12 +3176,13 @@ export class CollectionManager {
   }
 
   /**
-   * 🎮 게임 기록 추적 및 진도 업데이트
+   * 🎮 게임 기록 추적 및 진도 업데이트 (퀴즈와 동일한 분산 저장 구조)
    */
   async updateGameRecord(userEmail, gameData) {
     try {
       console.log("🎮 게임 기록 추적 시작:", gameData);
 
+      // 1. 🎯 game_records 컬렉션에 상세 게임 기록 저장
       const gameRecordRef = doc(collection(db, "game_records"));
 
       const activityDoc = {
@@ -2938,6 +3197,7 @@ export class CollectionManager {
         words_played: gameData.wordsPlayed || 0,
         correct_answers: gameData.correctAnswers || 0,
         total_answers: gameData.totalAnswers || 0,
+        concept_id: gameData.conceptId || [], // concept_id로 통일
         difficulty: gameData.difficulty || "basic",
         sourceLanguage: gameData.sourceLanguage,
         targetLanguage: gameData.targetLanguage,
@@ -2948,9 +3208,9 @@ export class CollectionManager {
         accuracy: gameData.accuracy || 0,
         success: gameData.success || false,
         isCompleted: gameData.isCompleted || true,
-        timestamp: gameData.timestamp || serverTimestamp(), // 진도 페이지용
-        completed_at: gameData.completed_at || serverTimestamp(), // game_activities용
-        playedAt: gameData.playedAt || serverTimestamp(), // 추가 호환성
+        timestamp: new Date(), // 진도 페이지용
+        completed_at: new Date(), // game_activities용
+        playedAt: new Date(), // 추가 호환성
         metadata: {
           game_duration: gameData.gameDuration || 0,
           accuracy_rate: gameData.accuracyRate || 0,
@@ -2959,10 +3219,22 @@ export class CollectionManager {
       };
 
       await setDoc(gameRecordRef, activityDoc);
+      console.log("✅ game_records에 게임 기록 저장 완료");
 
-      // 게임에서 사용된 개념들에 대한 진도 업데이트
-      if (gameData.conceptIds && gameData.conceptIds.length > 0) {
-        await this.updateUserProgressFromGame(userEmail, gameData);
+      // 2. 🎯 user_records에 통합 통계 업데이트
+      try {
+        await this.updateUserProgressFromGame(userEmail, {
+          score: gameData.score || 0,
+          timeSpent: gameData.timeSpent || gameData.time_spent || 0,
+          accuracy: gameData.accuracy || 0,
+          wordsPlayed: gameData.wordsPlayed || 0,
+          correctAnswers: gameData.correctAnswers || 0,
+          totalAnswers: gameData.totalAnswers || 0
+        });
+        console.log("✅ user_records 게임 통계 업데이트 완료");
+      } catch (progressError) {
+        console.error("❌ user_records 업데이트 실패:", progressError);
+        // game_records는 저장되었으므로 계속 진행
       }
 
       console.log("✅ 게임 기록 추적 완료");
@@ -2972,70 +3244,132 @@ export class CollectionManager {
   }
 
   /**
-   * 🎮 게임 기반 진도 업데이트
+   * 🎮 게임 기반 사용자 진도 업데이트 (퀴즈와 동일한 구조)
    */
   async updateUserProgressFromGame(userEmail, gameData) {
     try {
-      const batch = writeBatch(db);
-      const updatedConcepts = new Set();
+      console.log("📊 게임 결과 기반 사용자 진도 업데이트 시작");
 
-      for (const conceptId of gameData.conceptIds || []) {
-        if (updatedConcepts.has(conceptId)) continue;
-        updatedConcepts.add(conceptId);
-
-        const progressId = `${userEmail}_${conceptId}`;
-        const progressRef = doc(db, "user_records", progressId);
-
-        // 기존 진도 확인
-        const progressDoc = await getDoc(progressRef);
-        let currentProgress = {};
-
-        if (progressDoc.exists()) {
-          currentProgress = progressDoc.data();
-        } else {
-          await this.initializeUserProgress(conceptId, userEmail);
-          const newProgressDoc = await getDoc(progressRef);
-          currentProgress = newProgressDoc.data();
-        }
-
-        // 게임 성과 기반 진도 업데이트
-        const accuracyRate = gameData.accuracyRate || 0;
-        const pointsToAdd = Math.round(accuracyRate * 10); // 정확도에 따라 0-10점 추가
-
-        const updatedData = {
-          "vocabulary_mastery.game_exposure":
-            (currentProgress.vocabulary_mastery?.game_exposure || 0) + 1,
-          "vocabulary_mastery.last_studied": serverTimestamp(),
-          "vocabulary_mastery.game_score": Math.max(
-            currentProgress.vocabulary_mastery?.game_score || 0,
-            gameData.score || 0
-          ),
-
-          "overall_mastery.last_interaction": serverTimestamp(),
-          "overall_mastery.level": Math.min(
-            100,
-            (currentProgress.overall_mastery?.level || 0) + pointsToAdd
-          ),
-        };
-
-        // 마스터리 상태 재계산
-        const newLevel = updatedData["overall_mastery.level"];
-        updatedData["overall_mastery.status"] =
-          newLevel >= 60
-            ? "mastered"
-            : newLevel >= 30
-            ? "practiced"
-            : newLevel > 0
-            ? "learning"
-            : "not_started";
-
-        batch.update(progressRef, updatedData);
+      // 📊 user_records 문서 참조 및 현재 데이터 확인
+      const userRecordRef = doc(db, "user_records", userEmail);
+      const userDoc = await getDoc(userRecordRef);
+      
+      let currentRecord = {};
+      if (userDoc.exists()) {
+        currentRecord = userDoc.data();
       }
 
-      await batch.commit();
-      console.log("✅ 게임 기반 진도 업데이트 완료");
+      // 📊 게임 통계 계산 (NaN 방지를 위한 안전한 처리)
+      const score = Number(gameData.score) || 0;
+      const timeSpent = Number(gameData.timeSpent) || 0;
+      const accuracy = Number(gameData.accuracy) || 0;
+      const wordsPlayed = Number(gameData.wordsPlayed) || 0;
+      const correctAnswers = Number(gameData.correctAnswers) || 0;
+      const totalAnswers = Number(gameData.totalAnswers) || 1; // 최소 1로 설정
+
+      // 📊 현재 게임 통계 가져오기 (NaN 방지를 위한 안전한 기본값)
+      const currentGameStats = currentRecord.game_stats || {
+        total_games: 0,
+        total_time: 0,
+        avg_score: 0,
+        best_score: 0,
+        avg_accuracy: 0,
+        best_accuracy: 0,
+        last_game_date: null
+      };
+
+      const currentStats = currentRecord.stats || {};
+
+      // 📊 새로운 게임 통계 계산 (안전한 숫자 처리)
+      const newTotalGames = (Number(currentGameStats.total_games) || 0) + 1;
+      const newTotalTime = (Number(currentGameStats.total_time) || 0) + timeSpent;
+      
+      // NaN 방지를 위한 안전한 나눗셈 처리
+      const currentAvgScore = Number(currentGameStats.avg_score) || 0;
+      const newAvgScore = newTotalGames > 0 ? 
+        Math.round(((currentAvgScore * (newTotalGames - 1) + score) / newTotalGames) * 100) / 100 : 0;
+      
+      const newBestScore = Math.max(Number(currentGameStats.best_score) || 0, score);
+      
+      const currentAvgAccuracy = Number(currentGameStats.avg_accuracy) || 0;
+      const newAvgAccuracy = newTotalGames > 0 ? 
+        Math.round(((currentAvgAccuracy * (newTotalGames - 1) + accuracy) / newTotalGames) * 100) / 100 : 0;
+      
+      const newBestAccuracy = Math.max(Number(currentGameStats.best_accuracy) || 0, accuracy);
+
+      // 📊 업데이트할 데이터 준비 (NaN 방지를 위한 안전한 검증)
+      const now = new Date();
+      
+      // 모든 수치 데이터에 대해 NaN 체크 및 안전한 처리
+      const safeAvgScore = isNaN(newAvgScore) ? 0 : newAvgScore;
+      const safeAvgAccuracy = isNaN(newAvgAccuracy) ? 0 : newAvgAccuracy;
+      
+      const updatedData = {
+        // 게임 통계 업데이트
+        game_stats: {
+          total_games: newTotalGames,
+          total_time: newTotalTime,
+          avg_score: safeAvgScore,
+          best_score: newBestScore,
+          avg_accuracy: safeAvgAccuracy,
+          best_accuracy: newBestAccuracy,
+          last_game_date: now
+        },
+
+        // 전체 통계 업데이트
+        stats: {
+          ...currentStats,
+          game_accuracy: safeAvgAccuracy,
+          total_game_time: newTotalTime,
+          last_activity: now
+        },
+
+        // 마지막 업데이트 시간
+        last_updated: now
+      };
+
+      // 📊 Firestore 업데이트 (문서가 없으면 생성, 있으면 업데이트)
+      if (userDoc.exists()) {
+        await updateDoc(userRecordRef, updatedData);
+      } else {
+        // 새 사용자 문서 생성
+        const newUserRecord = {
+          user_email: userEmail,
+          ...updatedData,
+          mastered_concepts: [],
+          recent_studied: [],
+          quiz_stats: {
+            total_quizzes: 0,
+            total_questions: 0,
+            correct_answers: 0,
+            avg_accuracy: 0,
+            best_accuracy: 0,
+            total_time: 0,
+            avg_time_per_quiz: 0,
+            best_score: 0,
+            recent_scores: []
+          },
+          learning_stats: {
+            total_sessions: 0,
+            total_time: 0,
+            concepts_learned: 0,
+            avg_accuracy: 0,
+            avg_quality: 0,
+            last_session_date: null
+          }
+        };
+        await setDoc(userRecordRef, newUserRecord);
+      }
+
+      console.log("✅ 사용자 게임 진도 업데이트 완료:", {
+        games: newTotalGames,
+        avgScore: safeAvgScore,
+        bestScore: newBestScore,
+        accuracy: safeAvgAccuracy
+      });
+
     } catch (error) {
-      console.error("❌ 게임 기반 진도 업데이트 중 오류:", error);
+      console.error("❌ 사용자 게임 진도 업데이트 중 오류:", error);
     }
   }
 
