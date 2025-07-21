@@ -33,6 +33,46 @@
       </p>
     </div>
 
+    <!-- 📊 언어 필터 -->
+    <div class="bg-white rounded-xl p-4 mb-6 border border-gray-200 shadow-sm">
+      <div class="flex flex-wrap items-center gap-4">
+        <span class="text-sm font-medium text-gray-700">언어 필터:</span>
+
+        <div class="flex items-center gap-2">
+          <label class="text-xs text-gray-600">원본 언어</label>
+          <select id="source-language-filter"
+            class="text-sm border border-gray-300 rounded px-3 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <option value="korean">한국어</option>
+            <option value="english">영어</option>
+            <option value="japanese">일본어</option>
+            <option value="chinese">중국어</option>
+          </select>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <span class="text-gray-400">→</span>
+          <label class="text-xs text-gray-600">대상 언어</label>
+          <select id="target-language-filter"
+            class="text-sm border border-gray-300 rounded px-3 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <option value="english">영어</option>
+            <option value="korean">한국어</option>
+            <option value="japanese">일본어</option>
+            <option value="chinese">중국어</option>
+          </select>
+        </div>
+
+        <button id="apply-language-filter"
+          class="px-4 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors">
+          적용
+        </button>
+
+        <button id="reset-language-filter"
+          class="px-4 py-1 bg-gray-300 text-gray-700 text-sm rounded hover:bg-gray-400 transition-colors">
+          초기화
+        </button>
+      </div>
+    </div>
+
     <!-- 📊 학습 현황 요약 -->
     <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-8 border border-blue-100">
       <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
@@ -352,15 +392,15 @@
   <!-- 📊 총 단어 목록 모달 -->
   <div id="totalWordsModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
     style="display: none;">
-    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden">
-      <div class="flex items-center justify-between p-6 border-b">
-        <h2 class="text-xl font-bold text-gray-900">📊 학습 진행 상황</h2>
+    <div class="bg-white rounded-lg shadow-xl max-w-5xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between p-6 border-b sticky top-0 bg-white z-10">
+        <h2 class="text-xl font-bold text-gray-900">� 학습 개념 상세</h2>
         <button onclick="closeTotalWordsModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
       </div>
-      <div id="totalWordsModalBody" class="p-6 overflow-y-auto max-h-96">
+      <div id="totalWordsModalBody" class="p-6">
         <!-- 모달 내용이 여기에 동적으로 추가됩니다 -->
       </div>
-      <div class="p-6 border-t bg-gray-50 text-center">
+      <div class="p-6 border-t bg-gray-50 text-center sticky bottom-0">
         <button onclick="closeTotalWordsModal()"
           class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">
           닫기

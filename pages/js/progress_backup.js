@@ -286,9 +286,7 @@ async function initializeTargetLanguageStructure() {
             version: '3.0', // 새로운 구조 버전
             created_at: existingData.created_at || new Date(),
             last_updated: new Date(),
-            target_languages: existingData.target_languages || {},
-            // 기존 concept_snapshots 보존
-            concept_snapshots: existingData.concept_snapshots || {}
+            target_languages: existingData.target_languages || {}
         };
 
         // 실제 활동이 있는 언어만 생성/업데이트
@@ -301,9 +299,9 @@ async function initializeTargetLanguageStructure() {
             console.log(`✅ ${lang} 언어 통계 생성됨:`, langStats);
         }
 
-        // 기존 concept_snapshots 보존하면서 업데이트
+        // 기존 데이터를 완전히 덮어쓰기 (merge 사용 안함)
         await setDoc(userRecordRef, updateData);
-        console.log('✅ Active target language structure saved to user_records (concept_snapshots 보존)');
+        console.log('✅ Active target language structure saved to user_records');
         console.log('📊 Saved structure:', updateData);
 
         // Load the created structure
@@ -760,10 +758,6 @@ function calculateTargetLanguageStats(targetLanguage) {
             conceptIds = record.concept_id;
         } else if (record.concept_id) {
             conceptIds = [record.concept_id];
-        } else if (Array.isArray(record.concept_ids)) { // concept_ids 필드 추가
-            conceptIds = record.concept_ids;
-        } else if (record.concept_ids) {
-            conceptIds = [record.concept_ids];
         } else if (record.conceptId) {
             conceptIds = Array.isArray(record.conceptId) ? record.conceptId : [record.conceptId];
         } else if (record.quizData && record.quizData.concepts) {
@@ -1920,7 +1914,7 @@ async function saveConceptSnapshotToUserRecords(conceptId, conceptData, targetLa
             definition: conceptData.definition || '',
             example: conceptData.example || '',
             source_language: conceptData.source_language || 'korean',
-            target_language: targetLanguage || conceptData.target_language || selectedTargetLanguage || 'english',
+            target_language: targetLanguage,
             domain: conceptData.domain || '일반',
             category: conceptData.category || '기타',
             last_updated: new Date()
@@ -2067,14 +2061,13 @@ async function updateTargetLanguageStats(targetLanguage) {
                         last_updated: new Date()
                     }
                 },
-                concept_snapshots: {}, // 빈 스냅샷 객체로 초기화
                 created_at: new Date(),
                 version: '3.0'
             };
             await setDoc(userRecordRef, initialStructure);
-            console.log(`✅ Created new user_records with ${targetLanguage} stats (concept_snapshots 포함)`);
+            console.log(`✅ Created new user_records with ${targetLanguage} stats`);
         } else {
-            // 문서가 있으면 해당 언어만 업데이트 (concept_snapshots 보존)
+            // 문서가 있으면 해당 언어만 업데이트
             await updateDoc(userRecordRef, {
                 [`target_languages.${targetLanguage}`]: {
                     ...newStats,
@@ -2405,7 +2398,7 @@ async function fetchAndCreateConceptSnapshot(conceptId) {
                 category: conceptInfo.category || '기타',
                 definition: conceptInfo.definition || '',
                 example: conceptInfo.example || ''
-            }, targetLanguage);
+            });
             
             console.log(`✅ 개념 스냅샷 생성 완료: ${conceptId} -> ${snapshot.displayName}`);
             return snapshot;
@@ -2464,6 +2457,23 @@ async function fetchConceptSnapshotFromUserRecords(conceptId) {
         return createDefaultSnapshot(conceptId);
     }
 }
+                    example: conceptData.example || ''
+                };
+                
+                console.log(`� user_records에서 개념 스냅샷 조회: ${conceptId} -> ${snapshot.displayName}`);
+                return snapshot;
+            }
+        }
+        
+        // user_records에 없으면 기본 스냅샷 생성
+        console.log(`⚠️ user_records에 개념 없음: ${conceptId}, 기본 스냅샷 생성`);
+        return createDefaultSnapshot(conceptId);
+        
+    } catch (error) {
+        console.error('user_records 개념 스냅샷 조회 오류:', error);
+        return createDefaultSnapshot(conceptId);
+    }
+}
 
 // 기본 스냅샷 생성
 function createDefaultSnapshot(conceptId) {
@@ -2493,10 +2503,6 @@ function extractConceptIds(record) {
         conceptIds = record.concept_id;
     } else if (record.concept_id) {
         conceptIds = [record.concept_id];
-    } else if (Array.isArray(record.concept_ids)) { // concept_ids 필드 추가
-        conceptIds = record.concept_ids;
-    } else if (record.concept_ids) {
-        conceptIds = [record.concept_ids];
     } else if (record.conceptId) {
         conceptIds = Array.isArray(record.conceptId) ? record.conceptId : [record.conceptId];
     } else if (record.quizData && record.quizData.concepts) {
@@ -2752,48 +2758,7 @@ async function checkExistingSnapshot(conceptId) {
     }
 }
 
-// 🔧 테스트 및 데모 함수들
-
-// 기존 concept_id로 스냅샷 테스트 생성
-window.testCreateSnapshots = async function() {
-    if (!currentUser) {
-        console.log('❌ 사용자가 인증되지 않았습니다.');
-        return;
-    }
-    
-    try {
-        console.log('🧪 기존 활동의 개념들로 스냅샷 테스트 생성 시작...');
-        
-        // 기존 활동에서 개념 ID 수집
-        const allConceptIds = new Set();
-        
-        [...allLearningRecords, ...allGameRecords, ...allQuizRecords].forEach(record => {
-            const conceptIds = extractConceptIds(record);
-            conceptIds.forEach(id => allConceptIds.add(id));
-        });
-        
-        console.log(`🔍 발견된 개념 ID들: ${allConceptIds.size}개`);
-        
-        for (const conceptId of Array.from(allConceptIds).slice(0, 3)) { // 처음 3개만 테스트
-            console.log(`📋 스냅샷 생성 테스트: ${conceptId}`);
-            await fetchAndCreateConceptSnapshot(conceptId);
-        }
-        
-        console.log('✅ 스냅샷 테스트 생성 완료!');
-        
-    } catch (error) {
-        console.error('스냅샷 테스트 오류:', error);
-    }
-};
-
-// 전체 데이터 새로고침 후 UI 업데이트
-window.refreshAndUpdateUI = async function() {
-    try {
-        console.log('🔄 전체 데이터 새로고침...');
-        await loadProgressData();
-        updateUI();
-        console.log('✅ 데이터 새로고침 완료');
-    } catch (error) {
-        console.error('데이터 새로고침 오류:', error);
-    }
-};
+// 전역 함수로 노출하여 다른 파일에서 사용 가능
+window.saveLearningActivityWithSnapshot = saveLearningActivityWithSnapshot;
+window.saveGameActivityWithSnapshot = saveGameActivityWithSnapshot;
+window.saveQuizActivityWithSnapshot = saveQuizActivityWithSnapshot;

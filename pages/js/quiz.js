@@ -1206,11 +1206,20 @@ async function saveQuizResult(result) {
     console.log("💾 퀴즈 결과 저장 시작:", result);
 
     // 1. 🎯 quiz_records 컬렉션에 상세 퀴즈 기록 저장
+    // 퀴즈에서 사용된 개념 ID들 추출 (다양한 필드에서)
+    const conceptIds = result.answers.map(answer => {
+      return answer.conceptId || answer.concept_id || answer.questionId || answer.id;
+    }).filter(id => id && typeof id === 'string');
+    
+    console.log(`📋 퀴즈에서 추출된 개념 ID들: ${conceptIds.length}개`, conceptIds);
+    
     const quizRecord = {
       user_email: currentUser.email,
       quiz_type: result.settings.quizType,
-      source_language: result.settings.sourceLanguage,
-      target_language: result.settings.targetLanguage,
+      language_pair: {
+        source: result.settings.sourceLanguage,
+        target: result.settings.targetLanguage
+      },
       difficulty: result.settings.difficulty,
       score: result.score,
       correct_answers: result.correctCount,
@@ -1218,6 +1227,7 @@ async function saveQuizResult(result) {
       accuracy: Math.round((result.correctCount / result.totalCount) * 100),
       time_spent: result.totalTime,
       answers: result.answers,
+      concept_ids: conceptIds, // 개념 ID 추가
       completed_at: new Date(),
       timestamp: new Date(),
       metadata: {
@@ -1248,9 +1258,21 @@ async function saveQuizResult(result) {
       // quiz_records는 저장되었으므로 계속 진행
     }
 
+    // 3. 🔄 개념 스냅샷 자동 저장
+    try {
+      if (conceptIds.length > 0) {
+        console.log(`📋 퀴즈 개념 스냅샷 자동 저장 시작: ${conceptIds.length}개 개념`);
+        await collectionManager.saveConceptSnapshots(currentUser.email, conceptIds);
+        console.log("✅ 퀴즈 개념 스냅샷 자동 저장 완료");
+      }
+    } catch (snapshotError) {
+      console.error("❌ 퀴즈 개념 스냅샷 저장 실패:", snapshotError);
+      // 메인 기능은 완료되었으므로 계속 진행
+    }
+
     // 진도 페이지 자동 업데이트를 위한 localStorage 신호
     localStorage.setItem("quizCompletionUpdate", JSON.stringify({
-      userId: currentUser.uid,
+      userEmail: currentUser.email,
       timestamp: new Date().toISOString(),
       score: result.score,
       correctCount: result.correctCount,

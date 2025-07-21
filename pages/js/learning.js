@@ -5795,6 +5795,7 @@ async function completeLearningSession(forceComplete = false) {
   });
 
   const activityData = {
+    user_email: currentUser?.email, // 사용자 이메일 명시적 추가
     type: learningSessionData.area,
     learning_mode: learningSessionData.mode, // 🆕 세부 학습 모드 추가
     conceptIds: Array.from(learningSessionData.conceptsStudied),

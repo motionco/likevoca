@@ -54,7 +54,8 @@ function trackFirebaseRead(queryName, docCount) {
   firebaseReadCount += docCount;
   console.log(`📊 Firebase 읽기: ${queryName} (+${docCount}), 총 ${firebaseReadCount}회`);
   
-  if (firebaseReadCount > 30) {
+  // 임계값을 50으로 증가 (게임용 랜덤 조회는 여러 시도가 필요할 수 있음)
+  if (firebaseReadCount > 50) {
     console.warn("⚠️ Firebase 읽기 횟수가 많습니다:", firebaseReadCount);
   }
 }
@@ -638,7 +639,8 @@ export async function saveGameResult(
   gameType,
   score,
   timeSpent,
-  isCompleted = true
+  isCompleted = true,
+  conceptIds = [] // 개념 ID 배열 추가
 ) {
   if (!currentUser) {
     console.warn("사용자가 로그인하지 않아 게임 결과를 저장할 수 없습니다.");
@@ -646,10 +648,18 @@ export async function saveGameResult(
   }
 
   try {
+    // 유효한 Firebase 문서 ID만 필터링
+    const validConceptIds = conceptIds.filter(id => {
+      const isValid = id && typeof id === 'string' && id.length >= 15 && /^[A-Za-z0-9]+$/.test(id);
+      if (!isValid && id) {
+        console.log(`⚠️ saveGameResult에서 임시 ID 필터링됨: ${id} (유효한 Firebase 문서 ID가 아님)`);
+      }
+      return isValid;
+    });
+
     // game_records 컬렉션에 저장 (records 구조)
     const gameActivityData = {
       user_email: currentUser.email,
-      userId: currentUser.uid, // 진도 페이지 호환성
       game_type: gameType,
       gameType, // camelCase 호환성
       score,
@@ -662,6 +672,8 @@ export async function saveGameResult(
         source: sourceLanguage,
         target: targetLanguage,
       },
+      conceptIds: validConceptIds, // 유효한 개념 ID만 저장
+      conceptId: validConceptIds, // concept_id 호환성 (유효한 ID만)
       accuracy: score, // Firebase 통계용 (score와 동일값, UI에서는 score만 표시)
       success: score >= 70,
       timestamp: serverTimestamp(), // 진도 페이지용
@@ -675,7 +687,7 @@ export async function saveGameResult(
       gameActivityData
     );
 
-    console.log("게임 활동 저장 완료:", { gameType, score, timeSpent });
+    console.log("게임 활동 저장 완료:", { gameType, score, timeSpent, validConceptIds: validConceptIds.length });
     return true;
   } catch (error) {
     console.error("게임 활동 저장 오류:", error);
@@ -920,7 +932,16 @@ async function loadGameWords() {
 
       // Firebase에서 가져온 개념이 1개 이상이면 사용 (최소 요구사항 완화)
       if (concepts.length >= 1) {
-        const firebaseWords = concepts.slice(0, limit).map((concept) => ({
+        // 유효한 Firebase 문서 ID를 가진 개념만 필터링
+        const validConcepts = concepts.filter(concept => {
+          const isValid = concept.id && typeof concept.id === 'string' && concept.id.length >= 15 && /^[A-Za-z0-9]+$/.test(concept.id);
+          if (!isValid && concept.id) {
+            console.log(`⚠️ 게임 단어 변환 시 임시 ID 필터링됨: ${concept.id} (유효한 Firebase 문서 ID가 아님)`);
+          }
+          return isValid;
+        });
+
+        const firebaseWords = validConcepts.slice(0, limit).map((concept) => ({
           id: concept.id,
           source: concept.expressions?.[sourceLanguage]?.word || "",
           target: concept.expressions?.[targetLanguage]?.word || "",
@@ -932,12 +953,16 @@ async function loadGameWords() {
           isFromFirebase: true,
         }));
 
-        // Firebase 개념 수가 부족하면 기본 단어로 보완
+        console.log(`🔍 유효한 개념: ${validConcepts.length}개 (전체 ${concepts.length}개 중)`);
+
+        // Firebase 개념 수가 부족하면 기본 단어로 보완 (단, 저장하지 않음)
         if (firebaseWords.length < limit) {
           const additionalDefaultWords = getDefaultWordsForGame(
             limit - firebaseWords.length
           );
+          // 기본 단어들은 임시 ID를 가지므로 나중에 저장 시 필터링됨
           gameWords = [...firebaseWords, ...additionalDefaultWords];
+          console.log(`⚠️ 개념이 부족하여 기본 단어 ${additionalDefaultWords.length}개로 보완 (기본 단어는 기록에 저장되지 않음)`);
         } else {
           gameWords = firebaseWords;
         }
@@ -949,7 +974,7 @@ async function loadGameWords() {
         }
 
         console.log(
-          `🎯 게임 단어 로딩 완료: ${gameWords.length}개 (Firebase: ${firebaseWords.length}개, 무작위 섞기 적용)`
+          `🎯 게임 단어 로딩 완료: ${gameWords.length}개 (Firebase 유효: ${firebaseWords.length}개, 무작위 섞기 적용)`
         );
         return;
       }
@@ -1236,16 +1261,23 @@ async function completeGame(finalScore, timeSpent) {
       // 학습한 개념들의 진도 업데이트
       let updatedConceptsCount = 0;
       if (gameWords && gameWords.length > 0) {
-        // 🎮 게임 활동 데이터 준비
+        // 🎮 게임 활동 데이터 준비 (유효한 Firebase 문서 ID만 필터링)
         const conceptIds = gameWords
           .filter((word) => word.id && word.id !== "default") // 기본 단어 제외
-          .map((word) => word.id);
+          .map((word) => word.id)
+          .filter(id => {
+            // 유효한 Firebase 문서 ID만 허용 (15자 이상의 영숫자)
+            const isValid = id && typeof id === 'string' && id.length >= 15 && /^[A-Za-z0-9]+$/.test(id);
+            if (!isValid && id) {
+              console.log(`⚠️ 게임 데이터에서 임시 ID 필터링됨: ${id} (유효한 Firebase 문서 ID가 아님)`);
+            }
+            return isValid;
+          });
 
         if (conceptIds.length > 0) {
           try {
             // 게임 활동 추적
             const gameActivityData = {
-              userId: currentUser.uid, // 🔥 중요: userId 추가
               type: currentGameType,
               score: finalScore,
               maxScore: (gameWords?.length || 8) * 10,
@@ -1256,7 +1288,8 @@ async function completeGame(finalScore, timeSpent) {
               difficulty: gameDifficulty || "basic",
               sourceLanguage: sourceLanguage,
               targetLanguage: targetLanguage,
-              conceptId: conceptIds, // concept_id로 통일
+              conceptId: conceptIds, // concept_id로 통일 (유효한 ID만)
+              conceptIds: conceptIds, // 개념 스냅샷 저장용 추가 (유효한 ID만)
               accuracy: accuracy, // 🎯 정확도 필드 추가
               accuracyRate: accuracy / 100, // 0-1 범위로 변환
               performanceRating:
@@ -1275,11 +1308,13 @@ async function completeGame(finalScore, timeSpent) {
             );
             updatedConceptsCount = conceptIds.length;
             console.log(
-              `✓ 게임 활동 추적 및 진도 업데이트 완료: ${conceptIds.length}개 개념`
+              `✓ 게임 활동 추적 및 진도 업데이트 완료: ${conceptIds.length}개 유효한 개념`
             );
           } catch (error) {
             console.warn("게임 활동 추적 중 오류:", error);
           }
+        } else {
+          console.log("⚠️ 유효한 개념 ID가 없어 게임 활동 추적을 건너뜀");
         }
       }
 
@@ -1308,7 +1343,7 @@ async function completeGame(finalScore, timeSpent) {
           totalTime: totalTime,
           conceptsUpdated: updatedConceptsCount,
           completedAt: new Date().toISOString(),
-          userId: currentUser.uid,
+          userEmail: currentUser.email,
         };
         localStorage.setItem(
           "gameCompletionUpdate",
@@ -2826,6 +2861,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.log("사용자 로그아웃 상태");
       }
     });
+
+    // Firebase 읽기 카운터 초기화
+    firebaseReadCount = 0;
+    console.log("🔄 Firebase 읽기 카운터 초기화");
 
     console.log("게임 페이지 초기화 완료");
   } catch (error) {
