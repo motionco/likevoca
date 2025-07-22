@@ -1370,8 +1370,34 @@ function updateCategoryProgressChart() {
     // 도메인별 개념 수 집계
     const domainData = {};
     
-    // 현재 선택된 대상 언어에 해당하는 통계 데이터 가져오기
-    const stats = calculateTargetLanguageStats(selectedTargetLanguage);
+    // 현재 선택된 대상 언어에 해당하는 활동 기록들 필터링
+    const learningRecords = allLearningRecords.filter(record => 
+        record.targetLanguage === selectedTargetLanguage || 
+        (record.languagePair && record.languagePair.includes && record.languagePair.includes(selectedTargetLanguage)) ||
+        (record.language_pair && record.language_pair.target === selectedTargetLanguage) ||
+        (record.language_pair && record.language_pair.includes && record.language_pair.includes(selectedTargetLanguage)) ||
+        (record.metadata && record.metadata.targetLanguage === selectedTargetLanguage) ||
+        (record.target_language === selectedTargetLanguage) ||
+        (record.activity_type === 'vocabulary' && selectedTargetLanguage === 'english')
+    );
+
+    const gameRecords = allGameRecords.filter(record => 
+        record.targetLanguage === selectedTargetLanguage ||
+        (record.languagePair && record.languagePair.includes(selectedTargetLanguage)) ||
+        (record.language_pair && record.language_pair.target === selectedTargetLanguage) ||
+        (record.language_pair && record.language_pair.includes && record.language_pair.includes(selectedTargetLanguage)) ||
+        (record.metadata && record.metadata.targetLanguage === selectedTargetLanguage) ||
+        (record.game_type === 'word-matching' && selectedTargetLanguage === 'english')
+    );
+
+    const quizRecords = allQuizRecords.filter(record => 
+        record.targetLanguage === selectedTargetLanguage ||
+        (record.languagePair && record.languagePair.includes(selectedTargetLanguage)) ||
+        (record.language_pair && record.language_pair.target === selectedTargetLanguage) ||
+        (record.metadata && record.metadata.targetLanguage === selectedTargetLanguage) ||
+        (record.target_language === selectedTargetLanguage) ||
+        (record.quiz_type === 'translation' && selectedTargetLanguage === 'english')
+    );
     
     // userProgressData에서 concept_snapshots 가져오기
     if (userProgressData && userProgressData.concept_snapshots) {
@@ -1381,11 +1407,7 @@ function updateCategoryProgressChart() {
         const targetLanguageConcepts = new Set();
         
         // 학습, 퀴즈, 게임 기록에서 해당 언어의 개념들 수집
-        const allRecords = [
-            ...(stats.learningRecords || []),
-            ...(stats.gameRecords || []),
-            ...(stats.quizRecords || [])
-        ];
+        const allRecords = [...learningRecords, ...gameRecords, ...quizRecords];
         
         allRecords.forEach(record => {
             if (record.concept_id) {
@@ -1397,17 +1419,21 @@ function updateCategoryProgressChart() {
             }
         });
         
+        console.log('🔍 대상 언어 개념들:', Array.from(targetLanguageConcepts), '대상 언어:', selectedTargetLanguage);
+        console.log('📊 필터된 학습 기록:', learningRecords.length, '게임 기록:', gameRecords.length, '퀴즈 기록:', quizRecords.length);
+        
         // concept_snapshots에서 해당 언어의 개념들만 도메인별로 집계
         targetLanguageConcepts.forEach(conceptId => {
             const conceptInfo = conceptSnapshots[conceptId];
-            if (conceptInfo && conceptInfo.domain) {
-                const domain = conceptInfo.domain;
+            if (conceptInfo) {
+                // concept_info.domain에서 도메인 정보 확인
+                const domain = conceptInfo.concept_info?.domain || conceptInfo.domain || 'daily';
                 domainData[domain] = (domainData[domain] || 0) + 1;
-            } else if (conceptInfo) {
-                // 도메인 정보가 없으면 '일반'으로 분류
-                domainData['일반'] = (domainData['일반'] || 0) + 1;
+                console.log(`🔍 개념 ${conceptId} 도메인:`, domain, conceptInfo);
             }
         });
+        
+        console.log('📊 도메인별 집계 결과:', domainData);
     }
     
     // 데이터가 없는 경우 기본 도메인 추가
@@ -1758,7 +1784,7 @@ async function showTotalWordsDetails() {
                     <!-- 퀴즈 상세 통계 - 토글 가능, 중앙정렬 -->
                     ${concept.quizCount > 0 ? `
                     <div id="quiz-details-${concept.conceptId}" class="mt-3 p-3 bg-gray-50 rounded-lg text-center" style="display: none;">
-                        <div class="text-center text-sm font-medium text-gray-700 mb-2">
+                        <div class="text-center text-sm font-medium text-gray-700 mb-0">
                             🎯 퀴즈 | <span class="text-green-600">정답 ✓${concept.correctCount}</span> <span class="text-red-600">오답 ✗${concept.incorrectCount}</span> 정확도 ${concept.accuracyRate}%
                         </div>
                     </div>
@@ -1948,25 +1974,29 @@ function showStudyStreakDetails() {
             ...(allGameRecords || [])
         ];
         
-        // 모든 기록에서 날짜 추출
+        // 모든 기록에서 날짜 추출 (다양한 날짜 필드 확인)
         allRecords.forEach(record => {
-            if (record.created_at) {
+            let dateField = record.completed_at || record.timestamp || record.created_at;
+            if (dateField) {
                 let date;
-                if (record.created_at.toDate) {
-                    date = record.created_at.toDate();
+                if (dateField.toDate) {
+                    date = dateField.toDate();
+                } else if (dateField instanceof Date) {
+                    date = dateField;
                 } else {
-                    date = new Date(record.created_at);
+                    date = new Date(dateField);
                 }
                 const dateStr = date.toDateString();
                 studyDatesSet.add(dateStr);
+                console.log(`📅 학습 기록 날짜 추가: ${dateStr} (${record.id})`);
             }
         });
         
-        // 최근 30일 날짜별 도장 UI 생성
+        // 최근 2주 날짜별 도장 UI 생성
         const today = new Date();
         const calendarDays = [];
         
-        for (let i = 29; i >= 0; i--) {
+        for (let i = 13; i >= 0; i--) {
             const date = new Date(today);
             date.setDate(today.getDate() - i);
             const dateStr = date.toDateString();
@@ -1995,10 +2025,10 @@ function showStudyStreakDetails() {
                     </div>
                 </div>
                 
-                <!-- 날짜별 학습 도장 (최근 30일) -->
+                <!-- 날짜별 학습 도장 (최근 2주) -->
                 <div class="bg-white border border-gray-200 p-4 rounded-lg">
-                    <h4 class="font-medium text-gray-800 mb-3">📅 최근 30일 학습 기록</h4>
-                    <div class="grid grid-cols-10 gap-2 text-center">
+                    <h4 class="font-medium text-gray-800 mb-3">📅 최근 2주 학습 기록</h4>
+                    <div class="grid grid-cols-7 gap-2 text-center">
                         ${calendarDays.join('')}
                     </div>
                     <div class="flex items-center justify-center mt-3 space-x-4">
