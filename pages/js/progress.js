@@ -1006,6 +1006,9 @@ function updateUI() {
     
     // Update language selector
     updateLanguageSelector();
+    
+    // Update learning goals progress
+    updateLearningGoalsProgress(stats);
 }
 
 // Update summary cards
@@ -1191,6 +1194,75 @@ function updateLanguageSelector() {
     // 현재 선택된 값으로 업데이트
     selector.value = selectedTargetLanguage;
     console.log('Language selector updated to:', selectedTargetLanguage);
+}
+
+// 학습 목표 진행률 업데이트
+function updateLearningGoalsProgress(stats) {
+    // 일일 신규 단어 목표
+    const dailyWordsGoal = parseInt(document.getElementById('daily-words-goal')?.value || 10);
+    const dailyWordsProgress = Math.min(stats.totalConcepts, dailyWordsGoal);
+    const dailyWordsPercentage = Math.min(100, (dailyWordsProgress / dailyWordsGoal) * 100);
+    
+    const dailyWordsProgressEl = document.getElementById('daily-words-progress');
+    const dailyWordsBarEl = document.getElementById('daily-words-bar');
+    
+    if (dailyWordsProgressEl) {
+        dailyWordsProgressEl.textContent = `${dailyWordsProgress}/${dailyWordsGoal}`;
+    }
+    
+    if (dailyWordsBarEl) {
+        dailyWordsBarEl.style.width = `${dailyWordsPercentage}%`;
+    }
+    
+    // 일일 퀴즈 시간 목표
+    const dailyQuizGoal = parseInt(document.getElementById('daily-quiz-goal')?.value || 20);
+    const dailyQuizProgress = Math.min(stats.totalStudyTime, dailyQuizGoal);
+    const dailyQuizPercentage = Math.min(100, (dailyQuizProgress / dailyQuizGoal) * 100);
+    
+    const dailyQuizProgressEl = document.getElementById('daily-quiz-progress');
+    const dailyQuizBarEl = document.getElementById('daily-quiz-bar');
+    
+    if (dailyQuizProgressEl) {
+        dailyQuizProgressEl.textContent = `${dailyQuizProgress}/${dailyQuizGoal}분`;
+    }
+    
+    if (dailyQuizBarEl) {
+        dailyQuizBarEl.style.width = `${dailyQuizPercentage}%`;
+    }
+    
+    // 주간 학습 일수 목표 (연속 학습일 기준)
+    const weeklyDaysGoal = parseInt(document.getElementById('weekly-days-goal')?.value || 5);
+    const weeklyDaysProgress = Math.min(stats.studyStreak, weeklyDaysGoal);
+    const weeklyDaysPercentage = Math.min(100, (weeklyDaysProgress / weeklyDaysGoal) * 100);
+    
+    const weeklyDaysProgressEl = document.getElementById('weekly-days-progress');
+    const weeklyDaysBarEl = document.getElementById('weekly-days-bar');
+    
+    if (weeklyDaysProgressEl) {
+        weeklyDaysProgressEl.textContent = `${weeklyDaysProgress}/${weeklyDaysGoal}일`;
+    }
+    
+    if (weeklyDaysBarEl) {
+        weeklyDaysBarEl.style.width = `${weeklyDaysPercentage}%`;
+    }
+    
+    // 주간 단어 마스터 목표
+    const weeklyMasteryGoal = parseInt(document.getElementById('weekly-mastery-goal')?.value || 30);
+    const weeklyMasteryProgress = Math.min(stats.masteredConcepts, weeklyMasteryGoal);
+    const weeklyMasteryPercentage = Math.min(100, (weeklyMasteryProgress / weeklyMasteryGoal) * 100);
+    
+    const weeklyMasteryProgressEl = document.getElementById('weekly-mastery-progress');
+    const weeklyMasteryBarEl = document.getElementById('weekly-mastery-bar');
+    
+    if (weeklyMasteryProgressEl) {
+        weeklyMasteryProgressEl.textContent = `${weeklyMasteryProgress}/${weeklyMasteryGoal}개`;
+    }
+    
+    if (weeklyMasteryBarEl) {
+        weeklyMasteryBarEl.style.width = `${weeklyMasteryPercentage}%`;
+    }
+    
+    console.log(`🎯 학습 목표 업데이트 완료 - 대상 언어: ${selectedTargetLanguage}`);
 }
 
 // Update charts (placeholder for future chart implementation)
@@ -1846,14 +1918,62 @@ function showMasteredWordsDetails() {
     const modalBody = document.getElementById('totalWordsModalBody');
     
     if (modalBody) {
+        // 선택된 대상 언어의 활동 기록들 필터링
+        const learningRecords = allLearningRecords.filter(record => 
+            record.targetLanguage === selectedTargetLanguage || 
+            (record.languagePair && record.languagePair.includes && record.languagePair.includes(selectedTargetLanguage)) ||
+            (record.language_pair && record.language_pair.target === selectedTargetLanguage) ||
+            (record.language_pair && record.language_pair.includes && record.language_pair.includes(selectedTargetLanguage)) ||
+            (record.metadata && record.metadata.targetLanguage === selectedTargetLanguage) ||
+            (record.target_language === selectedTargetLanguage) ||
+            (record.activity_type === 'vocabulary' && selectedTargetLanguage === 'english')
+        );
+
+        const gameRecords = allGameRecords.filter(record => 
+            record.targetLanguage === selectedTargetLanguage ||
+            (record.languagePair && record.languagePair.includes(selectedTargetLanguage)) ||
+            (record.language_pair && record.language_pair.target === selectedTargetLanguage) ||
+            (record.language_pair && record.language_pair.includes && record.language_pair.includes(selectedTargetLanguage)) ||
+            (record.metadata && record.metadata.targetLanguage === selectedTargetLanguage) ||
+            (record.game_type === 'word-matching' && selectedTargetLanguage === 'english')
+        );
+
+        const quizRecords = allQuizRecords.filter(record => 
+            record.targetLanguage === selectedTargetLanguage ||
+            (record.languagePair && record.languagePair.includes(selectedTargetLanguage)) ||
+            (record.language_pair && record.language_pair.target === selectedTargetLanguage) ||
+            (record.metadata && record.metadata.targetLanguage === selectedTargetLanguage) ||
+            (record.target_language === selectedTargetLanguage) ||
+            (record.quiz_type === 'translation' && selectedTargetLanguage === 'english')
+        );
+
+        // 선택된 언어의 개념들만 수집
+        const allRecords = [...learningRecords, ...gameRecords, ...quizRecords];
+        const targetLanguageConcepts = new Set();
+        
+        allRecords.forEach(record => {
+            if (record.concept_id) {
+                if (Array.isArray(record.concept_id)) {
+                    record.concept_id.forEach(id => targetLanguageConcepts.add(id));
+                } else {
+                    targetLanguageConcepts.add(record.concept_id);
+                }
+            }
+            // 기타 개념 ID 필드들도 확인
+            const conceptIds = extractConceptIds(record);
+            conceptIds.forEach(id => targetLanguageConcepts.add(id));
+        });
+        
+        console.log(`🎯 마스터한 단어 모달 - 대상 언어: ${selectedTargetLanguage}, 필터된 개념 수: ${targetLanguageConcepts.size}`);
+        
         // concept_snapshots에서 마스터한 개념들 가져오기
         const masteredConcepts = [];
         
         if (userProgressData && userProgressData.concept_snapshots) {
             const conceptSnapshots = userProgressData.concept_snapshots;
             
-            // concept_snapshots에서 마스터한 개념들 필터링
-            Object.keys(conceptSnapshots).forEach(conceptId => {
+            // 선택된 언어의 개념들만 필터링
+            targetLanguageConcepts.forEach(conceptId => {
                 const conceptInfo = conceptSnapshots[conceptId];
                 if (conceptInfo) {
                     // 마스터리 계산
@@ -1966,15 +2086,42 @@ function showStudyStreakDetails() {
         const lastStudyText = stats.lastStudyDate ? 
             stats.lastStudyDate.toLocaleDateString('ko-KR') : '학습 기록 없음';
         
-        // 날짜별 학습 기록 생성 (최근 30일)
-        const studyDatesSet = new Set();
-        const allRecords = [
-            ...(allLearningRecords || []),
-            ...(allQuizRecords || []),
-            ...(allGameRecords || [])
-        ];
+        // 선택된 대상 언어의 활동 기록들만 필터링
+        const learningRecords = allLearningRecords.filter(record => 
+            record.targetLanguage === selectedTargetLanguage || 
+            (record.languagePair && record.languagePair.includes && record.languagePair.includes(selectedTargetLanguage)) ||
+            (record.language_pair && record.language_pair.target === selectedTargetLanguage) ||
+            (record.language_pair && record.language_pair.includes && record.language_pair.includes(selectedTargetLanguage)) ||
+            (record.metadata && record.metadata.targetLanguage === selectedTargetLanguage) ||
+            (record.target_language === selectedTargetLanguage) ||
+            (record.activity_type === 'vocabulary' && selectedTargetLanguage === 'english')
+        );
+
+        const gameRecords = allGameRecords.filter(record => 
+            record.targetLanguage === selectedTargetLanguage ||
+            (record.languagePair && record.languagePair.includes(selectedTargetLanguage)) ||
+            (record.language_pair && record.language_pair.target === selectedTargetLanguage) ||
+            (record.language_pair && record.language_pair.includes && record.language_pair.includes(selectedTargetLanguage)) ||
+            (record.metadata && record.metadata.targetLanguage === selectedTargetLanguage) ||
+            (record.game_type === 'word-matching' && selectedTargetLanguage === 'english')
+        );
+
+        const quizRecords = allQuizRecords.filter(record => 
+            record.targetLanguage === selectedTargetLanguage ||
+            (record.languagePair && record.languagePair.includes(selectedTargetLanguage)) ||
+            (record.language_pair && record.language_pair.target === selectedTargetLanguage) ||
+            (record.metadata && record.metadata.targetLanguage === selectedTargetLanguage) ||
+            (record.target_language === selectedTargetLanguage) ||
+            (record.quiz_type === 'translation' && selectedTargetLanguage === 'english')
+        );
         
-        // 모든 기록에서 날짜 추출 (다양한 날짜 필드 확인)
+        // 날짜별 학습 기록 생성 (선택된 언어만)
+        const studyDatesSet = new Set();
+        const allRecords = [...learningRecords, ...gameRecords, ...quizRecords];
+        
+        console.log(`🔥 연속 학습 모달 - 대상 언어: ${selectedTargetLanguage}, 필터된 기록 수: ${allRecords.length}`);
+        
+        // 필터된 기록에서 날짜 추출 (다양한 날짜 필드 확인)
         allRecords.forEach(record => {
             let dateField = record.completed_at || record.timestamp || record.created_at;
             if (dateField) {
@@ -1992,11 +2139,11 @@ function showStudyStreakDetails() {
             }
         });
         
-        // 최근 2주 날짜별 도장 UI 생성
+        // 최근 학습 기록 날짜별 도장 UI 생성 (6일전 ~ 1일후, 총 8일)
         const today = new Date();
         const calendarDays = [];
         
-        for (let i = 13; i >= 0; i--) {
+        for (let i = 6; i >= -1; i--) {
             const date = new Date(today);
             date.setDate(today.getDate() - i);
             const dateStr = date.toDateString();
@@ -2025,10 +2172,10 @@ function showStudyStreakDetails() {
                     </div>
                 </div>
                 
-                <!-- 날짜별 학습 도장 (최근 2주) -->
+                <!-- 날짜별 학습 도장 (최근 학습 기록) -->
                 <div class="bg-white border border-gray-200 p-4 rounded-lg">
-                    <h4 class="font-medium text-gray-800 mb-3">📅 최근 2주 학습 기록</h4>
-                    <div class="grid grid-cols-7 gap-2 text-center">
+                    <h4 class="font-medium text-gray-800 mb-3">📅 최근 학습 기록</h4>
+                    <div class="grid grid-cols-4 md:grid-cols-8 gap-2 text-center">
                         ${calendarDays.join('')}
                     </div>
                     <div class="flex items-center justify-center mt-3 space-x-4">
@@ -2498,6 +2645,77 @@ window.showGameAchievementsDetails = showGameAchievementsDetails;
 window.openModal = openModal;
 window.closeModal = closeModal;
 window.closeTotalWordsModal = closeTotalWordsModal;
+
+// 학습 목표 저장 기능
+document.addEventListener('DOMContentLoaded', function() {
+    const saveGoalsBtn = document.getElementById('save-goals-btn');
+    if (saveGoalsBtn) {
+        saveGoalsBtn.addEventListener('click', function() {
+            const dailyWordsGoal = document.getElementById('daily-words-goal')?.value || 10;
+            const dailyQuizGoal = document.getElementById('daily-quiz-goal')?.value || 20;
+            const weeklyDaysGoal = document.getElementById('weekly-days-goal')?.value || 5;
+            const weeklyMasteryGoal = document.getElementById('weekly-mastery-goal')?.value || 30;
+            
+            const goals = {
+                dailyWords: parseInt(dailyWordsGoal),
+                dailyQuiz: parseInt(dailyQuizGoal),
+                weeklyDays: parseInt(weeklyDaysGoal),
+                weeklyMastery: parseInt(weeklyMasteryGoal),
+                savedAt: new Date().toISOString()
+            };
+            
+            localStorage.setItem(`learningGoals_${selectedTargetLanguage}`, JSON.stringify(goals));
+            
+            // 진행률 즉시 업데이트
+            const currentStats = calculateTargetLanguageStats(selectedTargetLanguage);
+            updateLearningGoalsProgress(currentStats);
+            
+            // 저장 완료 알림
+            saveGoalsBtn.textContent = '✅ 저장 완료';
+            saveGoalsBtn.classList.add('bg-green-600');
+            saveGoalsBtn.classList.remove('bg-blue-600');
+            
+            setTimeout(() => {
+                saveGoalsBtn.textContent = '목표 저장';
+                saveGoalsBtn.classList.remove('bg-green-600');
+                saveGoalsBtn.classList.add('bg-blue-600');
+            }, 2000);
+            
+            console.log(`🎯 학습 목표 저장 완료 - ${selectedTargetLanguage}:`, goals);
+        });
+    }
+    
+    // 페이지 로드 시 저장된 목표 불러오기
+    function loadSavedGoals() {
+        const savedGoals = localStorage.getItem(`learningGoals_${selectedTargetLanguage}`);
+        if (savedGoals) {
+            const goals = JSON.parse(savedGoals);
+            
+            const dailyWordsGoalEl = document.getElementById('daily-words-goal');
+            const dailyQuizGoalEl = document.getElementById('daily-quiz-goal');
+            const weeklyDaysGoalEl = document.getElementById('weekly-days-goal');
+            const weeklyMasteryGoalEl = document.getElementById('weekly-mastery-goal');
+            
+            if (dailyWordsGoalEl) dailyWordsGoalEl.value = goals.dailyWords || 10;
+            if (dailyQuizGoalEl) dailyQuizGoalEl.value = goals.dailyQuiz || 20;
+            if (weeklyDaysGoalEl) weeklyDaysGoalEl.value = goals.weeklyDays || 5;
+            if (weeklyMasteryGoalEl) weeklyMasteryGoalEl.value = goals.weeklyMastery || 30;
+            
+            console.log(`🎯 저장된 학습 목표 로드 완료 - ${selectedTargetLanguage}:`, goals);
+        }
+    }
+    
+    // 언어 변경 시에도 목표 로드
+    const targetLanguageSelector = document.getElementById('target-language-filter');
+    if (targetLanguageSelector) {
+        targetLanguageSelector.addEventListener('change', function() {
+            setTimeout(loadSavedGoals, 100);
+        });
+    }
+    
+    // 초기 로드
+    loadSavedGoals();
+});
 
 // Test function to add sample data with proper snapshots
 window.addTestData = async function() {
