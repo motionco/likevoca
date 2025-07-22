@@ -1737,6 +1737,34 @@ window.updateEditCategoryOptions = updateEditCategoryOptions;
 window.updateEditEmojiOptions = updateEditEmojiOptions;
 window.setupModalEventListeners = setupModalEventListeners;
 
+// 도메인별 이모지 반환 함수
+window.getDomainEmoji = function(domain) {
+  const domainEmojiMap = {
+    '일상': '🏠',
+    '비즈니스': '💼',
+    '기술': '💻',
+    '학문': '📚',
+    '의학': '⚕️',
+    '여행': '✈️',
+    '음식': '🍽️',
+    '스포츠': '⚽',
+    '문화': '🎭',
+    '일반': '📝',
+    'daily': '🏠',
+    'business': '💼',
+    'technology': '💻',
+    'academic': '📚',
+    'medical': '⚕️',
+    'travel': '✈️',
+    'food': '🍽️',
+    'sports': '⚽',
+    'culture': '🎭',
+    'general': '📝'
+  };
+  
+  return domainEmojiMap[domain] || '📚';
+};
+
 // DOM 로드 시 이벤트 리스너 설정
 document.addEventListener("DOMContentLoaded", () => {
   const domainSelect = document.getElementById("domain-filter");
