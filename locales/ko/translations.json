@@ -581,7 +581,7 @@
   "no_recent_activity": "최근 학습 기록이 없습니다",
   "start_new_learning": "새로운 학습을 시작해보세요!",
   "minutes_ago": "분 전",
-  "hours_ago": "시간 전", 
+  "hours_ago": "시간 전",
   "days_ago": "일 전",
   "vocabulary_flashcard": "단어 플래시카드",
   "basic_vocabulary_learning": "기본 단어 학습",
@@ -638,8 +638,8 @@
   "weekly_activity": "주간 학습 활동",
   "category_progress": "카테고리별 진도",
   "language_mastery": "언어별 마스터리",
-  "recent_activities": "최근 학습 활동",
-  "no_recent_activities": "최근 학습 활동이 없습니다.",
+  "recent_activities": "최근 활동",
+  "no_recent_activities": "최근 활동이 없습니다.",
   "learning_goals": "학습 목표",
   "daily_goal": "일일 목표",
   "weekly_goal": "주간 목표",
@@ -702,4 +702,4 @@
   "avg_session_quality": "학습 효율:",
   "learning_efficiency": "학습 효율",
   "session_quality_desc": "학습 시간, 정확도, 집중도를 종합한 효율성 점수입니다."
-} 
+}

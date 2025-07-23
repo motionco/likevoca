@@ -24,52 +24,26 @@
   <!-- 메인 콘텐츠 -->
   <main class="container mx-auto px-6 py-8">
     <!-- 페이지 헤더 -->
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-800 mb-2" data-i18n="progress_title">
-        📊 진도
-      </h1>
-      <p class="text-gray-600" data-i18n="progress_description">
-        학습 성과와 진행 상황을 확인하고 목표를 설정하세요.
-      </p>
-    </div>
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-800 mb-2" data-i18n="progress_title">
+          📊 진도
+        </h1>
+        <p class="text-gray-600" data-i18n="progress_description">
+          학습 성과와 진행 상황을 확인하고 목표를 설정하세요.
+        </p>
+      </div>
 
-    <!-- 📊 언어 필터 -->
-    <div class="bg-white rounded-xl p-4 mb-6 border border-gray-200 shadow-sm">
-      <div class="flex flex-wrap items-center gap-4">
-        <span class="text-sm font-medium text-gray-700">언어 필터:</span>
-
-        <div class="flex items-center gap-2">
-          <label class="text-xs text-gray-600">원본 언어</label>
-          <select id="source-language-filter"
-            class="text-sm border border-gray-300 rounded px-3 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            <option value="korean">한국어</option>
-            <option value="english">영어</option>
-            <option value="japanese">일본어</option>
-            <option value="chinese">중국어</option>
-          </select>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <span class="text-gray-400">→</span>
-          <label class="text-xs text-gray-600">대상 언어</label>
-          <select id="target-language-filter"
-            class="text-sm border border-gray-300 rounded px-3 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            <option value="english">영어</option>
-            <option value="korean">한국어</option>
-            <option value="japanese">일본어</option>
-            <option value="chinese">중국어</option>
-          </select>
-        </div>
-
-        <button id="apply-language-filter"
-          class="px-4 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors">
-          적용
-        </button>
-
-        <button id="reset-language-filter"
-          class="px-4 py-1 bg-gray-300 text-gray-700 text-sm rounded hover:bg-gray-400 transition-colors">
-          초기화
-        </button>
+      <!-- 언어 필터를 제목 오른쪽으로 이동 -->
+      <div class="flex items-center gap-2">
+        <label class="text-sm text-gray-600">대상 언어</label>
+        <select id="target-language-filter"
+          class="text-sm border border-gray-300 rounded px-3 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          <option value="english">영어</option>
+          <option value="korean">한국어</option>
+          <option value="japanese">일본어</option>
+          <option value="chinese">중국어</option>
+        </select>
       </div>
     </div>
 
@@ -253,17 +227,17 @@
       </div>
     </div>
 
-    <!-- 🎯 최근 학습 활동 -->
+    <!-- 🎯 최근 활동 -->
     <div class="bg-gradient-to-r from-yellow-50 to-amber-50 rounded-xl p-6 mb-8 border border-yellow-100">
       <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
         <i class="fas fa-history text-yellow-600 mr-2"></i>
-        <span data-i18n="recent_activities">최근 학습 활동</span>
+        <span data-i18n="recent_activities">최근 활동</span>
       </h2>
 
       <div id="recent-activities-list" class="space-y-3">
         <div class="text-center py-8 text-gray-500">
           <i class="fas fa-clock text-3xl mb-2"></i>
-          <p data-i18n="no_recent_activities">최근 학습 활동이 없습니다.</p>
+          <p data-i18n="no_recent_activities">최근 활동이 없습니다.</p>
         </div>
       </div>
     </div>
@@ -294,7 +268,7 @@
               <div class="mt-2">
                 <div class="flex justify-between text-xs text-gray-500 mb-1">
                   <span data-i18n="today_progress">오늘 진행률</span>
-                  <span id="daily-words-progress">0/10</span>
+                  <span id="daily-words-progress">0/10개</span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-1">
                   <div id="daily-words-bar" class="bg-blue-600 h-1 rounded-full transition-all duration-300"

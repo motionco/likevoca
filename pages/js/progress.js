@@ -162,6 +162,23 @@ function setupEventListeners() {
             closeTotalWordsModal();
         }
     });
+    
+    // 윈도우 리사이즈 이벤트 추가 (차트 반응형 처리)
+    window.addEventListener('resize', function() {
+        // 주간 활동 차트 반응형 업데이트
+        if (window.weeklyActivityChart) {
+            window.weeklyActivityChart.options.plugins.legend.labels.boxWidth = window.innerWidth < 768 ? 8 : 12;
+            window.weeklyActivityChart.options.plugins.legend.labels.padding = window.innerWidth < 768 ? 8 : 15;
+            window.weeklyActivityChart.options.plugins.legend.labels.font.size = window.innerWidth < 768 ? 10 : 12;
+            window.weeklyActivityChart.update();
+        }
+        
+        // 카테고리 진도 차트 반응형 업데이트
+        if (window.categoryProgressChart) {
+            window.categoryProgressChart.options.plugins.legend.position = window.innerWidth < 768 ? 'bottom' : 'right';
+            window.categoryProgressChart.update();
+        }
+    });
 }
 
 // Load all progress data from Firebase collections
@@ -980,7 +997,7 @@ function calculateTargetLanguageStats(targetLanguage, forceRefresh = false) {
         return dateB - dateA;
     });
 
-    stats.activityHistory = activityHistory.slice(0, 10); // Last 10 activities
+    stats.activityHistory = activityHistory.slice(0, 5); // Last 5 activities
 
     // 통계 데이터 캐시에 저장
     cachedStats = stats;
@@ -1153,6 +1170,111 @@ function updateSummaryCards(stats) {
 }
 
 // Update activity list - 최근 활동 표시
+// 시간 경과 표시 함수
+function getTimeAgo(date) {
+    const now = new Date();
+    const diff = now - date;
+    const minutes = Math.floor(diff / (1000 * 60));
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    
+    if (minutes < 1) return '방금 전';
+    if (minutes < 60) return `${minutes}분 전`;
+    if (hours < 24) return `${hours}시간 전`;
+    if (days < 7) return `${days}일 전`;
+    
+    return date.toLocaleDateString('ko-KR');
+}
+
+// 활동 타입에 따른 상세 활동명 생성 함수
+function getDetailedActivityName(activity) {
+    const type = activity.type;
+    
+    if (type === 'learning') {
+        // 학습: 학습영역명 + 학습카드명
+        const learningArea = activity.learning_area || activity.area || activity.activity_type || 'vocabulary';
+        const cardType = activity.card_type || activity.learning_type || activity.mode || activity.learning_mode || 'flashcard';
+        
+        // 영역명 매핑
+        const areaMapping = {
+            'vocabulary': '단어',
+            'reading': '독해',
+            'listening': '듣기',
+            'speaking': '말하기',
+            'writing': '쓰기',
+            'grammar': '문법',
+            'conversation': '회화'
+        };
+        
+        // 카드타입 매핑
+        const cardMapping = {
+            'flashcard': '플래시카드',
+            'typing': '타이핑',
+            'example': '예문 학습',
+            'sentence': '문장 학습',
+            'pronunciation': '발음 학습',
+            'definition': '정의 학습',
+            'vocabulary': '플래시카드',
+            'grammar': '학습',
+            'conversation': '학습'
+        };
+        
+        const mappedArea = areaMapping[learningArea] || '단어';
+        const mappedCard = cardMapping[cardType] || '플래시카드';
+        
+        return `${mappedArea} ${mappedCard}`;
+        
+    } else if (type === 'quiz') {
+        // 퀴즈: 퀴즈타입명
+        const quizType = activity.quiz_type || activity.quizType || activity.type_detail || 'translation';
+        
+        const quizMapping = {
+            'translation': '단어 번역',
+            'multiple_choice': '객관식 퀴즈',
+            'multiple-choice': '객관식 퀴즈',
+            'fill_blank': '빈칸 채우기',
+            'fill-blank': '빈칸 채우기',
+            'listening': '듣기 퀴즈',
+            'pronunciation': '발음 퀴즈',
+            'sentence': '문장 구성'
+        };
+        
+        return quizMapping[quizType] || '단어 번역';
+        
+    } else if (type === 'game') {
+        // 게임: 게임카드명
+        const gameType = activity.game_type || activity.gameType || activity.type_detail || 'word-matching';
+        
+        console.log('🎮 게임 활동 디버깅:', {
+            activity_id: activity.id,
+            game_type: activity.game_type,
+            gameType: activity.gameType,
+            type_detail: activity.type_detail,
+            detected_gameType: gameType,
+            full_activity: activity
+        });
+        
+        const gameMapping = {
+            'word-matching': '단어 맞추기',
+            'word-shuffle': '단어 섞기',
+            'word_shuffle': '단어 섞기', // 언더스코어 버전도 추가
+            'word-scramble': '단어 섞기', // 추가
+            'word_scramble': '단어 섞기', // 언더스코어 버전도 추가
+            'scramble': '단어 섞기',
+            'shuffle': '단어 섞기',
+            'memory-card': '기억 카드',
+            'memory-game': '메모리 게임',
+            'speed-quiz': '스피드 퀴즈',
+            'crossword': '단어 퍼즐',
+            'hangman': '행맨 게임'
+        };
+        
+        return gameMapping[gameType] || '학습 게임';
+    }
+    
+    return '학습 활동';
+}
+
 function updateActivityList(activities) {
     // 기존 활동 리스트 업데이트
     const activityListEl = document.getElementById('recent-activities-list');
@@ -1169,54 +1291,24 @@ function updateActivityList(activities) {
                     minute: '2-digit' 
                 });
 
+                // 상세 활동명 생성
+                const activityName = getDetailedActivityName(activity);
+                
                 let activityInfo = '';
                 let badgeColor = 'bg-blue-100 text-blue-800';
-                let activityName = '';
 
                 switch (activity.type) {
                     case 'learning':
-                        // 학습 모드 세분화
-                        if (activity.activity_type === 'vocabulary' || activity.learning_mode === 'vocabulary' || activity.mode === 'vocabulary') {
-                            activityName = '단어 플래시카드';
-                        } else if (activity.activity_type === 'grammar' || activity.learning_mode === 'grammar' || activity.mode === 'grammar') {
-                            activityName = '문법 학습';
-                        } else if (activity.activity_type === 'conversation' || activity.learning_mode === 'conversation' || activity.mode === 'conversation') {
-                            activityName = '회화 학습';
-                        } else {
-                            activityName = '개념 학습';
-                        }
                         const sessionQuality = activity.session_quality || activity.accuracy || 0;
-                        activityInfo = `${activityName} - 학습 효율: ${Math.round(sessionQuality)}%`;
+                        activityInfo = `${activityName} - <span class="hidden md:inline">학습 효율: </span>${Math.round(sessionQuality)}%`;
                         badgeColor = 'bg-green-100 text-green-800';
                         break;
                     case 'game':
-                        // 게임 모드 세분화
-                        if (activity.game_type === 'word-matching' || activity.gameType === 'word-matching') {
-                            activityName = '단어 맞추기';
-                        } else if (activity.game_type === 'speed-quiz' || activity.gameType === 'speed-quiz') {
-                            activityName = '스피드 퀴즈';
-                        } else if (activity.game_type === 'memory-game' || activity.gameType === 'memory-game') {
-                            activityName = '메모리 게임';
-                        } else {
-                            activityName = '학습 게임';
-                        }
-                        activityInfo = `${activityName} - 점수: ${activity.score || 0}점`;
+                        activityInfo = `${activityName} - <span class="hidden md:inline">점수: </span>${activity.score || 0}점`;
                         badgeColor = 'bg-purple-100 text-purple-800';
                         break;
                     case 'quiz':
-                        // 퀴즈 모드 세분화
-                        if (activity.quiz_type === 'translation' || activity.quizType === 'translation') {
-                            activityName = '단어 번역';
-                        } else if (activity.quiz_type === 'multiple-choice' || activity.quizType === 'multiple-choice') {
-                            activityName = '객관식 퀴즈';
-                        } else if (activity.quiz_type === 'fill-blank' || activity.quizType === 'fill-blank') {
-                            activityName = '빈칸 채우기';
-                        } else if (activity.quiz_type === 'listening' || activity.quizType === 'listening') {
-                            activityName = '듣기 퀴즈';
-                        } else {
-                            activityName = '퀴즈';
-                        }
-                        activityInfo = `${activityName} - 점수: ${activity.score || 0}점`;
+                        activityInfo = `${activityName} - <span class="hidden md:inline">점수: </span>${activity.score || 0}점`;
                         badgeColor = 'bg-orange-100 text-orange-800';
                         break;
                 }
@@ -1474,6 +1566,13 @@ function updateWeeklyActivityChart(stats) {
             plugins: {
                 legend: {
                     position: 'top',
+                    labels: {
+                        boxWidth: window.innerWidth < 768 ? 8 : 12, // 모바일에서 박스 크기 줄이기
+                        padding: window.innerWidth < 768 ? 8 : 15,  // 모바일에서 패딩 줄이기
+                        font: {
+                            size: window.innerWidth < 768 ? 10 : 12 // 모바일에서 폰트 크기 줄이기
+                        }
+                    }
                 }
             },
             scales: {
@@ -1486,6 +1585,23 @@ function updateWeeklyActivityChart(stats) {
             }
         }
     });
+}
+
+// 도메인별 색상 매핑 함수
+function getDomainColorTheme(domain) {
+    const colorMapping = {
+        'daily': '#22c55e',      // green
+        'business': '#3b82f6',   // blue  
+        'technology': '#9333ea', // purple
+        'education': '#f59e0b',  // amber
+        'health': '#ef4444',     // red
+        'travel': '#06b6d4',     // cyan
+        'food': '#fbbf24',       // yellow
+        'entertainment': '#6366f1', // indigo
+        'culture': '#ec4899',    // pink
+        'general': '#9ca3af'     // gray
+    };
+    return colorMapping[domain] || '#9ca3af';
 }
 
 // 도메인별 진도 차트 업데이트 (concept_snapshots에서 도메인 정보 집계)
@@ -1596,19 +1712,13 @@ function updateCategoryProgressChart() {
     const domains = Object.keys(domainData);
     const values = Object.values(domainData).map(d => d.count);
     
-    // 도메인별 색상 정의
-    const colors = [
-        'rgba(34, 197, 94, 0.7)',  // 일상 - green
-        'rgba(59, 130, 246, 0.7)', // 비즈니스 - blue
-        'rgba(147, 51, 234, 0.7)', // 기술 - purple
-        'rgba(245, 158, 11, 0.7)', // 학문 - amber
-        'rgba(239, 68, 68, 0.7)',  // 의학 - red
-        'rgba(6, 182, 212, 0.7)',  // 여행 - cyan
-        'rgba(251, 191, 36, 0.7)', // 음식 - yellow
-        'rgba(99, 102, 241, 0.7)', // 스포츠 - indigo
-        'rgba(236, 72, 153, 0.7)', // 문화 - pink
-        'rgba(156, 163, 175, 0.7)' // 일반 - gray
-    ];
+    // 도메인별 색상 정의 (일관성 있는 색상 사용)
+    const colors = domains.map(domain => {
+        const color = getDomainColorTheme(domain);
+        return color + '80'; // 80% 투명도
+    });
+    
+    const borderColors = domains.map(domain => getDomainColorTheme(domain));
     
     window.categoryProgressChart = new Chart(ctx, {
         type: 'doughnut',
@@ -1616,8 +1726,8 @@ function updateCategoryProgressChart() {
             labels: domains,
             datasets: [{
                 data: values,
-                backgroundColor: colors.slice(0, domains.length),
-                borderColor: colors.slice(0, domains.length).map(color => color.replace('0.7', '1')),
+                backgroundColor: colors,
+                borderColor: borderColors,
                 borderWidth: 2
             }]
         },
@@ -1626,40 +1736,61 @@ function updateCategoryProgressChart() {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    position: 'right',
+                    position: window.innerWidth < 768 ? 'bottom' : 'right', // 모바일에서는 아래, 데스크탑에서는 오른쪽
                     labels: {
                         usePointStyle: true,
                         padding: 15
                     }
                 },
                 tooltip: {
+                    displayColors: true, // 색상 박스 표시 활성화
                     callbacks: {
                         title: function(context) {
                             const label = context[0].label || '';
                             const value = context[0].parsed || 0;
                             const total = context[0].dataset.data.reduce((a, b) => a + b, 0);
                             const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                            const color = getDomainColorTheme(label);
                             
-                            // 제목에 색상박스, 도메인명, 개수, 퍼센트 표시
-                            return `🔸 ${label}: ${value}개 (${percentage}%)`;
+                            // 색상 사각형을 직접 제목에 포함
+                            return `${label}: ${value}개 (${percentage}%)`;
+                        },
+                        titleColor: function(context) {
+                            // 제목 색상을 도메인 색상으로 설정
+                            const label = context[0].label || '';
+                            return getDomainColorTheme(label);
                         },
                         label: function(context) {
                             const label = context.label || '';
                             
-                            // 해당 도메인의 카테고리 정보만 표시
+                            // 해당 도메인의 카테고리 정보만 표시 (색상 없이)
                             const domainInfo = domainData[label];
                             if (domainInfo && domainInfo.categories && domainInfo.categories.size > 0) {
                                 const result = [];
                                 Array.from(domainInfo.categories.entries())
                                     .sort((a, b) => b[1] - a[1]) // 개수 순으로 정렬
                                     .forEach(([category, count]) => {
-                                        result.push(`• ${category}: ${count}개`);
+                                        result.push(`${category}: ${count}개`);
                                     });
                                 return result;
                             }
                             
                             return ['카테고리 정보 없음'];
-                        }
+                        },
+        labelColor: function(context) {
+            const label = context.label || '';
+            const domainColor = getDomainColorTheme(label);
+            
+            return {
+                borderColor: domainColor,
+                backgroundColor: domainColor,
+                borderWidth: 2,
+                borderRadius: 2
+            };
+        },
+                labelTextColor: function(context) {
+            return '#9fgg29'; // 텍스트 색상
+        }
                     }
                 }
             }

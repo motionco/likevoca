@@ -35,52 +35,26 @@
   <!-- 메인 콘텐츠 -->
   <main class="container mx-auto px-6 py-8">
     <!-- 페이지 헤더 -->
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-800 mb-2">
-        📊 Progress
-      </h1>
-      <p class="text-gray-600">
-        Track your learning achievements and progress, and set your goals.
-      </p>
-    </div>
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">
+          📊 Progress
+        </h1>
+        <p class="text-gray-600">
+          Track your learning achievements and progress, and set your goals.
+        </p>
+      </div>
 
-    <!-- 📊 Language Filter -->
-    <div class="bg-white rounded-xl p-4 mb-6 border border-gray-200 shadow-sm">
-      <div class="flex flex-wrap items-center gap-4">
-        <span class="text-sm font-medium text-gray-700">Language Filter:</span>
-
-        <div class="flex items-center gap-2">
-          <label class="text-xs text-gray-600">Source</label>
-          <select id="source-language-filter"
-            class="text-sm border border-gray-300 rounded px-3 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            <option value="korean">Korean</option>
-            <option value="english">English</option>
-            <option value="japanese">Japanese</option>
-            <option value="chinese">Chinese</option>
-          </select>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <span class="text-gray-400">→</span>
-          <label class="text-xs text-gray-600">Target</label>
-          <select id="target-language-filter"
-            class="text-sm border border-gray-300 rounded px-3 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            <option value="english">English</option>
-            <option value="korean">Korean</option>
-            <option value="japanese">Japanese</option>
-            <option value="chinese">Chinese</option>
-          </select>
-        </div>
-
-        <button id="apply-language-filter"
-          class="px-4 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors">
-          Apply
-        </button>
-
-        <button id="reset-language-filter"
-          class="px-4 py-1 bg-gray-300 text-gray-700 text-sm rounded hover:bg-gray-400 transition-colors">
-          Reset
-        </button>
+      <!-- 언어 필터를 제목 오른쪽으로 이동 -->
+      <div class="flex items-center gap-2">
+        <label class="text-sm text-gray-600">Target</label>
+        <select id="target-language-filter"
+          class="text-sm border border-gray-300 rounded px-3 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          <option value="english">English</option>
+          <option value="korean">Korean</option>
+          <option value="japanese">Japanese</option>
+          <option value="chinese">Chinese</option>
+        </select>
       </div>
     </div>
 
