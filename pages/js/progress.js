@@ -7,6 +7,13 @@ let userProgressData = {};
 let currentLanguage = 'ko';
 let selectedTargetLanguage = 'english';
 
+// 캐시된 통계 데이터
+let cachedStats = null;
+let lastStatsUpdate = null;
+// 캐시된 개념 데이터
+let cachedConceptData = null;
+let lastConceptUpdate = null;
+
 // Initialize page
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Progress page initializing...');
@@ -26,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             console.log('User authenticated:', currentUser.email);
             await loadProgressData();
             loadLanguageSettings();
-            updateUI();
+            updateUI(true); // 초기 로드 시 강제 새로고침
         } else {
             console.log('User not authenticated, redirecting to login');
             window.location.href = '/login.html';
@@ -92,6 +99,11 @@ function setupEventListeners() {
             selectedTargetLanguage = this.value;
             saveLanguageSettings();
             console.log('Target language changed to:', selectedTargetLanguage);
+            // 언어 변경 시 캐시 무효화
+            cachedStats = null;
+            lastStatsUpdate = null;
+            cachedConceptData = null;
+            lastConceptUpdate = null;
             updateUI();
         });
     }
@@ -105,6 +117,9 @@ function setupEventListeners() {
                 selectedTargetLanguage = selector.value;
                 console.log('Language applied:', selectedTargetLanguage);
                 saveLanguageSettings();
+                // 언어 변경 시 캐시 무효화
+                cachedStats = null;
+                lastStatsUpdate = null;
                 updateUI();
             }
         });
@@ -567,7 +582,16 @@ function calculateStatsForTargetLanguage(targetLanguage) {
 }
 
 // Calculate statistics for target language (main function for UI)
-function calculateTargetLanguageStats(targetLanguage) {
+function calculateTargetLanguageStats(targetLanguage, forceRefresh = false) {
+    // 캐시된 데이터가 있고 강제 새로고침이 아니면 캐시 사용
+    if (cachedStats && !forceRefresh && lastStatsUpdate && 
+        (Date.now() - lastStatsUpdate) < 30000) { // 30초 내 캐시 사용
+        console.log('📋 캐시된 통계 데이터 사용');
+        return cachedStats;
+    }
+    
+    console.log('🔄 새로운 통계 데이터 계산 시작...');
+    
     // 먼저 user_records에서 저장된 통계를 확인
     let savedStats = null;
     if (userProgressData && userProgressData.target_languages && userProgressData.target_languages[targetLanguage]) {
@@ -956,7 +980,13 @@ function calculateTargetLanguageStats(targetLanguage) {
         return dateB - dateA;
     });
 
-    stats.activityHistory = activityHistory.slice(0, 20); // Last 20 activities
+    stats.activityHistory = activityHistory.slice(0, 10); // Last 10 activities
+
+    // 통계 데이터 캐시에 저장
+    cachedStats = stats;
+    lastStatsUpdate = Date.now();
+    
+    console.log('📋 통계 데이터 캐시에 저장 완료');
 
     return stats;
 }
@@ -991,9 +1021,9 @@ function calculateStreak(sortedDates) {
 }
 
 // Update UI with current data
-function updateUI() {
+function updateUI(forceRefresh = false) {
     console.log('Updating UI for target language:', selectedTargetLanguage);
-    const stats = calculateTargetLanguageStats(selectedTargetLanguage);
+    const stats = calculateTargetLanguageStats(selectedTargetLanguage, forceRefresh);
     
     // Update summary cards
     updateSummaryCards(stats);
@@ -1122,65 +1152,96 @@ function updateSummaryCards(stats) {
     console.log('Summary cards updated with stats:', stats);
 }
 
-// Update activity list
+// Update activity list - 최근 활동 표시
 function updateActivityList(activities) {
+    // 기존 활동 리스트 업데이트
     const activityListEl = document.getElementById('recent-activities-list');
-    if (!activityListEl) {
-        console.log('Activity list element not found');
-        return;
-    }
+    if (activityListEl) {
+        if (activities.length === 0) {
+            activityListEl.innerHTML = '<p class="text-gray-500 text-center py-4">아직 학습 기록이 없습니다.</p>';
+        } else {
+            const activityHTML = activities.map(activity => {
+                const date = activity.timestamp?.toDate ? 
+                    activity.timestamp.toDate() : new Date(activity.timestamp);
+                const formattedDate = date.toLocaleDateString('ko-KR');
+                const formattedTime = date.toLocaleTimeString('ko-KR', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
 
-    if (activities.length === 0) {
-        activityListEl.innerHTML = '<p class="text-gray-500 text-center py-4">아직 학습 기록이 없습니다.</p>';
-        return;
-    }
+                let activityInfo = '';
+                let badgeColor = 'bg-blue-100 text-blue-800';
+                let activityName = '';
 
-    const activityHTML = activities.map(activity => {
-        const date = activity.timestamp?.toDate ? 
-            activity.timestamp.toDate() : new Date(activity.timestamp);
-        const formattedDate = date.toLocaleDateString('ko-KR');
-        const formattedTime = date.toLocaleTimeString('ko-KR', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-        });
+                switch (activity.type) {
+                    case 'learning':
+                        // 학습 모드 세분화
+                        if (activity.activity_type === 'vocabulary' || activity.learning_mode === 'vocabulary' || activity.mode === 'vocabulary') {
+                            activityName = '단어 플래시카드';
+                        } else if (activity.activity_type === 'grammar' || activity.learning_mode === 'grammar' || activity.mode === 'grammar') {
+                            activityName = '문법 학습';
+                        } else if (activity.activity_type === 'conversation' || activity.learning_mode === 'conversation' || activity.mode === 'conversation') {
+                            activityName = '회화 학습';
+                        } else {
+                            activityName = '개념 학습';
+                        }
+                        const sessionQuality = activity.session_quality || activity.accuracy || 0;
+                        activityInfo = `${activityName} - 학습 효율: ${Math.round(sessionQuality)}%`;
+                        badgeColor = 'bg-green-100 text-green-800';
+                        break;
+                    case 'game':
+                        // 게임 모드 세분화
+                        if (activity.game_type === 'word-matching' || activity.gameType === 'word-matching') {
+                            activityName = '단어 맞추기';
+                        } else if (activity.game_type === 'speed-quiz' || activity.gameType === 'speed-quiz') {
+                            activityName = '스피드 퀴즈';
+                        } else if (activity.game_type === 'memory-game' || activity.gameType === 'memory-game') {
+                            activityName = '메모리 게임';
+                        } else {
+                            activityName = '학습 게임';
+                        }
+                        activityInfo = `${activityName} - 점수: ${activity.score || 0}점`;
+                        badgeColor = 'bg-purple-100 text-purple-800';
+                        break;
+                    case 'quiz':
+                        // 퀴즈 모드 세분화
+                        if (activity.quiz_type === 'translation' || activity.quizType === 'translation') {
+                            activityName = '단어 번역';
+                        } else if (activity.quiz_type === 'multiple-choice' || activity.quizType === 'multiple-choice') {
+                            activityName = '객관식 퀴즈';
+                        } else if (activity.quiz_type === 'fill-blank' || activity.quizType === 'fill-blank') {
+                            activityName = '빈칸 채우기';
+                        } else if (activity.quiz_type === 'listening' || activity.quizType === 'listening') {
+                            activityName = '듣기 퀴즈';
+                        } else {
+                            activityName = '퀴즈';
+                        }
+                        activityInfo = `${activityName} - 점수: ${activity.score || 0}점`;
+                        badgeColor = 'bg-orange-100 text-orange-800';
+                        break;
+                }
 
-        let activityInfo = '';
-        let badgeColor = 'bg-blue-100 text-blue-800';
+                return `
+                    <div class="border-l-4 border-blue-400 pl-4 py-2">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badgeColor}">
+                                    ${activity.type}
+                                </span>
+                                <p class="text-sm text-gray-900 mt-1">${activityInfo}</p>
+                            </div>
+                            <div class="text-right text-xs text-gray-500">
+                                <p>${formattedDate}</p>
+                                <p>${formattedTime}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
 
-        switch (activity.type) {
-            case 'learning':
-                activityInfo = `개념 학습 - 정확도: ${Math.round(activity.accuracy || 0)}%`;
-                badgeColor = 'bg-green-100 text-green-800';
-                break;
-            case 'game':
-                activityInfo = `게임 - 점수: ${activity.score || 0}점`;
-                badgeColor = 'bg-purple-100 text-purple-800';
-                break;
-            case 'quiz':
-                activityInfo = `퀴즈 - 점수: ${activity.score || 0}점`;
-                badgeColor = 'bg-orange-100 text-orange-800';
-                break;
+            activityListEl.innerHTML = activityHTML;
         }
-
-        return `
-            <div class="border-l-4 border-blue-400 pl-4 py-2">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badgeColor}">
-                            ${activity.type}
-                        </span>
-                        <p class="text-sm text-gray-900 mt-1">${activityInfo}</p>
-                    </div>
-                    <div class="text-right text-xs text-gray-500">
-                        <p>${formattedDate}</p>
-                        <p>${formattedTime}</p>
-                    </div>
-                </div>
-            </div>
-        `;
-    }).join('');
-
-    activityListEl.innerHTML = activityHTML;
+    }
 }
 
 // Update language selector
@@ -1200,14 +1261,14 @@ function updateLanguageSelector() {
 function updateLearningGoalsProgress(stats) {
     // 일일 신규 단어 목표
     const dailyWordsGoal = parseInt(document.getElementById('daily-words-goal')?.value || 10);
-    const dailyWordsProgress = Math.min(stats.totalConcepts, dailyWordsGoal);
+    const dailyWordsProgress = stats.totalConcepts; // Math.min 제거하여 실제 값 표시
     const dailyWordsPercentage = Math.min(100, (dailyWordsProgress / dailyWordsGoal) * 100);
     
     const dailyWordsProgressEl = document.getElementById('daily-words-progress');
     const dailyWordsBarEl = document.getElementById('daily-words-bar');
     
     if (dailyWordsProgressEl) {
-        dailyWordsProgressEl.textContent = `${dailyWordsProgress}/${dailyWordsGoal}`;
+        dailyWordsProgressEl.textContent = `${dailyWordsProgress}/${dailyWordsGoal}개`;
     }
     
     if (dailyWordsBarEl) {
@@ -1216,7 +1277,7 @@ function updateLearningGoalsProgress(stats) {
     
     // 일일 퀴즈 시간 목표
     const dailyQuizGoal = parseInt(document.getElementById('daily-quiz-goal')?.value || 20);
-    const dailyQuizProgress = Math.min(stats.totalStudyTime, dailyQuizGoal);
+    const dailyQuizProgress = stats.totalStudyTime; // Math.min 제거하여 실제 값 표시
     const dailyQuizPercentage = Math.min(100, (dailyQuizProgress / dailyQuizGoal) * 100);
     
     const dailyQuizProgressEl = document.getElementById('daily-quiz-progress');
@@ -1232,7 +1293,7 @@ function updateLearningGoalsProgress(stats) {
     
     // 주간 학습 일수 목표 (연속 학습일 기준)
     const weeklyDaysGoal = parseInt(document.getElementById('weekly-days-goal')?.value || 5);
-    const weeklyDaysProgress = Math.min(stats.studyStreak, weeklyDaysGoal);
+    const weeklyDaysProgress = stats.studyStreak; // Math.min 제거하여 실제 값 표시
     const weeklyDaysPercentage = Math.min(100, (weeklyDaysProgress / weeklyDaysGoal) * 100);
     
     const weeklyDaysProgressEl = document.getElementById('weekly-days-progress');
@@ -1248,7 +1309,7 @@ function updateLearningGoalsProgress(stats) {
     
     // 주간 단어 마스터 목표
     const weeklyMasteryGoal = parseInt(document.getElementById('weekly-mastery-goal')?.value || 30);
-    const weeklyMasteryProgress = Math.min(stats.masteredConcepts, weeklyMasteryGoal);
+    const weeklyMasteryProgress = stats.masteredConcepts; // Math.min 제거하여 실제 값 표시
     const weeklyMasteryPercentage = Math.min(100, (weeklyMasteryProgress / weeklyMasteryGoal) * 100);
     
     const weeklyMasteryProgressEl = document.getElementById('weekly-mastery-progress');
@@ -1500,7 +1561,22 @@ function updateCategoryProgressChart() {
             if (conceptInfo) {
                 // concept_info.domain에서 도메인 정보 확인
                 const domain = conceptInfo.concept_info?.domain || conceptInfo.domain || 'daily';
-                domainData[domain] = (domainData[domain] || 0) + 1;
+                const category = conceptInfo.concept_info?.category || conceptInfo.category || '';
+                
+                if (!domainData[domain]) {
+                    domainData[domain] = {
+                        count: 0,
+                        categories: new Map()
+                    };
+                }
+                domainData[domain].count += 1;
+                
+                // 카테고리별 개수 집계
+                if (category) {
+                    const currentCount = domainData[domain].categories.get(category) || 0;
+                    domainData[domain].categories.set(category, currentCount + 1);
+                }
+                
                 console.log(`🔍 개념 ${conceptId} 도메인:`, domain, conceptInfo);
             }
         });
@@ -1510,15 +1586,15 @@ function updateCategoryProgressChart() {
     
     // 데이터가 없는 경우 기본 도메인 추가
     if (Object.keys(domainData).length === 0) {
-        domainData['일상'] = 0;
-        domainData['비즈니스'] = 0;
-        domainData['기술'] = 0;
-        domainData['학문'] = 0;
-        domainData['일반'] = 0;
+        domainData['일상'] = { count: 0, categories: new Map() };
+        domainData['비즈니스'] = { count: 0, categories: new Map() };
+        domainData['기술'] = { count: 0, categories: new Map() };
+        domainData['학문'] = { count: 0, categories: new Map() };
+        domainData['일반'] = { count: 0, categories: new Map() };
     }
     
     const domains = Object.keys(domainData);
-    const values = Object.values(domainData);
+    const values = Object.values(domainData).map(d => d.count);
     
     // 도메인별 색상 정의
     const colors = [
@@ -1558,12 +1634,31 @@ function updateCategoryProgressChart() {
                 },
                 tooltip: {
                     callbacks: {
+                        title: function(context) {
+                            const label = context[0].label || '';
+                            const value = context[0].parsed || 0;
+                            const total = context[0].dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                            
+                            // 제목에 색상박스, 도메인명, 개수, 퍼센트 표시
+                            return `🔸 ${label}: ${value}개 (${percentage}%)`;
+                        },
                         label: function(context) {
                             const label = context.label || '';
-                            const value = context.parsed || 0;
-                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
-                            return `${label}: ${value}개 (${percentage}%)`;
+                            
+                            // 해당 도메인의 카테고리 정보만 표시
+                            const domainInfo = domainData[label];
+                            if (domainInfo && domainInfo.categories && domainInfo.categories.size > 0) {
+                                const result = [];
+                                Array.from(domainInfo.categories.entries())
+                                    .sort((a, b) => b[1] - a[1]) // 개수 순으로 정렬
+                                    .forEach(([category, count]) => {
+                                        result.push(`• ${category}: ${count}개`);
+                                    });
+                                return result;
+                            }
+                            
+                            return ['카테고리 정보 없음'];
                         }
                     }
                 }
@@ -1574,7 +1669,7 @@ function updateCategoryProgressChart() {
 
 // Missing function for quiz accuracy details
 function showQuizAccuracyDetails() {
-    const stats = calculateTargetLanguageStats(selectedTargetLanguage);
+    const stats = calculateTargetLanguageStats(selectedTargetLanguage, false); // 캐시 사용
     const accuracy = stats.quizStats.totalQuestions > 0 ? 
         (stats.quizStats.correctAnswers / stats.quizStats.totalQuestions * 100) : 0;
     
@@ -1623,168 +1718,27 @@ function showQuizAccuracyDetails() {
 
 // 총 단어수 카드 클릭 시 모달 열기
 async function showTotalWordsDetails() {
-    const stats = calculateTargetLanguageStats(selectedTargetLanguage);
+    const stats = calculateTargetLanguageStats(selectedTargetLanguage, false); // 캐시 사용
+    
+    // 캐시된 개념 데이터 확인 및 사용
+    let detailedConceptsList;
+    if (cachedConceptData && lastConceptUpdate && 
+        (Date.now() - lastConceptUpdate) < 30000) { // 30초 내 캐시 사용
+        console.log('📋 캐시된 개념 데이터 사용');
+        detailedConceptsList = cachedConceptData;
+    } else {
+        console.log('🔄 새로운 개념 데이터 계산 시작...');
+        detailedConceptsList = await generateDetailedConceptsList();
+        // 캐시에 저장
+        cachedConceptData = detailedConceptsList;
+        lastConceptUpdate = Date.now();
+        console.log('📋 개념 데이터 캐시에 저장 완료');
+    }
+    
     const modalBody = document.getElementById('totalWordsModalBody');
     
     if (modalBody) {
-        // 🔄 선택된 대상 언어의 모든 활동 기록 필터링
-        const learningRecords = allLearningRecords.filter(record => {
-            const hasTargetLanguage = record.targetLanguage === selectedTargetLanguage;
-            const hasLanguagePairIncludes = record.languagePair && record.languagePair.includes && record.languagePair.includes(selectedTargetLanguage);
-            const hasLanguage_pairTarget = record.language_pair && record.language_pair.target === selectedTargetLanguage;
-            const hasLanguage_pairIncludes = record.language_pair && record.language_pair.includes && record.language_pair.includes(selectedTargetLanguage);
-            const hasMetadataTargetLanguage = record.metadata && record.metadata.targetLanguage === selectedTargetLanguage;
-            const hasTarget_language = record.target_language === selectedTargetLanguage;
-            const isVocabularyActivity = record.activity_type === 'vocabulary' && selectedTargetLanguage === 'english';
-            
-            return hasTargetLanguage || hasLanguagePairIncludes || hasLanguage_pairTarget || 
-                   hasLanguage_pairIncludes || hasMetadataTargetLanguage || hasTarget_language || 
-                   isVocabularyActivity;
-        });
-        
-        const gameRecords = allGameRecords.filter(record => {
-            return record.targetLanguage === selectedTargetLanguage ||
-                   (record.languagePair && record.languagePair.includes(selectedTargetLanguage)) ||
-                   (record.language_pair && record.language_pair.target === selectedTargetLanguage) ||
-                   (record.language_pair && record.language_pair.includes && record.language_pair.includes(selectedTargetLanguage)) ||
-                   (record.metadata && record.metadata.targetLanguage === selectedTargetLanguage);
-        });
-        
-        const quizRecords = allQuizRecords.filter(record => {
-            const hasTargetLanguage = record.targetLanguage === selectedTargetLanguage;
-            const hasLanguagePairIncludes = record.languagePair && record.languagePair.includes(selectedTargetLanguage);
-            const hasLanguage_pairTarget = record.language_pair && record.language_pair.target === selectedTargetLanguage;
-            const hasMetadataTargetLanguage = record.metadata && record.metadata.targetLanguage === selectedTargetLanguage;
-            const hasTarget_language = record.target_language === selectedTargetLanguage;
-            const isTranslationQuiz = record.quiz_type === 'translation' && selectedTargetLanguage === 'english';
-            
-            return hasTargetLanguage || hasLanguagePairIncludes || hasLanguage_pairTarget || 
-                   hasMetadataTargetLanguage || hasTarget_language || isTranslationQuiz;
-        });
-
-        // 🎯 스냅샷 데이터 기반 개념 맵 생성
-        const conceptsMap = new Map();
-        let allActivities = [];
-        
-        // 📚 학습 기록에서 개념 추출
-        learningRecords.forEach(record => {
-            const conceptIds = extractConceptIds(record);
-            conceptIds.forEach(conceptId => {
-                if (conceptId) {
-                    updateConceptMap(conceptsMap, conceptId, record, 'learning');
-                }
-            });
-            allActivities.push({...record, activity_type: 'learning'});
-        });
-
-        // 🎮 게임 기록에서 개념 추출
-        gameRecords.forEach(record => {
-            const conceptIds = extractConceptIds(record);
-            conceptIds.forEach(conceptId => {
-                if (conceptId) {
-                    updateConceptMap(conceptsMap, conceptId, record, 'game');
-                }
-            });
-            allActivities.push({...record, activity_type: 'game'});
-        });
-
-        // ❓ 퀴즈 기록에서 개념 추출
-        quizRecords.forEach(record => {
-            const conceptIds = extractConceptIds(record);
-            conceptIds.forEach(conceptId => {
-                if (conceptId) {
-                    updateConceptMap(conceptsMap, conceptId, record, 'quiz');
-                }
-            });
-            allActivities.push({...record, activity_type: 'quiz'});
-        });
-
-        // 🏆 개념 스냅샷 생성 및 활동 데이터 수집
-        console.log('🔍 개념 스냅샷 생성 시작...');
-        
-        const detailedConceptsList = [];
-        
-        for (const [conceptId, conceptData] of conceptsMap) {
-            // 🔄 1. 먼저 활동 기록에서 개념 정보 확인
-            let conceptSnapshot = null;
-            
-            // 활동 기록의 conceptData에서 개념 정보 추출
-            const activityWithConceptData = allActivities.find(activity => {
-                const activityConceptIds = extractConceptIds(activity);
-                return activityConceptIds.includes(conceptId) && 
-                       (activity.conceptData || activity.concept_data);
-            });
-            
-            if (activityWithConceptData && activityWithConceptData.conceptData) {
-                // 활동 기록에서 개념 정보가 있으면 사용
-                conceptSnapshot = createConceptSnapshotFromActivity(
-                    conceptId, 
-                    activityWithConceptData.conceptData
-                );
-                console.log(`📋 활동 기록에서 개념 정보 사용: ${conceptId}`);
-            } else {
-                // 2. user_records에서 개념 스냅샷 조회 (비용 효율적)
-                try {
-                    conceptSnapshot = await fetchConceptSnapshotFromUserRecords(conceptId);
-                    console.log(`🔍 user_records에서 개념 정보 조회: ${conceptId}`);
-                } catch (error) {
-                    console.error(`개념 조회 실패: ${conceptId}`, error);
-                    conceptSnapshot = createDefaultSnapshot(conceptId);
-                }
-            }
-            
-            // 해당 개념의 새로운 마스터 진행률 계산 시스템
-            const masteryData = calculateConceptMastery({ id: conceptId }, {
-                learningRecords: allLearningRecords,
-                quizRecords: allQuizRecords,
-                gameRecords: allGameRecords
-            });
-            
-            // 해당 개념의 모든 활동 수집 (기존 방식 - 표시용)
-            let learningCount = 0;
-            let gameCount = 0; 
-            let quizCount = 0;
-            let totalAccuracy = 0;
-            let activityCount = 0;
-            
-            // 각 활동 타입별로 카운트 및 정확도 수집 (기존 표시용)
-            allActivities.forEach(activity => {
-                const activityConceptIds = extractConceptIds(activity);
-                if (activityConceptIds.includes(conceptId)) {
-                    const accuracy = calculateActivityAccuracy(activity);
-                    totalAccuracy += accuracy;
-                    activityCount++;
-                    
-                    switch(activity.activity_type) {
-                        case 'learning': learningCount++; break;
-                        case 'game': gameCount++; break;
-                        case 'quiz': quizCount++; break;
-                    }
-                }
-            });
-            
-            const averageAccuracy = masteryData.masteryPercentage; // 새로운 마스터 진행률 사용
-            const isMastered = averageAccuracy >= 80;
-            
-            detailedConceptsList.push({
-                conceptId,
-                snapshot: conceptSnapshot,
-                averageAccuracy,
-                isMastered,
-                learningCount,
-                gameCount,
-                quizCount,
-                totalActivities: learningCount + gameCount + quizCount,
-                // 새로운 마스터 데이터 추가
-                correctCount: masteryData.correctCount,
-                incorrectCount: masteryData.incorrectCount,
-                accuracyRate: masteryData.accuracyRate
-            });
-        }
-        
-        console.log('📊 생성된 개념 스냅샷:', detailedConceptsList.length, '개');
-
-        // 📝 개념 목록 HTML 생성 - 스냅샷 방식으로 개선
+        //  개념 목록 HTML 생성 - 캐시된 데이터 사용
         const conceptsList = detailedConceptsList.map(concept => {
             const progressBarWidth = Math.min(100, Math.max(0, concept.averageAccuracy));
             const progressBarColor = concept.averageAccuracy >= 80 ? 'bg-green-500' : 
@@ -1796,7 +1750,7 @@ async function showTotalWordsDetails() {
                         <div class="flex items-center space-x-2">
                             <span class="text-lg">${concept.isMastered ? '🏆' : '📝'}</span>
                             <div>
-                                <p class="font-medium text-gray-900">${concept.snapshot.sourceFlag}→${concept.snapshot.targetFlag} ${concept.snapshot.displayName}</p>
+                                <p class="font-medium text-gray-900">${concept.snapshot.displayName}</p>
                                 <div class="flex items-center space-x-2 mt-1">
                                     <span class="text-xs px-2 py-1 rounded-full ${concept.snapshot.domainColor}">${concept.snapshot.domain}</span>
                                     <span class="text-xs px-2 py-1 rounded-full ${concept.snapshot.categoryColor}">${concept.snapshot.category}</span>
@@ -1914,108 +1868,48 @@ async function showTotalWordsDetails() {
 
 // 마스터한 단어 카드 클릭 시 모달 열기
 function showMasteredWordsDetails() {
-    const stats = calculateTargetLanguageStats(selectedTargetLanguage);
+    const stats = calculateTargetLanguageStats(selectedTargetLanguage, false); // 캐시 사용
+    
+    // 캐시된 개념 데이터 사용
+    let detailedConceptsList;
+    if (cachedConceptData && lastConceptUpdate && 
+        (Date.now() - lastConceptUpdate) < 30000) { // 30초 내 캐시 사용
+        console.log('📋 마스터한 단어 모달에서 캐시된 개념 데이터 사용');
+        detailedConceptsList = cachedConceptData;
+    } else {
+        console.log('⚠️ 마스터한 단어 모달에서 캐시 없음 - 모달 재계산 필요');
+        // 캐시가 없다면 빈 배열로 처리하고 사용자에게 안내
+        detailedConceptsList = [];
+    }
+    
     const modalBody = document.getElementById('totalWordsModalBody');
     
     if (modalBody) {
-        // 선택된 대상 언어의 활동 기록들 필터링
-        const learningRecords = allLearningRecords.filter(record => 
-            record.targetLanguage === selectedTargetLanguage || 
-            (record.languagePair && record.languagePair.includes && record.languagePair.includes(selectedTargetLanguage)) ||
-            (record.language_pair && record.language_pair.target === selectedTargetLanguage) ||
-            (record.language_pair && record.language_pair.includes && record.language_pair.includes(selectedTargetLanguage)) ||
-            (record.metadata && record.metadata.targetLanguage === selectedTargetLanguage) ||
-            (record.target_language === selectedTargetLanguage) ||
-            (record.activity_type === 'vocabulary' && selectedTargetLanguage === 'english')
-        );
-
-        const gameRecords = allGameRecords.filter(record => 
-            record.targetLanguage === selectedTargetLanguage ||
-            (record.languagePair && record.languagePair.includes(selectedTargetLanguage)) ||
-            (record.language_pair && record.language_pair.target === selectedTargetLanguage) ||
-            (record.language_pair && record.language_pair.includes && record.language_pair.includes(selectedTargetLanguage)) ||
-            (record.metadata && record.metadata.targetLanguage === selectedTargetLanguage) ||
-            (record.game_type === 'word-matching' && selectedTargetLanguage === 'english')
-        );
-
-        const quizRecords = allQuizRecords.filter(record => 
-            record.targetLanguage === selectedTargetLanguage ||
-            (record.languagePair && record.languagePair.includes(selectedTargetLanguage)) ||
-            (record.language_pair && record.language_pair.target === selectedTargetLanguage) ||
-            (record.metadata && record.metadata.targetLanguage === selectedTargetLanguage) ||
-            (record.target_language === selectedTargetLanguage) ||
-            (record.quiz_type === 'translation' && selectedTargetLanguage === 'english')
-        );
-
-        // 선택된 언어의 개념들만 수집
-        const allRecords = [...learningRecords, ...gameRecords, ...quizRecords];
-        const targetLanguageConcepts = new Set();
+        // 캐시된 데이터에서 마스터한 개념들만 필터링
+        const masteredConcepts = detailedConceptsList.filter(concept => concept.isMastered);
         
-        allRecords.forEach(record => {
-            if (record.concept_id) {
-                if (Array.isArray(record.concept_id)) {
-                    record.concept_id.forEach(id => targetLanguageConcepts.add(id));
-                } else {
-                    targetLanguageConcepts.add(record.concept_id);
-                }
-            }
-            // 기타 개념 ID 필드들도 확인
-            const conceptIds = extractConceptIds(record);
-            conceptIds.forEach(id => targetLanguageConcepts.add(id));
-        });
+        console.log(`🎯 마스터한 단어 모달 - 대상 언어: ${selectedTargetLanguage}, 마스터한 개념 수: ${masteredConcepts.length}`);
         
-        console.log(`🎯 마스터한 단어 모달 - 대상 언어: ${selectedTargetLanguage}, 필터된 개념 수: ${targetLanguageConcepts.size}`);
-        
-        // concept_snapshots에서 마스터한 개념들 가져오기
-        const masteredConcepts = [];
-        
-        if (userProgressData && userProgressData.concept_snapshots) {
-            const conceptSnapshots = userProgressData.concept_snapshots;
-            
-            // 선택된 언어의 개념들만 필터링
-            targetLanguageConcepts.forEach(conceptId => {
-                const conceptInfo = conceptSnapshots[conceptId];
-                if (conceptInfo) {
-                    // 마스터리 계산
-                    const concept = { id: conceptId };
-                    const masteryData = calculateConceptMastery(concept, {
-                        learningRecords: allLearningRecords,
-                        quizRecords: allQuizRecords,
-                        gameRecords: allGameRecords
-                    });
-                    
-                    if (masteryData.masteryPercentage >= 80) { // 마스터 기준 80%
-                        masteredConcepts.push({
-                            conceptId: conceptId,
-                            conceptInfo: conceptInfo,
-                            masteryData: masteryData
-                        });
-                    }
-                }
-            });
-        }
-
-        const masteredList = masteredConcepts.map(({ conceptId, conceptInfo, masteryData }) => {
-            const targetWord = conceptInfo.word || conceptInfo.korean || conceptId || '알 수 없는 개념';
-            const sourceWord = conceptInfo.source_word || '원본 언어';
-            const domain = conceptInfo.domain || '일반';
+        const masteredList = masteredConcepts.map(concept => {
+            const targetWord = concept.snapshot?.displayName || concept.conceptId || '알 수 없는 개념';
+            const domain = concept.snapshot?.domain || '일반';
             
             // 도메인별 이모지 가져오기 (domain-category-emoji.js에서)
-            const domainEmoji = window.getDomainEmoji ? window.getDomainEmoji(domain) : '📚';
+            const domainEmoji = window.getDomainEmoji ? window.getDomainEmoji(domain) : '';
             
             return `
                 <div class="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
                     <div class="flex items-center space-x-3">
                         <span class="text-lg">✅</span>
                         <div>
-                            <p class="font-medium text-gray-900">${domainEmoji} ${sourceWord} → ${targetWord}</p>
-                            <p class="text-sm text-gray-500">도메인: ${domain} | 마스터리: ${masteryData.masteryPercentage}% | 정확률: ${masteryData.accuracyRate}%</p>
+                            <p class="font-medium text-gray-900">${domainEmoji} ${targetWord}</p>
+                            <p class="text-sm text-gray-500">도메인: ${domain} | 마스터리: ${concept.averageAccuracy}% | 정확률: ${concept.accuracyRate || 0}%</p>
                         </div>
                     </div>
                     <div class="flex items-center space-x-2">
                         <div class="text-xs text-gray-500 flex items-center space-x-1">
-                            <span class="text-green-500">✓${masteryData.correctCount}</span>
-                            <span class="text-red-500">✗${masteryData.incorrectCount}</span>
+                            <span class="text-green-500">✓${concept.correctCount || 0}</span>
+                            <span class="text-red-500">✗${concept.incorrectCount || 0}</span>
                         </div>
                         <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
                             마스터
@@ -2044,7 +1938,7 @@ function showMasteredWordsDetails() {
                 <!-- 마스터한 개념 목록 -->
                 <div>
                     <h4 class="font-medium text-gray-800 mb-3">마스터한 개념 목록</h4>
-                    <div class="space-y-2 max-h-64 overflow-y-auto">
+                    <div class="space-y-2">
                         ${masteredList.length > 0 ? masteredList : '<p class="text-gray-500 text-center py-4">아직 마스터한 개념이 없습니다.<br>정확도 80% 이상으로 학습해보세요!</p>'}
                     </div>
                 </div>
@@ -2079,7 +1973,7 @@ function showMasteredWordsDetails() {
 
 // 연속 학습 카드 클릭 시 모달 열기
 function showStudyStreakDetails() {
-    const stats = calculateTargetLanguageStats(selectedTargetLanguage);
+    const stats = calculateTargetLanguageStats(selectedTargetLanguage, false); // 캐시 사용
     const modalBody = document.getElementById('totalWordsModalBody');
     
     if (modalBody) {
@@ -2139,20 +2033,22 @@ function showStudyStreakDetails() {
             }
         });
         
-        // 최근 학습 기록 날짜별 도장 UI 생성 (6일전 ~ 1일후, 총 8일)
+        // 최근 학습 기록 날짜별 도장 UI 생성 (이전 7일 + 오늘 + 이후 2일 = 총 10일)
         const today = new Date();
         const calendarDays = [];
         
-        for (let i = 6; i >= -1; i--) {
+        for (let i = 7; i >= -2; i--) {
             const date = new Date(today);
             date.setDate(today.getDate() - i);
             const dateStr = date.toDateString();
             const hasStudy = studyDatesSet.has(dateStr);
+            const isToday = i === 0;
+            const isFuture = i < 0;
             
             calendarDays.push(`
-                <div class="flex flex-col items-center p-2 rounded-lg ${hasStudy ? 'bg-green-100' : 'bg-gray-100'}">
-                    <div class="text-xs text-gray-600 mb-1">${date.getDate()}</div>
-                    <div class="text-lg">${hasStudy ? '✅' : '○'}</div>
+                <div class="flex flex-col items-center p-2 rounded-lg ${hasStudy ? 'bg-green-100' : isFuture ? 'bg-gray-50' : 'bg-gray-100'} ${isToday ? 'border-2 border-blue-500' : 'border'}">
+                    <div class="text-xs ${isToday ? 'text-blue-600 font-bold' : 'text-gray-600'} mb-1">${date.getDate()}${isToday ? '(오늘)' : ''}</div>
+                    <div class="text-lg">${hasStudy ? '🏆' : isFuture ? '📅' : '○'}</div>
                 </div>
             `);
         }
@@ -2174,13 +2070,13 @@ function showStudyStreakDetails() {
                 
                 <!-- 날짜별 학습 도장 (최근 학습 기록) -->
                 <div class="bg-white border border-gray-200 p-4 rounded-lg">
-                    <h4 class="font-medium text-gray-800 mb-3">📅 최근 학습 기록</h4>
-                    <div class="grid grid-cols-4 md:grid-cols-8 gap-2 text-center">
+                    <h4 class="font-medium text-gray-800 mb-3">📅 최근 학습 기록 (10일)</h4>
+                    <div class="grid grid-cols-5 md:grid-cols-10 gap-2 text-center">
                         ${calendarDays.join('')}
                     </div>
                     <div class="flex items-center justify-center mt-3 space-x-4">
                         <div class="flex items-center space-x-1">
-                            <span class="text-sm">✅</span>
+                            <span class="text-sm">🏆</span>
                             <span class="text-xs text-gray-600">학습 완료</span>
                         </div>
                         <div class="flex items-center space-x-1">
@@ -3513,3 +3409,164 @@ window.toggleQuizDetails = function(conceptId) {
         }
     }
 };
+
+// 📊 상세 개념 목록 생성 함수 (캐시 최적화)
+async function generateDetailedConceptsList() {
+    // 🔄 선택된 대상 언어의 모든 활동 기록 필터링
+    const learningRecords = allLearningRecords.filter(record => {
+        const hasTargetLanguage = record.targetLanguage === selectedTargetLanguage;
+        const hasLanguagePairIncludes = record.languagePair && record.languagePair.includes && record.languagePair.includes(selectedTargetLanguage);
+        const hasLanguage_pairTarget = record.language_pair && record.language_pair.target === selectedTargetLanguage;
+        const hasLanguage_pairIncludes = record.language_pair && record.language_pair.includes && record.language_pair.includes(selectedTargetLanguage);
+        const hasMetadataTargetLanguage = record.metadata && record.metadata.targetLanguage === selectedTargetLanguage;
+        const hasTarget_language = record.target_language === selectedTargetLanguage;
+        const isVocabularyActivity = record.activity_type === 'vocabulary' && selectedTargetLanguage === 'english';
+        
+        return hasTargetLanguage || hasLanguagePairIncludes || hasLanguage_pairTarget || 
+               hasLanguage_pairIncludes || hasMetadataTargetLanguage || hasTarget_language || 
+               isVocabularyActivity;
+    });
+    
+    const gameRecords = allGameRecords.filter(record => {
+        return record.targetLanguage === selectedTargetLanguage ||
+               (record.languagePair && record.languagePair.includes(selectedTargetLanguage)) ||
+               (record.language_pair && record.language_pair.target === selectedTargetLanguage) ||
+               (record.language_pair && record.language_pair.includes && record.language_pair.includes(selectedTargetLanguage)) ||
+               (record.metadata && record.metadata.targetLanguage === selectedTargetLanguage);
+    });
+    
+    const quizRecords = allQuizRecords.filter(record => {
+        const hasTargetLanguage = record.targetLanguage === selectedTargetLanguage;
+        const hasLanguagePairIncludes = record.languagePair && record.languagePair.includes(selectedTargetLanguage);
+        const hasLanguage_pairTarget = record.language_pair && record.language_pair.target === selectedTargetLanguage;
+        const hasMetadataTargetLanguage = record.metadata && record.metadata.targetLanguage === selectedTargetLanguage;
+        const hasTarget_language = record.target_language === selectedTargetLanguage;
+        const isTranslationQuiz = record.quiz_type === 'translation' && selectedTargetLanguage === 'english';
+        
+        return hasTargetLanguage || hasLanguagePairIncludes || hasLanguage_pairTarget || 
+               hasMetadataTargetLanguage || hasTarget_language || isTranslationQuiz;
+    });
+
+    // 🎯 스냅샷 데이터 기반 개념 맵 생성
+    const conceptsMap = new Map();
+    let allActivities = [];
+    
+    // 📚 학습 기록에서 개념 추출
+    learningRecords.forEach(record => {
+        const conceptIds = extractConceptIds(record);
+        conceptIds.forEach(conceptId => {
+            if (conceptId) {
+                updateConceptMap(conceptsMap, conceptId, record, 'learning');
+            }
+        });
+        allActivities.push({...record, activity_type: 'learning'});
+    });
+
+    // 🎮 게임 기록에서 개념 추출
+    gameRecords.forEach(record => {
+        const conceptIds = extractConceptIds(record);
+        conceptIds.forEach(conceptId => {
+            if (conceptId) {
+                updateConceptMap(conceptsMap, conceptId, record, 'game');
+            }
+        });
+        allActivities.push({...record, activity_type: 'game'});
+    });
+
+    // ❓ 퀴즈 기록에서 개념 추출
+    quizRecords.forEach(record => {
+        const conceptIds = extractConceptIds(record);
+        conceptIds.forEach(conceptId => {
+            if (conceptId) {
+                updateConceptMap(conceptsMap, conceptId, record, 'quiz');
+            }
+        });
+        allActivities.push({...record, activity_type: 'quiz'});
+    });
+
+    // 🏆 개념 스냅샷 생성 및 활동 데이터 수집
+    console.log('🔍 개념 스냅샷 생성 시작...');
+    
+    const detailedConceptsList = [];
+    
+    for (const [conceptId, conceptData] of conceptsMap) {
+        // 🔄 1. 먼저 활동 기록에서 개념 정보 확인
+        let conceptSnapshot = null;
+        
+        // 활동 기록의 conceptData에서 개념 정보 추출
+        const activityWithConceptData = allActivities.find(activity => {
+            const activityConceptIds = extractConceptIds(activity);
+            return activityConceptIds.includes(conceptId) && 
+                   (activity.conceptData || activity.concept_data);
+        });
+        
+        if (activityWithConceptData && activityWithConceptData.conceptData) {
+            // 활동 기록에서 개념 정보가 있으면 사용
+            conceptSnapshot = createConceptSnapshotFromActivity(
+                conceptId, 
+                activityWithConceptData.conceptData
+            );
+            console.log(`📋 활동 기록에서 개념 정보 사용: ${conceptId}`);
+        } else {
+            // 2. user_records에서 개념 스냅샷 조회 (비용 효율적)
+            try {
+                conceptSnapshot = await fetchConceptSnapshotFromUserRecords(conceptId);
+                console.log(`🔍 user_records에서 개념 정보 조회: ${conceptId}`);
+            } catch (error) {
+                console.error(`개념 조회 실패: ${conceptId}`, error);
+                conceptSnapshot = createDefaultSnapshot(conceptId);
+            }
+        }
+        
+        // 해당 개념의 새로운 마스터 진행률 계산 시스템
+        const masteryData = calculateConceptMastery({ id: conceptId }, {
+            learningRecords: allLearningRecords,
+            quizRecords: allQuizRecords,
+            gameRecords: allGameRecords
+        });
+        
+        // 해당 개념의 모든 활동 수집 (기존 방식 - 표시용)
+        let learningCount = 0;
+        let gameCount = 0; 
+        let quizCount = 0;
+        let totalAccuracy = 0;
+        let activityCount = 0;
+        
+        // 각 활동 타입별로 카운트 및 정확도 수집 (기존 표시용)
+        allActivities.forEach(activity => {
+            const activityConceptIds = extractConceptIds(activity);
+            if (activityConceptIds.includes(conceptId)) {
+                const accuracy = calculateActivityAccuracy(activity);
+                totalAccuracy += accuracy;
+                activityCount++;
+                
+                switch(activity.activity_type) {
+                    case 'learning': learningCount++; break;
+                    case 'game': gameCount++; break;
+                    case 'quiz': quizCount++; break;
+                }
+            }
+        });
+        
+        const averageAccuracy = masteryData.masteryPercentage; // 새로운 마스터 진행률 사용
+        const isMastered = averageAccuracy >= 80;
+        
+        detailedConceptsList.push({
+            conceptId,
+            snapshot: conceptSnapshot,
+            averageAccuracy,
+            isMastered,
+            learningCount,
+            gameCount,
+            quizCount,
+            totalActivities: learningCount + gameCount + quizCount,
+            // 새로운 마스터 데이터 추가
+            correctCount: masteryData.correctCount,
+            incorrectCount: masteryData.incorrectCount,
+            accuracyRate: masteryData.accuracyRate
+        });
+    }
+    
+    console.log('📊 생성된 개념 스냅샷:', detailedConceptsList.length, '개');
+    return detailedConceptsList;
+}
