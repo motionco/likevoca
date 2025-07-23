@@ -382,6 +382,9 @@ function updateUsageBar() {
     const count = bookmarkedConcepts.length;
     const maxBookmarks = 1000; // 임시 최대값
     const percentage = Math.min((count / maxBookmarks) * 100, 100);
+    // Tailwind 기본 클래스 사용 + style로 width 설정
+    usageBar.className =
+      "bg-blue-500 h-2 rounded-full transition-all duration-300";
     usageBar.style.width = `${percentage}%`;
   }
 }

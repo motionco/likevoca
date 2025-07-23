@@ -739,7 +739,12 @@ async function updateUsageUI() {
 
     if (usageBar) {
       const usagePercentage = (conceptCount / maxConcepts) * 100;
-      usageBar.style.width = `${Math.min(usagePercentage, 100)}%`;
+      const widthPercentage = Math.min(usagePercentage, 100);
+
+      // Tailwind 기본 클래스 사용 + style로 width 설정
+      usageBar.className =
+        "bg-[#4B63AC] h-2.5 rounded-full transition-all duration-300";
+      usageBar.style.width = `${widthPercentage}%`;
 
       // 색상 업데이트
       if (usagePercentage >= 90) {

@@ -29,7 +29,7 @@ let collectionManager = new CollectionManager();
 let cachedQuizData = {
   data: null,
   timestamp: null,
-  settings: null
+  settings: null,
 };
 const CACHE_DURATION = 10 * 60 * 1000; // 10분
 
@@ -39,8 +39,10 @@ let firebaseReadCount = 0;
 // Firebase 읽기 추적 함수
 function trackFirebaseRead(queryName, docCount) {
   firebaseReadCount += docCount;
-  console.log(`📊 Firebase 읽기: ${queryName} (+${docCount}), 총 ${firebaseReadCount}회`);
-  
+  console.log(
+    `📊 Firebase 읽기: ${queryName} (+${docCount}), 총 ${firebaseReadCount}회`
+  );
+
   if (firebaseReadCount > 30) {
     console.warn("⚠️ Firebase 읽기 횟수가 많습니다:", firebaseReadCount);
   }
@@ -275,10 +277,12 @@ async function generateQuizQuestions(settings) {
       // ✅ 캐시된 데이터가 있고 유효하면 사용
       const now = Date.now();
       const currentSettings = JSON.stringify(settings);
-      
-      if (cachedQuizData.data && 
-          (now - cachedQuizData.timestamp) < CACHE_DURATION &&
-          cachedQuizData.settings === currentSettings) {
+
+      if (
+        cachedQuizData.data &&
+        now - cachedQuizData.timestamp < CACHE_DURATION &&
+        cachedQuizData.settings === currentSettings
+      ) {
         personalizedConcepts = cachedQuizData.data;
         trackFirebaseRead("퀴즈 캐시 사용", 0); // 캐시 사용 시 읽기 비용 0
       } else {
@@ -309,7 +313,7 @@ async function generateQuizQuestions(settings) {
         cachedQuizData = {
           data: [...personalizedConcepts], // 깊은 복사
           timestamp: now,
-          settings: currentSettings
+          settings: currentSettings,
         };
       }
     } catch (error) {
@@ -318,7 +322,6 @@ async function generateQuizQuestions(settings) {
     }
 
     if (personalizedConcepts.length === 0) {
-
       // 🚨 테스트용 더미 데이터 (실제 개념이 없을 때만 사용)
       personalizedConcepts = [
         {
@@ -895,6 +898,9 @@ function displayQuestion() {
   // 진행률 업데이트
   elements.currentQuestion.textContent = quizData.currentQuestionIndex + 1;
   elements.totalQuestions.textContent = quizData.questions.length;
+  // Tailwind 기본 클래스 사용 + style로 width 설정
+  elements.quizProgress.className =
+    "bg-blue-600 h-2 rounded-full transition-all duration-300";
   elements.quizProgress.style.width = `${progress}%`;
 
   // 카테고리 표시 (이모지 포함)
@@ -1207,18 +1213,28 @@ async function saveQuizResult(result) {
 
     // 1. 🎯 quiz_records 컬렉션에 상세 퀴즈 기록 저장
     // 퀴즈에서 사용된 개념 ID들 추출 (다양한 필드에서)
-    const conceptIds = result.answers.map(answer => {
-      return answer.conceptId || answer.concept_id || answer.questionId || answer.id;
-    }).filter(id => id && typeof id === 'string');
-    
-    console.log(`📋 퀴즈에서 추출된 개념 ID들: ${conceptIds.length}개`, conceptIds);
-    
+    const conceptIds = result.answers
+      .map((answer) => {
+        return (
+          answer.conceptId ||
+          answer.concept_id ||
+          answer.questionId ||
+          answer.id
+        );
+      })
+      .filter((id) => id && typeof id === "string");
+
+    console.log(
+      `📋 퀴즈에서 추출된 개념 ID들: ${conceptIds.length}개`,
+      conceptIds
+    );
+
     const quizRecord = {
       user_email: currentUser.email,
       quiz_type: result.settings.quizType,
       language_pair: {
         source: result.settings.sourceLanguage,
-        target: result.settings.targetLanguage
+        target: result.settings.targetLanguage,
       },
       difficulty: result.settings.difficulty,
       score: result.score,
@@ -1233,8 +1249,8 @@ async function saveQuizResult(result) {
       metadata: {
         created_at: new Date(),
         question_count: result.totalCount,
-        settings: result.settings
-      }
+        settings: result.settings,
+      },
     };
 
     // quiz_records에 저장
@@ -1250,7 +1266,7 @@ async function saveQuizResult(result) {
         score: result.score,
         accuracy: quizRecord.accuracy,
         correctCount: result.correctCount,
-        totalCount: result.totalCount
+        totalCount: result.totalCount,
       });
       console.log("✅ user_records 퀴즈 통계 업데이트 완료");
     } catch (progressError) {
@@ -1261,8 +1277,13 @@ async function saveQuizResult(result) {
     // 3. 🔄 개념 스냅샷 자동 저장
     try {
       if (conceptIds.length > 0) {
-        console.log(`📋 퀴즈 개념 스냅샷 자동 저장 시작: ${conceptIds.length}개 개념`);
-        await collectionManager.saveConceptSnapshots(currentUser.email, conceptIds);
+        console.log(
+          `📋 퀴즈 개념 스냅샷 자동 저장 시작: ${conceptIds.length}개 개념`
+        );
+        await collectionManager.saveConceptSnapshots(
+          currentUser.email,
+          conceptIds
+        );
         console.log("✅ 퀴즈 개념 스냅샷 자동 저장 완료");
       }
     } catch (snapshotError) {
@@ -1271,13 +1292,16 @@ async function saveQuizResult(result) {
     }
 
     // 진도 페이지 자동 업데이트를 위한 localStorage 신호
-    localStorage.setItem("quizCompletionUpdate", JSON.stringify({
-      userEmail: currentUser.email,
-      timestamp: new Date().toISOString(),
-      score: result.score,
-      correctCount: result.correctCount,
-      totalCount: result.totalCount
-    }));
+    localStorage.setItem(
+      "quizCompletionUpdate",
+      JSON.stringify({
+        userEmail: currentUser.email,
+        timestamp: new Date().toISOString(),
+        score: result.score,
+        correctCount: result.correctCount,
+        totalCount: result.totalCount,
+      })
+    );
 
     console.log("✅ 퀴즈 결과 저장 및 진도 업데이트 완료");
   } catch (error) {
@@ -1354,7 +1378,10 @@ async function loadQuizHistory() {
         id: doc.id,
         ...data,
         // completed_at 필드 정규화
-        sortDate: data.completed_at?.toDate?.() || data.timestamp?.toDate?.() || new Date()
+        sortDate:
+          data.completed_at?.toDate?.() ||
+          data.timestamp?.toDate?.() ||
+          new Date(),
       });
     });
 
@@ -1363,17 +1390,22 @@ async function loadQuizHistory() {
 
     let historyHTML = "";
     quizRecords.slice(0, 10).forEach((data) => {
-      const accuracy = data.accuracy || Math.round((data.correct_answers / data.total_questions) * 100) || 0;
+      const accuracy =
+        data.accuracy ||
+        Math.round((data.correct_answers / data.total_questions) * 100) ||
+        0;
       const score = data.score || 0;
       const questions = data.total_questions || 5;
       const completedDate = data.sortDate;
-      
+
       historyHTML += `
         <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
           <div>
-            <span class="font-medium">${data.quiz_type || '어휘'} 퀴즈</span>
+            <span class="font-medium">${data.quiz_type || "어휘"} 퀴즈</span>
             <span class="text-sm text-gray-600 ml-2">
-              ${data.source_language || '한국어'} → ${data.target_language || '영어'} (${questions}문제)
+              ${data.source_language || "한국어"} → ${
+        data.target_language || "영어"
+      } (${questions}문제)
             </span>
           </div>
           <div class="text-right">
@@ -1383,11 +1415,11 @@ async function loadQuizHistory() {
               ${accuracy}%
             </div>
             <div class="text-xs text-gray-500">
-              ${completedDate.toLocaleDateString('ko-KR', { 
-                month: 'short', 
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
+              ${completedDate.toLocaleDateString("ko-KR", {
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
               })}
             </div>
           </div>

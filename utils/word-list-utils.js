@@ -140,6 +140,9 @@ export async function updateUsageUI(currentUser, db, type) {
   usageText.textContent = `${usage}/${maxUsage}`;
 
   const usagePercentage = maxUsage > 0 ? (usage / maxUsage) * 100 : 0;
+  // Tailwind 기본 클래스 사용 + style로 width 설정
+  usageBar.className =
+    "bg-blue-500 h-2 rounded-full transition-all duration-300";
   usageBar.style.width = `${Math.min(usagePercentage, 100)}%`;
 
   updateUsageBarColor(usageBar, usagePercentage);

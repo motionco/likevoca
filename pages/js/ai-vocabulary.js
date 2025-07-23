@@ -461,6 +461,10 @@ async function updateUsageDisplay() {
       const percentage = Math.min((aiUsed / aiLimit) * 100, 100);
 
       usageText.textContent = `${aiUsed}/${aiLimit}`;
+
+      // Tailwind 기본 클래스 사용 + style로 width 설정
+      usageBar.className =
+        "bg-[#4B63AC] h-2.5 rounded-full transition-all duration-300";
       usageBar.style.width = `${percentage}%`;
 
       // 색상 업데이트
@@ -488,6 +492,10 @@ async function updateUsageDisplay() {
 
       if (usageText && usageBar) {
         usageText.textContent = "0/10";
+
+        // Tailwind 기본 클래스 사용 + style로 width 설정
+        usageBar.className =
+          "bg-[#4B63AC] h-2.5 rounded-full transition-all duration-300";
         usageBar.style.width = "0%";
         usageBar.classList.remove("bg-red-500", "bg-yellow-500");
         usageBar.classList.add("bg-[#4B63AC]");
