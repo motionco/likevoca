@@ -22,10 +22,10 @@
       <div>
         <h1 class="text-3xl font-bold text-gray-800 mb-2" data-i18n="progress_title">
           📊 進捗
-        </h1>
+      </h1>
         <p class="text-gray-600" data-i18n="progress_description">
           学習の進捗と成果を確認し、目標を設定しましょう。
-        </p>
+      </p>
       </div>
       <div class="flex items-center gap-2">
         <label class="text-sm text-gray-600" data-i18n="target_language">対象言語</label>
@@ -44,53 +44,53 @@
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div id="total-words-card" class="bg-white rounded-lg shadow-sm p-5 border-l-4 border-blue-500 cursor-pointer hover:bg-blue-50 hover:shadow-md transition-all duration-200">
-          <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between">
             <div class="flex-1">
               <p class="text-sm font-medium text-gray-600" data-i18n="total_words">総単語数</p>
-              <p id="total-words-count" class="text-2xl font-bold text-blue-600">0</p>
+            <p id="total-words-count" class="text-2xl font-bold text-blue-600">0</p>
               <p class="text-xs text-blue-500 mt-1" data-i18n="see_details">詳細を見る →</p>
-            </div>
-            <div class="bg-blue-100 p-3 rounded-full">
+          </div>
+          <div class="bg-blue-100 p-3 rounded-full">
               <span class="text-2xl">📚</span>
             </div>
           </div>
         </div>
         <div id="mastered-words-card" class="bg-white rounded-lg shadow-sm p-5 border-l-4 border-green-500 cursor-pointer hover:bg-green-50 hover:shadow-md transition-all duration-200">
-          <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between">
             <div class="flex-1">
               <p class="text-sm font-medium text-gray-600" data-i18n="mastered_words">マスターした単語</p>
-              <p id="mastered-words-count" class="text-2xl font-bold text-green-600">0</p>
+            <p id="mastered-words-count" class="text-2xl font-bold text-green-600">0</p>
               <p class="text-xs text-green-500 mt-1" data-i18n="see_details">詳細を見る →</p>
-            </div>
-            <div class="bg-green-100 p-3 rounded-full">
+          </div>
+          <div class="bg-green-100 p-3 rounded-full">
               <span class="text-2xl">✅</span>
             </div>
           </div>
         </div>
         <div id="study-streak-card" class="bg-white rounded-lg shadow-sm p-5 border-l-4 border-orange-500 cursor-pointer hover:bg-orange-50 hover:shadow-md transition-all duration-200">
-          <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between">
             <div class="flex-1">
               <p class="text-sm font-medium text-gray-600" data-i18n="study_streak">連続学習</p>
               <p id="study-streak-count" class="text-2xl font-bold text-orange-600">0日</p>
               <p class="text-xs text-orange-500 mt-1" data-i18n="see_details">詳細を見る →</p>
-            </div>
-            <div class="bg-orange-100 p-3 rounded-full">
+          </div>
+          <div class="bg-orange-100 p-3 rounded-full">
               <span class="text-2xl">🔥</span>
             </div>
           </div>
         </div>
-        <div id="quiz-accuracy-card"
+      <div id="quiz-accuracy-card"
           class="bg-white rounded-lg shadow-sm p-5 border-l-4 border-purple-500 cursor-pointer hover:bg-purple-50 hover:shadow-md transition-all duration-200"
-          onclick="showQuizAccuracyDetails()">
-          <div class="flex items-center justify-between">
+        onclick="showQuizAccuracyDetails()">
+        <div class="flex items-center justify-between">
             <div class="flex-1">
               <p class="text-sm font-medium text-gray-600" data-i18n="quiz_accuracy">クイズ正確度</p>
-              <p id="quiz-accuracy-rate" class="text-2xl font-bold text-purple-600">0%</p>
+            <p id="quiz-accuracy-rate" class="text-2xl font-bold text-purple-600">0%</p>
               <p class="text-xs text-purple-500 mt-1" data-i18n="see_details">詳細を見る →</p>
-            </div>
-            <div class="bg-purple-100 p-3 rounded-full">
+          </div>
+          <div class="bg-purple-100 p-3 rounded-full">
               <span class="text-2xl">🎯</span>
-            </div>
+          </div>
           </div>
         </div>
       </div>
@@ -109,10 +109,10 @@
             <i class="fas fa-calendar-week text-sm mr-2"></i>
             週間学習活動
           </h3>
-          <div class="relative h-64">
-            <canvas id="weekly-activity-chart" class="w-full h-full"></canvas>
-          </div>
+        <div class="relative h-64">
+          <canvas id="weekly-activity-chart" class="w-full h-full"></canvas>
         </div>
+      </div>
         <!-- ドメイン別進捗 -->
         <div class="bg-white rounded-lg shadow-sm p-6 border border-green-100 relative">
           <h3 class="text-lg font-semibold mb-4 flex items-center text-green-700" data-i18n="domain_progress">
@@ -120,7 +120,7 @@
             ドメイン別進捗
           </h3>
           <div class="relative h-64 overflow-visible">
-            <canvas id="category-progress-chart" class="w-full h-full"></canvas>
+          <canvas id="category-progress-chart" class="w-full h-full"></canvas>
           </div>
         </div>
       </div>
@@ -147,7 +147,7 @@
             <div class="flex justify-between">
               <span class="text-sm text-gray-600" data-i18n="avg_quiz_accuracy">平均正確度:</span>
               <span id="avg-quiz-accuracy" class="text-sm font-medium">0%</span>
-            </div>
+          </div>
           </div>
         </div>
         <!-- ゲーム実績 -->
@@ -164,7 +164,7 @@
             <div class="flex justify-between">
               <span class="text-sm text-gray-600" data-i18n="avg_game_score">平均スコア:</span>
               <span id="avg-game-score" class="text-sm font-medium">0</span>
-            </div>
+          </div>
           </div>
         </div>
         <!-- 学習セッション実績 -->
@@ -181,7 +181,7 @@
             <div class="flex justify-between">
               <span class="text-sm text-gray-600" data-i18n="avg_session_quality">平均品質:</span>
               <span id="avg-session-quality" class="text-sm font-medium">-</span>
-            </div>
+          </div>
           </div>
         </div>
         <!-- 総合実績 -->
@@ -198,7 +198,7 @@
             <div class="flex justify-between">
               <span class="text-sm text-gray-600" data-i18n="completion_rate">完了率:</span>
               <span id="completion-rate" class="text-sm font-medium">0%</span>
-            </div>
+          </div>
           </div>
         </div>
       </div>

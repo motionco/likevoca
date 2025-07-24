@@ -3003,11 +3003,11 @@ function updateCategoryProgressChart() {
               tooltipEl.style.pointerEvents = "none";
               tooltipEl.style.position = "absolute";
               tooltipEl.style.transform = isMobile
-                ? "translate(-50%, -50%)"
+                ? "translate(0, 0)"
                 : "translate(-50%, 0)";
               tooltipEl.style.transition = "all .1s ease";
-              tooltipEl.style.padding = isMobile ? "8px 12px" : "12px 16px";
-              tooltipEl.style.fontSize = isMobile ? "12px" : "14px";
+              tooltipEl.style.padding = isMobile ? "10px 14px" : "12px 16px";
+              tooltipEl.style.fontSize = isMobile ? "13px" : "14px";
               tooltipEl.style.fontFamily = "Arial, sans-serif";
               tooltipEl.style.zIndex = "9999";
               tooltipEl.style.boxShadow = "0 4px 16px rgba(0,0,0,0.25)";
@@ -3035,8 +3035,8 @@ function updateCategoryProgressChart() {
               const isMobile = window.innerWidth <= 768;
 
               // 첫 줄: 색상 박스 + 도메인명 + 값 + 비율
-              const titleFontSize = isMobile ? "13px" : "15px";
-              const detailFontSize = isMobile ? "11px" : "13px";
+              const titleFontSize = isMobile ? "14px" : "15px";
+              const detailFontSize = isMobile ? "12px" : "13px";
 
               innerHtml += `<div style="margin-bottom: ${
                 isMobile ? "4px" : "8px"
@@ -3091,20 +3091,71 @@ function updateCategoryProgressChart() {
             // 모바일 여부 확인 (768px 이하)
             const isMobile = window.innerWidth <= 768;
 
-            // 툴팁 크기 설정 (모바일에서는 더 작게)
-            const tooltipWidth = isMobile ? 160 : 200;
-            const tooltipHeight = isMobile ? 120 : 150;
+            // 툴팁 크기 설정 (모바일에서도 적당한 크기 유지)
+            const tooltipWidth = isMobile ? 180 : 200;
+            const tooltipHeight = isMobile ? 140 : 150;
 
             // 툴팁이 카드 경계를 벗어나지 않도록 조정
             let left = tooltip.caretX;
             let top = tooltip.caretY;
 
-            // 모바일에서는 툴팁을 중앙에 배치
+            // 반응형 툴팁 위치 계산
             if (isMobile) {
-              left = containerRect.width / 2 - tooltipWidth / 2;
-              top = containerRect.height / 2 - tooltipHeight / 2;
+              // 모바일: 사분면 기반 위치 계산
+              const chartCenterX = containerRect.width / 2;
+              const chartCenterY = containerRect.height / 2;
+
+              // tooltip.caretX/Y는 차트 내부의 절대 좌표
+              const mouseX = tooltip.caretX;
+              const mouseY = tooltip.caretY;
+
+              // 마우스 위치가 차트의 어느 사분면에 있는지 확인
+              const isRightSide = mouseX > chartCenterX;
+              const isBottomSide = mouseY > chartCenterY;
+
+              // 툴팁 위치를 마우스 위치에 따라 동적으로 조정
+              if (isRightSide) {
+                // 오른쪽에 있을 때: 툴팁을 마우스 왼쪽에 배치 (더 자연스러운 간격)
+                left = mouseX - tooltipWidth - 10;
+              } else {
+                // 왼쪽에 있을 때: 툴팁을 마우스 오른쪽에 배치
+                left = mouseX + 10;
+              }
+
+              if (isBottomSide) {
+                // 아래쪽에 있을 때: 툴팁을 마우스 위에 배치
+                top = mouseY - tooltipHeight - 10;
+              } else {
+                // 위쪽에 있을 때: 툴팁을 마우스 아래에 배치
+                top = mouseY + 10;
+              }
+
+              // 경계 체크 및 조정 (더 자연스러운 여백)
+              // 툴팁이 오른쪽 경계를 벗어나는 경우
+              if (left + tooltipWidth > containerRect.width - 10) {
+                left = containerRect.width - tooltipWidth - 10;
+              }
+
+              // 툴팁이 왼쪽 경계를 벗어나는 경우
+              if (left < 10) {
+                left = 10;
+              }
+
+              // 툴팁이 아래쪽 경계를 벗어나는 경우
+              if (top + tooltipHeight > containerRect.height - 10) {
+                top = containerRect.height - tooltipHeight - 10;
+              }
+
+              // 툴팁이 위쪽 경계를 벗어나는 경우
+              if (top < 10) {
+                top = 10;
+              }
             } else {
-              // 데스크톱에서는 마우스 위치 기준으로 조정
+              // 데스크탑: 기존 중앙 정렬 방식
+              left = tooltip.caretX;
+              top = tooltip.caretY;
+
+              // 경계 체크 및 조정
               // 툴팁이 오른쪽 경계를 벗어나는 경우
               if (left + tooltipWidth > containerRect.width) {
                 left = containerRect.width - tooltipWidth - 10;
