@@ -1291,6 +1291,32 @@ async function saveQuizResult(result) {
       // 메인 기능은 완료되었으므로 계속 진행
     }
 
+    // 🆕 진도 페이지 캐시 무효화를 위한 타임스탬프 설정
+    try {
+      const targetLanguage = result.settings.targetLanguage || "english";
+      const invalidationTime = Date.now().toString();
+
+      // 캐시 무효화 타임스탬프 설정
+      localStorage.setItem(
+        `cache_invalidated_${targetLanguage}`,
+        invalidationTime
+      );
+
+      // 관련 캐시 삭제
+      localStorage.removeItem(`total_words_cache_${targetLanguage}`);
+      localStorage.removeItem(`mastered_words_cache_${targetLanguage}`);
+      localStorage.removeItem(`stats_cache_${targetLanguage}`);
+
+      console.log(
+        `🔄 퀴즈 완료 - 진도 페이지 캐시 무효화 완료: ${targetLanguage}, 타임스탬프: ${invalidationTime}`
+      );
+      console.log(
+        `🗑️ 관련 캐시 삭제 완료 - 퀴즈한 개념: ${conceptIds.length}개`
+      );
+    } catch (cacheError) {
+      console.warn("⚠️ 퀴즈 완료 - 진도 페이지 캐시 무효화 실패:", cacheError);
+    }
+
     // 진도 페이지 자동 업데이트를 위한 localStorage 신호
     localStorage.setItem(
       "quizCompletionUpdate",

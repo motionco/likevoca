@@ -42,7 +42,7 @@ let collectionManager = new CollectionManager();
 let cachedGameData = {
   data: null,
   timestamp: null,
-  settings: null
+  settings: null,
 };
 const CACHE_DURATION = 10 * 60 * 1000; // 10분
 
@@ -52,8 +52,10 @@ let firebaseReadCount = 0;
 // Firebase 읽기 추적 함수
 function trackFirebaseRead(queryName, docCount) {
   firebaseReadCount += docCount;
-  console.log(`📊 Firebase 읽기: ${queryName} (+${docCount}), 총 ${firebaseReadCount}회`);
-  
+  console.log(
+    `📊 Firebase 읽기: ${queryName} (+${docCount}), 총 ${firebaseReadCount}회`
+  );
+
   // 임계값을 50으로 증가 (게임용 랜덤 조회는 여러 시도가 필요할 수 있음)
   if (firebaseReadCount > 50) {
     console.warn("⚠️ Firebase 읽기 횟수가 많습니다:", firebaseReadCount);
@@ -649,10 +651,16 @@ export async function saveGameResult(
 
   try {
     // 유효한 Firebase 문서 ID만 필터링
-    const validConceptIds = conceptIds.filter(id => {
-      const isValid = id && typeof id === 'string' && id.length >= 15 && /^[A-Za-z0-9]+$/.test(id);
+    const validConceptIds = conceptIds.filter((id) => {
+      const isValid =
+        id &&
+        typeof id === "string" &&
+        id.length >= 15 &&
+        /^[A-Za-z0-9]+$/.test(id);
       if (!isValid && id) {
-        console.log(`⚠️ saveGameResult에서 임시 ID 필터링됨: ${id} (유효한 Firebase 문서 ID가 아님)`);
+        console.log(
+          `⚠️ saveGameResult에서 임시 ID 필터링됨: ${id} (유효한 Firebase 문서 ID가 아님)`
+        );
       }
       return isValid;
     });
@@ -687,7 +695,12 @@ export async function saveGameResult(
       gameActivityData
     );
 
-    console.log("게임 활동 저장 완료:", { gameType, score, timeSpent, validConceptIds: validConceptIds.length });
+    console.log("게임 활동 저장 완료:", {
+      gameType,
+      score,
+      timeSpent,
+      validConceptIds: validConceptIds.length,
+    });
     return true;
   } catch (error) {
     console.error("게임 활동 저장 오류:", error);
@@ -891,13 +904,17 @@ async function loadGameWords() {
       targetLanguage,
       gameDifficulty,
       fetchLimit,
-      currentGameType
+      currentGameType,
     });
-    
-    if (cachedGameData.data && 
-        (now - cachedGameData.timestamp) < CACHE_DURATION &&
-        cachedGameData.settings === currentSettings) {
-      console.log(`⚡ 게임 캐시된 데이터 사용: ${cachedGameData.data.length}개`);
+
+    if (
+      cachedGameData.data &&
+      now - cachedGameData.timestamp < CACHE_DURATION &&
+      cachedGameData.settings === currentSettings
+    ) {
+      console.log(
+        `⚡ 게임 캐시된 데이터 사용: ${cachedGameData.data.length}개`
+      );
       gameWords = cachedGameData.data.slice(0, limit);
       trackFirebaseRead("게임 캐시 사용", 0); // 캐시 사용 시 읽기 비용 0
       updateWordCount();
@@ -933,10 +950,16 @@ async function loadGameWords() {
       // Firebase에서 가져온 개념이 1개 이상이면 사용 (최소 요구사항 완화)
       if (concepts.length >= 1) {
         // 유효한 Firebase 문서 ID를 가진 개념만 필터링
-        const validConcepts = concepts.filter(concept => {
-          const isValid = concept.id && typeof concept.id === 'string' && concept.id.length >= 15 && /^[A-Za-z0-9]+$/.test(concept.id);
+        const validConcepts = concepts.filter((concept) => {
+          const isValid =
+            concept.id &&
+            typeof concept.id === "string" &&
+            concept.id.length >= 15 &&
+            /^[A-Za-z0-9]+$/.test(concept.id);
           if (!isValid && concept.id) {
-            console.log(`⚠️ 게임 단어 변환 시 임시 ID 필터링됨: ${concept.id} (유효한 Firebase 문서 ID가 아님)`);
+            console.log(
+              `⚠️ 게임 단어 변환 시 임시 ID 필터링됨: ${concept.id} (유효한 Firebase 문서 ID가 아님)`
+            );
           }
           return isValid;
         });
@@ -953,7 +976,9 @@ async function loadGameWords() {
           isFromFirebase: true,
         }));
 
-        console.log(`🔍 유효한 개념: ${validConcepts.length}개 (전체 ${concepts.length}개 중)`);
+        console.log(
+          `🔍 유효한 개념: ${validConcepts.length}개 (전체 ${concepts.length}개 중)`
+        );
 
         // Firebase 개념 수가 부족하면 기본 단어로 보완 (단, 저장하지 않음)
         if (firebaseWords.length < limit) {
@@ -962,7 +987,9 @@ async function loadGameWords() {
           );
           // 기본 단어들은 임시 ID를 가지므로 나중에 저장 시 필터링됨
           gameWords = [...firebaseWords, ...additionalDefaultWords];
-          console.log(`⚠️ 개념이 부족하여 기본 단어 ${additionalDefaultWords.length}개로 보완 (기본 단어는 기록에 저장되지 않음)`);
+          console.log(
+            `⚠️ 개념이 부족하여 기본 단어 ${additionalDefaultWords.length}개로 보완 (기본 단어는 기록에 저장되지 않음)`
+          );
         } else {
           gameWords = firebaseWords;
         }
@@ -1045,20 +1072,20 @@ async function loadGameWords() {
       targetLanguage,
       gameDifficulty,
       fetchLimit: 20,
-      currentGameType
+      currentGameType,
     });
-    
+
     cachedGameData = {
       data: [...gameWords], // 깊은 복사
       timestamp: Date.now(),
-      settings: currentSettings
+      settings: currentSettings,
     };
     console.log(`💾 최종 게임 데이터 캐시 저장: ${gameWords.length}개`);
   }
 
   // 단어 수 업데이트
   updateWordCount();
-  
+
   return gameWords;
 }
 
@@ -1265,11 +1292,17 @@ async function completeGame(finalScore, timeSpent) {
         const conceptIds = gameWords
           .filter((word) => word.id && word.id !== "default") // 기본 단어 제외
           .map((word) => word.id)
-          .filter(id => {
+          .filter((id) => {
             // 유효한 Firebase 문서 ID만 허용 (15자 이상의 영숫자)
-            const isValid = id && typeof id === 'string' && id.length >= 15 && /^[A-Za-z0-9]+$/.test(id);
+            const isValid =
+              id &&
+              typeof id === "string" &&
+              id.length >= 15 &&
+              /^[A-Za-z0-9]+$/.test(id);
             if (!isValid && id) {
-              console.log(`⚠️ 게임 데이터에서 임시 ID 필터링됨: ${id} (유효한 Firebase 문서 ID가 아님)`);
+              console.log(
+                `⚠️ 게임 데이터에서 임시 ID 필터링됨: ${id} (유효한 Firebase 문서 ID가 아님)`
+              );
             }
             return isValid;
           });
@@ -1332,6 +1365,35 @@ async function completeGame(finalScore, timeSpent) {
         console.log("🎯 게임 페이지 통계 새로고침 완료");
       } catch (error) {
         console.warn("게임 통계 새로고침 중 오류:", error);
+      }
+
+      // 🆕 진도 페이지 캐시 무효화를 위한 타임스탬프 설정
+      try {
+        const targetLanguage = "english"; // 게임에서는 기본적으로 영어 대상
+        const invalidationTime = Date.now().toString();
+
+        // 캐시 무효화 타임스탬프 설정
+        localStorage.setItem(
+          `cache_invalidated_${targetLanguage}`,
+          invalidationTime
+        );
+
+        // 관련 캐시 삭제
+        localStorage.removeItem(`total_words_cache_${targetLanguage}`);
+        localStorage.removeItem(`mastered_words_cache_${targetLanguage}`);
+        localStorage.removeItem(`stats_cache_${targetLanguage}`);
+
+        console.log(
+          `🔄 게임 완료 - 진도 페이지 캐시 무효화 완료: ${targetLanguage}, 타임스탬프: ${invalidationTime}`
+        );
+        console.log(
+          `🗑️ 관련 캐시 삭제 완료 - 게임한 개념: ${updatedConceptsCount}개`
+        );
+      } catch (cacheError) {
+        console.warn(
+          "⚠️ 게임 완료 - 진도 페이지 캐시 무효화 실패:",
+          cacheError
+        );
       }
 
       // 🔄 진도 페이지에서 감지할 수 있도록 localStorage에 게임 완료 정보 저장
@@ -1985,19 +2047,23 @@ function checkWordMatch(card1, card2) {
       setTimeout(() => {
         // 시간 보너스 계산 (10초 이내 20점, 10초 초과시 초당 0.5점 차감)
         const gameEndTime = Date.now();
-        const totalTimeInSeconds = Math.round((gameEndTime - gameState.startTime) / 1000);
+        const totalTimeInSeconds = Math.round(
+          (gameEndTime - gameState.startTime) / 1000
+        );
         let finalScore = score;
-        
+
         let timeBonus = 0;
         if (totalTimeInSeconds <= 10) {
           timeBonus = 20; // 1~10초: 20점
         } else if (totalTimeInSeconds <= 30) {
           timeBonus = 20 - Math.round((totalTimeInSeconds - 10) * 0.5); // 10초 초과시 초당 0.5점 차감
         }
-        
+
         finalScore += timeBonus;
-        console.log(`🏆 시간 보너스: ${timeBonus}점 (${totalTimeInSeconds}초 완료)`);
-        
+        console.log(
+          `🏆 시간 보너스: ${timeBonus}점 (${totalTimeInSeconds}초 완료)`
+        );
+
         completeGame(finalScore, totalTimeInSeconds);
       }, 500);
     }

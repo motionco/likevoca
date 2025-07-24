@@ -1540,16 +1540,33 @@ function calculateStatsForTargetLanguage(targetLanguage) {
 
 // Calculate statistics for target language (main function for UI)
 function calculateTargetLanguageStats(targetLanguage, forceRefresh = false) {
-  // 캐시된 데이터가 있고 강제 새로고침이 아니면 캐시 사용
+  // 캐시된 데이터가 있고 강제 새로고침이 아니면 캐시 사용 (24시간 캐시 + 실시간 무효화)
+  const CACHE_KEY = `stats_cache_${targetLanguage}`;
+  const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24시간
+
   if (
     cachedStats &&
     !forceRefresh &&
     lastStatsUpdate &&
     Date.now() - lastStatsUpdate < 30000
   ) {
-    // 30초 내 캐시 사용
+    // 30초 내 메모리 캐시 사용
     console.log("📋 캐시된 통계 데이터 사용");
     return cachedStats;
+  } else if (!forceRefresh) {
+    // 메모리 캐시가 없으면 localStorage 캐시 확인
+    const cachedData = localStorage.getItem(CACHE_KEY);
+    if (cachedData) {
+      const { data, timestamp } = JSON.parse(cachedData);
+      if (Date.now() - timestamp < CACHE_DURATION) {
+        console.log(
+          "📋 localStorage 캐시된 통계 데이터 사용 (Firebase 읽기 절약)"
+        );
+        cachedStats = data;
+        lastStatsUpdate = timestamp;
+        return cachedStats;
+      }
+    }
   }
 
   console.log("🔄 새로운 통계 데이터 계산 시작...");
@@ -2018,11 +2035,20 @@ function calculateTargetLanguageStats(targetLanguage, forceRefresh = false) {
 
   stats.activityHistory = activityHistory.slice(0, 5); // Last 5 activities
 
-  // 통계 데이터 캐시에 저장
+  // 통계 데이터 캐시에 저장 (메모리 + localStorage)
   cachedStats = stats;
   lastStatsUpdate = Date.now();
 
-  console.log("📋 통계 데이터 캐시에 저장 완료");
+  // localStorage에 영구 캐시 저장
+  localStorage.setItem(
+    CACHE_KEY,
+    JSON.stringify({
+      data: stats,
+      timestamp: Date.now(),
+    })
+  );
+
+  console.log("📋 통계 데이터 캐시에 저장 완료 (메모리 + localStorage)");
 
   return stats;
 }
@@ -2057,7 +2083,7 @@ function calculateStreak(sortedDates) {
 }
 
 // Update UI with current data
-function updateUI(forceRefresh = false) {
+async function updateUI(forceRefresh = false) {
   console.log("Updating UI for target language:", selectedTargetLanguage);
   const stats = calculateTargetLanguageStats(
     selectedTargetLanguage,
@@ -2066,6 +2092,9 @@ function updateUI(forceRefresh = false) {
 
   // 페이지 언어 업데이트 먼저 실행
   updatePageLanguage();
+
+  // 마스터한 단어 데이터 사전 로딩 제거 (Firebase 비용 효율화)
+  // 실제 모달 클릭 시에만 로딩하도록 변경
 
   // Update summary cards
   updateSummaryCards(stats);
@@ -2081,6 +2110,64 @@ function updateUI(forceRefresh = false) {
 
   // Update learning goals progress
   updateLearningGoalsProgress(stats);
+}
+
+// 마스터한 단어 데이터 사전 로딩 함수 (Firebase 비용 효율화)
+async function preloadMasteredWordsData() {
+  try {
+    // localStorage 영구 캐시 확인 (24시간 유효)
+    const CACHE_KEY = `mastered_words_cache_${selectedTargetLanguage}`;
+    const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24시간
+
+    const cachedData = localStorage.getItem(CACHE_KEY);
+    if (cachedData) {
+      const { data, timestamp } = JSON.parse(cachedData);
+      if (Date.now() - timestamp < CACHE_DURATION) {
+        console.log(
+          "📋 localStorage 캐시에서 마스터한 단어 데이터 사용 (Firebase 읽기 절약)"
+        );
+        cachedConceptData = data;
+        lastConceptUpdate = timestamp;
+        return;
+      }
+    }
+
+    // 메모리 캐시 확인 (30초)
+    if (
+      cachedConceptData &&
+      lastConceptUpdate &&
+      Date.now() - lastConceptUpdate < 30000
+    ) {
+      console.log("📋 메모리 캐시에서 마스터한 단어 데이터 사용");
+      return;
+    }
+
+    // Firebase에서 데이터 로딩 (실제 필요할 때만)
+    console.log("🔄 Firebase에서 마스터한 단어 데이터 로딩 시작...");
+    const detailedConceptsList = await generateDetailedConceptsList();
+
+    // 메모리 캐시에 저장
+    cachedConceptData = detailedConceptsList;
+    lastConceptUpdate = Date.now();
+
+    // localStorage에 영구 캐시 저장
+    localStorage.setItem(
+      CACHE_KEY,
+      JSON.stringify({
+        data: detailedConceptsList,
+        timestamp: Date.now(),
+      })
+    );
+
+    console.log("✅ 마스터한 단어 데이터 로딩 완료 (Firebase 읽기 1회):", {
+      totalConcepts: detailedConceptsList.length,
+      masteredConcepts: detailedConceptsList.filter(
+        (concept) => concept.isMastered
+      ).length,
+    });
+  } catch (error) {
+    console.error("❌ 마스터한 단어 데이터 로딩 실패:", error);
+  }
 }
 
 // Update summary cards
@@ -3266,25 +3353,134 @@ function showQuizAccuracyDetails() {
 
 // 총 단어수 카드 클릭 시 모달 열기
 async function showTotalWordsDetails() {
-  const stats = calculateTargetLanguageStats(selectedTargetLanguage, false); // 캐시 사용
+  console.log("📋 총 단어수 모달 열기 시작");
 
-  // 캐시된 개념 데이터 확인 및 사용
+  // 캐시된 통계 데이터 사용 (DB 비용 절약)
+  const stats = calculateTargetLanguageStats(selectedTargetLanguage, false);
+
+  // 캐시된 개념 데이터 확인 및 사용 (DB 비용 절약 + 새로운 활동 시 업데이트)
   let detailedConceptsList;
-  if (
-    cachedConceptData &&
-    lastConceptUpdate &&
-    Date.now() - lastConceptUpdate < 30000
-  ) {
-    // 30초 내 캐시 사용
-    console.log("📋 캐시된 개념 데이터 사용");
-    detailedConceptsList = cachedConceptData;
+  const currentTargetLanguage =
+    selectedTargetLanguage || getCurrentProgressLanguage();
+  const CACHE_KEY = `total_words_cache_${currentTargetLanguage}`;
+  const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24시간
+
+  // 새로운 학습 활동 후에만 강제 새로고침
+  const cacheInvalidatedTime = localStorage.getItem(
+    `cache_invalidated_${currentTargetLanguage}`
+  );
+
+  // stats_cache와 total_words_cache의 타임스탬프 비교
+  const statsCacheData = localStorage.getItem(
+    `stats_cache_${currentTargetLanguage}`
+  );
+  const totalWordsCacheData = localStorage.getItem(CACHE_KEY);
+
+  let statsCacheTimestamp = 0;
+  let totalWordsCacheTimestamp = 0;
+
+  if (statsCacheData) {
+    try {
+      const statsParsed = JSON.parse(statsCacheData);
+      statsCacheTimestamp = statsParsed.timestamp || 0;
+    } catch (e) {
+      console.warn("stats_cache 파싱 오류:", e);
+    }
+  }
+
+  if (totalWordsCacheData) {
+    try {
+      const totalWordsParsed = JSON.parse(totalWordsCacheData);
+      totalWordsCacheTimestamp = totalWordsParsed.timestamp || 0;
+    } catch (e) {
+      console.warn("total_words_cache 파싱 오류:", e);
+    }
+  }
+
+  // 캐시 무효화 시간이 있으면 새로고침 (학습 활동 후에만 설정됨)
+  const hasRecentActivity = cacheInvalidatedTime;
+
+  console.log(
+    `🔍 총 단어수 모달 - 캐시 무효화 확인: ${
+      cacheInvalidatedTime ? "있음" : "없음"
+    }, 최근 활동: ${
+      hasRecentActivity ? "있음" : "없음"
+    }, 대상 언어: ${currentTargetLanguage}`
+  );
+
+  // 새로운 활동이 있으면 무조건 Firebase에서 새로 로딩
+  if (hasRecentActivity) {
+    console.log("🔄 새로운 학습 활동 감지 - Firebase에서 실시간 데이터 로딩");
+    try {
+      detailedConceptsList = await generateDetailedConceptsList();
+      console.log(
+        `✅ 총 단어수 모달 - 실시간 데이터 로딩 완료: ${detailedConceptsList.length}개 개념`
+      );
+
+      // 새로운 데이터를 캐시에 저장
+      const cacheData = {
+        data: detailedConceptsList,
+        timestamp: Date.now(),
+      };
+      localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+
+      // 메모리 캐시도 업데이트
+      cachedConceptData = detailedConceptsList;
+      lastConceptUpdate = Date.now();
+
+      // 새로운 데이터 로딩 완료 후 캐시 무효화 타임스탬프 제거 (다음번에는 캐시 사용)
+      localStorage.removeItem(`cache_invalidated_${currentTargetLanguage}`);
+      console.log(`🔄 캐시 무효화 타임스탬프 제거 완료 - 다음번에는 캐시 사용`);
+      console.log(
+        `💾 새로운 데이터를 캐시에 저장 완료 - ${detailedConceptsList.length}개 개념`
+      );
+    } catch (error) {
+      console.error("❌ 총 단어수 모달 - 실시간 데이터 로딩 실패:", error);
+      detailedConceptsList = [];
+    }
   } else {
-    console.log("🔄 새로운 개념 데이터 계산 시작...");
-    detailedConceptsList = await generateDetailedConceptsList();
-    // 캐시에 저장
-    cachedConceptData = detailedConceptsList;
-    lastConceptUpdate = Date.now();
-    console.log("📋 개념 데이터 캐시에 저장 완료");
+    // 새로운 활동이 없으면 캐시 사용 (DB 비용 절약)
+    console.log("📋 새로운 활동 없음 - 캐시 사용 (DB 비용 절약)");
+
+    // 메모리 캐시 우선 확인 (30초)
+    if (
+      cachedConceptData &&
+      lastConceptUpdate &&
+      Date.now() - lastConceptUpdate < 30000
+    ) {
+      console.log("📋 총 단어수 모달에서 메모리 캐시 사용");
+      detailedConceptsList = cachedConceptData;
+    } else {
+      // localStorage 캐시 확인 (24시간)
+      const cachedData = localStorage.getItem(CACHE_KEY);
+      if (cachedData) {
+        const { data, timestamp } = JSON.parse(cachedData);
+        if (Date.now() - timestamp < CACHE_DURATION) {
+          console.log(
+            "📋 총 단어수 모달에서 localStorage 캐시 사용 (DB 비용 절약)"
+          );
+          detailedConceptsList = data;
+          cachedConceptData = data; // 메모리 캐시 업데이트
+          lastConceptUpdate = timestamp;
+        } else {
+          console.log("🔄 localStorage 캐시 만료 - Firebase에서 로딩");
+          detailedConceptsList = await loadAndCacheMasteredWordsData(CACHE_KEY);
+        }
+      } else {
+        console.log("🔄 캐시 없음 - Firebase에서 로딩");
+        detailedConceptsList = await loadAndCacheMasteredWordsData(CACHE_KEY);
+      }
+    }
+  }
+
+  // 디버깅: 로딩된 데이터 확인
+  console.log(
+    `🔍 총 단어수 모달 - 최종 로딩된 개념 수: ${
+      detailedConceptsList ? detailedConceptsList.length : 0
+    }`
+  );
+  if (detailedConceptsList && detailedConceptsList.length > 0) {
+    console.log("🔍 총 단어수 모달 - 첫 번째 개념:", detailedConceptsList[0]);
   }
 
   const modalBody = document.getElementById("totalWordsModalBody");
@@ -3503,37 +3699,224 @@ async function showTotalWordsDetails() {
   }
 }
 
-// 마스터한 단어 카드 클릭 시 모달 열기
-function showMasteredWordsDetails() {
-  const stats = calculateTargetLanguageStats(selectedTargetLanguage, false); // 캐시 사용
+// 마스터한 단어 데이터 로딩 및 캐싱 헬퍼 함수
+async function loadAndCacheMasteredWordsData(cacheKey) {
+  try {
+    const detailedConceptsList = await generateDetailedConceptsList();
 
-  // 캐시된 개념 데이터 사용
+    // 메모리 캐시에 저장
+    cachedConceptData = detailedConceptsList;
+    lastConceptUpdate = Date.now();
+
+    // localStorage에 영구 캐시 저장
+    localStorage.setItem(
+      cacheKey,
+      JSON.stringify({
+        data: detailedConceptsList,
+        timestamp: Date.now(),
+      })
+    );
+
+    console.log(
+      "✅ 마스터한 단어 데이터 로딩 및 캐싱 완료 (Firebase 읽기 1회)"
+    );
+    return detailedConceptsList;
+  } catch (error) {
+    console.error("❌ 마스터한 단어 데이터 로딩 실패:", error);
+    return [];
+  }
+}
+
+// 캐시 무효화 함수 (새로운 학습 활동 시 호출)
+function invalidateAllCaches() {
+  // 현재 활성화된 대상 언어 확인
+  const currentTargetLanguage =
+    selectedTargetLanguage || getCurrentProgressLanguage();
+
+  console.log(`🔄 캐시 무효화 시작 - 대상 언어: ${currentTargetLanguage}`);
+
+  // 마스터한 단어 캐시 무효화
+  const masteredWordsCacheKey = `mastered_words_cache_${currentTargetLanguage}`;
+  localStorage.removeItem(masteredWordsCacheKey);
+
+  // 총 단어수 캐시 무효화
+  const totalWordsCacheKey = `total_words_cache_${currentTargetLanguage}`;
+  localStorage.removeItem(totalWordsCacheKey);
+
+  // 통계 데이터 캐시 무효화
+  const statsCacheKey = `stats_cache_${currentTargetLanguage}`;
+  localStorage.removeItem(statsCacheKey);
+
+  // 메모리 캐시 무효화
+  cachedConceptData = null;
+  lastConceptUpdate = null;
+  cachedStats = null;
+  lastStatsUpdate = null;
+
+  // 캐시 무효화 시간 기록 (모달에서 이 시간을 확인하여 강제 새로고침 결정)
+  const invalidationTime = Date.now().toString();
+  localStorage.setItem(
+    `cache_invalidated_${currentTargetLanguage}`,
+    invalidationTime
+  );
+
+  console.log(
+    `🔄 모든 캐시 무효화 완료 - 대상 언어: ${currentTargetLanguage}, 시간: ${invalidationTime}`
+  );
+}
+
+// 마스터한 단어 캐시 무효화 함수 (하위 호환성을 위해 유지)
+function invalidateMasteredWordsCache() {
+  invalidateAllCaches();
+}
+
+// 마스터한 단어 카드 클릭 시 모달 열기
+async function showMasteredWordsDetails() {
+  console.log("📋 마스터한 단어 모달 열기 시작");
+
+  // 캐시된 통계 데이터 사용 (DB 비용 절약)
+  const stats = calculateTargetLanguageStats(selectedTargetLanguage, false);
+
+  // 캐시된 개념 데이터 확인 및 사용 (DB 비용 절약 + 새로운 활동 시 업데이트)
   let detailedConceptsList;
-  if (
-    cachedConceptData &&
-    lastConceptUpdate &&
-    Date.now() - lastConceptUpdate < 30000
-  ) {
-    // 30초 내 캐시 사용
-    console.log("�� 마스터한 단어 모달에서 캐시된 개념 데이터 사용");
-    detailedConceptsList = cachedConceptData;
+  const currentTargetLanguage =
+    selectedTargetLanguage || getCurrentProgressLanguage();
+  const CACHE_KEY = `mastered_words_cache_${currentTargetLanguage}`;
+  const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24시간
+
+  // 새로운 학습 활동 후에만 강제 새로고침
+  const cacheInvalidatedTime = localStorage.getItem(
+    `cache_invalidated_${currentTargetLanguage}`
+  );
+
+  // stats_cache와 mastered_words_cache의 타임스탬프 비교
+  const statsCacheData = localStorage.getItem(
+    `stats_cache_${currentTargetLanguage}`
+  );
+  const masteredWordsCacheData = localStorage.getItem(CACHE_KEY);
+
+  let statsCacheTimestamp = 0;
+  let masteredWordsCacheTimestamp = 0;
+
+  if (statsCacheData) {
+    try {
+      const statsParsed = JSON.parse(statsCacheData);
+      statsCacheTimestamp = statsParsed.timestamp || 0;
+    } catch (e) {
+      console.warn("stats_cache 파싱 오류:", e);
+    }
+  }
+
+  if (masteredWordsCacheData) {
+    try {
+      const masteredWordsParsed = JSON.parse(masteredWordsCacheData);
+      masteredWordsCacheTimestamp = masteredWordsParsed.timestamp || 0;
+    } catch (e) {
+      console.warn("mastered_words_cache 파싱 오류:", e);
+    }
+  }
+
+  // 캐시 무효화 시간이 있거나 stats_cache가 mastered_words_cache보다 최신이면 새로고침
+  const hasRecentActivity = cacheInvalidatedTime;
+
+  console.log(
+    `🔍 마스터한 단어 모달 - 캐시 무효화 확인: ${
+      cacheInvalidatedTime ? "있음" : "없음"
+    }, 최근 활동: ${
+      hasRecentActivity ? "있음" : "없음"
+    }, 대상 언어: ${currentTargetLanguage}`
+  );
+
+  // 새로운 활동이 있으면 무조건 Firebase에서 새로 로딩
+  if (hasRecentActivity) {
+    console.log("🔄 새로운 학습 활동 감지 - Firebase에서 실시간 데이터 로딩");
+    try {
+      detailedConceptsList = await generateDetailedConceptsList();
+      console.log(
+        `✅ 마스터한 단어 모달 - 실시간 데이터 로딩 완료: ${detailedConceptsList.length}개 개념`
+      );
+
+      // 새로운 데이터를 캐시에 저장
+      const cacheData = {
+        data: detailedConceptsList,
+        timestamp: Date.now(),
+      };
+      localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+
+      // 메모리 캐시도 업데이트
+      cachedConceptData = detailedConceptsList;
+      lastConceptUpdate = Date.now();
+
+      // 새로운 데이터 로딩 완료 후 캐시 무효화 타임스탬프 제거 (다음번에는 캐시 사용)
+      localStorage.removeItem(`cache_invalidated_${currentTargetLanguage}`);
+      console.log(`🔄 캐시 무효화 타임스탬프 제거 완료 - 다음번에는 캐시 사용`);
+      console.log(
+        `💾 새로운 데이터를 캐시에 저장 완료 - ${detailedConceptsList.length}개 개념`
+      );
+    } catch (error) {
+      console.error("❌ 마스터한 단어 모달 - 실시간 데이터 로딩 실패:", error);
+      detailedConceptsList = [];
+    }
   } else {
-    console.log("⚠️ 마스터한 단어 모달에서 캐시 없음 - 모달 재계산 필요");
-    // 캐시가 없다면 빈 배열로 처리하고 사용자에게 안내
-    detailedConceptsList = [];
+    // 새로운 활동이 없으면 캐시 사용 (DB 비용 절약)
+    console.log("📋 새로운 활동 없음 - 캐시 사용 (DB 비용 절약)");
+
+    // 메모리 캐시 우선 확인 (30초)
+    if (
+      cachedConceptData &&
+      lastConceptUpdate &&
+      Date.now() - lastConceptUpdate < 30000
+    ) {
+      console.log("📋 마스터한 단어 모달에서 메모리 캐시 사용");
+      detailedConceptsList = cachedConceptData;
+    } else {
+      // localStorage 캐시 확인 (24시간)
+      const cachedData = localStorage.getItem(CACHE_KEY);
+      if (cachedData) {
+        const { data, timestamp } = JSON.parse(cachedData);
+        if (Date.now() - timestamp < CACHE_DURATION) {
+          console.log(
+            "📋 마스터한 단어 모달에서 localStorage 캐시 사용 (DB 비용 절약)"
+          );
+          detailedConceptsList = data;
+          cachedConceptData = data;
+          lastConceptUpdate = timestamp;
+        } else {
+          console.log("🔄 localStorage 캐시 만료 - Firebase에서 로딩");
+          detailedConceptsList = await loadAndCacheMasteredWordsData(CACHE_KEY);
+        }
+      } else {
+        console.log("🔄 캐시 없음 - Firebase에서 로딩");
+        detailedConceptsList = await loadAndCacheMasteredWordsData(CACHE_KEY);
+      }
+    }
   }
 
   const modalBody = document.getElementById("totalWordsModalBody");
 
   if (modalBody) {
     // 캐시된 데이터에서 마스터한 개념들만 필터링
+    console.log(
+      `🔍 마스터한 단어 필터링 - 전체 개념 수: ${detailedConceptsList.length}`
+    );
+
     const masteredConcepts = detailedConceptsList.filter(
       (concept) => concept.isMastered
     );
 
     console.log(
-      `🎯 마스터한 단어 모달 - 대상 언어: ${selectedTargetLanguage}, 마스터한 개념 수: ${masteredConcepts.length}`
+      `🎯 마스터한 단어 모달 - 대상 언어: ${currentTargetLanguage}, 마스터한 개념 수: ${masteredConcepts.length}`
     );
+
+    // 디버깅: 마스터하지 않은 개념들도 확인
+    const nonMasteredConcepts = detailedConceptsList.filter(
+      (concept) => !concept.isMastered
+    );
+    console.log(`🔍 마스터하지 않은 개념 수: ${nonMasteredConcepts.length}`);
+
+    if (nonMasteredConcepts.length > 0) {
+      console.log("🔍 마스터하지 않은 개념 예시:", nonMasteredConcepts[0]);
+    }
 
     const masteredList = masteredConcepts
       .map((concept) => {
@@ -3605,64 +3988,20 @@ function showMasteredWordsDetails() {
                     </div>
                 </div>
 
-                <!-- 마스터한 개념 목록 -->
-                <div>
-                    <h4 class="font-medium text-gray-800 mb-3">${getProgressText(
-                      "masteredWords"
-                    )} ${getProgressText("list")}</h4>
-                    <div class="space-y-2">
-                        ${
-                          masteredList.length > 0
-                            ? masteredList
-                            : `<p class="text-gray-500 text-center py-4">${getProgressText(
-                                "encourageFirstMaster"
-                              )}</p>`
-                        }
-                    </div>
-                </div>
-
-                <!-- 진행률 및 격려 메시지 -->
-                <div class="bg-gray-50 p-4 rounded-lg">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="font-medium">${getProgressText(
-                          "masteryProgressAll"
-                        )}</span>
-                        <span class="text-sm text-gray-600">${
-                          stats.totalConcepts > 0
-                            ? Math.round(
-                                (stats.masteredConcepts / stats.totalConcepts) *
-                                  100
-                              )
-                            : 0
-                        }%</span>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-3">
-                        <div class="bg-green-500 h-3 rounded-full transition-all duration-300" style="width: ${
-                          stats.totalConcepts > 0
-                            ? (stats.masteredConcepts / stats.totalConcepts) *
-                              100
-                            : 0
-                        }%"></div>
-                    </div>
-                    <div class="mt-3 text-center">
-                        ${
-                          stats.masteredConcepts > 0
-                            ? `<p class="text-sm text-green-600">🌟 ${getProgressText(
-                                "congratsMastered"
-                              ).replace("{n}", stats.masteredConcepts)}</p>`
-                            : `<p class="text-sm text-gray-600">💪 ${getProgressText(
-                                "encourageFirstMaster"
-                              )}</p>`
-                        }
-                    </div>
+                <!-- 마스터한 단어 목록 -->
+                <div class="space-y-3">
+                    <h4 class="text-lg font-semibold text-gray-900">
+                        🏆 ${getProgressText("masteredWords")}
+                    </h4>
+                    ${
+                      masteredList ||
+                      `<p class="text-gray-500">${getProgressText(
+                        "noMasteredWords"
+                      )}</p>`
+                    }
                 </div>
             </div>
         `;
-
-    const modalTitle = document.querySelector("#totalWordsModal h2");
-    if (modalTitle) {
-      modalTitle.textContent = `✅ ${getProgressText("masteredWords")}`;
-    }
 
     openModal("totalWordsModal");
   }
@@ -3670,12 +4009,17 @@ function showMasteredWordsDetails() {
 
 // 연속 학습 카드 클릭 시 모달 열기
 function showStudyStreakDetails() {
+  console.log("🔥 연속학습 모달 열기 시작");
   const stats = calculateTargetLanguageStats(selectedTargetLanguage, false); // 캐시 사용
   const modalBody = document.getElementById("totalWordsModalBody");
 
+  console.log(`🔥 연속학습 모달 - modalBody 존재: ${!!modalBody}`);
+
   if (modalBody) {
     const lastStudyText = stats.lastStudyDate
-      ? stats.lastStudyDate.toLocaleDateString("ko-KR")
+      ? stats.lastStudyDate instanceof Date
+        ? stats.lastStudyDate.toLocaleDateString("ko-KR")
+        : new Date(stats.lastStudyDate).toLocaleDateString("ko-KR")
       : "학습 기록 없음";
 
     // 선택된 대상 언어의 활동 기록들만 필터링
@@ -4101,6 +4445,20 @@ async function saveLearningActivity(
     // Update local data and UI
     allLearningRecords.push({ id: docRef.id, ...learningRecord });
     await updateTargetLanguageStats(targetLanguage);
+
+    // 새로운 학습 활동으로 인한 캐시 무효화
+    console.log("🔄 학습 활동 저장 완료 - 캐시 무효화 시작");
+    invalidateMasteredWordsCache();
+
+    // 강제로 localStorage 캐시도 삭제
+    const currentTargetLanguage =
+      selectedTargetLanguage || getCurrentProgressLanguage();
+    localStorage.removeItem(`total_words_cache_${currentTargetLanguage}`);
+    localStorage.removeItem(`mastered_words_cache_${currentTargetLanguage}`);
+    localStorage.removeItem(`stats_cache_${currentTargetLanguage}`);
+
+    console.log("🔄 학습 활동 후 모든 캐시 삭제 완료");
+
     updateUI();
 
     return docRef.id;
@@ -4222,6 +4580,11 @@ async function saveGameActivity(
     // Update local data and UI
     allGameRecords.push({ id: docRef.id, ...gameRecord });
     await updateTargetLanguageStats(targetLanguage);
+
+    // 새로운 게임 활동으로 인한 캐시 무효화
+    console.log("🔄 게임 활동 저장 완료 - 캐시 무효화 시작");
+    invalidateMasteredWordsCache();
+
     updateUI();
 
     return docRef.id;
@@ -4277,6 +4640,11 @@ async function saveQuizActivity(
     // Update local data and UI
     allQuizRecords.push({ id: docRef.id, ...quizRecord });
     await updateTargetLanguageStats(targetLanguage);
+
+    // 새로운 퀴즈 활동으로 인한 캐시 무효화
+    console.log("🔄 퀴즈 활동 저장 완료 - 캐시 무효화 시작");
+    invalidateMasteredWordsCache();
+
     updateUI();
 
     return docRef.id;
@@ -4354,6 +4722,96 @@ function formatTime(minutes) {
 }
 
 // Export functions for testing
+// 강제 캐시 무효화 및 데이터 새로고침 함수
+function forceRefreshAllData() {
+  console.log("🔄 강제 데이터 새로고침 시작");
+
+  // 모든 캐시 무효화
+  invalidateAllCaches();
+
+  // 메모리 캐시 초기화
+  cachedConceptData = null;
+  lastConceptUpdate = null;
+  cachedStats = null;
+  lastStatsUpdate = null;
+
+  // localStorage 캐시도 완전 삭제
+  const currentTargetLanguage =
+    selectedTargetLanguage || getCurrentProgressLanguage();
+  localStorage.removeItem(`total_words_cache_${currentTargetLanguage}`);
+  localStorage.removeItem(`mastered_words_cache_${currentTargetLanguage}`);
+  localStorage.removeItem(`stats_cache_${currentTargetLanguage}`);
+
+  // UI 강제 새로고침
+  updateUI(true);
+
+  console.log("🔄 강제 데이터 새로고침 완료");
+}
+
+// 즉시 해결을 위한 함수
+function immediateFix() {
+  console.log("🚀 즉시 해결 시작");
+
+  // 1. 모든 캐시 완전 삭제
+  const currentTargetLanguage =
+    selectedTargetLanguage || getCurrentProgressLanguage();
+  localStorage.removeItem(`total_words_cache_${currentTargetLanguage}`);
+  localStorage.removeItem(`mastered_words_cache_${currentTargetLanguage}`);
+  localStorage.removeItem(`stats_cache_${currentTargetLanguage}`);
+  localStorage.removeItem(`cache_invalidated_${currentTargetLanguage}`);
+
+  // 2. 메모리 캐시 초기화
+  cachedConceptData = null;
+  lastConceptUpdate = null;
+  cachedStats = null;
+  lastStatsUpdate = null;
+
+  // 3. UI 강제 새로고침
+  updateUI(true);
+
+  console.log("🚀 즉시 해결 완료 - 모든 캐시 삭제 및 UI 새로고침");
+}
+
+// 캐시 무효화 타임스탬프 제거 함수 (DB 비용 절약용)
+function clearCacheInvalidation() {
+  console.log("🧹 캐시 무효화 타임스탬프 제거 시작");
+
+  const currentTargetLanguage =
+    selectedTargetLanguage || getCurrentProgressLanguage();
+  localStorage.removeItem(`cache_invalidated_${currentTargetLanguage}`);
+
+  console.log(`🧹 캐시 무효화 타임스탬프 제거 완료 - 다음번에는 캐시 사용`);
+}
+
+// 강제 캐시 무효화 함수 (데이터 불일치 해결용)
+function forceCacheInvalidation() {
+  console.log("🚨 강제 캐시 무효화 시작");
+
+  const currentTargetLanguage =
+    selectedTargetLanguage || getCurrentProgressLanguage();
+
+  // 1. 모든 캐시 삭제
+  localStorage.removeItem(`total_words_cache_${currentTargetLanguage}`);
+  localStorage.removeItem(`mastered_words_cache_${currentTargetLanguage}`);
+  localStorage.removeItem(`stats_cache_${currentTargetLanguage}`);
+
+  // 2. 메모리 캐시 초기화
+  cachedConceptData = null;
+  lastConceptUpdate = null;
+  cachedStats = null;
+  lastStatsUpdate = null;
+
+  // 3. 캐시 무효화 타임스탬프 설정
+  const invalidationTime = Date.now().toString();
+  localStorage.setItem(
+    `cache_invalidated_${currentTargetLanguage}`,
+    invalidationTime
+  );
+
+  console.log(`🚨 강제 캐시 무효화 완료 - 타임스탬프: ${invalidationTime}`);
+  console.log(`🚨 다음번 모달 열기 시 Firebase에서 실시간 데이터 로딩`);
+}
+
 window.progressModule = {
   calculateTargetLanguageStats,
   loadProgressData,
@@ -4364,6 +4822,14 @@ window.progressModule = {
   saveLearningActivity,
   saveGameActivity,
   saveQuizActivity,
+  saveLearningActivityWithSnapshot, // 스냅샷 포함 학습 활동 저장 함수 추가
+  saveGameActivityWithSnapshot, // 스냅샷 포함 게임 활동 저장 함수 추가
+  saveQuizActivityWithSnapshot, // 스냅샷 포함 퀴즈 활동 저장 함수 추가
+  invalidateAllCaches, // 캐시 무효화 함수 추가
+  forceRefreshAllData, // 강제 새로고침 함수 추가
+  immediateFix, // 즉시 해결 함수 추가
+  clearCacheInvalidation, // 캐시 무효화 타임스탬프 제거 함수 추가
+  forceCacheInvalidation, // 강제 캐시 무효화 함수 추가
 };
 
 // Make functions globally available
@@ -4372,6 +4838,9 @@ window.refreshProgressData = refreshProgressData;
 window.saveLearningActivity = saveLearningActivity;
 window.saveGameActivity = saveGameActivity;
 window.saveQuizActivity = saveQuizActivity;
+window.saveLearningActivityWithSnapshot = saveLearningActivityWithSnapshot;
+window.saveGameActivityWithSnapshot = saveGameActivityWithSnapshot;
+window.saveQuizActivityWithSnapshot = saveQuizActivityWithSnapshot;
 window.updateUI = updateUI;
 window.calculateTargetLanguageStats = calculateTargetLanguageStats;
 
@@ -5156,6 +5625,19 @@ async function saveLearningActivityWithSnapshot(activityData) {
     }
 
     console.log(`📚 학습 활동과 스냅샷 저장 완료: ${conceptIds.length}개 개념`);
+
+    // 새로운 학습 활동으로 인한 캐시 무효화
+    console.log("🔄 학습 활동 스냅샷 저장 완료 - 캐시 무효화 시작");
+    invalidateAllCaches();
+
+    // 강제로 localStorage 캐시도 삭제
+    const currentTargetLanguage =
+      selectedTargetLanguage || getCurrentProgressLanguage();
+    localStorage.removeItem(`total_words_cache_${currentTargetLanguage}`);
+    localStorage.removeItem(`mastered_words_cache_${currentTargetLanguage}`);
+    localStorage.removeItem(`stats_cache_${currentTargetLanguage}`);
+    console.log("🔄 학습 활동 후 모든 캐시 삭제 완료");
+
     return savedActivity;
   } catch (error) {
     console.error("학습 활동 및 스냅샷 저장 오류:", error);
@@ -5176,6 +5658,19 @@ async function saveGameActivityWithSnapshot(activityData) {
     }
 
     console.log(`🎮 게임 활동과 스냅샷 저장 완료: ${conceptIds.length}개 개념`);
+
+    // 새로운 게임 활동으로 인한 캐시 무효화
+    console.log("🔄 게임 활동 스냅샷 저장 완료 - 캐시 무효화 시작");
+    invalidateAllCaches();
+
+    // 강제로 localStorage 캐시도 삭제
+    const currentTargetLanguage =
+      selectedTargetLanguage || getCurrentProgressLanguage();
+    localStorage.removeItem(`total_words_cache_${currentTargetLanguage}`);
+    localStorage.removeItem(`mastered_words_cache_${currentTargetLanguage}`);
+    localStorage.removeItem(`stats_cache_${currentTargetLanguage}`);
+    console.log("🔄 게임 활동 후 모든 캐시 삭제 완료");
+
     return savedActivity;
   } catch (error) {
     console.error("게임 활동 및 스냅샷 저장 오류:", error);
@@ -5196,6 +5691,19 @@ async function saveQuizActivityWithSnapshot(activityData) {
     }
 
     console.log(`🎯 퀴즈 활동과 스냅샷 저장 완료: ${conceptIds.length}개 개념`);
+
+    // 새로운 퀴즈 활동으로 인한 캐시 무효화
+    console.log("🔄 퀴즈 활동 스냅샷 저장 완료 - 캐시 무효화 시작");
+    invalidateAllCaches();
+
+    // 강제로 localStorage 캐시도 삭제
+    const currentTargetLanguage =
+      selectedTargetLanguage || getCurrentProgressLanguage();
+    localStorage.removeItem(`total_words_cache_${currentTargetLanguage}`);
+    localStorage.removeItem(`mastered_words_cache_${currentTargetLanguage}`);
+    localStorage.removeItem(`stats_cache_${currentTargetLanguage}`);
+    console.log("🔄 퀴즈 활동 후 모든 캐시 삭제 완료");
+
     return savedActivity;
   } catch (error) {
     console.error("퀴즈 활동 및 스냅샷 저장 오류:", error);

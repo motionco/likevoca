@@ -32,7 +32,7 @@ let currentUILanguage = "korean";
 let cachedData = {
   vocabulary: { data: null, timestamp: null },
   grammar: { data: null, timestamp: null },
-  reading: { data: null, timestamp: null }
+  reading: { data: null, timestamp: null },
 };
 const CACHE_DURATION = 10 * 60 * 1000; // 10분
 
@@ -42,7 +42,7 @@ let firebaseReadCount = 0;
 // Firebase 읽기 추적 함수
 function trackFirebaseRead(queryName, docCount) {
   firebaseReadCount += docCount;
-  
+
   if (firebaseReadCount > 50) {
     console.warn("⚠️ Firebase 읽기 횟수가 많습니다:", firebaseReadCount);
   }
@@ -350,15 +350,18 @@ function handleFilterChange() {
   // 현재 학습 중인 경우 기존 데이터에 필터만 적용 (DB 재조회 없음)
   if (currentLearningArea && currentLearningMode) {
     console.log("🔄 필터 변경 - 기존 데이터 활용");
-    
+
     // ✅ DB 재조회 없이 기존 데이터에 필터만 적용
-    if (preloadedData[currentLearningArea] && preloadedData[currentLearningArea].length > 0) {
+    if (
+      preloadedData[currentLearningArea] &&
+      preloadedData[currentLearningArea].length > 0
+    ) {
       const filteredData = applyFilters(preloadedData[currentLearningArea]);
       areaData[currentLearningArea] = filteredData;
       currentIndex = 0; // 인덱스 초기화
-      
+
       console.log(`✅ 클라이언트 필터링 완료: ${filteredData.length}개`);
-      
+
       // UI만 업데이트
       updateCurrentView();
     } else {
@@ -1546,12 +1549,14 @@ async function finishLearningHandler(e) {
     try {
       const savedSessionData = await completeLearningSession(true); // forceComplete = true
       console.log("✅ 학습 세션 완료 처리 성공");
-      
+
       // 모달에 표시할 데이터 (저장된 세션 데이터 사용)
       const sessionStats = {
         conceptsCount,
         duration: savedSessionData?.duration || 1,
-        interactions: savedSessionData?.interactions || learningSessionData.totalInteractions,
+        interactions:
+          savedSessionData?.interactions ||
+          learningSessionData.totalInteractions,
         efficiency: savedSessionData?.session_quality || 0, // 저장된 효율 값 사용
       };
 
@@ -1608,11 +1613,12 @@ async function finishLearningHandler(e) {
     console.log("🎉 학습 종료 - 완료 팝업 표시");
     console.log("📊 학습 완료 통계:", {
       conceptsCount,
-      duration: Math.round(
-        (learningSessionData.endTime - learningSessionData.startTime) /
-          1000 /
-          60
-      ) || 1,
+      duration:
+        Math.round(
+          (learningSessionData.endTime - learningSessionData.startTime) /
+            1000 /
+            60
+        ) || 1,
       interactions: learningSessionData.totalInteractions,
       correctAnswers: learningSessionData.correctAnswers,
     });
@@ -1633,8 +1639,11 @@ async function finishLearningHandler(e) {
     let baseScore;
     if (currentLearningArea === "reading" && currentLearningMode === "flash") {
       // 독해 플래시 모드: 모든 카드를 본 것을 기준으로 기본 점수
-      const allConceptsPresented = conceptsCount >= Math.min(10, totalAvailableData);
-      baseScore = allConceptsPresented ? 60 : (conceptsCount / totalAvailableData) * 60;
+      const allConceptsPresented =
+        conceptsCount >= Math.min(10, totalAvailableData);
+      baseScore = allConceptsPresented
+        ? 60
+        : (conceptsCount / totalAvailableData) * 60;
     } else if (
       learningSessionData.mode === "flashcard" ||
       learningSessionData.mode === "listening" ||
@@ -1646,7 +1655,6 @@ async function finishLearningHandler(e) {
       // 기존 방식 (typing, pattern, practice 등): 실제 학습한 개념 수 기준
       baseScore = Math.min(60, conceptsCount * 6);
     }
-
   } else {
     console.log("🏁 학습 종료 - 학습한 개념이 없어 바로 영역 선택으로 이동");
     // 🔄 학습 데이터 초기화
@@ -2762,16 +2770,22 @@ async function loadLearningData(area) {
   try {
     // ✅ 프리로드된 데이터가 있으면 우선 사용
     if (preloadedData[area] && preloadedData[area].length > 0) {
-      console.log(`⚡ ${area} 프리로드된 데이터 사용: ${preloadedData[area].length}개`);
+      console.log(
+        `⚡ ${area} 프리로드된 데이터 사용: ${preloadedData[area].length}개`
+      );
       areaData[area] = applyFilters(preloadedData[area]);
       return;
     }
 
     // ✅ 캐시된 데이터가 있고 유효하면 사용
     const now = Date.now();
-    if (cachedData[area].data && 
-        (now - cachedData[area].timestamp) < CACHE_DURATION) {
-      console.log(`⚡ ${area} 캐시된 데이터 사용: ${cachedData[area].data.length}개`);
+    if (
+      cachedData[area].data &&
+      now - cachedData[area].timestamp < CACHE_DURATION
+    ) {
+      console.log(
+        `⚡ ${area} 캐시된 데이터 사용: ${cachedData[area].data.length}개`
+      );
       areaData[area] = applyFilters(cachedData[area].data);
       return;
     }
@@ -2799,7 +2813,7 @@ async function loadLearningData(area) {
     if (areaData[area] && areaData[area].length > 0) {
       cachedData[area] = {
         data: [...areaData[area]], // 깊은 복사
-        timestamp: now
+        timestamp: now,
       };
       console.log(`💾 ${area} 데이터 캐시 저장: ${areaData[area].length}개`);
     }
@@ -2854,9 +2868,7 @@ async function loadVocabularyData() {
           id: doc.id,
           ...doc.data(),
         }));
-        console.log(
-          `💰 효율적인 조회 성공: ${data.length}개 단어 (1개 쿼리)`
-        );
+        console.log(`💰 효율적인 조회 성공: ${data.length}개 단어 (1개 쿼리)`);
         trackFirebaseRead("단어 랜덤 조회", randomSnapshot.size); // ✅ 읽기 추적
       } else {
         // 충분하지 않은 경우 추가 조회
@@ -2882,7 +2894,10 @@ async function loadVocabularyData() {
 
         data = [...firstBatch, ...secondBatch];
         console.log(`💰 효율적인 조회 성공: ${data.length}개 단어 (2개 쿼리)`);
-        trackFirebaseRead("단어 추가 조회", randomSnapshot.size + additionalSnapshot.size); // ✅ 읽기 추적
+        trackFirebaseRead(
+          "단어 추가 조회",
+          randomSnapshot.size + additionalSnapshot.size
+        ); // ✅ 읽기 추적
       }
 
       // Fisher-Yates 셔플 적용
@@ -2982,7 +2997,9 @@ async function loadGrammarData() {
             ...docData,
           };
         });
-        console.log(`💰 문법 패턴 효율적인 조회 성공: ${grammarData.length}개 (1개 쿼리)`);
+        console.log(
+          `💰 문법 패턴 효율적인 조회 성공: ${grammarData.length}개 (1개 쿼리)`
+        );
         trackFirebaseRead("문법 패턴 랜덤 조회", randomSnapshot.size); // ✅ 읽기 추적
       } else {
         // 충분하지 않은 경우 추가 조회
@@ -3026,7 +3043,10 @@ async function loadGrammarData() {
         console.log(
           `💰 문법 패턴 효율적인 조회 성공: ${grammarData.length}개 (2개 쿼리)`
         );
-        trackFirebaseRead("문법 패턴 추가 조회", randomSnapshot.size + additionalSnapshot.size); // ✅ 읽기 추적
+        trackFirebaseRead(
+          "문법 패턴 추가 조회",
+          randomSnapshot.size + additionalSnapshot.size
+        ); // ✅ 읽기 추적
       }
 
       // Fisher-Yates 셔플 적용
@@ -3129,7 +3149,9 @@ async function loadReadingData() {
           })
           .filter(Boolean);
 
-        console.log(`💰 독해 예문 효율적인 조회 성공: ${exampleData.length}개 (1개 쿼리)`);
+        console.log(
+          `💰 독해 예문 효율적인 조회 성공: ${exampleData.length}개 (1개 쿼리)`
+        );
         trackFirebaseRead("독해 예문 랜덤 조회", randomSnapshot.size); // ✅ 읽기 추적
       } else {
         // 충분하지 않은 경우 추가 조회
@@ -3187,7 +3209,10 @@ async function loadReadingData() {
         console.log(
           `💰 독해 예문 효율적인 조회 성공: ${exampleData.length}개 (2개 쿼리)`
         );
-        trackFirebaseRead("독해 예문 추가 조회", randomSnapshot.size + additionalSnapshot.size); // ✅ 읽기 추적
+        trackFirebaseRead(
+          "독해 예문 추가 조회",
+          randomSnapshot.size + additionalSnapshot.size
+        ); // ✅ 읽기 추적
       }
 
       // Fisher-Yates 셔플 적용
@@ -3459,22 +3484,28 @@ function showTypingMode() {
   const typingMode = document.getElementById("typing-mode");
   if (typingMode) {
     typingMode.classList.remove("hidden");
-    
+
     // 타이핑 모드 요소들의 번역 속성 제거 (번역 시스템이 콘텐츠를 덮어쓰지 않도록)
-    const typingElements = ['typing-word', 'typing-pronunciation', 'typing-meaning'];
-    typingElements.forEach(id => {
+    const typingElements = [
+      "typing-word",
+      "typing-pronunciation",
+      "typing-meaning",
+    ];
+    typingElements.forEach((id) => {
       const element = document.getElementById(id);
       if (element) {
-        element.removeAttribute('data-i18n');
+        element.removeAttribute("data-i18n");
       }
     });
-    
+
     // 데이터가 로드되었는지 확인 후 UI 업데이트
     const currentData = getCurrentData();
     if (currentData && currentData.length > 0) {
       updateTyping();
     } else {
-      console.warn("⚠️ 타이핑 모드: 데이터가 아직 로드되지 않음, 잠시 후 재시도");
+      console.warn(
+        "⚠️ 타이핑 모드: 데이터가 아직 로드되지 않음, 잠시 후 재시도"
+      );
       // 데이터가 로드될 때까지 잠시 대기 후 재시도
       setTimeout(() => {
         const retryData = getCurrentData();
@@ -3489,11 +3520,15 @@ function showTypingMode() {
     // 번역 적용 (타이핑 모드 콘텐츠 제외)
     setTimeout(() => {
       // 타이핑 모드의 핵심 요소들을 번역에서 제외
-      const excludeElements = ['typing-word', 'typing-pronunciation', 'typing-meaning'];
-      excludeElements.forEach(id => {
+      const excludeElements = [
+        "typing-word",
+        "typing-pronunciation",
+        "typing-meaning",
+      ];
+      excludeElements.forEach((id) => {
         const element = document.getElementById(id);
         if (element) {
-          element.removeAttribute('data-i18n');
+          element.removeAttribute("data-i18n");
         }
       });
       applyTranslations();
@@ -3524,14 +3559,17 @@ function updateTyping() {
 
   const concept = currentData[currentIndex];
   if (!concept) {
-    console.warn("⚠️ updateTyping: 현재 인덱스의 개념이 없음", { currentIndex, dataLength: currentData.length });
+    console.warn("⚠️ updateTyping: 현재 인덱스의 개념이 없음", {
+      currentIndex,
+      dataLength: currentData.length,
+    });
     return;
   }
 
   console.log("🔄 타이핑 모드 업데이트:", {
     conceptId: concept.id,
     currentIndex,
-    concept: concept
+    concept: concept,
   });
 
   // 최신 언어 설정 사용
@@ -3586,24 +3624,24 @@ function updateTyping() {
   if (wordElement) {
     wordElement.textContent = sourceText;
     // data-i18n 속성 제거하여 번역 시스템이 덮어쓰지 않도록 함
-    wordElement.removeAttribute('data-i18n');
+    wordElement.removeAttribute("data-i18n");
     console.log("✅ 타이핑 모드 UI 업데이트:", {
       sourceText,
       sourcePronunciation,
       targetMeaning,
-      correctAnswer
+      correctAnswer,
     });
   } else {
     console.error("❌ typing-word 요소를 찾을 수 없음");
   }
   if (pronunciationElement) {
     pronunciationElement.textContent = sourcePronunciation;
-    pronunciationElement.removeAttribute('data-i18n');
+    pronunciationElement.removeAttribute("data-i18n");
   }
   if (meaningElement) {
     // 의미 표시를 숨김 (타이핑 모드에서는 정답을 미리 보여주지 않음)
-    meaningElement.style.display = 'none';
-    meaningElement.removeAttribute('data-i18n');
+    meaningElement.style.display = "none";
+    meaningElement.removeAttribute("data-i18n");
   }
 
   // 📊 학습 상호작용 추적 (타이핑 문제 표시) - 단순 조회는 카운트하지 않음
@@ -3786,13 +3824,13 @@ function playWordAudio(text, language = "korean") {
 
     // 새 음성 생성
     const utterance = new SpeechSynthesisUtterance(text);
-    
+
     // 언어별 설정
     const languageMap = {
       korean: "ko-KR",
-      english: "en-US", 
+      english: "en-US",
       japanese: "ja-JP",
-      chinese: "zh-CN"
+      chinese: "zh-CN",
     };
 
     // 기존 음성 재생 중지 (중복 방지)
@@ -3818,7 +3856,6 @@ function playWordAudio(text, language = "korean") {
 
     // 음성 재생
     window.speechSynthesis.speak(utterance);
-
   } catch (error) {
     console.error("❌ 음성 재생 중 오류 발생:", error);
     alert("음성 재생 중 오류가 발생했습니다.");
@@ -3834,7 +3871,9 @@ function updateListeningMode() {
 
   // 듣기 모드 요소들
   const listeningWord = document.getElementById("listening-word");
-  const listeningPronunciation = document.getElementById("listening-pronunciation");
+  const listeningPronunciation = document.getElementById(
+    "listening-pronunciation"
+  );
   const listeningMeaning = document.getElementById("listening-meaning");
   const listeningCategory = document.getElementById("listening-category");
   const listeningProgress = document.getElementById("listening-progress");
@@ -3861,14 +3900,19 @@ function updateListeningMode() {
     // 듣기 모드에서는 대상 언어를 듣고 원본 언어 의미를 확인
     const listenLanguageExpr = concept.expressions[currentTargetLanguage]; // 들을 언어
     const meaningLanguageExpr = concept.expressions[currentSourceLanguage]; // 의미를 확인할 언어
-    
+
     if (listenLanguageExpr) {
-      sourceWord = listenLanguageExpr.word || listenLanguageExpr.expression || "단어";
-      pronunciation = listenLanguageExpr.pronunciation || listenLanguageExpr.transcription || "";
+      sourceWord =
+        listenLanguageExpr.word || listenLanguageExpr.expression || "단어";
+      pronunciation =
+        listenLanguageExpr.pronunciation ||
+        listenLanguageExpr.transcription ||
+        "";
     }
-    
+
     if (meaningLanguageExpr) {
-      targetWord = meaningLanguageExpr.word || meaningLanguageExpr.expression || "의미";
+      targetWord =
+        meaningLanguageExpr.word || meaningLanguageExpr.expression || "의미";
     }
   }
 
@@ -3877,13 +3921,16 @@ function updateListeningMode() {
 
   // UI 업데이트
   if (listeningWord) listeningWord.textContent = sourceWord;
-  if (listeningPronunciation) listeningPronunciation.textContent = pronunciation;
+  if (listeningPronunciation)
+    listeningPronunciation.textContent = pronunciation;
   if (listeningMeaning) listeningMeaning.textContent = targetWord;
   if (listeningCategory) listeningCategory.textContent = category;
 
   // 진행 상황 업데이트
   if (listeningProgress) {
-    listeningProgress.textContent = `${currentIndex + 1} / ${currentData.length}`;
+    listeningProgress.textContent = `${currentIndex + 1} / ${
+      currentData.length
+    }`;
   }
 
   // 발음 버튼 이벤트 설정
@@ -3892,17 +3939,21 @@ function updateListeningMode() {
       // 듣기 모드에서는 대상 언어(듣는 언어)로 재생
       playWordAudio(sourceWord, currentTargetLanguage);
       // 📊 학습 상호작용 추적 (발음 듣기)
-      const conceptId = concept.id || concept.concept_id || `listening_${currentIndex}`;
+      const conceptId =
+        concept.id || concept.concept_id || `listening_${currentIndex}`;
       trackLearningInteraction(conceptId, true, "listen");
     };
   }
 
   // 📊 학습 상호작용 추적 (듣기 모드 표시)
-  const conceptId = concept.id || concept.concept_id || `listening_${currentIndex}`;
+  const conceptId =
+    concept.id || concept.concept_id || `listening_${currentIndex}`;
   trackLearningInteraction(conceptId, true, "view");
 
   // 삭제 버튼 추가
-  const deleteButtonContainer = document.getElementById("listening-delete-container");
+  const deleteButtonContainer = document.getElementById(
+    "listening-delete-container"
+  );
   if (deleteButtonContainer) {
     deleteButtonContainer.innerHTML = `
       <button class="delete-btn bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm" 
@@ -5500,7 +5551,7 @@ function flipReadingCard() {
   }
 }
 
-// Firebase 사용자별 학습 기록 저장
+// Firebase 사용자별 학습 기록 저장 (스냅샷 포함)
 async function saveLearningRecordToFirebase(learningRecord) {
   try {
     // Firebase 인증 확인
@@ -5569,6 +5620,24 @@ async function saveLearningRecordToFirebase(learningRecord) {
       streak: currentStreak,
       historyCount: trimmedHistory.length,
     });
+
+    // 🆕 진도 페이지 캐시 무효화를 위한 타임스탬프 설정 (학습 시작 시)
+    try {
+      const targetLanguage = learningRecord.targetLanguage || "english";
+      const invalidationTime = Date.now().toString();
+
+      // 캐시 무효화 타임스탬프 설정
+      localStorage.setItem(
+        `cache_invalidated_${targetLanguage}`,
+        invalidationTime
+      );
+
+      console.log(
+        `🔄 학습 시작 - 진도 페이지 캐시 무효화 완료: ${targetLanguage}, 타임스탬프: ${invalidationTime}`
+      );
+    } catch (cacheError) {
+      console.warn("⚠️ 학습 시작 - 진도 페이지 캐시 무효화 실패:", cacheError);
+    }
   } catch (error) {
     console.warn("☁️ Firebase 학습 기록 저장 실패:", error);
   }
@@ -5655,7 +5724,9 @@ function trackLearningInteraction(
   // 🎯 제시된 개념 추적 (상호작용과 무관하게 모든 제시된 개념)
   if (conceptId) {
     learningSessionData.conceptsStudied.add(conceptId);
-    console.log(`📚 개념 제시 추가: ${conceptId} (총 ${learningSessionData.conceptsStudied.size}개)`);
+    console.log(
+      `📚 개념 제시 추가: ${conceptId} (총 ${learningSessionData.conceptsStudied.size}개)`
+    );
   }
 
   // 🚫 view는 상호작용으로 계산하지 않음
@@ -5689,7 +5760,8 @@ function trackLearningInteraction(
 
   if (isFlashcardMode) {
     // 플래시카드 모드: 뒤집기와 네비게이션 모두 상호작용
-    isMeaningfulInteraction = interactionType === "flip" || interactionType === "navigate_completed";
+    isMeaningfulInteraction =
+      interactionType === "flip" || interactionType === "navigate_completed";
   } else if (isFlashMode) {
     // 독해 플래시 모드: 뒤집기만 상호작용 (navigate_completed 제외)
     isMeaningfulInteraction = interactionType === "flip";
@@ -5818,7 +5890,10 @@ async function completeLearningSession(forceComplete = false) {
       }
 
       // 3. 상호작용 점수 - 상호작용 회수 × 2점 (최대 20점)
-      const interactionScore = Math.min(20, learningSessionData.totalInteractions * 2);
+      const interactionScore = Math.min(
+        20,
+        learningSessionData.totalInteractions * 2
+      );
 
       const totalQuality = conceptScore + timeScore + interactionScore;
 
@@ -5871,6 +5946,32 @@ async function completeLearningSession(forceComplete = false) {
       learningEfficiency: activityData.session_quality, // 원본 값 그대로 표시
     });
 
+    // 🆕 진도 페이지 캐시 무효화를 위한 타임스탬프 설정
+    try {
+      const targetLanguage = activityData.targetLanguage || "english";
+      const invalidationTime = Date.now().toString();
+
+      // 캐시 무효화 타임스탬프 설정
+      localStorage.setItem(
+        `cache_invalidated_${targetLanguage}`,
+        invalidationTime
+      );
+
+      // 관련 캐시 삭제
+      localStorage.removeItem(`total_words_cache_${targetLanguage}`);
+      localStorage.removeItem(`mastered_words_cache_${targetLanguage}`);
+      localStorage.removeItem(`stats_cache_${targetLanguage}`);
+
+      console.log(
+        `🔄 진도 페이지 캐시 무효화 완료 - 대상 언어: ${targetLanguage}, 타임스탬프: ${invalidationTime}`
+      );
+      console.log(
+        `🗑️ 관련 캐시 삭제 완료 - 학습한 개념: ${activityData.conceptIds.length}개`
+      );
+    } catch (cacheError) {
+      console.warn("⚠️ 진도 페이지 캐시 무효화 실패:", cacheError);
+    }
+
     // 📚 학습 완료 데이터를 localStorage에 저장 (진도 페이지 자동 업데이트용)
     const learningCompletionData = {
       userId: currentUser?.uid,
@@ -5896,7 +5997,7 @@ async function completeLearningSession(forceComplete = false) {
       studiedConcepts: studiedConceptsCount,
       totalConcepts: totalAvailableData,
     });
-    
+
     // 세션 데이터 반환 (모달에서 사용)
     return {
       session_quality: activityData.session_quality,
@@ -5993,7 +6094,9 @@ async function showLearningCompleteWithStats(sessionStats) {
   console.log("🎉 학습 완료! (통계 전달됨)", sessionStats);
 
   // 기존 완료 화면이 있다면 제거
-  const existingOverlay = document.querySelector(".learning-completion-overlay");
+  const existingOverlay = document.querySelector(
+    ".learning-completion-overlay"
+  );
   if (existingOverlay) {
     existingOverlay.remove();
     console.log("🗑️ 기존 완료 화면 제거됨");
