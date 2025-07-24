@@ -5125,15 +5125,20 @@ const calculateConceptMastery = (concept, allRecords) => {
     return record.concept_id === concept.id || record.conceptId === concept.id;
   });
 
-  // 각 활동 유형별로 최대 1회씩만 카운트
-  if (conceptLearningRecords.length > 0) appearanceCount++;
-  if (conceptQuizRecords.length > 0) appearanceCount++;
-  if (conceptGameRecords.length > 0) appearanceCount++;
+  // 각 활동마다 3%씩 가산 (중복 처리하지 않음)
+  const learningCount = conceptLearningRecords.length;
+  const quizCount = conceptQuizRecords.length;
+  const gameCount = conceptGameRecords.length;
 
-  // 등장 횟수별 보너스 적용 (+3% per appearance)
-  masteryPercentage += appearanceCount * 3;
+  // 각 활동마다 3%씩 가산
+  masteryPercentage += learningCount * 3;
+  masteryPercentage += quizCount * 3;
+  masteryPercentage += gameCount * 3;
 
-  // 퀴즈 정답/오답에 따른 조정 (타이핑 학습은 제외)
+  // 총 등장 횟수 (표시용)
+  appearanceCount = learningCount + quizCount + gameCount;
+
+  // 퀴즈 정답/오답에 따른 조정 (각 개념별 개별 계산)
   let correctCount = 0;
   let incorrectCount = 0;
   let totalQuizzes = 0;
@@ -5155,8 +5160,28 @@ const calculateConceptMastery = (concept, allRecords) => {
       accuracy: record.accuracy,
     });
 
-    // isCorrect 필드가 있는 경우
-    if (typeof record.isCorrect === "boolean") {
+    // answers 배열이 있는 경우 (상세한 답안 정보)
+    if (record.answers && Array.isArray(record.answers)) {
+      // 해당 개념의 답안만 찾기
+      const conceptAnswer = record.answers.find(
+        (answer) =>
+          answer.concept_id === concept.id ||
+          answer.conceptId === concept.id ||
+          answer.questionId === concept.id
+      );
+
+      if (conceptAnswer) {
+        totalQuizzes++;
+        if (conceptAnswer.isCorrect) {
+          correctCount++;
+          masteryPercentage += 10; // 정답 시 +10%
+        } else {
+          incorrectCount++;
+          masteryPercentage -= 5; // 오답 시 -5%
+        }
+      }
+    } else if (typeof record.isCorrect === "boolean") {
+      // 개별 개념의 isCorrect 필드가 있는 경우
       totalQuizzes++;
       if (record.isCorrect) {
         correctCount++;
@@ -5169,18 +5194,22 @@ const calculateConceptMastery = (concept, allRecords) => {
       record.correct_answers !== undefined &&
       record.total_questions !== undefined
     ) {
-      // correct_answers/total_questions 기반 계산
-      const quizCorrect = record.correct_answers || 0;
-      const quizTotal = record.total_questions || 0;
-      const quizIncorrect = quizTotal - quizCorrect;
+      // 전체 퀴즈 통계만 있는 경우 (레거시 데이터)
+      // 이 경우에는 해당 개념이 퀴즈에 포함되었다는 것만 알 수 있으므로
+      // 기본적으로 정답으로 간주하되, 정확도에 따라 조정
+      const quizAccuracy = record.correct_answers / record.total_questions;
+      totalQuizzes++;
 
-      totalQuizzes += quizTotal;
-      correctCount += quizCorrect;
-      incorrectCount += quizIncorrect;
-
-      // 정답/오답에 따른 마스터리 조정
-      masteryPercentage += quizCorrect * 10; // 정답 당 +10%
-      masteryPercentage -= quizIncorrect * 5; // 오답 당 -5%
+      if (quizAccuracy >= 0.8) {
+        correctCount++;
+        masteryPercentage += 10; // 높은 정확도 시 +10%
+      } else if (quizAccuracy >= 0.6) {
+        correctCount++;
+        masteryPercentage += 5; // 보통 정확도 시 +5%
+      } else {
+        incorrectCount++;
+        masteryPercentage -= 5; // 낮은 정확도 시 -5%
+      }
     }
   });
 
