@@ -5160,55 +5160,22 @@ const calculateConceptMastery = (concept, allRecords) => {
       accuracy: record.accuracy,
     });
 
-    // answers 배열이 있는 경우 (상세한 답안 정보)
-    if (record.answers && Array.isArray(record.answers)) {
-      // 해당 개념의 답안만 찾기
-      const conceptAnswer = record.answers.find(
-        (answer) =>
-          answer.concept_id === concept.id ||
-          answer.conceptId === concept.id ||
-          answer.questionId === concept.id
-      );
+    // answers 배열에서 해당 개념의 답안만 찾기
+    const conceptAnswer = record.answers.find(
+      (answer) =>
+        answer.concept_id === concept.id ||
+        answer.conceptId === concept.id ||
+        answer.questionId === concept.id
+    );
 
-      if (conceptAnswer) {
-        totalQuizzes++;
-        if (conceptAnswer.isCorrect) {
-          correctCount++;
-          masteryPercentage += 10; // 정답 시 +10%
-        } else {
-          incorrectCount++;
-          masteryPercentage -= 5; // 오답 시 -5%
-        }
-      }
-    } else if (typeof record.isCorrect === "boolean") {
-      // 개별 개념의 isCorrect 필드가 있는 경우
+    if (conceptAnswer) {
       totalQuizzes++;
-      if (record.isCorrect) {
+      if (conceptAnswer.isCorrect) {
         correctCount++;
         masteryPercentage += 10; // 정답 시 +10%
       } else {
         incorrectCount++;
         masteryPercentage -= 5; // 오답 시 -5%
-      }
-    } else if (
-      record.correct_answers !== undefined &&
-      record.total_questions !== undefined
-    ) {
-      // 전체 퀴즈 통계만 있는 경우 (레거시 데이터)
-      // 이 경우에는 해당 개념이 퀴즈에 포함되었다는 것만 알 수 있으므로
-      // 기본적으로 정답으로 간주하되, 정확도에 따라 조정
-      const quizAccuracy = record.correct_answers / record.total_questions;
-      totalQuizzes++;
-
-      if (quizAccuracy >= 0.8) {
-        correctCount++;
-        masteryPercentage += 10; // 높은 정확도 시 +10%
-      } else if (quizAccuracy >= 0.6) {
-        correctCount++;
-        masteryPercentage += 5; // 보통 정확도 시 +5%
-      } else {
-        incorrectCount++;
-        masteryPercentage -= 5; // 낮은 정확도 시 -5%
       }
     }
   });
