@@ -9,12 +9,13 @@ import {
   updateDoc,
   addDoc,
   serverTimestamp,
+  limit,
 } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 import { db, conceptUtils } from "../../js/firebase/firebase-init.js";
 import { CollectionManager } from "../../js/firebase/firebase-collection-manager.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
 import { auth } from "../../js/firebase/firebase-init.js";
-import { getI18nText } from "../../utils/language-utils.js";
+import { getI18nText, getActiveLanguage } from "../../utils/language-utils.js";
 import { selectEmojiForWord } from "../../utils/emoji-utils.js";
 
 // 게임에 필요한 전역 변수
@@ -563,11 +564,12 @@ async function loadGameStats() {
   if (!currentUser) return;
 
   try {
-    // game_records에서 실시간 통계 계산 (records 컬렉션)
+    // game_records에서 실시간 통계 계산 (records 컬렉션) - 최근 5개만 조회
     const gameRecordsRef = collection(db, "game_records");
     const q = query(
       gameRecordsRef,
-      where("user_email", "==", currentUser.email)
+      where("user_email", "==", currentUser.email),
+      limit(5) // 최근 5개만 조회 (최근 활동 표시용)
     );
 
     const querySnapshot = await getDocs(q);
@@ -622,6 +624,9 @@ async function loadGameStats() {
       bestScore,
       averageScore,
     });
+
+    // 최근 게임 활동 표시
+    await updateRecentGameActivity(gameResults);
   } catch (error) {
     console.error("게임 통계 로드 오류:", error);
 
@@ -633,6 +638,90 @@ async function loadGameStats() {
     if (totalGamesElement) totalGamesElement.textContent = "0";
     if (bestScoreElement) bestScoreElement.textContent = "0";
     if (averageScoreElement) averageScoreElement.textContent = "0";
+  }
+}
+
+// 최근 게임 활동 업데이트
+async function updateRecentGameActivity(gameResults) {
+  try {
+    const recentActivityEl = document.getElementById("recent-game-activity");
+    if (!recentActivityEl) {
+      console.log("❌ recent-game-activity 요소를 찾을 수 없음");
+      return;
+    }
+
+    // 현재 언어 설정 가져오기
+    const currentLanguage = getCurrentLanguage();
+    const activeLanguage = await getActiveLanguage();
+    const locale =
+      activeLanguage === "ko"
+        ? "ko-KR"
+        : activeLanguage === "en"
+        ? "en-US"
+        : activeLanguage === "ja"
+        ? "ja-JP"
+        : activeLanguage === "zh"
+        ? "zh-CN"
+        : "en-US";
+
+    if (gameResults.length === 0) {
+      recentActivityEl.innerHTML = `
+        <p class="text-gray-500 text-center py-8">${
+          getI18nText("no_recent_game_activity", activeLanguage) ||
+          "아직 게임 활동이 없습니다."
+        }</p>
+      `;
+      return;
+    }
+
+    // 최근 5개 게임 활동 표시
+    const recentGames = gameResults.slice(0, 5);
+    let activityHTML = "";
+
+    recentGames.forEach((game) => {
+      const gameType = game.gameType || game.game_type || "unknown";
+      const score = game.score || 0;
+      const timeSpent = game.timeSpent || game.time_spent || 0;
+      const playedAt = game.playedAt || new Date();
+
+      const gameTypeName = getGameTypeName(gameType);
+      const formattedDate = playedAt.toLocaleDateString(locale, {
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+
+      // 번역된 단위 텍스트 가져오기
+      const secondsText = getI18nText("seconds", activeLanguage) || "초";
+      const pointsText = getI18nText("points", activeLanguage) || "점";
+
+      activityHTML += `
+        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+          <div>
+            <span class="font-medium">${gameTypeName}</span>
+            <span class="text-sm text-gray-600 ml-2">
+              ${timeSpent}${secondsText}
+            </span>
+          </div>
+          <div class="text-right">
+            <div class="font-medium text-${
+              score >= 80 ? "green" : score >= 60 ? "yellow" : "red"
+            }-600">
+              ${score}${pointsText}
+            </div>
+            <div class="text-xs text-gray-500">
+              ${formattedDate}
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    recentActivityEl.innerHTML = activityHTML;
+    console.log("✅ 최근 게임 활동 업데이트 완료:", recentGames.length);
+  } catch (error) {
+    console.error("❌ 최근 게임 활동 업데이트 오류:", error);
   }
 }
 
@@ -763,13 +852,13 @@ async function initializeGame(gameType) {
       // 게임별 초기화
       switch (gameType) {
         case "word-matching":
-          initWordMatchingGame(gameContainer);
+          await initWordMatchingGame(gameContainer);
           break;
         case "word-scramble":
-          initWordScrambleGame(gameContainer);
+          await initWordScrambleGame(gameContainer);
           break;
         case "memory-game":
-          initMemoryGame(gameContainer);
+          await initMemoryGame(gameContainer);
           break;
         default:
           console.warn("알 수 없는 게임 타입:", gameType);
@@ -844,13 +933,13 @@ async function loadGame(gameType) {
 
     switch (gameType) {
       case "word-matching":
-        initWordMatchingGame(gameContainer);
+        await initWordMatchingGame(gameContainer);
         break;
       case "word-scramble":
-        initWordScrambleGame(gameContainer);
+        await initWordScrambleGame(gameContainer);
         break;
       case "memory-game":
-        initMemoryGame(gameContainer);
+        await initMemoryGame(gameContainer);
         break;
     }
 
@@ -1421,7 +1510,7 @@ async function completeGame(finalScore, timeSpent) {
 
       // 게임 결과 표시
       if (currentGameType === "word-matching") {
-        showWordMatchingResults({
+        await showWordMatchingResults({
           finalScore: finalScore,
           totalTime: totalTime,
           accuracy: accuracy,
@@ -1429,7 +1518,7 @@ async function completeGame(finalScore, timeSpent) {
           totalWords: gameWords?.length || 0,
         });
       } else if (currentGameType === "word-scramble") {
-        showWordScrambleResults({
+        await showWordScrambleResults({
           finalScore: finalScore,
           totalTime: totalTime,
           accuracy: accuracy,
@@ -1437,7 +1526,7 @@ async function completeGame(finalScore, timeSpent) {
           totalWords: gameWords?.length || 0,
         });
       } else if (currentGameType === "memory-game") {
-        showMemoryGameResults({
+        await showMemoryGameResults({
           finalScore: finalScore,
           totalTime: totalTime,
           accuracy: accuracy,
@@ -1465,7 +1554,7 @@ async function completeGame(finalScore, timeSpent) {
 
     // 오류가 발생해도 결과는 표시
     if (currentGameType === "word-matching") {
-      showWordMatchingResults({
+      await showWordMatchingResults({
         finalScore: finalScore,
         totalTime: timeSpent || 0,
         accuracy:
@@ -1475,7 +1564,7 @@ async function completeGame(finalScore, timeSpent) {
         error: "진도 업데이트 중 일부 오류가 발생했습니다.",
       });
     } else if (currentGameType === "word-scramble") {
-      showWordScrambleResults({
+      await showWordScrambleResults({
         finalScore: finalScore,
         totalTime: timeSpent || 0,
         accuracy:
@@ -1485,7 +1574,7 @@ async function completeGame(finalScore, timeSpent) {
         error: "진도 업데이트 중 일부 오류가 발생했습니다.",
       });
     } else if (currentGameType === "memory-game") {
-      showMemoryGameResults({
+      await showMemoryGameResults({
         finalScore: finalScore,
         totalTime: timeSpent || 0,
         accuracy:
@@ -1514,9 +1603,12 @@ async function completeGame(finalScore, timeSpent) {
 }
 
 // 단어 맞추기 게임 결과 표시 (인라인)
-function showWordMatchingResults(results) {
+async function showWordMatchingResults(results) {
   const gameContainer = document.querySelector("#word-matching-container");
   if (!gameContainer) return;
+
+  // 현재 언어 설정 가져오기
+  const activeLanguage = await getActiveLanguage();
 
   // 헤더 부분 숨기기
   const headerArea = gameContainer.querySelector(
@@ -1555,15 +1647,20 @@ function showWordMatchingResults(results) {
     // 성과 메시지 업데이트
     const titleElement = resultsArea.querySelector("h2");
     if (titleElement) {
-      let message = "게임 완료!";
+      let message =
+        getI18nText("game_completed", activeLanguage) || "게임 완료!";
       if (results.accuracy >= 90) {
-        message = "🎉 완벽해요!";
+        message = `🎉 ${getI18nText("perfect", activeLanguage) || "완벽해요!"}`;
       } else if (results.accuracy >= 80) {
-        message = "👏 잘했어요!";
+        message = `👏 ${
+          getI18nText("great_job", activeLanguage) || "잘했어요!"
+        }`;
       } else if (results.accuracy >= 70) {
-        message = "👍 괜찮아요!";
+        message = `👍 ${getI18nText("good", activeLanguage) || "괜찮아요!"}`;
       } else {
-        message = "💪 다시 도전!";
+        message = `💪 ${
+          getI18nText("try_again", activeLanguage) || "다시 도전!"
+        }`;
       }
       titleElement.textContent = message;
     }
@@ -1778,36 +1875,56 @@ function getDifficultyName(difficulty) {
 // ======== 게임 초기화 함수들 ========
 
 // 단어 맞추기 게임 초기화
-function initWordMatchingGame(container) {
+async function initWordMatchingGame(container) {
   console.log("단어 맞추기 게임 초기화");
 
   // 게임 상태 초기화
   score = 0;
+
+  // 현재 언어 설정 가져오기
+  const activeLanguage = await getActiveLanguage();
 
   console.log("🎯 단어 맞추기 초기화:", {
     gameWordsLength: gameWords.length,
     sourceLanguage,
     targetLanguage,
     score,
+    activeLanguage,
   });
 
   if (gameWords.length === 0) {
     console.error("❌ gameWords가 비어있습니다! 게임을 중단합니다.");
-    alert("게임에 필요한 단어를 불러올 수 없습니다. 다시 시도해주세요.");
+    alert(
+      getI18nText("insufficient_words_error", activeLanguage) ||
+        "게임에 필요한 단어를 불러올 수 없습니다. 다시 시도해주세요."
+    );
     backToGameSelection();
     return;
   }
+
+  // 번역된 텍스트 가져오기
+  const scoreText = getI18nText("score", activeLanguage) || "점수";
+  const timeText = getI18nText("time", activeLanguage) || "시간";
+  const secondsText = getI18nText("seconds", activeLanguage) || "초";
+  const endGameText = getI18nText("end_game", activeLanguage) || "게임 종료";
+  const gameCompletedText =
+    getI18nText("game_completed", activeLanguage) || "게임 완료!";
+  const accuracyText = getI18nText("accuracy", activeLanguage) || "정확도";
+  const timeTakenText =
+    getI18nText("time_taken", activeLanguage) || "소요 시간";
+  const retryText = getI18nText("retry", activeLanguage) || "다시 도전";
+  const newGameText = getI18nText("new_game", activeLanguage) || "새 게임";
 
   // 게임 HTML 생성
   container.innerHTML = `
     <div class="bg-white rounded-xl p-6 shadow-lg">
       <div class="flex justify-between items-center mb-6">
         <div class="flex items-center space-x-4">
-          <div class="text-lg font-semibold">점수: <span id="matching-score">0</span></div>
-          <div class="text-lg font-semibold">시간: <span id="matching-timer">60</span>초</div>
+          <div class="text-lg font-semibold">${scoreText}: <span id="matching-score">0</span></div>
+          <div class="text-lg font-semibold">${timeText}: <span id="matching-timer">60</span>${secondsText}</div>
         </div>
         <button id="matching-end" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
-          게임 종료
+          ${endGameText}
         </button>
       </div>
       
@@ -1828,23 +1945,23 @@ function initWordMatchingGame(container) {
         <div class="bg-white rounded-lg shadow-md p-8 text-center">
           <div class="mb-6">
             <i class="fas fa-trophy text-6xl text-yellow-500 mb-4"></i>
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">게임 완료!</h2>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">${gameCompletedText}</h2>
           </div>
           
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div class="bg-green-50 p-4 rounded-lg">
               <div class="text-3xl font-bold text-green-600" id="matching-final-score">0</div>
-              <div class="text-sm text-gray-600">점수</div>
+              <div class="text-sm text-gray-600">${scoreText}</div>
             </div>
             
             <div class="bg-blue-50 p-4 rounded-lg">
               <div class="text-3xl font-bold text-blue-600" id="matching-accuracy">0%</div>
-              <div class="text-sm text-gray-600">정확도</div>
+              <div class="text-sm text-gray-600">${accuracyText}</div>
             </div>
             
             <div class="bg-purple-50 p-4 rounded-lg">
               <div class="text-3xl font-bold text-purple-600" id="matching-time">00:00</div>
-              <div class="text-sm text-gray-600">소요 시간</div>
+              <div class="text-sm text-gray-600">${timeTakenText}</div>
             </div>
           </div>
           
@@ -1853,14 +1970,14 @@ function initWordMatchingGame(container) {
               id="retry-matching-btn"
               class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
             >
-              다시 도전
+              ${retryText}
             </button>
             
             <button 
               id="new-matching-btn"
               class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
             >
-              새 게임
+              ${newGameText}
             </button>
           </div>
         </div>
@@ -2084,54 +2201,82 @@ function checkWordMatch(card1, card2) {
 }
 
 // 단어 섞기 게임 초기화
-function initWordScrambleGame(container) {
+async function initWordScrambleGame(container) {
   console.log("단어 섞기 게임 초기화");
 
   // 게임 상태 초기화
   currentScrambleWordIndex = 0;
   score = 0;
 
+  // 현재 언어 설정 가져오기
+  const activeLanguage = await getActiveLanguage();
+
   console.log("🔤 단어 섞기 초기화:", {
     gameWordsLength: gameWords.length,
     currentScrambleWordIndex,
     score,
+    activeLanguage,
   });
+
+  // 번역된 텍스트 가져오기
+  const scoreText = getI18nText("score", activeLanguage) || "점수";
+  const timeText = getI18nText("time", activeLanguage) || "시간";
+  const secondsText = getI18nText("seconds", activeLanguage) || "초";
+  const endGameText = getI18nText("end_game", activeLanguage) || "게임 종료";
+  const hintText = getI18nText("hint", activeLanguage) || "힌트";
+  const arrangeLettersText =
+    getI18nText("arrange_letters", activeLanguage) ||
+    "아래 글자들을 올바른 순서로 배열하세요";
+  const answerInputText =
+    getI18nText("answer_input", activeLanguage) || "정답 입력";
+  const checkText = getI18nText("check", activeLanguage) || "확인";
+  const resetArrangementText =
+    getI18nText("reset_arrangement", activeLanguage) || "다시 배열";
+  const nextProblemText =
+    getI18nText("next_problem", activeLanguage) || "다음 문제";
+  const gameCompletedText =
+    getI18nText("game_completed", activeLanguage) || "게임 완료!";
+  const accuracyText = getI18nText("accuracy", activeLanguage) || "정확도";
+  const timeTakenText =
+    getI18nText("time_taken", activeLanguage) || "소요 시간";
+  const retryText = getI18nText("retry", activeLanguage) || "다시 도전";
+  const newGameText = getI18nText("new_game", activeLanguage) || "새 게임";
 
   // 게임 HTML 생성
   container.innerHTML = `
     <div class="bg-white rounded-xl p-6 shadow-lg">
       <div class="flex justify-between items-center mb-6">
         <div class="flex items-center space-x-4">
-          <div class="text-lg font-semibold">점수: <span id="scramble-score">0</span></div>
-          <div class="text-lg font-semibold">시간: <span id="scramble-timer">60</span>초</div>
+          <div class="text-lg font-semibold">${scoreText}: <span id="scramble-score">0</span></div>
+          <div class="text-lg font-semibold">${timeText}: <span id="scramble-timer">60</span>${secondsText}</div>
         </div>
         <button id="scramble-end" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
-          게임 종료
+          ${endGameText}
         </button>
       </div>
       
       <!-- 게임 진행 화면 -->
       <div id="scramble-game" class="text-center">
         <div class="mb-4">
-          <h3 class="text-lg font-bold mb-2">힌트: <span id="scramble-hint" class="text-purple-600"></span></h3>
-          <p class="text-gray-600 text-sm">아래 글자들을 올바른 순서로 배열하세요</p>
+          <h3 class="text-lg font-bold mb-2">${hintText}: <span id="scramble-hint" class="text-purple-600"></span></h3>
+          <p class="text-gray-600 text-sm">${arrangeLettersText}</p>
         </div>
         
         <div class="mb-6">
           <div id="scramble-container" class="flex flex-wrap justify-center gap-2 mb-4 min-h-[60px] p-4 border-2 border-gray-300 rounded-lg"></div>
-          <div class="text-sm text-gray-500 mb-2">정답 입력</div>
+          <div class="text-sm text-gray-500 mb-2">${answerInputText}</div>
           <div id="scramble-answer" class="flex flex-wrap justify-center gap-1 min-h-[60px] p-4 border-2 border-purple-300 rounded-lg bg-purple-50" data-correct=""></div>
         </div>
         
         <div class="flex justify-center space-x-4">
           <button id="check-scramble" class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600">
-            확인
+            ${checkText}
           </button>
           <button id="reset-scramble" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600">
-            다시 배열
+            ${resetArrangementText}
           </button>
           <button id="skip-scramble" class="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600">
-            다음 문제
+            ${nextProblemText}
           </button>
         </div>
       </div>
@@ -2141,23 +2286,23 @@ function initWordScrambleGame(container) {
         <div class="bg-white rounded-lg shadow-md p-8 text-center">
           <div class="mb-6">
             <i class="fas fa-trophy text-6xl text-yellow-500 mb-4"></i>
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">게임 완료!</h2>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">${gameCompletedText}</h2>
           </div>
           
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div class="bg-green-50 p-4 rounded-lg">
               <div class="text-3xl font-bold text-green-600" id="scramble-final-score">0</div>
-              <div class="text-sm text-gray-600">점수</div>
+              <div class="text-sm text-gray-600">${scoreText}</div>
             </div>
             
             <div class="bg-blue-50 p-4 rounded-lg">
               <div class="text-3xl font-bold text-blue-600" id="scramble-accuracy">0%</div>
-              <div class="text-sm text-gray-600">정확도</div>
+              <div class="text-sm text-gray-600">${accuracyText}</div>
             </div>
             
             <div class="bg-purple-50 p-4 rounded-lg">
               <div class="text-3xl font-bold text-purple-600" id="scramble-time">00:00</div>
-              <div class="text-sm text-gray-600">소요 시간</div>
+              <div class="text-sm text-gray-600">${timeTakenText}</div>
             </div>
           </div>
           
@@ -2546,7 +2691,7 @@ function resetScrambleLettersToOriginalPosition() {
 }
 
 // 메모리 게임 초기화
-function initMemoryGame(container) {
+async function initMemoryGame(container) {
   console.log("메모리 게임 초기화");
 
   // 게임 상태 초기화
@@ -2555,37 +2700,62 @@ function initMemoryGame(container) {
   firstCard = null;
   secondCard = null;
 
+  // 현재 언어 설정 가져오기
+  const activeLanguage = await getActiveLanguage();
+
   console.log("🧠 메모리 게임 초기화:", {
     gameWordsLength: gameWords.length,
     sourceLanguage,
     targetLanguage,
     memoryPairs,
+    activeLanguage,
   });
 
   if (gameWords.length === 0) {
     console.error("❌ gameWords가 비어있습니다! 게임을 중단합니다.");
-    alert("게임에 필요한 단어를 불러올 수 없습니다. 다시 시도해주세요.");
+    alert(
+      getI18nText("insufficient_words_error", activeLanguage) ||
+        "게임에 필요한 단어를 불러올 수 없습니다. 다시 시도해주세요."
+    );
     backToGameSelection();
     return;
   }
+
+  // 번역된 텍스트 가져오기
+  const pairsFoundText =
+    getI18nText("pairs_found", activeLanguage) || "발견한 쌍";
+  const timeText = getI18nText("time", activeLanguage) || "시간";
+  const secondsText = getI18nText("seconds", activeLanguage) || "초";
+  const endGameText = getI18nText("end_game", activeLanguage) || "게임 종료";
+  const findMatchingPairsText =
+    getI18nText("find_matching_pairs", activeLanguage) ||
+    "같은 의미의 카드 쌍을 찾아 매칭하세요";
+  const gameCompletedText =
+    getI18nText("game_completed", activeLanguage) || "게임 완료!";
+  const scoreText = getI18nText("score", activeLanguage) || "점수";
+  const accuracyText = getI18nText("accuracy", activeLanguage) || "정확도";
+  const timeTakenText =
+    getI18nText("time_taken", activeLanguage) || "소요 시간";
+  const retryText = getI18nText("retry", activeLanguage) || "다시 도전";
+  const newGameText = getI18nText("new_game", activeLanguage) || "새 게임";
 
   // 게임 HTML 생성
   container.innerHTML = `
     <div class="bg-white rounded-xl p-6 shadow-lg">
       <div class="flex justify-between items-center mb-6">
         <div class="flex items-center space-x-4">
-          <div class="text-lg font-semibold">발견한 쌍: <span id="memory-pairs">0</span>/<span id="total-pairs">${gameWords.length}</span></div>
-          <div class="text-lg font-semibold">시간: <span id="memory-timer">90</span>초</div>
+          <div class="text-lg font-semibold">${pairsFoundText}: <span id="memory-pairs">0</span>/<span id="total-pairs">${gameWords.length}</span></div>
+          <div class="text-lg font-semibold">${timeText}: <span id="memory-timer">90</span>${secondsText}</div>
         </div>
         <button id="memory-end" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
-          게임 종료
+          ${endGameText}
         </button>
       </div>
       
       <!-- 게임 진행 화면 -->
       <div id="memory-game">
         <div class="text-center mb-4">
-          <p class="text-gray-600">같은 의미의 카드 쌍을 찾아 매칭하세요</p>
+          <p class="text-gray-600">${findMatchingPairsText}</p>
         </div>
         
         <div id="memory-board" class="grid grid-cols-4 gap-4 justify-center max-w-2xl mx-auto"></div>
@@ -2596,23 +2766,23 @@ function initMemoryGame(container) {
         <div class="bg-white rounded-lg shadow-md p-8 text-center">
           <div class="mb-6">
             <i class="fas fa-trophy text-6xl text-yellow-500 mb-4"></i>
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">게임 완료!</h2>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">${gameCompletedText}</h2>
           </div>
           
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div class="bg-green-50 p-4 rounded-lg">
               <div class="text-3xl font-bold text-green-600" id="memory-final-score">0</div>
-              <div class="text-sm text-gray-600">점수</div>
+              <div class="text-sm text-gray-600">${scoreText}</div>
             </div>
             
             <div class="bg-blue-50 p-4 rounded-lg">
               <div class="text-3xl font-bold text-blue-600" id="memory-accuracy">0%</div>
-              <div class="text-sm text-gray-600">정확도</div>
+              <div class="text-sm text-gray-600">${accuracyText}</div>
             </div>
             
             <div class="bg-purple-50 p-4 rounded-lg">
               <div class="text-3xl font-bold text-purple-600" id="memory-time">00:00</div>
-              <div class="text-sm text-gray-600">소요 시간</div>
+              <div class="text-sm text-gray-600">${timeTakenText}</div>
             </div>
           </div>
           
@@ -2939,9 +3109,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // 단어 섞기 게임 결과 표시 (인라인)
-function showWordScrambleResults(results) {
+async function showWordScrambleResults(results) {
   const gameContainer = document.querySelector("#word-scramble-container");
   if (!gameContainer) return;
+
+  // 현재 언어 설정 가져오기
+  const activeLanguage = await getActiveLanguage();
 
   // 헤더 부분 숨기기
   const headerArea = gameContainer.querySelector(
@@ -2980,15 +3153,20 @@ function showWordScrambleResults(results) {
     // 성과 메시지 업데이트
     const titleElement = resultsArea.querySelector("h2");
     if (titleElement) {
-      let message = "게임 완료!";
+      let message =
+        getI18nText("game_completed", activeLanguage) || "게임 완료!";
       if (results.accuracy >= 90) {
-        message = "🎉 완벽해요!";
+        message = `🎉 ${getI18nText("perfect", activeLanguage) || "완벽해요!"}`;
       } else if (results.accuracy >= 80) {
-        message = "👏 잘했어요!";
+        message = `👏 ${
+          getI18nText("great_job", activeLanguage) || "잘했어요!"
+        }`;
       } else if (results.accuracy >= 70) {
-        message = "👍 괜찮아요!";
+        message = `👍 ${getI18nText("good", activeLanguage) || "괜찮아요!"}`;
       } else {
-        message = "💪 다시 도전!";
+        message = `💪 ${
+          getI18nText("try_again", activeLanguage) || "다시 도전!"
+        }`;
       }
       titleElement.textContent = message;
     }
@@ -2998,9 +3176,12 @@ function showWordScrambleResults(results) {
 }
 
 // 단어 기억 게임 결과 표시 (인라인)
-function showMemoryGameResults(results) {
+async function showMemoryGameResults(results) {
   const gameContainer = document.querySelector("#memory-game-container");
   if (!gameContainer) return;
+
+  // 현재 언어 설정 가져오기
+  const activeLanguage = await getActiveLanguage();
 
   // 헤더 부분 숨기기
   const headerArea = gameContainer.querySelector(
@@ -3039,15 +3220,20 @@ function showMemoryGameResults(results) {
     // 성과 메시지 업데이트
     const titleElement = resultsArea.querySelector("h2");
     if (titleElement) {
-      let message = "게임 완료!";
+      let message =
+        getI18nText("game_completed", activeLanguage) || "게임 완료!";
       if (results.accuracy >= 90) {
-        message = "🎉 완벽해요!";
+        message = `🎉 ${getI18nText("perfect", activeLanguage) || "완벽해요!"}`;
       } else if (results.accuracy >= 80) {
-        message = "👏 잘했어요!";
+        message = `👏 ${
+          getI18nText("great_job", activeLanguage) || "잘했어요!"
+        }`;
       } else if (results.accuracy >= 70) {
-        message = "👍 괜찮아요!";
+        message = `👍 ${getI18nText("good", activeLanguage) || "괜찮아요!"}`;
       } else {
-        message = "💪 다시 도전!";
+        message = `💪 ${
+          getI18nText("try_again", activeLanguage) || "다시 도전!"
+        }`;
       }
       titleElement.textContent = message;
     }

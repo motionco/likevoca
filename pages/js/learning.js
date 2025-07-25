@@ -1965,13 +1965,13 @@ async function updateRecommendedLearning() {
           }
         });
 
-        // 시간순 정렬
-        learningHistory = combinedHistory.sort(
-          (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
-        );
+        // 시간순 정렬 후 최근 5개만 유지 (최근 활동 표시용)
+        learningHistory = combinedHistory
+          .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+          .slice(0, 5);
 
         console.log(
-          "📊 Firebase 학습 기록과 병합 완료:",
+          "📊 Firebase 학습 기록과 병합 완료 (최근 5개만):",
           learningHistory.length
         );
       }
@@ -1980,6 +1980,7 @@ async function updateRecommendedLearning() {
     console.warn("📊 Firebase 학습 기록 로드 실패:", error);
   }
 
+  // 🔧 추천 시스템 최적화: 최근 7일 데이터만 사용 (DB 조회 최소화)
   const lastWeekHistory = learningHistory.filter((record) => {
     const recordDate = new Date(record.timestamp);
     const weekAgo = new Date();
@@ -2680,7 +2681,7 @@ window.startLearningMode = async function startLearningMode(area, mode) {
       localStorage.getItem("learningHistory") || "[]"
     );
     learningHistory.unshift(learningRecord);
-    learningHistory = learningHistory.slice(0, 100); // 최근 100개만 유지
+    learningHistory = learningHistory.slice(0, 50); // 최근 50개만 유지
     localStorage.setItem("learningHistory", JSON.stringify(learningHistory));
 
     // Firebase 사용자별 학습 기록 저장 (로그인된 경우)
