@@ -727,5 +727,6 @@
   "good": "괜찮아요!",
   "try_again": "다시 도전!",
   "game": "게임",
-  "words_learned": "학습한 단어"
+  "words_learned": "학습한 단어",
+  "learning_statistics": "학습 통계"
 }

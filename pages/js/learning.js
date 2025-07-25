@@ -1791,6 +1791,9 @@ async function showAreaSelection() {
   console.log("🏠 통합 학습 대시보드 표시");
   hideAllSections();
 
+  // 학습 모드 비활성화 시 body에서 클래스 제거 (통계 카드 표시용)
+  document.body.classList.remove("learning-mode-active");
+
   const areaSelection = document.getElementById("area-selection");
   if (areaSelection) {
     areaSelection.classList.remove("hidden");
@@ -2084,7 +2087,7 @@ function getSmartRecommendation(history) {
     const usedModes = [...new Set(areaHistory.map((r) => r.mode))];
 
     const allModes = {
-      vocabulary: ["flashcard", "typing", "pronunciation"],
+      vocabulary: ["flashcard", "typing"],
       grammar: ["pattern", "practice"],
       reading: ["example", "flash"],
     };
@@ -2645,6 +2648,9 @@ window.startLearningMode = async function startLearningMode(area, mode) {
   // 새 학습 세션 시작
   startLearningSession(area, mode);
 
+  // 학습 모드 활성화 시 body에 클래스 추가 (통계 카드 숨김용)
+  document.body.classList.add("learning-mode-active");
+
   // 🔧 학습 상태 완전 초기화
   currentLearningArea = area;
   currentLearningMode = mode;
@@ -2719,9 +2725,7 @@ window.startLearningMode = async function startLearningMode(area, mode) {
         case "typing":
           showTypingMode();
           break;
-        case "pronunciation":
-          showPronunciationMode();
-          break;
+
         case "listening":
           showListeningMode();
           break;
@@ -3765,23 +3769,6 @@ function checkTypingAnswer() {
   setTimeout(() => {
     navigateContent(1);
   }, 2000);
-}
-
-function showPronunciationMode() {
-  console.log("🎤 발음 연습 모드 (구현 예정)");
-
-  const pronunciationMode = document.getElementById("pronunciation-mode");
-  if (pronunciationMode) {
-    pronunciationMode.classList.remove("hidden");
-
-    // 번역 적용
-    setTimeout(() => {
-      applyTranslations();
-    }, 50);
-  } else {
-    alert("발음 연습 모드는 아직 구현중입니다.");
-    showAreaSelection();
-  }
 }
 
 function showListeningMode() {

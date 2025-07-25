@@ -108,6 +108,11 @@
       line-height: 1.5;
       max-height: 4.5em;
     }
+
+    /* 학습 모드 활성화 시 통계 카드 숨김 */
+    .learning-mode-active #learning-stats {
+      display: none;
+    }
   </style>
 </head>
 
@@ -302,10 +307,6 @@
             class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-colors hidden">
             <i class="fas fa-play mr-2"></i><span>Continue Learning</span>
           </button>
-          <a href="quiz.html"
-            class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-            <i class="fas fa-brain mr-2"></i><span>Quiz Test</span>
-          </a>
         </div>
       </div>
 
@@ -383,28 +384,6 @@
           </div>
           <div class="text-xs opacity-90 bg-white bg-opacity-20 rounded px-2 py-1 inline-block">
             <span data-i18n="vocabulary_listening_features">Accurate Listening • Pronunciation Improvement</span>
-          </div>
-        </div>
-
-        <!-- 단어 - 발음 -->
-        <div
-          class="learning-mode-card bg-gradient-to-br from-purple-500 to-purple-600 text-white p-4 rounded-lg cursor-pointer hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
-          data-area="vocabulary" data-mode="pronunciation">
-          <div class="flex items-center justify-between mb-3">
-            <div class="flex items-center">
-              <i class="fas fa-microphone text-2xl mr-3"></i>
-              <div>
-                <div class="font-bold text-lg">Pronunciation Practice</div>
-                <div class="text-xs opacity-80">Speech Recognition Learning</div>
-              </div>
-            </div>
-            <div class="text-right">
-              <div class="text-xs opacity-70" data-i18n="estimated_time">Estimated Time</div>
-              <div class="text-sm font-medium" data-i18n="time_10_15_min_3">2-3 min</div>
-            </div>
-          </div>
-          <div class="text-xs opacity-90 bg-white bg-opacity-20 rounded px-2 py-1 inline-block">
-            <span data-i18n="vocabulary_pronunciation_features">Accurate Pronunciation • Listening Improvement</span>
           </div>
         </div>
       </div>
@@ -522,35 +501,35 @@
     </div>
 
     <!-- 학습 통계 및 추천 -->
-    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div class="bg-gray-50 rounded-lg p-4">
-        <h4 class="font-semibold text-gray-700 mb-2">Recent Activity</h4>
+    <div id="learning-stats" class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-gray-50 rounded-lg p-4 shadow-lg">
+        <h4 class="font-semibold text-gray-700 mb-2" data-i18n="recent_activity">Recent Activity</h4>
         <div id="recent-activity" class="text-sm text-gray-600">
-          <span>No recent learning record</span>
+          <span data-i18n="no_recent_activity">No recent learning record</span>
         </div>
       </div>
-      <div class="bg-gray-50 rounded-lg p-4">
-        <h4 class="font-semibold text-gray-700 mb-2">Recommended Mode</h4>
+      <div class="bg-gray-50 rounded-lg p-4 shadow-lg">
+        <h4 class="font-semibold text-gray-700 mb-2" data-i18n="recommended_mode">Recommended Mode</h4>
         <div id="recommended-mode" class="text-sm text-gray-600">
           <div class="space-y-2">
             <div class="flex items-center justify-between p-2 bg-white rounded border">
               <div class="flex items-center">
                 <i class="fas fa-clone text-blue-500 mr-2"></i>
-                <span>Flashcard</span>
+                <span data-i18n="flashcard_recommended">Flashcard</span>
               </div>
-              <span class="text-xs text-green-600 font-medium">Recommended</span>
+              <span class="text-xs text-green-600 font-medium" data-i18n="recommended">Recommended</span>
             </div>
-            <div class="text-xs text-gray-500">
+            <div class="text-xs text-gray-500" data-i18n="recommendation_reason">
               Recommended based on recent learning patterns
             </div>
           </div>
         </div>
       </div>
-      <div class="bg-gray-50 rounded-lg p-4">
-        <h4 class="font-semibold text-gray-700 mb-2">Learning Streak</h4>
+      <div class="bg-gray-50 rounded-lg p-4 shadow-lg">
+        <h4 class="font-semibold text-gray-700 mb-2" data-i18n="learning_streak">Learning Streak</h4>
         <div id="learning-streak" class="text-sm text-gray-600">
           <span class="text-2xl font-bold text-green-600">0</span>
-          <span>Days</span>
+          <span data-i18n="days">Days</span>
         </div>
       </div>
     </div>
@@ -799,74 +778,111 @@
     </div>
 
     <!-- 새로운 학습 모드 섹션들 -->
-    <!-- 플래시카드 모드 -->
+    <!-- 플래시카드 모드 (단어 학습) -->
     <div id="flashcard-mode" class="hidden mb-8">
-      <div class="relative">
-        <button id="back-from-flashcard"
-          class="absolute top-4 right-4 bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm z-10">
-          <i class="fas fa-arrow-left mr-1"></i><span>Back</span>
-        </button>
-        <div class="text-center mb-6">
-          <h2 class="text-2xl font-bold mb-2">🃏 Flashcard Learning</h2>
-          <div id="flashcard-mode-progress" class="text-gray-600">0 / 0</div>
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <!-- 헤더 영역 - 반응형 -->
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 space-y-4 md:space-y-0">
+          <div class="text-center md:text-left">
+            <h2 class="text-2xl font-bold" data-i18n="flashcard_learning">🃏 Flashcard Learning</h2>
+          </div>
+          <div class="flex gap-2 justify-center md:justify-end">
+            <button id="finish-learning-flashcard"
+              class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-sm">
+              <i class="fas fa-stop mr-1"></i><span data-i18n="finish_learning">Finish Learning</span>
+            </button>
+            <button id="back-from-flashcard" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm">
+              <i class="fas fa-arrow-left mr-1"></i><span data-i18n="back">Back</span>
+            </button>
+          </div>
         </div>
 
-        <div id="flashcard-mode-card" class="flip-card max-w-md mx-auto cursor-pointer">
+        <!-- 플래시카드 영역 -->
+        <div id="flashcard-mode-card" class="flip-card max-w-2xl mx-auto cursor-pointer mb-6">
           <div class="flip-card-inner">
             <div
               class="flip-card-front bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-8">
               <div class="text-center">
+                <div id="flashcard-front-emoji" class="text-6xl mb-4">📚</div>
                 <h3 id="flashcard-front-word" class="text-4xl font-bold text-gray-800 mb-4">Word</h3>
-                <p id="flashcard-front-transcription" class="text-gray-600">Pronunciation</p>
+                <p id="flashcard-front-transcription" class="text-xl text-gray-600 mb-4">Pronunciation</p>
                 <p class="text-gray-500 mt-8 text-sm" data-i18n="click_to_check_meaning">Click to check meaning</p>
               </div>
             </div>
             <div
               class="flip-card-back bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg p-8">
               <div class="text-center">
+                <div id="flashcard-back-emoji" class="text-4xl mb-2">📚</div>
+                <div id="flashcard-back-category"
+                  class="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full inline-block mb-4">Category</div>
                 <h3 id="flashcard-back-word" class="text-3xl font-bold text-green-600 mb-4">Meaning</h3>
-                <p id="flashcard-back-definition" class="text-gray-700">Description</p>
-                <p class="text-gray-500 mt-8 text-sm" data-i18n="click_to_see_word">Click again to see the word</p>
+                <p id="flashcard-back-transcription" class="text-xl text-gray-600 mb-2">Pronunciation</p>
+                <p id="flashcard-back-definition" class="text-lg text-gray-700 mb-6">Description</p>
+                <div id="flashcard-back-example" class="border-t border-gray-200 pt-4 mt-4 text-md text-gray-600">Example
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="flex justify-center space-x-4 mt-6">
-          <button id="prev-flashcard-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-            <i class="fas fa-arrow-left mr-2"></i><span>Previous</span>
-          </button>
-          <button id="flip-flashcard-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-            <span>Flip</span>
-          </button>
-          <button id="next-flashcard-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-            <span>Next</span><i class="fas fa-arrow-right ml-2"></i>
-          </button>
+        <!-- 네비게이션 버튼 -->
+        <div class="text-center mb-4">
+          <div id="flashcard-mode-progress" class="text-gray-600 mb-4">0 / 0</div>
+          <div class="flex justify-center space-x-4">
+            <button id="prev-flashcard-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
+              <i class="fas fa-arrow-left mr-2"></i><span data-i18n="previous">Previous</span>
+            </button>
+            <button id="flip-flashcard-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+              <span data-i18n="flip">Flip</span>
+            </button>
+            <button id="next-flashcard-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
+              <span data-i18n="next">Next</span><i class="fas fa-arrow-right ml-2"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- 삭제 버튼 영역 -->
+        <div class="text-center">
+          <div id="flashcard-delete-container">
+            <!-- 삭제 버튼이 여기에 동적으로 추가됩니다 -->
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- 타이학 학습 영역 -->
+    <!-- 타이핑 모드 (단어 학습) -->
     <div id="typing-mode" class="hidden mb-8">
-      <div class="bg-white rounded-lg shadow-md p-6 relative">
-        <button id="back-from-typing"
-          class="absolute top-4 right-4 bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm">
-          <i class="fas fa-arrow-left mr-1"></i><span>Back</span>
-        </button>
-        <div class="text-center mb-6">
-          <h2 class="text-2xl font-bold mb-2">⌨️ Typing Learning</h2>
-          <div id="typing-mode-progress" class="text-gray-600">0 / 0</div>
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <!-- 헤더 영역 -->
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 space-y-4 md:space-y-0">
+          <div>
+            <h2 class="text-2xl font-bold mb-2" data-i18n="typing_learning">⌨️ Typing Learning</h2>
+          </div>
+          <div class="flex gap-2 justify-center md:justify-end">
+            <button id="finish-learning-typing"
+              class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-sm">
+              <i class="fas fa-stop mr-1"></i><span data-i18n="finish_learning">Finish Learning</span>
+            </button>
+            <button id="back-from-typing" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm">
+              <i class="fas fa-arrow-left mr-1"></i><span data-i18n="back">Back</span>
+            </button>
+          </div>
         </div>
 
-        <div class="max-w-lg mx-auto">
+        <!-- 타이핑 문제 영역 -->
+        <div class="max-w-2xl mx-auto mb-6">
           <div id="typing-mode-question" class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6 text-center">
-            <div class="text-xl font-bold mb-2">Word</div>
-            <div class="text-gray-600">Meaning</div>
+            <div id="typing-category"
+              class="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full inline-block mb-4">Category</div>
+            <div id="typing-word" class="text-2xl font-bold mb-2">Word</div>
+            <div id="typing-pronunciation" class="text-gray-600 mb-2">Pronunciation</div>
+            <div id="typing-meaning" class="text-gray-600">Meaning</div>
           </div>
 
           <div class="mb-6">
+            <label for="typing-mode-answer" class="block text-sm font-medium mb-2" data-i18n="typing_prompt">Enter the answer:</label>
             <input type="text" id="typing-mode-answer" class="w-full p-4 text-xl border rounded-lg text-center"
-              data-i18n-placeholder="typing_answer_placeholder" placeholder="Enter Answer..."
+              data-i18n-placeholder="typing_answer_placeholder" placeholder="Enter your answer"
               onkeypress="if(event.key==='Enter') checkTypingAnswer()">
           </div>
 
@@ -875,32 +891,151 @@
           <div class="text-center mt-4">
             <button id="check-typing-answer-btn"
               class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg">
-              <span>Check</span>
+              <span data-i18n="check">Check</span>
             </button>
           </div>
         </div>
 
-        <div class="flex justify-center space-x-4 mt-6">
-          <button id="prev-typing-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-            <i class="fas fa-arrow-left mr-2"></i><span>Previous</span>
-          </button>
-          <button id="next-typing-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-            <span>Next</span><i class="fas fa-arrow-right ml-2"></i>
-          </button>
+        <!-- 네비게이션 버튼 -->
+        <div class="text-center mb-4">
+          <div id="typing-mode-progress" class="text-gray-600 mb-4">0 / 0</div>
+          <div class="flex justify-center space-x-4">
+            <button id="prev-typing-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
+              <i class="fas fa-arrow-left mr-2"></i><span data-i18n="previous">Previous</span>
+            </button>
+            <button id="next-typing-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
+              <span data-i18n="next">Next</span><i class="fas fa-arrow-right ml-2"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- 통계 영역 -->
+        <div class="text-center">
+          <div class="mt-2">
+            <span id="typing-correct" class="text-green-600 font-medium"><span data-i18n="correct_count">Correct:</span>
+              0</span>
+            <span class="mx-2">|</span>
+            <span id="typing-wrong" class="text-red-600 font-medium"><span data-i18n="wrong_count">Wrong:</span>
+              0</span>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- 발음 연습 모드 -->
-    <div id="pronunciation-mode" class="hidden mb-8">
-      <div class="bg-white rounded-lg shadow-md p-6 relative">
-        <button id="back-to-dashboard-pronunciation"
-          class="absolute top-4 right-4 bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm">
-          <i class="fas fa-arrow-left mr-1"></i><span>Back</span>
-        </button>
+    <!-- 듣기 연습 모드 -->
+    <div id="listening-mode" class="hidden mb-8">
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <!-- 헤더 영역 -->
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 space-y-4 md:space-y-0">
+          <div>
+            <h2 class="text-2xl font-bold mb-2" data-i18n="listening_practice">🎧 Listening Practice</h2>
+          </div>
+          <div class="flex gap-2 justify-center md:justify-end">
+            <button id="finish-learning-listening"
+              class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-sm">
+              <i class="fas fa-stop mr-1"></i><span data-i18n="finish_learning">Finish Learning</span>
+            </button>
+            <button id="back-to-dashboard-listening"
+              class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm">
+              <i class="fas fa-arrow-left mr-1"></i><span data-i18n="back">Back</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 듣기 연습 내용 -->
+        <div class="max-w-2xl mx-auto mb-6">
+          <div class="bg-purple-50 border border-purple-200 rounded-lg p-6 mb-6 text-center">
+            <div id="listening-category"
+              class="text-sm bg-purple-100 text-purple-800 px-3 py-1 rounded-full inline-block mb-4">Category</div>
+            <div id="listening-word" class="text-3xl font-bold mb-4">Word</div>
+            <div id="listening-pronunciation" class="text-gray-600 mb-4">Pronunciation</div>
+            <div id="listening-meaning" class="text-xl text-gray-700 mb-6">Meaning</div>
+
+            <!-- 발음 재생 버튼 -->
+            <button id="play-audio-btn"
+              class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-lg text-lg font-medium">
+              <i class="fas fa-volume-up mr-2"></i><span data-i18n="play_pronunciation">Play Pronunciation</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 네비게이션 버튼 -->
+        <div class="text-center mb-4">
+          <div id="listening-progress" class="text-gray-600 mb-4">0 / 0</div>
+          <div class="flex justify-center space-x-4">
+            <button id="prev-listening-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
+              <i class="fas fa-arrow-left mr-2"></i><span data-i18n="previous">Previous</span>
+            </button>
+            <button id="next-listening-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
+              <span data-i18n="next">Next</span><i class="fas fa-arrow-right ml-2"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- 삭제 버튼 영역 -->
         <div class="text-center">
-          <h2 class="text-2xl font-bold mb-4">🎤 Pronunciation Practice</h2>
-          <p class="text-gray-600">Pronunciation practice mode is under preparation.</p>
+          <div id="listening-delete-container">
+            <!-- 삭제 버튼이 여기에 동적으로 추가됩니다 -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 문법 패턴 모드 -->
+    <div id="grammar-pattern-mode" class="hidden mb-8">
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <!-- 헤더 영역 -->
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 space-y-4 md:space-y-0">
+          <div>
+            <h2 class="text-2xl font-bold mb-2" data-i18n="grammar_pattern_analysis">📝 Grammar Pattern Analysis</h2>
+          </div>
+          <div class="flex gap-2 justify-center md:justify-end">
+            <button id="finish-learning-grammar"
+              class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-sm">
+              <i class="fas fa-stop mr-1"></i><span data-i18n="finish_learning">Finish Learning</span>
+            </button>
+            <button id="back-to-dashboard-pattern"
+              class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm">
+              <i class="fas fa-arrow-left mr-1"></i><span data-i18n="back">Back</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 문법 패턴 내용 -->
+        <div class="max-w-2xl mx-auto mb-6">
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+            <h3 id="pattern-title" class="text-xl font-bold mb-4" data-i18n="grammar_pattern">Grammar Pattern</h3>
+            <div class="text-lg font-mono bg-white p-3 rounded border mb-4">
+              <span id="pattern-structure">Pattern Structure</span>
+            </div>
+            <p id="pattern-explanation" class="text-gray-700 mb-4">Explanation</p>
+            <div class="bg-white rounded p-4 border">
+              <h4 class="font-semibold mb-2" data-i18n="examples">Examples:</h4>
+              <ul id="pattern-examples" class="list-disc list-inside">
+                <li>Examples will be displayed here</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- 네비게이션 버튼 -->
+        <div class="text-center mb-4">
+          <div id="pattern-progress" class="text-gray-600 mb-4">0 / 0</div>
+          <div class="flex justify-center space-x-4">
+            <button id="prev-pattern" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
+              <i class="fas fa-arrow-left mr-2"></i><span data-i18n="previous">Previous</span>
+            </button>
+            <button id="next-pattern" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
+              <span data-i18n="next">Next</span><i class="fas fa-arrow-right ml-2"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- 삭제 버튼 영역 -->
+        <div class="text-center">
+          <div id="pattern-delete-container" class="mt-4">
+            <!-- 삭제 버튼이 여기에 동적으로 추가됩니다 -->
+          </div>
         </div>
       </div>
     </div>
@@ -952,21 +1087,32 @@
 
     <!-- 문법 실습 모드 -->
     <div id="grammar-practice-mode" class="hidden mb-8">
-      <div class="bg-white rounded-lg shadow-md p-6 relative">
-        <button id="back-to-dashboard-practice"
-          class="absolute top-4 right-4 bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm">
-          <i class="fas fa-arrow-left mr-1"></i><span>Back</span>
-        </button>
-        <div class="text-center mb-6">
-          <h2 class="text-2xl font-bold mb-2">📚 Grammar Practice Practice</h2>
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <!-- 헤더 영역 -->
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 space-y-4 md:space-y-0">
+          <div>
+            <h2 class="text-2xl font-bold mb-2" data-i18n="grammar_practice">📚 Grammar Practice</h2>
+          </div>
+          <div class="flex gap-2 justify-center md:justify-end">
+            <button id="finish-learning-grammar-practice"
+              class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-sm">
+              <i class="fas fa-stop mr-1"></i><span data-i18n="finish_learning">Finish Learning</span>
+            </button>
+            <button id="back-to-dashboard-practice"
+              class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm">
+              <i class="fas fa-arrow-left mr-1"></i><span data-i18n="back">Back</span>
+            </button>
+          </div>
         </div>
 
-        <div id="grammar-card" class="flip-card max-w-md mx-auto cursor-pointer">
+        <!-- 문법 카드 영역 -->
+        <div id="grammar-card" class="flip-card max-w-md mx-auto cursor-pointer mb-6">
           <div class="flip-card-inner">
             <div
               class="flip-card-front bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg p-8">
               <div class="text-center">
-                <h3 id="grammar-front-title" class="text-2xl font-bold text-green-800 mb-4">Grammar Pattern</h3>
+                <h3 id="grammar-front-title" class="text-2xl font-bold text-green-800 mb-4" data-i18n="grammar_pattern">
+                  Grammar Pattern</h3>
                 <div id="grammar-front-structure" class="text-3xl font-mono font-bold text-gray-800 mb-4">Pattern</div>
                 <p class="text-gray-500 mt-8 text-sm" data-i18n="click_to_see_explanation">Click to see explanation</p>
               </div>
@@ -974,11 +1120,11 @@
             <div
               class="flip-card-back bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-8">
               <div class="text-center">
-                <p id="grammar-back-explanation" class="text-gray-700 mb-4">Description</p>
+                <p id="grammar-back-explanation" class="text-gray-700 mb-4">Explanation</p>
                 <div class="bg-white rounded-lg p-4 border border-blue-300">
-                  <h4 class="font-semibold mb-2">Examples:</h4>
+                  <h4 class="font-semibold mb-2" data-i18n="examples">Examples:</h4>
                   <ul id="grammar-back-examples" class="list-disc list-inside text-left">
-                    <li>Example sentences will be displayed here</li>
+                    <li>Examples will be displayed here</li>
                   </ul>
                 </div>
               </div>
@@ -986,20 +1132,24 @@
           </div>
         </div>
 
-        <div class="flex justify-center space-x-4 mt-6">
-          <button id="prev-practice" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-            <i class="fas fa-arrow-left mr-2"></i><span>Previous</span>
-          </button>
-          <button id="flip-grammar-practice-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-            <span>Flip</span>
-          </button>
-          <button id="next-practice" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-            <span>Next</span><i class="fas fa-arrow-right ml-2"></i>
-          </button>
+        <!-- 네비게이션 버튼 -->
+        <div class="text-center mb-4">
+          <div id="grammar-practice-progress" class="text-gray-600 mb-4">0 / 0</div>
+          <div class="flex justify-center space-x-4">
+            <button id="prev-practice" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
+              <i class="fas fa-arrow-left mr-2"></i><span data-i18n="previous">Previous</span>
+            </button>
+            <button id="flip-grammar-practice-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+              <span data-i18n="flip">Flip</span>
+            </button>
+            <button id="next-practice" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
+              <span data-i18n="next">Next</span><i class="fas fa-arrow-right ml-2"></i>
+            </button>
+          </div>
         </div>
 
-        <div class="mt-6 text-center">
-          <div id="grammar-practice-progress" class="text-gray-600">0 / 0</div>
+        <!-- 삭제 버튼 영역 -->
+        <div class="text-center">
           <div id="grammar-delete-container" class="mt-4">
             <!-- 삭제 버튼이 여기에 동적으로 추가됩니다 -->
           </div>
@@ -1007,47 +1157,139 @@
       </div>
     </div>
 
-    <!-- 독해 모드 -->
-    <div id="reading-mode" class="hidden mb-8">
+    <!-- 독해 예문 모드 -->
+    <div id="reading-example-mode" class="hidden mb-8">
       <div class="bg-white rounded-lg shadow-md p-6">
-        <div class="text-center mb-6">
-          <h2 class="text-2xl font-bold mb-2">Reading Flash Card</h2>
-          <div id="reading-progress" class="text-gray-600">0 / 0</div>
+        <!-- 헤더 영역 -->
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 space-y-4 md:space-y-0">
+          <div>
+            <h2 class="text-2xl font-bold mb-2" data-i18n="reading_example_learning">📖 Example Learning</h2>
+          </div>
+          <div class="flex gap-2 justify-center md:justify-end">
+            <button id="finish-learning-reading-example"
+              class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-sm">
+              <i class="fas fa-stop mr-1"></i><span data-i18n="finish_learning">Finish Learning</span>
+            </button>
+            <button id="back-to-dashboard-reading-example"
+              class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm">
+              <i class="fas fa-arrow-left mr-1"></i><span data-i18n="back">Back</span>
+            </button>
+          </div>
         </div>
 
-        <div class="max-w-2xl mx-auto">
-          <div class="space-y-6">
+        <!-- 독해 예문 내용 -->
+        <div class="max-w-4xl mx-auto mb-6">
+          <div id="reading-example-container" class="space-y-6">
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
               <h3 class="font-bold text-blue-800 text-lg mb-4">
-                <i class="fas fa-book-open mr-2"></i><span>Original Text</span>
+                <i class="fas fa-book-open mr-2"></i><span data-i18n="original_text">Original Text</span>
               </h3>
-              <p id="reading-text" class="text-xl leading-relaxed text-gray-800">Original text will be displayed here
-              </p>
+              <p id="reading-example-text" class="text-xl leading-relaxed text-gray-800">Original text will be displayed here</p>
             </div>
 
             <div class="bg-green-50 border border-green-200 rounded-lg p-6">
               <h3 class="font-bold text-green-800 text-lg mb-4">
-                <i class="fas fa-language mr-2"></i><span>Translation</span>
+                <i class="fas fa-language mr-2"></i><span data-i18n="translation">Translation</span>
               </h3>
-              <p id="reading-translation" class="text-lg text-gray-700">Translation will be displayed here</p>
+              <p id="reading-example-translation" class="text-lg text-gray-700">Translation will be displayed here</p>
             </div>
 
             <div class="bg-purple-50 border border-purple-200 rounded-lg p-6">
               <h3 class="font-bold text-purple-800 text-lg mb-4">
-                <i class="fas fa-info-circle mr-2"></i><span>Context</span>
+                <i class="fas fa-info-circle mr-2"></i><span data-i18n="context">Context</span>
               </h3>
-              <p id="reading-context" class="text-gray-700">Context description will be displayed here</p>
+              <p id="reading-example-context" class="text-gray-700">Context description will be displayed here</p>
             </div>
           </div>
         </div>
 
-        <div class="flex justify-center space-x-4 mt-6">
-          <button id="prev-reading-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-            <i class="fas fa-arrow-left mr-2"></i><span>Previous</span>
-          </button>
-          <button id="next-reading-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
-            <span>Next</span><i class="fas fa-arrow-right ml-2"></i>
-          </button>
+        <!-- 네비게이션 버튼 -->
+        <div class="text-center">
+          <div id="reading-example-progress" class="text-gray-600 mb-4">0 / 0</div>
+          <div class="flex justify-center space-x-4">
+            <button id="prev-reading-example-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
+              <i class="fas fa-arrow-left mr-2"></i><span data-i18n="previous">Previous</span>
+            </button>
+            <button id="next-reading-example-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
+              <span data-i18n="next">Next</span><i class="fas fa-arrow-right ml-2"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 독해 플래시 모드 -->
+    <div id="reading-flash-mode" class="hidden mb-8">
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <!-- 헤더 영역 -->
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 space-y-4 md:space-y-0">
+          <div>
+            <h2 class="text-2xl font-bold mb-2" data-i18n="reading_flash_card">⚡ Flash Reading</h2>
+          </div>
+          <div class="flex gap-2 justify-center md:justify-end">
+            <button id="finish-learning-reading-flash"
+              class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-sm">
+              <i class="fas fa-stop mr-1"></i><span data-i18n="finish_learning">Finish Learning</span>
+            </button>
+            <button id="back-to-dashboard-reading-flash"
+              class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm">
+              <i class="fas fa-arrow-left mr-1"></i><span data-i18n="back">Back</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 독해 플래시 카드 영역 -->
+        <div id="reading-flash-card" class="flip-card max-w-2xl mx-auto cursor-pointer mb-6">
+          <div class="flip-card-inner">
+            <div
+              class="flip-card-front bg-gradient-to-br from-violet-50 to-purple-50 border border-violet-200 rounded-lg p-8">
+              <div class="text-center">
+                <div class="text-6xl mb-4">⚡</div>
+                <h3 id="reading-flash-front-text" class="text-2xl font-bold text-gray-800 mb-4">Original Text</h3>
+                <p class="text-gray-500 mt-8 text-sm" data-i18n="click_to_see_translation">Click to see translation</p>
+              </div>
+            </div>
+            <div
+              class="flip-card-back bg-gradient-to-br from-orange-50 to-yellow-50 border border-orange-200 rounded-lg p-8">
+              <div class="text-center">
+                <div class="text-4xl mb-2">🌟</div>
+                <h3 id="reading-flash-back-translation" class="text-xl font-bold text-orange-600 mb-4">Translation</h3>
+                <p id="reading-flash-back-context" class="text-gray-700 mb-4">Context</p>
+                <p class="text-gray-500 mt-8 text-sm" data-i18n="click_to_see_original">Click again to see original text</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 네비게이션 버튼 -->
+        <div class="text-center">
+          <div id="reading-flash-progress" class="text-gray-600 mb-4">0 / 0</div>
+          <div class="flex justify-center space-x-4">
+            <button id="prev-reading-flash-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
+              <i class="fas fa-arrow-left mr-2"></i><span data-i18n="previous">Previous</span>
+            </button>
+            <button id="flip-reading-flash-btn" class="bg-violet-500 hover:bg-violet-600 text-white px-4 py-2 rounded">
+              <span data-i18n="flip">Flip</span>
+            </button>
+            <button id="next-reading-flash-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
+              <span data-i18n="next">Next</span><i class="fas fa-arrow-right ml-2"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 데이터 없음 메시지 -->
+    <div id="no-data-message" class="hidden mb-8">
+      <div class="bg-white rounded-lg shadow-md p-6 relative">
+        <button id="back-to-dashboard-nodata"
+          class="absolute top-4 right-4 bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm">
+          <i class="fas fa-arrow-left mr-1"></i><span data-i18n="back">Back</span>
+        </button>
+        <div class="text-center">
+          <div class="text-6xl mb-4">📭</div>
+          <h2 class="text-2xl font-bold mb-4" data-i18n="no_data">No Data</h2>
+          <p class="text-gray-600 mb-6" data-i18n="no_data_description">There is no data to learn. Please upload data first.</p>
         </div>
       </div>
     </div>
