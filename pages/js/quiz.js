@@ -17,6 +17,11 @@ import {
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 import { CollectionManager } from "../../js/firebase/firebase-collection-manager.js";
+import {
+  getCurrentLanguage,
+  getActiveLanguage,
+  getI18nText,
+} from "../../utils/language-utils.js";
 
 // 전역 변수
 let currentUser = null;
@@ -204,9 +209,11 @@ async function startQuiz() {
       questionCount: parseInt(elements.questionCount.value),
     };
 
+    const activeLanguage = await getActiveLanguage();
+
     if (settings.sourceLanguage === settings.targetLanguage) {
       showError(
-        getTranslatedText("same_language_error") ||
+        getI18nText("same_language_error", activeLanguage) ||
           "원어와 대상 언어가 같을 수 없습니다."
       );
       return;
@@ -214,18 +221,18 @@ async function startQuiz() {
 
     elements.startQuizBtn.disabled = true;
     elements.startQuizBtn.textContent =
-      getTranslatedText("preparing_questions") || "문제 준비 중...";
+      getI18nText("preparing_questions", activeLanguage) || "문제 준비 중...";
 
     const questions = await generateQuizQuestions(settings);
 
     if (questions.length === 0) {
       showError(
-        getTranslatedText("no_questions_found") ||
+        getI18nText("no_questions_found", activeLanguage) ||
           "선택한 조건에 맞는 문제를 찾을 수 없습니다."
       );
       elements.startQuizBtn.disabled = false;
       elements.startQuizBtn.textContent =
-        getTranslatedText("start_quiz") || "퀴즈 시작";
+        getI18nText("start_quiz", activeLanguage) || "퀴즈 시작";
       return;
     }
 
@@ -250,13 +257,15 @@ async function startQuiz() {
 
     console.log(`✅ 퀴즈 시작 완료: ${questions.length}문제`);
   } catch (error) {
+    const activeLanguage = await getActiveLanguage();
     console.error("❌ 퀴즈 시작 중 오류:", error);
     showError(
-      getTranslatedText("quiz_start_error") || "퀴즈를 시작할 수 없습니다."
+      getI18nText("quiz_start_error", activeLanguage) ||
+        "퀴즈를 시작할 수 없습니다."
     );
     elements.startQuizBtn.disabled = false;
     elements.startQuizBtn.textContent =
-      getTranslatedText("start_quiz") || "퀴즈 시작";
+      getI18nText("start_quiz", activeLanguage) || "퀴즈 시작";
   }
 }
 
@@ -573,16 +582,8 @@ function createTranslationQuestion(concept, settings, allConcepts) {
     ]);
 
     // 문제 텍스트 생성
-    const currentLang = getCurrentUILanguage();
-    const translatePrompt =
-      getTranslatedText("translate_this_word") ||
-      (currentLang === "ja"
-        ? "次の単語を翻訳してください"
-        : currentLang === "zh"
-        ? "请翻译下列单词"
-        : currentLang === "en"
-        ? "Translate this word"
-        : "다음 단어를 번역하세요");
+    const currentLang = getCurrentLanguage();
+    const translatePrompt = getI18nText("translate_this_word", currentLang);
 
     // 카테고리 정보 생성
     const categoryInfo =
@@ -653,16 +654,8 @@ function createPronunciationQuestion(concept, settings, allConcepts) {
         ? `${concept.conceptInfo.domain} / ${concept.conceptInfo.category}`
         : concept.conceptInfo?.domain || "일반";
 
-    const currentLang = getCurrentUILanguage();
-    const pronPrompt =
-      getTranslatedText("choose_pronunciation") ||
-      (currentLang === "ja"
-        ? "次の単語の正しい発音を選んでください"
-        : currentLang === "zh"
-        ? "请选择下列单词的正确发音"
-        : currentLang === "en"
-        ? "Choose the correct pronunciation for this word"
-        : "다음 단어의 올바른 발음을 선택하세요");
+    const currentLang = getCurrentLanguage();
+    const pronPrompt = getI18nText("choose_pronunciation", currentLang);
 
     return {
       id: concept.id,
@@ -734,16 +727,8 @@ function createMatchingQuestion(concept, settings, allConcepts) {
         ? `${concept.conceptInfo.domain} / ${concept.conceptInfo.category}`
         : concept.conceptInfo?.domain || "일반";
 
-    const currentLang = getCurrentUILanguage();
-    const matchPrompt =
-      getTranslatedText("choose_matching_word") ||
-      (currentLang === "ja"
-        ? "次の説明に該当する単語を選んでください"
-        : currentLang === "zh"
-        ? "请选择与下列解释相符的单词"
-        : currentLang === "en"
-        ? "Choose the word that matches the following description"
-        : "다음 설명에 해당하는 단어를 선택하세요");
+    const currentLang = getCurrentLanguage();
+    const matchPrompt = getI18nText("choose_matching_word", currentLang);
 
     return {
       id: concept.id,
@@ -835,16 +820,8 @@ function createFillBlankQuestion(concept, settings, allConcepts) {
         ? `${concept.conceptInfo.domain} / ${concept.conceptInfo.category}`
         : concept.conceptInfo?.domain || "일반";
 
-    const currentLang = getCurrentUILanguage();
-    const blankPrompt =
-      getTranslatedText("choose_blank_word") ||
-      (currentLang === "ja"
-        ? "空欄に当てはまる単語を選んでください"
-        : currentLang === "zh"
-        ? "请选择填入空格的正确单词"
-        : currentLang === "en"
-        ? "Choose the correct word for the blank"
-        : "다음 빈칸에 알맞은 단어를 선택하세요");
+    const currentLang = getCurrentLanguage();
+    const blankPrompt = getI18nText("choose_blank_word", currentLang);
 
     return {
       id: concept.id,
@@ -890,6 +867,25 @@ function displayQuestion() {
     const category = question.category || "일반";
     const difficulty = question.difficulty || "basic";
 
+    // 카테고리 동적 번역
+    const currentLang = getCurrentLanguage();
+    let translatedCategory = category;
+
+    // 카테고리가 "domain / category" 형태인 경우 분리하여 번역
+    if (category.includes(" / ")) {
+      const [domain, cat] = category.split(" / ");
+      const translatedDomain =
+        getI18nText(`domain_${domain.toLowerCase()}`, currentLang) || domain;
+      const translatedCat =
+        getI18nText(`category_${cat.toLowerCase()}`, currentLang) || cat;
+      translatedCategory = `${translatedDomain} / ${translatedCat}`;
+    } else {
+      // 단일 카테고리인 경우
+      translatedCategory =
+        getI18nText(`category_${category.toLowerCase()}`, currentLang) ||
+        category;
+    }
+
     // 난이도 표시를 위한 색상 설정
     const difficultyColors = {
       basic: "bg-green-100 text-green-800",
@@ -903,7 +899,7 @@ function displayQuestion() {
     const colorClass =
       difficultyColors[difficulty] || "bg-blue-100 text-blue-800";
     categoryElement.className = `text-sm px-3 py-1 rounded-full inline-block mb-4 ${colorClass}`;
-    categoryElement.textContent = `${emoji} ${category}`;
+    categoryElement.textContent = `${emoji} ${translatedCategory}`;
   }
 
   // 문제 지시문/본문 표시
@@ -1054,9 +1050,11 @@ function showAnswerFeedback(isCorrect, question) {
 
   if (!feedbackElement || !feedbackContent) return;
 
+  const currentLang = getCurrentLanguage();
   // 번역된 메시지 가져오기
-  const correctMsg = getTranslatedText("correct_answer") || "정답입니다! 🎉";
-  const wrongMsg = getTranslatedText("wrong_answer") || "틀렸습니다";
+  const correctMsg =
+    getI18nText("correct_answer", currentLang) || "정답입니다! 🎉";
+  const wrongMsg = getI18nText("wrong_answer", currentLang) || "틀렸습니다";
 
   if (isCorrect) {
     feedbackElement.className =
@@ -1158,7 +1156,7 @@ function skipQuestion() {
 // 퀴즈 종료
 function quitQuiz() {
   const confirmMsg =
-    getTranslatedText("quit_quiz_confirm") || "정말로 퀴즈를 종료하시겠습니까?";
+    getI18nText("quit_quiz_confirm") || "정말로 퀴즈를 종료하시겠습니까?";
   if (confirm(confirmMsg)) {
     quizData.isActive = false;
     resetQuizSettings();
@@ -1361,8 +1359,7 @@ function resetQuizSettings() {
   elements.quizResults.classList.add("hidden");
 
   elements.startQuizBtn.disabled = false;
-  elements.startQuizBtn.textContent =
-    getTranslatedText("start_quiz") || "퀴즈 시작";
+  elements.startQuizBtn.textContent = getI18nText("start_quiz") || "퀴즈 시작";
 
   stopTimer();
 
@@ -1381,6 +1378,20 @@ async function loadQuizHistory() {
   try {
     if (!currentUser) return;
 
+    // 현재 언어 설정 가져오기
+    const currentLanguage = getCurrentLanguage();
+    const activeLanguage = await getActiveLanguage();
+    const locale =
+      activeLanguage === "ko"
+        ? "ko-KR"
+        : activeLanguage === "en"
+        ? "en-US"
+        : activeLanguage === "ja"
+        ? "ja-JP"
+        : activeLanguage === "zh"
+        ? "zh-CN"
+        : "en-US";
+
     // 📊 quiz_records 컬렉션에서 퀴즈 기록 로드 (인덱스 오류 방지를 위해 단순화)
     const quizRecordsRef = collection(db, "quiz_records");
     const q = query(
@@ -1393,7 +1404,10 @@ async function loadQuizHistory() {
 
     if (querySnapshot.empty) {
       elements.quizHistory.innerHTML = `
-        <p class="text-gray-500 text-center py-8">아직 퀴즈 기록이 없습니다.</p>
+        <p class="text-gray-500 text-center py-8">${
+          getI18nText("no_quiz_history", activeLanguage) ||
+          "아직 퀴즈 기록이 없습니다."
+        }</p>
       `;
       return;
     }
@@ -1427,17 +1441,38 @@ async function loadQuizHistory() {
       const completedDate = data.sortDate;
 
       // 언어 정보 추출 (DB에서 올바른 정보 가져오기)
+      const sourceLangCode =
+        data.language_pair?.source || data.sourceLanguage || "korean";
+      const targetLangCode =
+        data.language_pair?.target || data.targetLanguage || "english";
+
+      // 언어 코드를 번역된 언어 이름으로 변환
       const sourceLang =
-        data.language_pair?.source || data.sourceLanguage || "한국어";
+        getI18nText(sourceLangCode, activeLanguage) || sourceLangCode;
       const targetLang =
-        data.language_pair?.target || data.targetLanguage || "영어";
+        getI18nText(targetLangCode, activeLanguage) || targetLangCode;
+
+      // 퀴즈 타입 번역 - 퀴즈 타입 설정에서 사용하는 키와 동일하게
+      let quizTypeKey = `quiz_${data.quiz_type || "translation"}`;
+
+      // fill_in_blank을 fill_blank로 매핑
+      if (data.quiz_type === "fill_in_blank") {
+        quizTypeKey = "quiz_fill_blank";
+      }
+
+      const quizTypeText =
+        getI18nText(quizTypeKey, activeLanguage) || data.quiz_type || "어휘";
+
+      // 문제 수 번역
+      const questionCountText =
+        getI18nText("question_count", activeLanguage) || "문제";
 
       historyHTML += `
         <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
           <div>
-            <span class="font-medium">${data.quiz_type || "어휘"} 퀴즈</span>
+            <span class="font-medium">${quizTypeText}</span>
             <span class="text-sm text-gray-600 ml-2">
-              ${sourceLang} → ${targetLang} (${questions}문제)
+              ${sourceLang} → ${targetLang} (${questions}${questionCountText})
             </span>
           </div>
           <div class="text-right">
@@ -1447,7 +1482,7 @@ async function loadQuizHistory() {
               ${accuracy}%
             </div>
             <div class="text-xs text-gray-500">
-              ${completedDate.toLocaleDateString("ko-KR", {
+              ${completedDate.toLocaleDateString(locale, {
                 month: "short",
                 day: "numeric",
                 hour: "2-digit",
@@ -1463,7 +1498,10 @@ async function loadQuizHistory() {
   } catch (error) {
     console.error("❌ 퀴즈 기록 로드 중 오류:", error);
     elements.quizHistory.innerHTML = `
-      <p class="text-red-500 text-center py-8">퀴즈 기록을 불러오는 중 오류가 발생했습니다.</p>
+      <p class="text-red-500 text-center py-8">${
+        getI18nText("error_loading_quiz_history", activeLanguage) ||
+        "퀴즈 기록을 불러오는 중 오류가 발생했습니다."
+      }</p>
     `;
   }
 }
@@ -1516,24 +1554,4 @@ function formatDate(date) {
 
 function showError(message) {
   alert(message);
-}
-
-// 번역 텍스트 가져오기 함수 (language-utils에서 가져옴)
-function getTranslatedText(key) {
-  try {
-    // 전역 번역 함수가 있으면 사용
-    if (typeof window.getTranslatedText === "function") {
-      return window.getTranslatedText(key);
-    }
-
-    // localStorage에서 번역 데이터 직접 가져오기
-    const currentLanguage = localStorage.getItem("userLanguage") || "ko";
-    const translations = JSON.parse(
-      localStorage.getItem(`translations_${currentLanguage}`)
-    );
-    return translations && translations[key] ? translations[key] : null;
-  } catch (error) {
-    console.error("번역 텍스트 가져오기 오류:", error);
-    return null;
-  }
 }

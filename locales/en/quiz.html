@@ -72,14 +72,14 @@
 
           <!-- 퀴즈 타입 -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="quiz_type">
               Quiz Type
             </label>
             <select id="quiz-type" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="translation">Translation</option>
-              <option value="pronunciation">Pronunciation</option>
-              <option value="matching">Matching</option>
-              <option value="fill_in_blank">Fill in the Blank</option>
+              <option value="translation" data-i18n="quiz_translation">Translation</option>
+              <option value="pronunciation" data-i18n="quiz_pronunciation">Pronunciation</option>
+              <option value="matching" data-i18n="quiz_matching">Matching</option>
+              <option value="fill_in_blank" data-i18n="quiz_fill_blank">Fill in the Blank</option>
             </select>
           </div>
         </div>
@@ -87,20 +87,20 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <!-- 난이도 -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="difficulty">
               Difficulty Level
             </label>
             <select id="quiz-difficulty" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="all">All Levels</option>
-              <option value="beginner">Beginner</option>
-              <option value="intermediate">Intermediate</option>
-              <option value="advanced">Advanced</option>
+              <option value="all" data-i18n="all_levels">All Levels</option>
+              <option value="beginner" data-i18n="beginner">Beginner</option>
+              <option value="intermediate" data-i18n="intermediate">Intermediate</option>
+              <option value="advanced" data-i18n="advanced">Advanced</option>
             </select>
           </div>
 
           <!-- 문제 수 -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="question_count">
               Number of Questions
             </label>
             <select id="quiz-question-count" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -117,6 +117,7 @@
           <button 
             id="start-quiz-btn"
             class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+            data-i18n="start_quiz"
           >
             Start Quiz
           </button>
