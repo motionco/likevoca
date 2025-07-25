@@ -43,18 +43,26 @@ let quizHistoryCache = null;
 let quizHistoryCacheTimestamp = null;
 const QUIZ_HISTORY_CACHE_DURATION = 5 * 60 * 1000; // 5분 캐시 유효 시간
 
-// ✅ Firebase 읽기 비용 모니터링
+// ✅ Firebase 읽기 비용 모니터링 (개발 모드에서만)
 let firebaseReadCount = 0;
 
-// Firebase 읽기 추적 함수
+// Firebase 읽기 추적 함수 (개발 모드에서만 동작)
 function trackFirebaseRead(queryName, docCount) {
-  firebaseReadCount += docCount;
-  console.log(
-    `📊 Firebase 읽기: ${queryName} (+${docCount}), 총 ${firebaseReadCount}회`
-  );
+  // 개발 모드에서만 모니터링 활성화
+  if (
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1" ||
+    window.location.hostname.includes("vercel.app") ||
+    window.location.hostname.includes("netlify.app")
+  ) {
+    firebaseReadCount += docCount;
+    console.log(
+      `📊 Firebase 읽기: ${queryName} (+${docCount}), 총 ${firebaseReadCount}회`
+    );
 
-  if (firebaseReadCount > 30) {
-    console.warn("⚠️ Firebase 읽기 횟수가 많습니다:", firebaseReadCount);
+    if (firebaseReadCount > 30) {
+      console.warn("⚠️ Firebase 읽기 횟수가 많습니다:", firebaseReadCount);
+    }
   }
 }
 
