@@ -38,6 +38,11 @@ let cachedQuizData = {
 };
 const CACHE_DURATION = 10 * 60 * 1000; // 10분
 
+// 퀴즈 기록 캐시 시스템
+let quizHistoryCache = null;
+let quizHistoryCacheTimestamp = null;
+const QUIZ_HISTORY_CACHE_DURATION = 5 * 60 * 1000; // 5분 캐시 유효 시간
+
 // ✅ Firebase 읽기 비용 모니터링
 let firebaseReadCount = 0;
 
@@ -1186,6 +1191,13 @@ async function finishQuiz() {
       completedAt: endTime,
     });
 
+    // 퀴즈 기록 캐시 무효화 및 새로고침
+    console.log("🔄 퀴즈 기록 캐시 무효화 및 새로고침 시작");
+    quizHistoryCache = null;
+    quizHistoryCacheTimestamp = null;
+    await loadQuizHistory();
+    console.log("✅ 퀴즈 기록 새로고침 완료");
+
     displayResults(correctCount, score, totalTime);
 
     console.log(`✅ 퀴즈 완료: ${correctCount}/${totalCount} (${score}%)`);
@@ -1376,7 +1388,16 @@ function resetQuizSettings() {
 // 퀴즈 기록 로드
 async function loadQuizHistory() {
   try {
-    if (!currentUser) return;
+    console.log("📊 퀴즈 기록 로드 시작");
+    if (!currentUser) {
+      console.log("❌ 사용자 정보 없음 - 퀴즈 기록 로드 중단");
+      return;
+    }
+
+    if (!elements.quizHistory) {
+      console.log("❌ quizHistory 요소를 찾을 수 없음");
+      return;
+    }
 
     // 현재 언어 설정 가져오기
     const currentLanguage = getCurrentLanguage();
@@ -1392,17 +1413,19 @@ async function loadQuizHistory() {
         ? "zh-CN"
         : "en-US";
 
-    // 📊 quiz_records 컬렉션에서 퀴즈 기록 로드 (인덱스 오류 방지를 위해 단순화)
+    // Firestore에서 퀴즈 기록 로드 (인덱스 오류 방지를 위해 단순화)
     const quizRecordsRef = collection(db, "quiz_records");
     const q = query(
       quizRecordsRef,
       where("user_email", "==", currentUser.email),
-      limit(10)
+      limit(5)
     );
 
     const querySnapshot = await getDocs(q);
+    console.log(`📊 퀴즈 기록 조회 결과: ${querySnapshot.size}개 문서`);
 
     if (querySnapshot.empty) {
+      console.log("📊 퀴즈 기록 없음");
       elements.quizHistory.innerHTML = `
         <p class="text-gray-500 text-center py-8">${
           getI18nText("no_quiz_history", activeLanguage) ||
@@ -1412,14 +1435,22 @@ async function loadQuizHistory() {
       return;
     }
 
-    // 📊 데이터를 가져온 후 클라이언트에서 정렬
+    // 필요한 필드만 추출 (select() 대신 클라이언트 필터링)
     const quizRecords = [];
     querySnapshot.forEach((doc) => {
       const data = doc.data();
       quizRecords.push({
         id: doc.id,
-        ...data,
-        // completed_at 필드 정규화
+        quiz_type: data.quiz_type,
+        accuracy: data.accuracy,
+        correct_answers: data.correct_answers,
+        total_questions: data.total_questions,
+        completed_at: data.completed_at,
+        timestamp: data.timestamp,
+        language_pair: data.language_pair,
+        sourceLanguage: data.sourceLanguage,
+        targetLanguage: data.targetLanguage,
+        // 정렬용
         sortDate:
           data.completed_at?.toDate?.() ||
           data.timestamp?.toDate?.() ||
@@ -1429,44 +1460,32 @@ async function loadQuizHistory() {
 
     // 클라이언트에서 날짜순 정렬 (최신순)
     quizRecords.sort((a, b) => b.sortDate - a.sortDate);
+    console.log(`📊 정렬된 퀴즈 기록: ${quizRecords.length}개`);
 
     let historyHTML = "";
-    quizRecords.slice(0, 10).forEach((data) => {
+    quizRecords.forEach((data) => {
       const accuracy =
         data.accuracy ||
         Math.round((data.correct_answers / data.total_questions) * 100) ||
         0;
-      const score = data.score || 0;
       const questions = data.total_questions || 5;
       const completedDate = data.sortDate;
-
-      // 언어 정보 추출 (DB에서 올바른 정보 가져오기)
       const sourceLangCode =
         data.language_pair?.source || data.sourceLanguage || "korean";
       const targetLangCode =
         data.language_pair?.target || data.targetLanguage || "english";
-
-      // 언어 코드를 번역된 언어 이름으로 변환
       const sourceLang =
         getI18nText(sourceLangCode, activeLanguage) || sourceLangCode;
       const targetLang =
         getI18nText(targetLangCode, activeLanguage) || targetLangCode;
-
-      // 퀴즈 타입 번역 - 퀴즈 타입 설정에서 사용하는 키와 동일하게
       let quizTypeKey = `quiz_${data.quiz_type || "translation"}`;
-
-      // fill_in_blank을 fill_blank로 매핑
       if (data.quiz_type === "fill_in_blank") {
         quizTypeKey = "quiz_fill_blank";
       }
-
       const quizTypeText =
         getI18nText(quizTypeKey, activeLanguage) || data.quiz_type || "어휘";
-
-      // 문제 수 번역
       const questionCountText =
         getI18nText("question_count", activeLanguage) || "문제";
-
       historyHTML += `
         <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
           <div>
@@ -1495,11 +1514,15 @@ async function loadQuizHistory() {
     });
 
     elements.quizHistory.innerHTML = historyHTML;
+    console.log(
+      `📝 퀴즈 기록 UI 렌더링 완료 - HTML 길이: ${historyHTML.length}자`
+    );
   } catch (error) {
     console.error("❌ 퀴즈 기록 로드 중 오류:", error);
+    const currentLanguage = getCurrentLanguage();
     elements.quizHistory.innerHTML = `
       <p class="text-red-500 text-center py-8">${
-        getI18nText("error_loading_quiz_history", activeLanguage) ||
+        getI18nText("error_loading_quiz_history", currentLanguage) ||
         "퀴즈 기록을 불러오는 중 오류가 발생했습니다."
       }</p>
     `;

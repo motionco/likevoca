@@ -113,6 +113,8 @@ const progressTranslations = {
     listeningQuiz: "듣기 퀴즈",
     pronunciationQuiz: "발음 퀴즈",
     sentenceConstruction: "문장 구성",
+    meaningInference: "단어 맞추기",
+    matchingQuiz: "단어 맞추기",
 
     // 섹션 제목
     activitySummary: "활동 현황 요약",
@@ -252,6 +254,8 @@ const progressTranslations = {
     listeningQuiz: "Listening Quiz",
     pronunciationQuiz: "Pronunciation Quiz",
     sentenceConstruction: "Sentence Construction",
+    meaningInference: "Word Matching",
+    matchingQuiz: "Word Matching",
 
     // 섹션 제목
     activitySummary: "Activity Summary",
@@ -394,6 +398,8 @@ const progressTranslations = {
     listeningQuiz: "リスニングクイズ",
     pronunciationQuiz: "発音クイズ",
     sentenceConstruction: "文章構成",
+    meaningInference: "単語マッチング",
+    matchingQuiz: "単語マッチング",
 
     // 섹션 제목
     activitySummary: "活動現況要約",
@@ -536,6 +542,8 @@ const progressTranslations = {
     listeningQuiz: "听力测验",
     pronunciationQuiz: "发音测验",
     sentenceConstruction: "句子构成",
+    meaningInference: "单词匹配",
+    matchingQuiz: "单词匹配",
 
     // 섹션 제목
     activitySummary: "活动现状总结",
@@ -2413,9 +2421,13 @@ function getDetailedActivityName(activity) {
       "multiple-choice": () => getProgressText("multipleChoiceQuiz"),
       fill_blank: () => getProgressText("fillBlank"),
       "fill-blank": () => getProgressText("fillBlank"),
+      fill_in_blank: () => getProgressText("fillBlank"), // 추가
       listening: () => getProgressText("listeningQuiz"),
       pronunciation: () => getProgressText("pronunciationQuiz"),
       sentence: () => getProgressText("sentenceConstruction"),
+      sentence_completion: () => getProgressText("sentenceConstruction"), // 문장 완성
+      meaning_inference: () => getProgressText("meaningInference"), // 의미 추론
+      matching: () => getProgressText("meaningInference"), // 매칭 퀴즈 → 의미 추론으로 매핑
     };
 
     return quizMapping[quizType]
