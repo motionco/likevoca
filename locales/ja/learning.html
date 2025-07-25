@@ -294,11 +294,11 @@
 
     <!-- 영역별 학습 선택 -->
     <div id="area-selection" class="bg-white rounded-lg shadow-md p-6 mb-8">
-      <div class="flex justify-between items-center mb-6">
+      <div class="flex flex-wrap justify-between items-center gap-3 mb-6">
         <h2 class="text-2xl font-bold">学習ダッシュボード</h2>
         <div class="flex space-x-3">
           <button id="quick-continue"
-            class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-colors hidden">
+            class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg font-medium transition-colors hidden">
             <i class="fas fa-play mr-2"></i><span>学習を続ける</span>
           </button>
         </div>
@@ -492,16 +492,16 @@
       </div>
 
     <!-- 학습 통계 및 추천 -->
-    <div id="learning-stats" class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div id="learning-stats" class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
       <div class="bg-gray-50 rounded-lg p-4 shadow-lg">
-        <h4 class="font-semibold text-gray-700 mb-2" data-i18n="recent_activity">最近の活動</h4>
+        <h4 class="font-semibold text-gray-700 mb-2">最近の学習</h4>
         <div id="recent-activity" class="text-sm text-gray-600">
           <span data-i18n="no_recent_activity">最近の学習記録がありません</span>
         </div>
       </div>
-      <div class="bg-gray-50 rounded-lg p-4 shadow-lg">
-        <h4 class="font-semibold text-gray-700 mb-2" data-i18n="recommended_mode">おすすめ学習</h4>
-        <div id="recommended-mode" class="text-sm text-gray-600">
+                              <div class="bg-gray-50 rounded-lg p-4 shadow-lg">
+            <h4 class="font-semibold text-gray-700 mb-2" data-i18n="recommended_mode">おすすめ学習</h4>
+            <div id="recommended-mode" class="text-sm text-gray-600">
           <div class="space-y-2">
             <div class="flex items-center justify-between p-2 bg-white rounded border">
               <div class="flex items-center">
@@ -510,19 +510,10 @@
               </div>
               <span class="text-xs text-green-600 font-medium" data-i18n="recommended">おすすめ</span>
             </div>
-            <div class="text-xs text-gray-500" data-i18n="recommendation_reason">
-              最近の学習パターンを基におすすめされます
-            </div>
           </div>
         </div>
       </div>
-      <div class="bg-gray-50 rounded-lg p-4 shadow-lg">
-        <h4 class="font-semibold text-gray-700 mb-2" data-i18n="learning_streak">学習連続日</h4>
-        <div id="learning-streak" class="text-sm text-gray-600">
-          <span class="text-2xl font-bold text-green-600">0</span>
-          <span data-i18n="days">日</span>
-        </div>
-      </div>
+
     </div>
     </div>
 

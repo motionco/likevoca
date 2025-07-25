@@ -1334,9 +1334,10 @@ async function completeGame(finalScore, timeSpent) {
       totalTime = 60; // 기본값 (1분)
     }
 
-    // 정확도 계산 - 게임별 최대 점수 기준
+    // 정확도 계산 - 기본 점수만 기준 (시간 보너스 제외)
     const maxScore = (gameWords?.length || 8) * 10; // 단어당 10점
-    const accuracy = Math.round((finalScore / maxScore) * 100) || 0;
+    const baseScore = Math.min(finalScore, maxScore); // 시간 보너스 제외한 기본 점수
+    const accuracy = Math.round((baseScore / maxScore) * 100) || 0;
 
     console.log("🎯 게임 완료 계산:", {
       finalScore,

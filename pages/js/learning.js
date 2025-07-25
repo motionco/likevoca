@@ -1865,7 +1865,6 @@ async function showAreaSelection() {
 
   // 최근 학습 기록 표시
   await updateRecentActivity();
-  updateLearningStreak();
 }
 
 // 로딩 상태 표시 함수
@@ -1891,23 +1890,81 @@ function showLoadingState(card) {
 // 최근 활동 업데이트
 async function updateRecentActivity() {
   const recentActivityEl = document.getElementById("recent-activity");
-  const lastArea = sessionStorage.getItem("lastLearningArea");
-  const lastMode = sessionStorage.getItem("lastLearningMode");
-  const lastTime = sessionStorage.getItem("lastLearningTime");
 
-  if (lastArea && lastMode && lastTime) {
-    const timeAgo = getTimeAgo(new Date(lastTime));
-    const areaName = getAreaName(lastArea);
-    const modeName = getModeName(lastMode);
+  // 학습 기록에서 최근 3개 가져오기
+  let learningHistory = JSON.parse(
+    localStorage.getItem("learningHistory") || "[]"
+  );
 
-    recentActivityEl.innerHTML = `
-      <div class="text-sm">
-        <div class="font-medium">${areaName} - ${modeName}</div>
-        <div class="text-gray-500">${timeAgo}</div>
-      </div>
-    `;
+  // Firebase에서 추가 학습 기록 가져오기 (로그인된 경우)
+  try {
+    if (
+      window.firebaseInit &&
+      window.firebaseInit.auth &&
+      window.firebaseInit.auth.currentUser
+    ) {
+      const user = window.firebaseInit.auth.currentUser;
+      const userRef = window.firebaseInit.doc(
+        window.firebaseInit.db,
+        "users",
+        user.email
+      );
+      const userDoc = await window.firebaseInit.getDoc(userRef);
 
-    // 학습 이어하기 버튼 표시
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        const firebaseHistory = userData.learning_history || [];
+
+        // Firebase 데이터와 로컬 데이터 병합 (중복 제거)
+        const combinedHistory = [...learningHistory];
+        firebaseHistory.forEach((record) => {
+          const exists = combinedHistory.some(
+            (local) =>
+              local.timestamp === record.timestamp &&
+              local.area === record.area &&
+              local.mode === record.mode
+          );
+          if (!exists) {
+            combinedHistory.push(record);
+          }
+        });
+
+        learningHistory = combinedHistory;
+      }
+    }
+  } catch (error) {
+    console.warn("📊 Firebase 학습 기록 로드 실패:", error);
+  }
+
+  // 시간순 정렬 후 최근 3개만 가져오기
+  const recentActivities = learningHistory
+    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+    .slice(0, 3);
+
+  if (recentActivities.length > 0) {
+    const activitiesHTML = recentActivities
+      .map((activity) => {
+        const timeAgo = getTimeAgo(new Date(activity.timestamp));
+        const areaName = getAreaName(activity.area);
+        const modeName = getModeName(activity.mode);
+
+        return `
+        <div class="mb-2 p-2 bg-white rounded border-l-4 border-blue-200">
+          <div class="text-sm flex justify-between items-center">
+            <div class="flex items-center">
+              <span class="inline-block px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full mr-2">${areaName}</span>
+              <span>${modeName}</span>
+            </div>
+            <span class="text-gray-500 text-xs">${timeAgo}</span>
+          </div>
+        </div>
+      `;
+      })
+      .join("");
+
+    recentActivityEl.innerHTML = activitiesHTML;
+
+    // 학습 이어하기 버튼 표시 (가장 최근 학습 기준)
     const quickContinueBtn = document.getElementById("quick-continue");
     if (quickContinueBtn) {
       quickContinueBtn.classList.remove("hidden");
@@ -1994,6 +2051,9 @@ async function updateRecommendedLearning() {
   let recommendation = getSmartRecommendation(lastWeekHistory);
 
   recommendedEl.innerHTML = `
+    <div class="text-xs text-gray-500 mb-3">
+      ${recommendation.reason}
+    </div>
     <div class="space-y-2">
       <div class="flex items-center justify-between p-2 bg-white rounded border cursor-pointer hover:bg-gray-50" 
            onclick="startLearningMode('${recommendation.area}', '${recommendation.mode}')">
@@ -2005,9 +2065,6 @@ async function updateRecommendedLearning() {
           </div>
         </div>
         <span class="text-xs text-green-600 font-medium" data-i18n="recommended">추천</span>
-      </div>
-      <div class="text-xs text-gray-500">
-        ${recommendation.reason}
       </div>
     </div>
   `;
@@ -2023,7 +2080,7 @@ function getSmartRecommendation(history) {
     subtitle: getTranslatedText("basic_vocabulary_learning"),
     icon: "fas fa-clone",
     color: "blue",
-    reason: getTranslatedText("start_new_learning_desc"),
+    reason: getTranslatedText("recommendation_reason"),
   };
 
   if (history.length === 0) {
@@ -2122,22 +2179,12 @@ function getSmartRecommendation(history) {
             : mostStudiedArea === "grammar"
             ? "green"
             : "purple",
-        reason: getTranslatedText("try_new_method"),
+        reason: getTranslatedText("recommendation_reason"),
       };
     }
   }
 
   return recommendation;
-}
-
-// 학습 연속일 업데이트
-function updateLearningStreak() {
-  const streakEl = document.getElementById("learning-streak");
-  const streak = parseInt(localStorage.getItem("learningStreak") || "0");
-
-  if (streakEl) {
-    streakEl.querySelector(".text-2xl").textContent = streak;
-  }
 }
 
 // 시간 차이 계산
@@ -2175,34 +2222,6 @@ function getModeName(mode) {
     flash: getTranslatedText("flash_mode"),
   };
   return names[mode] || mode;
-}
-
-// 학습 연속일 업데이트 (학습 시작 시)
-function updateLearningStreakOnStart() {
-  const today = new Date().toDateString();
-  const lastLearningDate = localStorage.getItem("lastLearningDate");
-  const currentStreak = parseInt(localStorage.getItem("learningStreak") || "0");
-
-  if (lastLearningDate !== today) {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    if (lastLearningDate === yesterday.toDateString()) {
-      // 연속 학습
-      localStorage.setItem("learningStreak", (currentStreak + 1).toString());
-    } else if (
-      !lastLearningDate ||
-      lastLearningDate !== yesterday.toDateString()
-    ) {
-      // 첫 학습 또는 연속성 끊김
-      localStorage.setItem("learningStreak", "1");
-    }
-
-    localStorage.setItem("lastLearningDate", today);
-    console.log(
-      `📅 학습 연속일 업데이트: ${localStorage.getItem("learningStreak")}일`
-    );
-  }
 }
 
 // 데이터 프리로딩 (백그라운드에서 미리 로드)
@@ -2697,9 +2716,6 @@ window.startLearningMode = async function startLearningMode(area, mode) {
   } catch (error) {
     console.warn("학습 기록 저장 실패:", error);
   }
-
-  // 학습 스트릭 업데이트
-  updateLearningStreakOnStart();
 
   // 데이터 로드
   await loadLearningData(area);
@@ -5570,42 +5586,17 @@ async function saveLearningRecordToFirebase(learningRecord) {
     learningHistory.unshift(learningRecord);
     const trimmedHistory = learningHistory.slice(0, 100); // 최근 100개만 유지
 
-    // 학습 스트릭 계산
-    const today = new Date().toDateString();
-    const lastLearningDate = userData.last_learning_date;
-    let currentStreak = userData.learning_streak || 0;
-
-    if (lastLearningDate !== today) {
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-
-      if (lastLearningDate === yesterday.toDateString()) {
-        currentStreak += 1; // 연속 학습
-      } else if (!lastLearningDate) {
-        currentStreak = 1; // 첫 학습
-      } else {
-        currentStreak = 1; // 연속성 끊김
-      }
-    }
-
     // Firebase에 업데이트
     await window.firebaseInit.setDoc(
       userRef,
       {
         learning_history: trimmedHistory,
-        last_learning_date: today,
-        learning_streak: currentStreak,
         last_updated: new Date().toISOString(),
       },
       { merge: true }
     );
 
-    // 로컬 스트릭도 Firebase와 동기화
-    localStorage.setItem("learningStreak", currentStreak.toString());
-    localStorage.setItem("lastLearningDate", today);
-
     console.log("☁️ Firebase 학습 기록 저장 완료:", {
-      streak: currentStreak,
       historyCount: trimmedHistory.length,
     });
 
@@ -5652,17 +5643,6 @@ async function syncUserLearningData() {
 
     if (userDoc.exists()) {
       const userData = userDoc.data();
-
-      // 학습 스트릭 동기화
-      if (userData.learning_streak !== undefined) {
-        localStorage.setItem(
-          "learningStreak",
-          userData.learning_streak.toString()
-        );
-      }
-      if (userData.last_learning_date) {
-        localStorage.setItem("lastLearningDate", userData.last_learning_date);
-      }
 
       // 학습 히스토리 동기화 (로컬이 비어있는 경우에만)
       const localHistory = JSON.parse(
@@ -6051,7 +6031,6 @@ window.addEventListener("load", async () => {
   await syncUserLearningData();
 
   // UI 업데이트
-  updateLearningStreak();
   await updateRecentActivity();
 });
 
