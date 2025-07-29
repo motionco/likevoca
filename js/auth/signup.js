@@ -12,7 +12,7 @@ function goToLanguageSpecificPage(filename) {
   const isDev =
     window.location.hostname === "localhost" ||
     window.location.hostname === "127.0.0.1" ||
-    window.location.port === "5500";
+    window.location.port === "5595";
 
   if (isDev) {
     window.location.href = `/locales/${userLanguage}/${filename}`;

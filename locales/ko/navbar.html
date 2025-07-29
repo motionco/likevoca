@@ -2,12 +2,9 @@
   <div class="container mx-auto flex justify-between items-center max-w-6xl">
     <!-- 왼쪽: 햄버거 메뉴 (모바일) + 로고 -->
     <div class="flex items-center">
-    <button
-      id="menu-toggle"
-        class="text-white text-2xl lg:hidden mr-3"
-    >
-      <i class="fa-solid fa-bars"></i>
-    </button>
+      <button id="menu-toggle" class="text-white text-2xl lg:hidden mr-3">
+        <i class="fa-solid fa-bars"></i>
+      </button>
 
       <a
         href="index.html"
@@ -19,25 +16,43 @@
     <!-- 중앙: 네비게이션 메뉴 (데스크톱만) -->
     <ul id="nav-menu" class="hidden lg:flex space-x-10 items-center">
       <li>
-        <a href="vocabulary.html" class="text-xl text-white hover:text-yellow-400">단어장</a>
+        <a
+          href="vocabulary.html"
+          class="text-xl text-white hover:text-yellow-400"
+          >단어장</a
+        >
       </li>
       <li>
-        <a href="ai-vocabulary.html" class="text-xl text-white hover:text-yellow-400">AI 단어장</a>
+        <a
+          href="ai-vocabulary.html"
+          class="text-xl text-white hover:text-yellow-400"
+          >AI 단어장</a
+        >
       </li>
       <li>
-        <a href="learning.html" class="text-xl text-white hover:text-yellow-400">학습</a>
+        <a href="learning.html" class="text-xl text-white hover:text-yellow-400"
+          >학습</a
+        >
       </li>
       <li>
-        <a href="quiz.html" class="text-xl text-white hover:text-yellow-400">퀴즈</a>
+        <a href="quiz.html" class="text-xl text-white hover:text-yellow-400"
+          >퀴즈</a
+        >
       </li>
       <li>
-        <a href="games.html" class="text-xl text-white hover:text-yellow-400">게임</a>
+        <a href="games.html" class="text-xl text-white hover:text-yellow-400"
+          >게임</a
+        >
       </li>
       <li>
-        <a href="progress.html" class="text-xl text-white hover:text-yellow-400">진도</a>
+        <a href="progress.html" class="text-xl text-white hover:text-yellow-400"
+          >진도</a
+        >
       </li>
       <li>
-        <a href="inquiry.html" class="text-xl text-white hover:text-yellow-400">문의하기</a>
+        <a href="inquiry.html" class="text-xl text-white hover:text-yellow-400"
+          >문의하기</a
+        >
       </li>
     </ul>
 
@@ -46,12 +61,7 @@
       <!-- 언어 설정 버튼 (반응형) -->
       <button
         id="language-button"
-        class="
-          text-white font-semibold transition duration-300
-          hover:text-yellow-400
-          text-xl lg:text-base
-          p-2 lg:p-2
-        "
+        class="text-white font-semibold transition duration-300 hover:text-yellow-400 text-xl lg:text-base p-2 lg:p-2"
       >
         <i class="fas fa-globe lg:mr-1"></i>
         <span class="hidden lg:inline lg:ml-1">🇰🇷</span>
@@ -73,30 +83,32 @@
           class="hidden lg:inline-block border-2 border-white bg-white text-[#4B63AC] font-semibold px-4 py-1.5 text-sm rounded-lg hover:bg-[#4B63AC] hover:text-white transition duration-300"
           >회원가입</a
         >
-    </div>
+      </div>
 
       <!-- 유저 프로필 (반응형) -->
       <div id="desktop-user-section" class="hidden">
-    <div
-      id="user-profile"
-          class="relative flex items-center text-white"
-    >
+        <div id="user-profile" class="relative flex items-center text-white">
           <div id="avatar-container" class="cursor-pointer">
-        <div
-          id="avatar"
+            <div
+              id="avatar"
               class="w-8 h-8 lg:w-10 lg:h-10 rounded-full overflow-hidden border-2 border-white"
-        >
-          <img id="profile-image" src="" alt="프로필" class="w-full h-full object-cover" />
-        </div>
-      </div>
+            >
+              <img
+                id="profile-image"
+                src=""
+                alt="프로필"
+                class="w-full h-full object-cover"
+              />
+            </div>
+          </div>
 
-      <div
-        id="profile-dropdown"
+          <div
+            id="profile-dropdown"
             class="hidden absolute top-12 right-0 bg-white shadow-lg rounded-lg py-2 w-48 text-gray-900 z-50"
-      >
-        <div class="px-4 py-2 font-semibold border-b border-gray-200">
-          <span id="user-name"></span>
-        </div>
+          >
+            <div class="px-4 py-2 font-semibold border-b border-gray-200">
+              <span id="user-name"></span>
+            </div>
             <a
               href="my-word-list.html"
               class="block w-full text-left px-4 py-2 hover:bg-gray-100"
@@ -106,15 +118,15 @@
             <a
               href="profile.html"
               class="block w-full text-left px-4 py-2 hover:bg-gray-100"
-        >
+            >
               프로필
             </a>
-        <button
-          id="logout-button"
-          class="block w-full text-left px-4 py-2 hover:bg-gray-100"
-        >
-          로그아웃
-        </button>
+            <button
+              id="logout-button"
+              class="block w-full text-left px-4 py-2 hover:bg-gray-100"
+            >
+              로그아웃
+            </button>
           </div>
         </div>
       </div>
@@ -126,7 +138,9 @@
     class="hidden flex flex-col items-center space-y-4 bg-[#4B63AC] text-white p-3 lg:hidden"
   >
     <a href="vocabulary.html" class="text-lg hover:text-yellow-400">단어장</a>
-    <a href="ai-vocabulary.html" class="text-lg hover:text-yellow-400">AI 단어장</a>
+    <a href="ai-vocabulary.html" class="text-lg hover:text-yellow-400"
+      >AI 단어장</a
+    >
     <a href="learning.html" class="text-lg hover:text-yellow-400">학습</a>
     <a href="quiz.html" class="text-lg hover:text-yellow-400">퀴즈</a>
     <a href="games.html" class="text-lg hover:text-yellow-400">게임</a>
@@ -152,36 +166,35 @@
 </nav>
 
 <script>
-// 언어별 페이지로 이동하는 함수
-function goToLanguageSpecificPage(filename) {
-  const userLanguage = localStorage.getItem('userLanguage') || 'ko';
-  const isDev = window.location.hostname === 'localhost' || 
-               window.location.hostname === '127.0.0.1' ||
-               window.location.port === '5500';
-  
-  if (isDev) {
-    window.location.href = `/locales/${userLanguage}/${filename}`;
-  } else {
-    window.location.href = `/${userLanguage}/${filename}`;
-  }
-}
+  // 언어별 페이지로 이동하는 함수
+  function goToLanguageSpecificPage(filename) {
+    const userLanguage = localStorage.getItem("userLanguage") || "ko";
+    const isDev =
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1" ||
+      window.location.port === "5595";
 
-// 네비게이션바 초기화 함수
-function initializeNavbar() {
-  // navbar.js의 초기화 함수들이 이미 로드되었는지 확인
-  if (typeof window.setupNavbarAuth === 'function') {
-    window.setupNavbarAuth();
+    if (isDev) {
+      window.location.href = `/locales/${userLanguage}/${filename}`;
+    } else {
+      window.location.href = `/${userLanguage}/${filename}`;
+    }
   }
-  
-  if (typeof window.setupNavbarEvents === 'function') {
-    window.setupNavbarEvents();
-  }
-}
 
-// DOM이 로드된 후 초기화
-document.addEventListener('DOMContentLoaded', function() {
-  initializeNavbar();
-});
+  // 네비게이션바 초기화 함수
+  function initializeNavbar() {
+    // navbar.js의 초기화 함수들이 이미 로드되었는지 확인
+    if (typeof window.setupNavbarAuth === "function") {
+      window.setupNavbarAuth();
+    }
+
+    if (typeof window.setupNavbarEvents === "function") {
+      window.setupNavbarEvents();
+    }
+  }
+
+  // DOM이 로드된 후 초기화
+  document.addEventListener("DOMContentLoaded", function () {
+    initializeNavbar();
+  });
 </script>
-
-

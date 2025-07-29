@@ -1353,22 +1353,36 @@ async function completeGame(finalScore, timeSpent) {
     if (currentUser) {
       // 게임 통계 업데이트 (CollectionManager 사용)
       try {
-        // updateUserProgressFromQuiz는 다른 매개변수 구조를 사용
-        const quizResults = {
+        // 현재 언어 설정 확인
+        const currentSourceLanguage =
+          document.getElementById("source-language")?.value ||
+          sourceLanguage ||
+          "korean";
+        const currentTargetLanguage =
+          document.getElementById("target-language")?.value ||
+          targetLanguage ||
+          "english";
+
+        console.log("🎮 게임 완료 - 언어 설정 확인:", {
+          sourceLanguage: currentSourceLanguage,
+          targetLanguage: currentTargetLanguage,
+          gameType: currentGameType,
+        });
+
+        const gameResults = {
           gameType: currentGameType,
           score: finalScore,
           accuracy: accuracy,
           timeSpent: totalTime,
-          answers: gameWords.map((word) => ({
-            conceptId: word.id,
-            isCorrect: true, // 게임에서는 정확도로 대체
-            responseTime: totalTime / gameWords.length,
-          })),
+          wordsPlayed: gameWords.length,
+          // 언어 정보 추가
+          sourceLanguage: currentSourceLanguage,
+          targetLanguage: currentTargetLanguage,
         };
 
-        await collectionManager.updateUserProgressFromQuiz(
+        await collectionManager.updateUserProgressFromGame(
           currentUser.email,
-          quizResults
+          gameResults
         );
         console.log("✓ 게임 통계 업데이트 완료");
       } catch (error) {
@@ -1410,7 +1424,7 @@ async function completeGame(finalScore, timeSpent) {
               totalAnswers: gameWords?.length || 0,
               difficulty: gameDifficulty || "basic",
               sourceLanguage: sourceLanguage,
-              targetLanguage: targetLanguage,
+              targetLanguage: targetLanguage, // 명시적으로 targetLanguage 전달
               conceptId: conceptIds, // concept_id로 통일 (유효한 ID만)
               conceptIds: conceptIds, // 개념 스냅샷 저장용 추가 (유효한 ID만)
               accuracy: accuracy, // 🎯 정확도 필드 추가
@@ -1459,7 +1473,8 @@ async function completeGame(finalScore, timeSpent) {
 
       // 🆕 진도 페이지 캐시 무효화를 위한 타임스탬프 설정
       try {
-        const targetLanguage = "english"; // 게임에서는 기본적으로 영어 대상
+        const targetLanguage =
+          localStorage.getItem("selectedTargetLanguage") || "english"; // 실제 선택된 대상 언어 사용
         const invalidationTime = Date.now().toString();
 
         // 캐시 무효화 타임스탬프 설정

@@ -1279,6 +1279,14 @@ async function saveQuizResult(result) {
     console.log("✅ quiz_records에 퀴즈 기록 저장 완료");
 
     // 2. 🎯 user_records에 통합 통계 업데이트
+    console.log("🎯 퀴즈 완료 - 언어 설정 확인:", {
+      sourceLanguage: result.settings.sourceLanguage,
+      targetLanguage: result.settings.targetLanguage,
+      score: result.score,
+      correctCount: result.correctCount,
+      totalCount: result.totalCount,
+    });
+
     try {
       await collectionManager.updateUserProgressFromQuiz(currentUser.email, {
         answers: result.answers,
@@ -1287,6 +1295,9 @@ async function saveQuizResult(result) {
         accuracy: quizRecord.accuracy,
         correctCount: result.correctCount,
         totalCount: result.totalCount,
+        // 언어 정보 추가
+        sourceLanguage: result.settings.sourceLanguage,
+        targetLanguage: result.settings.targetLanguage,
       });
       console.log("✅ user_records 퀴즈 통계 업데이트 완료");
     } catch (progressError) {
@@ -1294,16 +1305,59 @@ async function saveQuizResult(result) {
       // quiz_records는 저장되었으므로 계속 진행
     }
 
-    // 3. 🔄 개념 스냅샷 자동 저장
+    // 3. 🔄 개념 스냅샷 자동 저장 (새로운 DB 구조 지원)
     try {
       if (conceptIds.length > 0) {
         console.log(
           `📋 퀴즈 개념 스냅샷 자동 저장 시작: ${conceptIds.length}개 개념`
         );
-        await collectionManager.saveConceptSnapshots(
-          currentUser.email,
-          conceptIds
-        );
+
+        // 퀴즈에서 사용된 개념들의 타입을 확인하여 적절한 타입으로 저장
+        for (const conceptId of conceptIds) {
+          // 개념 ID를 기반으로 컬렉션을 확인하여 타입 결정
+          let conceptType = "vocabulary"; // 기본값
+
+          try {
+            // concepts, grammar, examples 컬렉션에서 확인
+            const { doc, getDoc, db } = window.firebaseInit;
+
+            // concepts 컬렉션 확인
+            const conceptRef = doc(db, "concepts", conceptId);
+            const conceptDoc = await getDoc(conceptRef);
+
+            if (conceptDoc.exists()) {
+              conceptType = "vocabulary";
+            } else {
+              // grammar 컬렉션 확인
+              const grammarRef = doc(db, "grammar", conceptId);
+              const grammarDoc = await getDoc(grammarRef);
+
+              if (grammarDoc.exists()) {
+                conceptType = "grammar";
+              } else {
+                // examples 컬렉션 확인
+                const examplesRef = doc(db, "examples", conceptId);
+                const examplesDoc = await getDoc(examplesRef);
+
+                if (examplesDoc.exists()) {
+                  conceptType = "examples";
+                }
+              }
+            }
+          } catch (error) {
+            console.warn(`⚠️ 개념 타입 확인 실패: ${conceptId}`, error);
+            conceptType = "vocabulary"; // 기본값 사용
+          }
+
+          // 타입별로 개별 저장
+          await collectionManager.saveConceptSnapshotWithType(
+            currentUser.email,
+            conceptId,
+            conceptType,
+            result.settings.targetLanguage || "english"
+          );
+        }
+
         console.log("✅ 퀴즈 개념 스냅샷 자동 저장 완료");
       }
     } catch (snapshotError) {

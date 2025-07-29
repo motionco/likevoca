@@ -251,6 +251,14 @@ let translations = {};
 // 번역 파일들을 동적으로 로드하는 함수
 async function loadTranslations() {
   try {
+    // 이미 번역이 로드되어 있으면 다시 로드하지 않음 (무한루프 방지)
+    if (translations && Object.keys(translations).length > 0) {
+      console.log("📋 번역 파일이 이미 로드되어 있음 - 재로드 건너뜀");
+      return;
+    }
+
+    console.log("📋 번역 파일 로드 시작");
+
     // 현재 경로에 따라 상대 경로 조정
     const currentPath = window.location.pathname;
     let basePath = "";
@@ -637,7 +645,7 @@ function redirectToLanguagePage(langCode, forceRedirect = false) {
   const isDevelopment =
     window.location.hostname === "localhost" ||
     window.location.hostname === "127.0.0.1" ||
-    window.location.port === "5500";
+    window.location.port === "5595";
 
   // 현재 페이지에서 언어별 경로로 변환
   if (currentPath === "/" || currentPath === "/index.html") {
@@ -968,7 +976,7 @@ function goToLanguageSpecificPage(pageName) {
   const isDevelopment =
     window.location.hostname === "localhost" ||
     window.location.hostname === "127.0.0.1" ||
-    window.location.port === "5500" ||
+    window.location.port === "5595" ||
     window.location.hostname.includes("127.0.0.1");
 
   let targetPath;
@@ -1074,7 +1082,7 @@ function updateLinkForLanguage(originalHref, language) {
   const isDevelopment =
     window.location.hostname === "localhost" ||
     window.location.hostname === "127.0.0.1" ||
-    window.location.port === "5500";
+    window.location.port === "5595";
 
   // 현재 경로 정보
   const currentPath = window.location.pathname;

@@ -13,6 +13,12 @@
       "english": "Hello! Nice to meet you for the first time.",
       "japanese": "こんにちは！初めてお会いします。",
       "chinese": "你好！初次见面。"
+    },
+    "word": {
+      "korean": "안녕하세요",
+      "english": "Hello",
+      "japanese": "こんにちは",
+      "chinese": "你好"
     }
   },
   {
@@ -30,6 +36,12 @@
       "english": "Please give me one apple juice.",
       "japanese": "りんごジュースを一つください。",
       "chinese": "请给我一杯苹果汁。"
+    },
+    "word": {
+      "korean": "사과",
+      "english": "apple",
+      "japanese": "りんご",
+      "chinese": "苹果"
     }
   }
 ]

@@ -30,6 +30,12 @@
       "japanese": "こんにちは、初めまして。",
       "chinese": "您好，初次见面。"
     },
+    "word": {
+      "korean": "안녕하세요",
+      "english": "Hello",
+      "japanese": "こんにちは",
+      "chinese": "您好"
+    },
     "difficulty": "basic",
     "situation": [
       "polite",
@@ -67,6 +73,12 @@
       "english": "Please give me kimchi stew.",
       "japanese": "キムチチゲをください。",
       "chinese": "请给我泡菜汤。"
+    },
+    "word": {
+      "korean": "주세요",
+      "english": "give",
+      "japanese": "ください",
+      "chinese": "请给"
     },
     "difficulty": "basic",
     "situation": [

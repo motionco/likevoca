@@ -4,16 +4,22 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>登录 - LikeVoca</title>
-    <meta name="description" content="登录LikeVoca，开始您的个性化多语言学习体验。使用单词本、测验和进度跟踪功能" />
+    <meta
+      name="description"
+      content="登录LikeVoca，开始您的个性化多语言学习体验。使用单词本、测验和进度跟踪功能"
+    />
     <meta property="og:title" content="登录 - LikeVoca" />
-    <meta property="og:description" content="登录LikeVoca，开始您的个性化多语言学习体验。使用单词本、测验和进度跟踪功能" />
+    <meta
+      property="og:description"
+      content="登录LikeVoca，开始您的个性化多语言学习体验。使用单词本、测验和进度跟踪功能"
+    />
     <meta property="og:locale" content="zh_CN" />
     <link rel="canonical" href="https://likevoca.com/zh/login" />
     <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/login" />
     <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/login" />
     <link rel="alternate" hreflang="en" href="https://likevoca.com/en/login" />
     <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/login" />
-    <link href="../../css/style.css" rel="stylesheet"/>
+    <link href="../../css/style.css" rel="stylesheet" />
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link
@@ -27,97 +33,114 @@
   <body class="bg-gray-100 min-h-screen">
     <!-- 네비게이션바 컨테이너 -->
     <div id="navbar-container"></div>
-    
+
     <div class="flex items-center justify-center min-h-screen py-12">
-    <div class="bg-white shadow-lg rounded-lg w-11/12 sm:w-96 p-6">
-      <h1 class="text-3xl font-bold text-gray-800 text-center mb-6">登录</h1>
-      <div class="space-y-4">
-        <button
-          id="google-login-btn"
-          class="w-full flex items-center justify-center bg-red-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-red-600"
-        >
-        <i class="fa-brands fa-google mr-2"></i><span>使用Google登录</span>
-        </button>
-        <button
-          id="github-login-btn"
-          class="w-full flex items-center justify-center bg-gray-800 text-white py-2 px-4 rounded-lg shadow-md hover:bg-gray-900"
-        >
-        <i class="fa-brands fa-github mr-2"></i> <span>使用Github登录</span>
-        </button>
-      </div>
-
-      <div class="relative my-6">
-        <div class="absolute inset-0 flex items-center">
-          <div class="w-full border-t border-gray-300"></div>
-        </div>
-        <div class="relative flex justify-center text-sm">
-          <span class="px-2 bg-white text-gray-500">或者</span>
-        </div>
-      </div>
-
-      <form id="login-form" class="space-y-4">
-        <div>
-          <label for="email" class="block text-sm font-medium text-gray-700">邮箱</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            required
-            placeholder="请输入您的邮箱"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#4B63AC] focus:border-[#4B63AC] sm:text-sm"
-          />
-        </div>
-        <div>
-          <label for="password" class="block text-sm font-medium text-gray-700">密码</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            required
-            placeholder="请输入您的密码"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#4B63AC] focus:border-[#4B63AC] sm:text-sm"
-          />
+      <div class="bg-white shadow-lg rounded-lg w-11/12 sm:w-96 p-6">
+        <h1 class="text-3xl font-bold text-gray-800 text-center mb-6">登录</h1>
+        <div class="space-y-4">
+          <button
+            id="google-login-btn"
+            class="w-full flex items-center justify-center bg-red-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-red-600"
+          >
+            <i class="fa-brands fa-google mr-2"></i><span>使用Google登录</span>
+          </button>
+          <button
+            id="github-login-btn"
+            class="w-full flex items-center justify-center bg-gray-800 text-white py-2 px-4 rounded-lg shadow-md hover:bg-gray-900"
+          >
+            <i class="fa-brands fa-github mr-2"></i> <span>使用Github登录</span>
+          </button>
         </div>
 
-        <div class="flex items-center justify-between">
-          <label class="flex items-center">
+        <div class="relative my-6">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-gray-300"></div>
+          </div>
+          <div class="relative flex justify-center text-sm">
+            <span class="px-2 bg-white text-gray-500">或者</span>
+          </div>
+        </div>
+
+        <form id="login-form" class="space-y-4">
+          <div>
+            <label for="email" class="block text-sm font-medium text-gray-700"
+              >邮箱</label
+            >
             <input
-              type="checkbox"
-              class="h-4 w-4 text-[#4B63AC] border-gray-300 rounded"
-            /><span class="ml-2 text-sm text-gray-700">记住我</span>
-          </label>
-          <a href="#" onclick="goToLanguageSpecificPage('forgotpassword.html'); return false;" class="text-sm text-[#4B63AC] hover:underline">忘记密码？</a>
-        </div>
+              type="email"
+              id="email"
+              name="email"
+              required
+              placeholder="请输入您的邮箱"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#4B63AC] focus:border-[#4B63AC] sm:text-sm"
+            />
+          </div>
+          <div>
+            <label
+              for="password"
+              class="block text-sm font-medium text-gray-700"
+              >密码</label
+            >
+            <input
+              type="password"
+              id="password"
+              name="password"
+              required
+              placeholder="请输入您的密码"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#4B63AC] focus:border-[#4B63AC] sm:text-sm"
+            />
+          </div>
 
-        <div
-          id="error-message"
-          class="hidden text-red-500 text-sm text-center"
-        ></div>
+          <div class="flex items-center justify-between">
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                class="h-4 w-4 text-[#4B63AC] border-gray-300 rounded"
+              /><span class="ml-2 text-sm text-gray-700">记住我</span>
+            </label>
+            <a
+              href="#"
+              onclick="goToLanguageSpecificPage('forgotpassword.html'); return false;"
+              class="text-sm text-[#4B63AC] hover:underline"
+              >忘记密码？</a
+            >
+          </div>
 
-        <button
-          id="login-button"
-          type="submit"
-          class="w-full bg-[#4B63AC] text-white px-4 py-2 rounded-lg shadow-md hover:bg-[#3A4F8B] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-        >
-          登录
-        </button>
-      </form>
+          <div
+            id="error-message"
+            class="hidden text-red-500 text-sm text-center"
+          ></div>
 
-      <p class="mt-6 text-sm text-center text-gray-600">
-        <span>还没有账户吗？</span>
-        <a href="#" onclick="goToLanguageSpecificPage('signup.html'); return false;" class="text-[#4B63AC] hover:underline">注册</a>
-      </p>
+          <button
+            id="login-button"
+            type="submit"
+            class="w-full bg-[#4B63AC] text-white px-4 py-2 rounded-lg shadow-md hover:bg-[#3A4F8B] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            登录
+          </button>
+        </form>
+
+        <p class="mt-6 text-sm text-center text-gray-600">
+          <span>还没有账户吗？</span>
+          <a
+            href="#"
+            onclick="goToLanguageSpecificPage('signup.html'); return false;"
+            class="text-[#4B63AC] hover:underline"
+            >注册</a
+          >
+        </p>
+      </div>
     </div>
-    </div>
-    
+
     <script>
       // 언어별 페이지로 이동하는 함수
       function goToLanguageSpecificPage(filename) {
-        const userLanguage = localStorage.getItem('userLanguage') || 'zh';
-        const isDev = window.location.hostname === 'localhost' || 
-                     window.location.hostname === '127.0.0.1' ||
-                     window.location.port === '5500';
-        
+        const userLanguage = localStorage.getItem("userLanguage") || "zh";
+        const isDev =
+          window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1" ||
+          window.location.port === "5595";
+
         if (isDev) {
           window.location.href = `/locales/${userLanguage}/${filename}`;
         } else {
@@ -127,7 +150,3 @@
     </script>
   </body>
 </html>
-
-
-
-

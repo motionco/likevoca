@@ -1,3 +1,3 @@
-domain,category,difficulty,situation,purpose,korean,english,japanese,chinese
-daily,routine,basic,"polite,social",greeting,안녕하세요! 처음 뵙겠습니다.,Hello! Nice to meet you for the first time.,こんにちは！初めてお会いします。,你好！初次见面。
-food,fruit,basic,"shopping,public,polite",request,사과 주스 하나 주세요.,Please give me one apple juice.,りんごジュースを一つください。,请给我一杯苹果汁。 
+domain,category,difficulty,situation,purpose,korean,english,japanese,chinese,korean_word,english_word,japanese_word,chinese_word
+daily,routine,basic,"polite,social",greeting,안녕하세요! 처음 뵙겠습니다.,Hello! Nice to meet you for the first time.,こんにちは！初めてお会いします。,你好！初次见面。,안녕하세요,Hello,こんにちは,你好
+food,fruit,basic,"shopping,public,polite",request,사과 주스 하나 주세요.,Please give me one apple juice.,りんごジュースを一つください。,请给我一杯苹果汁。,사과,apple,りんご,苹果 

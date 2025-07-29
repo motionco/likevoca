@@ -996,8 +996,9 @@ export class CollectionManager {
         snapshot.forEach((doc) => {
           const data = doc.data();
           // Firebase 문서 ID는 최소 15자 이상의 영숫자 문자열이어야 함
-          const isValidFirebaseId = doc.id.length >= 15 && /^[A-Za-z0-9]+$/.test(doc.id);
-          
+          const isValidFirebaseId =
+            doc.id.length >= 15 && /^[A-Za-z0-9]+$/.test(doc.id);
+
           if (
             isValidFirebaseId &&
             data.expressions?.[mappedUserLang] &&
@@ -1024,7 +1025,9 @@ export class CollectionManager {
               },
             });
           } else if (!isValidFirebaseId) {
-            console.log(`⚠️ 임시 ID 필터링됨: ${doc.id} (유효한 Firebase 문서 ID가 아님)`);
+            console.log(
+              `⚠️ 임시 ID 필터링됨: ${doc.id} (유효한 Firebase 문서 ID가 아님)`
+            );
           }
         });
 
@@ -2173,7 +2176,7 @@ export class CollectionManager {
       // user_records 문서 참조 (email을 document ID로 사용)
       const userRecordRef = doc(db, "user_records", userEmail);
       const userDoc = await getDoc(userRecordRef);
-      
+
       // 입력 데이터 검증 및 기본값 설정
       const {
         correctCount = 0,
@@ -2181,13 +2184,34 @@ export class CollectionManager {
         totalTime = 0,
         accuracy = 0,
         score = 0,
-        targetLanguage = 'english'
+        targetLanguage = "english",
+        sourceLanguage = null, // 퀴즈에서는 sourceLanguage가 없을 수 있음
       } = quizData;
+
+      // 학습 활동과 동일한 언어 순서 로직 적용
+      let actualTargetLanguage;
+      if (targetLanguage === "korean") {
+        actualTargetLanguage = "korean";
+      } else if (targetLanguage === "japanese") {
+        actualTargetLanguage = "japanese";
+      } else if (targetLanguage === "chinese") {
+        actualTargetLanguage = "chinese";
+      } else {
+        actualTargetLanguage = "english";
+      }
+
+      console.log("🎯 퀴즈 언어 순서 결정:", {
+        originalTargetLanguage: targetLanguage,
+        sourceLanguage: sourceLanguage,
+        actualTargetLanguage: actualTargetLanguage,
+        storageKey: `target_languages.${actualTargetLanguage}`,
+      });
 
       // 현재 문서 데이터 가져오기
       const currentRecord = userDoc.exists() ? userDoc.data() : {};
       const currentTargetLanguages = currentRecord.target_languages || {};
-      const currentLanguageData = currentTargetLanguages[targetLanguage] || {};
+      const currentLanguageData =
+        currentTargetLanguages[actualTargetLanguage] || {};
       const currentQuizStats = currentLanguageData.quiz_stats || {};
 
       // NaN 방지를 위한 안전한 숫자 변환
@@ -2198,9 +2222,10 @@ export class CollectionManager {
       const safeScore = Number(score) || 0;
 
       // 정확도 재계산
-      const recalculatedAccuracy = safeTotalCount > 0 ? 
-        Math.round(((safeCorrectCount / safeTotalCount) * 100) * 100) / 100 : 
-        safeAccuracy;
+      const recalculatedAccuracy =
+        safeTotalCount > 0
+          ? Math.round((safeCorrectCount / safeTotalCount) * 100 * 100) / 100
+          : safeAccuracy;
 
       console.log("🎯 퀴즈 데이터 입력값:", {
         email: userEmail,
@@ -2209,24 +2234,40 @@ export class CollectionManager {
         total: safeTotalCount,
         time: safeTimeSpent,
         accuracy: recalculatedAccuracy,
-        score: safeScore
+        score: safeScore,
       });
 
       // 새로운 퀴즈 통계 계산
       const newTotalQuizzes = (Number(currentQuizStats.total_quizzes) || 0) + 1;
-      const newTotalQuestions = (Number(currentQuizStats.total_questions) || 0) + safeTotalCount;
-      const newCorrectAnswers = (Number(currentQuizStats.correct_answers) || 0) + safeCorrectCount;
-      const newTotalTime = (Number(currentQuizStats.total_time) || 0) + safeTimeSpent;
-      
+      const newTotalQuestions =
+        (Number(currentQuizStats.total_questions) || 0) + safeTotalCount;
+      const newCorrectAnswers =
+        (Number(currentQuizStats.correct_answers) || 0) + safeCorrectCount;
+      const newTotalTime =
+        (Number(currentQuizStats.total_time) || 0) + safeTimeSpent;
+
       // 통계 계산
-      const newAvgAccuracy = newTotalQuestions > 0 ? 
-        Math.round(((newCorrectAnswers / newTotalQuestions) * 100) * 100) / 100 : 0;
-      const newBestAccuracy = Math.max(Number(currentQuizStats.best_accuracy) || 0, recalculatedAccuracy);
-      const newAvgTimePerQuiz = newTotalQuizzes > 0 ? Math.round(newTotalTime / newTotalQuizzes) : 0;
-      const newBestScore = Math.max(Number(currentQuizStats.best_score) || 0, safeScore);
+      const newAvgAccuracy =
+        newTotalQuestions > 0
+          ? Math.round((newCorrectAnswers / newTotalQuestions) * 100 * 100) /
+            100
+          : 0;
+      const newBestAccuracy = Math.max(
+        Number(currentQuizStats.best_accuracy) || 0,
+        recalculatedAccuracy
+      );
+      const newAvgTimePerQuiz =
+        newTotalQuizzes > 0 ? Math.round(newTotalTime / newTotalQuizzes) : 0;
+      const newBestScore = Math.max(
+        Number(currentQuizStats.best_score) || 0,
+        safeScore
+      );
 
       // 최근 점수 기록 (최대 10개)
-      const recentScores = [...(currentQuizStats.recent_scores || []), safeScore];
+      const recentScores = [
+        ...(currentQuizStats.recent_scores || []),
+        safeScore,
+      ];
       if (recentScores.length > 10) {
         recentScores.shift();
       }
@@ -2236,7 +2277,7 @@ export class CollectionManager {
       // target_languages.{language}.quiz_stats 구조로 업데이트 데이터 준비
       const updatedData = {
         user_email: userEmail,
-        [`target_languages.${targetLanguage}.quiz_stats`]: {
+        [`target_languages.${actualTargetLanguage}.quiz_stats`]: {
           total_quizzes: newTotalQuizzes,
           total_questions: newTotalQuestions,
           correct_answers: newCorrectAnswers,
@@ -2246,9 +2287,9 @@ export class CollectionManager {
           avg_time_per_quiz: newAvgTimePerQuiz,
           best_score: newBestScore,
           recent_scores: recentScores,
-          last_quiz_date: now
+          last_quiz_date: now,
         },
-        last_updated: now
+        last_updated: now,
       };
 
       // Firestore 업데이트
@@ -2259,7 +2300,7 @@ export class CollectionManager {
         const newUserRecord = {
           user_email: userEmail,
           target_languages: {
-            [targetLanguage]: {
+            [actualTargetLanguage]: {
               quiz_stats: {
                 total_quizzes: newTotalQuizzes,
                 total_questions: newTotalQuestions,
@@ -2270,40 +2311,40 @@ export class CollectionManager {
                 avg_time_per_quiz: newAvgTimePerQuiz,
                 best_score: newBestScore,
                 recent_scores: recentScores,
-                last_quiz_date: now
+                last_quiz_date: now,
               },
               learning_stats: {
                 total_sessions: 0,
                 total_time: 0,
                 concepts_learned: 0,
                 avg_accuracy: 0,
-                last_session_date: null
+                last_session_date: null,
               },
               game_stats: {
                 total_games: 0,
                 total_time: 0,
                 avg_score: 0,
                 best_score: 0,
-                last_game_date: null
-              }
-            }
+                last_game_date: null,
+              },
+            },
           },
           concept_snapshots: {}, // 빈 스냅샷 객체로 초기화
           mastered_concepts: [],
           recent_studied: [],
-          last_updated: now
+          last_updated: now,
         };
         await setDoc(userRecordRef, newUserRecord);
       }
 
       console.log("✅ 퀴즈 진도 업데이트 완료 (target_languages 구조):", {
         email: userEmail,
-        target: targetLanguage,
+        originalTarget: targetLanguage,
+        actualTarget: actualTargetLanguage,
         quizzes: newTotalQuizzes,
         accuracy: Math.round(newAvgAccuracy * 100) / 100,
-        score: safeScore
+        score: safeScore,
       });
-
     } catch (error) {
       console.error("❌ 퀴즈 진도 업데이트 중 오류:", error);
     }
@@ -2705,7 +2746,7 @@ export class CollectionManager {
       console.log("📧 userId 확인:", userId);
 
       // userId 유효성 검사
-      if (!userId || typeof userId !== 'string') {
+      if (!userId || typeof userId !== "string") {
         console.error("❌ 유효하지 않은 userId:", userId);
         throw new Error("유효하지 않은 사용자 ID");
       }
@@ -2768,15 +2809,30 @@ export class CollectionManager {
       console.log("✅ learning_records에 학습 기록 저장 완료");
 
       // 2. 🎯 user_records에 통합 통계 업데이트
+      console.log("🔍 updateUserProgressFromLearning 호출 전 언어 정보:", {
+        sourceLanguage: activityData.sourceLanguage,
+        targetLanguage: activityData.targetLanguage,
+        learningType: `${activityData.sourceLanguage} → ${activityData.targetLanguage}`,
+      });
+
       try {
         await this.updateUserProgressFromLearning(userId, {
           conceptIds: activityData.conceptIds || [],
-          session_duration: activityData.session_duration || activityData.duration || 0,
-          concepts_studied: activityData.concepts_studied || activityData.conceptsStudied || 0,
-          correct_answers: activityData.correct_answers || activityData.correctAnswers || 0,
-          total_interactions: activityData.total_interactions || activityData.totalInteractions || 0,
+          session_duration:
+            activityData.session_duration || activityData.duration || 0,
+          concepts_studied:
+            activityData.concepts_studied || activityData.conceptsStudied || 0,
+          correct_answers:
+            activityData.correct_answers || activityData.correctAnswers || 0,
+          total_interactions:
+            activityData.total_interactions ||
+            activityData.totalInteractions ||
+            0,
           session_quality: activityData.session_quality || 0,
-          activity_type: activityData.type
+          activity_type: activityData.type,
+          // 언어 정보 추가
+          sourceLanguage: activityData.sourceLanguage,
+          targetLanguage: activityData.targetLanguage,
         });
         console.log("✅ user_records 학습 통계 업데이트 완료");
       } catch (progressError) {
@@ -2784,12 +2840,21 @@ export class CollectionManager {
         // learning_records는 저장되었으므로 계속 진행
       }
 
-      // 3. 🔄 개념 스냅샷 자동 저장
+      // 3. 🔄 개념 스냅샷 자동 저장 (conceptType 지원)
       try {
         const conceptIds = activityData.conceptIds || [];
+        const conceptType = activityData.conceptType || "vocabulary"; // 기본값은 vocabulary
+
         if (conceptIds.length > 0) {
-          console.log(`📋 개념 스냅샷 자동 저장 시작: ${conceptIds.length}개 개념`);
-          await this.saveConceptSnapshots(userId, conceptIds);
+          console.log(
+            `📋 개념 스냅샷 자동 저장 시작: ${conceptIds.length}개 개념 (타입: ${conceptType})`
+          );
+          await this.saveConceptSnapshotsWithType(
+            userId,
+            conceptIds,
+            conceptType,
+            activityData.targetLanguage || "english"
+          );
           console.log("✅ 개념 스냅샷 자동 저장 완료");
         }
       } catch (snapshotError) {
@@ -2811,9 +2876,9 @@ export class CollectionManager {
   async updateUserProgressFromLearning(userEmail, learningData) {
     try {
       console.log("📊 학습 결과 기반 사용자 진도 업데이트 시작");
-      
+
       // userEmail 유효성 검사
-      if (!userEmail || typeof userEmail !== 'string') {
+      if (!userEmail || typeof userEmail !== "string") {
         console.error("❌ 유효하지 않은 userEmail:", userEmail);
         throw new Error("유효하지 않은 사용자 이메일");
       }
@@ -2821,7 +2886,7 @@ export class CollectionManager {
       // 📊 user_records 문서 참조 및 현재 데이터 확인 (user_email 사용)
       const userRecordRef = doc(db, "user_records", userEmail);
       const userDoc = await getDoc(userRecordRef);
-      
+
       let currentRecord = {};
       if (userDoc.exists()) {
         currentRecord = userDoc.data();
@@ -2832,25 +2897,51 @@ export class CollectionManager {
         currentRecord.target_languages = {};
       }
 
-      // 기본적으로 english 언어로 설정 (실제로는 learningData에서 가져와야 함)
-      const targetLanguage = learningData.targetLanguage || 'english';
-      
-      if (!currentRecord.target_languages[targetLanguage]) {
-        currentRecord.target_languages[targetLanguage] = {
+      // 언어 설정 가져오기
+      const sourceLanguage = learningData.sourceLanguage || "korean";
+      const targetLanguage = learningData.targetLanguage || "english";
+
+      // 개념 스냅샷과 동일한 언어 순서 로직 적용
+      // target_languages 필드는 실제 대상 언어(학습하려는 언어)를 키로 사용
+      let actualTargetLanguage;
+      if (targetLanguage === "korean") {
+        // 한국어가 대상 언어인 경우 (영어→한국어 학습)
+        actualTargetLanguage = "korean";
+      } else if (targetLanguage === "japanese") {
+        // 일본어가 대상 언어인 경우 (영어→일본어 학습)
+        actualTargetLanguage = "japanese";
+      } else if (targetLanguage === "chinese") {
+        // 중국어가 대상 언어인 경우 (영어→중국어 학습)
+        actualTargetLanguage = "chinese";
+      } else {
+        // 영어가 대상 언어인 경우 (한국어/일본어/중국어→영어 학습)
+        actualTargetLanguage = "english";
+      }
+
+      console.log("🔍 언어 순서 결정:", {
+        sourceLanguage,
+        targetLanguage,
+        actualTargetLanguage,
+        learningType: `${sourceLanguage} → ${targetLanguage}`,
+        storageKey: `target_languages.${actualTargetLanguage}`,
+      });
+
+      if (!currentRecord.target_languages[actualTargetLanguage]) {
+        currentRecord.target_languages[actualTargetLanguage] = {
           learning_stats: {
             total_sessions: 0,
             total_time: 0,
             concepts_learned: 0,
             avg_accuracy: 0,
             avg_quality: 0,
-            last_session_date: null
+            last_session_date: null,
           },
           game_stats: {
             total_games: 0,
             total_time: 0,
             avg_score: 0,
             best_score: 0,
-            last_game_date: null
+            last_game_date: null,
           },
           quiz_stats: {
             total_quizzes: 0,
@@ -2861,14 +2952,14 @@ export class CollectionManager {
             total_time: 0,
             avg_time_per_quiz: 0,
             best_score: 0,
-            recent_scores: []
+            recent_scores: [],
           },
           stats: {
             learning_accuracy: 0,
             total_learning_time: 0,
-            last_activity: null
+            last_activity: null,
           },
-          mastered_concepts: []
+          mastered_concepts: [],
         };
       }
 
@@ -2880,49 +2971,70 @@ export class CollectionManager {
       const sessionQuality = Number(learningData.session_quality) || 0;
 
       // 📊 현재 학습 통계 가져오기 (NaN 방지를 위한 안전한 기본값)
-      const currentLearningStats = currentRecord.target_languages[targetLanguage].learning_stats;
+      const currentLearningStats =
+        currentRecord.target_languages[actualTargetLanguage].learning_stats;
 
       // 📊 새로운 학습 통계 계산 (안전한 숫자 처리)
-      const newTotalSessions = (Number(currentLearningStats.total_sessions) || 0) + 1;
-      const newTotalTime = (Number(currentLearningStats.total_time) || 0) + sessionDuration;
-      const newConceptsLearned = (Number(currentLearningStats.concepts_learned) || 0) + conceptsStudied;
-      
+      const newTotalSessions =
+        (Number(currentLearningStats.total_sessions) || 0) + 1;
+      const newTotalTime =
+        (Number(currentLearningStats.total_time) || 0) + sessionDuration;
+      const newConceptsLearned =
+        (Number(currentLearningStats.concepts_learned) || 0) + conceptsStudied;
+
       // NaN 방지를 위한 안전한 나눗셈 처리
-      const newAvgAccuracy = totalInteractions > 0 ? Math.round(((correctAnswers / totalInteractions) * 100) * 100) / 100 : 0;
+      const newAvgAccuracy =
+        totalInteractions > 0
+          ? Math.round((correctAnswers / totalInteractions) * 100 * 100) / 100
+          : 0;
       const currentAvgAccuracy = Number(currentLearningStats.avg_accuracy) || 0;
-      const combinedAvgAccuracy = newTotalSessions > 0 ? 
-        Math.round(((currentAvgAccuracy * (newTotalSessions - 1) + newAvgAccuracy) / newTotalSessions) * 100) / 100 : 0;
-      
+      const combinedAvgAccuracy =
+        newTotalSessions > 0
+          ? Math.round(
+              ((currentAvgAccuracy * (newTotalSessions - 1) + newAvgAccuracy) /
+                newTotalSessions) *
+                100
+            ) / 100
+          : 0;
+
       const newAvgQuality = sessionQuality;
       const currentAvgQuality = Number(currentLearningStats.avg_quality) || 0;
-      const combinedAvgQuality = newTotalSessions > 0 ? 
-        Math.round(((currentAvgQuality * (newTotalSessions - 1) + newAvgQuality) / newTotalSessions) * 100) / 100 : 0;
+      const combinedAvgQuality =
+        newTotalSessions > 0
+          ? Math.round(
+              ((currentAvgQuality * (newTotalSessions - 1) + newAvgQuality) /
+                newTotalSessions) *
+                100
+            ) / 100
+          : 0;
 
       // 📊 업데이트할 데이터 준비 (NaN 방지를 위한 안전한 검증)
       const now = new Date();
-      
+
       // 모든 수치 데이터에 대해 NaN 체크 및 안전한 처리
-      const safeAvgAccuracy = isNaN(combinedAvgAccuracy) ? 0 : combinedAvgAccuracy;
+      const safeAvgAccuracy = isNaN(combinedAvgAccuracy)
+        ? 0
+        : combinedAvgAccuracy;
       const safeAvgQuality = isNaN(combinedAvgQuality) ? 0 : combinedAvgQuality;
-      
-      // target_languages 구조로 업데이트
+
+      // target_languages 구조로 업데이트 (actualTargetLanguage 사용)
       const updatedData = {
-        [`target_languages.${targetLanguage}.learning_stats`]: {
+        [`target_languages.${actualTargetLanguage}.learning_stats`]: {
           total_sessions: newTotalSessions,
           total_time: newTotalTime,
           concepts_learned: newConceptsLearned,
           avg_accuracy: safeAvgAccuracy,
           avg_quality: safeAvgQuality,
-          last_session_date: now
+          last_session_date: now,
         },
-        [`target_languages.${targetLanguage}.stats`]: {
-          ...currentRecord.target_languages[targetLanguage].stats,
+        [`target_languages.${actualTargetLanguage}.stats`]: {
+          ...currentRecord.target_languages[actualTargetLanguage].stats,
           learning_accuracy: safeAvgAccuracy,
           total_learning_time: newTotalTime,
-          last_activity: now
+          last_activity: now,
         },
-        version: '3.0',
-        last_updated: now
+        version: "3.0",
+        last_updated: now,
       };
 
       // 📊 Firestore 업데이트 (문서가 없으면 생성, 있으면 업데이트)
@@ -2940,14 +3052,14 @@ export class CollectionManager {
                 concepts_learned: newConceptsLearned,
                 avg_accuracy: safeAvgAccuracy,
                 avg_quality: safeAvgQuality,
-                last_session_date: now
+                last_session_date: now,
               },
               game_stats: {
                 total_games: 0,
                 total_time: 0,
                 avg_score: 0,
                 best_score: 0,
-                last_game_date: null
+                last_game_date: null,
               },
               quiz_stats: {
                 total_quizzes: 0,
@@ -2958,29 +3070,29 @@ export class CollectionManager {
                 total_time: 0,
                 avg_time_per_quiz: 0,
                 best_score: 0,
-                recent_scores: []
+                recent_scores: [],
               },
               stats: {
                 learning_accuracy: safeAvgAccuracy,
                 total_learning_time: newTotalTime,
-                last_activity: now
+                last_activity: now,
               },
-              mastered_concepts: []
-            }
+              mastered_concepts: [],
+            },
           },
-          version: '3.0',
+          version: "3.0",
           created_at: now,
-          last_updated: now
+          last_updated: now,
         });
       }
 
       console.log("✅ 사용자 학습 진도 업데이트 완료:", {
+        targetLanguage: actualTargetLanguage,
         sessions: newTotalSessions,
         accuracy: safeAvgAccuracy,
         quality: safeAvgQuality,
-        conceptsLearned: newConceptsLearned
+        conceptsLearned: newConceptsLearned,
       });
-
     } catch (error) {
       console.error("❌ 사용자 학습 진도 업데이트 중 오류:", error);
     }
@@ -3118,50 +3230,155 @@ export class CollectionManager {
     }
   }
   */
-  
+
   /**
    * 📋 개념 스냅샷 생성 (추가 DB 조회 없이 모든 정보 포함)
    */
-  async getConceptSnapshot(conceptId, conceptType = 'vocabulary') {
+  async getConceptSnapshot(conceptId, conceptType = "vocabulary") {
     try {
-      let collectionName = 'concepts';
-      if (conceptType === 'grammar') collectionName = 'grammar';
-      else if (conceptType === 'examples') collectionName = 'examples';
-      
+      let collectionName = "concepts";
+      if (conceptType === "grammar") collectionName = "grammar";
+      else if (conceptType === "examples") collectionName = "examples";
+
       const conceptDoc = await getDoc(doc(db, collectionName, conceptId));
       if (!conceptDoc.exists()) {
         return null;
       }
-      
+
       const data = conceptDoc.data();
-      
+
       // 데이터 구조에 따라 스냅샷 생성
       let snapshot = {
-        korean: '',
-        english: '',
-        japanese: '',
-        chinese: '',
-        domain: data.domain || '일반',
-        difficulty: data.difficulty || '초급',
-        type: conceptType
+        korean: "",
+        english: "",
+        japanese: "",
+        chinese: "",
+        domain: data.domain || "일반",
+        difficulty: data.difficulty || "초급",
+        type: conceptType,
       };
-      
-      if (data.expressions) {
-        // 다국어 표현 구조
-        snapshot.korean = data.expressions.korean?.word || data.expressions.korean || '';
-        snapshot.english = data.expressions.english?.word || data.expressions.english || '';
-        snapshot.japanese = data.expressions.japanese?.word || data.expressions.japanese || '';
-        snapshot.chinese = data.expressions.chinese?.word || data.expressions.chinese || '';
+
+      if (conceptType === "grammar") {
+        // 문법 패턴 데이터 처리 - word 필드 우선 사용
+        if (data.word) {
+          snapshot.korean =
+            data.word.korean ||
+            data.pattern_name ||
+            data.korean_name ||
+            conceptId.substring(0, 12);
+          snapshot.english =
+            data.word.english ||
+            data.english_name ||
+            data.pattern_name ||
+            conceptId.substring(0, 12);
+          snapshot.japanese =
+            data.word.japanese ||
+            data.japanese_name ||
+            data.pattern_name ||
+            conceptId.substring(0, 12);
+          snapshot.chinese =
+            data.word.chinese ||
+            data.chinese_name ||
+            data.pattern_name ||
+            conceptId.substring(0, 12);
+        } else {
+          snapshot.korean =
+            data.pattern_name || data.korean_name || conceptId.substring(0, 12);
+          snapshot.english =
+            data.english_name ||
+            data.pattern_name ||
+            conceptId.substring(0, 12);
+          snapshot.japanese =
+            data.japanese_name ||
+            data.pattern_name ||
+            conceptId.substring(0, 12);
+          snapshot.chinese =
+            data.chinese_name ||
+            data.pattern_name ||
+            conceptId.substring(0, 12);
+        }
+
+        // 문법 특화 정보 추가
+        snapshot.structural_pattern = data.structural_pattern || "";
+        snapshot.grammar_tags = data.grammar_tags || [];
+        snapshot.learning_focus = data.learning_focus || [];
+      } else if (conceptType === "examples") {
+        // 독해/예문 데이터 처리 - word 필드 우선 사용
+        if (data.word) {
+          snapshot.korean =
+            data.word.korean ||
+            data.translations?.korean?.text ||
+            data.korean_text ||
+            conceptId.substring(0, 12);
+          snapshot.english =
+            data.word.english ||
+            data.translations?.english?.text ||
+            data.english_text ||
+            conceptId.substring(0, 12);
+          snapshot.japanese =
+            data.word.japanese ||
+            data.translations?.japanese?.text ||
+            data.japanese_text ||
+            conceptId.substring(0, 12);
+          snapshot.chinese =
+            data.word.chinese ||
+            data.translations?.chinese?.text ||
+            data.chinese_text ||
+            conceptId.substring(0, 12);
+        } else if (data.translations) {
+          snapshot.korean =
+            data.translations.korean?.text ||
+            data.korean_text ||
+            conceptId.substring(0, 12);
+          snapshot.english =
+            data.translations.english?.text ||
+            data.english_text ||
+            conceptId.substring(0, 12);
+          snapshot.japanese =
+            data.translations.japanese?.text ||
+            data.japanese_text ||
+            conceptId.substring(0, 12);
+          snapshot.chinese =
+            data.translations.chinese?.text ||
+            data.chinese_text ||
+            conceptId.substring(0, 12);
+        } else {
+          snapshot.korean =
+            data.korean_text || data.text || conceptId.substring(0, 12);
+          snapshot.english =
+            data.english_text || data.text || conceptId.substring(0, 12);
+          snapshot.japanese =
+            data.japanese_text || data.text || conceptId.substring(0, 12);
+          snapshot.chinese =
+            data.chinese_text || data.text || conceptId.substring(0, 12);
+        }
+
+        // 독해 특화 정보 추가
+        snapshot.reading_level =
+          data.reading_level || data.difficulty || "초급";
+        snapshot.comprehension_questions = data.comprehension_questions || [];
       } else {
-        // 단일 언어 구조
-        snapshot.korean = data.korean || data.word || '';
-        snapshot.english = data.english || '';
-        snapshot.japanese = data.japanese || '';
-        snapshot.chinese = data.chinese || '';
+        // 기존 단어/개념 데이터 처리
+        if (data.expressions) {
+          // 다국어 표현 구조
+          snapshot.korean =
+            data.expressions.korean?.word || data.expressions.korean || "";
+          snapshot.english =
+            data.expressions.english?.word || data.expressions.english || "";
+          snapshot.japanese =
+            data.expressions.japanese?.word || data.expressions.japanese || "";
+          snapshot.chinese =
+            data.expressions.chinese?.word || data.expressions.chinese || "";
+        } else {
+          // 단일 언어 구조
+          snapshot.korean = data.korean || data.word || "";
+          snapshot.english = data.english || "";
+          snapshot.japanese = data.japanese || "";
+          snapshot.chinese = data.chinese || "";
+        }
       }
-      
+
       return snapshot;
-      
     } catch (error) {
       console.warn(`개념 스냅샷 생성 실패: ${conceptId}`, error);
       return null;
@@ -3278,22 +3495,26 @@ export class CollectionManager {
       const gameRecordRef = doc(collection(db, "game_records"));
 
       // 유효한 Firebase 문서 ID만 필터링하여 저장
-      const validConceptIds = (gameData.conceptId || []).filter(id => {
-        const isValid = id && typeof id === 'string' && id.length >= 15 && /^[A-Za-z0-9]+$/.test(id);
+      const validConceptIds = (gameData.conceptId || []).filter((id) => {
+        const isValid =
+          id &&
+          typeof id === "string" &&
+          id.length >= 15 &&
+          /^[A-Za-z0-9]+$/.test(id);
         if (!isValid && id) {
-          console.log(`⚠️ 임시 개념 ID 필터링됨: ${id} (유효한 Firebase 문서 ID가 아님)`);
+          console.log(
+            `⚠️ 임시 개념 ID 필터링됨: ${id} (유효한 Firebase 문서 ID가 아님)`
+          );
         }
         return isValid;
       });
 
       const activityDoc = {
         user_email: userEmail,
-        game_type: gameData.game_type || gameData.type, // "word-matching", "word-scramble", "memory-game"
-        gameType: gameData.gameType || gameData.game_type || gameData.type, // camelCase 호환성
+        gameType: gameData.gameType || gameData.type, // camelCase 필드만 사용
         score: gameData.score || 0,
         max_score: gameData.maxScore || 0,
-        time_spent: gameData.timeSpent || gameData.time_spent || 0,
-        timeSpent: gameData.timeSpent || gameData.time_spent || 0, // camelCase 호환성
+        timeSpent: gameData.timeSpent || gameData.time_spent || 0, // camelCase 필드만 사용
         words_played: gameData.wordsPlayed || 0,
         correct_answers: gameData.correctAnswers || 0,
         total_answers: gameData.totalAnswers || 0,
@@ -3329,7 +3550,8 @@ export class CollectionManager {
           accuracy: gameData.accuracy || 0,
           wordsPlayed: gameData.wordsPlayed || 0,
           correctAnswers: gameData.correctAnswers || 0,
-          totalAnswers: gameData.totalAnswers || 0
+          totalAnswers: gameData.totalAnswers || 0,
+          targetLanguage: gameData.targetLanguage || "english", // targetLanguage 명시적 전달
         });
         console.log("✅ user_records 게임 통계 업데이트 완료");
       } catch (progressError) {
@@ -3341,17 +3563,30 @@ export class CollectionManager {
       try {
         const conceptIds = gameData.conceptIds || gameData.concept_id || [];
         // 유효한 Firebase 문서 ID만 필터링
-        const validConceptIdsForSnapshot = conceptIds.filter(id => {
-          const isValid = id && typeof id === 'string' && id.length >= 15 && /^[A-Za-z0-9]+$/.test(id);
+        const validConceptIdsForSnapshot = conceptIds.filter((id) => {
+          const isValid =
+            id &&
+            typeof id === "string" &&
+            id.length >= 15 &&
+            /^[A-Za-z0-9]+$/.test(id);
           if (!isValid && id) {
-            console.log(`⚠️ 스냅샷용 임시 ID 필터링됨: ${id} (유효한 Firebase 문서 ID가 아님)`);
+            console.log(
+              `⚠️ 스냅샷용 임시 ID 필터링됨: ${id} (유효한 Firebase 문서 ID가 아님)`
+            );
           }
           return isValid;
         });
-        
+
         if (validConceptIdsForSnapshot.length > 0) {
-          console.log(`📋 게임 개념 스냅샷 자동 저장 시작: ${validConceptIdsForSnapshot.length}개 개념`);
-          await this.saveConceptSnapshots(userEmail, validConceptIdsForSnapshot);
+          console.log(
+            `📋 게임 개념 스냅샷 자동 저장 시작: ${validConceptIdsForSnapshot.length}개 개념`
+          );
+          await this.saveConceptSnapshotsWithType(
+            userEmail,
+            validConceptIdsForSnapshot,
+            "vocabulary",
+            gameData.targetLanguage || "english" // targetLanguage 전달
+          );
           console.log("✅ 게임 개념 스냅샷 자동 저장 완료");
         } else {
           console.log("⚠️ 유효한 개념 ID가 없어 스냅샷 저장 건너뜀");
@@ -3377,7 +3612,7 @@ export class CollectionManager {
       // 📊 user_records 문서 참조 및 현재 데이터 확인 (user_email 사용)
       const userRecordRef = doc(db, "user_records", userEmail);
       const userDoc = await getDoc(userRecordRef);
-      
+
       let currentRecord = {};
       if (userDoc.exists()) {
         currentRecord = userDoc.data();
@@ -3388,25 +3623,47 @@ export class CollectionManager {
         currentRecord.target_languages = {};
       }
 
-      // 기본적으로 english 언어로 설정 (실제로는 gameData에서 가져와야 함)
-      const targetLanguage = gameData.targetLanguage || 'english';
-      
-      if (!currentRecord.target_languages[targetLanguage]) {
-        currentRecord.target_languages[targetLanguage] = {
+      // gameData에서 targetLanguage 가져오기
+      const targetLanguage = gameData.targetLanguage || "english";
+
+      // 학습 활동과 동일한 언어 순서 로직 적용
+      let actualTargetLanguage;
+      if (targetLanguage === "korean") {
+        actualTargetLanguage = "korean";
+      } else if (targetLanguage === "japanese") {
+        actualTargetLanguage = "japanese";
+      } else if (targetLanguage === "chinese") {
+        actualTargetLanguage = "chinese";
+      } else {
+        actualTargetLanguage = "english";
+      }
+
+      console.log("🎮 게임 언어 순서 결정:", {
+        originalTargetLanguage: targetLanguage,
+        actualTargetLanguage: actualTargetLanguage,
+        storageKey: `target_languages.${actualTargetLanguage}`,
+      });
+
+      // target_languages[actualTargetLanguage]이 없거나 game_stats가 없는 경우 초기화
+      if (
+        !currentRecord.target_languages[actualTargetLanguage] ||
+        !currentRecord.target_languages[actualTargetLanguage].game_stats
+      ) {
+        currentRecord.target_languages[actualTargetLanguage] = {
           learning_stats: {
             total_sessions: 0,
             total_time: 0,
             concepts_learned: 0,
             avg_accuracy: 0,
             avg_quality: 0,
-            last_session_date: null
+            last_session_date: null,
           },
           game_stats: {
             total_games: 0,
             total_time: 0,
             avg_score: 0,
             best_score: 0,
-            last_game_date: null
+            last_game_date: null,
           },
           quiz_stats: {
             total_quizzes: 0,
@@ -3417,14 +3674,14 @@ export class CollectionManager {
             total_time: 0,
             avg_time_per_quiz: 0,
             best_score: 0,
-            recent_scores: []
+            recent_scores: [],
           },
           stats: {
             learning_accuracy: 0,
             total_learning_time: 0,
-            last_activity: null
+            last_activity: null,
           },
-          mastered_concepts: []
+          mastered_concepts: [],
         };
       }
 
@@ -3434,35 +3691,53 @@ export class CollectionManager {
       const accuracy = Number(gameData.accuracy) || 0;
       const wordsPlayed = Number(gameData.wordsPlayed) || 0;
 
-      // 📊 현재 게임 통계 가져오기
-      const currentGameStats = currentRecord.target_languages[targetLanguage].game_stats;
+      // 📊 현재 게임 통계 가져오기 (안전한 접근)
+      const currentGameStats = currentRecord.target_languages[
+        actualTargetLanguage
+      ]?.game_stats || {
+        total_games: 0,
+        total_time: 0,
+        avg_score: 0,
+        best_score: 0,
+        last_game_date: null,
+      };
 
       // 📊 새로운 게임 통계 계산 (안전한 숫자 처리)
       const newTotalGames = (Number(currentGameStats.total_games) || 0) + 1;
-      const newTotalTime = (Number(currentGameStats.total_time) || 0) + timeSpent;
-      
+      const newTotalTime =
+        (Number(currentGameStats.total_time) || 0) + timeSpent;
+
       // NaN 방지를 위한 안전한 나눗셈 처리
       const currentAvgScore = Number(currentGameStats.avg_score) || 0;
-      const newAvgScore = newTotalGames > 0 ? 
-        Math.round(((currentAvgScore * (newTotalGames - 1) + score) / newTotalGames) * 100) / 100 : 0;
-      
-      const newBestScore = Math.max(Number(currentGameStats.best_score) || 0, score);
+      const newAvgScore =
+        newTotalGames > 0
+          ? Math.round(
+              ((currentAvgScore * (newTotalGames - 1) + score) /
+                newTotalGames) *
+                100
+            ) / 100
+          : 0;
+
+      const newBestScore = Math.max(
+        Number(currentGameStats.best_score) || 0,
+        score
+      );
 
       // 📊 업데이트할 데이터 준비 (NaN 방지를 위한 안전한 검증)
       const now = new Date();
-      
-      // target_languages 구조로 업데이트
+
+      // target_languages 구조로 업데이트 (actualTargetLanguage 사용)
       const updatedData = {
-        [`target_languages.${targetLanguage}.game_stats`]: {
+        [`target_languages.${actualTargetLanguage}.game_stats`]: {
           total_games: newTotalGames,
           total_time: newTotalTime,
           avg_score: newAvgScore,
           best_score: newBestScore,
-          last_game_date: now
+          last_game_date: now,
         },
-        [`target_languages.${targetLanguage}.stats.last_activity`]: now,
-        version: '3.0',
-        last_updated: now
+        [`target_languages.${actualTargetLanguage}.stats.last_activity`]: now,
+        version: "3.0",
+        last_updated: now,
       };
 
       // 📊 Firestore 업데이트 (문서가 없으면 생성, 있으면 업데이트)
@@ -3473,21 +3748,21 @@ export class CollectionManager {
         await setDoc(userRecordRef, {
           user_email: userEmail,
           target_languages: {
-            [targetLanguage]: {
+            [actualTargetLanguage]: {
               learning_stats: {
                 total_sessions: 0,
                 total_time: 0,
                 concepts_learned: 0,
                 avg_accuracy: 0,
                 avg_quality: 0,
-                last_session_date: null
+                last_session_date: null,
               },
               game_stats: {
                 total_games: newTotalGames,
                 total_time: newTotalTime,
                 avg_score: newAvgScore,
                 best_score: newBestScore,
-                last_game_date: now
+                last_game_date: now,
               },
               quiz_stats: {
                 total_quizzes: 0,
@@ -3498,29 +3773,30 @@ export class CollectionManager {
                 total_time: 0,
                 avg_time_per_quiz: 0,
                 best_score: 0,
-                recent_scores: []
+                recent_scores: [],
               },
               stats: {
                 learning_accuracy: 0,
                 total_learning_time: 0,
-                last_activity: now
+                last_activity: now,
               },
-              mastered_concepts: []
-            }
+              mastered_concepts: [],
+            },
           },
           concept_snapshots: {}, // 빈 스냅샷 객체로 초기화
-          version: '3.0',
+          version: "3.0",
           created_at: now,
-          last_updated: now
+          last_updated: now,
         });
       }
 
       console.log("✅ 사용자 게임 진도 업데이트 완료:", {
+        originalTarget: targetLanguage,
+        actualTarget: actualTargetLanguage,
         games: newTotalGames,
         avgScore: newAvgScore,
-        bestScore: newBestScore
+        bestScore: newBestScore,
       });
-
     } catch (error) {
       console.error("❌ 사용자 게임 진도 업데이트 중 오류:", error);
     }
@@ -3787,127 +4063,439 @@ export class CollectionManager {
   // 🔄 개념 스냅샷 자동 저장 메서드들
 
   /**
-   * 개념 스냅샷들을 user_records에 저장
+   * 개념 스냅샷들을 user_records에 저장 (conceptType 지원)
    * @param {string} userEmail - 사용자 이메일
    * @param {Array<string>} conceptIds - 개념 ID 배열
+   * @param {string} conceptType - 개념 타입 (vocabulary, grammar, examples)
    */
-  async saveConceptSnapshots(userEmail, conceptIds) {
+  async saveConceptSnapshotsWithType(
+    userEmail,
+    conceptIds,
+    conceptType = "vocabulary",
+    targetLanguage = "english"
+  ) {
     try {
       // userEmail 유효성 검사
-      if (!userEmail || typeof userEmail !== 'string') {
+      if (!userEmail || typeof userEmail !== "string") {
         console.error("❌ 유효하지 않은 userEmail:", userEmail);
         throw new Error("유효하지 않은 사용자 이메일");
       }
-      
+
       // conceptIds 유효성 검사 및 Firebase ID 필터링
-      if (!conceptIds || !Array.isArray(conceptIds) || conceptIds.length === 0) {
+      if (
+        !conceptIds ||
+        !Array.isArray(conceptIds) ||
+        conceptIds.length === 0
+      ) {
         console.log("⚠️ 유효하지 않은 conceptIds:", conceptIds);
         return;
       }
-      
+
       // 유효한 Firebase 문서 ID만 필터링
-      const validConceptIds = conceptIds.filter(id => {
-        const isValid = id && typeof id === 'string' && id.length >= 15 && /^[A-Za-z0-9]+$/.test(id);
+      const validConceptIds = conceptIds.filter((id) => {
+        const isValid =
+          id &&
+          typeof id === "string" &&
+          id.length >= 15 &&
+          /^[A-Za-z0-9]+$/.test(id);
         if (!isValid && id) {
-          console.log(`⚠️ 스냅샷 저장용 임시 ID 건너뜀: ${id} (유효한 Firebase 문서 ID가 아님)`);
+          console.log(
+            `⚠️ 스냅샷 저장용 임시 ID 건너뜀: ${id} (유효한 Firebase 문서 ID가 아님)`
+          );
         }
         return isValid;
       });
-      
+
       if (validConceptIds.length === 0) {
         console.log("⚠️ 저장할 유효한 개념 ID가 없습니다");
         return;
       }
-      
-      console.log(`📋 개념 스냅샷 저장 시작: ${validConceptIds.length}개 (${conceptIds.length - validConceptIds.length}개 필터링됨)`);
-      
+
+      console.log(
+        `📋 개념 스냅샷 저장 시작: ${
+          validConceptIds.length
+        }개 (타입: ${conceptType}, ${
+          conceptIds.length - validConceptIds.length
+        }개 필터링됨)`
+      );
+
       for (const conceptId of validConceptIds) {
-        await this.saveConceptSnapshot(userEmail, conceptId);
+        await this.saveConceptSnapshotWithType(
+          userEmail,
+          conceptId,
+          conceptType,
+          targetLanguage
+        );
       }
-      
-      console.log(`✅ 개념 스냅샷 저장 완료: ${validConceptIds.length}개`);
-      
+
+      console.log(
+        `✅ 개념 스냅샷 저장 완료: ${validConceptIds.length}개 (타입: ${conceptType})`
+      );
     } catch (error) {
-      console.error('개념 스냅샷들 저장 오류:', error);
+      console.error("개념 스냅샷들 저장 오류:", error);
       throw error;
     }
   }
 
   /**
-   * 단일 개념 스냅샷을 user_records에 저장
-   * @param {string} userEmail - 사용자 이메일  
-   * @param {string} conceptId - 개념 ID
+   * 개념 스냅샷들을 user_records에 저장 (기존 호환성)
+   * @param {string} userEmail - 사용자 이메일
+   * @param {Array<string>} conceptIds - 개념 ID 배열
    */
-  async saveConceptSnapshot(userEmail, conceptId) {
+  async saveConceptSnapshots(userEmail, conceptIds) {
+    return await this.saveConceptSnapshotsWithType(
+      userEmail,
+      conceptIds,
+      "vocabulary"
+    );
+  }
+
+  /**
+   * 단일 개념 스냅샷을 user_records에 저장 (conceptType 지원)
+   * 원본 언어와 대상 언어가 같다면 단어 기반으로 통합
+   * @param {string} userEmail - 사용자 이메일
+   * @param {string} conceptId - 개념 ID
+   * @param {string} conceptType - 개념 타입 (vocabulary, grammar, examples)
+   */
+  async saveConceptSnapshotWithType(
+    userEmail,
+    conceptId,
+    conceptType = "vocabulary",
+    targetLanguage = "english"
+  ) {
     try {
       // 매개변수 유효성 검사
-      if (!userEmail || typeof userEmail !== 'string') {
+      if (!userEmail || typeof userEmail !== "string") {
         console.error("❌ 유효하지 않은 userEmail:", userEmail);
         return;
       }
-      
-      if (!conceptId || typeof conceptId !== 'string') {
+
+      if (!conceptId || typeof conceptId !== "string") {
         console.error("❌ 유효하지 않은 conceptId:", conceptId);
         return;
       }
-      
-      // 1. 이미 스냅샷이 있는지 확인
-      const userRecordRef = doc(db, 'user_records', userEmail);
-      const userDoc = await getDoc(userRecordRef);
-      
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        const conceptSnapshots = userData.concept_snapshots || {};
-        
-        if (conceptSnapshots[conceptId]) {
-          console.log(`✅ 기존 스냅샷 존재: ${conceptId}`);
-          return;
-        }
-      }
-      
-      // 2. concepts 컬렉션에서 개념 정보 조회
-      const conceptRef = doc(db, 'concepts', conceptId);
+
+      // 2. 해당 컬렉션에서 개념 정보 조회
+      let collectionName = "concepts";
+      if (conceptType === "grammar") collectionName = "grammar";
+      else if (conceptType === "examples") collectionName = "examples";
+
+      const conceptRef = doc(db, collectionName, conceptId);
       const conceptDoc = await getDoc(conceptRef);
-      
-      if (conceptDoc.exists()) {
-        const conceptData = conceptDoc.data();
-        const conceptInfo = conceptData.concept_info || {};
-        const expressions = conceptData.expressions || {};
-        
-        // 3. 스냅샷 데이터 생성
-        const sourceLanguage = 'korean'; // 기본값
-        const targetLanguage = 'english'; // 기본값 (실제로는 현재 학습 언어 사용)
-        
-        const sourceWord = expressions[sourceLanguage]?.word || conceptId.substring(0, 12);
-        const targetWord = expressions[targetLanguage]?.word || conceptId.substring(0, 12);
-        
-        const conceptSnapshot = {
+
+      if (!conceptDoc.exists()) {
+        console.log(`⚠️ ${collectionName} 컬렉션에 없음: ${conceptId}`);
+        return;
+      }
+
+      const conceptData = conceptDoc.data();
+
+      // 3. conceptType에 따른 스냅샷 데이터 생성
+      let conceptSnapshot = {
+        last_updated: new Date(),
+      };
+
+      if (conceptType === "grammar") {
+        // 문법 패턴 스냅샷 - 언어 순서 동적 결정
+
+        // 언어 순서 결정 (기존 단어/개념과 동일한 로직)
+        let sourceLanguage, actualTargetLanguage;
+        let sourceWord, targetWord;
+
+        if (targetLanguage === "korean") {
+          // 한국어가 대상 언어인 경우, 원본은 영어
+          sourceLanguage = "english";
+          actualTargetLanguage = "korean";
+          sourceWord =
+            conceptData.word?.english ||
+            conceptData.pattern_name ||
+            conceptData.english_name ||
+            conceptId.substring(0, 12);
+          targetWord =
+            conceptData.word?.korean ||
+            conceptData.korean_name ||
+            conceptData.pattern_name ||
+            conceptId.substring(0, 12);
+        } else {
+          // 기존 로직: 한국어가 원본 언어
+          sourceLanguage = "korean";
+          actualTargetLanguage = targetLanguage;
+          sourceWord =
+            conceptData.word?.korean ||
+            conceptData.korean_name ||
+            conceptData.pattern_name ||
+            conceptId.substring(0, 12);
+          targetWord =
+            conceptData.word?.english ||
+            conceptData.pattern_name ||
+            conceptData.english_name ||
+            conceptId.substring(0, 12);
+        }
+
+        conceptSnapshot = {
+          ...conceptSnapshot,
           word: targetWord,
           source_word: sourceWord,
           source_language: sourceLanguage,
-          target_language: targetLanguage,
-          domain: conceptInfo.domain || '일반',
-          category: conceptInfo.category || '기타',
-          definition: conceptInfo.definition || '',
-          example: conceptInfo.example || '',
-          last_updated: new Date()
+          target_language: actualTargetLanguage,
+          domain: conceptData.domain || "문법",
+          category: conceptData.category || "패턴",
+          definition: conceptData.structural_pattern || "",
+          example: conceptData.example || "",
+          structural_pattern: conceptData.structural_pattern || "",
+          grammar_tags: conceptData.grammar_tags || [],
+          learning_focus: conceptData.learning_focus || [],
         };
-        
-        // 4. user_records에 스냅샷 저장
-        await updateDoc(userRecordRef, {
-          [`concept_snapshots.${conceptId}`]: conceptSnapshot,
-          last_updated: new Date()
-        });
-        
-        console.log(`✅ 개념 스냅샷 저장 완료: ${conceptId} -> ${targetWord}`);
-        
+      } else if (conceptType === "examples") {
+        // 독해/예문 스냅샷 - 언어 순서 동적 결정
+        const translations = conceptData.translations || {};
+
+        // 언어 순서 결정 (기존 단어/개념과 동일한 로직)
+        let sourceLanguage, actualTargetLanguage;
+        let sourceWord, targetWord;
+
+        if (targetLanguage === "korean") {
+          // 한국어가 대상 언어인 경우, 원본은 영어
+          sourceLanguage = "english";
+          actualTargetLanguage = "korean";
+          sourceWord =
+            conceptData.word?.english ||
+            translations.english?.text ||
+            conceptData.english_text ||
+            conceptId.substring(0, 12);
+          targetWord =
+            conceptData.word?.korean ||
+            translations.korean?.text ||
+            conceptData.korean_text ||
+            conceptId.substring(0, 12);
+        } else {
+          // 기존 로직: 한국어가 원본 언어
+          sourceLanguage = "korean";
+          actualTargetLanguage = targetLanguage;
+          sourceWord =
+            conceptData.word?.korean ||
+            translations.korean?.text ||
+            conceptData.korean_text ||
+            conceptId.substring(0, 12);
+          targetWord =
+            conceptData.word?.english ||
+            translations.english?.text ||
+            conceptData.english_text ||
+            conceptId.substring(0, 12);
+        }
+
+        conceptSnapshot = {
+          ...conceptSnapshot,
+          word: targetWord,
+          source_word: sourceWord,
+          source_language: sourceLanguage,
+          target_language: actualTargetLanguage,
+          domain: conceptData.domain || "독해",
+          category: conceptData.category || "예문",
+          definition: conceptData.comprehension_notes || "",
+          example: translations.english?.text || conceptData.english_text || "",
+          reading_level:
+            conceptData.reading_level || conceptData.difficulty || "초급",
+          comprehension_questions: conceptData.comprehension_questions || [],
+        };
       } else {
-        console.log(`⚠️ concepts 컬렉션에 없음: ${conceptId}`);
+        // 기존 단어/개념 스냅샷
+        const conceptInfo = conceptData.concept_info || {};
+        const expressions = conceptData.expressions || {};
+
+        // 원본 언어와 대상 언어 결정
+        let sourceLanguage, actualTargetLanguage;
+        let sourceWord, targetWord;
+
+        if (targetLanguage === "korean") {
+          // 한국어가 대상 언어인 경우, 원본은 영어/일본어/중국어
+          // 우선순위: english > japanese > chinese
+          if (expressions.english?.word && expressions.korean?.word) {
+            sourceLanguage = "english";
+            actualTargetLanguage = "korean";
+            sourceWord = expressions.english.word;
+            targetWord = expressions.korean.word;
+          } else if (expressions.japanese?.word && expressions.korean?.word) {
+            sourceLanguage = "japanese";
+            actualTargetLanguage = "korean";
+            sourceWord = expressions.japanese.word;
+            targetWord = expressions.korean.word;
+          } else if (expressions.chinese?.word && expressions.korean?.word) {
+            sourceLanguage = "chinese";
+            actualTargetLanguage = "korean";
+            sourceWord = expressions.chinese.word;
+            targetWord = expressions.korean.word;
+          } else {
+            // 폴백: 한국어 → 한국어 (또는 사용 가능한 언어)
+            sourceLanguage = "korean";
+            actualTargetLanguage = "korean";
+            sourceWord = expressions.korean?.word || conceptId.substring(0, 12);
+            targetWord = expressions.korean?.word || conceptId.substring(0, 12);
+          }
+        } else {
+          // 기존 로직: 한국어가 원본 언어
+          sourceLanguage = "korean";
+          actualTargetLanguage = targetLanguage;
+          sourceWord =
+            expressions[sourceLanguage]?.word || conceptId.substring(0, 12);
+          targetWord =
+            expressions[targetLanguage]?.word || conceptId.substring(0, 12);
+        }
+
+        conceptSnapshot = {
+          ...conceptSnapshot,
+          word: targetWord,
+          source_word: sourceWord,
+          source_language: sourceLanguage,
+          target_language: actualTargetLanguage,
+          domain: conceptInfo.domain || "일반",
+          category: conceptInfo.category || "기타",
+          definition: conceptInfo.definition || "",
+          example: conceptInfo.example || "",
+        };
       }
-      
+
+      // 4. 컬렉션에서 영어 단어 추출하여 통합 키 생성
+      const sourceWord = conceptSnapshot.source_word || "";
+      const targetWord = conceptSnapshot.word || "";
+      const sourceLanguage = conceptSnapshot.source_language || "korean";
+      const snapshotTargetLanguage =
+        conceptSnapshot.target_language || targetLanguage;
+
+      // 영어 단어를 컬렉션 데이터에서 추출
+      let englishWord = null;
+      if (conceptData.expressions && conceptData.expressions.english) {
+        englishWord = conceptData.expressions.english.word;
+      } else if (conceptData.word && conceptData.word.english) {
+        englishWord = conceptData.word.english;
+      }
+
+      // 영어 단어가 없으면 대상 언어 단어를 기본값으로 사용
+      if (!englishWord) {
+        englishWord = targetWord || "unknown_word";
+      }
+
+      // 영어 단어를 소문자로 정규화 (키 일관성 확보)
+      const normalizedEnglishWord = englishWord
+        .toLowerCase()
+        .replace(/[^\w]/g, "_");
+
+      // 새로운 계층적 구조를 위한 키 설정
+      let unifiedKey = conceptId; // 기본값 // 기본값은 conceptId
+
+      // 단어가 있으면 계층적 구조를 위한 키 생성
+      if (sourceWord && targetWord && englishWord) {
+        // 임시 식별자 생성 (실제 계층적 저장은 아래에서 처리)
+        unifiedKey = `${normalizedEnglishWord}_${snapshotTargetLanguage}`;
+        console.log(
+          `🔄 계층적 구조용 키 생성: ${conceptId} -> ${unifiedKey} (${sourceWord} → ${targetWord} -> ${englishWord})`
+        );
+      }
+
+      // 5. 계층적 구조로 기존 스냅샷 확인
+      const userRecordRef = doc(db, "user_records", userEmail);
+      const userDoc = await getDoc(userRecordRef);
+
+      if (userDoc.exists() && sourceWord && targetWord && englishWord) {
+        const userData = userDoc.data();
+        const conceptSnapshots = userData.concept_snapshots || {};
+
+        // 계층적 구조 확인: concept_snapshots[language][englishWord]
+        const languageSnapshots =
+          conceptSnapshots[snapshotTargetLanguage] || {};
+        const existingSnapshot = languageSnapshots[normalizedEnglishWord];
+
+        if (existingSnapshot) {
+          console.log(
+            `✅ 기존 계층적 스냅샷 존재: ${snapshotTargetLanguage}.${normalizedEnglishWord} (원본: ${conceptId}, 타입: ${conceptType})`
+          );
+
+          // 기존 스냅샷에 새로운 타입 정보와 원본 ID 추가
+          const updatedConceptTypes = existingSnapshot.concept_types || [];
+          const updatedOriginalConceptIds =
+            existingSnapshot.original_concept_ids || [];
+
+          if (!updatedConceptTypes.includes(conceptType)) {
+            updatedConceptTypes.push(conceptType);
+          }
+
+          if (!updatedOriginalConceptIds.includes(conceptId)) {
+            updatedOriginalConceptIds.push(conceptId);
+          }
+
+          // 계층적 구조로 기존 스냅샷 업데이트
+          await updateDoc(userRecordRef, {
+            [`concept_snapshots.${snapshotTargetLanguage}.${normalizedEnglishWord}.concept_types`]:
+              updatedConceptTypes,
+            [`concept_snapshots.${snapshotTargetLanguage}.${normalizedEnglishWord}.original_concept_ids`]:
+              updatedOriginalConceptIds,
+            [`concept_snapshots.${snapshotTargetLanguage}.${normalizedEnglishWord}.last_updated`]:
+              new Date(),
+            last_updated: new Date(),
+          });
+
+          console.log(
+            `✅ 기존 계층적 스냅샷에 타입과 원본 ID 추가: ${conceptType} -> ${snapshotTargetLanguage}.${normalizedEnglishWord} (원본 ID: ${conceptId})`
+          );
+          return;
+        }
+      }
+
+      // 6. 새로운 스냅샷 저장 (계층적 또는 플랫 구조)
+      conceptSnapshot.concept_types = [conceptType]; // 타입 배열 추가
+      conceptSnapshot.original_concept_ids = [conceptId]; // 원본 concept_id 배열
+
+      if (sourceWord && targetWord && englishWord) {
+        // 계층적 구조로 새로운 스냅샷 저장
+        if (userDoc && userDoc.exists()) {
+          // 기존 문서 업데이트
+          await updateDoc(userRecordRef, {
+            [`concept_snapshots.${snapshotTargetLanguage}.${normalizedEnglishWord}`]:
+              conceptSnapshot,
+            last_updated: new Date(),
+          });
+        } else {
+          // 새 문서 생성
+          await setDoc(userRecordRef, {
+            concept_snapshots: {
+              [snapshotTargetLanguage]: {
+                [normalizedEnglishWord]: conceptSnapshot,
+              },
+            },
+            last_updated: new Date(),
+          });
+        }
+
+        console.log(
+          `✅ 새로운 계층적 스냅샷 저장 완료: ${snapshotTargetLanguage}.${normalizedEnglishWord} -> ${conceptSnapshot.word} (타입: ${conceptType})`
+        );
+      } else {
+        console.warn(
+          `⚠️ 영어 단어 추출 실패로 인한 스냅샷 저장 건너뜀: ${conceptId} (타입: ${conceptType})`
+        );
+        console.warn(
+          `   sourceWord: ${sourceWord}, targetWord: ${targetWord}, englishWord: ${englishWord}`
+        );
+      }
     } catch (error) {
-      console.error(`개념 스냅샷 저장 오류: ${conceptId}`, error);
+      console.error(
+        `개념 스냅샷 저장 오류: ${conceptId} (타입: ${conceptType})`,
+        error
+      );
     }
+  }
+
+  /**
+   * 단일 개념 스냅샷을 user_records에 저장 (기존 호환성)
+   * @param {string} userEmail - 사용자 이메일
+   * @param {string} conceptId - 개념 ID
+   */
+  async saveConceptSnapshot(userEmail, conceptId) {
+    return await this.saveConceptSnapshotWithType(
+      userEmail,
+      conceptId,
+      "vocabulary"
+    );
   }
 }
 

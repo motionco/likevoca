@@ -232,6 +232,7 @@ async function uploadExamples(data) {
         purpose: exampleData.purpose || null,
         tags: exampleData.tags || [],
         translations: exampleData.translations || {},
+        word: exampleData.word || {},
       };
 
       await collectionManager.createExample(exampleDoc);
@@ -264,6 +265,7 @@ async function uploadGrammarPatterns(data) {
         pattern: patternData.pattern || patternData.structural_pattern || "",
         explanation: patternData.explanation || "",
         example: patternData.example || {},
+        word: patternData.word || {},
         difficulty: patternData.difficulty || "basic",
         situation: Array.isArray(patternData.situation)
           ? patternData.situation
@@ -463,6 +465,10 @@ function downloadExamplesCSVTemplate() {
     "english",
     "japanese",
     "chinese",
+    "korean_word",
+    "english_word",
+    "japanese_word",
+    "chinese_word",
   ];
   const rows = EXAMPLES_TEMPLATE.map((item) => [
     item.domain,
@@ -474,6 +480,10 @@ function downloadExamplesCSVTemplate() {
     item.translations.english,
     item.translations.japanese,
     item.translations.chinese,
+    item.word?.korean || "",
+    item.word?.english || "",
+    item.word?.japanese || "",
+    item.word?.chinese || "",
   ]);
 
   downloadCSV([headers, ...rows], "examples_template.csv");
@@ -517,6 +527,10 @@ function downloadGrammarCSVTemplate() {
     "english_example",
     "japanese_example",
     "chinese_example",
+    "korean_word",
+    "english_word",
+    "japanese_word",
+    "chinese_word",
     "difficulty",
     "situation",
     "purpose",
@@ -565,6 +579,10 @@ function downloadGrammarCSVTemplate() {
     grammar.example.english,
     grammar.example.japanese,
     grammar.example.chinese,
+    grammar.word?.korean || "",
+    grammar.word?.english || "",
+    grammar.word?.japanese || "",
+    grammar.word?.chinese || "",
     grammar.difficulty,
     Array.isArray(grammar.situation)
       ? grammar.situation.join(",")
@@ -658,6 +676,12 @@ function convertCSVToExample(item) {
       japanese: item.japanese || "",
       chinese: item.chinese || "",
     },
+    word: {
+      korean: item.korean_word || "",
+      english: item.english_word || "",
+      japanese: item.japanese_word || "",
+      chinese: item.chinese_word || "",
+    },
   };
 }
 
@@ -734,6 +758,12 @@ function convertCSVToGrammar(item) {
     category: item.category || "general",
     pattern: pattern,
     example: example,
+    word: {
+      korean: item.korean_word || "",
+      english: item.english_word || "",
+      japanese: item.japanese_word || "",
+      chinese: item.chinese_word || "",
+    },
     difficulty: item.difficulty || "basic",
     situation: item.situation
       ? item.situation.split(",").map((s) => s.trim())

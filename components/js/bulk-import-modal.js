@@ -316,6 +316,7 @@ async function uploadExamples(data) {
           : ["casual"],
         purpose: exampleData.purpose || null,
         translations: exampleData.translations || {},
+        word: exampleData.word || {},
         randomField: Math.random(), // 🎲 효율적인 랜덤 쿼리를 위한 필드
         created_at: serverTimestamp(),
       };
@@ -367,6 +368,7 @@ async function uploadGrammarPatterns(data) {
         purpose: patternData.purpose || "description",
         pattern: patternData.pattern || {},
         example: patternData.example || {},
+        word: patternData.word || {},
         randomField: Math.random(), // 🎲 효율적인 랜덤 쿼리를 위한 필드
         created_at: patternData.created_at || new Date().toISOString(),
       };
@@ -701,6 +703,12 @@ function parseExampleFromCSV(row) {
         japanese: row.japanese || "",
         chinese: row.chinese || "",
       },
+      word: {
+        korean: row.korean_word || "",
+        english: row.english_word || "",
+        japanese: row.japanese_word || "",
+        chinese: row.chinese_word || "",
+      },
     };
   } catch (error) {
     console.error("예문 CSV 파싱 오류:", error);
@@ -837,6 +845,16 @@ function parseGrammarPatternFromCSV(row, headers) {
     "🔧 [parseGrammarPatternFromCSV] 완성된 example 객체:",
     pattern.example
   );
+
+  // word 필드 추가
+  pattern.word = {
+    korean: row.korean_word || "",
+    english: row.english_word || "",
+    japanese: row.japanese_word || "",
+    chinese: row.chinese_word || "",
+  };
+
+  console.log("🔧 [parseGrammarPatternFromCSV] word 객체:", pattern.word);
 
   // created_at만 추가 (updated_at 제거)
   pattern.created_at = new Date().toISOString();

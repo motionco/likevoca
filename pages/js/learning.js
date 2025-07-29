@@ -934,7 +934,12 @@ function setupEventListeners() {
       sourceLanguage = newValue;
       window.languageSettings.sourceLanguage = sourceLanguage;
 
-      console.log("🌐 원본 언어 변경:", sourceLanguage);
+      console.log("🌐 원본 언어 변경:", {
+        newValue,
+        sourceLanguage,
+        targetLanguage,
+        windowSettings: window.languageSettings,
+      });
 
       // 같은 언어 선택 방지
       if (sourceLanguage === targetLanguage) {
@@ -958,7 +963,12 @@ function setupEventListeners() {
       targetLanguage = newValue;
       window.languageSettings.targetLanguage = targetLanguage;
 
-      console.log("🌐 대상 언어 변경:", targetLanguage);
+      console.log("🌐 대상 언어 변경:", {
+        newValue,
+        sourceLanguage,
+        targetLanguage,
+        windowSettings: window.languageSettings,
+      });
 
       // 같은 언어 선택 방지
       if (sourceLanguage === targetLanguage) {
@@ -995,7 +1005,11 @@ function setupEventListeners() {
 
   // 공통 언어 전환 핸들러
   function handleLanguageSwap() {
-    console.log("🔄 언어 스왑 버튼 클릭");
+    console.log("🔄 언어 스왑 버튼 클릭 - 이전:", {
+      sourceLanguage,
+      targetLanguage,
+      windowSettings: window.languageSettings,
+    });
 
     // 중복 이벤트 방지 플래그 설정
     isLanguageSwapping = true;
@@ -1008,6 +1022,12 @@ function setupEventListeners() {
     // 전역 설정 업데이트
     window.languageSettings.sourceLanguage = sourceLanguage;
     window.languageSettings.targetLanguage = targetLanguage;
+
+    console.log("🔄 언어 스왑 완료 - 이후:", {
+      sourceLanguage,
+      targetLanguage,
+      windowSettings: window.languageSettings,
+    });
 
     // 모든 언어 선택 요소 업데이트
     if (sourceLanguageSelect) sourceLanguageSelect.value = sourceLanguage;
@@ -1575,6 +1595,15 @@ async function finishLearningHandler(e) {
                 1000 /
                 60
             ) || 1;
+          // 🔥 learningSessionData 디버깅
+          console.log("[DEBUG] learningSessionData:", {
+            area: learningSessionData.area,
+            mode: learningSessionData.mode,
+            conceptsStudied: Array.from(learningSessionData.conceptsStudied),
+            correctAnswers: learningSessionData.correctAnswers,
+            totalInteractions: learningSessionData.totalInteractions,
+          });
+
           const activityData = {
             type: learningSessionData.area,
             learning_mode: learningSessionData.mode,
@@ -1586,6 +1615,10 @@ async function finishLearningHandler(e) {
             sourceLanguage: sourceLanguage || "korean",
             targetLanguage: targetLanguage || "english",
             session_quality: Math.min(100, conceptsCount * 10), // 간단한 품질 계산
+            conceptType:
+              learningSessionData.area === "reading"
+                ? "examples"
+                : learningSessionData.area, // conceptType 수정: reading → examples
           };
 
           if (
@@ -5600,23 +5633,7 @@ async function saveLearningRecordToFirebase(learningRecord) {
       historyCount: trimmedHistory.length,
     });
 
-    // 🆕 진도 페이지 캐시 무효화를 위한 타임스탬프 설정 (학습 시작 시)
-    try {
-      const targetLanguage = learningRecord.targetLanguage || "english";
-      const invalidationTime = Date.now().toString();
-
-      // 캐시 무효화 타임스탬프 설정
-      localStorage.setItem(
-        `cache_invalidated_${targetLanguage}`,
-        invalidationTime
-      );
-
-      console.log(
-        `🔄 학습 시작 - 진도 페이지 캐시 무효화 완료: ${targetLanguage}, 타임스탬프: ${invalidationTime}`
-      );
-    } catch (cacheError) {
-      console.warn("⚠️ 학습 시작 - 진도 페이지 캐시 무효화 실패:", cacheError);
-    }
+    // 학습 시작 시에는 캐시 무효화 불필요 (완료 시에만 처리)
   } catch (error) {
     console.warn("☁️ Firebase 학습 기록 저장 실패:", error);
   }
@@ -5834,6 +5851,59 @@ async function completeLearningSession(forceComplete = false) {
     shouldSaveSession,
   });
 
+  // 현재 언어 설정을 여러 소스에서 확인
+  function getCurrentLanguageSettings() {
+    // 1. window.languageSettings 우선
+    if (
+      window.languageSettings?.sourceLanguage &&
+      window.languageSettings?.targetLanguage
+    ) {
+      return {
+        sourceLanguage: window.languageSettings.sourceLanguage,
+        targetLanguage: window.languageSettings.targetLanguage,
+      };
+    }
+
+    // 2. DOM 요소에서 직접 확인
+    const sourceSelect =
+      document.getElementById("source-language") ||
+      document.getElementById("source-language-desktop");
+    const targetSelect =
+      document.getElementById("target-language") ||
+      document.getElementById("target-language-desktop");
+
+    if (sourceSelect?.value && targetSelect?.value) {
+      return {
+        sourceLanguage: sourceSelect.value,
+        targetLanguage: targetSelect.value,
+      };
+    }
+
+    // 3. 전역 변수 사용
+    return {
+      sourceLanguage: sourceLanguage || "korean",
+      targetLanguage: targetLanguage || "english",
+    };
+  }
+
+  const currentLanguageSettings = getCurrentLanguageSettings();
+  const currentSourceLanguage = currentLanguageSettings.sourceLanguage;
+  const currentTargetLanguage = currentLanguageSettings.targetLanguage;
+
+  console.log("🔍 학습 활동 언어 설정 확인:", {
+    windowSettings: window.languageSettings,
+    domSourceValue:
+      document.getElementById("source-language")?.value ||
+      document.getElementById("source-language-desktop")?.value,
+    domTargetValue:
+      document.getElementById("target-language")?.value ||
+      document.getElementById("target-language-desktop")?.value,
+    globalSourceLanguage: sourceLanguage,
+    globalTargetLanguage: targetLanguage,
+    finalSourceLanguage: currentSourceLanguage,
+    finalTargetLanguage: currentTargetLanguage,
+  });
+
   const activityData = {
     user_email: currentUser?.email, // 사용자 이메일 명시적 추가
     type: learningSessionData.area,
@@ -5843,8 +5913,12 @@ async function completeLearningSession(forceComplete = false) {
     concepts_studied: studiedConceptsCount, // 실제 학습한 개념 수
     correct_answers: learningSessionData.correctAnswers,
     total_interactions: learningSessionData.totalInteractions,
-    sourceLanguage: sourceLanguage,
-    targetLanguage: targetLanguage,
+    sourceLanguage: currentSourceLanguage,
+    targetLanguage: currentTargetLanguage,
+    conceptType:
+      learningSessionData.area === "reading"
+        ? "examples"
+        : learningSessionData.area, // 🔥 conceptType 추가
     // 학습 효율 계산 (0-100점) - 사용자 제시 공식 적용
     session_quality: (() => {
       // 1. 개념 점수 - 학습한 개념 수 × 6점 (최대 60점)
@@ -5896,11 +5970,15 @@ async function completeLearningSession(forceComplete = false) {
         correct_answers: activityData.correct_answers,
         total_interactions: activityData.total_interactions,
         session_quality: activityData.session_quality,
+        conceptType: activityData.conceptType, // 🔥 conceptType 추가
         hasSessionQuality:
           activityData.session_quality !== undefined &&
           activityData.session_quality !== null,
       },
     });
+
+    // 🔥 전체 activityData 객체 확인
+    console.log("[DEBUG] 전체 activityData 객체:", activityData);
 
     const docRef = await collectionManager.updateLearningActivity(
       currentUser.email,

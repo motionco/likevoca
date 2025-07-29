@@ -4,9 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>サインアップ - LikeVoca</title>
-    <meta name="description" content="LikeVocaアカウントを作成して、多言語学習の旅を始めましょう。パーソナライズされた単語帳、クイズ、進捗追跡機能をご利用いただけます" />
+    <meta
+      name="description"
+      content="LikeVocaアカウントを作成して、多言語学習の旅を始めましょう。パーソナライズされた単語帳、クイズ、進捗追跡機能をご利用いただけます"
+    />
     <meta property="og:title" content="サインアップ - LikeVoca" />
-    <meta property="og:description" content="LikeVocaアカウントを作成して、多言語学習の旅を始めましょう。パーソナライズされた単語帳、クイズ、進捗追跡機能をご利用いただけます" />
+    <meta
+      property="og:description"
+      content="LikeVocaアカウントを作成して、多言語学習の旅を始めましょう。パーソナライズされた単語帳、クイズ、進捗追跡機能をご利用いただけます"
+    />
     <meta property="og:locale" content="ja_JP" />
     <link rel="canonical" href="https://likevoca.com/ja/signup" />
     <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/signup" />
@@ -27,94 +33,110 @@
   <body class="bg-gray-100 min-h-screen">
     <!-- 네비게이션바 컨테이너 -->
     <div id="navbar-container"></div>
-    
+
     <div class="flex items-center justify-center min-h-screen py-12">
-    <div class="bg-white shadow-lg rounded-lg w-11/12 sm:w-96 p-6">
-      <h1 class="text-3xl font-bold text-gray-800 text-center mb-6">アカウント作成</h1>
+      <div class="bg-white shadow-lg rounded-lg w-11/12 sm:w-96 p-6">
+        <h1 class="text-3xl font-bold text-gray-800 text-center mb-6">
+          アカウント作成
+        </h1>
 
-      <form
-        id="signup-form"
-        class="space-y-4"
-        autocomplete="off"
-        onsubmit="return false;"
-      >
-        <div>
-          <label for="name" class="block text-sm font-medium text-gray-700">お名前</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            required
-            placeholder="お名前を入力してください"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#4B63AC] focus:border-[#4B63AC] sm:text-sm"
-          />
-        </div>
-        <div>
-          <label for="email" class="block text-sm font-medium text-gray-700">メールアドレス</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            required
-            placeholder="メールアドレスを入力してください"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#4B63AC] focus:border-[#4B63AC] sm:text-sm"
-          />
-        </div>
-        <div>
-          <label for="password" class="block text-sm font-medium text-gray-700">パスワード</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            required
-            placeholder="パスワードを入力してください"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#4B63AC] focus:border-[#4B63AC] sm:text-sm"
-          />
-        </div>
-        <div>
-          <label
-            for="confirm-password"
-            class="block text-sm font-medium text-gray-700"
-            >パスワード確認</label
-          >
-          <input
-            type="password"
-            id="confirm-password"
-            name="confirm-password"
-            required
-            placeholder="パスワードを再入力してください"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#4B63AC] focus:border-[#4B63AC] sm:text-sm"
-          />
-        </div>
-
-        <div
-          id="error-message"
-          class="hidden text-red-500 text-sm text-center"
-        ></div>
-
-        <button
-          id="signup-button"
-          type="submit"
-          class="w-full bg-[#4B63AC] text-white px-4 py-2 rounded-lg shadow-md hover:bg-[#3A4F8B] focus:outline-none focus:ring-2 focus:ring-[#4B63AC] focus:ring-offset-2"
+        <form
+          id="signup-form"
+          class="space-y-4"
+          autocomplete="off"
+          onsubmit="return false;"
         >
-          サインアップ
-        </button>
-      </form>
-      <p class="mt-6 text-sm text-center text-gray-600">
-        <span>すでにアカウントをお持ちですか？</span>
-        <a href="#" onclick="goToLanguageSpecificPage('login.html'); return false;" class="text-[#4B63AC] hover:underline">ログイン</a>
-      </p>
+          <div>
+            <label for="name" class="block text-sm font-medium text-gray-700"
+              >お名前</label
+            >
+            <input
+              type="text"
+              id="name"
+              name="name"
+              required
+              placeholder="お名前を入力してください"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#4B63AC] focus:border-[#4B63AC] sm:text-sm"
+            />
+          </div>
+          <div>
+            <label for="email" class="block text-sm font-medium text-gray-700"
+              >メールアドレス</label
+            >
+            <input
+              type="email"
+              id="email"
+              name="email"
+              required
+              placeholder="メールアドレスを入力してください"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#4B63AC] focus:border-[#4B63AC] sm:text-sm"
+            />
+          </div>
+          <div>
+            <label
+              for="password"
+              class="block text-sm font-medium text-gray-700"
+              >パスワード</label
+            >
+            <input
+              type="password"
+              id="password"
+              name="password"
+              required
+              placeholder="パスワードを入力してください"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#4B63AC] focus:border-[#4B63AC] sm:text-sm"
+            />
+          </div>
+          <div>
+            <label
+              for="confirm-password"
+              class="block text-sm font-medium text-gray-700"
+              >パスワード確認</label
+            >
+            <input
+              type="password"
+              id="confirm-password"
+              name="confirm-password"
+              required
+              placeholder="パスワードを再入力してください"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#4B63AC] focus:border-[#4B63AC] sm:text-sm"
+            />
+          </div>
+
+          <div
+            id="error-message"
+            class="hidden text-red-500 text-sm text-center"
+          ></div>
+
+          <button
+            id="signup-button"
+            type="submit"
+            class="w-full bg-[#4B63AC] text-white px-4 py-2 rounded-lg shadow-md hover:bg-[#3A4F8B] focus:outline-none focus:ring-2 focus:ring-[#4B63AC] focus:ring-offset-2"
+          >
+            サインアップ
+          </button>
+        </form>
+        <p class="mt-6 text-sm text-center text-gray-600">
+          <span>すでにアカウントをお持ちですか？</span>
+          <a
+            href="#"
+            onclick="goToLanguageSpecificPage('login.html'); return false;"
+            class="text-[#4B63AC] hover:underline"
+            >ログイン</a
+          >
+        </p>
+      </div>
     </div>
-    </div>
-    
+
     <script>
       // 언어별 페이지로 이동하는 함수
       function goToLanguageSpecificPage(filename) {
-        const userLanguage = localStorage.getItem('userLanguage') || 'ja';
-        const isDev = window.location.hostname === 'localhost' || 
-                     window.location.hostname === '127.0.0.1' ||
-                     window.location.port === '5500';
-        
+        const userLanguage = localStorage.getItem("userLanguage") || "ja";
+        const isDev =
+          window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1" ||
+          window.location.port === "5595";
+
         if (isDev) {
           window.location.href = `/locales/${userLanguage}/${filename}`;
         } else {
@@ -124,7 +146,3 @@
     </script>
   </body>
 </html>
-
-
-
-
