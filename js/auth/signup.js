@@ -1,4 +1,4 @@
-import { db, auth } from "../../utils/firebase/firebase-init.js";
+import { db, auth } from "../../js/firebase/firebase-init.js";
 import { signup } from "../../utils/firebase/firebase-auth.js";
 import {
   doc,

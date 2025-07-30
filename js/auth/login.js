@@ -4,7 +4,7 @@ import {
   githubLogin,
 } from "../../utils/firebase/firebase-auth.js";
 
-import { auth } from "../../utils/firebase/firebase-init.js";
+import { auth } from "../../js/firebase/firebase-init.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
 
 // 언어별 페이지로 이동하는 함수

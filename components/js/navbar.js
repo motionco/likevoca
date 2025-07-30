@@ -400,6 +400,7 @@ window.detectCurrentLanguage = detectCurrentLanguage;
 window.initializeNavbar = initializeNavbar;
 window.checkAuthenticationStatus = checkAuthenticationStatus;
 window.updateNavbarForAuthState = updateNavbarForAuthState;
+window.handleLogout = handleLogout;
 
 // DOMContentLoaded 이벤트에서 자동 네비게이션바 로드 및 초기화
 document.addEventListener("DOMContentLoaded", async () => {
