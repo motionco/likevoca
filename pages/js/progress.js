@@ -667,19 +667,21 @@ async function updateUI() {
 
     const conceptsList = await generateDetailedConceptsListFromSnapshots();
 
-    // 총 단어수 카드 업데이트
+    // 학습 단어 카드 업데이트 (마스터한 단어 제외)
     const totalWordsCard = document.getElementById("total-words-card");
     const totalWordsCount = document.getElementById("total-words-count");
     if (totalWordsCard && totalWordsCount) {
-      const totalWords = conceptsList.length;
-      totalWordsCount.textContent = totalWords;
+      const learningWords = conceptsList.filter(
+        (concept) => !concept.isMastered
+      ).length;
+      totalWordsCount.textContent = learningWords;
 
       // 기존 이벤트 리스너 제거 후 새로 추가
       const newTotalWordsCard = totalWordsCard.cloneNode(true);
       totalWordsCard.parentNode.replaceChild(newTotalWordsCard, totalWordsCard);
 
       newTotalWordsCard.addEventListener("click", async () => {
-        console.log("📋 총 단어수 카드 클릭됨");
+        console.log("📋 학습 단어 카드 클릭됨");
         await showTotalWordsModal(conceptsList);
       });
     }
@@ -738,7 +740,9 @@ function updateActivitySummary(conceptsList) {
     const studyStreak = calculateStudyStreak();
     const studyStreakElement = document.getElementById("study-streak-count");
     if (studyStreakElement) {
-      studyStreakElement.textContent = `${studyStreak}일`;
+      studyStreakElement.textContent = `${studyStreak}${getTranslatedText(
+        "days_suffix"
+      )}`;
     }
 
     // 연속학습 카드에 클릭 이벤트 추가
@@ -760,7 +764,9 @@ function updateActivitySummary(conceptsList) {
     const quizAccuracy = calculateOverallQuizAccuracy(conceptsList);
     const quizAccuracyElement = document.getElementById("quiz-accuracy-rate");
     if (quizAccuracyElement) {
-      quizAccuracyElement.textContent = `${Math.round(quizAccuracy)}%`;
+      quizAccuracyElement.textContent = `${Math.round(
+        quizAccuracy
+      )}${getTranslatedText("unit_percent")}`;
     }
 
     // 퀴즈 정확도 카드에 클릭 이벤트 추가
@@ -799,9 +805,13 @@ function updateAchievements(conceptsList) {
     const avgQuizAccuracyElement = document.getElementById("avg-quiz-accuracy");
 
     if (totalQuizzesElement)
-      totalQuizzesElement.textContent = `${totalQuizzes}회`;
+      totalQuizzesElement.textContent = `${totalQuizzes}${getTranslatedText(
+        "unit_times"
+      )}`;
     if (avgQuizAccuracyElement)
-      avgQuizAccuracyElement.textContent = `${Math.round(avgQuizAccuracy)}%`;
+      avgQuizAccuracyElement.textContent = `${Math.round(
+        avgQuizAccuracy
+      )}${getTranslatedText("unit_percent")}`;
 
     // 게임 성취도
     const totalGames = allGameRecords.length;
@@ -816,17 +826,35 @@ function updateAchievements(conceptsList) {
     const totalGamesElement = document.getElementById("total-games-count");
     const avgGameScoreElement = document.getElementById("avg-game-score");
 
-    if (totalGamesElement) totalGamesElement.textContent = `${totalGames}회`;
+    if (totalGamesElement)
+      totalGamesElement.textContent = `${totalGames}${getTranslatedText(
+        "unit_times"
+      )}`;
     if (avgGameScoreElement)
-      avgGameScoreElement.textContent = `${avgGameScore}점`;
+      avgGameScoreElement.textContent = `${avgGameScore}${getTranslatedText(
+        "unit_points"
+      )}`;
 
     // 학습 세션 성취도
     const totalSessions = allLearningRecords.length;
+    const avgSessionQuality = calculateAverageSessionQuality();
+
     const totalSessionsElement = document.getElementById(
       "total-learning-sessions"
     );
+    const avgSessionQualityElement = document.getElementById(
+      "avg-session-quality"
+    );
+
     if (totalSessionsElement)
-      totalSessionsElement.textContent = `${totalSessions}회`;
+      totalSessionsElement.textContent = `${totalSessions}${getTranslatedText(
+        "unit_times"
+      )}`;
+    if (avgSessionQualityElement)
+      avgSessionQualityElement.textContent =
+        totalSessions > 0
+          ? `${avgSessionQuality.toFixed(1)}${getTranslatedText("unit_points")}`
+          : "-";
 
     // 종합 성취도
     const totalStudyTime = calculateTotalStudyTime();
@@ -836,15 +864,44 @@ function updateAchievements(conceptsList) {
     const completionRateElement = document.getElementById("completion-rate");
 
     if (totalStudyTimeElement)
-      totalStudyTimeElement.textContent = `${Math.round(totalStudyTime)}분`;
+      totalStudyTimeElement.textContent = `${Math.round(
+        totalStudyTime
+      )}${getTranslatedText("unit_minutes")}`;
     if (completionRateElement)
-      completionRateElement.textContent = `${Math.round(completionRate)}%`;
+      completionRateElement.textContent = `${Math.round(
+        completionRate
+      )}${getTranslatedText("unit_percent")}`;
 
     console.log(
       `📊 성취도 업데이트: 퀴즈 ${totalQuizzes}회, 게임 ${totalGames}회, 학습 ${totalSessions}회`
     );
   } catch (error) {
     console.error("성취도 업데이트 실패:", error);
+  }
+}
+
+// 평균 학습 효율 계산
+function calculateAverageSessionQuality() {
+  try {
+    if (allLearningRecords.length === 0) return 0;
+
+    let totalQuality = 0;
+    let validSessions = 0;
+
+    allLearningRecords.forEach((record) => {
+      if (
+        record.session_quality &&
+        typeof record.session_quality === "number"
+      ) {
+        totalQuality += record.session_quality;
+        validSessions++;
+      }
+    });
+
+    return validSessions > 0 ? totalQuality / validSessions : 0;
+  } catch (error) {
+    console.error("평균 학습 효율 계산 실패:", error);
+    return 0;
   }
 }
 
@@ -912,23 +969,36 @@ function updateRecentActivities() {
     recentActivities.forEach((activity) => {
       const timestamp =
         activity.timestamp?.toDate?.() || new Date(activity.timestamp);
-      const timeStr = timestamp.toLocaleString("ko-KR");
+      const currentLang = localStorage.getItem("userLanguage") || "ko";
+      const localeMap = {
+        ko: "ko-KR",
+        en: "en-US",
+        ja: "ja-JP",
+        zh: "zh-CN",
+      };
+      const timeStr = timestamp.toLocaleString(
+        localeMap[currentLang] || "ko-KR"
+      );
 
       let activityHTML = "";
       const data = activity.data;
 
       switch (activity.type) {
         case "learning":
+          const learningMode = data.learning_mode || "vocabulary";
+          const modeTranslationKey = `${learningMode}_mode`;
           activityHTML = `
             <div class="flex items-center p-4 bg-white rounded-lg border border-blue-100">
               <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
                 <span class="text-blue-600">📚</span>
               </div>
               <div class="flex-1">
-                <p class="font-medium text-gray-800">학습 활동</p>
-                <p class="text-sm text-gray-600">${
-                  data.learning_mode || "vocabulary"
-                } 모드</p>
+                <p class="font-medium text-gray-800">${getTranslatedText(
+                  "learning_activity"
+                )}</p>
+                <p class="text-sm text-gray-600">${getTranslatedText(
+                  modeTranslationKey
+                )}</p>
                 <p class="text-xs text-gray-500">${timeStr}</p>
               </div>
             </div>
@@ -942,10 +1012,14 @@ function updateRecentActivities() {
                 <span class="text-purple-600">🎯</span>
               </div>
               <div class="flex-1">
-                <p class="font-medium text-gray-800">퀴즈 활동</p>
-                <p class="text-sm text-gray-600">정확도: ${Math.round(
-                  accuracy
-                )}%</p>
+                <p class="font-medium text-gray-800">${getTranslatedText(
+                  "quiz_activity"
+                )}</p>
+                <p class="text-sm text-gray-600">${getTranslatedText(
+                  "accuracy_label"
+                )}: ${Math.round(accuracy)}${getTranslatedText(
+            "unit_percent"
+          )}</p>
                 <p class="text-xs text-gray-500">${timeStr}</p>
               </div>
             </div>
@@ -959,8 +1033,12 @@ function updateRecentActivities() {
                 <span class="text-green-600">🎮</span>
               </div>
               <div class="flex-1">
-                <p class="font-medium text-gray-800">게임 활동</p>
-                <p class="text-sm text-gray-600">점수: ${score}점</p>
+                <p class="font-medium text-gray-800">${getTranslatedText(
+                  "game_activity"
+                )}</p>
+                <p class="text-sm text-gray-600">${getTranslatedText(
+                  "score_label"
+                )}: ${score}${getTranslatedText("unit_points")}</p>
                 <p class="text-xs text-gray-500">${timeStr}</p>
               </div>
             </div>
@@ -1119,37 +1197,49 @@ async function showQuizAccuracyDetails() {
       <div class="space-y-4">
         <div class="text-center mb-6">
           <div class="text-6xl mb-2">🎯</div>
-          <h3 class="text-2xl font-bold text-purple-600 mb-2">퀴즈 정확도 ${avgAccuracy}%</h3>
-          <p class="text-gray-600">총 ${totalQuizzes}회의 퀴즈를 완료했어요!</p>
+                <h3 class="text-2xl font-bold text-purple-600 mb-2">${getTranslatedText(
+                  "quiz_accuracy"
+                )} ${avgAccuracy}${getTranslatedText("unit_percent")}</h3>
+      <p class="text-gray-600">${totalQuizzes}${getTranslatedText(
+      "quiz_completion_message"
+    )}</p>
         </div>
         
         <div class="bg-purple-50 rounded-lg p-4 mb-4">
-          <h4 class="font-semibold text-purple-800 mb-3">📊 상세 통계</h4>
+          <h4 class="font-semibold text-purple-800 mb-3">📊 ${getTranslatedText(
+            "detailed_stats"
+          )}</h4>
           <div class="grid grid-cols-2 gap-4">
             <div class="text-center">
               <div class="text-2xl font-bold text-green-600">${
                 quizDetails.totalCorrect
               }</div>
-              <div class="text-sm text-gray-600">정답 수</div>
+              <div class="text-sm text-gray-600">${getTranslatedText(
+                "correct_answers_count"
+              )}</div>
             </div>
             <div class="text-center">
               <div class="text-2xl font-bold text-red-600">${
                 quizDetails.totalIncorrect
               }</div>
-              <div class="text-sm text-gray-600">오답 수</div>
+              <div class="text-sm text-gray-600">${getTranslatedText(
+                "incorrect_answers_count"
+              )}</div>
             </div>
           </div>
         </div>
         
         <div class="bg-blue-50 rounded-lg p-4">
-          <h4 class="font-semibold text-blue-800 mb-2">💡 학습 팁</h4>
+          <h4 class="font-semibold text-blue-800 mb-2">💡 ${getTranslatedText(
+            "learning_tips_title"
+          )}</h4>
           <p class="text-sm text-blue-700">
             ${
               avgAccuracy >= 80
-                ? "훌륭한 실력이에요! 계속 도전해보세요."
+                ? getTranslatedText("great_skills_message")
                 : avgAccuracy >= 60
-                ? "좋은 성과입니다. 틀린 문제를 다시 복습해보세요."
-                : "기초를 더 탄탄히 다져보세요. 학습 후 퀴즈에 도전하면 도움이 됩니다."
+                ? getTranslatedText("good_performance_message")
+                : getTranslatedText("need_improvement_message")
             }
           </p>
         </div>
@@ -1180,6 +1270,36 @@ function calculateQuizDetails(conceptsList) {
   };
 }
 
+// 번역 텍스트 가져오기 함수
+function getTranslatedText(key) {
+  try {
+    // 1. window.getI18nText 함수 사용 (우선순위)
+    if (typeof window.getI18nText === "function") {
+      const result = window.getI18nText(key);
+      if (result !== key) {
+        return result;
+      }
+    }
+
+    // 2. window.translations 직접 사용
+    const currentLang = localStorage.getItem("userLanguage") || "ko";
+    if (
+      window.translations &&
+      window.translations[currentLang] &&
+      window.translations[currentLang][key]
+    ) {
+      return window.translations[currentLang][key];
+    }
+
+    // 3. 기본값 반환
+    console.warn(`번역 키를 찾을 수 없습니다: ${key}`);
+    return key;
+  } catch (error) {
+    console.error("번역 텍스트 가져오기 실패:", error);
+    return key;
+  }
+}
+
 // 연속학습 모달 표시 (달력 형식으로 개선)
 function showStudyStreakModal(studyStreak) {
   try {
@@ -1191,27 +1311,59 @@ function showStudyStreakModal(studyStreak) {
     let modalContent = `
       <div class="space-y-4">
         <div class="text-center mb-6">
-          <div class="text-6xl mb-2">🔥</div>
-          <h3 class="text-2xl font-bold text-orange-600 mb-2">연속 활동 ${studyStreak}일</h3>
-          <p class="text-gray-600">꾸준한 ${getLanguageName(
-            selectedTargetLanguage
-          )} 활동으로 실력을 쌓아가고 있어요!</p>
+          <div class="text-6xl mb-2">${
+            studyStreak >= 7
+              ? "🔥"
+              : studyStreak >= 3
+              ? "⭐"
+              : studyStreak >= 1
+              ? "👍"
+              : "💪"
+          }</div>
+          <h3 class="text-2xl font-bold text-orange-600 mb-2">${getTranslatedText(
+            "study_streak"
+          )} ${studyStreak}${getTranslatedText("days_suffix")}</h3>
+          <p class="text-gray-600">${
+            studyStreak >= 7
+              ? getTranslatedText("streak_message_7_plus").replace(
+                  "{language}",
+                  getLanguageName(selectedTargetLanguage)
+                )
+              : studyStreak >= 3
+              ? getTranslatedText("streak_message_3_6").replace(
+                  "{language}",
+                  getLanguageName(selectedTargetLanguage)
+                )
+              : studyStreak >= 1
+              ? getTranslatedText("streak_message_1_2").replace(
+                  "{language}",
+                  getLanguageName(selectedTargetLanguage)
+                )
+              : getTranslatedText("streak_message_0").replace(
+                  "{language}",
+                  getLanguageName(selectedTargetLanguage)
+                )
+          }</p>
         </div>
         
         <div class="bg-orange-50 rounded-lg p-4 mb-4">
-          <h4 class="font-semibold text-orange-800 mb-3">📅 연속 활동 달력 (최근 8일)</h4>
+          <h4 class="font-semibold text-orange-800 mb-3">📅 ${getTranslatedText(
+            "streak_calendar_title"
+          )}</h4>
           ${generateStudyCalendar(learningDatesInfo)}
         </div>
         
         <div class="bg-blue-50 rounded-lg p-4">
-          <h4 class="font-semibold text-blue-800 mb-2">💡 학습 팁</h4>
+          <h4 class="font-semibold text-blue-800 mb-2">💡 ${getTranslatedText(
+            "learning_tips_title"
+          )}</h4>
           <p class="text-sm text-blue-700">
             ${
               studyStreak >= 7
-                ? "정말 대단해요! 이 페이스를 유지해보세요."
+                ? getTranslatedText("learning_tip_7_plus")
                 : studyStreak >= 3
-                ? "좋은 습관이 만들어지고 있어요!"
-                : "매일 조금씩이라도 학습하면 큰 변화를 만들 수 있어요."
+                ? getTranslatedText("learning_tip_3_6")
+                : getTranslatedText("learning_tip_0_2")
             }
           </p>
         </div>
@@ -1219,7 +1371,7 @@ function showStudyStreakModal(studyStreak) {
     `;
 
     // 모달 표시
-    showModal("연속 활동 상세", modalContent);
+    showModal(getTranslatedText("streak_modal_title"), modalContent);
     console.log("✅ 연속학습 모달 표시 완료");
   } catch (error) {
     console.error("연속학습 모달 표시 실패:", error);
@@ -1231,8 +1383,8 @@ function calculateLearningDatesInfoForTargetLanguage() {
   const datesInfo = [];
   const today = new Date();
 
-  for (let i = 0; i < 8; i++) {
-    // 최근 8일
+  for (let i = 0; i < 10; i++) {
+    // 최근 10일
     const date = new Date(today);
     date.setDate(date.getDate() - i);
     const dateStr = date.toLocaleDateString("ko-KR");
@@ -1306,31 +1458,49 @@ function getLanguageName(languageCode) {
   return languageNames[languageCode] || languageCode;
 }
 
-// 연속 활동 달력 생성 함수 (8일, 요일 제거, 모바일 반응형)
+// 연속 활동 달력 생성 함수 (데스크탑 10일, 모바일 8일 반응형)
 function generateStudyCalendar(learningDatesInfo) {
-  // 모바일과 데스크톱 구분을 위한 반응형 그리드
-  let calendarHTML = '<div class="grid grid-cols-8 gap-2 text-xs">';
+  // 반응형 그리드: 데스크탑 5개씩, 모바일 4개씩 (데스크탑 간격 조정)
+  let calendarHTML =
+    '<div class="grid grid-cols-4 md:grid-cols-5 gap-2 md:gap-4 text-xs">';
 
-  // 날짜 셀들 (최신 8일, 요일 헤더 없음)
+  // 날짜 셀들 (총 10일, 모바일에서 마지막 2개 숨김)
   learningDatesInfo.forEach((dateInfo, index) => {
     const today = new Date();
     const isToday = dateInfo.dateKey === today.toISOString().split("T")[0];
     const dayNumber = dateInfo.date.getDate();
 
+    // 기본 사각형 스타일 (반응형 크기 조정)
     let cellClass =
-      "aspect-square flex flex-col items-center justify-center rounded-full text-xs font-medium min-h-12 ";
+      "aspect-square flex flex-col items-center justify-center text-xs font-medium min-h-14 w-14 md:min-h-20 md:w-20 rounded-lg ";
+
+    // 모바일에서 처음 2개 셀 숨기기 (index 0, 1)
+    if (index < 2) {
+      cellClass += "hidden md:flex ";
+    }
 
     if (isToday) {
+      // 오늘 날짜는 활동 여부에 따라 결정
       if (dateInfo.hasAnyActivity) {
-        cellClass += "border-4 border-orange-500 bg-green-50 text-green-700 ";
+        cellClass +=
+          "border-2 border-green-500 bg-green-50 text-green-700 rounded-full ";
       } else {
-        cellClass += "border-4 border-orange-500 bg-orange-50 text-orange-700 ";
+        cellClass += "border-2 border-gray-300 bg-gray-50 text-gray-500 ";
       }
     } else if (dateInfo.hasAnyActivity) {
-      cellClass += "border-2 border-green-500 bg-green-50 text-green-700 ";
+      // 활동한 날짜는 녹색 원형 (깔끔하게)
+      cellClass +=
+        "border-2 border-green-500 bg-green-50 text-green-700 rounded-full ";
     } else {
+      // 활동하지 않은 날짜는 회색 사각형
       cellClass += "border-2 border-gray-300 bg-gray-50 text-gray-500 ";
     }
+
+    // 활동 이모지 생성
+    let activityEmojis = "";
+    if (dateInfo.hasLearning) activityEmojis += "📚";
+    if (dateInfo.hasQuizActivity) activityEmojis += "🎯";
+    if (dateInfo.hasGameActivity) activityEmojis += "🎮";
 
     calendarHTML += `
       <div class="${cellClass} relative" title="${dateInfo.dateStr} ${
@@ -1338,50 +1508,60 @@ function generateStudyCalendar(learningDatesInfo) {
     }">
         <div class="font-bold text-sm">${
           dateInfo.date.getMonth() + 1
-        }.${dayNumber}</div>
+        }/${dayNumber}</div>
+        ${
+          activityEmojis
+            ? `<div class="text-xs mt-1">${activityEmojis}</div>`
+            : ""
+        }
+
       </div>
     `;
   });
 
   calendarHTML += "</div>";
 
-  // 모바일 전용 CSS 추가
+  // 반응형 CSS 추가
   calendarHTML += `
     <style>
       @media (max-width: 768px) {
-        .grid-cols-8 {
-          grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        .grid-cols-4 {
+          gap: 0.5rem !important;
         }
-        .grid-cols-8 > div:nth-child(5) {
-          grid-column-start: 1;
+      }
+      @media (min-width: 768px) {
+        .md\\:grid-cols-5 {
+          grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
         }
       }
     </style>
   `;
 
-  // 범례 추가 (용어 수정)
+  // 범례 추가 (번역 시스템 사용)
   calendarHTML += `
     <div class="mt-4 flex flex-wrap items-center justify-center gap-4 text-xs">
       <div class="flex items-center gap-1">
-        <div class="w-3 h-3 bg-green-100 rounded"></div>
-        <span class="text-gray-600">활동한 날</span>
+        <div class="w-3 h-3 border-2 border-green-500 rounded-full"></div>
+        <span class="text-gray-600">${getTranslatedText(
+          "activity_completed_day"
+        )}</span>
       </div>
       <div class="flex items-center gap-1">
-        <div class="w-3 h-3 bg-gray-100 rounded"></div>
-        <span class="text-gray-600">활동하지 않은 날</span>
+        <div class="w-3 h-3 border-2 border-gray-300 bg-gray-50 rounded-lg"></div>
+        <span class="text-gray-600">${getTranslatedText(
+          "no_activity_day"
+        )}</span>
       </div>
-      <div class="flex items-center gap-1">
-        <div class="w-3 h-3 border-2 border-orange-500 rounded"></div>
-        <span class="text-gray-600">오늘</span>
-      </div>
+
       <div class="flex items-center gap-2">
-        <span class="text-gray-600">📚 학습 🎯 퀴즈 🎮 게임</span>
+        <span class="text-gray-600">📚 ${getTranslatedText(
+          "activity_legend_learning"
+        )} 🎯 ${getTranslatedText(
+    "activity_legend_quiz"
+  )} 🎮 ${getTranslatedText("activity_legend_game")}</span>
       </div>
     </div>
-    <div class="mt-2 text-xs text-gray-500 text-center">
-      <p class="mb-1">💡 학습, 퀴즈, 게임 중 하나라도 활동하면 연속 활동으로 계산됩니다.</p>
-      <p class="text-green-600">🟢 초록 테두리는 해당 날짜에 활동을 완료했음을 의미합니다.</p>
-    </div>
+
   `;
 
   return calendarHTML;
@@ -1389,7 +1569,7 @@ function generateStudyCalendar(learningDatesInfo) {
 
 // 기존 함수 유지 (호환성을 위해)
 function calculateLearningDatesInfo() {
-  return calculateLearningDatesInfoForTargetLanguage().slice(0, 8);
+  return calculateLearningDatesInfoForTargetLanguage().slice(0, 10);
 }
 
 // 학습 활동 분석 업데이트
@@ -1437,7 +1617,16 @@ function calculateWeeklyActivityDataForTargetLanguage() {
     const date = new Date(today);
     date.setDate(date.getDate() - i);
     const dateKey = date.toISOString().split("T")[0];
-    const dayName = ["일", "월", "화", "수", "목", "금", "토"][date.getDay()];
+    const dayKeys = [
+      "day_sun",
+      "day_mon",
+      "day_tue",
+      "day_wed",
+      "day_thu",
+      "day_fri",
+      "day_sat",
+    ];
+    const dayName = getTranslatedText(dayKeys[date.getDay()]);
 
     // 해당 날짜의 활동 수 계산 (이미 대상 언어별로 필터링된 배열 사용)
     let learningCount = 0;
@@ -1501,21 +1690,21 @@ function createWeeklyActivityChartJS(canvas, weekData) {
       labels: labels,
       datasets: [
         {
-          label: "📚 학습",
+          label: `📚 ${getTranslatedText("activity_legend_learning")}`,
           data: learningData,
           backgroundColor: "#3b82f6",
           borderColor: "#2563eb",
           borderWidth: 1,
         },
         {
-          label: "🎯 퀴즈",
+          label: `🎯 ${getTranslatedText("activity_legend_quiz")}`,
           data: quizData,
           backgroundColor: "#8b5cf6",
           borderColor: "#7c3aed",
           borderWidth: 1,
         },
         {
-          label: "🎮 게임",
+          label: `🎮 ${getTranslatedText("activity_legend_game")}`,
           data: gameData,
           backgroundColor: "#10b981",
           borderColor: "#059669",
@@ -1578,7 +1767,9 @@ function createWeeklyActivityChartJS(canvas, weekData) {
             footer: (tooltipItems) => {
               const index = tooltipItems[0].dataIndex;
               const total = weekData[index].total;
-              return `총 활동: ${total}회`;
+              return `${getTranslatedText(
+                "total_activity"
+              )}: ${total}${getTranslatedText("unit_times")}`;
             },
           },
         },
@@ -1951,14 +2142,19 @@ function createDomainProgressChartJS(canvas, domainData) {
             label: function (context) {
               const domain = domainData[context.dataIndex];
               const percentage = ((domain.count / totalCount) * 100).toFixed(1);
-              return `${domain.name}: ${domain.count}개 (${percentage}%)`;
+              return `${domain.name}: ${domain.count}${getTranslatedText(
+                "unit_items"
+              )} (${percentage}${getTranslatedText("unit_percent")})`;
             },
             afterLabel: function (context) {
               const domain = domainData[context.dataIndex];
               const categoryList = Object.entries(domain.categories)
                 .sort(([, a], [, b]) => b - a)
                 .slice(0, 3)
-                .map(([cat, count]) => `${cat}: ${count}개`);
+                .map(
+                  ([cat, count]) =>
+                    `${cat}: ${count}${getTranslatedText("unit_items")}`
+                );
               return categoryList.join("\n");
             },
           },
@@ -1988,11 +2184,19 @@ function createDomainProgressChartJS(canvas, domainData) {
           // 전체 통계 텍스트
           ctx.fillStyle = "#1f2937";
           ctx.font = "bold 14px sans-serif";
-          ctx.fillText(`${domainCount}개 도메인`, centerX, centerY - 10);
+          ctx.fillText(
+            `🌍 ${domainCount}${getTranslatedText("unit_domains")}`,
+            centerX,
+            centerY - 10
+          );
 
           ctx.font = "12px sans-serif";
           ctx.fillStyle = "#6b7280";
-          ctx.fillText(`${totalCount}개 개념`, centerX, centerY + 8);
+          ctx.fillText(
+            `💡 ${totalCount}${getTranslatedText("unit_concepts")}`,
+            centerX,
+            centerY + 8
+          );
 
           ctx.restore();
         },
@@ -2197,12 +2401,16 @@ function showDomainTooltip(e, sliceData) {
     .slice(0, 5); // 상위 5개만 표시
 
   sortedCategories.forEach(([category, count]) => {
-    categoryDetails += `<div class="flex justify-between"><span>${category}:</span><span>${count}개</span></div>`;
+    categoryDetails += `<div class="flex justify-between"><span>${category}:</span><span>${count}${getTranslatedText(
+      "unit_items"
+    )}</span></div>`;
   });
 
   if (Object.keys(sliceData.categories).length > 5) {
     const remaining = Object.keys(sliceData.categories).length - 5;
-    categoryDetails += `<div class="text-gray-400 mt-1">+${remaining}개 카테고리 더</div>`;
+    categoryDetails += `<div class="text-gray-400 mt-1">+${remaining}${getTranslatedText(
+      "unit_items"
+    )} ${getTranslatedText("category_progress")} 더</div>`;
   }
 
   tooltip.innerHTML = `
@@ -2292,14 +2500,19 @@ window.closeModal = closeModal;
 // 총 단어수 모달 표시
 async function showTotalWordsModal(conceptsList) {
   try {
-    console.log("📋 총 단어수 모달 표시 시작");
+    console.log("📋 학습 단어 모달 표시 시작");
+
+    // 마스터하지 않은 단어만 필터링 (중복 방지)
+    const learningConcepts = conceptsList.filter(
+      (concept) => !concept.isMastered
+    );
 
     // 모달 내용 생성
     let modalContent = `
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     `;
 
-    conceptsList.forEach((concept, index) => {
+    learningConcepts.forEach((concept, index) => {
       const snapshot = concept.snapshot;
       // 올바른 단어 추출: snapshot의 실제 단어 값 사용
       const sourceWord =
@@ -2335,7 +2548,7 @@ async function showTotalWordsModal(conceptsList) {
         ? "bg-yellow-500"
         : "bg-red-500";
       const statusIcon = isMastered ? "🎓" : "📚";
-      const statusText = isMastered ? "학습중" : "학습중";
+      const statusText = getTranslatedText("learning_status");
 
       modalContent += `
         <div class="bg-gray-900 border border-gray-700 rounded-lg p-4 shadow-sm text-white">
@@ -2357,8 +2570,12 @@ async function showTotalWordsModal(conceptsList) {
           <!-- 마스터 진행률 -->
           <div class="mb-3">
             <div class="flex items-center justify-between text-sm mb-1">
-              <span class="text-pink-400">🎯 마스터 진행률</span>
-              <span class="font-bold">${accuracy}%</span>
+              <span class="text-pink-400">🎯 ${getTranslatedText(
+                "mastery_progress"
+              )}</span>
+              <span class="font-bold">${accuracy}${getTranslatedText(
+        "unit_percent"
+      )}</span>
             </div>
             <div class="w-full bg-gray-700 rounded-full h-2">
               <div class="${progressColor} h-2 rounded-full transition-all duration-300" style="width: ${accuracy}%"></div>
@@ -2395,13 +2612,15 @@ async function showTotalWordsModal(conceptsList) {
               ? `
           <div id="quiz-details-${index}" class="hidden mt-2 pt-2 border-t border-gray-600">
             <div class="flex items-center justify-center space-x-4 text-xs text-gray-300">
-              <span>✅ 정답: ${concept.quizCorrect || 0}회</span>
-              <span>❌ 오답: ${
-                (concept.quizTotal || 0) - (concept.quizCorrect || 0)
-              }회</span>
-              <span>📊 정확도: ${
-                concept.quizAccuracy ? concept.quizAccuracy.toFixed(1) : 0
-              }%</span>
+              <span>✅ ${getTranslatedText("correct_short")}: ${
+                  concept.quizCorrect || 0
+                }${getTranslatedText("unit_times")}</span>
+              <span>❌ ${getTranslatedText("incorrect_short")}: ${
+                  (concept.quizTotal || 0) - (concept.quizCorrect || 0)
+                }${getTranslatedText("unit_times")}</span>
+              <span>📊 ${getTranslatedText("accuracy_label")}: ${
+                  concept.quizAccuracy ? concept.quizAccuracy.toFixed(1) : 0
+                }${getTranslatedText("unit_percent")}</span>
             </div>
           </div>
           `
@@ -2421,14 +2640,16 @@ async function showTotalWordsModal(conceptsList) {
     const modalTitle = modal.querySelector("h2");
 
     if (modal && modalBody && modalTitle) {
-      modalTitle.textContent = `📚 총 단어 목록 (${conceptsList.length}개)`;
+      modalTitle.textContent = `📚 ${getTranslatedText(
+        "learning_words_list"
+      )} (${learningConcepts.length}${getTranslatedText("unit_items")})`;
       modalBody.innerHTML = modalContent;
       modal.classList.remove("hidden");
     }
 
-    console.log("✅ 총 단어수 모달 표시 완료");
+    console.log("✅ 학습 단어 모달 표시 완료");
   } catch (error) {
-    console.error("❌ 총 단어수 모달 표시 실패:", error);
+    console.error("❌ 학습 단어 모달 표시 실패:", error);
   }
 }
 
@@ -2485,14 +2706,20 @@ async function showMasteredWordsModal(conceptsList) {
                   <div class="text-xs text-gray-400 mt-1">${categoryTags}</div>
                 </div>
               </div>
-              <span class="px-2 py-1 text-xs rounded bg-green-600 text-white">마스터</span>
+              <span class="px-2 py-1 text-xs rounded bg-green-600 text-white">${getTranslatedText(
+                "mastered_status"
+              )}</span>
             </div>
             
             <!-- 마스터 진행률 -->
             <div class="mb-3">
               <div class="flex items-center justify-between text-sm mb-1">
-                <span class="text-pink-400">🎯 마스터 진행률</span>
-                <span class="font-bold">${accuracy}%</span>
+                <span class="text-pink-400">🎯 ${getTranslatedText(
+                  "mastery_progress"
+                )}</span>
+                <span class="font-bold">${accuracy}${getTranslatedText(
+          "unit_percent"
+        )}</span>
               </div>
               <div class="w-full bg-gray-700 rounded-full h-2">
                 <div class="bg-green-500 h-2 rounded-full transition-all duration-300" style="width: ${accuracy}%"></div>
@@ -2531,13 +2758,15 @@ async function showMasteredWordsModal(conceptsList) {
               ? `
           <div id="quiz-details-${index}" class="hidden mt-2 pt-2 border-t border-gray-600">
             <div class="flex items-center justify-center space-x-4 text-xs text-gray-300">
-              <span>✅ 정답: ${concept.quizCorrect || 0}회</span>
-              <span>❌ 오답: ${
-                (concept.quizTotal || 0) - (concept.quizCorrect || 0)
-              }회</span>
-              <span>📊 정확도: ${
-                concept.quizAccuracy ? concept.quizAccuracy.toFixed(1) : 0
-              }%</span>
+              <span>✅ ${getTranslatedText("correct_short")}: ${
+                  concept.quizCorrect || 0
+                }${getTranslatedText("unit_times")}</span>
+              <span>❌ ${getTranslatedText("incorrect_short")}: ${
+                  (concept.quizTotal || 0) - (concept.quizCorrect || 0)
+                }${getTranslatedText("unit_times")}</span>
+              <span>📊 ${getTranslatedText("accuracy_label")}: ${
+                  concept.quizAccuracy ? concept.quizAccuracy.toFixed(1) : 0
+                }${getTranslatedText("unit_percent")}</span>
             </div>
           </div>
           `
@@ -2558,7 +2787,9 @@ async function showMasteredWordsModal(conceptsList) {
     const modalTitle = modal.querySelector("h2");
 
     if (modal && modalBody && modalTitle) {
-      modalTitle.textContent = `🎓 마스터한 단어 목록 (${masteredConcepts.length}개)`;
+      modalTitle.textContent = `🎓 ${getTranslatedText("mastered_words")} (${
+        masteredConcepts.length
+      }${getTranslatedText("unit_items")})`;
       modalBody.innerHTML = modalContent;
       modal.classList.remove("hidden");
     }
@@ -2892,7 +3123,9 @@ function updateGoalsProgressUI(
   const dailyWordsProgress = document.getElementById("daily-words-progress");
   const dailyWordsBar = document.getElementById("daily-words-bar");
   if (dailyWordsProgress && dailyWordsBar) {
-    dailyWordsProgress.textContent = `${todayNewWords}/${dailyWordsGoal}개`;
+    dailyWordsProgress.textContent = `${todayNewWords}/${dailyWordsGoal}${getTranslatedText(
+      "unit_items"
+    )}`;
     const wordsPercentage = Math.min(
       (todayNewWords / dailyWordsGoal) * 100,
       100
@@ -2904,7 +3137,9 @@ function updateGoalsProgressUI(
   const dailyQuizProgress = document.getElementById("daily-quiz-progress");
   const dailyQuizBar = document.getElementById("daily-quiz-bar");
   if (dailyQuizProgress && dailyQuizBar) {
-    dailyQuizProgress.textContent = `${todayQuizMinutes}/${dailyQuizGoal}분`;
+    dailyQuizProgress.textContent = `${todayQuizMinutes}/${dailyQuizGoal}${getTranslatedText(
+      "unit_minutes"
+    )}`;
     const quizPercentage = Math.min(
       (todayQuizMinutes / dailyQuizGoal) * 100,
       100
@@ -2916,7 +3151,9 @@ function updateGoalsProgressUI(
   const weeklyDaysProgress = document.getElementById("weekly-days-progress");
   const weeklyDaysBar = document.getElementById("weekly-days-bar");
   if (weeklyDaysProgress && weeklyDaysBar) {
-    weeklyDaysProgress.textContent = `${weeklyStudyDays}/${weeklyDaysGoal}일`;
+    weeklyDaysProgress.textContent = `${weeklyStudyDays}/${weeklyDaysGoal}${getTranslatedText(
+      "days_suffix"
+    )}`;
     const daysPercentage = Math.min(
       (weeklyStudyDays / weeklyDaysGoal) * 100,
       100
@@ -2930,7 +3167,9 @@ function updateGoalsProgressUI(
   );
   const weeklyMasteryBar = document.getElementById("weekly-mastery-bar");
   if (weeklyMasteryProgress && weeklyMasteryBar) {
-    weeklyMasteryProgress.textContent = `${weeklyMasteredWords}/${weeklyMasteryGoal}개`;
+    weeklyMasteryProgress.textContent = `${weeklyMasteredWords}/${weeklyMasteryGoal}${getTranslatedText(
+      "unit_items"
+    )}`;
     const masteryPercentage = Math.min(
       (weeklyMasteredWords / weeklyMasteryGoal) * 100,
       100
