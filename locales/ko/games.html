@@ -3,15 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>게임 - LikeVoca</title>
+    <title>LikeVoca - 게임으로 언어 마스터하기</title>
 
     <!-- 기본 메타 태그 -->
-    <meta name="description" content="재미있는 게임을 통해 다양한 언어를 즐겁게 배워보세요." />
-    <meta name="keywords" content="언어 게임, 게임, 단어 게임, 언어 학습 게임, 영어, 일본어, 중국어, 한국어" />
+    <meta name="description" content="게임화된 학습으로 언어를 재미있게 마스터하세요. 단어 맞추기, 스피드 퀴즈, 메모리 게임 등 다양한 게임을 통해 자연스럽게 어휘력을 늘리고 언어 실력을 향상시킬 수 있습니다." />
+    <meta name="keywords" content="언어 학습 게임, 단어 게임, 게임화 학습, 어휘 게임, 맞춤형 게임, AI 게임, 다국어 게임, 영어 게임, 일본어 게임, 중국어 게임, 한국어 게임" />
     
     <!-- Open Graph / 소셜 미디어 메타 태그 -->
-    <meta property="og:title" content="LikeVoca - 게임" />
-    <meta property="og:description" content="재미있는 게임을 통해 다양한 언어를 즐겁게 배워보세요." />
+    <meta property="og:title" content="LikeVoca - 게임으로 언어 마스터하기" />
+    <meta property="og:description" content="게임화된 학습으로 언어를 재미있게 마스터하세요. 단어 맞추기, 스피드 퀴즈, 메모리 게임 등 다양한 게임을 통해 자연스럽게 어휘력을 늘리고 언어 실력을 향상시킬 수 있습니다." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://likevoca.com/pages/games.html" />
     <meta property="og:locale" content="ko" />
@@ -26,7 +26,13 @@
     <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/pages/games.html" />
     <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/pages/games.html" />
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 성능 최적화 - Resource Hints -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
@@ -79,8 +85,13 @@
     <div id="navbar-container"></div>
 
     <main class="container mx-auto max-w-7xl px-4 py-8">
-      <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800" data-i18n="games">게임</h1>
+      <div class="flex justify-between items-start mb-8">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-800 mb-2" data-i18n="games">🎮 게임</h1>
+          <p class="text-gray-600">
+            게임화된 학습으로 언어를 재미있게 마스터하세요. 단어 맞추기, 스피드 퀴즈, 메모리 게임 등 다양한 게임을 통해 자연스럽게 어휘력을 늘리고 언어 실력을 향상시킬 수 있습니다.
+          </p>
+        </div>
         <div class="flex space-x-4">
           <select id="source-language" class="border p-2 rounded">
             <option value="korean" data-i18n="korean">한국어</option>

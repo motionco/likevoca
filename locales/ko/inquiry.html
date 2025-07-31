@@ -3,9 +3,42 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LikeVoca - 문의하기</title>
+    <title>LikeVoca - 고객 지원 및 문의하기</title>
+    
+    <!-- 기본 메타 태그 -->
+    <meta name="description" content="LikeVoca 서비스에 대한 문의사항이나 기술 지원이 필요하시나요? 언제든지 편리하게 문의해주세요. 빠르고 친절한 고객 지원으로 최상의 언어 학습 경험을 제공해드립니다." />
+    <meta name="keywords" content="고객 지원, 문의하기, 기술 지원, 고객 서비스, LikeVoca 문의, 언어 학습 지원, 사용자 지원, 피드백" />
+    
+    <!-- Open Graph / 소셜 미디어 메타 태그 -->
+    <meta property="og:title" content="LikeVoca - 고객 지원 및 문의하기" />
+    <meta property="og:description" content="LikeVoca 서비스에 대한 문의사항이나 기술 지원이 필요하시나요? 언제든지 편리하게 문의해주세요. 빠르고 친절한 고객 지원으로 최상의 언어 학습 경험을 제공해드립니다." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://likevoca.com/ko/inquiry" />
+    <meta property="og:locale" content="ko" />
+    
+    <!-- Twitter Card 태그 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="LikeVoca - 고객 지원 및 문의하기" />
+    <meta name="twitter:description" content="LikeVoca 서비스에 대한 문의사항이나 기술 지원이 필요하시나요? 언제든지 편리하게 문의해주세요. 빠르고 친절한 고객 지원으로 최상의 언어 학습 경험을 제공해드립니다." />
+    <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
+    
+    <!-- 표준 링크 -->
+    <link rel="canonical" href="https://likevoca.com/ko/inquiry" />
+    
+    <!-- 대체 언어 링크 -->
+    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/inquiry" />
+    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/inquiry" />
+    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/inquiry" />
+    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/inquiry" />
+    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/inquiry" />
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 성능 최적화 - Resource Hints -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
     <script type="module" src="../../js/language-init.js"></script>
     <link
       rel="stylesheet"
@@ -13,6 +46,32 @@
     />
 
     <link rel="stylesheet" href="../../css/style.css" />
+    
+    <!-- 구조화된 데이터 (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ContactPage",
+      "name": "LikeVoca 문의하기",
+      "description": "LikeVoca 서비스에 대한 문의사항이나 기술 지원이 필요하시나요? 언제든지 편리하게 문의해주세요.",
+      "url": "https://likevoca.com/ko/inquiry",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "LikeVoca",
+        "url": "https://likevoca.com"
+      },
+      "inLanguage": "ko",
+      "mainEntity": {
+        "@type": "Organization",
+        "name": "LikeVoca",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "customer service",
+          "availableLanguage": ["Korean", "English", "Japanese", "Chinese"]
+        }
+      }
+    }
+    </script>
   </head>
   <body class="bg-gray-100">
     <div id="navbar-container"></div>
@@ -23,9 +82,12 @@
       >
         <div class="w-full lg:w-1/2 p-8 flex items-center">
           <div class="w-full">
-            <h1 class="text-4xl font-bold text-gray-800 mb-6 text-center" data-i18n="contact_us">
-              문의하기
+            <h1 class="text-4xl font-bold text-gray-800 mb-2 text-center" data-i18n="contact_us">
+              📞 문의하기
             </h1>
+            <p class="text-gray-600 text-center mb-6">
+              LikeVoca 서비스에 대한 문의사항이나 기술 지원이 필요하시나요? 언제든지 편리하게 문의해주세요. 빠르고 친절한 고객 지원으로 최상의 언어 학습 경험을 제공해드립니다.
+            </p>
 
             <form id="inquiry-form" class="space-y-6">
               <div>

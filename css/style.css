@@ -8,3 +8,28 @@
 * {
     font-family: 'NoonnuBasicGothicRegular';
 }
+
+/* 더보기 기능 CSS */
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.text-content-container {
+    position: relative;
+}
+
+.show-more-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    text-decoration: underline;
+}
+
+.show-more-btn:hover {
+    text-decoration: none;
+}

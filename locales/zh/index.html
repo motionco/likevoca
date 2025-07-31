@@ -6,15 +6,21 @@
     <title>LikeVoca - 多语言学习平台</title>
     
     <!-- 기본 메타 태그 -->
-    <meta name="description" content="通过系统化课程和直观的学习系统，让语言学习更有效。" />
-    <meta name="keywords" content="语言学习, 多语言, 词汇本, AI 词汇本, 英语, 日语, 中文, 韩语" />
+    <meta name="description" content="一个定制化语言学习平台，让您轻松快速地掌握目标语言。通过AI词汇生成和词汇书签功能系统性地管理个人词汇本，并通过学习、测验和游戏完美掌握词汇。" />
+    <meta name="keywords" content="定制化语言学习, AI词汇生成, 词汇书签, 个人词汇本, 多语言, 语言学习, 测验, 游戏, 英语, 日语, 中文, 韩语" />
     
     <!-- Open Graph / 소셜 미디어 메타 태그 -->
-    <meta property="og:title" content="LikeVoca - 多语言学习平台" />
-    <meta property="og:description" content="通过系统化课程和直观的学习系统，让语言学习更有效。" />
+    <meta property="og:title" content="LikeVoca - 定制化语言学习平台" />
+    <meta property="og:description" content="一个定制化语言学习平台，让您轻松快速地掌握目标语言。通过AI词汇生成和词汇书签功能系统性地管理个人词汇本，并通过学习、测验和游戏完美掌握词汇。" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://likevoca.com" />
     <meta property="og:locale" content="zh" />
+    
+    <!-- Twitter Card 태그 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="LikeVoca - 定制化语言学习平台" />
+    <meta name="twitter:description" content="一个定制化语言学习平台，让您轻松快速地掌握目标语言。通过AI词汇生成和词汇书签功能系统性地管理个人词汇本，并通过学习、测验和游戏完美掌握词汇。" />
+    <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
     
     <!-- 표준 링크 -->
     <link rel="canonical" href="https://likevoca.com" />
@@ -26,13 +32,49 @@
     <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh" />
     <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en" />
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 성능 최적화 - Resource Hints -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
 
     <link rel="stylesheet" href="../../css/style.css" />
+    
+    <!-- 구조화된 데이터 (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "LikeVoca",
+      "alternateName": "定制化语言学习平台",
+      "description": "一个定制化语言学习平台，让您轻松快速地掌握目标语言。通过AI词汇生成和词汇书签功能系统性地管理个人词汇本，并通过学习、测验和游戏完美掌握词汇。",
+      "url": "https://likevoca.com",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://likevoca.com/search?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "LikeVoca",
+        "url": "https://likevoca.com"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "CNY",
+        "description": "通过AI词汇生成和定制化学习免费开始的语言学习平台"
+      },
+      "inLanguage": "zh",
+      "availableLanguage": ["ko", "en", "ja", "zh"]
+    }
+    </script>
   </head>
   <body class="bg-gray-100">
     <div id="navbar-container"></div>
@@ -64,11 +106,15 @@
         </div>
         <div class="lg:w-1/2 mt-8 lg:mt-0 w-full px-4 lg:px-0">
           <div class="h-64 md:h-80 lg:h-96 rounded-xl overflow-hidden">
-            <img
-              src="../../assets/hero.jpeg"
-              class="w-full h-full object-cover rounded-xl"
-              alt="Hero Image"
-            />
+            <picture>
+              <source srcset="../../assets/hero.webp" type="image/webp">
+              <img
+                src="../../assets/hero.jpeg"
+                class="w-full h-full object-cover rounded-xl"
+                alt="LikeVoca多语言学习平台 - 帮助您有效学习语言的在线服务"
+                loading="lazy"
+              />
+            </picture>
           </div>
         </div>
       </div>
@@ -80,16 +126,18 @@
         <div
           class="bg-[#E6F0FF] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
         >
-          <div class="h-auto md:h-48 flex flex-col space-y-4">
+          <div class="h-auto md:h-56 flex flex-col justify-between space-y-4">
             <div>
-              <h3 class="text-2xl font-bold text-[#4B63AC] mb-4">
-                我的词汇本
-              </h3>
-              <p class="text-gray-700 text-sm lg:text-lg">
-                创建您的个人词汇收藏，跟踪学习进度。
-              </p>
+              <h3 class="text-2xl font-bold text-[#4B63AC] mb-4">我的单词本</h3>
+              <div class="text-content-container">
+                <p class="text-gray-700 text-sm lg:text-lg line-clamp-3" id="text-1">创建和管理您的个性化单词本。跟踪学习进度并设置复习计划。</p>
+                <button class="text-blue-600 text-sm mt-2 hover:text-blue-800 transition duration-200 show-more-btn" 
+                        onclick="toggleText(1)" id="btn-1" style="display: none;">
+                  查看更多
+                </button>
+              </div>
             </div>
-            <div class="mt-auto pb-2">
+            <div>
               <a href="my-word-list.html" class="block">
                 <button
                   class="w-full bg-[#4B63AC] text-white px-6 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300"
@@ -104,14 +152,18 @@
         <div
           class="bg-[#FFF3E0] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
         >
-          <div class="h-auto md:h-48 flex flex-col space-y-4">
+          <div class="h-auto md:h-56 flex flex-col justify-between space-y-4">
             <div>
-              <h3 class="text-2xl font-bold text-[#E65100] mb-4">词汇本</h3>
-              <p class="text-gray-700 text-sm lg:text-lg">
-                使用全面的词汇集合构建您的多语言词汇量。
-              </p>
+              <h3 class="text-2xl font-bold text-[#E65100] mb-4">单词本</h3>
+              <div class="text-content-container">
+                <p class="text-gray-700 text-sm lg:text-lg line-clamp-3" id="text-2">搜索和学习各种语言的单词和表达。提供实时翻译和发音指导。</p>
+                <button class="text-blue-600 text-sm mt-2 hover:text-blue-800 transition duration-200 show-more-btn" 
+                        onclick="toggleText(2)" id="btn-2" style="display: none;">
+                  查看更多
+                </button>
+              </div>
             </div>
-            <div class="mt-auto pb-2">
+            <div>
               <a href="vocabulary.html" class="block">
                 <button
                   class="w-full bg-[#E65100] text-white px-6 py-2 rounded-lg hover:bg-[#BF360C] transition duration-300"
@@ -126,16 +178,18 @@
         <div
           class="bg-[#E8F5E9] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
         >
-          <div class="h-auto md:h-48 flex flex-col space-y-4">
+          <div class="h-auto md:h-56 flex flex-col justify-between space-y-4">
             <div>
-              <h3 class="text-2xl font-bold text-[#2E7D32] mb-4">
-                AI 词汇本
-              </h3>
-              <p class="text-gray-700 text-sm lg:text-lg">
-                获得由 AI 技术支持的个人化词汇推荐。
-              </p>
+              <h3 class="text-2xl font-bold text-[#2E7D32] mb-4">AI单词本</h3>
+              <div class="text-content-container">
+                <p class="text-gray-700 text-sm lg:text-lg line-clamp-3" id="text-3">体验AI推荐的个性化单词学习，实现高效的词汇扩展。</p>
+                <button class="text-blue-600 text-sm mt-2 hover:text-blue-800 transition duration-200 show-more-btn" 
+                        onclick="toggleText(3)" id="btn-3" style="display: none;">
+                  查看更多
+                </button>
+              </div>
             </div>
-            <div class="mt-auto pb-2">
+            <div>
               <a href="ai-vocabulary.html" class="block">
                 <button
                   class="w-full bg-[#2E7D32] text-white px-6 py-2 rounded-lg hover:bg-[#1B5E20] transition duration-300"
@@ -148,12 +202,18 @@
         </div>
         <!-- 4. 언어 학습 -->
         <div
-          class="bg-[#E0F7FA] rounded-xl p-4 md:p-6 pb-8 shadow-lg hover:shadow-xl transition duration-300"
+          class="bg-[#E0F7FA] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
         >
           <div class="h-auto md:h-56 flex flex-col justify-between space-y-4">
             <div>
               <h3 class="text-2xl font-bold text-[#0097A7] mb-4">语言学习</h3>
-              <p class="text-gray-700 text-sm lg:text-lg">通过互动课程练习和提高您的语言技能。</p>
+              <div class="text-content-container">
+                <p class="text-gray-700 text-sm lg:text-lg line-clamp-3" id="text-4">通过互动课程练习和提高您的语言技能。</p>
+                <button class="text-blue-600 text-sm mt-2 hover:text-blue-800 transition duration-200 show-more-btn" 
+                        onclick="toggleText(4)" id="btn-4" style="display: none;">
+                  查看更多
+                </button>
+              </div>
             </div>
             <div>
               <a href="learning.html" class="block">
@@ -170,14 +230,18 @@
         <div
           class="bg-[#FFF8E1] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
         >
-          <div class="h-auto md:h-48 flex flex-col space-y-4">
+          <div class="h-auto md:h-56 flex flex-col justify-between space-y-4">
             <div>
               <h3 class="text-2xl font-bold text-[#F57C00] mb-4">语言测验</h3>
-              <p class="text-gray-700 text-sm lg:text-lg">
-                通过有趣的测验和挑战来测试您的知识。
-              </p>
+              <div class="text-content-container">
+                <p class="text-gray-700 text-sm lg:text-lg line-clamp-3" id="text-5">通过有趣的测验复习所学内容并测试您的技能。</p>
+                <button class="text-blue-600 text-sm mt-2 hover:text-blue-800 transition duration-200 show-more-btn" 
+                        onclick="toggleText(5)" id="btn-5" style="display: none;">
+                  查看更多
+                </button>
+              </div>
             </div>
-            <div class="mt-auto pb-2">
+            <div>
               <a href="quiz.html" class="block">
                 <button
                   class="w-full bg-[#F57C00] text-white px-6 py-2 rounded-lg hover:bg-[#E65100] transition duration-300"
@@ -190,14 +254,20 @@
         </div>
         <!-- 6. 언어 게임 -->
         <div
-          class="bg-[#F3E5F5] rounded-xl p-4 md:p-6 pb-8 shadow-lg hover:shadow-xl transition duration-300"
+          class="bg-[#F3E5F5] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
         >
           <div class="h-auto md:h-56 flex flex-col justify-between space-y-4">
             <div>
               <h3 class="text-2xl font-bold text-[#9C27B0] mb-4">语言游戏</h3>
-              <p class="text-gray-700 text-sm lg:text-lg">
-                通过为语言学习者设计的有趣互动游戏来学习。
-              </p>
+              <div class="text-content-container">
+                <p class="text-gray-700 text-sm lg:text-lg line-clamp-3" id="text-6">
+                  通过为语言学习者设计的有趣互动游戏来学习。
+                </p>
+                <button class="text-blue-600 text-sm mt-2 hover:text-blue-800 transition duration-200 show-more-btn" 
+                        onclick="toggleText(6)" id="btn-6" style="display: none;">
+                  查看更多
+                </button>
+              </div>
             </div>
             <div>
               <a href="games.html" class="block">
@@ -214,14 +284,18 @@
         <div
           class="bg-[#E3F2FD] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
         >
-          <div class="h-auto md:h-48 flex flex-col space-y-4">
+          <div class="h-auto md:h-56 flex flex-col justify-between space-y-4">
             <div>
               <h3 class="text-2xl font-bold text-[#1565CD] mb-4">联系我们</h3>
-              <p class="text-gray-700 text-sm lg:text-lg">
-                在您的语言学习之旅中获得帮助和支持。
-              </p>
+              <div class="text-content-container">
+                <p class="text-gray-700 text-sm lg:text-lg line-clamp-3" id="text-7">如果您有任何问题或疑问，请随时联系我们。我们会快速回复。</p>
+                <button class="text-blue-600 text-sm mt-2 hover:text-blue-800 transition duration-200 show-more-btn" 
+                        onclick="toggleText(7)" id="btn-7" style="display: none;">
+                  查看更多
+                </button>
+              </div>
             </div>
-            <div class="mt-auto pb-2">
+            <div>
               <a href="inquiry.html" class="block">
                 <button
                   class="w-full bg-[#1565CD] text-white px-6 py-2 rounded-lg hover:bg-[#0D47A1] transition duration-300"
@@ -241,6 +315,57 @@
     <!-- Firebase 초기화 스크립트 -->
     <script type="module" src="../../js/firebase/firebase-init.js"></script>
     
+    <!-- 더보기 기능 JavaScript -->
+    <script>
+      // 페이지 로드 시 더보기 버튼 표시 여부 확인
+      document.addEventListener('DOMContentLoaded', function() {
+        checkShowMoreButtons();
+      });
+
+      // 텍스트 토글 함수
+      function toggleText(id) {
+        const textElement = document.getElementById(`text-${id}`);
+        const button = document.getElementById(`btn-${id}`);
+        
+        if (textElement.classList.contains('line-clamp-3')) {
+          // 전체 텍스트 보이기
+          textElement.classList.remove('line-clamp-3');
+          button.textContent = '收起';
+        } else {
+          // 3줄로 제한
+          textElement.classList.add('line-clamp-3');
+          button.textContent = '查看更多';
+        }
+      }
+
+      // 더보기 버튼 표시 여부 확인 함수
+      function checkShowMoreButtons() {
+        const textElements = document.querySelectorAll('[id^="text-"]');
+        
+        textElements.forEach(element => {
+          const id = element.id.split('-')[1];
+          const button = document.getElementById(`btn-${id}`);
+          
+          // 요소의 실제 높이와 3줄 높이 비교
+          const lineHeight = parseInt(window.getComputedStyle(element).lineHeight);
+          const threeLineHeight = lineHeight * 3;
+          
+          if (element.scrollHeight > threeLineHeight) {
+            // 3줄을 넘어가는 경우 더보기 버튼 표시
+            button.style.display = 'block';
+          } else {
+            // 3줄 이하인 경우 더보기 버튼 숨김
+            button.style.display = 'none';
+          }
+        });
+      }
+
+      // 윈도우 리사이즈 시 더보기 버튼 재확인
+      window.addEventListener('resize', function() {
+        setTimeout(checkShowMoreButtons, 100);
+      });
+    </script>
+
     <script type="module">
       import { applyLanguage, updateMetadata, getActiveLanguage } from '../../utils/language-utils.js';
       
