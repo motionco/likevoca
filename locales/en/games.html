@@ -3,18 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Games - LikeVoca</title>
+    <title>LikeVoca - Master Languages with Games</title>
 
     <!-- 기본 메타 태그 -->
-    <meta name="description" content="Learn languages through fun and engaging games including word matching, word scramble, and memory games" />
-    <meta name="keywords" content="language games, word games, language learning games, English, Japanese, Chinese, Korean" />
+    <meta name="description" content="Master languages through fun and engaging games including word matching, word scramble, and memory games. Learn vocabulary naturally and improve your language skills through interactive gameplay." />
+    <meta name="keywords" content="language games, word games, language learning games, customized games, AI games, multilingual games, English games, Japanese games, Chinese games, Korean games" />
     
     <!-- Open Graph / 소셜 미디어 메타 태그 -->
-    <meta property="og:title" content="Games - LikeVoca" />
-    <meta property="og:description" content="Learn languages through fun and engaging games including word matching, word scramble, and memory games" />
+    <meta property="og:title" content="LikeVoca - Master Languages with Games" />
+    <meta property="og:description" content="Master languages through fun and engaging games including word matching, word scramble, and memory games. Learn vocabulary naturally and improve your language skills through interactive gameplay." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://likevoca.com/en/games" />
-    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale" content="en" />
+    
+    <!-- Twitter Card 태그 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="LikeVoca - Master Languages with Games" />
+    <meta name="twitter:description" content="Master languages through fun and engaging games including word matching, word scramble, and memory games. Learn vocabulary naturally and improve your language skills through interactive gameplay." />
+    <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
     
     <!-- 표준 링크 -->
     <link rel="canonical" href="https://likevoca.com/en/games" />
@@ -26,13 +32,41 @@
     <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/games" />
     <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/games" />
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 성능 최적화 - Resource Hints -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
 
     <link rel="stylesheet" href="../../css/style.css" />
+    
+    <!-- 구조화된 데이터 (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "LikeVoca Games",
+      "description": "Master languages through fun and engaging games including word matching, word scramble, and memory games. Learn vocabulary naturally and improve your language skills through interactive gameplay.",
+      "url": "https://likevoca.com/en/games",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "LikeVoca",
+        "url": "https://likevoca.com"
+      },
+      "inLanguage": "en",
+      "potentialAction": {
+        "@type": "ViewAction",
+        "name": "Play Games",
+        "description": "Learn languages naturally through fun and interactive games"
+      }
+    }
+    </script>
     
     <!-- Firebase -->
     <script type="module" src="../../js/firebase/firebase-init.js"></script>
@@ -79,8 +113,13 @@
     <div id="navbar-container"></div>
 
     <main class="container mx-auto max-w-7xl px-4 py-8">
-      <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800">Games</h1>
+      <div class="flex justify-between items-start mb-8">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-800 mb-2">🎮 Games</h1>
+          <p class="text-gray-600">
+            Learn languages naturally through fun and interactive games.
+          </p>
+        </div>
         <div class="flex space-x-4">
           <select id="source-language" class="border p-2 rounded">
             <option value="korean" data-i18n="korean">Korean</option>

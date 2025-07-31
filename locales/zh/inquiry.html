@@ -3,18 +3,42 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>联系我们 - LikeVoca</title>
-    <meta name="description" content="联系LikeVoca支持团队。向我们发送关于多语言学习平台的问题、反馈或建议" />
-    <meta property="og:title" content="联系我们 - LikeVoca" />
-    <meta property="og:description" content="联系LikeVoca支持团队。向我们发送关于多语言学习平台的问题、反馈或建议" />
-    <meta property="og:locale" content="zh_CN" />
+    <title>LikeVoca - 客户支持与联系我们</title>
+    
+    <!-- 기본 메타 태그 -->
+    <meta name="description" content="需要LikeVoca服务相关帮助或技术支持吗？随时方便地联系我们。我们提供快速友好的客户支持，为您提供最佳的语言学习体验。" />
+    <meta name="keywords" content="客户支持, 联系我们, 技术支持, 客户服务, LikeVoca联系, 语言学习支持, 用户支持, 反馈" />
+    
+    <!-- Open Graph / 소셜 미디어 메타 태그 -->
+    <meta property="og:title" content="LikeVoca - 客户支持与联系我们" />
+    <meta property="og:description" content="需要LikeVoca服务相关帮助或技术支持吗？随时方便地联系我们。我们提供快速友好的客户支持，为您提供最佳的语言学习体验。" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://likevoca.com/zh/inquiry" />
+    <meta property="og:locale" content="zh" />
+    
+    <!-- Twitter Card 태그 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="LikeVoca - 客户支持与联系我们" />
+    <meta name="twitter:description" content="需要LikeVoca服务相关帮助或技术支持吗？随时方便地联系我们。我们提供快速友好的客户支持，为您提供最佳的语言学习体验。" />
+    <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
+    
+    <!-- 표준 링크 -->
     <link rel="canonical" href="https://likevoca.com/zh/inquiry" />
+    
+    <!-- 대체 언어 링크 -->
+    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/inquiry" />
     <link rel="alternate" hreflang="en" href="https://likevoca.com/en/inquiry" />
     <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/inquiry" />
     <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/inquiry" />
-    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/inquiry" />
+    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/inquiry" />
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 성능 최적화 - Resource Hints -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
     <script type="module" src="../../js/language-init.js"></script>
     <link
       rel="stylesheet"
@@ -22,6 +46,32 @@
     />
 
     <link rel="stylesheet" href="../../css/style.css" />
+    
+    <!-- 구조화된 데이터 (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ContactPage",
+      "name": "LikeVoca 联系我们",
+      "description": "需要LikeVoca服务相关帮助或技术支持吗？随时方便地联系我们。",
+      "url": "https://likevoca.com/zh/inquiry",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "LikeVoca",
+        "url": "https://likevoca.com"
+      },
+      "inLanguage": "zh",
+      "mainEntity": {
+        "@type": "Organization",
+        "name": "LikeVoca",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "customer service",
+          "availableLanguage": ["Chinese", "English", "Korean", "Japanese"]
+        }
+      }
+    }
+    </script>
   </head>
   <body class="bg-gray-100">
     <div id="navbar-container"></div>
@@ -32,9 +82,12 @@
       >
         <div class="w-full lg:w-1/2 p-8 flex items-center">
           <div class="w-full">
-            <h1 class="text-4xl font-bold text-gray-800 mb-6 text-center">
-              联系我们
+            <h1 class="text-4xl font-bold text-gray-800 mb-2 text-center">
+              📞 联系我们
             </h1>
+            <p class="text-gray-600 text-center mb-6">
+              如有任何问题或需要支持，请随时联系我们。
+            </p>
 
             <form id="inquiry-form" class="space-y-6">
               <div>

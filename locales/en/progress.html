@@ -3,12 +3,71 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title data-i18n="progress_title">LikeVoca - Progress</title>
+  <title>LikeVoca - Learning Progress and Performance Analysis</title>
+  
+  <!-- 기본 메타 태그 -->
+  <meta name="description" content="Visually check and analyze your personalized learning progress. View word learning volume, quiz performance, game scores, and more at a glance through charts and graphs. Effectively improve your language skills through data-driven learning." />
+  <meta name="keywords" content="learning progress, performance analysis, learning statistics, progress management, learning data, performance tracking, language learning analysis, personalized progress, learning achievement" />
+  
+  <!-- Open Graph / 소셜 미디어 메타 태그 -->
+  <meta property="og:title" content="LikeVoca - Learning Progress and Performance Analysis" />
+  <meta property="og:description" content="Visually check and analyze your personalized learning progress. View word learning volume, quiz performance, game scores, and more at a glance through charts and graphs. Effectively improve your language skills through data-driven learning." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://likevoca.com/en/progress" />
+  <meta property="og:locale" content="en" />
+  
+  <!-- Twitter Card 태그 -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="LikeVoca - Learning Progress and Performance Analysis" />
+  <meta name="twitter:description" content="Visually check and analyze your personalized learning progress. View word learning volume, quiz performance, game scores, and more at a glance through charts and graphs. Effectively improve your language skills through data-driven learning." />
+  <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
+  
+  <!-- 표준 링크 -->
+  <link rel="canonical" href="https://likevoca.com/en/progress" />
+  
+  <!-- 대체 언어 링크 -->
+  <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/progress" />
+  <link rel="alternate" hreflang="en" href="https://likevoca.com/en/progress" />
+  <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/progress" />
+  <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/progress" />
+  <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/progress" />
+
+  <!-- 성능 최적화 - Resource Hints -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+
   <link rel="icon" href="../../assets/favicon.ico" type="image/x-icon" />
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="../../css/style.css" />
+  
+  <!-- 구조화된 데이터 (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "LikeVoca Learning Progress",
+    "description": "Visually check and analyze your personalized learning progress. View word learning volume, quiz performance, game scores, and more at a glance through charts and graphs.",
+    "url": "https://likevoca.com/en/progress",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "LikeVoca",
+      "url": "https://likevoca.com"
+    },
+    "inLanguage": "en",
+    "potentialAction": {
+      "@type": "ViewAction",
+      "name": "Check Progress",
+      "description": "Visually analyze and check your personal learning progress and performance"
+    }
+  }
+  </script>
+
   <script type="module" src="../../js/firebase/firebase-init.js"></script>
   <script type="module" src="../../utils/language-utils.js"></script>
   <script type="module" src="../../js/language-init.js"></script>
@@ -21,8 +80,8 @@
         <h1 class="text-3xl font-bold text-gray-800 mb-2" data-i18n="progress_title">
           📊 Progress
         </h1>
-        <p class="text-gray-600" data-i18n="progress_description">
-          Check your learning achievements and progress, and set your goals.
+        <p class="text-gray-600">
+          Check your learning progress and achievements with charts and graphs.
         </p>
       </div>
       <div class="flex items-center gap-2">

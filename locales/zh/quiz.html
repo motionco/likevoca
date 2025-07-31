@@ -3,23 +3,70 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>测验 - LikeVoca</title>
-    <meta name="description" content="通过翻译、发音、匹配、填空等多种测验类型检验您的语言学习进展" />
-    <meta property="og:title" content="测验 - LikeVoca" />
-    <meta property="og:description" content="通过翻译、发音、匹配、填空等多种测验类型检验您的语言学习进展" />
-    <meta property="og:locale" content="zh_CN" />
+    <title>LikeVoca - 测验中掌握单词</title>
+    
+    <!-- 기본 메타 태그 -->
+    <meta name="description" content="通过各种测验形式复习学习的单词并掌握它们。通过选择题、填空题、听力测验等有趣地提高语言技能。" />
+    <meta name="keywords" content="语言测验, 单词测验, 词汇测试, 语言学习测验, 定制化测验, AI测验, 多语言测验, 英语测验, 日语测验, 中文测验" />
+    
+    <!-- Open Graph / 소셜 미디어 메타 태그 -->
+    <meta property="og:title" content="LikeVoca - 测验中掌握单词" />
+    <meta property="og:description" content="通过各种测验形式复习学习的单词并掌握它们。通过选择题、填空题、听力测验等有趣地提高语言技能。" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://likevoca.com/zh/quiz" />
+    <meta property="og:locale" content="zh" />
+    
+    <!-- Twitter Card 태그 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="LikeVoca - 测验中掌握单词" />
+    <meta name="twitter:description" content="通过各种测验形式复习学习的单词并掌握它们。通过选择题、填空题、听力测验等有趣地提高语言技能。" />
+    <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
+    
+    <!-- 표준 링크 -->
     <link rel="canonical" href="https://likevoca.com/zh/quiz" />
-    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/quiz" />
+    
+    <!-- 대체 언어 링크 -->
     <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/quiz" />
+    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/quiz" />
     <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/quiz" />
     <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/quiz" />
+    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/quiz" />
+
+    <!-- 성능 최적화 - Resource Hints -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
     <link rel="icon" href="../assets/favicon.ico" type="image/x-icon" />
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <link rel="stylesheet" href="../../css/style.css" />
+    
+    <!-- 구조화된 데이터 (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "LikeVoca 测验",
+      "description": "通过各种测验形式复习学习的单词并掌握它们。通过选择题、填空题、听力测验等有趣地提高语言技能。",
+      "url": "https://likevoca.com/zh/quiz",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "LikeVoca",
+        "url": "https://likevoca.com"
+      },
+      "inLanguage": "zh",
+      "potentialAction": {
+        "@type": "InteractAction",
+        "name": "参加测验",
+        "description": "通过语言学习测验测试和提高单词技能"
+      }
+    }
+    </script>
   </head>
 
   <body class="bg-gray-50 min-h-screen">
@@ -34,7 +81,7 @@
           📝 测验
         </h1>
         <p class="text-gray-600">
-          通过多种测验检验您学习的词汇和语法。
+          通过有趣的测验复习学习的单词并提高技能。
         </p>
       </div>
 

@@ -3,30 +3,42 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>词汇本 - LikeVoca</title>
+    <title>LikeVoca - 智能词汇本管理</title>
 
     <!-- 기본 메타 태그 -->
-    <meta name="description" content="创建您自己的词汇本，有效学习。" />
-    <meta name="keywords" content="词汇本, 英语词汇, 日语词汇, 中文词汇, 语言学习" />
+    <meta name="description" content="开始系统化的多语言词汇学习。为英语、日语、中文、韩语的有效学习提供单词、分类、搜索功能和个性化学习进度管理。" />
+    <meta name="keywords" content="智能词汇本, 多语言词汇, 词汇学习, 单词管理, 语言学习工具, 英语词汇, 日语词汇, 中文词汇, 个性化学习" />
     
     <!-- Open Graph / 소셜 미디어 메타 태그 -->
-    <meta property="og:title" content="LikeVoca - 词汇本" />
-    <meta property="og:description" content="创建您自己的词汇本，有效学习。" />
+    <meta property="og:title" content="LikeVoca - 智能词汇本管理" />
+    <meta property="og:description" content="开始系统化的多语言词汇学习。为英语、日语、中文、韩语的有效学习提供单词、分类、搜索功能和个性化学习进度管理。" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://likevoca.com/vocabulary.html" />
+    <meta property="og:url" content="https://likevoca.com/zh/vocabulary" />
     <meta property="og:locale" content="zh" />
     
-    <!-- 표준 링크 -->
-    <link rel="canonical" href="https://likevoca.com/zh/vocabulary.html" />
+    <!-- Twitter Card 태그 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="LikeVoca - 智能词汇本管理" />
+    <meta name="twitter:description" content="开始系统化的多语言词汇学习。为英语、日语、中文、韩语的有效学习提供单词、分类、搜索功能和个性化学习进度管理。" />
+    <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
     
-    <!-- 대체 언어 링크 (초기값) -->
-    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/vocabulary.html" />
-    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/vocabulary.html" />
-    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/vocabulary.html" />
-    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/vocabulary.html" />
-    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/vocabulary.html" />
+    <!-- 표준 링크 -->
+    <link rel="canonical" href="https://likevoca.com/zh/vocabulary" />
+    
+    <!-- 대체 언어 링크 -->
+    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/vocabulary" />
+    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/vocabulary" />
+    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/vocabulary" />
+    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/vocabulary" />
+    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/vocabulary" />
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 성능 최적화 - Resource Hints -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
     
     <link
       rel="stylesheet"
@@ -34,6 +46,29 @@
     />
 
     <link rel="stylesheet" href="../../css/style.css" />
+    
+    <!-- 구조화된 데이터 (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "LikeVoca 词汇本",
+      "description": "开始系统化的多语言词汇学习。为英语、日语、中文、韩语的有效学习提供单词、分类、搜索功能和个性化学习进度管理。",
+      "url": "https://likevoca.com/zh/vocabulary",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "LikeVoca",
+        "url": "https://likevoca.com"
+      },
+      "inLanguage": "zh",
+      "potentialAction": {
+        "@type": "ViewAction",
+        "name": "管理词汇本",
+        "description": "系统性地管理多语言词汇并学习"
+      }
+    }
+    </script>
+    
     <style>
       .dropdown-container {
         position: relative;
@@ -56,8 +91,13 @@
     <div id="navbar-container"></div>
 
     <main class="container mx-auto max-w-7xl px-4 py-8">
-      <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800">词汇本</h1>
+      <div class="flex justify-between items-start mb-8">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-800 mb-2">📚 词汇本</h1>
+          <p class="text-gray-600">
+            系统性地管理多语言词汇并学习。
+          </p>
+        </div>
         <div class="mt-6 flex flex-col md:flex-row gap-4">
           <button
             id="add-concept-btn"

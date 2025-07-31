@@ -4,12 +4,71 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title data-i18n="progress_title">LikeVoca - 進捗</title>
+  <title>LikeVoca - 学習進捗と成果分析</title>
+  
+  <!-- 기본 메타 태그 -->
+  <meta name="description" content="個人カスタマイズされた学習進捗を視覚的に確認し、分析しましょう。単語学習量、クイズ成果、ゲームスコアなどをチャートとグラフで一目で把握できます。データ駆動学習で言語スキルを効果的に向上させることができます。" />
+  <meta name="keywords" content="学習進捗, 成果分析, 学習統計, 進捗管理, 学習データ, 成果追跡, 言語学習分析, 個人カスタマイズ進捗, 学習達成度" />
+  
+  <!-- Open Graph / 소셜 미디어 메타 태그 -->
+  <meta property="og:title" content="LikeVoca - 学習進捗と成果分析" />
+  <meta property="og:description" content="個人カスタマイズされた学習進捗を視覚的に確認し、分析しましょう。単語学習量、クイズ成果、ゲームスコアなどをチャートとグラフで一目で把握できます。データ駆動学習で言語スキルを効果的に向上させることができます。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://likevoca.com/ja/progress" />
+  <meta property="og:locale" content="ja" />
+  
+  <!-- Twitter Card 태그 -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="LikeVoca - 学習進捗と成果分析" />
+  <meta name="twitter:description" content="個人カスタマイズされた学習進捗を視覚的に確認し、分析しましょう。単語学習量、クイズ成果、ゲームスコアなどをチャートとグラフで一目で把握できます。データ駆動学習で言語スキルを効果的に向上させることができます。" />
+  <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
+  
+  <!-- 표준 링크 -->
+  <link rel="canonical" href="https://likevoca.com/ja/progress" />
+  
+  <!-- 대체 언어 링크 -->
+  <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/progress" />
+  <link rel="alternate" hreflang="en" href="https://likevoca.com/en/progress" />
+  <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/progress" />
+  <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/progress" />
+  <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/progress" />
+
+  <!-- 성능 최적화 - Resource Hints -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+
   <link rel="icon" href="../../assets/favicon.ico" type="image/x-icon" />
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="../../css/style.css" />
+  
+  <!-- 구조화된 데이터 (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "LikeVoca 学習進捗",
+    "description": "個人カスタマイズされた学習進捗を視覚的に確認し、分析しましょう。単語学習量、クイズ成果、ゲームスコアなどをチャートとグラフで一目で把握できます。",
+    "url": "https://likevoca.com/ja/progress",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "LikeVoca",
+      "url": "https://likevoca.com"
+    },
+    "inLanguage": "ja",
+    "potentialAction": {
+      "@type": "ViewAction",
+      "name": "進捗を確認",
+      "description": "個人学習進捗と成果を視覚的に分析し、確認する"
+    }
+  }
+  </script>
+
   <script type="module" src="../../js/firebase/firebase-init.js"></script>
   <script type="module" src="../../utils/language-utils.js"></script>
   <script type="module" src="../../js/language-init.js"></script>
@@ -23,9 +82,9 @@
         <h1 class="text-3xl font-bold text-gray-800 mb-2" data-i18n="progress_title">
           📊 進捗
       </h1>
-        <p class="text-gray-600" data-i18n="progress_description">
-          学習の進捗と成果を確認し、目標を設定しましょう。
-      </p>
+        <p class="text-gray-600">
+          チャートとグラフで学習進捗と成果を一目で確認しましょう。
+        </p>
       </div>
       <div class="flex items-center gap-2">
         <label class="text-sm text-gray-600" data-i18n="target_language">対象言語</label>

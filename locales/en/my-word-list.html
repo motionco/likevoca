@@ -3,28 +3,71 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Word List - LikeVoca</title>
-    <meta name="description" content="Create and manage your personalized vocabulary list with bookmarked words for effective language learning" />
-    <meta name="keywords" content="personal vocabulary, bookmarked words, multilingual wordlist, custom vocabulary, language learning" />
-    <meta property="og:title" content="My Word List - LikeVoca" />
-    <meta property="og:description" content="Create and manage your personalized vocabulary list with bookmarked words for effective language learning" />
+    <title>LikeVoca - My Customized Vocabulary</title>
+    
+    <!-- 기본 메타 태그 -->
+    <meta name="description" content="Create your own customized vocabulary with AI word generation and word bookmark features. Effectively improve your vocabulary through personalized learning progress management and review systems." />
+    <meta name="keywords" content="my vocabulary, customized vocabulary, AI word generation, word bookmarks, personal vocabulary, vocabulary management, learning progress, review system, multilingual vocabulary" />
+    
+    <!-- Open Graph / 소셜 미디어 메타 태그 -->
+    <meta property="og:title" content="LikeVoca - My Customized Vocabulary" />
+    <meta property="og:description" content="Create your own customized vocabulary with AI word generation and word bookmark features. Effectively improve your vocabulary through personalized learning progress management and review systems." />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://likevoca.com/en/my-word-list.html" />
-    <meta property="og:locale" content="en_US" />
-    <link rel="canonical" href="https://likevoca.com/en/my-word-list.html" />
-    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/my-word-list.html" />
-    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/my-word-list.html" />
-    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/my-word-list.html" />
-    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/my-word-list.html" />
-    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/my-word-list.html" />
+    <meta property="og:url" content="https://likevoca.com/en/my-word-list" />
+    <meta property="og:locale" content="en" />
+    
+    <!-- Twitter Card 태그 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="LikeVoca - My Customized Vocabulary" />
+    <meta name="twitter:description" content="Create your own customized vocabulary with AI word generation and word bookmark features. Effectively improve your vocabulary through personalized learning progress management and review systems." />
+    <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
+    
+    <!-- 표준 링크 -->
+    <link rel="canonical" href="https://likevoca.com/en/my-word-list" />
+    
+    <!-- 대체 언어 링크 -->
+    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/my-word-list" />
+    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/my-word-list" />
+    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/my-word-list" />
+    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/my-word-list" />
+    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/my-word-list" />
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 성능 최적화 - Resource Hints -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
 
     <link rel="stylesheet" href="../../css/style.css" />
+    
+    <!-- 구조화된 데이터 (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "LikeVoca My Vocabulary",
+      "description": "Create your own customized vocabulary with AI word generation and word bookmark features. Effectively improve your vocabulary through personalized learning progress management and review systems.",
+      "url": "https://likevoca.com/en/my-word-list",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "LikeVoca",
+        "url": "https://likevoca.com"
+      },
+      "inLanguage": "en",
+      "potentialAction": {
+        "@type": "ViewAction",
+        "name": "Manage My Vocabulary",
+        "description": "Create and manage your personalized vocabulary with bookmarked words"
+      }
+    }
+    </script>
+    
     <style>
       .dropdown-container {
         position: relative;
@@ -47,8 +90,13 @@
     <div id="navbar-container"></div>
 
     <main class="container mx-auto max-w-7xl px-4 py-8">
-      <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800">My Word List</h1>
+      <div class="flex justify-between items-start mb-8">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-800 mb-2">📖 My Word List</h1>
+          <p class="text-gray-600">
+            Create your personalized word list with bookmarked words.
+          </p>
+        </div>
         <a
           href="vocabulary.html"
           class="bg-[#4B63AC] text-white px-4 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300 flex items-center"

@@ -3,18 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ゲーム - LikeVoca</title>
+    <title>LikeVoca - ゲームで言語をマスター</title>
 
     <!-- 기본 메타 태그 -->
-    <meta name="description" content="単語マッチング、単語シャッフル、記憶ゲームなど楽しいゲームで言語を学習しましょう" />
-    <meta name="keywords" content="言語ゲーム, ゲーム, 単語ゲーム, 言語学習ゲーム, 英語, 日本語, 中国語, 韓国語" />
+    <meta name="description" content="楽しいゲームで言語をマスターしましょう。単語マッチング、単語シャッフル、記憶ゲームなど様々なゲームを通じて自然に語彙を学習し、言語スキルを向上させることができます。" />
+    <meta name="keywords" content="言語ゲーム, 単語ゲーム, 言語学習ゲーム, カスタマイズされたゲーム, AIゲーム, 多言語ゲーム, 英語ゲーム, 日本語ゲーム, 中国語ゲーム, 韓国語ゲーム" />
     
     <!-- Open Graph / 소셜 미디어 메타 태그 -->
-    <meta property="og:title" content="ゲーム - LikeVoca" />
-    <meta property="og:description" content="単語マッチング、単語シャッフル、記憶ゲームなど楽しいゲームで言語を学習しましょう" />
+    <meta property="og:title" content="LikeVoca - ゲームで言語をマスター" />
+    <meta property="og:description" content="楽しいゲームで言語をマスターしましょう。単語マッチング、単語シャッフル、記憶ゲームなど様々なゲームを通じて自然に語彙を学習し、言語スキルを向上させることができます。" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://likevoca.com/ja/games" />
-    <meta property="og:locale" content="ja_JP" />
+    <meta property="og:locale" content="ja" />
+    
+    <!-- Twitter Card 태그 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="LikeVoca - ゲームで言語をマスター" />
+    <meta name="twitter:description" content="楽しいゲームで言語をマスターしましょう。単語マッチング、単語シャッフル、記憶ゲームなど様々なゲームを通じて自然に語彙を学習し、言語スキルを向上させることができます。" />
+    <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
     
     <!-- 표준 링크 -->
     <link rel="canonical" href="https://likevoca.com/ja/games" />
@@ -26,13 +32,41 @@
     <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/games" />
     <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/games" />
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 성능 최적화 - Resource Hints -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
 
     <link rel="stylesheet" href="../../css/style.css" />
+    
+    <!-- 구조화된 데이터 (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "LikeVoca ゲーム",
+      "description": "楽しいゲームで言語をマスターしましょう。単語マッチング、単語シャッフル、記憶ゲームなど様々なゲームを通じて自然に語彙を学習し、言語スキルを向上させることができます。",
+      "url": "https://likevoca.com/ja/games",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "LikeVoca",
+        "url": "https://likevoca.com"
+      },
+      "inLanguage": "ja",
+      "potentialAction": {
+        "@type": "ViewAction",
+        "name": "ゲームをプレイ",
+        "description": "楽しいインタラクティブなゲームを通じて自然に言語を学習する"
+      }
+    }
+    </script>
     
     <!-- Firebase -->
     <script type="module" src="../../js/firebase/firebase-init.js"></script>
@@ -79,8 +113,13 @@
     <div id="navbar-container"></div>
 
     <main class="container mx-auto max-w-7xl px-4 py-8">
-      <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800">ゲーム</h1>
+      <div class="flex justify-between items-start mb-8">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-800 mb-2">🎮 ゲーム</h1>
+          <p class="text-gray-600">
+            楽しいインタラクティブなゲームを通じて自然に言語を学習しましょう。
+          </p>
+        </div>
         <div class="flex space-x-4">
           <select id="source-language" class="border p-2 rounded">
             <option value="korean" data-i18n="korean">韓国語</option>

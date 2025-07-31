@@ -3,28 +3,71 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>我的词汇本 - LikeVoca</title>
-    <meta name="description" content="收集书签单词，创建个人专属词汇本，进行高效的语言学习" />
-    <meta name="keywords" content="我的词汇本, 书签词汇本, 多语言词汇本, 个人词汇本, 语言学习" />
-    <meta property="og:title" content="我的词汇本 - LikeVoca" />
-    <meta property="og:description" content="收集书签单词，创建个人专属词汇本，进行高效的语言学习" />
+    <title>LikeVoca - 我的定制化词汇本</title>
+    
+    <!-- 기본 메타 태그 -->
+    <meta name="description" content="通过AI单词生成和单词书签功能创建您自己的定制化词汇本。通过个性化学习进度管理和复习系统有效提高词汇水平。" />
+    <meta name="keywords" content="我的词汇本, 定制化词汇本, AI单词生成, 单词书签, 个人词汇本, 词汇管理, 学习进度, 复习系统, 多语言词汇本" />
+    
+    <!-- Open Graph / 소셜 미디어 메타 태그 -->
+    <meta property="og:title" content="LikeVoca - 我的定制化词汇本" />
+    <meta property="og:description" content="通过AI单词生成和单词书签功能创建您自己的定制化词汇本。通过个性化学习进度管理和复习系统有效提高词汇水平。" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://likevoca.com/zh/my-word-list.html" />
-    <meta property="og:locale" content="zh_CN" />
-    <link rel="canonical" href="https://likevoca.com/zh/my-word-list.html" />
-    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/my-word-list.html" />
-    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/my-word-list.html" />
-    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/my-word-list.html" />
-    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/my-word-list.html" />
-    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/my-word-list.html" />
+    <meta property="og:url" content="https://likevoca.com/zh/my-word-list" />
+    <meta property="og:locale" content="zh" />
+    
+    <!-- Twitter Card 태그 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="LikeVoca - 我的定制化词汇本" />
+    <meta name="twitter:description" content="通过AI单词生成和单词书签功能创建您自己的定制化词汇本。通过个性化学习进度管理和复习系统有效提高词汇水平。" />
+    <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
+    
+    <!-- 표준 링크 -->
+    <link rel="canonical" href="https://likevoca.com/zh/my-word-list" />
+    
+    <!-- 대체 언어 링크 -->
+    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/my-word-list" />
+    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/my-word-list" />
+    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/my-word-list" />
+    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/my-word-list" />
+    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/my-word-list" />
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 성능 최적화 - Resource Hints -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
 
     <link rel="stylesheet" href="../../css/style.css" />
+    
+    <!-- 구조화된 데이터 (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "LikeVoca 我的词汇本",
+      "description": "通过AI单词生成和单词书签功能创建您自己的定制化词汇本。通过个性化学习进度管理和复习系统有效提高词汇水平。",
+      "url": "https://likevoca.com/zh/my-word-list",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "LikeVoca",
+        "url": "https://likevoca.com"
+      },
+      "inLanguage": "zh",
+      "potentialAction": {
+        "@type": "ViewAction",
+        "name": "管理我的词汇本",
+        "description": "使用书签单词创建和管理个性化词汇本"
+      }
+    }
+    </script>
+    
     <style>
       .dropdown-container {
         position: relative;
@@ -47,8 +90,13 @@
     <div id="navbar-container"></div>
 
     <main class="container mx-auto max-w-7xl px-4 py-8">
-      <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800">我的词汇本</h1>
+      <div class="flex justify-between items-start mb-8">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-800 mb-2">📖 我的词汇本</h1>
+          <p class="text-gray-600">
+            使用书签单词创建您自己的个性化词汇本。
+          </p>
+        </div>
         <a
           href="vocabulary.html"
           class="bg-[#4B63AC] text-white px-4 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300 flex items-center"

@@ -3,30 +3,42 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vocabulary - LikeVoca</title>
+    <title>LikeVoca - Smart Vocabulary Management</title>
 
     <!-- 기본 메타 태그 -->
-    <meta name="description" content="Create your own vocabulary and learn effectively." />
-    <meta name="keywords" content="vocabulary, English vocabulary, Japanese vocabulary, Chinese vocabulary, language learning" />
+    <meta name="description" content="Start systematic vocabulary learning with multilingual word lists. Manage words, classifications, and search functions along with personalized learning progress for effective learning in English, Japanese, Chinese, and Korean." />
+    <meta name="keywords" content="smart vocabulary, multilingual vocabulary, vocabulary learning, word management, language learning tools, English vocabulary, Japanese vocabulary, Chinese vocabulary, personalized learning" />
     
     <!-- Open Graph / 소셜 미디어 메타 태그 -->
-    <meta property="og:title" content="LikeVoca - Vocabulary" />
-    <meta property="og:description" content="Create your own vocabulary and learn effectively." />
+    <meta property="og:title" content="LikeVoca - Smart Vocabulary Management" />
+    <meta property="og:description" content="Start systematic vocabulary learning with multilingual word lists. Manage words, classifications, and search functions along with personalized learning progress for effective learning in English, Japanese, Chinese, and Korean." />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://likevoca.com/vocabulary.html" />
+    <meta property="og:url" content="https://likevoca.com/en/vocabulary" />
     <meta property="og:locale" content="en" />
     
-    <!-- 표준 링크 -->
-    <link rel="canonical" href="https://likevoca.com/en/vocabulary.html" />
+    <!-- Twitter Card 태그 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="LikeVoca - Smart Vocabulary Management" />
+    <meta name="twitter:description" content="Start systematic vocabulary learning with multilingual word lists. Manage words, classifications, and search functions along with personalized learning progress for effective learning in English, Japanese, Chinese, and Korean." />
+    <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
     
-    <!-- 대체 언어 링크 (초기값) -->
-    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/vocabulary.html" />
-    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/vocabulary.html" />
-    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/vocabulary.html" />
-    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/vocabulary.html" />
-    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/vocabulary.html" />
+    <!-- 표준 링크 -->
+    <link rel="canonical" href="https://likevoca.com/en/vocabulary" />
+    
+    <!-- 대체 언어 링크 -->
+    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/vocabulary" />
+    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/vocabulary" />
+    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/vocabulary" />
+    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/vocabulary" />
+    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/vocabulary" />
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 성능 최적화 - Resource Hints -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
     
     <link
       rel="stylesheet"
@@ -34,6 +46,29 @@
     />
 
     <link rel="stylesheet" href="../../css/style.css" />
+    
+    <!-- 구조화된 데이터 (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "LikeVoca Vocabulary",
+      "description": "Start systematic vocabulary learning with multilingual word lists. Manage words, classifications, and search functions along with personalized learning progress for effective learning in English, Japanese, Chinese, and Korean.",
+      "url": "https://likevoca.com/en/vocabulary",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "LikeVoca",
+        "url": "https://likevoca.com"
+      },
+      "inLanguage": "en",
+      "potentialAction": {
+        "@type": "ViewAction",
+        "name": "Manage Vocabulary",
+        "description": "Systematically manage and learn multilingual vocabulary"
+      }
+    }
+    </script>
+    
     <style>
       .dropdown-container {
         position: relative;
@@ -56,8 +91,13 @@
     <div id="navbar-container"></div>
 
     <main class="container mx-auto max-w-7xl px-4 py-8">
-      <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800">Vocabulary</h1>
+      <div class="flex justify-between items-start mb-8">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-800 mb-2">📚 Vocabulary</h1>
+          <p class="text-gray-600">
+            Manage and learn multilingual vocabulary systematically.
+          </p>
+        </div>
         <div class="mt-6 flex flex-col md:flex-row gap-4">
           <button
             id="add-concept-btn"

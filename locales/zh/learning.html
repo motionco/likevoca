@@ -4,33 +4,67 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>学习 - LikeVoca</title>
+  <title>LikeVoca - 综合语言学习系统</title>
 
   <!-- 기본 메타 태그 -->
-  <meta name="description" content="整合词汇、语法、阅读学习的综合语言学习系统" />
-  <meta name="keywords" content="语言学习, 词汇学习, 语法学习, 阅读学习, 闪卡, 语法模式" />
+  <meta name="description" content="将词汇、语法、阅读整合为一体的系统性语言学习系统。通过闪卡、语法模式学习、阅读练习培养综合语言技能。通过个性化学习进度有效掌握语言。" />
+  <meta name="keywords" content="综合语言学习, 系统学习, 词汇学习, 语法学习, 阅读学习, 闪卡, 语法模式, 定制化学习, 综合语言教育" />
 
   <!-- Open Graph / 소셜 미디어 메타 태그 -->
-  <meta property="og:title" content="LikeVoca - 学习" />
-  <meta property="og:description" content="整合词汇、语法、阅读学习的综合语言学习系统" />
+  <meta property="og:title" content="LikeVoca - 综合语言学习系统" />
+  <meta property="og:description" content="将词汇、语法、阅读整合为一体的系统性语言学习系统。通过闪卡、语法模式学习、阅读练习培养综合语言技能。通过个性化学习进度有效掌握语言。" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://likevoca.com/learning.html" />
+  <meta property="og:url" content="https://likevoca.com/zh/learning" />
   <meta property="og:locale" content="zh" />
 
+  <!-- Twitter Card 태그 -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="LikeVoca - 综合语言学习系统" />
+  <meta name="twitter:description" content="将词汇、语法、阅读整合为一体的系统性语言学习系统。通过闪卡、语法模式学习、阅读练习培养综合语言技能。通过个性化学习进度有效掌握语言。" />
+  <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
+
   <!-- 표준 링크 -->
-  <link rel="canonical" href="https://likevoca.com/zh/learning.html" />
+  <link rel="canonical" href="https://likevoca.com/zh/learning" />
 
-  <!-- 대체 언어 링크 (초기값) -->
-  <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/learning.html" />
-  <link rel="alternate" hreflang="en" href="https://likevoca.com/en/learning.html" />
-  <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/learning.html" />
-  <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/learning.html" />
-  <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/learning.html" />
+  <!-- 대체 언어 링크 -->
+  <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/learning" />
+  <link rel="alternate" hreflang="en" href="https://likevoca.com/en/learning" />
+  <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/learning" />
+  <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/learning" />
+  <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/learning" />
 
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 성능 최적화 - Resource Hints -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
   <link rel="stylesheet" href="../../css/style.css" />
+  
+  <!-- 구조화된 데이터 (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "LikeVoca 学习",
+    "description": "将词汇、语法、阅读整合为一体的系统性语言学习系统。通过闪卡、语法模式学习、阅读练习培养综合语言技能。通过个性化学习进度有效掌握语言。",
+    "url": "https://likevoca.com/zh/learning",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "LikeVoca",
+      "url": "https://likevoca.com"
+    },
+    "inLanguage": "zh",
+    "potentialAction": {
+      "@type": "ViewAction",
+      "name": "开始学习",
+      "description": "通过词汇、语法、阅读练习开始综合语言学习"
+    }
+  }
+  </script>
 
   <!-- Firebase SDK -->
   <script type="module" src="../../js/firebase/firebase-init.js"></script>
@@ -117,7 +151,10 @@
   <div id="navbar-container"></div>
 
   <main class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold text-gray-800">学习</h1>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">📚 学习</h1>
+        <p class="text-gray-600 text-center md:text-left">
+          通过综合的词汇、语法、阅读练习构建语言技能。
+        </p>
 
     <!-- 过滤器行 -->
     <div class="space-y-3 md:space-y-0">

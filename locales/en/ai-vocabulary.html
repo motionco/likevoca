@@ -3,70 +3,107 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI Vocabulary - LikeVoca</title>
+    <title>LikeVoca - AI Customized Vocabulary Generation</title>
 
     <!-- 기본 메타 태그 -->
     <meta
       name="description"
-      content="Create AI-powered multilingual vocabulary and learn effectively."
+      content="Automatically generate personalized vocabulary lists with AI technology. AI recommends words based on your learning level and interests, providing efficient learning plans. Rapidly improve your language skills through smart vocabulary expansion."
     />
     <meta
       name="keywords"
-      content="AI vocabulary, multilingual vocabulary, English vocabulary, Japanese vocabulary, Chinese vocabulary, AI language learning"
+      content="AI word generation, customized vocabulary, AI language learning, smart vocabulary learning, personalized word recommendations, AI learning tools, automatic vocabulary generation, multilingual AI learning"
     />
 
     <!-- Open Graph / 소셜 미디어 메타 태그 -->
-    <meta property="og:title" content="LikeVoca - AI Vocabulary" />
+    <meta property="og:title" content="LikeVoca - AI Customized Vocabulary Generation" />
     <meta
       property="og:description"
-      content="Create AI-powered multilingual vocabulary and learn effectively."
+      content="Automatically generate personalized vocabulary lists with AI technology. AI recommends words based on your learning level and interests, providing efficient learning plans. Rapidly improve your language skills through smart vocabulary expansion."
     />
     <meta property="og:type" content="website" />
     <meta
       property="og:url"
-      content="https://likevoca.com/ai-vocabulary.html"
+      content="https://likevoca.com/en/ai-vocabulary"
     />
     <meta property="og:locale" content="en" />
+
+    <!-- Twitter Card 태그 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="LikeVoca - AI Customized Vocabulary Generation" />
+    <meta
+      name="twitter:description"
+      content="Automatically generate personalized vocabulary lists with AI technology. AI recommends words based on your learning level and interests, providing efficient learning plans. Rapidly improve your language skills through smart vocabulary expansion."
+    />
+    <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
 
     <!-- 표준 링크 -->
     <link
       rel="canonical"
-      href="https://likevoca.com/en/ai-vocabulary.html"
+      href="https://likevoca.com/en/ai-vocabulary"
     />
 
-    <!-- 대체 언어 링크 (초기값) -->
+    <!-- 대체 언어 링크 -->
     <link
       rel="alternate"
       hreflang="ko"
-      href="https://likevoca.com/ko/ai-vocabulary.html"
+      href="https://likevoca.com/ko/ai-vocabulary"
     />
     <link
       rel="alternate"
       hreflang="en"
-      href="https://likevoca.com/en/ai-vocabulary.html"
+      href="https://likevoca.com/en/ai-vocabulary"
     />
     <link
       rel="alternate"
       hreflang="ja"
-      href="https://likevoca.com/ja/ai-vocabulary.html"
+      href="https://likevoca.com/ja/ai-vocabulary"
     />
     <link
       rel="alternate"
       hreflang="zh"
-      href="https://likevoca.com/zh/ai-vocabulary.html"
+      href="https://likevoca.com/zh/ai-vocabulary"
     />
     <link
       rel="alternate"
       hreflang="x-default"
-      href="https://likevoca.com/en/ai-vocabulary.html"
+      href="https://likevoca.com/en/ai-vocabulary"
     />
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 성능 최적화 - Resource Hints -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
     <link rel="stylesheet" href="../../css/style.css" />
+    
+    <!-- 구조화된 데이터 (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "LikeVoca AI Vocabulary",
+      "description": "Automatically generate personalized vocabulary lists with AI technology. AI recommends words based on your learning level and interests, providing efficient learning plans. Rapidly improve your language skills through smart vocabulary expansion.",
+      "url": "https://likevoca.com/en/ai-vocabulary",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "LikeVoca",
+        "url": "https://likevoca.com"
+      },
+      "inLanguage": "en",
+      "potentialAction": {
+        "@type": "ViewAction",
+        "name": "Generate AI Vocabulary",
+        "description": "Create personalized vocabulary lists with AI technology"
+      }
+    }
+    </script>
 
     <style>
       .dropdown-container {
@@ -94,10 +131,15 @@
     <div id="navbar-container"></div>
 
     <main class="container mx-auto max-w-7xl px-4 py-8">
-      <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800">
-          AI Vocabulary
-        </h1>
+      <div class="flex justify-between items-start mb-8">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-800 mb-2">
+            🤖 AI Vocabulary
+          </h1>
+          <p class="text-gray-600">
+            Learn smarter with AI-recommended personalized words.
+          </p>
+        </div>
         <button
           id="ai-add-concept"
           class="bg-[#4B63AC] text-white px-4 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300 flex items-center"

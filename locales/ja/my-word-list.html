@@ -3,28 +3,71 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>私の単語帳 - LikeVoca</title>
-    <meta name="description" content="ブックマークした単語を集めて自分だけの単語帳を作成し、効果的に学習しましょう" />
-    <meta name="keywords" content="私の単語帳, ブックマーク単語帳, 多言語単語帳, 個人単語帳, 言語学習" />
-    <meta property="og:title" content="私の単語帳 - LikeVoca" />
-    <meta property="og:description" content="ブックマークした単語を集めて自分だけの単語帳を作成し、効果的に学習しましょう" />
+    <title>LikeVoca - 私のカスタマイズ単語帳</title>
+    
+    <!-- 기본 메타 태그 -->
+    <meta name="description" content="AI単語生成と単語ブックマーク機能で自分だけのカスタマイズ単語帳を作成しましょう。個人化された学習進捗管理と復習システムで効果的に語彙を向上させることができます。" />
+    <meta name="keywords" content="私の単語帳, カスタマイズ単語帳, AI単語生成, 単語ブックマーク, 個人単語帳, 語彙管理, 学習進捗, 復習システム, 多言語単語帳" />
+    
+    <!-- Open Graph / 소셜 미디어 메타 태그 -->
+    <meta property="og:title" content="LikeVoca - 私のカスタマイズ単語帳" />
+    <meta property="og:description" content="AI単語生成と単語ブックマーク機能で自分だけのカスタマイズ単語帳を作成しましょう。個人化された学習進捗管理と復習システムで効果的に語彙を向上させることができます。" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://likevoca.com/ja/my-word-list.html" />
-    <meta property="og:locale" content="ja_JP" />
-    <link rel="canonical" href="https://likevoca.com/ja/my-word-list.html" />
-    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/my-word-list.html" />
-    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/my-word-list.html" />
-    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/my-word-list.html" />
-    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/my-word-list.html" />
-    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/my-word-list.html" />
+    <meta property="og:url" content="https://likevoca.com/ja/my-word-list" />
+    <meta property="og:locale" content="ja" />
+    
+    <!-- Twitter Card 태그 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="LikeVoca - 私のカスタマイズ単語帳" />
+    <meta name="twitter:description" content="AI単語生成と単語ブックマーク機能で自分だけのカスタマイズ単語帳を作成しましょう。個人化された学習進捗管理と復習システムで効果的に語彙を向上させることができます。" />
+    <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
+    
+    <!-- 표준 링크 -->
+    <link rel="canonical" href="https://likevoca.com/ja/my-word-list" />
+    
+    <!-- 대체 언어 링크 -->
+    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/my-word-list" />
+    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/my-word-list" />
+    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/my-word-list" />
+    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/my-word-list" />
+    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/my-word-list" />
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 성능 최적화 - Resource Hints -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
 
     <link rel="stylesheet" href="../../css/style.css" />
+    
+    <!-- 구조화된 데이터 (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "LikeVoca 私の単語帳",
+      "description": "AI単語生成と単語ブックマーク機能で自分だけのカスタマイズ単語帳を作成しましょう。個人化された学習進捗管理と復習システムで効果的に語彙を向上させることができます。",
+      "url": "https://likevoca.com/ja/my-word-list",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "LikeVoca",
+        "url": "https://likevoca.com"
+      },
+      "inLanguage": "ja",
+      "potentialAction": {
+        "@type": "ViewAction",
+        "name": "私の単語帳を管理",
+        "description": "ブックマークした単語で個人化された単語帳を作成・管理する"
+      }
+    }
+    </script>
+    
     <style>
       .dropdown-container {
         position: relative;
@@ -47,8 +90,13 @@
     <div id="navbar-container"></div>
 
     <main class="container mx-auto max-w-7xl px-4 py-8">
-      <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800">私の単語帳</h1>
+      <div class="flex justify-between items-start mb-8">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-800 mb-2">📖 私の単語帳</h1>
+          <p class="text-gray-600">
+            ブックマークした単語で自分だけの個人化された単語帳を作成しましょう。
+          </p>
+        </div>
         <a
           href="vocabulary.html"
           class="bg-[#4B63AC] text-white px-4 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300 flex items-center"

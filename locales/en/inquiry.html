@@ -3,18 +3,42 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Contact Us - LikeVoca</title>
-    <meta name="description" content="Get in touch with LikeVoca support team. Send us your questions, feedback, or suggestions about our multilingual learning platform" />
-    <meta property="og:title" content="Contact Us - LikeVoca" />
-    <meta property="og:description" content="Get in touch with LikeVoca support team. Send us your questions, feedback, or suggestions about our multilingual learning platform" />
-    <meta property="og:locale" content="en_US" />
+    <title>LikeVoca - Customer Support and Contact</title>
+    
+    <!-- 기본 메타 태그 -->
+    <meta name="description" content="Need help with LikeVoca services or technical support? Contact us anytime for convenient inquiries. We provide fast and friendly customer support for the best language learning experience." />
+    <meta name="keywords" content="customer support, contact us, technical support, customer service, LikeVoca contact, language learning support, user support, feedback" />
+    
+    <!-- Open Graph / 소셜 미디어 메타 태그 -->
+    <meta property="og:title" content="LikeVoca - Customer Support and Contact" />
+    <meta property="og:description" content="Need help with LikeVoca services or technical support? Contact us anytime for convenient inquiries. We provide fast and friendly customer support for the best language learning experience." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://likevoca.com/en/inquiry" />
+    <meta property="og:locale" content="en" />
+    
+    <!-- Twitter Card 태그 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="LikeVoca - Customer Support and Contact" />
+    <meta name="twitter:description" content="Need help with LikeVoca services or technical support? Contact us anytime for convenient inquiries. We provide fast and friendly customer support for the best language learning experience." />
+    <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
+    
+    <!-- 표준 링크 -->
     <link rel="canonical" href="https://likevoca.com/en/inquiry" />
+    
+    <!-- 대체 언어 링크 -->
+    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/inquiry" />
     <link rel="alternate" hreflang="en" href="https://likevoca.com/en/inquiry" />
     <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/inquiry" />
     <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/inquiry" />
-    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/inquiry" />
+    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/inquiry" />
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 성능 최적화 - Resource Hints -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
     <script type="module" src="../../js/language-init.js"></script>
     <link
       rel="stylesheet"
@@ -22,6 +46,32 @@
     />
 
     <link rel="stylesheet" href="../../css/style.css" />
+    
+    <!-- 구조화된 데이터 (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ContactPage",
+      "name": "LikeVoca Contact",
+      "description": "Need help with LikeVoca services or technical support? Contact us anytime for convenient inquiries.",
+      "url": "https://likevoca.com/en/inquiry",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "LikeVoca",
+        "url": "https://likevoca.com"
+      },
+      "inLanguage": "en",
+      "mainEntity": {
+        "@type": "Organization",
+        "name": "LikeVoca",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "customer service",
+          "availableLanguage": ["English", "Korean", "Japanese", "Chinese"]
+        }
+      }
+    }
+    </script>
   </head>
   <body class="bg-gray-100">
     <div id="navbar-container"></div>
@@ -32,9 +82,12 @@
       >
         <div class="w-full lg:w-1/2 p-8 flex items-center">
           <div class="w-full">
-            <h1 class="text-4xl font-bold text-gray-800 mb-6 text-center">
-              Contact Us
+            <h1 class="text-4xl font-bold text-gray-800 mb-2 text-center">
+              📞 Contact Us
             </h1>
+            <p class="text-gray-600 text-center mb-6">
+              Contact us anytime for questions or support you need.
+            </p>
 
             <form id="inquiry-form" class="space-y-6">
               <div>

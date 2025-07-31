@@ -3,12 +3,71 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title data-i18n="progress_title">LikeVoca - 进度</title>
+  <title>LikeVoca - 学习进度和成果分析</title>
+  
+  <!-- 기본 메타 태그 -->
+  <meta name="description" content="可视化查看和分析个性化学习进度。通过图表和图形一目了然地掌握单词学习量、测验成果、游戏分数等。通过数据驱动学习有效提高语言技能。" />
+  <meta name="keywords" content="学习进度, 成果分析, 学习统计, 进度管理, 学习数据, 成果追踪, 语言学习分析, 个性化进度, 学习成就" />
+  
+  <!-- Open Graph / 소셜 미디어 메타 태그 -->
+  <meta property="og:title" content="LikeVoca - 学习进度和成果分析" />
+  <meta property="og:description" content="可视化查看和分析个性化学习进度。通过图表和图形一目了然地掌握单词学习量、测验成果、游戏分数等。通过数据驱动学习有效提高语言技能。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://likevoca.com/zh/progress" />
+  <meta property="og:locale" content="zh" />
+  
+  <!-- Twitter Card 태그 -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="LikeVoca - 学习进度和成果分析" />
+  <meta name="twitter:description" content="可视化查看和分析个性化学习进度。通过图表和图形一目了然地掌握单词学习量、测验成果、游戏分数等。通过数据驱动学习有效提高语言技能。" />
+  <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
+  
+  <!-- 표준 링크 -->
+  <link rel="canonical" href="https://likevoca.com/zh/progress" />
+  
+  <!-- 대체 언어 링크 -->
+  <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/progress" />
+  <link rel="alternate" hreflang="en" href="https://likevoca.com/en/progress" />
+  <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/progress" />
+  <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/progress" />
+  <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/progress" />
+
+  <!-- 성능 최적화 - Resource Hints -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+
   <link rel="icon" href="../../assets/favicon.ico" type="image/x-icon" />
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="../../css/style.css" />
+  
+  <!-- 구조화된 데이터 (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "LikeVoca 学习进度",
+    "description": "可视化查看和分析个性化学习进度。通过图表和图形一目了然地掌握单词学习量、测验成果、游戏分数等。",
+    "url": "https://likevoca.com/zh/progress",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "LikeVoca",
+      "url": "https://likevoca.com"
+    },
+    "inLanguage": "zh",
+    "potentialAction": {
+      "@type": "ViewAction",
+      "name": "查看进度",
+      "description": "可视化分析并查看个人学习进度和成果"
+    }
+  }
+  </script>
+
   <script type="module" src="../../js/firebase/firebase-init.js"></script>
   <script type="module" src="../../utils/language-utils.js"></script>
   <script type="module" src="../../js/language-init.js"></script>
@@ -21,9 +80,9 @@
         <h1 class="text-3xl font-bold text-gray-800 mb-2" data-i18n="progress_title">
           📊 进度
       </h1>
-        <p class="text-gray-600" data-i18n="progress_description">
-          查看学习进度和成果，设定学习目标。
-      </p>
+        <p class="text-gray-600">
+          通过图表和图形一目了然地查看学习进度和成果。
+        </p>
       </div>
       <div class="flex items-center gap-2">
         <label class="text-sm text-gray-600" data-i18n="target_language">目标语言</label>

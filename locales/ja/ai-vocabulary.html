@@ -3,70 +3,107 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI 単語帳 - LikeVoca</title>
+    <title>LikeVoca - AI カスタマイズ単語帳生成</title>
 
     <!-- 기본 메타 태그 -->
     <meta
       name="description"
-      content="AIが推薦する多言語単語帳を作成し、効果的に学習しましょう。"
+      content="AI技術で個人カスタマイズ単語帳を自動生成しましょう。学習レベルと興味に合わせた単語をAIが推薦し、効率的な学習計画を提供します。スマートな語彙拡張で言語スキルを迅速に向上させることができます。"
     />
     <meta
       name="keywords"
-      content="AI 単語帳, 多言語単語帳, 英単語, 日本語単語, 中国語単語, AI 言語学習"
+      content="AI単語生成, カスタマイズ単語帳, AI言語学習, スマート語彙学習, 個人化単語推薦, AI学習ツール, 自動単語帳生成, 多言語AI学習"
     />
 
     <!-- Open Graph / 소셜 미디어 메타 태그 -->
-    <meta property="og:title" content="LikeVoca - AI 単語帳" />
+    <meta property="og:title" content="LikeVoca - AI カスタマイズ単語帳生成" />
     <meta
       property="og:description"
-      content="AIが推薦する多言語単語帳を作成し、効果的に学習しましょう。"
+      content="AI技術で個人カスタマイズ単語帳を自動生成しましょう。学習レベルと興味に合わせた単語をAIが推薦し、効率的な学習計画を提供します。スマートな語彙拡張で言語スキルを迅速に向上させることができます。"
     />
     <meta property="og:type" content="website" />
     <meta
       property="og:url"
-      content="https://likevoca.com/ai-vocabulary.html"
+      content="https://likevoca.com/ja/ai-vocabulary"
     />
     <meta property="og:locale" content="ja" />
+
+    <!-- Twitter Card 태그 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="LikeVoca - AI カスタマイズ単語帳生成" />
+    <meta
+      name="twitter:description"
+      content="AI技術で個人カスタマイズ単語帳を自動生成しましょう。学習レベルと興味に合わせた単語をAIが推薦し、効率的な学習計画を提供します。スマートな語彙拡張で言語スキルを迅速に向上させることができます。"
+    />
+    <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
 
     <!-- 표준 링크 -->
     <link
       rel="canonical"
-      href="https://likevoca.com/ja/ai-vocabulary.html"
+      href="https://likevoca.com/ja/ai-vocabulary"
     />
 
-    <!-- 대체 언어 링크 (초기값) -->
+    <!-- 대체 언어 링크 -->
     <link
       rel="alternate"
       hreflang="ko"
-      href="https://likevoca.com/ko/ai-vocabulary.html"
+      href="https://likevoca.com/ko/ai-vocabulary"
     />
     <link
       rel="alternate"
       hreflang="en"
-      href="https://likevoca.com/en/ai-vocabulary.html"
+      href="https://likevoca.com/en/ai-vocabulary"
     />
     <link
       rel="alternate"
       hreflang="ja"
-      href="https://likevoca.com/ja/ai-vocabulary.html"
+      href="https://likevoca.com/ja/ai-vocabulary"
     />
     <link
       rel="alternate"
       hreflang="zh"
-      href="https://likevoca.com/zh/ai-vocabulary.html"
+      href="https://likevoca.com/zh/ai-vocabulary"
     />
     <link
       rel="alternate"
       hreflang="x-default"
-      href="https://likevoca.com/en/ai-vocabulary.html"
+      href="https://likevoca.com/en/ai-vocabulary"
     />
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 성능 최적화 - Resource Hints -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
     <link rel="stylesheet" href="../../css/style.css" />
+    
+    <!-- 구조화된 데이터 (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "LikeVoca AI 単語帳",
+      "description": "AI技術で個人カスタマイズ単語帳を自動生成しましょう。学習レベルと興味に合わせた単語をAIが推薦し、効率的な学習計画を提供します。スマートな語彙拡張で言語スキルを迅速に向上させることができます。",
+      "url": "https://likevoca.com/ja/ai-vocabulary",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "LikeVoca",
+        "url": "https://likevoca.com"
+      },
+      "inLanguage": "ja",
+      "potentialAction": {
+        "@type": "ViewAction",
+        "name": "AI単語帳を生成",
+        "description": "AI技術で個人カスタマイズ単語帳を作成する"
+      }
+    }
+    </script>
 
     <style>
       .dropdown-container {
@@ -94,10 +131,15 @@
     <div id="navbar-container"></div>
 
     <main class="container mx-auto max-w-7xl px-4 py-8">
-      <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800">
-          AI 単語帳
-        </h1>
+      <div class="flex justify-between items-start mb-8">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-800 mb-2">
+            🤖 AI 単語帳
+          </h1>
+          <p class="text-gray-600">
+            AI推薦のパーソナライズされた単語でよりスマートに学習しましょう。
+          </p>
+        </div>
         <button
           id="ai-add-concept"
           class="bg-[#4B63AC] text-white px-4 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300 flex items-center"

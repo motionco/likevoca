@@ -3,23 +3,70 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>クイズ - LikeVoca</title>
-    <meta name="description" content="翻訳、発音、マッチング、穴埋め問題など様々なクイズタイプで言語学習の進捗を確認できます" />
-    <meta property="og:title" content="クイズ - LikeVoca" />
-    <meta property="og:description" content="翻訳、発音、マッチング、穴埋め問題など様々なクイズタイプで言語学習の進捗を確認できます" />
-    <meta property="og:locale" content="ja_JP" />
+    <title>LikeVoca - クイズで単語をマスター</title>
+    
+    <!-- 기본 메타 태그 -->
+    <meta name="description" content="様々なクイズ形式で学習した単語を復習し、マスターしましょう。選択問題、記述問題、リスニングクイズを通じて楽しく言語スキルを向上させることができます。" />
+    <meta name="keywords" content="言語クイズ, 単語クイズ, 語彙テスト, 言語学習クイズ, カスタマイズされたクイズ, AIクイズ, 多言語クイズ, 英語クイズ, 日本語クイズ, 中国語クイズ" />
+    
+    <!-- Open Graph / 소셜 미디어 메타 태그 -->
+    <meta property="og:title" content="LikeVoca - クイズで単語をマスター" />
+    <meta property="og:description" content="様々なクイズ形式で学習した単語を復習し、マスターしましょう。選択問題、記述問題、リスニングクイズを通じて楽しく言語スキルを向上させることができます。" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://likevoca.com/ja/quiz" />
+    <meta property="og:locale" content="ja" />
+    
+    <!-- Twitter Card 태그 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="LikeVoca - クイズで単語をマスター" />
+    <meta name="twitter:description" content="様々なクイズ形式で学習した単語を復習し、マスターしましょう。選択問題、記述問題、リスニングクイズを通じて楽しく言語スキルを向上させることができます。" />
+    <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
+    
+    <!-- 표준 링크 -->
     <link rel="canonical" href="https://likevoca.com/ja/quiz" />
-    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/quiz" />
+    
+    <!-- 대체 언어 링크 -->
     <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/quiz" />
+    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/quiz" />
     <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/quiz" />
     <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/quiz" />
+    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/quiz" />
+    
+    <!-- 성능 최적화 - Resource Hints -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
     <link rel="icon" href="../assets/favicon.ico" type="image/x-icon" />
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <link rel="stylesheet" href="../../css/style.css" />
+    
+    <!-- 구조화된 데이터 (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "LikeVoca クイズ",
+      "description": "様々なクイズ形式で学習した単語を復習し、マスターしましょう。選択問題、記述問題、リスニングクイズを通じて楽しく言語スキルを向上させることができます。",
+      "url": "https://likevoca.com/ja/quiz",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "LikeVoca",
+        "url": "https://likevoca.com"
+      },
+      "inLanguage": "ja",
+      "potentialAction": {
+        "@type": "InteractAction",
+        "name": "クイズを受ける",
+        "description": "言語学習クイズを通じて単語スキルをテストし、向上させる"
+      }
+    }
+    </script>
   </head>
 
   <body class="bg-gray-50 min-h-screen">
@@ -34,7 +81,7 @@
           📝 クイズ
         </h1>
         <p class="text-gray-600">
-          様々なクイズで学習した単語や文法を確認しましょう。
+          楽しいクイズで学習した単語を復習し、スキルを向上させましょう。
         </p>
       </div>
 
