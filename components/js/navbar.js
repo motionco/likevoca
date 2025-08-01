@@ -213,6 +213,7 @@ function updateLanguageButton(language) {
     en: { name: "English", flag: "🇺🇸" },
     ja: { name: "日본語", flag: "🇯🇵" },
     zh: { name: "중문", flag: "🇨🇳" },
+    es: { name: "Español", flag: "🇪🇸" },
   };
 
   const info = languageInfo[language] || languageInfo.ko;

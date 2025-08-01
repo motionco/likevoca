@@ -1,14 +1,14 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Profile Management - LikeVoca</title>
-  <meta name="description" content="Manage your LikeVoca profile settings, account connections, and personal information for language learning" />
-  <meta property="og:title" content="Profile Management - LikeVoca" />
-  <meta property="og:description" content="Manage your LikeVoca profile settings, account connections, and personal information for language learning" />
-  <meta property="og:locale" content="en_US" />
-  <link rel="canonical" href="https://likevoca.com/en/profile" />
+  <title>Gestión de Perfil - LikeVoca</title>
+  <meta name="description" content="Gestiona la configuración de tu perfil de LikeVoca, conexiones de cuenta e información personal para el aprendizaje de idiomas" />
+  <meta property="og:title" content="Gestión de Perfil - LikeVoca" />
+  <meta property="og:description" content="Gestiona la configuración de tu perfil de LikeVoca, conexiones de cuenta e información personal para el aprendizaje de idiomas" />
+      <meta property="og:locale" content="es" />
+  <link rel="canonical" href="https://likevoca.com/es/profile" />
   <link rel="alternate" hreflang="en" href="https://likevoca.com/en/profile" />
   <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/profile" />
   <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/profile" />
@@ -26,63 +26,63 @@
 
   <main class="container mx-auto px-4 py-8">
     <div id="profile-container" class="bg-white rounded-lg shadow-md p-6">
-      <h1 class="text-2xl font-bold mb-6">Profile Management</h1>
+      <h1 class="text-2xl font-bold mb-6">Gestión de Perfil</h1>
       
       <div id="auth-required" class="p-6 bg-yellow-100 rounded-lg border border-yellow-300 mb-4">
-        <p class="text-lg">You need to log in to view this page.</p>
-        <a href="#" onclick="window.redirectToLogin()" class="btn btn-primary mt-3 inline-block">Login</a>
+        <p class="text-lg">Necesitas iniciar sesión para ver esta página.</p>
+        <a href="#" onclick="window.redirectToLogin()" class="btn btn-primary mt-3 inline-block">Iniciar Sesión</a>
       </div>
       
       <div id="profile-content">
         <div class="profile-section">
-          <h2>Personal Information</h2>
+          <h2>Información Personal</h2>
           <form id="profile-form">
             <div class="form-group">
-              <label for="displayName">Name</label>
+              <label for="displayName">Nombre</label>
               <input type="text" id="displayName" name="displayName" class="form-control">
             </div>
             <div class="form-group">
               <label for="email">Email</label>
               <input type="email" id="email" name="email" class="form-control" disabled>
             </div>
-            <button type="submit" id="update-profile" class="btn btn-primary">Update Information</button>
+            <button type="submit" id="update-profile" class="btn btn-primary">Actualizar Información</button>
           </form>
         </div>
         
         <div class="profile-section">
-          <h2>Account Connections</h2>
+          <h2>Conexiones de Cuenta</h2>
           <div class="account-connections">
             <div class="connection-item">
               <div class="connection-info">
                 <i class="fab fa-google provider-icon" style="color: #DB4437;"></i>
-                <span>Google Account</span>
+                <span>Cuenta de Google</span>
               </div>
               <div class="connection-status">
-                <span id="google-status" class="status-badge">Not Connected</span>
-                <button id="google-connect" class="btn btn-outline">Connect</button>
-                <button id="google-disconnect" class="btn btn-outline btn-danger hidden">Disconnect</button>
+                <span id="google-status" class="status-badge">No Conectado</span>
+                <button id="google-connect" class="btn btn-outline">Conectar</button>
+                <button id="google-disconnect" class="btn btn-outline btn-danger hidden">Desconectar</button>
               </div>
             </div>
             
             <div class="connection-item">
               <div class="connection-info">
                 <i class="fab fa-github provider-icon"></i>
-                <span>GitHub Account</span>
+                <span>Cuenta de GitHub</span>
               </div>
               <div class="connection-status">
-                <span id="github-status" class="status-badge">Not Connected</span>
-                <button id="github-connect" class="btn btn-outline">Connect</button>
-                <button id="github-disconnect" class="btn btn-outline btn-danger hidden">Disconnect</button>
+                <span id="github-status" class="status-badge">No Conectado</span>
+                <button id="github-connect" class="btn btn-outline">Conectar</button>
+                <button id="github-disconnect" class="btn btn-outline btn-danger hidden">Desconectar</button>
               </div>
             </div>
           </div>
         </div>
         
         <div class="profile-section danger-zone">
-          <h2>Danger Zone</h2>
+          <h2>Zona de Peligro</h2>
           <div class="danger-actions">
-            <button id="logout-btn" class="btn btn-outline">Logout</button>
-            <button id="delete-account" class="btn btn-danger">Delete Account</button>
+            <button id="logout-btn" class="btn btn-outline">Cerrar Sesión</button>
+            <button id="delete-account" class="btn btn-danger">Eliminar Cuenta</button>
           </div>
         </div>
       </div>
@@ -91,7 +91,7 @@
   
   <footer class="footer bg-gray-200 mt-8 py-4">
     <div class="container mx-auto text-center">
-      <p>&copy; 2025 LikeVoca. All rights reserved.</p>
+      <p>&copy; 2025 LikeVoca. Todos los derechos reservados.</p>
     </div>
   </footer>
 
@@ -103,4 +103,3 @@
   <script type="module" src="../../components/js/navbar.js"></script>
 </body>
 </html> 
-

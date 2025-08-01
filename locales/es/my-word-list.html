@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LikeVoca - Mi Vocabulario Personalizado</title>
+    
+    <!-- 기본 메타 태그 -->
+    <meta name="description" content="Crea tu propio vocabulario personalizado con generación de palabras IA y funciones de marcadores de palabras. Mejora efectivamente tu vocabulario a través de gestión de progreso de aprendizaje personalizado y sistemas de revisión." />
+    <meta name="keywords" content="mi vocabulario, vocabulario personalizado, generación de palabras IA, marcadores de palabras, vocabulario personal, gestión de vocabulario, progreso de aprendizaje, sistema de revisión, vocabulario multilingüe" />
+    
+    <!-- Open Graph / 소셜 미디어 메타 태그 -->
+    <meta property="og:title" content="LikeVoca - Mi Vocabulario Personalizado" />
+    <meta property="og:description" content="Crea tu propio vocabulario personalizado con generación de palabras IA y funciones de marcadores de palabras. Mejora efectivamente tu vocabulario a través de gestión de progreso de aprendizaje personalizado y sistemas de revisión." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://likevoca.com/es/my-word-list" />
+    <meta property="og:locale" content="es" />
+    
+    <!-- Twitter Card 태그 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="LikeVoca - Mi Vocabulario Personalizado" />
+    <meta name="twitter:description" content="Crea tu propio vocabulario personalizado con generación de palabras IA y funciones de marcadores de palabras. Mejora efectivamente tu vocabulario a través de gestión de progreso de aprendizaje personalizado y sistemas de revisión." />
+    <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
+    
+    <!-- 표준 링크 -->
+    <link rel="canonical" href="https://likevoca.com/es/my-word-list" />
+    
+    <!-- 대체 언어 링크 -->
+    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/my-word-list" />
+    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/my-word-list" />
+    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/my-word-list" />
+    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/my-word-list" />
+    <link rel="alternate" hreflang="es" href="https://likevoca.com/es/my-word-list" />
+    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/my-word-list" />
+
+    <!-- 성능 최적화 - Resource Hints -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+
+    <link rel="stylesheet" href="../../css/style.css" />
+    
+    <!-- 구조화된 데이터 (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "LikeVoca Mi Vocabulario",
+      "description": "Crea tu propio vocabulario personalizado con generación de palabras IA y funciones de marcadores de palabras. Mejora efectivamente tu vocabulario a través de gestión de progreso de aprendizaje personalizado y sistemas de revisión.",
+      "url": "https://likevoca.com/es/my-word-list",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "LikeVoca",
+        "url": "https://likevoca.com"
+      },
+      "inLanguage": "es",
+      "potentialAction": {
+        "@type": "ViewAction",
+        "name": "Gestionar Mi Vocabulario",
+        "description": "Crea y gestiona tu vocabulario personalizado con palabras marcadas"
+      }
+    }
+    </script>
+    
+    <style>
+      .dropdown-container {
+        position: relative;
+      }
+      .dropdown {
+        position: absolute;
+        z-index: 10;
+        width: 100%;
+      }
+      .word-card {
+        transition: transform 0.3s;
+      }
+      .word-card:hover {
+        transform: translateY(-5px);
+      }
+    </style>
+    <script type="module" src="../../js/language-init.js"></script>
+  </head>
+  <body class="bg-gray-100">
+    <div id="navbar-container"></div>
+
+    <main class="container mx-auto max-w-7xl px-4 py-8">
+      <div class="flex justify-between items-start mb-8">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-800 mb-2">📖 Mi Lista de Palabras</h1>
+          <p class="text-gray-600">
+            Crea tu lista de palabras personalizada con palabras marcadas.
+          </p>
+        </div>
+        <a
+          href="vocabulary.html"
+          class="bg-[#4B63AC] text-white px-4 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300 flex items-center"
+        >
+          <i class="fas fa-bookmark mr-2"></i> <span>Marcar Palabras</span>
+        </a>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <!-- 필터 컨트롤 - 3열 분할, 반응형 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <!-- 첫 번째 열: 검색 -->
+          <div class="space-y-2">
+            <label for="search-input" class="hidden md:block text-sm font-medium text-gray-700">Buscar</label>
+            <div class="relative">
+              <input
+                type="text"
+                id="search-input"
+                class="w-full p-2 border rounded pl-8 h-10"
+                placeholder="Ingresar término de búsqueda..."
+              />
+              <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+            </div>
+          </div>
+
+          <!-- 두 번째 열: 언어 필터 -->
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Configuración de Idioma</label>
+            <div class="flex items-center space-x-2">
+              <select id="source-language" class="flex-1 p-2 border rounded h-10 text-sm">
+                <option value="korean">Coreano</option>
+                <option value="english">Inglés</option>
+                <option value="japanese">Japonés</option>
+                <option value="chinese">Chino</option>
+              </select>
+              <button
+                id="swap-languages"
+                class="w-10 h-10 text-gray-600 hover:text-[#4B63AC] hover:bg-gray-100 rounded-lg transition duration-200 border border-gray-300 hover:border-[#4B63AC] flex items-center justify-center"
+                title="Intercambiar idiomas"
+              >
+                <i class="fas fa-exchange-alt text-sm"></i>
+              </button>
+              <select id="target-language" class="flex-1 p-2 border rounded h-10 text-sm">
+                <option value="english">Inglés</option>
+                <option value="korean">Coreano</option>
+                <option value="japanese">Japonés</option>
+                <option value="chinese">Chino</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 세 번째 열: 도메인과 정렬 (동적 생성) -->
+          <div id="domain-sort-filters" class="space-y-2">
+            <!-- JavaScript로 동적 생성됨 -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 북마크 사용량 -->
+      <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm font-medium text-gray-700">Uso de Marcadores</span>
+          <span id="usage-text" class="text-sm font-bold text-blue-600">0/<span>Ilimitado</span></span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2">
+          <div id="usage-bar" class="bg-blue-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- 개념 카드 표시 영역 -->
+      <div id="word-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                <!-- 더 보기 버튼 -->
+      <div class="flex justify-center mt-8">
+        <button
+          id="load-more"
+          class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-6 rounded-lg transition duration-300 hidden"
+        >
+          Cargar Más <i class="fas fa-chevron-down ml-1"></i>
+        </button>
+      </div>
+
+      <!-- 총 개념 수 (페이지 하단) -->
+      <div class="text-center mt-6 py-4">
+        <span class="text-sm font-medium text-gray-700 mr-2">Total de Conceptos:</span>
+        <span id="concept-count-display" class="text-sm font-bold text-green-600">0</span>
+      </div>
+    </main>
+
+    <div id="modal-container"></div>
+
+    <!-- Firebase -->
+    <script type="module" src="../../js/firebase/firebase-init.js"></script>
+    <script type="module" src="../../components/js/navbar.js"></script>
+    <script type="module" src="../../pages/js/my-word-list.js"></script>
+    
+    <!-- 개념 모달 스크립트 -->
+    <script type="module" src="../../components/js/concept-modal-enhanced.js"></script>
+    <script type="module" src="../../components/js/concept-modal-utils.js"></script>
+    <script type="module" src="../../components/js/add-concept-modal.js"></script>
+    <script type="module" src="../../components/js/edit-concept-modal.js"></script>
+    <script type="module" src="../../components/js/bulk-import-modal.js"></script>
+    <script type="module" src="../../components/js/separated-import-modal.js"></script>
+    <script type="module" src="../../components/js/csv-parser-utils.js"></script>
+    <script type="module" src="../../components/js/domain-category-emoji.js"></script>
+
+    <script>
+      // 페이지 로드 시 초기화
+      document.addEventListener('DOMContentLoaded', async () => {
+        try {
+          // 네비게이션바 로드
+          if (typeof window.loadNavbar === 'function') {
+            await window.loadNavbar();
+          }
+          
+          // 번역 적용
+          if (typeof window.applyLanguage === 'function') {
+            await window.applyLanguage();
+          }
+          
+          // 메타데이터 업데이트
+          if (typeof window.updateMetadata === 'function') {
+            await window.updateMetadata('my-word-list');
+          }
+
+          // 검색 기능
+          document.getElementById('search-input').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            filterWords(searchTerm);
+          });
+
+          // 필터 기능
+          document.getElementById('language-filter').addEventListener('change', filterWords);
+          document.getElementById('status-filter').addEventListener('change', filterWords);
+          document.getElementById('sort-option').addEventListener('change', sortWords);
+
+          // 내보내기 버튼
+          document.getElementById('export-list').addEventListener('click', () => {
+            exportWordList();
+          });
+
+          // 가져오기 버튼
+          document.getElementById('import-list').addEventListener('click', () => {
+            importWordList();
+          });
+
+        } catch (error) {
+          console.error('페이지 초기화 오류:', error);
+        }
+      });
+
+      function filterWords() {
+        const searchTerm = document.getElementById('search-input').value.toLowerCase();
+        const languageFilter = document.getElementById('language-filter').value;
+        const statusFilter = document.getElementById('status-filter').value;
+
+        // 필터링 로직 구현
+        console.log('Filtrando palabras:', { searchTerm, languageFilter, statusFilter });
+      }
+
+      function sortWords() {
+        const sortOption = document.getElementById('sort-option').value;
+        // 정렬 로직 구현
+        console.log('Ordenando por:', sortOption);
+      }
+
+      function exportWordList() {
+        // 내보내기 로직 구현
+        console.log('Exportando lista de palabras...');
+        alert('Lista de palabras exportada exitosamente');
+      }
+
+      function importWordList() {
+        // 가져오기 로직 구현
+        console.log('Importando lista de palabras...');
+        alert('Lista de palabras importada exitosamente');
+      }
+    </script>
+  </body>
+</html> 

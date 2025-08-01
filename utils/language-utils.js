@@ -20,6 +20,11 @@ const SUPPORTED_LANGUAGES = {
     code: "zh",
     emoji: "🇨🇳",
   },
+  es: {
+    name: "Español",
+    code: "es",
+    emoji: "🇪🇸",
+  },
 };
 
 // 공통으로 사용되는 텍스트 정의
@@ -51,6 +56,14 @@ const commonTexts = {
     language_learning_desc: "通过闪卡、测验和打字等多种方式学习语言。",
     language_games: "多语言游戏",
     language_games_desc: "通过有趣的游戏愉快地学习各种语言。",
+  },
+  es: {
+    language_learning: "Aprendizaje de Idiomas",
+    language_learning_desc:
+      "Aprende idiomas de diversas maneras como tarjetas de memoria, cuestionarios y escritura.",
+    language_games: "Juegos de Idiomas",
+    language_games_desc:
+      "Aprende varios idiomas de manera divertida a través de juegos entretenidos.",
   },
 };
 
@@ -84,6 +97,13 @@ const seoMetadata = {
       description: commonTexts.zh.language_learning_desc,
       keywords: "语言学习, 多语言, 单词本, AI单词本, 英语, 日语, 中文, 韩语",
       canonical: "https://likevoca.com/zh",
+    },
+    es: {
+      title: "LikeVoca - " + commonTexts.es.language_learning,
+      description: commonTexts.es.language_learning_desc,
+      keywords:
+        "aprendizaje de idiomas, multilingüe, libro de palabras, libro de palabras IA, inglés, japonés, chino, coreano, español",
+      canonical: "https://likevoca.com/es",
     },
   },
   // 다국어 단어장 페이지 메타데이터

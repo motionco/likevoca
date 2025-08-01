@@ -1,29 +1,29 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LikeVoca - Customer Support and Contact</title>
+    <title>LikeVoca - Soporte al Cliente y Contacto</title>
     
     <!-- 기본 메타 태그 -->
-    <meta name="description" content="Need help with LikeVoca services or technical support? Contact us anytime for convenient inquiries. We provide fast and friendly customer support for the best language learning experience." />
-    <meta name="keywords" content="customer support, contact us, technical support, customer service, LikeVoca contact, language learning support, user support, feedback" />
+    <meta name="description" content="¿Necesitas ayuda con los servicios de LikeVoca o soporte técnico? Contáctanos en cualquier momento para consultas convenientes. Proporcionamos soporte al cliente rápido y amigable para la mejor experiencia de aprendizaje de idiomas." />
+    <meta name="keywords" content="soporte al cliente, contáctanos, soporte técnico, servicio al cliente, contacto LikeVoca, soporte de aprendizaje de idiomas, soporte de usuario, comentarios" />
     
     <!-- Open Graph / 소셜 미디어 메타 태그 -->
-    <meta property="og:title" content="LikeVoca - Customer Support and Contact" />
-    <meta property="og:description" content="Need help with LikeVoca services or technical support? Contact us anytime for convenient inquiries. We provide fast and friendly customer support for the best language learning experience." />
+    <meta property="og:title" content="LikeVoca - Soporte al Cliente y Contacto" />
+    <meta property="og:description" content="¿Necesitas ayuda con los servicios de LikeVoca o soporte técnico? Contáctanos en cualquier momento para consultas convenientes. Proporcionamos soporte al cliente rápido y amigable para la mejor experiencia de aprendizaje de idiomas." />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://likevoca.com/en/inquiry" />
-    <meta property="og:locale" content="en" />
+    <meta property="og:url" content="https://likevoca.com/es/inquiry" />
+    <meta property="og:locale" content="es" />
     
     <!-- Twitter Card 태그 -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="LikeVoca - Customer Support and Contact" />
-    <meta name="twitter:description" content="Need help with LikeVoca services or technical support? Contact us anytime for convenient inquiries. We provide fast and friendly customer support for the best language learning experience." />
+    <meta name="twitter:title" content="LikeVoca - Soporte al Cliente y Contacto" />
+    <meta name="twitter:description" content="¿Necesitas ayuda con los servicios de LikeVoca o soporte técnico? Contáctanos en cualquier momento para consultas convenientes. Proporcionamos soporte al cliente rápido y amigable para la mejor experiencia de aprendizaje de idiomas." />
     <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
     
     <!-- 표준 링크 -->
-    <link rel="canonical" href="https://likevoca.com/en/inquiry" />
+    <link rel="canonical" href="https://likevoca.com/es/inquiry" />
     
     <!-- 대체 언어 링크 -->
     <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/inquiry" />
@@ -53,22 +53,22 @@
     {
       "@context": "https://schema.org",
       "@type": "ContactPage",
-      "name": "LikeVoca Contact",
-      "description": "Need help with LikeVoca services or technical support? Contact us anytime for convenient inquiries.",
-      "url": "https://likevoca.com/en/inquiry",
+      "name": "LikeVoca Contacto",
+      "description": "¿Necesitas ayuda con los servicios de LikeVoca o soporte técnico? Contáctanos en cualquier momento para consultas convenientes.",
+      "url": "https://likevoca.com/es/inquiry",
       "isPartOf": {
         "@type": "WebSite",
         "name": "LikeVoca",
         "url": "https://likevoca.com"
       },
-      "inLanguage": "en",
+      "inLanguage": "es",
       "mainEntity": {
         "@type": "Organization",
         "name": "LikeVoca",
         "contactPoint": {
           "@type": "ContactPoint",
           "contactType": "customer service",
-          "availableLanguage": ["English", "Korean", "Japanese", "Chinese"]
+          "availableLanguage": ["English", "Korean", "Japanese", "Chinese", "Spanish"]
         }
       }
     }
@@ -84,10 +84,10 @@
         <div class="w-full lg:w-1/2 p-8 flex items-center">
           <div class="w-full">
             <h1 class="text-4xl font-bold text-gray-800 mb-2 text-center">
-              📞 Contact Us
+              📞 Contáctanos
             </h1>
             <p class="text-gray-600 text-center mb-6">
-              Contact us anytime for questions or support you need.
+              Contáctanos en cualquier momento para preguntas o soporte que necesites.
             </p>
 
             <form id="inquiry-form" class="space-y-6">
@@ -96,7 +96,7 @@
                   for="name"
                   class="block text-lg font-medium text-gray-700 mb-1"
                 >
-                  Your Email
+                  Tu Email
                 </label>
                 <input
                   type="email"
@@ -107,48 +107,82 @@
                   disabled
                 />
               </div>
+
               <div>
                 <label
                   for="title"
                   class="block text-lg font-medium text-gray-700 mb-1"
                 >
-                  Subject
+                  Asunto
                 </label>
                 <input
                   type="text"
                   id="title"
                   name="title"
                   required
-                  placeholder="Enter your inquiry subject"
+                  placeholder="Ingresa el asunto de tu consulta"
                   class="w-full px-4 py-2 border rounded-md transition-all duration-300"
                 />
               </div>
+
               <div>
                 <label
                   for="message"
                   class="block text-lg font-medium text-gray-700 mb-1"
                 >
-                  Message
+                  Mensaje
                 </label>
                 <textarea
                   id="message"
                   name="message"
                   rows="6"
                   required
-                  placeholder="Enter your message"
+                  placeholder="Ingresa tu mensaje"
                   class="w-full px-4 py-3 border rounded-md transition-all duration-300"
                 >
                 </textarea>
               </div>
-              <div class="text-center">
-                <button
-                  type="submit"
-                  class="bg-[#4B63AC] text-white px-8 py-3 rounded-md hover:bg-[#3A4F8B] transition-colors duration-300 shadow-md"
-                >
-                  Send Inquiry
-                </button>
+
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="privacy"
+                  name="privacy"
+                  required
+                  class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label for="privacy" class="ml-2 block text-sm text-gray-700">
+                  Acepto la
+                  <a href="#" class="text-blue-600 hover:text-blue-800 underline">
+                    política de privacidad
+                  </a>
+                </label>
               </div>
+
+              <button
+                type="submit"
+                class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-300 font-semibold text-lg"
+              >
+                <i class="fas fa-paper-plane mr-2"></i>
+                Enviar Mensaje
+              </button>
             </form>
+
+            <!-- 성공 메시지 -->
+            <div id="success-message" class="hidden mt-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+              <div class="flex items-center">
+                <i class="fas fa-check-circle mr-2"></i>
+                <span>¡Mensaje enviado con éxito! Te responderemos pronto.</span>
+              </div>
+            </div>
+
+            <!-- 에러 메시지 -->
+            <div id="error-message" class="hidden mt-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+              <div class="flex items-center">
+                <i class="fas fa-exclamation-circle mr-2"></i>
+                <span id="error-text">Hubo un error al enviar el mensaje. Inténtalo de nuevo.</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -162,14 +196,7 @@
       </div>
     </div>
 
-    <!-- Firebase -->
-    <script type="module" src="../../js/firebase/firebase-init.js"></script>
-    <script type="module" src="../../utils/language-utils.js"></script>
-    <!-- 네비게이션바 스크립트 -->
-    <script src="../../components/js/navbar.js"></script>
-    <!-- 문의하기 페이지 스크립트 -->
     <script type="module" src="../../pages/js/inquiry.js"></script>
+    <script src="../../components/js/navbar.js"></script>
   </body>
-</html>
-
-
+</html> 

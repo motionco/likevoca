@@ -1,29 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LikeVoca - Master Words with Quizzes</title>
+    <title>LikeVoca - Domina Palabras con Cuestionarios</title>
     
     <!-- 기본 메타 태그 -->
-    <meta name="description" content="Review and master learned words with various quiz formats. Improve your language skills through multiple choice, short answer, and listening quizzes in an enjoyable way." />
-    <meta name="keywords" content="language quizzes, word quizzes, vocabulary tests, language learning quizzes, customized quizzes, AI quizzes, multilingual quizzes, English quizzes, Japanese quizzes, Chinese quizzes" />
+    <meta name="description" content="Revisa y domina las palabras aprendidas con varios formatos de cuestionarios. Mejora tus habilidades lingüísticas a través de cuestionarios de opción múltiple, respuesta corta y audición de manera divertida." />
+    <meta name="keywords" content="cuestionarios de idiomas, cuestionarios de palabras, pruebas de vocabulario, cuestionarios de aprendizaje de idiomas, cuestionarios personalizados, cuestionarios IA, cuestionarios multilingües, cuestionarios en inglés, cuestionarios en japonés, cuestionarios en chino, cuestionarios en español" />
     
     <!-- Open Graph / 소셜 미디어 메타 태그 -->
-    <meta property="og:title" content="LikeVoca - Master Words with Quizzes" />
-    <meta property="og:description" content="Review and master learned words with various quiz formats. Improve your language skills through multiple choice, short answer, and listening quizzes in an enjoyable way." />
+    <meta property="og:title" content="LikeVoca - Domina Palabras con Cuestionarios" />
+    <meta property="og:description" content="Revisa y domina las palabras aprendidas con varios formatos de cuestionarios. Mejora tus habilidades lingüísticas a través de cuestionarios de opción múltiple, respuesta corta y audición de manera divertida." />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://likevoca.com/en/quiz" />
-    <meta property="og:locale" content="en" />
+    <meta property="og:url" content="https://likevoca.com/es/quiz" />
+    <meta property="og:locale" content="es" />
     
     <!-- Twitter Card 태그 -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="LikeVoca - Master Words with Quizzes" />
-    <meta name="twitter:description" content="Review and master learned words with various quiz formats. Improve your language skills through multiple choice, short answer, and listening quizzes in an enjoyable way." />
+    <meta name="twitter:title" content="LikeVoca - Domina Palabras con Cuestionarios" />
+    <meta name="twitter:description" content="Revisa y domina las palabras aprendidas con varios formatos de cuestionarios. Mejora tus habilidades lingüísticas a través de cuestionarios de opción múltiple, respuesta corta y audición de manera divertida." />
     <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
     
     <!-- 표준 링크 -->
-    <link rel="canonical" href="https://likevoca.com/en/quiz" />
+    <link rel="canonical" href="https://likevoca.com/es/quiz" />
     
     <!-- 대체 언어 링크 -->
     <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/quiz" />
@@ -52,19 +52,19 @@
     {
       "@context": "https://schema.org",
       "@type": "WebPage",
-      "name": "LikeVoca Quiz",
-      "description": "Review and master learned words with various quiz formats. Improve your language skills through multiple choice, short answer, and listening quizzes in an enjoyable way.",
-      "url": "https://likevoca.com/en/quiz",
+      "name": "LikeVoca Cuestionario",
+      "description": "Revisa y domina las palabras aprendidas con varios formatos de cuestionarios. Mejora tus habilidades lingüísticas a través de cuestionarios de opción múltiple, respuesta corta y audición de manera divertida.",
+      "url": "https://likevoca.com/es/quiz",
       "isPartOf": {
         "@type": "WebSite",
         "name": "LikeVoca",
         "url": "https://likevoca.com"
       },
-      "inLanguage": "en",
+      "inLanguage": "es",
       "potentialAction": {
         "@type": "InteractAction",
-        "name": "Take Quiz",
-        "description": "Test and improve your word skills through language learning quizzes"
+        "name": "Realizar Cuestionario",
+        "description": "Prueba y mejora tus habilidades de palabras a través de cuestionarios de aprendizaje de idiomas"
       }
     }
     </script>
@@ -79,24 +79,24 @@
       <!-- 페이지 헤더 -->
       <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-800 mb-2">
-          📝 Quiz
+          📝 Cuestionario
         </h1>
         <p class="text-gray-600">
-          Review learned words with fun quizzes and improve your skills.
+          Revisa las palabras aprendidas con cuestionarios divertidos y mejora tus habilidades.
         </p>
       </div>
 
       <!-- 퀴즈 설정 섹션 -->
       <div class="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 class="text-xl font-semibold mb-4">
-          Quiz Settings
+          Configuración del Cuestionario
         </h2>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <!-- 언어 설정 -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
-              Source Language
+              Idioma de Origen
             </label>
             <select id="quiz-source-language" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
               <option value="korean">한국어</option>
@@ -108,7 +108,7 @@
 
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
-              Target Language
+              Idioma Objetivo
             </label>
             <select id="quiz-target-language" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
               <option value="english">English</option>
@@ -121,13 +121,13 @@
           <!-- 퀴즈 타입 -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="quiz_type">
-              Quiz Type
+              Tipo de Cuestionario
             </label>
             <select id="quiz-type" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="translation" data-i18n="quiz_translation">Translation</option>
-              <option value="pronunciation" data-i18n="quiz_pronunciation">Pronunciation</option>
-              <option value="matching" data-i18n="quiz_matching">Matching</option>
-              <option value="fill_in_blank" data-i18n="quiz_fill_blank">Fill in the Blank</option>
+              <option value="translation" data-i18n="quiz_translation">Traducción</option>
+              <option value="pronunciation" data-i18n="quiz_pronunciation">Pronunciación</option>
+              <option value="matching" data-i18n="quiz_matching">Emparejamiento</option>
+              <option value="fill_in_blank" data-i18n="quiz_fill_blank">Completar Espacios</option>
             </select>
           </div>
         </div>
@@ -136,26 +136,26 @@
           <!-- 난이도 -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="difficulty">
-              Difficulty Level
+              Nivel de Dificultad
             </label>
             <select id="quiz-difficulty" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="all" data-i18n="all_levels">All Levels</option>
-              <option value="beginner" data-i18n="beginner">Beginner</option>
-              <option value="intermediate" data-i18n="intermediate">Intermediate</option>
-              <option value="advanced" data-i18n="advanced">Advanced</option>
+              <option value="all" data-i18n="all_levels">Todos los Niveles</option>
+              <option value="beginner" data-i18n="beginner">Principiante</option>
+              <option value="intermediate" data-i18n="intermediate">Intermedio</option>
+              <option value="advanced" data-i18n="advanced">Avanzado</option>
             </select>
           </div>
 
           <!-- 문제 수 -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="question_count">
-              Number of Questions
+              Número de Preguntas
             </label>
             <select id="quiz-question-count" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="5">5 Questions</option>
-              <option value="10" selected>10 Questions</option>
-              <option value="15">15 Questions</option>
-              <option value="20">20 Questions</option>
+              <option value="5">5 Preguntas</option>
+              <option value="10" selected>10 Preguntas</option>
+              <option value="15">15 Preguntas</option>
+              <option value="20">20 Preguntas</option>
             </select>
           </div>
         </div>
@@ -167,7 +167,7 @@
             class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors"
             data-i18n="start_quiz"
           >
-            Start Quiz
+            Comenzar Cuestionario
           </button>
         </div>
       </div>
@@ -177,7 +177,7 @@
         <!-- 퀴즈 진행 헤더 -->
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
           <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-semibold">Quiz in Progress</h2>
+            <h2 class="text-xl font-semibold">Cuestionario en Progreso</h2>
             <div class="text-sm text-gray-600">
               <span id="current-question">1</span> / <span id="total-questions">10</span>
             </div>
@@ -196,7 +196,7 @@
             <div id="question-category" class="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full inline-block mb-4"></div>
             
             <!-- 문제 제목 -->
-            <h3 id="question-text" class="text-3xl font-bold text-gray-800 mb-6">Loading question...</h3>
+            <h3 id="question-text" class="text-3xl font-bold text-gray-800 mb-6">Cargando pregunta...</h3>
             
             <!-- 힌트 영역 -->
             <div id="question-hint" class="text-lg text-gray-600 mb-8 hidden">
@@ -223,7 +223,7 @@
               id="skip-question-btn"
               class="text-gray-600 hover:text-gray-800 px-4 py-2 rounded border border-gray-300 hover:border-gray-400"
             >
-              Skip
+              Omitir
             </button>
             
             <div class="text-center">
@@ -234,7 +234,7 @@
               id="quit-quiz-btn"
               class="text-red-600 hover:text-red-800 px-4 py-2 rounded border border-red-300 hover:border-red-400"
             >
-              Quit Quiz
+              Salir del Cuestionario
             </button>
           </div>
         </div>
@@ -245,23 +245,23 @@
         <div class="bg-white rounded-lg shadow-md p-8 text-center">
           <div class="mb-6">
             <i class="fas fa-trophy text-6xl text-yellow-500 mb-4"></i>
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">Quiz Complete!</h2>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">¡Cuestionario Completado!</h2>
           </div>
           
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div class="bg-green-50 p-4 rounded-lg">
               <div class="text-3xl font-bold text-green-600" id="correct-answers">0</div>
-              <div class="text-sm text-gray-600">Correct</div>
+              <div class="text-sm text-gray-600">Correctas</div>
             </div>
             
             <div class="bg-blue-50 p-4 rounded-lg">
               <div class="text-3xl font-bold text-blue-600" id="quiz-score">0%</div>
-              <div class="text-sm text-gray-600">Score</div>
+              <div class="text-sm text-gray-600">Puntuación</div>
             </div>
             
             <div class="bg-purple-50 p-4 rounded-lg">
               <div class="text-3xl font-bold text-purple-600" id="time-taken">00:00</div>
-              <div class="text-sm text-gray-600">Time</div>
+              <div class="text-sm text-gray-600">Tiempo</div>
             </div>
           </div>
           
@@ -270,14 +270,14 @@
               id="retry-quiz-btn"
               class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
             >
-              Try Again
+              Intentar de Nuevo
             </button>
             
             <button 
               id="new-quiz-btn"
               class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
             >
-              New Quiz
+              Nuevo Cuestionario
             </button>
           </div>
         </div>
@@ -285,9 +285,9 @@
 
       <!-- 최근 퀴즈 기록 -->
       <div class="bg-white rounded-lg shadow-md p-6 mt-8">
-        <h2 class="text-xl font-semibold mb-4">Recent Quiz History</h2>
+        <h2 class="text-xl font-semibold mb-4">Historial Reciente de Cuestionarios</h2>
         <div id="quiz-history" class="space-y-3">
-          <p class="text-gray-500 text-center py-8">No quiz history yet.</p>
+          <p class="text-gray-500 text-center py-8">Aún no hay historial de cuestionarios.</p>
         </div>
       </div>
     </main>

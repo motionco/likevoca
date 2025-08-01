@@ -31,8 +31,8 @@ async function loadNavbar() {
       navbarPath = "navbar.html";
     } else if (currentPath.includes("/pages/")) {
       navbarPath = `../locales/${currentLanguage}/navbar.html`;
-    } else if (currentPath.match(/^\/(ko|en|ja|zh)\//)) {
-      // 언어별 경로 (/ko/, /en/, /ja/, /zh/)
+    } else if (currentPath.match(/^\/(ko|en|ja|zh|es)\//)) {
+      // 언어별 경로 (/ko/, /en/, /ja/, /zh/, /es/)
       navbarPath = `../locales/${currentLanguage}/navbar.html`;
     } else {
       navbarPath = `locales/${currentLanguage}/navbar.html`;
@@ -56,7 +56,7 @@ async function loadNavbar() {
       ? "../../components/js/navbar.js"
       : currentPath.includes("/pages/")
       ? "../components/js/navbar.js"
-      : currentPath.match(/^\/(ko|en|ja|zh)\//)
+      : currentPath.match(/^\/(ko|en|ja|zh|es)\//)
       ? "../components/js/navbar.js"
       : "components/js/navbar.js";
 

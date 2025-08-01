@@ -14,6 +14,7 @@
     <link rel="alternate" hreflang="en" href="/en/" />
     <link rel="alternate" hreflang="ja" href="/ja/" />
     <link rel="alternate" hreflang="zh" href="/zh/" />
+    <link rel="alternate" hreflang="es" href="/es/" />
     <link rel="alternate" hreflang="x-default" href="/en/" />
 
     <script>
@@ -38,6 +39,8 @@
           targetLanguage = "ja";
         } else if (browserLanguage.startsWith("zh")) {
           targetLanguage = "zh";
+        } else if (browserLanguage.startsWith("es")) {
+          targetLanguage = "es";
         }
 
         // 언어 설정 저장
@@ -93,6 +96,11 @@
           href="/locales/zh/index.html"
           class="inline-block mx-2 px-5 py-2 bg-[#4B63AC] text-white no-underline rounded"
           >中文</a
+        >
+        <a
+          href="/locales/es/index.html"
+          class="inline-block mx-2 px-5 py-2 bg-[#4B63AC] text-white no-underline rounded"
+          >Español</a
         >
       </div>
     </div>

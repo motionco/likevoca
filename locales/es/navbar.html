@@ -1,0 +1,202 @@
+<nav class="bg-[#4B63AC] p-4 shadow-md">
+  <div class="container mx-auto flex justify-between items-center max-w-6xl">
+    <!-- 왼쪽: 햄버거 메뉴 (모바일) + 로고 -->
+    <div class="flex items-center">
+      <button id="menu-toggle" class="text-white text-2xl lg:hidden mr-3">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <a
+        href="index.html"
+        class="text-white text-xl md:text-2xl lg:text-3xl font-bold"
+        >LikeVoca</a
+      >
+    </div>
+
+    <!-- 중앙: 네비게이션 메뉴 (데스크톱만) -->
+    <ul id="nav-menu" class="hidden lg:flex space-x-10 items-center">
+      <li>
+        <a
+          href="vocabulary.html"
+          class="text-xl text-white hover:text-yellow-400"
+          >Vocabulario</a
+        >
+      </li>
+      <li>
+        <a
+          href="ai-vocabulary.html"
+          class="text-xl text-white hover:text-yellow-400"
+          >Vocabulario IA</a
+        >
+      </li>
+      <li>
+        <a href="learning.html" class="text-xl text-white hover:text-yellow-400"
+          >Aprendizaje</a
+        >
+      </li>
+      <li>
+        <a href="quiz.html" class="text-xl text-white hover:text-yellow-400"
+          >Cuestionario</a
+        >
+      </li>
+      <li>
+        <a href="games.html" class="text-xl text-white hover:text-yellow-400"
+          >Juegos</a
+        >
+      </li>
+      <li>
+        <a href="progress.html" class="text-xl text-white hover:text-yellow-400"
+          >Progreso</a
+        >
+      </li>
+      <li>
+        <a href="inquiry.html" class="text-xl text-white hover:text-yellow-400"
+          >Contáctanos</a
+        >
+      </li>
+    </ul>
+
+    <!-- 오른쪽: 언어 설정 + 로그인/회원가입 버튼 + 유저 프로필 -->
+    <div class="flex items-center space-x-1.5 lg:space-x-3">
+      <!-- 언어 설정 버튼 (반응형) -->
+      <button
+        id="language-button"
+        class="text-white font-semibold transition duration-300 hover:text-yellow-400 text-xl lg:text-base p-2 lg:p-2"
+      >
+        <i class="fas fa-globe lg:mr-1"></i>
+        <span class="hidden lg:inline lg:ml-1">🇪🇸</span>
+      </button>
+
+      <!-- 로그인/회원가입 버튼 (로그인 전) -->
+      <div id="desktop-login-section" class="hidden space-x-2">
+        <a
+          href="#"
+          id="login-button"
+          onclick="goToLanguageSpecificPage('login.html')"
+          class="border-2 border-white bg-[#4B63AC] text-white font-semibold px-4 py-1.5 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
+          >Iniciar Sesión</a
+        >
+        <a
+          href="#"
+          id="signup-button"
+          onclick="goToLanguageSpecificPage('signup.html')"
+          class="hidden lg:inline-block border-2 border-white bg-white text-[#4B63AC] font-semibold px-4 py-1.5 text-sm rounded-lg hover:bg-[#4B63AC] hover:text-white transition duration-300"
+          >Registrarse</a
+        >
+      </div>
+
+      <!-- 유저 프로필 (반응형) -->
+      <div id="desktop-user-section" class="hidden">
+        <div id="user-profile" class="relative flex items-center text-white">
+          <div id="avatar-container" class="cursor-pointer">
+            <div
+              id="avatar"
+              class="w-8 h-8 lg:w-10 lg:h-10 rounded-full overflow-hidden border-2 border-white"
+            >
+              <img
+                id="profile-image"
+                src=""
+                alt="Perfil"
+                class="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+
+          <div
+            id="profile-dropdown"
+            class="hidden absolute top-12 right-0 bg-white shadow-lg rounded-lg py-2 w-48 text-gray-900 z-50"
+          >
+            <div class="px-4 py-2 font-semibold border-b border-gray-200">
+              <span id="user-name"></span>
+            </div>
+            <a
+              href="my-word-list.html"
+              class="block w-full text-left px-4 py-2 hover:bg-gray-100"
+            >
+              Mi Vocabulario
+            </a>
+            <a
+              href="profile.html"
+              class="block w-full text-left px-4 py-2 hover:bg-gray-100"
+            >
+              Perfil
+            </a>
+            <button
+              id="logout-button"
+              class="block w-full text-left px-4 py-2 hover:bg-gray-100"
+            >
+              Cerrar Sesión
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    id="mobile-menu"
+    class="hidden flex flex-col items-center space-y-4 bg-[#4B63AC] text-white p-3 lg:hidden"
+  >
+    <a href="vocabulary.html" class="text-lg hover:text-yellow-400"
+      >Vocabulario</a
+    >
+    <a href="ai-vocabulary.html" class="text-lg hover:text-yellow-400"
+      >Vocabulario IA</a
+    >
+    <a href="learning.html" class="text-lg hover:text-yellow-400">Aprendizaje</a>
+    <a href="quiz.html" class="text-lg hover:text-yellow-400">Cuestionario</a>
+    <a href="games.html" class="text-lg hover:text-yellow-400">Juegos</a>
+    <a href="progress.html" class="text-lg hover:text-yellow-400">Progreso</a>
+    <a href="inquiry.html" class="text-lg hover:text-yellow-400">Contáctanos</a>
+
+    <!-- 모바일 로그인 버튼들 -->
+    <div id="mobile-login-buttons" class="hidden flex space-x-3">
+      <a
+        href="#"
+        onclick="goToLanguageSpecificPage('login.html')"
+        class="border-2 border-white bg-[#4B63AC] text-white font-semibold px-5 py-2 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
+        >Iniciar Sesión</a
+      >
+      <a
+        href="#"
+        onclick="goToLanguageSpecificPage('signup.html')"
+        class="border-2 border-white bg-[#4B63AC] text-white font-semibold px-5 py-2 text-sm rounded-lg hover:bg-white hover:text-[#4B63AC] transition duration-300"
+        >Registrarse</a
+      >
+    </div>
+  </div>
+</nav>
+
+<script>
+  // 언어별 페이지로 이동하는 함수
+  function goToLanguageSpecificPage(filename) {
+    const userLanguage = localStorage.getItem("userLanguage") || "ko";
+    const isDev =
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1" ||
+      window.location.port === "5595";
+
+    if (isDev) {
+      window.location.href = `/locales/${userLanguage}/${filename}`;
+    } else {
+      window.location.href = `/${userLanguage}/${filename}`;
+    }
+  }
+
+  // 네비게이션바 초기화 함수
+  function initializeNavbar() {
+    // navbar.js의 초기화 함수들이 이미 로드되었는지 확인
+    if (typeof window.setupNavbarAuth === "function") {
+      window.setupNavbarAuth();
+    }
+
+    if (typeof window.setupNavbarEvents === "function") {
+      window.setupNavbarEvents();
+    }
+  }
+
+  // DOM이 로드된 후 초기화
+  document.addEventListener("DOMContentLoaded", function () {
+    initializeNavbar();
+  });
+</script> 

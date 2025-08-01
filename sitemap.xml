@@ -13,6 +13,7 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/"/>
     <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/"/>
   </url>
   
   <!-- 한국어 퀴즈 -->
@@ -24,6 +25,7 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/quiz"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/quiz"/>
     <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/quiz"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/quiz"/>
   </url>
   
   <!-- 한국어 게임 -->
@@ -35,6 +37,7 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/games"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/games"/>
     <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/games"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/games"/>
   </url>
   
   <!-- 한국어 단어장 -->
@@ -46,6 +49,7 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/vocabulary"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/vocabulary"/>
     <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/vocabulary"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/vocabulary"/>
   </url>
   
   <!-- 한국어 AI 단어장 -->
@@ -57,6 +61,7 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/ai-vocabulary"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/ai-vocabulary"/>
     <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/ai-vocabulary"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/ai-vocabulary"/>
   </url>
   
   <!-- 한국어 나만의 단어장 -->
@@ -68,6 +73,7 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/my-word-list"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/my-word-list"/>
     <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/my-word-list"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/my-word-list"/>
   </url>
   
   <!-- 한국어 학습 -->
@@ -79,6 +85,7 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/learning"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/learning"/>
     <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/learning"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/learning"/>
   </url>
   
   <!-- 한국어 진도 -->
@@ -90,6 +97,7 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/progress"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/progress"/>
     <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/progress"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/progress"/>
   </url>
   
   <!-- 한국어 문의하기 -->
@@ -101,6 +109,7 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/inquiry"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/inquiry"/>
     <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/inquiry"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/inquiry"/>
   </url>
   
   <!-- ===== 영어 페이지들 ===== -->
@@ -114,6 +123,7 @@
     <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/"/>
     <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/"/>
   </url>
   
   <!-- 영어 퀴즈 -->
@@ -125,6 +135,7 @@
     <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/quiz"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/quiz"/>
     <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/quiz"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/quiz"/>
   </url>
   
   <!-- 영어 게임 -->
@@ -136,6 +147,7 @@
     <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/games"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/games"/>
     <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/games"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/games"/>
   </url>
   
   <!-- 영어 단어장 -->
@@ -147,6 +159,7 @@
     <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/vocabulary"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/vocabulary"/>
     <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/vocabulary"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/vocabulary"/>
   </url>
   
   <!-- 영어 AI 단어장 -->
@@ -158,6 +171,7 @@
     <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/ai-vocabulary"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/ai-vocabulary"/>
     <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/ai-vocabulary"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/ai-vocabulary"/>
   </url>
   
   <!-- 영어 나만의 단어장 -->
@@ -169,6 +183,7 @@
     <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/my-word-list"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/my-word-list"/>
     <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/my-word-list"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/my-word-list"/>
   </url>
   
   <!-- 영어 학습 -->
@@ -180,6 +195,7 @@
     <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/learning"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/learning"/>
     <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/learning"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/learning"/>
   </url>
   
   <!-- 영어 진도 -->
@@ -191,6 +207,7 @@
     <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/progress"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/progress"/>
     <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/progress"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/progress"/>
   </url>
   
   <!-- 영어 문의하기 -->
@@ -202,208 +219,126 @@
     <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/inquiry"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/inquiry"/>
     <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/inquiry"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/inquiry"/>
   </url>
   
-  <!-- ===== 일본어 페이지들 ===== -->
+  <!-- ===== 스페인어 페이지들 ===== -->
   
-  <!-- 일본어 홈페이지 -->
+  <!-- 스페인어 홈페이지 -->
   <url>
-    <loc>https://likevoca.com/ja/</loc>
-    <lastmod>2024-01-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/"/>
-    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/"/>
-  </url>
-  
-  <!-- 일본어 퀴즈 -->
-  <url>
-    <loc>https://likevoca.com/ja/quiz</loc>
-    <lastmod>2024-01-01</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/quiz"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/quiz"/>
-    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/quiz"/>
-  </url>
-  
-  <!-- 일본어 게임 -->
-  <url>
-    <loc>https://likevoca.com/ja/games</loc>
-    <lastmod>2024-01-01</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/games"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/games"/>
-    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/games"/>
-  </url>
-  
-  <!-- 일본어 단어장 -->
-  <url>
-    <loc>https://likevoca.com/ja/vocabulary</loc>
-    <lastmod>2024-01-01</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-    <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/vocabulary"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/vocabulary"/>
-    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/vocabulary"/>
-  </url>
-  
-  <!-- 일본어 AI 단어장 -->
-  <url>
-    <loc>https://likevoca.com/ja/ai-vocabulary</loc>
-    <lastmod>2024-01-01</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-    <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/ai-vocabulary"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/ai-vocabulary"/>
-    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/ai-vocabulary"/>
-  </url>
-  
-  <!-- 일본어 나만의 단어장 -->
-  <url>
-    <loc>https://likevoca.com/ja/my-word-list</loc>
-    <lastmod>2024-01-01</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-    <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/my-word-list"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/my-word-list"/>
-    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/my-word-list"/>
-  </url>
-  
-  <!-- 일본어 학습 -->
-  <url>
-    <loc>https://likevoca.com/ja/learning</loc>
-    <lastmod>2024-01-01</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/learning"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/learning"/>
-    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/learning"/>
-  </url>
-  
-  <!-- 일본어 진도 -->
-  <url>
-    <loc>https://likevoca.com/ja/progress</loc>
-    <lastmod>2024-01-01</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/progress"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/progress"/>
-    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/progress"/>
-  </url>
-  
-  <!-- 일본어 문의하기 -->
-  <url>
-    <loc>https://likevoca.com/ja/inquiry</loc>
-    <lastmod>2024-01-01</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/inquiry"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/inquiry"/>
-    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/inquiry"/>
-  </url>
-  
-  <!-- ===== 중국어 페이지들 ===== -->
-  
-  <!-- 중국어 홈페이지 -->
-  <url>
-    <loc>https://likevoca.com/zh/</loc>
+    <loc>https://likevoca.com/es/</loc>
     <lastmod>2024-01-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/"/>
   </url>
   
-  <!-- 중국어 퀴즈 -->
+  <!-- 스페인어 퀴즈 -->
   <url>
-    <loc>https://likevoca.com/zh/quiz</loc>
+    <loc>https://likevoca.com/es/quiz</loc>
     <lastmod>2024-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/quiz"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/quiz"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/quiz"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/quiz"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/quiz"/>
   </url>
   
-  <!-- 중국어 게임 -->
+  <!-- 스페인어 게임 -->
   <url>
-    <loc>https://likevoca.com/zh/games</loc>
+    <loc>https://likevoca.com/es/games</loc>
     <lastmod>2024-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/games"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/games"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/games"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/games"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/games"/>
   </url>
   
-  <!-- 중국어 단어장 -->
+  <!-- 스페인어 단어장 -->
   <url>
-    <loc>https://likevoca.com/zh/vocabulary</loc>
+    <loc>https://likevoca.com/es/vocabulary</loc>
     <lastmod>2024-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/vocabulary"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/vocabulary"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/vocabulary"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/vocabulary"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/vocabulary"/>
   </url>
   
-  <!-- 중국어 AI 단어장 -->
+  <!-- 스페인어 AI 단어장 -->
   <url>
-    <loc>https://likevoca.com/zh/ai-vocabulary</loc>
+    <loc>https://likevoca.com/es/ai-vocabulary</loc>
     <lastmod>2024-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/ai-vocabulary"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/ai-vocabulary"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/ai-vocabulary"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/ai-vocabulary"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/ai-vocabulary"/>
   </url>
   
-  <!-- 중국어 나만의 단어장 -->
+  <!-- 스페인어 나만의 단어장 -->
   <url>
-    <loc>https://likevoca.com/zh/my-word-list</loc>
+    <loc>https://likevoca.com/es/my-word-list</loc>
     <lastmod>2024-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/my-word-list"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/my-word-list"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/my-word-list"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/my-word-list"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/my-word-list"/>
   </url>
   
-  <!-- 중국어 학습 -->
+  <!-- 스페인어 학습 -->
   <url>
-    <loc>https://likevoca.com/zh/learning</loc>
+    <loc>https://likevoca.com/es/learning</loc>
     <lastmod>2024-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/learning"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/learning"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/learning"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/learning"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/learning"/>
   </url>
   
-  <!-- 중국어 진도 -->
+  <!-- 스페인어 진도 -->
   <url>
-    <loc>https://likevoca.com/zh/progress</loc>
+    <loc>https://likevoca.com/es/progress</loc>
     <lastmod>2024-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/progress"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/progress"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/progress"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/progress"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/progress"/>
   </url>
   
-  <!-- 중국어 문의하기 -->
+  <!-- 스페인어 문의하기 -->
   <url>
-    <loc>https://likevoca.com/zh/inquiry</loc>
+    <loc>https://likevoca.com/es/inquiry</loc>
     <lastmod>2024-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/inquiry"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/inquiry"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/inquiry"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/inquiry"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/inquiry"/>
   </url>
   
 </urlset> 

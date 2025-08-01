@@ -1,20 +1,20 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sign Up - LikeVoca</title>
+    <title>Registrarse - LikeVoca</title>
     <meta
       name="description"
-      content="Create your LikeVoca account to start your multilingual learning journey with personalized vocabulary, quizzes, and progress tracking"
+      content="Crea tu cuenta de LikeVoca para comenzar tu viaje de aprendizaje multilingüe con vocabulario personalizado, cuestionarios y seguimiento de progreso"
     />
-    <meta property="og:title" content="Sign Up - LikeVoca" />
+    <meta property="og:title" content="Registrarse - LikeVoca" />
     <meta
       property="og:description"
-      content="Create your LikeVoca account to start your multilingual learning journey with personalized vocabulary, quizzes, and progress tracking"
+      content="Crea tu cuenta de LikeVoca para comenzar tu viaje de aprendizaje multilingüe con vocabulario personalizado, cuestionarios y seguimiento de progreso"
     />
-    <meta property="og:locale" content="en_US" />
-    <link rel="canonical" href="https://likevoca.com/en/signup" />
+    <meta property="og:locale" content="es" />
+    <link rel="canonical" href="https://likevoca.com/es/signup" />
     <link rel="alternate" hreflang="en" href="https://likevoca.com/en/signup" />
     <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/signup" />
     <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/signup" />
@@ -39,7 +39,7 @@
     <div class="flex items-center justify-center min-h-screen py-12">
       <div class="bg-white shadow-lg rounded-lg w-11/12 sm:w-96 p-6">
         <h1 class="text-3xl font-bold text-gray-800 text-center mb-6">
-          Create Account
+          Crear Cuenta
         </h1>
 
         <form
@@ -50,14 +50,14 @@
         >
           <div>
             <label for="name" class="block text-sm font-medium text-gray-700"
-              >Name</label
+              >Nombre</label
             >
             <input
               type="text"
               id="name"
               name="name"
               required
-              placeholder="Enter your name"
+              placeholder="Ingresa tu nombre"
               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#4B63AC] focus:border-[#4B63AC] sm:text-sm"
             />
           </div>
@@ -70,7 +70,7 @@
               id="email"
               name="email"
               required
-              placeholder="Enter your email"
+              placeholder="Ingresa tu email"
               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#4B63AC] focus:border-[#4B63AC] sm:text-sm"
             />
           </div>
@@ -78,14 +78,14 @@
             <label
               for="password"
               class="block text-sm font-medium text-gray-700"
-              >Password</label
+              >Contraseña</label
             >
             <input
               type="password"
               id="password"
               name="password"
               required
-              placeholder="Enter your password"
+              placeholder="Ingresa tu contraseña"
               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#4B63AC] focus:border-[#4B63AC] sm:text-sm"
             />
           </div>
@@ -93,58 +93,67 @@
             <label
               for="confirm-password"
               class="block text-sm font-medium text-gray-700"
-              >Confirm Password</label
+              >Confirmar Contraseña</label
             >
             <input
               type="password"
               id="confirm-password"
               name="confirm-password"
               required
-              placeholder="Confirm your password"
+              placeholder="Confirma tu contraseña"
               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#4B63AC] focus:border-[#4B63AC] sm:text-sm"
             />
           </div>
 
-          <div
-            id="error-message"
-            class="hidden text-red-500 text-sm text-center"
-          ></div>
+          <div class="flex items-center">
+            <input
+              id="agree-terms"
+              name="agree-terms"
+              type="checkbox"
+              required
+              class="h-4 w-4 text-[#4B63AC] focus:ring-[#4B63AC] border-gray-300 rounded"
+            />
+            <label for="agree-terms" class="ml-2 block text-sm text-gray-700">
+              Acepto los
+              <a href="#" class="text-[#4B63AC] hover:text-[#3A4F8B] underline">
+                términos y condiciones
+              </a>
+            </label>
+          </div>
 
           <button
-            id="signup-button"
             type="submit"
-            class="w-full bg-[#4B63AC] text-white px-4 py-2 rounded-lg shadow-md hover:bg-[#3A4F8B] focus:outline-none focus:ring-2 focus:ring-[#4B63AC] focus:ring-offset-2"
+            class="w-full bg-[#4B63AC] text-white py-2 px-4 rounded-lg hover:bg-[#3A4F8B] transition-colors duration-300 font-semibold"
           >
-            Sign Up
+            Crear Cuenta
           </button>
         </form>
-        <p class="mt-6 text-sm text-center text-gray-600">
-          <span>Already have an account?</span>
-          <a
-            href="#"
-            onclick="goToLanguageSpecificPage('login.html'); return false;"
-            class="text-[#4B63AC] hover:underline"
-            >Login</a
-          >
-        </p>
+
+        <div class="mt-6 text-center">
+          <p class="text-sm text-gray-600">
+            ¿Ya tienes una cuenta?
+            <a href="login.html" class="text-[#4B63AC] hover:text-[#3A4F8B] font-semibold">
+              Iniciar Sesión
+            </a>
+          </p>
+        </div>
+
+        <!-- 에러 메시지 -->
+        <div id="error-message" class="hidden mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+          <div class="flex items-center">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            <span id="error-text">Error en el registro. Inténtalo de nuevo.</span>
+          </div>
+        </div>
+
+        <!-- 성공 메시지 -->
+        <div id="success-message" class="hidden mt-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+          <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span>¡Cuenta creada exitosamente! Redirigiendo...</span>
+          </div>
+        </div>
       </div>
     </div>
-
-    <script>
-      // 언어별 페이지로 이동하는 함수
-      function goToLanguageSpecificPage(filename) {
-        const userLanguage = localStorage.getItem("userLanguage") || "en";
-        const isDev =
-          window.location.hostname === "localhost" ||
-          window.location.hostname === "127.0.0.1" ||
-          window.location.port === "5595";
-
-        if (isDev) {
-          window.location.href = `/locales/${userLanguage}/${filename}`;
-        } else {
-          window.location.href = `/${userLanguage}/${filename}`;
-        }
-      }
-    </script>
   </body>
-</html>
+</html> 

@@ -1,29 +1,29 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LikeVoca - Smart Vocabulary Management</title>
+    <title>LikeVoca - Gestión Inteligente de Vocabulario</title>
 
     <!-- 기본 메타 태그 -->
-    <meta name="description" content="Start systematic vocabulary learning with multilingual word lists. Manage words, classifications, and search functions along with personalized learning progress for effective learning in English, Japanese, Chinese, and Korean." />
-    <meta name="keywords" content="smart vocabulary, multilingual vocabulary, vocabulary learning, word management, language learning tools, English vocabulary, Japanese vocabulary, Chinese vocabulary, personalized learning" />
+    <meta name="description" content="Comienza el aprendizaje sistemático de vocabulario con listas de palabras multilingües. Gestiona palabras, clasificaciones y funciones de búsqueda junto con progreso de aprendizaje personalizado para un aprendizaje efectivo en inglés, japonés, chino, coreano y español." />
+    <meta name="keywords" content="vocabulario inteligente, vocabulario multilingüe, aprendizaje de vocabulario, gestión de palabras, herramientas de aprendizaje de idiomas, vocabulario en inglés, vocabulario en japonés, vocabulario en chino, aprendizaje personalizado, vocabulario en español" />
     
     <!-- Open Graph / 소셜 미디어 메타 태그 -->
-    <meta property="og:title" content="LikeVoca - Smart Vocabulary Management" />
-    <meta property="og:description" content="Start systematic vocabulary learning with multilingual word lists. Manage words, classifications, and search functions along with personalized learning progress for effective learning in English, Japanese, Chinese, and Korean." />
+    <meta property="og:title" content="LikeVoca - Gestión Inteligente de Vocabulario" />
+    <meta property="og:description" content="Comienza el aprendizaje sistemático de vocabulario con listas de palabras multilingües. Gestiona palabras, clasificaciones y funciones de búsqueda junto con progreso de aprendizaje personalizado para un aprendizaje efectivo en inglés, japonés, chino, coreano y español." />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://likevoca.com/en/vocabulary" />
-    <meta property="og:locale" content="en" />
+    <meta property="og:url" content="https://likevoca.com/es/vocabulary" />
+    <meta property="og:locale" content="es" />
     
     <!-- Twitter Card 태그 -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="LikeVoca - Smart Vocabulary Management" />
-    <meta name="twitter:description" content="Start systematic vocabulary learning with multilingual word lists. Manage words, classifications, and search functions along with personalized learning progress for effective learning in English, Japanese, Chinese, and Korean." />
+    <meta name="twitter:title" content="LikeVoca - Gestión Inteligente de Vocabulario" />
+    <meta name="twitter:description" content="Comienza el aprendizaje sistemático de vocabulario con listas de palabras multilingües. Gestiona palabras, clasificaciones y funciones de búsqueda junto con progreso de aprendizaje personalizado para un aprendizaje efectivo en inglés, japonés, chino, coreano y español." />
     <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
     
     <!-- 표준 링크 -->
-    <link rel="canonical" href="https://likevoca.com/en/vocabulary" />
+    <link rel="canonical" href="https://likevoca.com/es/vocabulary" />
     
     <!-- 대체 언어 링크 -->
     <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/vocabulary" />
@@ -53,19 +53,19 @@
     {
       "@context": "https://schema.org",
       "@type": "WebPage",
-      "name": "LikeVoca Vocabulary",
-      "description": "Start systematic vocabulary learning with multilingual word lists. Manage words, classifications, and search functions along with personalized learning progress for effective learning in English, Japanese, Chinese, and Korean.",
-      "url": "https://likevoca.com/en/vocabulary",
+      "name": "LikeVoca Vocabulario",
+      "description": "Comienza el aprendizaje sistemático de vocabulario con listas de palabras multilingües. Gestiona palabras, clasificaciones y funciones de búsqueda junto con progreso de aprendizaje personalizado para un aprendizaje efectivo en inglés, japonés, chino, coreano y español.",
+      "url": "https://likevoca.com/es/vocabulary",
       "isPartOf": {
         "@type": "WebSite",
         "name": "LikeVoca",
         "url": "https://likevoca.com"
       },
-      "inLanguage": "en",
+      "inLanguage": "es",
       "potentialAction": {
         "@type": "ViewAction",
-        "name": "Manage Vocabulary",
-        "description": "Systematically manage and learn multilingual vocabulary"
+        "name": "Gestionar Vocabulario",
+        "description": "Gestiona y aprende vocabulario multilingüe de manera sistemática"
       }
     }
     </script>
@@ -94,9 +94,9 @@
     <main class="container mx-auto max-w-7xl px-4 py-8">
       <div class="flex justify-between items-start mb-8">
         <div>
-          <h1 class="text-3xl font-bold text-gray-800 mb-2">📚 Vocabulary</h1>
+          <h1 class="text-3xl font-bold text-gray-800 mb-2">📚 Vocabulario</h1>
           <p class="text-gray-600">
-            Manage and learn multilingual vocabulary systematically.
+            Gestiona y aprende vocabulario multilingüe de manera sistemática.
           </p>
         </div>
         <div class="mt-6 flex flex-col md:flex-row gap-4">
@@ -104,13 +104,13 @@
             id="add-concept-btn"
             class="bg-[#4B63AC] text-white px-6 py-3 rounded-lg hover:bg-[#3A4F8B] transition duration-300 font-medium"
           >
-            Add New Concept
+            Agregar Nuevo Concepto
           </button>
           <button
             id="bulk-add-btn"
             class="bg-[#2E7D32] text-white px-6 py-3 rounded-lg hover:bg-[#1B5E20] transition duration-300 font-medium"
           >
-            Bulk Add
+            Agregar en Lote
           </button>
         </div>
       </div>
@@ -119,13 +119,13 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <!-- 검색 필터 -->
           <div class="w-full">
-            <label for="search-input" class="hidden md:block text-sm font-medium mb-1 text-gray-700">Search</label>
+            <label for="search-input" class="hidden md:block text-sm font-medium mb-1 text-gray-700">Buscar</label>
             <div class="relative">
               <input
                 type="text"
                 id="search-input"
                 class="w-full p-2 border rounded pl-8 h-10"
-                placeholder="Search words or translations"
+                placeholder="Buscar palabras o traducciones"
               />
               <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
             </div>
@@ -136,28 +136,28 @@
             <label
               for="source-language"
               class="text-sm font-medium text-gray-700"
-            >Language Filter</label>
+            >Filtro de Idioma</label>
             <div class="grid grid-cols-5 gap-1 h-10">
               <select id="source-language" class="col-span-2 p-2 border rounded text-sm">
-                <option value="korean">Korean</option>
-                <option value="english" selected>English</option>
-                <option value="japanese">Japanese</option>
-                <option value="chinese">Chinese</option>
+                <option value="korean">Coreano</option>
+                <option value="english" selected>Inglés</option>
+                <option value="japanese">Japonés</option>
+                <option value="chinese">Chino</option>
               </select>
 
               <button
                 id="swap-languages"
                 class="w-full h-full text-gray-600 hover:text-[#4B63AC] hover:bg-gray-100 rounded-lg transition duration-200 border border-gray-300 hover:border-[#4B63AC] flex items-center justify-center"
-                title="Swap languages"
+                title="Intercambiar idiomas"
               >
                 <i class="fas fa-exchange-alt text-sm"></i>
               </button>
               
               <select id="target-language" class="col-span-2 p-2 border rounded text-sm">
-                <option value="english">English</option>
-                <option value="korean" selected>Korean</option>
-                <option value="japanese">Japanese</option>
-                <option value="chinese">Chinese</option>
+                <option value="english">Inglés</option>
+                <option value="korean" selected>Coreano</option>
+                <option value="japanese">Japonés</option>
+                <option value="chinese">Chino</option>
               </select>
             </div>
           </div>
@@ -166,30 +166,30 @@
           <div class="w-full">
             <div class="grid grid-cols-2 gap-2">
               <div>
-                <label for="domain-filter" class="block text-sm font-medium mb-1 text-gray-700">Domain</label>
+                <label for="domain-filter" class="block text-sm font-medium mb-1 text-gray-700">Dominio</label>
                 <select id="domain-filter" class="w-full p-2 border rounded h-10 text-sm">
-                  <option value="all">All Domains</option>
-                  <option value="daily">Daily</option>
-                  <option value="food">Food</option>
-                  <option value="travel">Travel</option>
-                  <option value="business">Business</option>
-                  <option value="education">Education</option>
-                  <option value="nature">Nature</option>
-                  <option value="technology">Technology</option>
-                  <option value="health">Health</option>
-                  <option value="sports">Sports</option>
-                  <option value="entertainment">Entertainment</option>
-                  <option value="culture">Culture</option>
-                  <option value="other">Other</option>
+                  <option value="all">Todos los Dominios</option>
+                  <option value="daily">Diario</option>
+                  <option value="food">Comida</option>
+                  <option value="travel">Viajes</option>
+                  <option value="business">Negocios</option>
+                  <option value="education">Educación</option>
+                  <option value="nature">Naturaleza</option>
+                  <option value="technology">Tecnología</option>
+                  <option value="health">Salud</option>
+                  <option value="sports">Deportes</option>
+                  <option value="entertainment">Entretenimiento</option>
+                  <option value="culture">Cultura</option>
+                  <option value="other">Otros</option>
                 </select>
               </div>
               <div>
-                <label for="sort-option" class="block text-sm font-medium mb-1 text-gray-700">Sort</label>
+                <label for="sort-option" class="block text-sm font-medium mb-1 text-gray-700">Ordenar</label>
                 <select id="sort-option" class="w-full p-2 border rounded h-10 text-sm">
-                  <option value="latest">Latest</option>
-                  <option value="oldest">Oldest</option>
-                  <option value="alphabetical">Alphabetical</option>
-                  <option value="reverse_alphabetical">Reverse Alphabetical</option>
+                  <option value="latest">Más Reciente</option>
+                  <option value="oldest">Más Antiguo</option>
+                  <option value="alphabetical">Alfabético</option>
+                  <option value="reverse_alphabetical">Alfabético Inverso</option>
                 </select>
               </div>
             </div>
@@ -199,11 +199,11 @@
         <!-- 개념 수 및 사용량 표시 -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div class="text-sm text-gray-600">
-            <span id="concept-count">0</span><span> concepts</span>
+            <span id="concept-count">0</span><span> conceptos</span>
           </div>
 
           <div class="flex items-center gap-4 w-full md:w-auto">
-            <span class="text-sm font-medium text-gray-700 whitespace-nowrap">Concept Usage:</span>
+            <span class="text-sm font-medium text-gray-700 whitespace-nowrap">Uso de Conceptos:</span>
             <div class="flex items-center gap-2 min-w-[200px]">
               <div class="flex-1 bg-gray-200 rounded-full h-2.5">
                 <div id="usage-bar" class="bg-[#4B63AC] h-2.5 rounded-full" style="width: 0%"></div>
@@ -213,7 +213,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- 개념 목록 -->
       <div id="concept-list" class="space-y-4">
         <!-- 개념 카드들이 여기에 동적으로 추가됩니다 -->
@@ -226,7 +226,7 @@
           class="bg-[#4B63AC] text-white px-8 py-3 rounded-lg hover:bg-[#3A4F8B] transition duration-300 font-medium"
           style="display: none;"
         >
-          Load More
+          Cargar Más
         </button>
       </div>
     </main>
@@ -251,7 +251,30 @@
     <script type="module" src="../../components/js/separated-import-modal.js"></script>
     <script type="module" src="../../components/js/csv-parser-utils.js"></script>
     <script type="module" src="../../components/js/domain-category-emoji.js"></script>
+
+    <script>
+      // 페이지 로드 시 초기화
+      document.addEventListener('DOMContentLoaded', async () => {
+        try {
+          // 네비게이션바 로드
+          if (typeof window.loadNavbar === 'function') {
+            await window.loadNavbar();
+          }
+          
+          // 번역 적용
+          if (typeof window.applyLanguage === 'function') {
+            await window.applyLanguage();
+          }
+          
+          // 메타데이터 업데이트
+          if (typeof window.updateMetadata === 'function') {
+            await window.updateMetadata('vocabulary');
+          }
+
+        } catch (error) {
+          console.error('Error de inicialización de página:', error);
+        }
+      });
+    </script>
   </body>
 </html> 
-
-

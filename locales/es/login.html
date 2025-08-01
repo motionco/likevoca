@@ -1,20 +1,20 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login - LikeVoca</title>
+    <title>Iniciar Sesión - LikeVoca</title>
     <meta
       name="description"
-      content="Login to LikeVoca to access your personalized multilingual learning experience with vocabulary, quizzes, and progress tracking"
+      content="Inicia sesión en LikeVoca para acceder a tu experiencia de aprendizaje multilingüe personalizada con vocabulario, cuestionarios y seguimiento de progreso"
     />
-    <meta property="og:title" content="Login - LikeVoca" />
+    <meta property="og:title" content="Iniciar Sesión - LikeVoca" />
     <meta
       property="og:description"
-      content="Login to LikeVoca to access your personalized multilingual learning experience with vocabulary, quizzes, and progress tracking"
+      content="Inicia sesión en LikeVoca para acceder a tu experiencia de aprendizaje multilingüe personalizada con vocabulario, cuestionarios y seguimiento de progreso"
     />
-    <meta property="og:locale" content="en_US" />
-    <link rel="canonical" href="https://likevoca.com/en/login" />
+    <meta property="og:locale" content="es" />
+    <link rel="canonical" href="https://likevoca.com/es/login" />
     <link rel="alternate" hreflang="en" href="https://likevoca.com/en/login" />
     <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/login" />
     <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/login" />
@@ -38,21 +38,21 @@
 
     <div class="flex items-center justify-center min-h-screen py-12">
       <div class="bg-white shadow-lg rounded-lg w-11/12 sm:w-96 p-6">
-        <h1 class="text-3xl font-bold text-gray-800 text-center mb-6">Login</h1>
+        <h1 class="text-3xl font-bold text-gray-800 text-center mb-6">Iniciar Sesión</h1>
         <div class="space-y-4">
           <button
             id="google-login-btn"
             class="w-full flex items-center justify-center bg-red-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-red-600"
           >
             <i class="fa-brands fa-google mr-2"></i
-            ><span>Login with Google</span>
+            ><span>Iniciar Sesión con Google</span>
           </button>
           <button
             id="github-login-btn"
             class="w-full flex items-center justify-center bg-gray-800 text-white py-2 px-4 rounded-lg shadow-md hover:bg-gray-900"
           >
             <i class="fa-brands fa-github mr-2"></i>
-            <span>Login with Github</span>
+            <span>Iniciar Sesión con Github</span>
           </button>
         </div>
 
@@ -61,7 +61,7 @@
             <div class="w-full border-t border-gray-300"></div>
           </div>
           <div class="relative flex justify-center text-sm">
-            <span class="px-2 bg-white text-gray-500">Or</span>
+            <span class="px-2 bg-white text-gray-500">O</span>
           </div>
         </div>
 
@@ -75,7 +75,7 @@
               id="email"
               name="email"
               required
-              placeholder="Enter your email"
+              placeholder="Ingresa tu email"
               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#4B63AC] focus:border-[#4B63AC] sm:text-sm"
             />
           </div>
@@ -83,14 +83,14 @@
             <label
               for="password"
               class="block text-sm font-medium text-gray-700"
-              >Password</label
+              >Contraseña</label
             >
             <input
               type="password"
               id="password"
               name="password"
               required
-              placeholder="Enter your password"
+              placeholder="Ingresa tu contraseña"
               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#4B63AC] focus:border-[#4B63AC] sm:text-sm"
             />
           </div>
@@ -100,57 +100,50 @@
               <input
                 type="checkbox"
                 class="h-4 w-4 text-[#4B63AC] border-gray-300 rounded"
-              /><span class="ml-2 text-sm text-gray-700">Remember me</span>
+              />
+              <span class="ml-2 text-sm text-gray-700">Recordarme</span>
             </label>
             <a
-              href="#"
-              onclick="goToLanguageSpecificPage('forgotpassword.html'); return false;"
-              class="text-sm text-[#4B63AC] hover:underline"
-              >Forgot password?</a
+              href="forgotpassword.html"
+              class="text-sm text-[#4B63AC] hover:text-[#3A4F8B]"
             >
+              ¿Olvidaste tu contraseña?
+            </a>
           </div>
 
-          <div
-            id="error-message"
-            class="hidden text-red-500 text-sm text-center"
-          ></div>
-
           <button
-            id="login-button"
             type="submit"
-            class="w-full bg-[#4B63AC] text-white px-4 py-2 rounded-lg shadow-md hover:bg-[#3A4F8B] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            class="w-full bg-[#4B63AC] text-white py-2 px-4 rounded-lg hover:bg-[#3A4F8B] transition-colors duration-300 font-semibold"
           >
-            Login
+            Iniciar Sesión
           </button>
         </form>
 
-        <p class="mt-6 text-sm text-center text-gray-600">
-          <span>Don't have an account?</span>
-          <a
-            href="#"
-            onclick="goToLanguageSpecificPage('signup.html'); return false;"
-            class="text-[#4B63AC] hover:underline"
-            >Sign Up</a
-          >
-        </p>
+        <div class="mt-6 text-center">
+          <p class="text-sm text-gray-600">
+            ¿No tienes una cuenta?
+            <a href="signup.html" class="text-[#4B63AC] hover:text-[#3A4F8B] font-semibold">
+              Registrarse
+            </a>
+          </p>
+        </div>
+
+        <!-- 에러 메시지 -->
+        <div id="error-message" class="hidden mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+          <div class="flex items-center">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            <span id="error-text">Error en el inicio de sesión. Verifica tus credenciales.</span>
+          </div>
+        </div>
+
+        <!-- 성공 메시지 -->
+        <div id="success-message" class="hidden mt-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+          <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span>¡Inicio de sesión exitoso! Redirigiendo...</span>
+          </div>
+        </div>
       </div>
     </div>
-
-    <script>
-      // 언어별 페이지로 이동하는 함수
-      function goToLanguageSpecificPage(filename) {
-        const userLanguage = localStorage.getItem("userLanguage") || "en";
-        const isDev =
-          window.location.hostname === "localhost" ||
-          window.location.hostname === "127.0.0.1" ||
-          window.location.port === "5595";
-
-        if (isDev) {
-          window.location.href = `/locales/${userLanguage}/${filename}`;
-        } else {
-          window.location.href = `/${userLanguage}/${filename}`;
-        }
-      }
-    </script>
   </body>
-</html>
+</html> 
