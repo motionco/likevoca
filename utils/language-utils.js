@@ -1813,9 +1813,9 @@ export function getInitialLanguageSettings() {
   let sourceLanguage = systemLanguage;
   let targetLanguage = "english";
 
-  // 시스템 언어가 영어인 경우 대상 언어를 다른 언어로 설정
+  // 시스템 언어가 영어인 경우 대상 언어를 스페인어로 설정
   if (systemLanguage === "english") {
-    targetLanguage = "korean";
+    targetLanguage = "spanish";
   }
   // 시스템 언어가 스페인어인 경우 대상 언어를 영어로 설정 (기본값이므로 그대로 유지)
   else if (systemLanguage === "spanish") {
@@ -1952,9 +1952,9 @@ export function updateLanguageFilterOnUIChange(newUILanguage, storageKey) {
     uiLanguageToFilterLanguage[newUILanguage] || "korean";
   let newTargetLanguage = "english";
 
-  // 원본 언어가 영어인 경우 대상 언어를 한국어로 설정
+  // 원본 언어가 영어인 경우 대상 언어를 스페인어로 설정
   if (newSourceLanguage === "english") {
-    newTargetLanguage = "korean";
+    newTargetLanguage = "spanish";
   }
   // 원본 언어가 스페인어인 경우 대상 언어를 영어로 설정 (기본값이므로 그대로 유지)
   else if (newSourceLanguage === "spanish") {
