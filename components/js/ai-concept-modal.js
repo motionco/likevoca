@@ -172,6 +172,7 @@ function getUserLanguageCode() {
     en: "english",
     ja: "japanese",
     zh: "chinese",
+    es: "spanish",
   };
   return languageCodeMap[userLanguage] || "korean";
 }
@@ -486,24 +487,28 @@ function getLanguageName(langCode) {
       english: "영어",
       japanese: "일본어",
       chinese: "중국어",
+      spanish: "스페인어",
     },
     en: {
       korean: "Korean",
       english: "English",
       japanese: "Japanese",
       chinese: "Chinese",
+      spanish: "Spanish",
     },
     ja: {
       korean: "韓国語",
       english: "英語",
       japanese: "日本語",
       chinese: "中国語",
+      spanish: "スペイン語",
     },
     zh: {
       korean: "韩语",
       english: "英语",
       japanese: "日语",
       chinese: "中文",
+      spanish: "西班牙语",
     },
   };
 
@@ -539,6 +544,7 @@ function showLanguageContent(lang, concept) {
       en: "english",
       ja: "japanese",
       zh: "chinese",
+      es: "spanish",
     };
     return languageCodeMap[langCode] || "korean";
   }

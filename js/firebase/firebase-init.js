@@ -104,6 +104,7 @@ export const supportedLanguages = {
   english: { nameKo: "영어", code: "en", example: "apple" },
   japanese: { nameKo: "일본어", code: "ja", example: "りんご" },
   chinese: { nameKo: "중국어", code: "zh", example: "苹果" },
+  spanish: { nameKo: "스페인어", code: "es", example: "manzana" },
 };
 
 // 다국어 개념 유틸리티 함수 (분리된 컬렉션 통합)

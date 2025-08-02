@@ -104,13 +104,37 @@
           "オンラインショッピング",
           "週末のショッピング"
         ]
+      },
+      "spanish": {
+        "word": "compras",
+        "pronunciation": "/komˈpɾas/",
+        "definition": "actividad de comprar cosas de las tiendas",
+        "part_of_speech": "sustantivo",
+        "synonyms": [
+          "compra",
+          "adquisición"
+        ],
+        "antonyms": [],
+        "word_family": [
+          "compra",
+          "mercado"
+        ],
+        "compound_words": [
+          "centro comercial",
+          "bolsa de compras"
+        ],
+        "collocations": [
+          "compras en línea",
+          "compras de fin de semana"
+        ]
       }
     },
     "representative_example": {
       "korean": "나는 주말에 쇼핑을 갑니다.",
       "english": "I go shopping on weekends.",
       "chinese": "我周末去购物。",
-      "japanese": "週末にショッピングに行きます。"
+      "japanese": "週末にショッピングに行きます。",
+      "spanish": "Voy de compras los fines de semana."
     }
   },
   {
@@ -230,13 +254,40 @@
           "韓国の伝統",
           "伝統を保存"
         ]
+      },
+      "spanish": {
+        "word": "tradición",
+        "pronunciation": "/tɾaðiˈθjon/",
+        "definition": "costumbres y creencias transmitidas a través de generaciones",
+        "part_of_speech": "sustantivo",
+        "synonyms": [
+          "costumbre",
+          "herencia"
+        ],
+        "antonyms": [
+          "modernidad",
+          "innovación"
+        ],
+        "word_family": [
+          "cultura",
+          "historia"
+        ],
+        "compound_words": [
+          "cultura tradicional",
+          "comida tradicional"
+        ],
+        "collocations": [
+          "tradición coreana",
+          "preservar tradición"
+        ]
       }
     },
     "representative_example": {
       "korean": "한국의 전통 문화를 보존해야 합니다.",
       "english": "We should preserve Korean traditional culture.",
       "chinese": "我们应该保护韩国传统文化。",
-      "japanese": "韓国の伝統文化を保存すべきです。"
+      "japanese": "韓国の伝統文化を保存すべきです。",
+      "spanish": "Debemos preservar la cultura tradicional coreana."
     }
   }
 ]

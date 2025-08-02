@@ -813,21 +813,31 @@ function collectFormData() {
     document.getElementById("edit-japanese-example")?.value.trim() || "";
   const chineseExample =
     document.getElementById("edit-chinese-example")?.value.trim() || "";
+  const spanishExample =
+    document.getElementById("edit-spanish-example")?.value.trim() || "";
 
   console.log("🔍 AI 편집 모달 예문 수집:", {
     korean: koreanExample,
     english: englishExample,
     japanese: japaneseExample,
     chinese: chineseExample,
+    spanish: spanishExample,
   });
 
   // 대표 예문 설정 (최소 하나의 언어에 값이 있으면)
-  if (koreanExample || englishExample || japaneseExample || chineseExample) {
+  if (
+    koreanExample ||
+    englishExample ||
+    japaneseExample ||
+    chineseExample ||
+    spanishExample
+  ) {
     representativeExample = {
       korean: koreanExample,
       english: englishExample,
       japanese: japaneseExample,
       chinese: chineseExample,
+      spanish: spanishExample,
     };
     console.log("✅ 대표 예문 설정:", representativeExample);
   } else {

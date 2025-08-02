@@ -76,6 +76,8 @@
   "english_example": "영어 예문",
   "japanese_example": "일본어 예문",
   "chinese_example": "중국어 예문",
+  "spanish_example": "스페인어 예문",
+  "spanish": "스페인어",
   "tags": "태그",
   "purpose": "목적",
   "select_purpose": "목적 선택",

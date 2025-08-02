@@ -141,6 +141,9 @@
             <button type="button" class="edit-language-tab pb-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" data-language="chinese">
               <span class="flag-icon">🇨🇳</span> <span data-i18n="chinese">중국어</span>
             </button>
+            <button type="button" class="edit-language-tab pb-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" data-language="spanish">
+              <span class="flag-icon">🇪🇸</span> <span data-i18n="spanish">스페인어</span>
+            </button>
           </nav>
         </div>
 
@@ -357,6 +360,59 @@
               </div>
             </div>
           </div>
+
+          <!-- 스페인어 탭 -->
+          <div id="spanish-content" class="language-content hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+              <div>
+                <label class="block text-sm text-gray-600" data-i18n="word">단어</label>
+                <input type="text" id="spanish-word" class="w-full p-2 border rounded" placeholder="manzana">
+              </div>
+              <div>
+                <label class="block text-sm text-gray-600" data-i18n="pronunciation">발음</label>
+                <input type="text" id="spanish-pronunciation" class="w-full p-2 border rounded" placeholder="/manˈθana/">
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-sm text-gray-600" data-i18n="definition">정의</label>
+                <input type="text" id="spanish-definition" class="w-full p-2 border rounded" placeholder="fruta redonda con piel roja o verde">
+              </div>
+              <div>
+                <label class="block text-sm text-gray-600" data-i18n="part_of_speech">품사</label>
+                <select id="spanish-pos" class="w-full p-2 border rounded">
+                  <option value="" class="hidden" data-i18n="select_pos">품사 선택</option>
+                  <option value="sustantivo" data-i18n="noun">sustantivo</option>
+                  <option value="verbo" data-i18n="verb">verbo</option>
+                  <option value="adjetivo" data-i18n="adjective">adjetivo</option>
+                  <option value="adverbio" data-i18n="adverb">adverbio</option>
+                  <option value="pronombre" data-i18n="pronoun">pronombre</option>
+                  <option value="preposición" data-i18n="preposition">preposición</option>
+                  <option value="conjunción" data-i18n="conjunction">conjunción</option>
+                  <option value="interjección" data-i18n="interjection">interjección</option>
+                  <option value="determinante" data-i18n="determiner">determinante</option>
+                  <option value="otro" data-i18n="other">otro</option>
+                </select>
+              </div>
+            </div>
+            <!-- 고급 필드들 -->
+            <div class="space-y-3">
+              <div>
+                <label class="block text-sm text-gray-600" data-i18n="synonyms">유사어 (쉼표로 구분)</label>
+                <input type="text" id="spanish-synonyms" class="w-full p-2 border rounded" placeholder="fruta, producto">
+              </div>
+              <div>
+                <label class="block text-sm text-gray-600" data-i18n="antonyms">반의어 (쉼표로 구분)</label>
+                <input type="text" id="spanish-antonyms" class="w-full p-2 border rounded" placeholder="">
+              </div>
+              <div>
+                <label class="block text-sm text-gray-600" data-i18n="collocations">연어 (쉼표로 구분)</label>
+                <input type="text" id="spanish-collocations" class="w-full p-2 border rounded" placeholder="manzana roja, manzana fresca">
+              </div>
+              <div>
+                <label class="block text-sm text-gray-600" data-i18n="compound_words">복합어 (쉼표로 구분)</label>
+                <input type="text" id="spanish-compound-words" class="w-full p-2 border rounded" placeholder="manzano, jugo de manzana">
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -392,6 +448,10 @@
               <div>
                 <label class="block text-sm text-gray-600 mb-1" data-i18n="chinese_example">중국어 예문</label>
                 <textarea class="chinese-example w-full p-2 border rounded h-20" placeholder="我喜欢红苹果。"></textarea>
+              </div>
+              <div>
+                <label class="block text-sm text-gray-600 mb-1" data-i18n="spanish_example">스페인어 예문</label>
+                <textarea class="spanish-example w-full p-2 border rounded h-20" placeholder="Me gustan las manzanas rojas."></textarea>
               </div>
             </div>
           </div>
