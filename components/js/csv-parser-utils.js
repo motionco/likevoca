@@ -1,9 +1,9 @@
 /**
- * CSV ?�싱 �??�일 ?�기 ?�틸리티 ?�수??
- * 분리??컬렉???�로?��? ?�한 ?�용 ?�서
+ * CSV ?�싱 �??�일 ?�기 ?�틸리티 ?�수??
+ * 분리??컬렉???�로?��? ?�한 ?�용 ?�서
  */
 
-// ?�일 ?�기 ?�수
+// ?�일 ?�기 ?�수
 export function readFile(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -13,11 +13,11 @@ export function readFile(file) {
   });
 }
 
-// CSV ?�싱 ?�수
+// CSV ?�싱 ?�수
 export function parseCSV(content, tabName) {
   const lines = content.trim().split("\n");
   if (lines.length < 2) {
-    throw new Error("CSV ?�일???�이?��? ?�습?�다.");
+    throw new Error("CSV ?�일???�이?��? ?�습?�다.");
   }
 
   const headers = lines[0].split(",").map((h) => h.trim().replace(/"/g, ""));
@@ -31,7 +31,7 @@ export function parseCSV(content, tabName) {
         row[header] = values[index];
       });
 
-      // 컬렉???�?�에 ?�라 ?�절???�식?�로 변??
+      // 컬렉???�?�에 ?�라 ?�절???�식?�로 변??
       let parsedData;
       switch (tabName) {
         case "concepts":
@@ -56,7 +56,7 @@ export function parseCSV(content, tabName) {
   return data;
 }
 
-// CSV ?�인 ?�싱 (?�표�?분리?�되 ?�옴???��???무시)
+// CSV ?�인 ?�싱 (?�표�?분리?�되 ?�옴???��???무시)
 function parseCSVLine(line) {
   const values = [];
   let current = "";
@@ -79,7 +79,7 @@ function parseCSVLine(line) {
   return values;
 }
 
-// 개념 CSV ?�싱
+// 개념 CSV ?�싱
 function parseConceptFromCSV(row) {
   try {
     return {
@@ -87,7 +87,7 @@ function parseConceptFromCSV(row) {
         domain: row.domain || "general",
         category: row.category || "uncategorized",
         difficulty: row.difficulty || "beginner",
-        unicode_emoji: row.emoji || "?��",
+        unicode_emoji: row.emoji || "?��",
         color_theme: row.color_theme || "#9C27B0",
         tags: row.tags ? row.tags.split(",").map((t) => t.trim()) : [],
       },
@@ -106,23 +106,31 @@ function parseConceptFromCSV(row) {
           part_of_speech: row.english_pos || "noun",
           level: row.english_level || "beginner",
         },
+        spanish: {
+          word: row.spanish_word || "",
+          pronunciation: row.spanish_pronunciation || "",
+          definition: row.spanish_definition || "",
+          part_of_speech: row.spanish_pos || "sustantivo",
+          level: row.spanish_level || "beginner",
+        },
       },
       representative_example: {
         translations: {
           korean: row.example_korean || "",
           english: row.example_english || "",
+          spanish: row.example_spanish || "",
         },
         context: row.context || "daily_conversation",
         difficulty: row.difficulty || "beginner",
       },
     };
   } catch (error) {
-    console.error("개념 CSV ?�싱 ?�류:", error);
+    console.error("개념 CSV ?�싱 ?�류:", error);
     return null;
   }
 }
 
-// ?�문 CSV ?�싱
+// ?�문 CSV ?�싱
 function parseExampleFromCSV(row) {
   try {
     return {
@@ -138,20 +146,21 @@ function parseExampleFromCSV(row) {
         english: row.english_text || row.english || "",
         japanese: row.japanese_text || row.japanese || "",
         chinese: row.chinese_text || row.chinese || "",
+        spanish: row.spanish_text || row.spanish || "",
       },
     };
   } catch (error) {
-    console.error("?�문 CSV ?�싱 ?�류:", error);
+    console.error("?�문 CSV ?�싱 ?�류:", error);
     return null;
   }
 }
 
-// 문법 ?�턴 CSV ?�싱
+// 문법 ?�턴 CSV ?�싱
 function parseGrammarPatternFromCSV(row) {
   try {
     return {
       pattern_id: row.pattern_id || null,
-      pattern_name: row.pattern_name || "기본 ?�턴",
+      pattern_name: row.pattern_name || "기본 ?�턴",
       pattern_type: row.pattern_type || "basic",
       difficulty: row.difficulty || "beginner",
       tags: row.tags ? row.tags.split(",").map((t) => t.trim()) : [],
@@ -174,19 +183,19 @@ function parseGrammarPatternFromCSV(row) {
       teaching_notes: {
         korean: row.korean_notes || "",
         english: row.english_notes || "",
-        primary_focus: row.primary_focus || "기본 문법 ?�습",
+        primary_focus: row.primary_focus || "기본 문법 ?�습",
         practice_suggestions: row.practice_suggestions
           ? row.practice_suggestions.split(",").map((s) => s.trim())
-          : ["기본 ?�습"],
+          : ["기본 ?�습"],
       },
     };
   } catch (error) {
-    console.error("문법 ?�턴 CSV ?�싱 ?�류:", error);
+    console.error("문법 ?�턴 CSV ?�싱 ?�류:", error);
     return null;
   }
 }
 
-// ?�그 문자?�을 배열�?변??
+// ?�그 문자?�을 배열�?변??
 export function parseTagsField(tagsString) {
   if (!tagsString || typeof tagsString !== "string") {
     return [];
@@ -197,7 +206,7 @@ export function parseTagsField(tagsString) {
     .filter((tag) => tag.length > 0);
 }
 
-// 배열 ?�드 ?�싱 (콤마???��?콜론?�로 분리??문자??
+// 배열 ?�드 ?�싱 (콤마???��?콜론?�로 분리??문자??
 export function parseArrayField(value, separator = ",") {
   if (!value || typeof value !== "string") {
     return [];
@@ -208,13 +217,13 @@ export function parseArrayField(value, separator = ",") {
     .filter((item) => item.length > 0);
 }
 
-// ?�자 ?�드 ?�싱 (기본�??�함)
+// ?�자 ?�드 ?�싱 (기본�??�함)
 export function parseNumberField(value, defaultValue = 0) {
   const parsed = parseInt(value);
   return isNaN(parsed) ? defaultValue : parsed;
 }
 
-// 불린 ?�드 ?�싱
+// 불린 ?�드 ?�싱
 export function parseBooleanField(value, defaultValue = true) {
   if (typeof value === "boolean") return value;
   if (typeof value === "string") {

@@ -21,6 +21,7 @@ const supportedLangs = {
   english: "English",
   japanese: "日本語",
   chinese: "中文",
+  spanish: "Español",
 };
 
 // 언어별 기본 품사 반환 (빈 값으로 수정하여 플레이스홀더가 보이도록)
@@ -33,28 +34,134 @@ export function getDefaultPartOfSpeech(langCode) {
 export function translatePartOfSpeech(originalPos, targetLang) {
   const posMapping = {
     // 한국어 → 다른 언어
-    명사: { english: "noun", japanese: "名詞", chinese: "名词" },
-    동사: { english: "verb", japanese: "動詞", chinese: "动词" },
-    형용사: { english: "adjective", japanese: "形容詞", chinese: "形容词" },
-    부사: { english: "adverb", japanese: "副詞", chinese: "副词" },
+    명사: {
+      english: "noun",
+      japanese: "名詞",
+      chinese: "名词",
+      spanish: "sustantivo",
+    },
+    동사: {
+      english: "verb",
+      japanese: "動詞",
+      chinese: "动词",
+      spanish: "verbo",
+    },
+    형용사: {
+      english: "adjective",
+      japanese: "形容詞",
+      chinese: "形容词",
+      spanish: "adjetivo",
+    },
+    부사: {
+      english: "adverb",
+      japanese: "副詞",
+      chinese: "副词",
+      spanish: "adverbio",
+    },
 
     // 영어 → 다른 언어
-    noun: { korean: "명사", japanese: "名詞", chinese: "名词" },
-    verb: { korean: "동사", japanese: "動詞", chinese: "动词" },
-    adjective: { korean: "형용사", japanese: "形容詞", chinese: "形容词" },
-    adverb: { korean: "부사", japanese: "副詞", chinese: "副词" },
+    noun: {
+      korean: "명사",
+      japanese: "名詞",
+      chinese: "名词",
+      spanish: "sustantivo",
+    },
+    verb: {
+      korean: "동사",
+      japanese: "動詞",
+      chinese: "动词",
+      spanish: "verbo",
+    },
+    adjective: {
+      korean: "형용사",
+      japanese: "形容詞",
+      chinese: "形容词",
+      spanish: "adjetivo",
+    },
+    adverb: {
+      korean: "부사",
+      japanese: "副詞",
+      chinese: "副词",
+      spanish: "adverbio",
+    },
 
     // 일본어 → 다른 언어
-    名詞: { korean: "명사", english: "noun", chinese: "名词" },
-    動詞: { korean: "동사", english: "verb", chinese: "动词" },
-    形容詞: { korean: "형용사", english: "adjective", chinese: "形容词" },
-    副詞: { korean: "부사", english: "adverb", chinese: "副词" },
+    名詞: {
+      korean: "명사",
+      english: "noun",
+      chinese: "名词",
+      spanish: "sustantivo",
+    },
+    動詞: {
+      korean: "동사",
+      english: "verb",
+      chinese: "动词",
+      spanish: "verbo",
+    },
+    形容詞: {
+      korean: "형용사",
+      english: "adjective",
+      chinese: "形容词",
+      spanish: "adjetivo",
+    },
+    副詞: {
+      korean: "부사",
+      english: "adverb",
+      chinese: "副词",
+      spanish: "adverbio",
+    },
 
     // 중국어 → 다른 언어
-    名词: { korean: "명사", english: "noun", japanese: "名詞" },
-    动词: { korean: "동사", english: "verb", japanese: "動詞" },
-    形容词: { korean: "형용사", english: "adjective", japanese: "形容詞" },
-    副词: { korean: "부사", english: "adverb", japanese: "副詞" },
+    名词: {
+      korean: "명사",
+      english: "noun",
+      japanese: "名詞",
+      spanish: "sustantivo",
+    },
+    动词: {
+      korean: "동사",
+      english: "verb",
+      japanese: "動詞",
+      spanish: "verbo",
+    },
+    形容词: {
+      korean: "형용사",
+      english: "adjective",
+      japanese: "形容詞",
+      spanish: "adjetivo",
+    },
+    副词: {
+      korean: "부사",
+      english: "adverb",
+      japanese: "副詞",
+      spanish: "adverbio",
+    },
+
+    // 스페인어 → 다른 언어
+    sustantivo: {
+      korean: "명사",
+      english: "noun",
+      japanese: "名詞",
+      chinese: "名词",
+    },
+    verbo: {
+      korean: "동사",
+      english: "verb",
+      japanese: "動詞",
+      chinese: "动词",
+    },
+    adjetivo: {
+      korean: "형용사",
+      english: "adjective",
+      japanese: "形容詞",
+      chinese: "形容词",
+    },
+    adverbio: {
+      korean: "부사",
+      english: "adverb",
+      japanese: "副詞",
+      chinese: "副词",
+    },
   };
 
   return (
@@ -469,6 +576,7 @@ export function addExampleFields(
       english: "I like red apples.",
       japanese: "私は赤いりんごが好きです。",
       chinese: "我喜欢红苹果。",
+      spanish: "Me gustan las manzanas rojas.",
     };
 
     const defaultValue = existingValue || "";
@@ -998,6 +1106,10 @@ export function addEditExampleFields(
   existingExample = null,
   isRepresentative = false
 ) {
+  console.log("🔍 addEditExampleFields 호출:", {
+    existingExample,
+    isRepresentative,
+  });
   const containerFound = document.getElementById("edit-examples-container");
 
   if (!containerFound) {
@@ -1036,6 +1148,7 @@ export function addEditExampleFields(
       english: "I like red apples.",
       japanese: "私は赤いりんごが好きです。",
       chinese: "我喜欢红苹果。",
+      spanish: "Me gustan las manzanas rojas.",
     };
 
     const defaultValue = existingValue || "";

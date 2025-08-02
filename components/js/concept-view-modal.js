@@ -311,12 +311,9 @@ export async function showConceptViewModal(
   // 모달 표시
   modal.classList.remove("hidden");
 
-  // 번역 적용 - 기존 번역 시스템 사용
+  // 번역 적용 - data-i18n 속성 처리
   try {
-    // 전역 번역 함수가 있다면 사용
-    if (typeof window.applyTranslations === "function") {
-      await window.applyTranslations();
-    }
+    applyModalTranslations();
   } catch (error) {
     console.error("번역 적용 실패:", error);
   }
@@ -352,6 +349,13 @@ function getLanguageName(langCode) {
       japanese: "日语",
       chinese: "中文",
       spanish: "西班牙语",
+    },
+    es: {
+      korean: "Coreano",
+      english: "Inglés",
+      japanese: "Japonés",
+      chinese: "Chino",
+      spanish: "Español",
     },
   };
 
@@ -1002,6 +1006,21 @@ function setupModalButtons(conceptData) {
     closeButton.onclick = closeModal;
     console.log("✅ 닫기 버튼 이벤트 설정 완료");
   }
+}
+
+// 모달 번역 적용 함수
+function applyModalTranslations() {
+  const modal = document.getElementById("concept-view-modal");
+  if (!modal) return;
+
+  const elements = modal.querySelectorAll("[data-i18n]");
+  elements.forEach((element) => {
+    const key = element.getAttribute("data-i18n");
+    const translation = getTranslatedText(key);
+    if (translation) {
+      element.textContent = translation;
+    }
+  });
 }
 
 // 모달 닫기 함수

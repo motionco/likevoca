@@ -644,6 +644,12 @@ function convertCSVToConcept(item) {
         definition: item.english_definition || "",
         part_of_speech: item.english_part_of_speech || "noun",
       },
+      spanish: {
+        word: item.spanish_word || "",
+        pronunciation: item.spanish_pronunciation || "",
+        definition: item.spanish_definition || "",
+        part_of_speech: item.spanish_part_of_speech || "sustantivo",
+      },
     },
     representative_example:
       item.representative_example_korean || item.representative_example_english
@@ -654,6 +660,7 @@ function convertCSVToConcept(item) {
             translations: {
               korean: { text: item.representative_example_korean || "" },
               english: { text: item.representative_example_english || "" },
+              spanish: { text: item.representative_example_spanish || "" },
             },
           }
         : null,
@@ -675,12 +682,14 @@ function convertCSVToExample(item) {
       english: item.english || "",
       japanese: item.japanese || "",
       chinese: item.chinese || "",
+      spanish: item.spanish || "",
     },
     word: {
       korean: item.korean_word || "",
       english: item.english_word || "",
       japanese: item.japanese_word || "",
       chinese: item.chinese_word || "",
+      spanish: item.spanish_word || "",
     },
   };
 }

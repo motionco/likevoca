@@ -510,6 +510,13 @@ function getLanguageName(langCode) {
       chinese: "中文",
       spanish: "西班牙语",
     },
+    es: {
+      korean: "Coreano",
+      english: "Inglés",
+      japanese: "Japonés",
+      chinese: "Chino",
+      spanish: "Español",
+    },
   };
 
   return (

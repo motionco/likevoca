@@ -297,28 +297,41 @@ function fillFormWithConceptData(conceptData) {
     let hasExamples = false;
 
     // 대표 예문 처리
+    console.log(
+      "🔍 편집 모달 대표예문 처리 시작:",
+      conceptData.representative_example
+    );
     if (conceptData.representative_example) {
       let repExample = null;
 
       if (conceptData.representative_example.translations) {
         repExample = conceptData.representative_example.translations;
+        console.log("📝 translations 구조 사용:", repExample);
       } else if (
         conceptData.representative_example.korean ||
         conceptData.representative_example.english
       ) {
         repExample = conceptData.representative_example;
+        console.log("📝 직접 구조 사용:", repExample);
       }
 
+      console.log("🔍 처리할 대표예문:", repExample);
       if (
         repExample &&
         (repExample.korean ||
           repExample.english ||
           repExample.japanese ||
-          repExample.chinese)
+          repExample.chinese ||
+          repExample.spanish)
       ) {
+        console.log("✅ 대표예문 필드 추가");
         addEditExampleFields(repExample, true);
         hasExamples = true;
+      } else {
+        console.log("❌ 대표예문 조건 불충족:", repExample);
       }
+    } else {
+      console.log("❌ representative_example 없음");
     }
 
     // 추가 예제들 처리

@@ -658,6 +658,28 @@ function parseConceptFromCSV(row) {
             ? row.japanese_collocations.split(",").map((c) => c.trim())
             : [],
         },
+        spanish: {
+          word: row.spanish_word || "",
+          pronunciation: row.spanish_pronunciation || "",
+          definition: row.spanish_definition || "",
+          part_of_speech:
+            row.spanish_part_of_speech || row.spanish_pos || "sustantivo",
+          synonyms: row.spanish_synonyms
+            ? row.spanish_synonyms.split(",").map((s) => s.trim())
+            : [],
+          antonyms: row.spanish_antonyms
+            ? row.spanish_antonyms.split(",").map((s) => s.trim())
+            : [],
+          word_family: row.spanish_word_family
+            ? row.spanish_word_family.split(",").map((w) => w.trim())
+            : [],
+          compound_words: row.spanish_compound_words
+            ? row.spanish_compound_words.split(",").map((c) => c.trim())
+            : [],
+          collocations: row.spanish_collocations
+            ? row.spanish_collocations.split(",").map((c) => c.trim())
+            : [],
+        },
       },
       representative_example:
         (row.korean_example || row.representative_korean) &&
@@ -668,6 +690,8 @@ function parseConceptFromCSV(row) {
               chinese: row.chinese_example || row.representative_chinese || "",
               japanese:
                 row.japanese_example || row.representative_japanese || "",
+              spanish:
+                row.spanish_example || row.representative_spanish || "",
             }
           : null,
     };
@@ -702,12 +726,14 @@ function parseExampleFromCSV(row) {
         english: row.english || "",
         japanese: row.japanese || "",
         chinese: row.chinese || "",
+        spanish: row.spanish || "",
       },
       word: {
         korean: row.korean_word || "",
         english: row.english_word || "",
         japanese: row.japanese_word || "",
         chinese: row.chinese_word || "",
+        spanish: row.spanish_word || "",
       },
     };
   } catch (error) {
@@ -751,6 +777,7 @@ function parseGrammarPatternFromCSV(row, headers) {
     english: {},
     japanese: {},
     chinese: {},
+    spanish: {},
   };
 
   // Korean pattern - row 객체에서 직접 접근
@@ -816,6 +843,22 @@ function parseGrammarPatternFromCSV(row, headers) {
   if (chineseDescription)
     pattern.pattern.chinese.description = chineseDescription;
 
+  // Spanish pattern - row 객체에서 직접 접근
+  const spanishTitle = row.spanish_title || "";
+  const spanishStructure = row.spanish_structure || "";
+  const spanishDescription = row.spanish_description || "";
+
+  console.log("🔍 [parseGrammarPatternFromCSV] Spanish 원본 값들:", {
+    spanishTitle,
+    spanishStructure,
+    spanishDescription,
+  });
+
+  if (spanishTitle) pattern.pattern.spanish.title = spanishTitle;
+  if (spanishStructure) pattern.pattern.spanish.structure = spanishStructure;
+  if (spanishDescription)
+    pattern.pattern.spanish.description = spanishDescription;
+
   console.log(
     "🔧 [parseGrammarPatternFromCSV] 완성된 pattern 객체:",
     pattern.pattern
@@ -828,18 +871,21 @@ function parseGrammarPatternFromCSV(row, headers) {
   const englishExample = row.english_example || "";
   const japaneseExample = row.japanese_example || "";
   const chineseExample = row.chinese_example || "";
+  const spanishExample = row.spanish_example || "";
 
   console.log("🔍 [parseGrammarPatternFromCSV] Example 원본 값들:", {
     koreanExample,
     englishExample,
     japaneseExample,
     chineseExample,
+    spanishExample,
   });
 
   if (koreanExample) pattern.example.korean = koreanExample;
   if (englishExample) pattern.example.english = englishExample;
   if (japaneseExample) pattern.example.japanese = japaneseExample;
   if (chineseExample) pattern.example.chinese = chineseExample;
+  if (spanishExample) pattern.example.spanish = spanishExample;
 
   console.log(
     "🔧 [parseGrammarPatternFromCSV] 완성된 example 객체:",
@@ -852,6 +898,7 @@ function parseGrammarPatternFromCSV(row, headers) {
     english: row.english_word || "",
     japanese: row.japanese_word || "",
     chinese: row.chinese_word || "",
+    spanish: row.spanish_word || "",
   };
 
   console.log("🔧 [parseGrammarPatternFromCSV] word 객체:", pattern.word);
