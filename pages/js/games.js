@@ -420,6 +420,7 @@ function setupLanguageSelectors() {
           "english",
           "japanese",
           "chinese",
+          "spanish",
         ].filter((lang) => lang !== sourceLanguage);
         targetLanguage = otherLanguages[0];
         targetSelect.value = targetLanguage;
@@ -439,6 +440,7 @@ function setupLanguageSelectors() {
           "english",
           "japanese",
           "chinese",
+          "spanish",
         ].filter((lang) => lang !== targetLanguage);
         sourceLanguage = otherLanguages[0];
         sourceSelect.value = sourceLanguage;

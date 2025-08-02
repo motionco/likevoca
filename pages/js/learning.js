@@ -288,8 +288,11 @@ window.showLearningModes = showLearningModes;
 window.updateFilterOptionsLanguage = updateFilterOptionsLanguage;
 
 function initializeLanguageSettings() {
+  // 현재 언어 감지
+  const detectedLanguage = getCurrentLanguage();
+
   // 사용자 언어 설정 가져오기
-  const userLanguage = localStorage.getItem("userLanguage") || "ko";
+  const userLanguage = localStorage.getItem("userLanguage") || detectedLanguage;
 
   // 언어 필터 설정 임포트 및 초기화
   import("../../utils/language-utils.js").then((module) => {
@@ -303,7 +306,8 @@ function initializeLanguageSettings() {
       window.languageSettings = {
         sourceLanguage: filterSettings.sourceLanguage,
         targetLanguage: filterSettings.targetLanguage,
-        currentUILanguage: userLanguage === "auto" ? "ko" : userLanguage,
+        currentUILanguage:
+          userLanguage === "auto" ? detectedLanguage : userLanguage,
       };
     }
 
@@ -319,6 +323,7 @@ function initializeLanguageSettings() {
         "english",
         "japanese",
         "chinese",
+        "spanish",
       ].filter((lang) => lang !== sourceLanguage);
       targetLanguage = otherLanguages[0];
       window.languageSettings.targetLanguage = targetLanguage;
@@ -802,6 +807,20 @@ function applyAdditionalTranslations() {
 
 // 현재 언어 가져오기 함수
 function getCurrentLanguage() {
+  // URL 경로에서 언어 감지 (locales 구조)
+  const path = window.location.pathname;
+  if (path.includes("/locales/")) {
+    const pathParts = path.split("/");
+    const langIndex = pathParts.indexOf("locales") + 1;
+    if (langIndex < pathParts.length) {
+      const detectedLang = pathParts[langIndex];
+      if (["ko", "en", "ja", "zh", "es"].includes(detectedLang)) {
+        console.log("🔍 URL 경로에서 언어 감지:", detectedLang);
+        return detectedLang;
+      }
+    }
+  }
+
   // utils/language-utils.js와 동일한 방식으로 언어 감지
   const savedLanguage = localStorage.getItem("preferredLanguage");
   if (savedLanguage) {
@@ -949,6 +968,7 @@ function setupEventListeners() {
           "english",
           "japanese",
           "chinese",
+          "spanish",
         ].filter((lang) => lang !== sourceLanguage);
         targetLanguage = otherLanguages[0];
 
@@ -978,6 +998,7 @@ function setupEventListeners() {
           "english",
           "japanese",
           "chinese",
+          "spanish",
         ].filter((lang) => lang !== targetLanguage);
         sourceLanguage = otherLanguages[0];
 
@@ -2337,7 +2358,50 @@ async function loadLearningDataOptimized(area) {
 function getTranslatedText(key) {
   // window.translations 사용
   if (window.translations && window.translations[currentUILanguage]) {
-    return window.translations[currentUILanguage][key] || key;
+    // 상황과 목적 필터의 경우 접두사 추가
+    let translationKey = key;
+    if (
+      [
+        "formal",
+        "casual",
+        "polite",
+        "urgent",
+        "work",
+        "school",
+        "social",
+        "travel",
+        "shopping",
+        "home",
+        "public",
+        "online",
+        "medical",
+      ].includes(key)
+    ) {
+      translationKey = `situation_${key}`;
+    } else if (
+      [
+        "greeting",
+        "thanking",
+        "request",
+        "question",
+        "opinion",
+        "agreement",
+        "refusal",
+        "apology",
+        "instruction",
+        "description",
+        "suggestion",
+        "emotion",
+      ].includes(key)
+    ) {
+      translationKey = `purpose_${key}`;
+    }
+
+    return (
+      window.translations[currentUILanguage][translationKey] ||
+      window.translations[currentUILanguage][key] ||
+      key
+    );
   }
 
   // 기본 번역 (하위 호환성)
@@ -2389,6 +2453,18 @@ function getTranslatedText(key) {
       practice: "练习",
       example: "例子",
       flash: "闪现",
+    },
+    es: {
+      vocabulary: "Vocabulario",
+      grammar: "Gramática",
+      reading: "Lectura",
+      flashcards: "Tarjetas Flash",
+      typing: "Escritura",
+      pronunciation: "Pronunciación",
+      pattern: "Patrón",
+      practice: "Práctica",
+      example: "Ejemplo",
+      flash: "Flash",
     },
   };
 
@@ -2461,53 +2537,63 @@ async function loadSituationAndPurposeFilterOptions() {
       "emotion", // 감정표현
     ];
 
-    // 상황 필터 옵션 생성
-    const situationFilter = document.getElementById("situation-filter");
-    if (situationFilter) {
-      // 기존 옵션 제거 (전체 상황 옵션 제외)
-      const allSituationOption = situationFilter.querySelector(
-        'option[value="all"]'
-      );
-      situationFilter.innerHTML = "";
-      if (allSituationOption) {
-        situationFilter.appendChild(allSituationOption);
+    // 상황 필터 옵션 생성 (데스크톱과 모바일)
+    const situationFilters = [
+      document.getElementById("situation-filter"),
+      document.getElementById("situation-filter-mobile"),
+    ];
+
+    situationFilters.forEach((situationFilter) => {
+      if (situationFilter) {
+        // 기존 옵션 제거 (전체 상황 옵션 제외)
+        const allSituationOption = situationFilter.querySelector(
+          'option[value="all"]'
+        );
+        situationFilter.innerHTML = "";
+        if (allSituationOption) {
+          situationFilter.appendChild(allSituationOption);
+        }
+
+        // 상황 태그 옵션 추가 (환경 언어에 맞게 번역)
+        situationTags.forEach((tag) => {
+          const option = document.createElement("option");
+          option.value = tag;
+          option.textContent = getTranslatedText(tag) || tag;
+          situationFilter.appendChild(option);
+        });
       }
+    });
 
-      // 상황 태그 옵션 추가 (환경 언어에 맞게 번역)
-      situationTags.forEach((tag) => {
-        const option = document.createElement("option");
-        option.value = tag;
-        option.textContent = getTranslatedText(tag) || tag;
-        situationFilter.appendChild(option);
-      });
+    console.log(`✅ 상황 필터 옵션 로드 완료: ${situationTags.length}개 태그`);
 
-      console.log(
-        `✅ 상황 필터 옵션 로드 완료: ${situationTags.length}개 태그`
-      );
-    }
+    // 목적 필터 옵션 생성 (데스크톱과 모바일)
+    const purposeFilters = [
+      document.getElementById("purpose-filter"),
+      document.getElementById("purpose-filter-mobile"),
+    ];
 
-    // 목적 필터 옵션 생성
-    const purposeFilter = document.getElementById("purpose-filter");
-    if (purposeFilter) {
-      // 기존 옵션 제거 (전체 목적 옵션 제외)
-      const allPurposeOption = purposeFilter.querySelector(
-        'option[value="all"]'
-      );
-      purposeFilter.innerHTML = "";
-      if (allPurposeOption) {
-        purposeFilter.appendChild(allPurposeOption);
+    purposeFilters.forEach((purposeFilter) => {
+      if (purposeFilter) {
+        // 기존 옵션 제거 (전체 목적 옵션 제외)
+        const allPurposeOption = purposeFilter.querySelector(
+          'option[value="all"]'
+        );
+        purposeFilter.innerHTML = "";
+        if (allPurposeOption) {
+          purposeFilter.appendChild(allPurposeOption);
+        }
+
+        // 목적 태그 옵션 추가 (환경 언어에 맞게 번역)
+        purposeTags.forEach((tag) => {
+          const option = document.createElement("option");
+          option.value = tag;
+          option.textContent = getTranslatedText(tag) || tag;
+          purposeFilter.appendChild(option);
+        });
       }
+    });
 
-      // 목적 태그 옵션 추가 (환경 언어에 맞게 번역)
-      purposeTags.forEach((tag) => {
-        const option = document.createElement("option");
-        option.value = tag;
-        option.textContent = getTranslatedText(tag) || tag;
-        purposeFilter.appendChild(option);
-      });
-
-      console.log(`✅ 목적 필터 옵션 로드 완료: ${purposeTags.length}개 태그`);
-    }
+    console.log(`✅ 목적 필터 옵션 로드 완료: ${purposeTags.length}개 태그`);
   } catch (error) {
     console.error("❌ 상황 및 목적 필터 옵션 로드 실패:", error);
   }
@@ -3868,6 +3954,7 @@ function playWordAudio(text, language = "korean") {
       english: "en-US",
       japanese: "ja-JP",
       chinese: "zh-CN",
+      spanish: "es-ES",
     };
 
     // 기존 음성 재생 중지 (중복 방지)
@@ -4721,6 +4808,23 @@ function generateBasicReadingExamples() {
           context: "자기소개",
         },
       ],
+      spanish: [
+        {
+          korean: "안녕하세요. 만나서 반갑습니다.",
+          spanish: "Hola. Encantado de conocerte.",
+          context: "첫 만남 인사",
+        },
+        {
+          korean: "오늘 날씨가 정말 좋네요.",
+          spanish: "El clima está muy agradable hoy.",
+          context: "일상 대화",
+        },
+        {
+          korean: "어디서 오셨나요?",
+          spanish: "¿De dónde eres?",
+          context: "자기소개",
+        },
+      ],
     },
     english: {
       korean: [
@@ -4774,6 +4878,93 @@ function generateBasicReadingExamples() {
           context: "Self-introduction",
         },
       ],
+      spanish: [
+        {
+          english: "Hello. Nice to meet you.",
+          spanish: "Hola. Encantado de conocerte.",
+          context: "First meeting",
+        },
+        {
+          english: "The weather is really nice today.",
+          spanish: "El clima está muy agradable hoy.",
+          context: "Daily conversation",
+        },
+        {
+          english: "Where are you from?",
+          spanish: "¿De dónde eres?",
+          context: "Self-introduction",
+        },
+      ],
+    },
+    spanish: {
+      korean: [
+        {
+          spanish: "Hola. Encantado de conocerte.",
+          korean: "안녕하세요. 만나서 반갑습니다.",
+          context: "Primera reunión",
+        },
+        {
+          spanish: "El clima está muy agradable hoy.",
+          korean: "오늘 날씨가 정말 좋네요.",
+          context: "Conversación diaria",
+        },
+        {
+          spanish: "¿De dónde eres?",
+          korean: "어디서 오셨나요?",
+          context: "Autopresentación",
+        },
+      ],
+      english: [
+        {
+          spanish: "Hola. Encantado de conocerte.",
+          english: "Hello. Nice to meet you.",
+          context: "Primera reunión",
+        },
+        {
+          spanish: "El clima está muy agradable hoy.",
+          english: "The weather is really nice today.",
+          context: "Conversación diaria",
+        },
+        {
+          spanish: "¿De dónde eres?",
+          english: "Where are you from?",
+          context: "Autopresentación",
+        },
+      ],
+      japanese: [
+        {
+          spanish: "Hola. Encantado de conocerte.",
+          japanese: "こんにちは。はじめまして。",
+          context: "Primera reunión",
+        },
+        {
+          spanish: "El clima está muy agradable hoy.",
+          japanese: "今日はとてもいい天気ですね。",
+          context: "Conversación diaria",
+        },
+        {
+          spanish: "¿De dónde eres?",
+          japanese: "どちらからいらっしゃいましたか？",
+          context: "Autopresentación",
+        },
+      ],
+      chinese: [
+        {
+          spanish: "Hola. Encantado de conocerte.",
+          chinese: "你好。很高兴见到你。",
+          context: "Primera reunión",
+        },
+        {
+          spanish: "El clima está muy agradable hoy.",
+          chinese: "今天天气真好。",
+          context: "Conversación diaria",
+        },
+        {
+          spanish: "¿De dónde eres?",
+          chinese: "你从哪里来？",
+          context: "Autopresentación",
+        },
+      ],
     },
   };
 
@@ -4811,10 +5002,12 @@ function getLocalizedPatternTitle(data) {
     en: "english",
     ja: "japanese",
     zh: "chinese",
+    es: "spanish",
     korean: "korean",
     english: "english",
     japanese: "japanese",
     chinese: "chinese",
+    spanish: "spanish",
   };
 
   const mappedLanguage = languageMap[currentLanguage] || currentLanguage;

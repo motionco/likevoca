@@ -521,7 +521,7 @@ function fillExamples(conceptData) {
     console.log("✅ 대표 예문 발견:", conceptData.representative_example);
 
     // 각 언어별 예문 필드에 값 설정
-    const languages = ["korean", "english", "japanese", "chinese"];
+    const languages = ["korean", "english", "japanese", "chinese", "spanish"];
     languages.forEach((lang) => {
       const exampleField = document.getElementById(`edit-${lang}-example`);
       if (exampleField && conceptData.representative_example[lang]) {

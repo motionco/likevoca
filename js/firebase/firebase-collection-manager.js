@@ -1378,7 +1378,13 @@ export class CollectionManager {
         pronunciation: 15,
       },
 
-      related_languages: ["korean", "english", "japanese", "chinese"],
+      related_languages: [
+        "korean",
+        "english",
+        "japanese",
+        "chinese",
+        "spanish",
+      ],
 
       // 학습 메타데이터
       learning_metadata: {

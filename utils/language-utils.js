@@ -295,27 +295,36 @@ async function loadTranslations() {
     const rootPath = window.location.origin;
 
     // 각 언어별 번역 파일 로드
-    const [koTranslations, enTranslations, jaTranslations, zhTranslations] =
-      await Promise.all([
-        fetch(`${rootPath}/locales/ko/translations.json`).then((res) =>
-          res.json()
-        ),
-        fetch(`${rootPath}/locales/en/translations.json`).then((res) =>
-          res.json()
-        ),
-        fetch(`${rootPath}/locales/ja/translations.json`).then((res) =>
-          res.json()
-        ),
-        fetch(`${rootPath}/locales/zh/translations.json`).then((res) =>
-          res.json()
-        ),
-      ]);
+    const [
+      koTranslations,
+      enTranslations,
+      jaTranslations,
+      zhTranslations,
+      esTranslations,
+    ] = await Promise.all([
+      fetch(`${rootPath}/locales/ko/translations.json`).then((res) =>
+        res.json()
+      ),
+      fetch(`${rootPath}/locales/en/translations.json`).then((res) =>
+        res.json()
+      ),
+      fetch(`${rootPath}/locales/ja/translations.json`).then((res) =>
+        res.json()
+      ),
+      fetch(`${rootPath}/locales/zh/translations.json`).then((res) =>
+        res.json()
+      ),
+      fetch(`${rootPath}/locales/es/translations.json`).then((res) =>
+        res.json()
+      ),
+    ]);
 
     translations = {
       ko: koTranslations,
       en: enTranslations,
       ja: jaTranslations,
       zh: zhTranslations,
+      es: esTranslations,
     };
 
     // 전역 객체에 설정
@@ -352,6 +361,13 @@ async function loadTranslations() {
         learn_languages: "轻松愉快地学习各种语言",
         wordbook: "单词本",
         start: "开始",
+      },
+      es: {
+        home: "Inicio",
+        vocabulary: "Vocabulario",
+        learn_languages: "Aprende varios idiomas de manera fácil y divertida",
+        wordbook: "Libro de Palabras",
+        start: "Comenzar",
       },
     };
     window.translations = translations;
@@ -1748,7 +1764,7 @@ export {
 
 /**
  * 시스템 언어를 감지하고 지원하는 언어 형식으로 변환
- * @returns {string} 지원하는 언어 코드 (korean, english, japanese, chinese)
+ * @returns {string} 지원하는 언어 코드 (korean, english, japanese, chinese, spanish)
  */
 export function getSystemLanguage() {
   const browserLanguage = navigator.language || navigator.userLanguage;
@@ -1767,6 +1783,10 @@ export function getSystemLanguage() {
     "zh-cn": "chinese",
     "zh-tw": "chinese",
     "zh-hk": "chinese",
+    es: "spanish",
+    "es-es": "spanish",
+    "es-mx": "spanish",
+    "es-ar": "spanish",
   };
 
   // 정확한 매칭을 먼저 시도
@@ -1796,6 +1816,10 @@ export function getInitialLanguageSettings() {
   // 시스템 언어가 영어인 경우 대상 언어를 다른 언어로 설정
   if (systemLanguage === "english") {
     targetLanguage = "korean";
+  }
+  // 시스템 언어가 스페인어인 경우 대상 언어를 영어로 설정 (기본값이므로 그대로 유지)
+  else if (systemLanguage === "spanish") {
+    targetLanguage = "english";
   }
 
   return {
@@ -1920,6 +1944,7 @@ export function updateLanguageFilterOnUIChange(newUILanguage, storageKey) {
     en: "english",
     ja: "japanese",
     zh: "chinese",
+    es: "spanish",
   };
 
   // 새로운 UI 언어에 맞는 원본 언어 설정
@@ -1930,6 +1955,10 @@ export function updateLanguageFilterOnUIChange(newUILanguage, storageKey) {
   // 원본 언어가 영어인 경우 대상 언어를 한국어로 설정
   if (newSourceLanguage === "english") {
     newTargetLanguage = "korean";
+  }
+  // 원본 언어가 스페인어인 경우 대상 언어를 영어로 설정 (기본값이므로 그대로 유지)
+  else if (newSourceLanguage === "spanish") {
+    newTargetLanguage = "english";
   }
 
   const newSettings = {
