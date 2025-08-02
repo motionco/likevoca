@@ -65,6 +65,11 @@ const pageTranslations = {
     examples: "例句",
     ai_generated: "AI生成",
   },
+  es: {
+    meaning: "Significado",
+    examples: "Ejemplos",
+    ai_generated: "Generado por IA",
+  },
 };
 
 /**

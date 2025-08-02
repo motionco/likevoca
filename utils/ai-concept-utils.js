@@ -296,6 +296,18 @@ const TEST_CONCEPTS = [
         compound_words: ["りんごの木", "りんごジュース"],
         collocations: ["赤いりんご", "新鮮なりんご"],
       },
+      spanish: {
+        word: "manzana",
+        pronunciation: "manˈθana",
+        definition: "fruta redonda con piel roja o verde",
+        part_of_speech: "sustantivo",
+        level: "beginner",
+        synonyms: ["fruta"],
+        antonyms: [],
+        word_family: ["fruta", "comida"],
+        compound_words: ["manzano", "jugo de manzana"],
+        collocations: ["manzana roja", "manzana fresca"],
+      },
     },
 
     representative_example: {
@@ -303,6 +315,7 @@ const TEST_CONCEPTS = [
       english: "I eat an apple every morning.",
       chinese: "我每天早上吃苹果。",
       japanese: "私は毎朝りんごを食べます。",
+      spanish: "Como una manzana cada mañana.",
     },
 
     examples: [
@@ -373,6 +386,18 @@ const TEST_CONCEPTS = [
         compound_words: ["国際便", "国内便"],
         collocations: ["直行便", "乗り継ぎ便"],
       },
+      spanish: {
+        word: "vuelo",
+        pronunciation: "ˈbwelo",
+        definition: "viaje realizado por una aeronave",
+        part_of_speech: "sustantivo",
+        level: "intermediate",
+        synonyms: ["viaje aéreo", "trayecto"],
+        antonyms: [],
+        word_family: ["aviación", "viaje", "transporte"],
+        compound_words: ["ruta de vuelo", "tiempo de vuelo"],
+        collocations: ["vuelo directo", "vuelo de conexión"],
+      },
     },
 
     representative_example: {
@@ -380,6 +405,7 @@ const TEST_CONCEPTS = [
       english: "I booked a morning flight for tomorrow.",
       chinese: "我预订了明天上午的航班。",
       japanese: "明日の朝のフライトを予約しました。",
+      spanish: "Reservé un vuelo de mañana para mañana.",
     },
 
     examples: [
@@ -1128,6 +1154,7 @@ async function showAIConceptSelectionModal() {
           english: "영어",
           chinese: "중국어",
           japanese: "일본어",
+          spanish: "스페인어",
         },
       },
       en: {
@@ -1146,6 +1173,7 @@ async function showAIConceptSelectionModal() {
           english: "English",
           chinese: "Chinese",
           japanese: "Japanese",
+          spanish: "Spanish",
         },
       },
       ja: {
@@ -1164,6 +1192,7 @@ async function showAIConceptSelectionModal() {
           english: "英語",
           chinese: "中国語",
           japanese: "日本語",
+          spanish: "スペイン語",
         },
       },
       zh: {
@@ -1182,6 +1211,26 @@ async function showAIConceptSelectionModal() {
           english: "英语",
           chinese: "中文",
           japanese: "日语",
+          spanish: "西班牙语",
+        },
+      },
+      es: {
+        title: "Configuración de Recomendación de Conceptos AI",
+        step1: "1. Seleccionar Dominio",
+        step2: "2. Seleccionar Categoría",
+        step3: "3. Seleccionar Idiomas de Aprendizaje (mínimo 2)",
+        selectDomain: "Por favor seleccione un dominio",
+        selectCategory: "Por favor seleccione una categoría",
+        selectDomainFirst: "Por favor seleccione un dominio primero",
+        cancel: "Cancelar",
+        generate: "Generar Concepto AI",
+        minLanguages: "Por favor seleccione al menos 2 idiomas",
+        languages: {
+          korean: "Coreano",
+          english: "Inglés",
+          chinese: "Chino",
+          japanese: "Japonés",
+          spanish: "Español",
         },
       },
     };
@@ -1195,58 +1244,73 @@ async function showAIConceptSelectionModal() {
         en: "Daily Life",
         ja: "日常生活",
         zh: "日常生活",
+        es: "Vida Diaria",
       },
       food: {
         ko: "음식",
         en: "Food",
         ja: "食べ物",
         zh: "食物",
+        es: "Comida",
       },
-      travel: { ko: "여행", en: "Travel", ja: "旅行", zh: "旅行" },
+      travel: { ko: "여행", en: "Travel", ja: "旅行", zh: "旅行", es: "Viaje" },
       business: {
         ko: "비즈니스",
         en: "Business",
         ja: "ビジネス",
         zh: "商务",
+        es: "Negocios",
       },
-      education: { ko: "교육", en: "Education", ja: "教育", zh: "教育" },
+      education: {
+        ko: "교육",
+        en: "Education",
+        ja: "教育",
+        zh: "教育",
+        es: "Educación",
+      },
       nature: {
         ko: "자연",
         en: "Nature",
         ja: "自然",
         zh: "自然",
+        es: "Naturaleza",
       },
       technology: {
         ko: "기술",
         en: "Technology",
         ja: "技術",
         zh: "技术",
+        es: "Tecnología",
       },
       health: {
         ko: "건강",
         en: "Health",
         ja: "健康",
         zh: "健康",
+        es: "Salud",
       },
       sports: {
         ko: "스포츠",
         en: "Sports",
         ja: "スポーツ",
         zh: "体育",
+        es: "Deportes",
       },
       entertainment: {
         ko: "엔터테인먼트",
         en: "Entertainment",
         ja: "エンターテインメント",
         zh: "娱乐",
+        es: "Entretenimiento",
       },
       culture: {
         ko: "문화",
         en: "Culture",
         ja: "文化",
         zh: "文化",
+        es: "Cultura",
       },
-      other: { ko: "기타", en: "Other", ja: "その他", zh: "其他" },
+      other: { ko: "기타", en: "Other", ja: "その他", zh: "其他", es: "Otros" },
     };
 
     // 모달 HTML 생성
@@ -1348,6 +1412,10 @@ async function showAIConceptSelectionModal() {
                 <label class="flex items-center space-x-2 p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
                   <input type="checkbox" id="lang-japanese" value="japanese" class="form-checkbox">
                   <span>${texts.languages.japanese}</span>
+                </label>
+                <label class="flex items-center space-x-2 p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
+                  <input type="checkbox" id="lang-spanish" value="spanish" class="form-checkbox">
+                  <span>${texts.languages.spanish}</span>
                 </label>
               </div>
             </div>
