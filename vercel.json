@@ -18,15 +18,17 @@
     { "src": "/api/test-env", "dest": "/api/test-env.js" },
     { "src": "/api/log-auth-error", "dest": "/api/log-auth-error.js" },
     { "handle": "filesystem" },
-    { "src": "^/(?!ko|en|ja|zh).*", "dest": "/index.html" },
+    { "src": "^/(?!ko|en|ja|zh|es).*", "dest": "/index.html" },
     { "src": "/ko", "dest": "/locales/ko/index.html" },
     { "src": "/en", "dest": "/locales/en/index.html" },
     { "src": "/ja", "dest": "/locales/ja/index.html" },
     { "src": "/zh", "dest": "/locales/zh/index.html" },
+    { "src": "/es", "dest": "/locales/es/index.html" },
     { "src": "/ko/(.*)", "dest": "/locales/ko/$1" },
     { "src": "/en/(.*)", "dest": "/locales/en/$1" },
     { "src": "/ja/(.*)", "dest": "/locales/ja/$1" },
     { "src": "/zh/(.*)", "dest": "/locales/zh/$1" },
+    { "src": "/es/(.*)", "dest": "/locales/es/$1" },
     { "src": "/(.*)", "dest": "/$1" }
   ]
 } 
