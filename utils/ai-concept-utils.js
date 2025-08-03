@@ -1131,6 +1131,7 @@ async function showAIConceptSelectionModal() {
     const currentLang =
       localStorage.getItem("preferredLanguage") ||
       localStorage.getItem("userLanguage") ||
+      getSystemLanguage() ||
       "ko";
 
     // 도메인-카테고리 매핑 import (전역에서 사용 가능하다고 가정)
@@ -1667,70 +1668,168 @@ async function showAIConceptSelectionModal() {
         en: "Household",
         ja: "家庭用品",
         zh: "家庭用品",
+        es: "Artículos del Hogar",
       },
-      family: { ko: "가족", en: "Family", ja: "家族", zh: "家庭" },
+      family: {
+        ko: "가족",
+        en: "Family",
+        ja: "家族",
+        zh: "家庭",
+        es: "Familia",
+      },
       routine: {
         ko: "일상 루틴",
         en: "Routine",
         ja: "日常ルーチン",
         zh: "日常例行",
+        es: "Rutina Diaria",
       },
-      clothing: { ko: "의류", en: "Clothing", ja: "衣類", zh: "服装" },
-      furniture: { ko: "가구", en: "Furniture", ja: "家具", zh: "家具" },
-      shopping: { ko: "쇼핑", en: "Shopping", ja: "ショッピング", zh: "购物" },
+      clothing: {
+        ko: "의류",
+        en: "Clothing",
+        ja: "衣類",
+        zh: "服装",
+        es: "Ropa",
+      },
+      furniture: {
+        ko: "가구",
+        en: "Furniture",
+        ja: "家具",
+        zh: "家具",
+        es: "Muebles",
+      },
+      shopping: {
+        ko: "쇼핑",
+        en: "Shopping",
+        ja: "ショッピング",
+        zh: "购物",
+        es: "Compras",
+      },
       communication: {
         ko: "의사소통",
         en: "Communication",
         ja: "コミュニケーション",
         zh: "交流",
+        es: "Comunicación",
       },
       personal_care: {
         ko: "개인관리",
         en: "Personal Care",
         ja: "個人ケア",
         zh: "个人护理",
+        es: "Cuidado Personal",
       },
-      leisure: { ko: "여가", en: "Leisure", ja: "レジャー", zh: "休闲" },
+      leisure: {
+        ko: "여가",
+        en: "Leisure",
+        ja: "レジャー",
+        zh: "休闲",
+        es: "Ocio",
+      },
       relationships: {
         ko: "인간관계",
         en: "Relationships",
         ja: "人間関係",
         zh: "人际关系",
+        es: "Relaciones",
       },
-      emotions: { ko: "감정", en: "Emotions", ja: "感情", zh: "情感" },
-      time: { ko: "시간", en: "Time", ja: "時間", zh: "时间" },
+      emotions: {
+        ko: "감정",
+        en: "Emotions",
+        ja: "感情",
+        zh: "情感",
+        es: "Emociones",
+      },
+      time: { ko: "시간", en: "Time", ja: "時間", zh: "时间", es: "Tiempo" },
       weather_talk: {
         ko: "날씨 대화",
         en: "Weather Talk",
         ja: "天気の話",
         zh: "天气谈话",
+        es: "Conversación sobre el Clima",
       },
 
       // Food
-      fruit: { ko: "과일", en: "Fruit", ja: "果物", zh: "水果" },
-      vegetable: { ko: "채소", en: "Vegetable", ja: "野菜", zh: "蔬菜" },
-      meat: { ko: "고기", en: "Meat", ja: "肉", zh: "肉类" },
-      drink: { ko: "음료", en: "Drink", ja: "飲み物", zh: "饮料" },
-      snack: { ko: "간식", en: "Snack", ja: "スナック", zh: "零食" },
-      grain: { ko: "곡물", en: "Grain", ja: "穀物", zh: "谷物" },
-      seafood: { ko: "해산물", en: "Seafood", ja: "海産物", zh: "海鲜" },
-      dairy: { ko: "유제품", en: "Dairy", ja: "乳製品", zh: "乳制品" },
-      cooking: { ko: "요리", en: "Cooking", ja: "料理", zh: "烹饪" },
-      dining: { ko: "식사", en: "Dining", ja: "食事", zh: "用餐" },
+      fruit: { ko: "과일", en: "Fruit", ja: "果物", zh: "水果", es: "Fruta" },
+      vegetable: {
+        ko: "채소",
+        en: "Vegetable",
+        ja: "野菜",
+        zh: "蔬菜",
+        es: "Verdura",
+      },
+      meat: { ko: "고기", en: "Meat", ja: "肉", zh: "肉类", es: "Carne" },
+      drink: {
+        ko: "음료",
+        en: "Drink",
+        ja: "飲み物",
+        zh: "饮料",
+        es: "Bebida",
+      },
+      snack: {
+        ko: "간식",
+        en: "Snack",
+        ja: "スナック",
+        zh: "零食",
+        es: "Aperitivo",
+      },
+      grain: { ko: "곡물", en: "Grain", ja: "穀物", zh: "谷物", es: "Cereal" },
+      seafood: {
+        ko: "해산물",
+        en: "Seafood",
+        ja: "海産物",
+        zh: "海鲜",
+        es: "Marisco",
+      },
+      dairy: {
+        ko: "유제품",
+        en: "Dairy",
+        ja: "乳製品",
+        zh: "乳制品",
+        es: "Lácteos",
+      },
+      cooking: {
+        ko: "요리",
+        en: "Cooking",
+        ja: "料理",
+        zh: "烹饪",
+        es: "Cocina",
+      },
+      dining: {
+        ko: "식사",
+        en: "Dining",
+        ja: "食事",
+        zh: "用餐",
+        es: "Comida",
+      },
       restaurant: {
         ko: "음식점",
         en: "Restaurant",
         ja: "レストラン",
         zh: "餐厅",
+        es: "Restaurante",
       },
       kitchen_utensils: {
         ko: "주방용품",
         en: "Kitchen Utensils",
         ja: "キッチン用具",
         zh: "厨房用具",
+        es: "Utensilios de Cocina",
       },
-      spices: { ko: "향신료", en: "Spices", ja: "スパイス", zh: "香料" },
-      dessert: { ko: "디저트", en: "Dessert", ja: "デザート", zh: "甜点" },
+      spices: {
+        ko: "향신료",
+        en: "Spices",
+        ja: "スパイス",
+        zh: "香料",
+        es: "Especias",
+      },
+      dessert: {
+        ko: "디저트",
+        en: "Dessert",
+        ja: "デザート",
+        zh: "甜点",
+        es: "Postre",
+      },
 
       // Travel
       transportation: {
@@ -1738,38 +1837,85 @@ async function showAIConceptSelectionModal() {
         en: "Transportation",
         ja: "交通",
         zh: "交通",
+        es: "Transporte",
       },
       accommodation: {
         ko: "숙박",
         en: "Accommodation",
         ja: "宿泊",
         zh: "住宿",
+        es: "Alojamiento",
       },
       tourist_attraction: {
         ko: "관광지",
         en: "Tourist Attraction",
         ja: "観光地",
         zh: "旅游景点",
+        es: "Atracción Turística",
       },
-      luggage: { ko: "짐", en: "Luggage", ja: "荷物", zh: "行李" },
-      direction: { ko: "길찾기", en: "Direction", ja: "道案内", zh: "方向" },
-      booking: { ko: "예약", en: "Booking", ja: "予約", zh: "预订" },
-      currency: { ko: "화폐", en: "Currency", ja: "通貨", zh: "货币" },
+      luggage: {
+        ko: "짐",
+        en: "Luggage",
+        ja: "荷物",
+        zh: "行李",
+        es: "Equipaje",
+      },
+      direction: {
+        ko: "길찾기",
+        en: "Direction",
+        ja: "道案内",
+        zh: "方向",
+        es: "Dirección",
+      },
+      booking: {
+        ko: "예약",
+        en: "Booking",
+        ja: "予約",
+        zh: "预订",
+        es: "Reserva",
+      },
+      currency: {
+        ko: "화폐",
+        en: "Currency",
+        ja: "通貨",
+        zh: "货币",
+        es: "Moneda",
+      },
       emergency: {
         ko: "응급상황",
         en: "Emergency",
         ja: "緊急事態",
         zh: "紧急情况",
+        es: "Emergencia",
       },
-      documents: { ko: "서류", en: "Documents", ja: "書類", zh: "文件" },
-      sightseeing: { ko: "관광", en: "Sightseeing", ja: "観光", zh: "观光" },
+      documents: {
+        ko: "서류",
+        en: "Documents",
+        ja: "書類",
+        zh: "文件",
+        es: "Documentos",
+      },
+      sightseeing: {
+        ko: "관광",
+        en: "Sightseeing",
+        ja: "観光",
+        zh: "观光",
+        es: "Turismo",
+      },
       local_food: {
         ko: "현지음식",
         en: "Local Food",
         ja: "現地料理",
         zh: "当地美食",
+        es: "Comida Local",
       },
-      souvenir: { ko: "기념품", en: "Souvenir", ja: "お土産", zh: "纪念品" },
+      souvenir: {
+        ko: "기념품",
+        en: "Souvenir",
+        ja: "お土産",
+        zh: "纪念品",
+        es: "Souvenir",
+      },
 
       // Business
       meeting: { ko: "회의", en: "Meeting", ja: "会議", zh: "会议" },
@@ -1832,42 +1978,83 @@ async function showAIConceptSelectionModal() {
         zh: "课程",
       },
       assessment: { ko: "평가", en: "Assessment", ja: "評価", zh: "评估" },
-      pedagogy: { ko: "교육학", en: "Pedagogy", ja: "教育学", zh: "教育学" },
+      pedagogy: {
+        ko: "교육학",
+        en: "Pedagogy",
+        ja: "教育学",
+        zh: "教育学",
+        es: "Pedagogía",
+      },
       skill_development: {
         ko: "기술개발",
         en: "Skill Development",
         ja: "スキル開発",
         zh: "技能发展",
+        es: "Desarrollo de Habilidades",
       },
       online_learning: {
         ko: "온라인학습",
         en: "Online Learning",
         ja: "オンライン学習",
         zh: "在线学习",
+        es: "Aprendizaje en Línea",
       },
-      training: { ko: "훈련", en: "Training", ja: "トレーニング", zh: "培训" },
+      training: {
+        ko: "훈련",
+        en: "Training",
+        ja: "トレーニング",
+        zh: "培训",
+        es: "Entrenamiento",
+      },
       certification: {
         ko: "자격증",
         en: "Certification",
         ja: "資格",
         zh: "认证",
+        es: "Certificación",
       },
       educational_technology: {
         ko: "교육기술",
         en: "Educational Technology",
         ja: "教育技術",
         zh: "教育技术",
+        es: "Tecnología Educativa",
       },
       student_life: {
         ko: "학생생활",
         en: "Student Life",
         ja: "学生生活",
         zh: "学生生活",
+        es: "Vida Estudiantil",
       },
-      graduation: { ko: "졸업", en: "Graduation", ja: "卒業", zh: "毕业" },
-      examination: { ko: "시험", en: "Examination", ja: "試験", zh: "考试" },
-      university: { ko: "대학교", en: "University", ja: "大学", zh: "大学" },
-      library: { ko: "도서관", en: "Library", ja: "図書館", zh: "图书馆" },
+      graduation: {
+        ko: "졸업",
+        en: "Graduation",
+        ja: "卒業",
+        zh: "毕业",
+        es: "Graduación",
+      },
+      examination: {
+        ko: "시험",
+        en: "Examination",
+        ja: "試験",
+        zh: "考试",
+        es: "Examen",
+      },
+      university: {
+        ko: "대학교",
+        en: "University",
+        ja: "大学",
+        zh: "大学",
+        es: "Universidad",
+      },
+      library: {
+        ko: "도서관",
+        en: "Library",
+        ja: "図書館",
+        zh: "图书馆",
+        es: "Biblioteca",
+      },
 
       // Nature
       animal: { ko: "동물", en: "Animal", ja: "動物", zh: "动物" },
@@ -2166,11 +2353,12 @@ async function showAIConceptSelectionModal() {
           const option = document.createElement("option");
           option.value = category;
           // 상위 스코프의 categoryTranslations 객체 사용
-          option.textContent =
+          const categoryTranslation =
             categoryTranslations[category] &&
             categoryTranslations[category][currentLang]
               ? categoryTranslations[category][currentLang]
               : category;
+          option.textContent = categoryTranslation;
           categorySelect.appendChild(option);
         });
       } else {

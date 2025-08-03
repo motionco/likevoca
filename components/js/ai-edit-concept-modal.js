@@ -605,6 +605,12 @@ function addExampleField(existingExample = null, isRepresentative = false) {
           "chinese"
         )}">
       </div>
+      <div>
+        <label class="block text-sm text-gray-600">스페인어</label>
+        <input type="text" class="spanish-example w-full p-2 border rounded" value="${getExampleValue(
+          "spanish"
+        )}">
+      </div>
     </div>
   `;
 

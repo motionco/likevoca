@@ -928,6 +928,9 @@ export function collectEditFormData() {
       const compoundWordsField = document.getElementById(
         `edit-${langCode}-compound-words`
       );
+      const representativeExampleField = document.getElementById(
+        `edit-${langCode}-representative-example`
+      );
 
       expressions[langCode] = {
         word: wordField.value.trim(),
@@ -978,6 +981,14 @@ export function collectEditFormData() {
   // 예제 수집 (편집 모달용)
   const examples = [];
   let representativeExample = {};
+
+  // 스페인어 대표 예문 필드 처리
+  const spanishRepresentativeField = document.getElementById(
+    "edit-spanish-representative-example"
+  );
+  if (spanishRepresentativeField && spanishRepresentativeField.value.trim()) {
+    representativeExample.spanish = spanishRepresentativeField.value.trim();
+  }
 
   document
     .querySelectorAll("#edit-examples-container .example-item")
