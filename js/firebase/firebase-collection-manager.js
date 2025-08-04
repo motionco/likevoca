@@ -2092,6 +2092,7 @@ export class CollectionManager {
 
       const conceptDoc = {
         ...conceptData,
+        concept_id: conceptData.concept_id || null, // concept_id 필드 추가
         randomField: randomField, // 🎲 효율적인 랜덤 쿼리를 위한 필드
         created_at: serverTimestamp(),
       };
@@ -2136,6 +2137,7 @@ export class CollectionManager {
 
       const patternDoc = {
         ...patternData,
+        concept_id: patternData.concept_id || null, // concept_id 필드 추가
         randomField: patternData.randomField || Math.random(), // 🎲 효율적인 랜덤 쿼리를 위한 필드
         created_at: serverTimestamp(),
       };
@@ -2159,6 +2161,7 @@ export class CollectionManager {
 
       const exampleDoc = {
         ...exampleData,
+        concept_id: exampleData.concept_id || null, // concept_id 필드 추가
         randomField: exampleData.randomField || Math.random(), // 🎲 효율적인 랜덤 쿼리를 위한 필드
         created_at: serverTimestamp(),
       };

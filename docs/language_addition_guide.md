@@ -386,16 +386,36 @@ function parseConceptFromCSV(row) {
 }
 ```
 
-## 템플릿 파일 업데이트
+## 📋 4단계: 템플릿 파일 업데이트
 
-### 1. samples/concepts_template.csv
+### 4.1 CSV 템플릿 업데이트
 
-새로운 언어 컬럼을 추가해야 합니다:
+새로운 언어를 위한 CSV 템플릿 파일들을 업데이트합니다:
 
-```csv
-korean_word,korean_pronunciation,korean_definition,korean_part_of_speech,korean_synonyms,korean_antonyms,korean_collocations,korean_compound_words,korean_word_family,representative_korean,english_word,english_pronunciation,english_definition,english_part_of_speech,english_synonyms,english_antonyms,english_collocations,english_compound_words,english_word_family,representative_english,japanese_word,japanese_pronunciation,japanese_definition,japanese_part_of_speech,japanese_synonyms,japanese_antonyms,japanese_collocations,japanese_compound_words,japanese_word_family,representative_japanese,chinese_word,chinese_pronunciation,chinese_definition,chinese_part_of_speech,chinese_synonyms,chinese_antonyms,chinese_collocations,chinese_compound_words,chinese_word_family,representative_chinese,spanish_word,spanish_pronunciation,spanish_definition,spanish_part_of_speech,spanish_synonyms,spanish_antonyms,spanish_collocations,spanish_compound_words,spanish_word_family,representative_spanish
-사과,사과,과일의 한 종류,명사,과일,채소,맛있는 사과,사과나무,사과류,나는 사과를 먹는다,apple,ˈæpəl,a round fruit with red or green skin,noun,fruit,vegetable,delicious apple,apple tree,apple family,I eat an apple,りんご,りんご,丸い果물で赤や緑の皮がある,名詞,果物,野菜,おいしいりんご,りんごの木,りんご科,私はりんごを食べる,苹果,píngguǒ,圆形水果，有红色或绿色外皮,名词,水果,蔬菜,美味的苹果,苹果树,苹果科,我吃苹果,manzana,manˈθana,fruta redonda con piel roja o verde,sustantivo,fruta,verdura,manzana deliciosa,manzano,familia de la manzana,Como una manzana
-```
+#### Concepts 템플릿 (`samples/concepts_template.csv`)
+
+- 헤더에 새로운 언어 필드 추가
+- 샘플 데이터에 새로운 언어 정보 추가
+
+#### Examples 템플릿 (`samples/examples_template_add.csv`)
+
+- 헤더에 새로운 언어 필드 추가
+- 샘플 데이터에 새로운 언어 정보 추가
+
+#### Grammar 템플릿 (`samples/grammar_template_add.csv`)
+
+- 헤더에 새로운 언어 필드 추가
+- 샘플 데이터에 새로운 언어 정보 추가
+
+#### ⚠️ CSV 파싱 주의사항
+
+새로운 언어를 추가할 때는 다음 사항을 반드시 확인해야 합니다:
+
+1. **쉼표 포함 필드**: 새로운 언어의 예문이나 설명에 쉼표가 포함된 경우 반드시 **쌍따옴표("")로 감싸야 합니다**
+   - 예: `"안녕하세요, 처음 뵙겠습니다."`, `"Hello, nice to meet you."`
+2. **따옴표 누락 시**: CSV 파싱 시 컬럼 수가 맞지 않아 업로드가 실패할 수 있습니다
+3. **특히 주의할 언어**: 스페인어, 프랑스어 등 쉼표가 자주 사용되는 언어는 특별히 주의가 필요합니다
+4. **문법 설명 필드**: `{lang}_description` 필드에 쉼표가 포함된 경우 반드시 따옴표로 감싸야 합니다
 
 ### 2. samples/concepts_template.json
 

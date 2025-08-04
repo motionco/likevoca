@@ -1,11 +1,19 @@
-domain,category,difficulty,situation,purpose,korean,english,japanese,chinese
-daily,routine,basic,"polite,social",greeting,안녕하세요! 처음 뵙겠습니다.,Hello! Nice to meet you for the first time.,こんにちは！初めてお会いします。,你好！初次见面。
-food,fruit,basic,"shopping,public,polite",request,사과 주스 하나 주세요.,Please give me one apple juice.,りんごジュースを一つください。,请给我一杯苹果汁。
-daily,time,basic,"casual,daily",question,지금 몇 시예요?,What time is it now?,今何時ですか？,现在几点了？
-travel,transportation,basic,"casual,travel",instruction,지하철역이 어디예요?,Where is the subway station?,地下鉄の駅はどこですか？,地铁站在哪里？
-business,meeting,intermediate,"formal,work",report,회의가 3시에 시작됩니다.,The meeting starts at 3 o'clock.,会議は3時に始まります。,会议3点开始。
-education,learning,basic,"casual,school",description,한국어를 배우고 있어요.,I'm learning Korean.,韓国語を習っています。,我在学习韩语。
-health,medical,intermediate,"formal,medical",request,병원 예약을 하고 싶어요.,I'd like to make a hospital appointment.,病院の予約をしたいです。,我想预约医院。
-entertainment,movie,basic,"casual,social",opinion,그 영화 정말 재미있었어요.,That movie was really interesting.,その映画はとても面白かったです。,那部电影真的很有趣。
-technology,phone,basic,"casual,daily",instruction,핸드폰 번호를 알려 주세요.,Please tell me your phone number.,携帯電話の番号を教えてください。,请告诉我你的手机号码。
-culture,tradition,intermediate,"formal,cultural",explanation,한국의 전통 음식을 좋아해요.,I like Korean traditional food.,韓国の伝統料理が好きです。,我喜欢韩国传统食物。 
+concept_id,domain,category,difficulty,situation,purpose,korean,english,japanese,chinese,spanish,korean_word,english_word,japanese_word,chinese_word,spanish_word
+food_apple_fruit,food,fruit,basic,"casual,home",description,나는 사과를 먹는다,I eat an apple,私はりんごを食べる,我吃苹果,Como una manzana,사과,apple,りんご,苹果,manzana
+daily_hello_greeting,daily,greeting,basic,"casual,social",greeting,안녕하세요! 처음 뵙겠습니다,Hello! Nice to meet you,こんにちは！初めまして,你好！初次见面,¡Hola! Encantado de conocerte,안녕하세요,hello,こんにちは,你好,hola
+travel_travel_journey,travel,journey,basic,"casual,travel",description,나는 여행을 좋아한다,I like to travel,私は旅行が好きだ,我喜欢旅行,Me gusta viajar,여행,travel,旅行,旅行,viaje
+education_study_learn,education,learning,basic,"casual,school",description,나는 한국어를 공부한다,I study Korean,私は韓国語を勉強する,我学习韩语,Estudio coreano,공부하다,study,勉強,学习,estudiar
+food_eat_consume,food,meal,basic,"casual,home",description,나는 사과를 먹는다,I eat an apple,私はりんごを食べる,我吃苹果,Como una manzana,먹다,eat,食べる,吃,comer
+business_work_labor,business,work,basic,"formal,work",description,나는 회사에서 일한다,I work at a company,私は会社で働く,我在公司工作,Trabajo en una empresa,일하다,work,働く,工作,trabajar
+daily_family_relative,daily,family,basic,"casual,home",description,나는 가족을 사랑한다,I love my family,私は家族を愛している,我爱我的家人,Amor a mi familia,가족,family,家族,家庭,familia
+daily_time_duration,daily,time,basic,"casual,home",description,시간이 없다,I don't have time,時間がない,我没有时间,No tengo tiempo,시간,time,時間,时间,tiempo
+daily_home_residence,daily,home,basic,"casual,home",description,집에 돌아간다,I go home,家に帰る,我回家,Voy a casa,집,home,家,家,casa
+daily_friend_companion,daily,friend,basic,"casual,social",description,친구를 만난다,I meet my friend,友達に会う,我见朋友,Veo a mi amigo,친구,friend,友達,朋友,amigo
+education_book_reading,education,book,basic,"casual,school",description,책을 읽는다,I read a book,本を読む,我读书,Leo un libro,책,book,本,书,libro
+travel_car_vehicle,travel,vehicle,basic,"casual,travel",description,자동차를 운전한다,I drive a car,車を運転する,我开车,Conduzco un coche,자동차,car,車,汽车,coche
+business_money_currency,business,money,basic,"casual,business",description,돈을 번다,I earn money,お金を稼ぐ,我赚钱,Gano dinero,돈,money,お金,钱,dinero
+entertainment_music_song,entertainment,music,basic,"casual,entertainment",description,음악을 듣는다,I listen to music,音楽を聴く,我听音乐,Escucho música,음악,music,音楽,音乐,música
+technology_phone_communication,technology,phone,basic,"casual,technology",description,전화를 건다,I make a phone call,電話をかける,我打电话,Hago una llamada telefónica,전화,phone,電話,电话,teléfono
+nature_weather_climate,nature,weather,basic,"casual,nature",description,날씨가 좋다,The weather is good,天気が良い,天气很好,El clima está bueno,날씨,weather,天気,天气,clima
+food_food_meal,food,meal,basic,"casual,home",description,음식을 만든다,I cook food,食べ物を作る,我做饭,Cocino comida,음식,food,食べ物,食物,comida
+education_school_institution,education,school,basic,"casual,school",description,학교에 간다,I go to school,学校に行く,我去学校,Voy a la escuela,학교,school,学校,学校,escuela 

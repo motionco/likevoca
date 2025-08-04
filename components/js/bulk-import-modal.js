@@ -262,6 +262,7 @@ async function uploadConcepts(data) {
   for (const conceptData of concepts) {
     try {
       const conceptDoc = {
+        concept_id: conceptData.concept_id || null, // concept_id 필드 추가
         concept_info: conceptData.concept_info || {},
         expressions: conceptData.expressions || {},
         representative_example: conceptData.representative_example || null,
@@ -306,6 +307,7 @@ async function uploadExamples(data) {
   for (const exampleData of examples) {
     try {
       const exampleDoc = {
+        concept_id: exampleData.concept_id || null, // concept_id 필드 추가
         domain: exampleData.domain || "general",
         category: exampleData.category || "common",
         difficulty: exampleData.difficulty || "beginner",
@@ -357,6 +359,7 @@ async function uploadGrammarPatterns(data) {
       console.log("📝 원본 패턴 데이터:", patternData);
 
       const patternDoc = {
+        concept_id: patternData.concept_id || null, // concept_id 필드 추가
         domain: patternData.domain || "daily",
         category: patternData.category || "general",
         difficulty: patternData.difficulty || "basic",
@@ -496,7 +499,19 @@ function parseCSV(content, tabName) {
   const data = [];
 
   for (let i = 1; i < lines.length; i++) {
-    const values = parseCSVLine(lines[i]);
+    const line = lines[i].trim();
+
+    // 빈 줄 건너뛰기
+    if (!line) {
+      console.log(`⚠️ 빈 줄 건너뛰기: 라인 ${i + 1}`);
+      continue;
+    }
+
+    const values = parseCSVLine(line);
+    console.log(
+      `🔍 라인 ${i + 1} 파싱: 헤더 수=${headers.length}, 값 수=${values.length}`
+    );
+
     if (values.length === headers.length) {
       const row = {};
       headers.forEach((header, index) => {
@@ -521,7 +536,15 @@ function parseCSV(content, tabName) {
 
       if (parsedData) {
         data.push(parsedData);
+        console.log(`✅ 라인 ${i + 1} 파싱 성공`);
       }
+    } else {
+      console.log(
+        `❌ 라인 ${i + 1} 파싱 실패: 헤더 수(${headers.length})와 값 수(${
+          values.length
+        }) 불일치`
+      );
+      console.log(`📄 라인 내용: ${line.substring(0, 100)}...`);
     }
   }
 
@@ -557,6 +580,7 @@ function parseConceptFromCSV(row) {
     console.log("🔍 [parseConceptFromCSV] 파싱 시작 - row:", row);
 
     const conceptData = {
+      concept_id: row.concept_id || null, // concept_id 필드 추가
       concept_info: {
         domain: row.domain || "general",
         category: row.category || "uncategorized",
@@ -690,8 +714,7 @@ function parseConceptFromCSV(row) {
               chinese: row.chinese_example || row.representative_chinese || "",
               japanese:
                 row.japanese_example || row.representative_japanese || "",
-              spanish:
-                row.spanish_example || row.representative_spanish || "",
+              spanish: row.spanish_example || row.representative_spanish || "",
             }
           : null,
     };
@@ -714,6 +737,7 @@ function parseConceptFromCSV(row) {
 function parseExampleFromCSV(row) {
   try {
     return {
+      concept_id: row.concept_id || null, // concept_id 필드 추가
       domain: row.domain || "general",
       category: row.category || "common",
       difficulty: row.difficulty || "basic",
@@ -748,6 +772,9 @@ function parseGrammarPatternFromCSV(row, headers) {
   console.log("🔍 [parseGrammarPatternFromCSV] headers:", headers);
 
   const pattern = {};
+
+  // concept_id 필드 추가
+  pattern.concept_id = row.concept_id || null;
 
   // 기본 속성들 - row 객체에서 직접 접근
   pattern.domain = row.domain || "daily";
