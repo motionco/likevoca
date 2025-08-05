@@ -3,7 +3,7 @@ food_apple_fruit,food,fruit,basic,"casual,home",description,나는 사과를 먹
 daily_hello_greeting,daily,greeting,basic,"casual,social",greeting,안녕하세요! 처음 뵙겠습니다,Hello! Nice to meet you,こんにちは！初めまして,你好！初次见面,¡Hola! Encantado de conocerte,안녕하세요,hello,こんにちは,你好,hola
 travel_travel_journey,travel,journey,basic,"casual,travel",description,나는 여행을 좋아한다,I like to travel,私は旅行が好きだ,我喜欢旅行,Me gusta viajar,여행,travel,旅行,旅行,viaje
 education_study_learn,education,learning,basic,"casual,school",description,나는 한국어를 공부한다,I study Korean,私は韓国語を勉強する,我学习韩语,Estudio coreano,공부하다,study,勉強,学习,estudiar
-food_eat_consume,food,meal,basic,"casual,home",description,나는 사과를 먹는다,I eat an apple,私はりんごを食べる,我吃苹果,Como una manzana,먹다,eat,食べる,吃,comer
+food_eat_consume,food,meal,basic,"casual,home",description,나는 점심을 먹는다,I eat lunch,私は昼食を食べる,我吃午饭,Como el almuerzo,먹다,eat,食べる,吃,comer
 business_work_labor,business,work,basic,"formal,work",description,나는 회사에서 일한다,I work at a company,私は会社で働く,我在公司工作,Trabajo en una empresa,일하다,work,働く,工作,trabajar
 daily_family_relative,daily,family,basic,"casual,home",description,나는 가족을 사랑한다,I love my family,私は家族を愛している,我爱我的家人,Amor a mi familia,가족,family,家族,家庭,familia
 daily_time_duration,daily,time,basic,"casual,home",description,시간이 없다,I don't have time,時間がない,我没有时间,No tengo tiempo,시간,time,時間,时间,tiempo
