@@ -6,11 +6,70 @@ _add.csv 파일의 데이터를 _list.csv 파일에 누적합니다.
 """
 
 import csv
+import json
+import datetime
 from pathlib import Path
 
 # 기본 설정
 BASE_DIR = Path(__file__).parent
 DATA_DIR = BASE_DIR / "data"
+
+def update_transaction_log(added_concepts):
+    """JSON 트랜잭션 로그 업데이트"""
+    log_path = DATA_DIR / "data_tracking_log.json"
+    
+    # 현재 시간
+    timestamp = datetime.datetime.now().isoformat() + "Z"
+    transaction_id = f"TX_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    
+    try:
+        # 기존 로그 파일 읽기
+        if log_path.exists():
+            with open(log_path, "r", encoding="utf-8") as f:
+                log_data = json.load(f)
+        else:
+            # 새 로그 구조 생성
+            log_data = {
+                "metadata": {
+                    "created": datetime.datetime.now().strftime("%Y-%m-%d"),
+                    "last_updated": timestamp,
+                    "system_version": "v2.0",
+                    "description": "LikeVoca 데이터 트랜잭션 로그"
+                },
+                "transactions": [],
+                "current_status": {}
+            }
+        
+        # 새 트랜잭션 추가
+        new_transaction = {
+            "transaction_id": transaction_id,
+            "timestamp": timestamp,
+            "operation": "ADD",
+            "added_concepts": added_concepts,
+            "summary": {
+                "concepts_added": len(added_concepts),
+                "total_records_after": len(log_data.get("transactions", [])) + 1
+            }
+        }
+        
+        log_data["transactions"].append(new_transaction)
+        log_data["metadata"]["last_updated"] = timestamp
+        
+        # 현재 상태 업데이트
+        log_data["current_status"] = {
+            "total_transactions": len(log_data["transactions"]),
+            "last_transaction": transaction_id,
+            "last_update": timestamp
+        }
+        
+        # 로그 파일 저장
+        with open(log_path, "w", encoding="utf-8") as f:
+            json.dump(log_data, f, indent=2, ensure_ascii=False)
+        
+        print(f"📊 트랜잭션 로그 업데이트: {transaction_id}")
+        
+    except Exception as e:
+        print(f"⚠️ 트랜잭션 로그 업데이트 실패: {e}")
 
 def accumulate_data():
     """_add.csv 파일들의 데이터를 _list.csv 파일들에 누적"""
@@ -21,6 +80,7 @@ def accumulate_data():
     ]
     
     print("📁 데이터 누적 시작...")
+    total_added_concepts = []
     
     for add_file, list_file in file_pairs:
         add_path = DATA_DIR / add_file
@@ -31,8 +91,8 @@ def accumulate_data():
             continue
         
         try:
-            # _add.csv 파일 읽기
-            with open(add_path, "r", encoding="utf-8") as f:
+            # _add.csv 파일 읽기 (BOM 제거를 위해 utf-8-sig 사용)
+            with open(add_path, "r", encoding="utf-8-sig") as f:
                 reader = csv.DictReader(f)
                 new_data = list(reader)
             
@@ -43,26 +103,55 @@ def accumulate_data():
             # 기존 _list.csv 파일 읽기 (있다면)
             existing_data = []
             existing_concept_ids = set()
+            list_fieldnames = None
             
             if list_path.exists() and list_path.stat().st_size > 0:
                 with open(list_path, "r", encoding="utf-8-sig") as f:
                     reader = csv.DictReader(f)
+                    list_fieldnames = reader.fieldnames  # 기존 파일의 필드명 저장
+                    # BOM 제거
+                    if list_fieldnames and list_fieldnames[0].startswith('\ufeff'):
+                        list_fieldnames = [list_fieldnames[0][1:]] + list(list_fieldnames[1:])
                     existing_data = list(reader)
                     existing_concept_ids = {row.get('concept_id', '') for row in existing_data}
             
+            # 필드명 결정: 기존 list 파일이 있으면 그것 사용, 없으면 add 파일 사용
+            if list_fieldnames is None:
+                list_fieldnames = new_data[0].keys() if new_data else []
+            
+            print(f"🔧 사용할 필드명 (처음 5개): {list(list_fieldnames)[:5]}")
+            print(f"🔧 신규 데이터 필드명 (처음 5개): {list(new_data[0].keys())[:5] if new_data else []}")
+            
             # 중복 제거하면서 새 데이터 추가
             added_count = 0
+            print(f"🔍 {add_file}: {len(new_data)}개 신규 데이터, {len(existing_concept_ids)}개 기존 ID")
+            
             for row in new_data:
                 concept_id = row.get('concept_id', '')
                 if concept_id and concept_id not in existing_concept_ids:
                     existing_data.append(row)
                     existing_concept_ids.add(concept_id)
                     added_count += 1
+                    print(f"  ➕ 추가: {concept_id}")
+                    
+                    # concepts 파일인 경우 트랜잭션 로그용 데이터 수집
+                    if add_file == "concepts_template_add.csv":
+                        total_added_concepts.append({
+                            "concept_id": concept_id,
+                            "domain": row.get('domain', ''),
+                            "category": row.get('category', ''),
+                            "korean_word": row.get('korean_word', ''),
+                            "english_word": row.get('english_word', '')
+                        })
+                else:
+                    print(f"  ⚠️ 중복 또는 빈 ID: {concept_id}")
             
-            # _list.csv 파일에 전체 데이터 저장
-            if existing_data:
+            print(f"📊 처리 결과: {added_count}개 추가됨, 총 {len(existing_data)}개 데이터")
+            
+            # _list.csv 파일에 전체 데이터 저장 (데이터가 있거나 새로 추가된 경우)
+            if existing_data or added_count > 0:
                 with open(list_path, "w", encoding="utf-8-sig", newline="") as f:
-                    writer = csv.DictWriter(f, fieldnames=new_data[0].keys())
+                    writer = csv.DictWriter(f, fieldnames=list_fieldnames)
                     writer.writeheader()
                     writer.writerows(existing_data)
                 
@@ -72,6 +161,10 @@ def accumulate_data():
                 
         except Exception as e:
             print(f"❌ {add_file} 처리 실패: {e}")
+    
+    # 트랜잭션 로그 업데이트 (concepts가 추가된 경우에만)
+    if total_added_concepts:
+        update_transaction_log(total_added_concepts)
     
     print("\n🎉 데이터 누적 완료!")
 
@@ -117,8 +210,9 @@ def main():
     check_data_status()
     
     print(f"\n💡 다음 단계:")
-    print(f"   1️⃣ 데이터 검증: python validate.py")
-    print(f"   2️⃣ 새 템플릿 생성: python template_generator.py")
+    print(f"   1️⃣ 데이터 백업: python backup.py")
+    print(f"   2️⃣ 새 데이터 생성: python generate.py")
+    print(f"   3️⃣ 백업 복원: python restore.py")
 
 if __name__ == "__main__":
     main()

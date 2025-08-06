@@ -6,7 +6,79 @@ Restore Data - 백업 복원
 
 import shutil
 import datetime
+import json
+import csv
 from pathlib import Path
+
+def sync_transaction_log_with_current_data():
+    """현재 CSV 데이터와 트랜잭션 로그 동기화"""
+    base_dir = Path(__file__).parent
+    data_dir = base_dir / "data"
+    log_path = data_dir / "data_tracking_log.json"
+    
+    try:
+        # 현재 concepts_template_list.csv에서 실제 데이터 읽기
+        concepts_file = data_dir / "concepts_template_list.csv"
+        if not concepts_file.exists():
+            print("⚠️ concepts_template_list.csv 파일이 없습니다.")
+            return
+        
+        current_concepts = []
+        with open(concepts_file, "r", encoding="utf-8-sig") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                current_concepts.append({
+                    "concept_id": row.get('concept_id', ''),
+                    "domain": row.get('domain', ''),
+                    "category": row.get('category', ''),
+                    "korean_word": row.get('korean_word', ''),
+                    "english_word": row.get('english_word', '')
+                })
+        
+        # 트랜잭션 로그 업데이트
+        if log_path.exists():
+            with open(log_path, "r", encoding="utf-8") as f:
+                log_data = json.load(f)
+        else:
+            log_data = {"metadata": {}, "transactions": [], "current_status": {}}
+        
+        # 현재 상태 동기화
+        timestamp = datetime.datetime.now().isoformat() + "Z"
+        log_data["metadata"]["last_updated"] = timestamp
+        log_data["current_status"] = {
+            "total_transactions": len(log_data.get("transactions", [])),
+            "total_concepts": len(current_concepts),
+            "active_concept_ids": [c["concept_id"] for c in current_concepts],
+            "domains_in_use": list(set(c["domain"] for c in current_concepts if c["domain"])),
+            "categories_in_use": list(set(c["category"] for c in current_concepts if c["category"])),
+            "last_sync": timestamp
+        }
+        
+        # 통계 업데이트
+        domain_stats = {}
+        category_stats = {}
+        for concept in current_concepts:
+            domain = concept.get("domain", "")
+            category = concept.get("category", "")
+            if domain:
+                domain_stats[domain] = domain_stats.get(domain, 0) + 1
+            if category:
+                category_stats[category] = category_stats.get(category, 0) + 1
+        
+        log_data["statistics"] = {
+            "domains": domain_stats,
+            "categories": category_stats,
+            "total_concepts": len(current_concepts)
+        }
+        
+        # 로그 파일 저장
+        with open(log_path, "w", encoding="utf-8") as f:
+            json.dump(log_data, f, indent=2, ensure_ascii=False)
+        
+        print(f"📊 트랜잭션 로그 동기화 완료 (현재 {len(current_concepts)}개 concept)")
+        
+    except Exception as e:
+        print(f"⚠️ 트랜잭션 로그 동기화 실패: {e}")
 
 def restore_backup():
     """백업 시점 선택하여 복원"""
@@ -130,6 +202,10 @@ def restore_backup():
 
     print(f"\n🎉 복원 완료! {restored_count}개 파일이 복원되었습니다.")
     
+    # 트랜잭션 로그와 현재 데이터 동기화
+    print("\n🔄 트랜잭션 로그 동기화 중...")
+    sync_transaction_log_with_current_data()
+    
     # 복원 후 파일 상태 요약
     print(f"\n📊 복원된 파일 상태:")
     for csv_file in csv_files:
@@ -141,6 +217,7 @@ def restore_backup():
         else:
             print(f"   ❌ {csv_file}: 파일 없음")
     
+    print("💡 VS Code에서 파일 변경이 자동으로 감지됩니다.")
     return True
 
 if __name__ == "__main__":
