@@ -95,16 +95,29 @@ def restore_backup():
             
             # 복원 전 백업 파일 크기 확인
             source_size = source.stat().st_size
-            source_mtime = source.stat().st_mtime
             
-            shutil.copy2(source, destination)
+            # VS Code 파일 감지를 위한 개선된 복원 방식
+            # 1. 파일 내용을 바이너리로 읽어서 정확히 복사
+            with open(source, 'rb') as f:
+                content = f.read()
+            
+            # 2. 새로운 파일로 작성 (VS Code가 확실히 감지)
+            with open(destination, 'wb') as f:
+                f.write(content)
+                f.flush()  # 버퍼 강제 플러시
+                import os
+                os.fsync(f.fileno())  # 디스크에 강제 동기화
+            
+            # 3. 추가 파일 시스템 알림
+            import time
+            current_time = time.time()
+            os.utime(destination, (current_time, current_time))
             
             # 복원 후 파일 검증
             if destination.exists():
                 dest_size = destination.stat().st_size
-                dest_mtime = destination.stat().st_mtime
                 
-                if dest_size == source_size and dest_mtime == source_mtime:
+                if dest_size == source_size:
                     restored_count += 1
                     print(f"✅ {csv_file} 복원 완료 (크기: {dest_size:,} bytes)")
                 else:
