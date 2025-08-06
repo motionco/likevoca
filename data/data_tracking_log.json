@@ -1,7 +1,7 @@
 {
   "metadata": {
     "created": "2025-08-06",
-    "last_updated": "2025-08-06T18:34:45.807565Z",
+    "last_updated": "2025-08-07T06:14:11.573452Z",
     "system_version": "v2.0",
     "description": "LikeVoca 데이터 트랜잭션 로그 - concepts_template_list.csv의 모든 변경 기록"
   },
@@ -226,12 +226,235 @@
         "concepts_added": 5,
         "total_records_after": 6
       }
+    },
+    {
+      "transaction_id": "TX_20250807_050236",
+      "timestamp": "2025-08-07T05:02:36.467727Z",
+      "operation": "ADD",
+      "added_concepts": [
+        {
+          "concept_id": "daily_apple_common",
+          "domain": "daily",
+          "category": "communication",
+          "korean_word": "사과",
+          "english_word": "car"
+        },
+        {
+          "concept_id": "health_apple_basic",
+          "domain": "health",
+          "category": "fitness",
+          "korean_word": "자동차",
+          "english_word": "tree"
+        },
+        {
+          "concept_id": "shopping_car_basic",
+          "domain": "shopping",
+          "category": "product",
+          "korean_word": "나무",
+          "english_word": "book"
+        },
+        {
+          "concept_id": "health_book_common",
+          "domain": "health",
+          "category": "body",
+          "korean_word": "나무",
+          "english_word": "house"
+        },
+        {
+          "concept_id": "nature_book_basic",
+          "domain": "nature",
+          "category": "weather",
+          "korean_word": "집",
+          "english_word": "tree"
+        }
+      ],
+      "summary": {
+        "concepts_added": 5,
+        "total_records_after": 7
+      }
+    },
+    {
+      "transaction_id": "TX_20250807_054839",
+      "timestamp": "2025-08-07T05:48:39.597778Z",
+      "operation": "ADD",
+      "added_concepts": [
+        {
+          "concept_id": "food_car_transport",
+          "domain": "food",
+          "category": "fruit",
+          "korean_word": "자동차",
+          "english_word": "car"
+        },
+        {
+          "concept_id": "food_apple_fruit",
+          "domain": "food",
+          "category": "drink",
+          "korean_word": "사과",
+          "english_word": "apple"
+        },
+        {
+          "concept_id": "nature_car_transport",
+          "domain": "nature",
+          "category": "plant",
+          "korean_word": "자동차",
+          "english_word": "car"
+        },
+        {
+          "concept_id": "daily_car_transport",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "자동차",
+          "english_word": "car"
+        },
+        {
+          "concept_id": "nature_apple_fruit",
+          "domain": "nature",
+          "category": "animal",
+          "korean_word": "사과",
+          "english_word": "apple"
+        }
+      ],
+      "summary": {
+        "concepts_added": 5,
+        "total_records_after": 8
+      }
+    },
+    {
+      "transaction_id": "TX_20250807_054941",
+      "timestamp": "2025-08-07T05:49:41.547313Z",
+      "operation": "ADD",
+      "added_concepts": [
+        {
+          "concept_id": "food_car_transport",
+          "domain": "food",
+          "category": "fruit",
+          "korean_word": "자동차",
+          "english_word": "car"
+        },
+        {
+          "concept_id": "food_apple_fruit",
+          "domain": "food",
+          "category": "drink",
+          "korean_word": "사과",
+          "english_word": "apple"
+        },
+        {
+          "concept_id": "nature_car_transport",
+          "domain": "nature",
+          "category": "plant",
+          "korean_word": "자동차",
+          "english_word": "car"
+        },
+        {
+          "concept_id": "daily_car_transport",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "자동차",
+          "english_word": "car"
+        },
+        {
+          "concept_id": "nature_apple_fruit",
+          "domain": "nature",
+          "category": "animal",
+          "korean_word": "사과",
+          "english_word": "apple"
+        }
+      ],
+      "summary": {
+        "concepts_added": 5,
+        "total_records_after": 9
+      }
+    },
+    {
+      "transaction_id": "TX_20250807_055100",
+      "timestamp": "2025-08-07T05:51:00.241075Z",
+      "operation": "ADD",
+      "added_concepts": [
+        {
+          "concept_id": "health_car_transport",
+          "domain": "health",
+          "category": "medicine",
+          "korean_word": "자동차",
+          "english_word": "car"
+        },
+        {
+          "concept_id": "daily_book_knowledge",
+          "domain": "daily",
+          "category": "communication",
+          "korean_word": "책",
+          "english_word": "book"
+        },
+        {
+          "concept_id": "daily_tree_nature",
+          "domain": "daily",
+          "category": "communication",
+          "korean_word": "나무",
+          "english_word": "tree"
+        },
+        {
+          "concept_id": "shopping_car_transport",
+          "domain": "shopping",
+          "category": "store",
+          "korean_word": "자동차",
+          "english_word": "car"
+        },
+        {
+          "concept_id": "health_house_shelter",
+          "domain": "health",
+          "category": "fitness",
+          "korean_word": "집",
+          "english_word": "house"
+        }
+      ],
+      "summary": {
+        "concepts_added": 5,
+        "total_records_after": 10
+      }
+    },
+    {
+      "transaction_id": "TX_20250807_061411",
+      "timestamp": "2025-08-07T06:14:11.573452Z",
+      "operation": "ADD",
+      "added_concepts": [
+        {
+          "concept_id": "health_apple_fruit",
+          "domain": "health",
+          "category": "fitness",
+          "korean_word": "사과",
+          "english_word": "apple"
+        },
+        {
+          "concept_id": "nature_house_shelter",
+          "domain": "nature",
+          "category": "animal",
+          "korean_word": "집",
+          "english_word": "house"
+        },
+        {
+          "concept_id": "travel_book_knowledge",
+          "domain": "travel",
+          "category": "accommodation",
+          "korean_word": "책",
+          "english_word": "book"
+        },
+        {
+          "concept_id": "travel_tree_nature",
+          "domain": "travel",
+          "category": "accommodation",
+          "korean_word": "나무",
+          "english_word": "tree"
+        }
+      ],
+      "summary": {
+        "concepts_added": 4,
+        "total_records_after": 11
+      }
     }
   ],
   "current_status": {
-    "total_transactions": 6,
-    "last_transaction": "TX_20250806_183445",
-    "last_update": "2025-08-06T18:34:45.807565Z"
+    "total_transactions": 11,
+    "last_transaction": "TX_20250807_061411",
+    "last_update": "2025-08-07T06:14:11.573452Z"
   },
   "integrity_checks": {
     "last_validated": "2025-08-06T16:00:00Z",

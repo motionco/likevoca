@@ -1,6 +1,6 @@
 ﻿concept_id,domain,category,difficulty,situation,purpose,korean,english,japanese,chinese,spanish,korean_word,english_word,japanese_word,chinese_word,spanish_word
-travel_book_simple,travel,transportation,advanced,formal,greeting,나무에 대해 이야기해요,Let's talk about car,나무_日本語について話しましょう,我们来谈论나무_中文,Hablemos sobre 나무_español,나무,car,나무_日本語,나무_中文,나무_español
-daily_house_common,daily,communication,basic,formal,question,나무에 대해 이야기해요,Let's talk about book,나무_日本語について話しましょう,我们来谈论나무_中文,Hablemos sobre 나무_español,나무,book,나무_日本語,나무_中文,나무_español
-shopping_house_simple,shopping,payment,basic,formal,greeting,집에 대해 이야기해요,Let's talk about car,집_日本語について話しましょう,我们来谈论집_中文,Hablemos sobre 집_español,집,car,집_日本語,집_中文,집_español
-nature_book_simple,nature,plant,advanced,formal,question,사과에 대해 이야기해요,Let's talk about house,사과_日本語について話しましょう,我们来谈论사과_中文,Hablemos sobre 사과_español,사과,house,사과_日本語,사과_中文,사과_español
-health_tree_basic,health,fitness,advanced,formal,question,책에 대해 이야기해요,Let's talk about house,책_日本語について話しましょう,我们来谈论책_中文,Hablemos sobre 책_español,책,house,책_日本語,책_中文,책_español
+shopping_book_knowledge,shopping,payment,basic,formal,question,도서관에서 책을 빌렸습니다.,I borrowed a book from the library.,책_日本語について話しましょう,我们来谈论책_中文,Hablemos sobre 책_español,책,book,책_日本語,책_中文,책_español
+daily_car_transport,daily,communication,intermediate,formal,description,새 자동차를 구매했습니다.,I bought a new car.,자동차_日本語について話しましょう,我们来谈论자동차_中文,Hablemos sobre 자동차_español,자동차,car,자동차_日本語,자동차_中文,자동차_español
+travel_tree_nature,travel,accommodation,advanced,formal,description,공원에 큰 나무가 있습니다.,There is a big tree in the park.,나무_日本語について話しましょう,我们来谈论나무_中文,Hablemos sobre 나무_español,나무,tree,나무_日本語,나무_中文,나무_español
+food_apple_fruit,food,vegetable,advanced,formal,description,오늘 점심에 사과를 먹었습니다.,I ate an apple for lunch today.,사과_日本語について話しましょう,我们来谈论사과_中文,Hablemos sobre 사과_español,사과,apple,사과_日本語,사과_中文,사과_español
+daily_house_shelter,daily,routine,intermediate,formal,greeting,새로운 집으로 이사했습니다.,We moved to a new house.,집_日本語について話しましょう,我们来谈论집_中文,Hablemos sobre 집_español,집,house,집_日本語,집_中文,집_español

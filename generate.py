@@ -11,6 +11,68 @@ from pathlib import Path
 import datetime
 import json
 
+def generate_differentiated_examples(korean_word, english_word, collection_type):
+    """컬렉션별로 차별화된 예문 생성"""
+    
+    # 단어별 예문 패턴 매핑
+    word_patterns = {
+        "사과": {
+            "concepts": ("사과는 맛있는 과일입니다.", "Apple is a delicious fruit."),
+            "examples": ("오늘 점심에 사과를 먹었습니다.", "I ate an apple for lunch today."),
+            "grammar": ("나는 빨간 사과를 선호합니다.", "I prefer red apples.")
+        },
+        "집": {
+            "concepts": ("집은 사람이 사는 곳입니다.", "A house is where people live."),
+            "examples": ("새로운 집으로 이사했습니다.", "We moved to a new house."),
+            "grammar": ("그의 집은 학교 근처에 있습니다.", "His house is near the school.")
+        },
+        "학교": {
+            "concepts": ("학교는 배움의 장소입니다.", "School is a place of learning."),
+            "examples": ("매일 아침 학교에 갑니다.", "I go to school every morning."),
+            "grammar": ("우리 학교는 매우 큽니다.", "Our school is very large.")
+        },
+        "친구": {
+            "concepts": ("친구는 소중한 존재입니다.", "A friend is a precious person."),
+            "examples": ("친구와 함께 영화를 봤습니다.", "I watched a movie with my friend."),
+            "grammar": ("좋은 친구를 만나기는 어렵습니다.", "It's hard to meet good friends.")
+        },
+        "음식": {
+            "concepts": ("음식은 생존에 필요합니다.", "Food is necessary for survival."),
+            "examples": ("한국 음식을 좋아합니다.", "I like Korean food."),
+            "grammar": ("맛있는 음식을 만들어 보세요.", "Try making delicious food.")
+        },
+        "자동차": {
+            "concepts": ("자동차는 편리한 교통수단입니다.", "A car is a convenient means of transportation."),
+            "examples": ("새 자동차를 구매했습니다.", "I bought a new car."),
+            "grammar": ("그는 빨간 자동차를 운전합니다.", "He drives a red car.")
+        },
+        "책": {
+            "concepts": ("책은 지식의 보고입니다.", "Books are treasures of knowledge."),
+            "examples": ("도서관에서 책을 빌렸습니다.", "I borrowed a book from the library."),
+            "grammar": ("이 책을 읽어 보세요.", "Please read this book.")
+        },
+        "나무": {
+            "concepts": ("나무는 산소를 만듭니다.", "Trees produce oxygen."),
+            "examples": ("공원에 큰 나무가 있습니다.", "There is a big tree in the park."),
+            "grammar": ("저 나무는 100년 되었습니다.", "That tree is 100 years old.")
+        }
+    }
+    
+    # 기본 패턴 (단어별 패턴이 없는 경우)
+    default_patterns = {
+        "concepts": (f"{korean_word}는 중요한 개념입니다.", f"{english_word.capitalize()} is an important concept."),
+        "examples": (f"오늘 {korean_word}에 대해 배웠습니다.", f"I learned about {english_word} today."),
+        "grammar": (f"이 {korean_word}를 사용해 보세요.", f"Please use this {english_word}.")
+    }
+    
+    # 해당 단어의 패턴이 있으면 사용, 없으면 기본 패턴 사용
+    if korean_word in word_patterns:
+        patterns = word_patterns[korean_word]
+    else:
+        patterns = default_patterns
+    
+    return patterns[collection_type]
+
 def generate_random_templates():
     """랜덤 템플릿 데이터 생성"""
     print("🎲 랜덤 템플릿 생성 시작...")
@@ -18,6 +80,38 @@ def generate_random_templates():
     # 기본 설정
     base_dir = Path(__file__).parent
     data_dir = base_dir / "data"
+    
+    # 기존 concept_id 수집 (중복 방지용)
+    existing_concept_ids = set()
+    existing_word_meanings = set()  # 단어+의미 조합 추적
+    list_files = ["concepts_template_list.csv", "examples_template_list.csv", "grammar_template_list.csv"]
+    
+    for file_name in list_files:
+        file_path = data_dir / file_name
+        if file_path.exists():
+            try:
+                with open(file_path, "r", encoding="utf-8-sig") as f:
+                    reader = csv.DictReader(f)
+                    for row in reader:
+                        concept_id = row.get('concept_id')
+                        if concept_id:
+                            existing_concept_ids.add(concept_id)
+                            
+                            # concepts 파일에서 단어+의미 조합도 수집
+                            if "concepts_template" in file_name:
+                                english_word = row.get('english_word', '')
+                                korean_word = row.get('korean_word', '')
+                                if english_word and korean_word:
+                                    parts = concept_id.split('_')
+                                    meaning = parts[-1] if len(parts) >= 3 else 'unknown'
+                                    en_combination = f"{english_word}_{meaning}"
+                                    ko_combination = f"{korean_word}_{meaning}"
+                                    existing_word_meanings.add(en_combination)
+                                    existing_word_meanings.add(ko_combination)
+            except Exception as e:
+                print(f"⚠️ {file_name} 읽기 실패: {e}")
+    
+    print(f"🔍 기존 concept_id {len(existing_concept_ids)}개, 단어+의미 조합 {len(existing_word_meanings)}개 발견")
     
     # 도메인과 카테고리 매핑
     domains = {
@@ -35,10 +129,72 @@ def generate_random_templates():
     grammar_data = []
     
     # 5개 랜덤 concept 생성
+    generated_concept_ids = set()  # 이번 생성에서 concept_id 중복 방지
+    generated_word_meanings = set()  # 이번 생성에서 단어+의미 중복 방지
+    
     for i in range(5):
-        domain = random.choice(list(domains.keys()))
-        category = random.choice(domains[domain])
-        concept_id = f"{domain}_{random.choice(['apple', 'book', 'car', 'house', 'tree'])}_{random.choice(['basic', 'simple', 'common'])}"
+        max_attempts = 20  # 중복 시 최대 재시도 횟수 증가
+        attempt = 0
+        
+        while attempt < max_attempts:
+            domain = random.choice(list(domains.keys()))
+            category = random.choice(domains[domain])
+            
+            # 단어와 의미 매핑 정의 (영어 단어 기준)
+            word_meaning_map = {
+                "apple": "fruit",
+                "book": "knowledge", 
+                "car": "transport",
+                "house": "shelter",
+                "tree": "nature"
+            }
+            
+            korean_word_map = {
+                "apple": "사과",
+                "book": "책",
+                "car": "자동차", 
+                "house": "집",
+                "tree": "나무"
+            }
+            
+            english_word = random.choice(["apple", "book", "car", "house", "tree"])
+            korean_word = korean_word_map[english_word]
+            meaning = word_meaning_map[english_word]
+            
+            # 올바른 형식: {domain}_{word}_{meaning}
+            concept_id = f"{domain}_{english_word}_{meaning}"
+            
+            # 단어+의미 조합
+            en_combination = f"{english_word}_{meaning}"
+            ko_combination = f"{korean_word}_{meaning}"
+            
+            # 중복 검사: concept_id + 단어+의미 조합
+            if (concept_id not in existing_concept_ids and 
+                concept_id not in generated_concept_ids and
+                en_combination not in existing_word_meanings and
+                ko_combination not in existing_word_meanings and
+                en_combination not in generated_word_meanings and
+                ko_combination not in generated_word_meanings):
+                
+                generated_concept_ids.add(concept_id)
+                generated_word_meanings.add(en_combination)
+                generated_word_meanings.add(ko_combination)
+                break
+            else:
+                if concept_id in existing_concept_ids or concept_id in generated_concept_ids:
+                    print(f"⚠️ concept_id 중복: {concept_id} (재시도 {attempt + 1}/{max_attempts})")
+                else:
+                    print(f"⚠️ 단어+의미 중복: {en_combination} (재시도 {attempt + 1}/{max_attempts})")
+                attempt += 1
+        
+        if attempt >= max_attempts:
+            print(f"❌ concept_id 생성 실패: 최대 재시도 횟수 초과 (시도한 조합: {domain}_{english_word}_{meaning})")
+            continue
+        
+        # 차별화된 예문 생성
+        concept_examples = generate_differentiated_examples(korean_word, english_word, "concepts")
+        example_examples = generate_differentiated_examples(korean_word, english_word, "examples")
+        grammar_examples = generate_differentiated_examples(korean_word, english_word, "grammar")
         
         # Concepts 데이터
         concept = {
@@ -50,10 +206,11 @@ def generate_random_templates():
             "color": random.choice(["#FF5722", "#4CAF50", "#2196F3", "#FF9800"]),
             "situation": "formal",
             "purpose": random.choice(["description", "question", "greeting"]),
-            "korean_word": random.choice(["사과", "책", "자동차", "집", "나무"]),
-            "english_word": random.choice(["apple", "book", "car", "house", "tree"]),
-            "korean_example": "예문입니다.",
-            "english_example": "This is an example."
+            "korean_word": korean_word,
+            "english_word": english_word,
+            # 예문 차별화: Concepts = 기본 의미 표현
+            "korean_example": concept_examples[0],
+            "english_example": concept_examples[1]
         }
         concepts_data.append(concept)
         
@@ -65,8 +222,9 @@ def generate_random_templates():
             "difficulty": concept["difficulty"],
             "situation": "formal",
             "purpose": concept["purpose"],
-            "korean": "이것은 예문입니다.",
-            "english": "This is an example sentence.",
+            # 예문 차별화: Examples = 실제 상황 사용
+            "korean": example_examples[0],
+            "english": example_examples[1],
             "korean_word": concept["korean_word"],
             "english_word": concept["english_word"]
         }
@@ -83,11 +241,12 @@ def generate_random_templates():
             "korean_title": "문법 패턴",
             "korean_structure": "N + V",
             "korean_description": "기본 문법 설명",
-            "korean_example": "문법 예문입니다.",
+            # 예문 차별화: Grammar = 문법 패턴 설명
+            "korean_example": grammar_examples[0],
             "english_title": "Grammar Pattern",
             "english_structure": "S + V + O",
             "english_description": "Basic grammar explanation",
-            "english_example": "This is a grammar example.",
+            "english_example": grammar_examples[1],
             "korean_word": concept["korean_word"],
             "english_word": concept["english_word"]
         }
@@ -217,8 +376,9 @@ def save_csv_templates(data_dir, concepts_data, examples_data, grammar_data):
             "difficulty": example["difficulty"],
             "situation": example["situation"],
             "purpose": example["purpose"],
-            "korean": f"{example['korean_word']}에 대해 이야기해요",
-            "english": f"Let's talk about {example['english_word']}",
+            # 차별화된 예문 유지 (덮어쓰지 않음)
+            "korean": example["korean"],
+            "english": example["english"],
             "japanese": f"{example['korean_word']}_日本語について話しましょう",
             "chinese": f"我们来谈论{example['korean_word']}_中文",
             "spanish": f"Hablemos sobre {example['korean_word']}_español",
@@ -245,13 +405,15 @@ def save_csv_templates(data_dir, concepts_data, examples_data, grammar_data):
             "korean_title": f"{grammar['korean_word']} 사용법",
             "korean_structure": f"{grammar['korean_word']} + 를/을",
             "korean_description": f"{grammar['korean_word']}를 사용하는 문법 패턴",
-            "korean_example": f"저는 {grammar['korean_word']}를 좋아해요",
+            # 차별화된 예문 유지 (덮어쓰지 않음)
+            "korean_example": grammar["korean_example"],
             
             # 영어 패턴 (4개 필드)
             "english_title": f"Using {grammar['english_word']}",
             "english_structure": f"Subject + verb + {grammar['english_word']}",
             "english_description": f"Grammar pattern for using {grammar['english_word']}",
-            "english_example": f"I like {grammar['english_word']}",
+            # 차별화된 예문 유지 (덮어쓰지 않음)
+            "english_example": grammar["english_example"],
             
             # 일본어 패턴 (4개 필드)
             "japanese_title": f"{grammar['korean_word']}_日本語の使い方",

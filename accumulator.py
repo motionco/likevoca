@@ -103,6 +103,7 @@ def accumulate_data():
             # 기존 _list.csv 파일 읽기 (있다면)
             existing_data = []
             existing_concept_ids = set()
+            existing_word_meanings = set()  # 단어+의미 조합 추적
             list_fieldnames = None
             
             if list_path.exists() and list_path.stat().st_size > 0:
@@ -113,7 +114,24 @@ def accumulate_data():
                     if list_fieldnames and list_fieldnames[0].startswith('\ufeff'):
                         list_fieldnames = [list_fieldnames[0][1:]] + list(list_fieldnames[1:])
                     existing_data = list(reader)
-                    existing_concept_ids = {row.get('concept_id', '') for row in existing_data}
+                    
+                    # 기존 데이터의 concept_id와 단어+의미 조합 수집
+                    for row in existing_data:
+                        concept_id = row.get('concept_id', '')
+                        if concept_id:
+                            existing_concept_ids.add(concept_id)
+                            
+                            # concepts 파일인 경우 단어+의미 조합도 체크
+                            if add_file == "concepts_template_add.csv":
+                                english_word = row.get('english_word', '')
+                                korean_word = row.get('korean_word', '')
+                                if english_word and korean_word and concept_id:
+                                    parts = concept_id.split('_')
+                                    meaning = parts[-1] if len(parts) >= 3 else 'unknown'
+                                    en_combination = f"{english_word}_{meaning}"
+                                    ko_combination = f"{korean_word}_{meaning}"
+                                    existing_word_meanings.add(en_combination)
+                                    existing_word_meanings.add(ko_combination)
             
             # 필드명 결정: 기존 list 파일이 있으면 그것 사용, 없으면 add 파일 사용
             if list_fieldnames is None:
@@ -124,13 +142,46 @@ def accumulate_data():
             
             # 중복 제거하면서 새 데이터 추가
             added_count = 0
-            print(f"🔍 {add_file}: {len(new_data)}개 신규 데이터, {len(existing_concept_ids)}개 기존 ID")
+            print(f"🔍 {add_file}: {len(new_data)}개 신규 데이터, {len(existing_concept_ids)}개 기존 concept_id, {len(existing_word_meanings)}개 기존 단어+의미")
             
             for row in new_data:
                 concept_id = row.get('concept_id', '')
-                if concept_id and concept_id not in existing_concept_ids:
+                skip_reason = None
+                
+                # 1. concept_id 중복 검사
+                if concept_id in existing_concept_ids:
+                    skip_reason = f"concept_id 중복: {concept_id}"
+                
+                # 2. 단어+의미 조합 중복 검사 (concepts 파일만)
+                elif add_file == "concepts_template_add.csv" and concept_id:
+                    english_word = row.get('english_word', '')
+                    korean_word = row.get('korean_word', '')
+                    if english_word and korean_word:
+                        parts = concept_id.split('_')
+                        meaning = parts[-1] if len(parts) >= 3 else 'unknown'
+                        en_combination = f"{english_word}_{meaning}"
+                        ko_combination = f"{korean_word}_{meaning}"
+                        
+                        if en_combination in existing_word_meanings or ko_combination in existing_word_meanings:
+                            skip_reason = f"단어+의미 중복: {en_combination} 또는 {ko_combination}"
+                
+                # 추가 또는 스킵
+                if concept_id and not skip_reason:
                     existing_data.append(row)
                     existing_concept_ids.add(concept_id)
+                    
+                    # concepts 파일인 경우 단어+의미 조합도 추가
+                    if add_file == "concepts_template_add.csv":
+                        english_word = row.get('english_word', '')
+                        korean_word = row.get('korean_word', '')
+                        if english_word and korean_word:
+                            parts = concept_id.split('_')
+                            meaning = parts[-1] if len(parts) >= 3 else 'unknown'
+                            en_combination = f"{english_word}_{meaning}"
+                            ko_combination = f"{korean_word}_{meaning}"
+                            existing_word_meanings.add(en_combination)
+                            existing_word_meanings.add(ko_combination)
+                    
                     added_count += 1
                     print(f"  ➕ 추가: {concept_id}")
                     
@@ -144,7 +195,7 @@ def accumulate_data():
                             "english_word": row.get('english_word', '')
                         })
                 else:
-                    print(f"  ⚠️ 중복 또는 빈 ID: {concept_id}")
+                    print(f"  ⚠️ 스킵: {concept_id} ({skip_reason or '빈 concept_id'})")
             
             print(f"📊 처리 결과: {added_count}개 추가됨, 총 {len(existing_data)}개 데이터")
             

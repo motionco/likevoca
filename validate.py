@@ -18,7 +18,7 @@ def ensure_directories():
     DATA_DIR.mkdir(exist_ok=True)
 
 def validate_duplicates():
-    """모든 CSV 파일에서 중복 검증"""
+    """모든 CSV 파일에서 중복 검증 (concept_id + 단어+의미 조합)"""
     print("🎯 중복 검증")
     print("="*50)
     
@@ -48,21 +48,57 @@ def validate_duplicates():
                 print(f"⚪ {file_name}: 데이터 없음")
                 continue
             
-            # concept_id 중복 검사
+            # 1. concept_id 중복 검사
             concept_ids = [row.get('concept_id', '') for row in rows if row.get('concept_id')]
-            duplicates = []
-            seen = set()
+            concept_id_duplicates = []
+            seen_concept_ids = set()
             
             for concept_id in concept_ids:
-                if concept_id in seen:
-                    duplicates.append(concept_id)
+                if concept_id in seen_concept_ids:
+                    concept_id_duplicates.append(concept_id)
                 else:
-                    seen.add(concept_id)
+                    seen_concept_ids.add(concept_id)
             
-            if duplicates:
-                print(f"❌ {file_name}: 중복 발견 {len(duplicates)}개")
-                for dup in duplicates[:3]:  # 최대 3개만 표시
-                    print(f"   🔄 {dup}")
+            # 2. 단어+의미 조합 중복 검사 (concepts 파일만)
+            word_meaning_duplicates = []
+            if "concepts_template" in file_name:
+                word_meaning_combinations = []
+                for row in rows:
+                    concept_id = row.get('concept_id', '')
+                    english_word = row.get('english_word', '')
+                    korean_word = row.get('korean_word', '')
+                    
+                    if concept_id and english_word and korean_word:
+                        # concept_id에서 의미 추출
+                        parts = concept_id.split('_')
+                        meaning = parts[-1] if len(parts) >= 3 else 'unknown'
+                        
+                        # 영어 단어+의미, 한국어 단어+의미 조합
+                        en_combination = f"{english_word}_{meaning}"
+                        ko_combination = f"{korean_word}_{meaning}"
+                        word_meaning_combinations.append((en_combination, ko_combination, concept_id))
+                
+                # 중복 검사
+                seen_combinations = set()
+                for en_combo, ko_combo, concept_id in word_meaning_combinations:
+                    if en_combo in seen_combinations or ko_combo in seen_combinations:
+                        word_meaning_duplicates.append(f"{concept_id} ({en_combo})")
+                    else:
+                        seen_combinations.add(en_combo)
+                        seen_combinations.add(ko_combo)
+            
+            # 결과 출력
+            if concept_id_duplicates or word_meaning_duplicates:
+                if concept_id_duplicates:
+                    print(f"❌ {file_name}: concept_id 중복 {len(concept_id_duplicates)}개")
+                    for dup in concept_id_duplicates[:3]:  # 최대 3개만 표시
+                        print(f"   🔄 {dup}")
+                
+                if word_meaning_duplicates:
+                    print(f"❌ {file_name}: 단어+의미 중복 {len(word_meaning_duplicates)}개")
+                    for dup in word_meaning_duplicates[:3]:  # 최대 3개만 표시
+                        print(f"   🔄 {dup}")
+                
                 all_clean = False
             else:
                 print(f"✅ {file_name}: 중복 없음 ({len(rows)}개 데이터)")
@@ -243,10 +279,17 @@ def validate_format():
             for row in rows:
                 concept_id = row.get('concept_id', '')
                 if concept_id:
-                    # {domain}_{word}_{category} 형식 검증
+                    # {domain}_{word}_{meaning} 형식 검증 (최소 3개 부분)
                     parts = concept_id.split('_')
                     if len(parts) < 3:
-                        invalid_concept_ids.append(concept_id)
+                        invalid_concept_ids.append(f"{concept_id} (부분 수: {len(parts)})")
+                    else:
+                        # 도메인 검증 (선택사항 - 알려진 도메인 목록과 비교)
+                        known_domains = ["daily", "food", "travel", "health", "nature", "shopping", 
+                                       "education", "technology", "business", "culture", "sports", "entertainment"]
+                        domain = parts[0]
+                        if domain not in known_domains:
+                            invalid_concept_ids.append(f"{concept_id} (알 수 없는 도메인: {domain})")
             
             if invalid_concept_ids:
                 print(f"❌ {file_name}: 잘못된 concept_id 형식 {len(invalid_concept_ids)}개")
