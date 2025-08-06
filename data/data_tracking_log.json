@@ -1,0 +1,260 @@
+{
+  "metadata": {
+    "created": "2025-08-06",
+    "last_updated": "2025-08-06T18:34:45.807565Z",
+    "system_version": "v2.0",
+    "description": "LikeVoca 데이터 트랜잭션 로그 - concepts_template_list.csv의 모든 변경 기록"
+  },
+  "schema_info": {
+    "concepts_fields": 58,
+    "examples_fields": 16,
+    "grammar_fields": 31,
+    "total_collections": 3
+  },
+  "transactions": [
+    {
+      "transaction_id": "TX_20250806_151048",
+      "timestamp": "2025-08-06T15:10:48Z",
+      "operation": "INITIAL_ADD",
+      "backup_ref": "backup_20250806_151048",
+      "added_concepts": [
+        {
+          "concept_id": "health_apple_medicine",
+          "domain": "health",
+          "category": "medicine",
+          "korean_word": "키위",
+          "english_word": "apple"
+        },
+        {
+          "concept_id": "nature_peach_animal",
+          "domain": "nature",
+          "category": "animal",
+          "korean_word": "메론",
+          "english_word": "peach"
+        }
+      ],
+      "summary": {
+        "concepts_added": 2,
+        "examples_added": 2,
+        "grammar_added": 2,
+        "total_records_after": 2
+      }
+    },
+    {
+      "transaction_id": "TX_20250806_154317",
+      "timestamp": "2025-08-06T15:43:17Z",
+      "operation": "ADD",
+      "backup_ref": "backup_20250806_154317",
+      "added_concepts": [
+        {
+          "concept_id": "health_grape_body",
+          "domain": "health",
+          "category": "body",
+          "korean_word": "딸기",
+          "english_word": "grape"
+        }
+      ],
+      "summary": {
+        "concepts_added": 1,
+        "examples_added": 1,
+        "grammar_added": 1,
+        "total_records_after": 3
+      }
+    },
+    {
+      "transaction_id": "TX_20250806_160000",
+      "timestamp": "2025-08-06T16:00:00Z",
+      "operation": "ADD",
+      "backup_ref": "backup_20250806_160000",
+      "added_concepts": [
+        {
+          "concept_id": "food_pear_drink",
+          "domain": "food",
+          "category": "drink",
+          "korean_word": "배",
+          "english_word": "pear"
+        },
+        {
+          "concept_id": "shopping_kiwi_store",
+          "domain": "shopping",
+          "category": "store",
+          "korean_word": "바나나",
+          "english_word": "kiwi"
+        }
+      ],
+      "summary": {
+        "concepts_added": 2,
+        "examples_added": 2,
+        "grammar_added": 2,
+        "total_records_after": 5
+      }
+    },
+    {
+      "transaction_id": "TX_20250806_183356",
+      "timestamp": "2025-08-06T18:33:56.166404Z",
+      "operation": "ADD",
+      "added_concepts": [
+        {
+          "concept_id": "travel_book_simple",
+          "domain": "travel",
+          "category": "transportation",
+          "korean_word": "나무",
+          "english_word": "car"
+        },
+        {
+          "concept_id": "daily_house_common",
+          "domain": "daily",
+          "category": "communication",
+          "korean_word": "나무",
+          "english_word": "book"
+        },
+        {
+          "concept_id": "shopping_house_simple",
+          "domain": "shopping",
+          "category": "payment",
+          "korean_word": "집",
+          "english_word": "car"
+        },
+        {
+          "concept_id": "nature_book_simple",
+          "domain": "nature",
+          "category": "plant",
+          "korean_word": "사과",
+          "english_word": "house"
+        },
+        {
+          "concept_id": "health_tree_basic",
+          "domain": "health",
+          "category": "fitness",
+          "korean_word": "책",
+          "english_word": "house"
+        }
+      ],
+      "summary": {
+        "concepts_added": 5,
+        "total_records_after": 4
+      }
+    },
+    {
+      "transaction_id": "TX_20250806_183425",
+      "timestamp": "2025-08-06T18:34:25.336885Z",
+      "operation": "ADD",
+      "added_concepts": [
+        {
+          "concept_id": "travel_book_simple",
+          "domain": "travel",
+          "category": "transportation",
+          "korean_word": "나무",
+          "english_word": "car"
+        },
+        {
+          "concept_id": "daily_house_common",
+          "domain": "daily",
+          "category": "communication",
+          "korean_word": "나무",
+          "english_word": "book"
+        },
+        {
+          "concept_id": "shopping_house_simple",
+          "domain": "shopping",
+          "category": "payment",
+          "korean_word": "집",
+          "english_word": "car"
+        },
+        {
+          "concept_id": "nature_book_simple",
+          "domain": "nature",
+          "category": "plant",
+          "korean_word": "사과",
+          "english_word": "house"
+        },
+        {
+          "concept_id": "health_tree_basic",
+          "domain": "health",
+          "category": "fitness",
+          "korean_word": "책",
+          "english_word": "house"
+        }
+      ],
+      "summary": {
+        "concepts_added": 5,
+        "total_records_after": 5
+      }
+    },
+    {
+      "transaction_id": "TX_20250806_183445",
+      "timestamp": "2025-08-06T18:34:45.807565Z",
+      "operation": "ADD",
+      "added_concepts": [
+        {
+          "concept_id": "travel_book_simple",
+          "domain": "travel",
+          "category": "transportation",
+          "korean_word": "나무",
+          "english_word": "car"
+        },
+        {
+          "concept_id": "daily_house_common",
+          "domain": "daily",
+          "category": "communication",
+          "korean_word": "나무",
+          "english_word": "book"
+        },
+        {
+          "concept_id": "shopping_house_simple",
+          "domain": "shopping",
+          "category": "payment",
+          "korean_word": "집",
+          "english_word": "car"
+        },
+        {
+          "concept_id": "nature_book_simple",
+          "domain": "nature",
+          "category": "plant",
+          "korean_word": "사과",
+          "english_word": "house"
+        },
+        {
+          "concept_id": "health_tree_basic",
+          "domain": "health",
+          "category": "fitness",
+          "korean_word": "책",
+          "english_word": "house"
+        }
+      ],
+      "summary": {
+        "concepts_added": 5,
+        "total_records_after": 6
+      }
+    }
+  ],
+  "current_status": {
+    "total_transactions": 6,
+    "last_transaction": "TX_20250806_183445",
+    "last_update": "2025-08-06T18:34:45.807565Z"
+  },
+  "integrity_checks": {
+    "last_validated": "2025-08-06T16:00:00Z",
+    "duplicate_check": "PASSED",
+    "field_completeness": "PASSED",
+    "format_validation": "PASSED",
+    "concept_id_format": "PASSED",
+    "total_concept_ids_verified": 5
+  },
+  "statistics": {
+    "domains": {
+      "health": 2,
+      "nature": 1,
+      "food": 1,
+      "shopping": 1
+    },
+    "categories": {
+      "medicine": 1,
+      "animal": 1,
+      "body": 1,
+      "drink": 1,
+      "store": 1
+    },
+    "total_concepts": 5
+  }
+}

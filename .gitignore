@@ -9,4 +9,4 @@ desktop.ini
 .env
 
 # Data folder - exclude from git
-data/
+# data/
