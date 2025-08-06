@@ -1,0 +1,14 @@
+﻿concept_id,domain,category,difficulty,situation,purpose,korean,english,japanese,chinese,spanish,korean_word,english_word,japanese_word,chinese_word,spanish_word
+weather_sunny_climate,weather,climate,basic,"casual,outdoor",description,창문을 열고 맑은 공기를 마셔요,I open the window and breathe the clear air,窓を開けて澄んだ空気を吸います,我打开窗户呼吸清新的空气,Abro la ventana y respiro el aire fresco,맑다,sunny,晴れ,晴朗,soleado
+time_morning_daily,time,daily,basic,"casual,home",description,아침마다 운동을 해요,I exercise every morning,毎朝運動をします,我每天早上都锻炼,Hago ejercicio todas las mañanas,아침,morning,朝,早上,mañana
+weather_sunny_climate,weather,climate,basic,"casual,outdoor",description,창문을 열고 맑은 공기를 마셔요,I open the window and breathe the clear air,窓を開けて澄んだ空気を吸います,我打开窗户呼吸清新的空气,Abro la ventana y respiro el aire fresco,맑다,sunny,晴れ,晴朗,soleado
+time_morning_daily,time,daily,basic,"casual,home",description,아침마다 운동을 해요,I exercise every morning,毎朝運動をします,我每天早上都锻炼,Hago ejercicio todas las mañanas,아침,morning,朝,早上,mañana
+weather_sunny_climate,weather,climate,basic,"casual,outdoor",description,창문을 열고 맑은 공기를 마셔요,I open the window and breathe the clear air,窓を開けて澄んだ空気を吸います,我打开窗户呼吸清新的空气,Abro la ventana y respiro el aire fresco,맑다,sunny,晴れ,晴朗,soleado
+time_morning_daily,time,daily,basic,"casual,home",description,아침마다 운동을 해요,I exercise every morning,毎朝運動をします,我每天早上都锻炼,Hago ejercicio todas las mañanas,아침,morning,朝,早上,mañana
+education_strawberry_exam,education,exam,basic,casual,action,바나나에 대해 이야기해요,Let's talk about strawberry,りんごについて話しましょう,我们来谈论苹果,Hablemos sobre fresa,바나나,strawberry,りんご,苹果,fresa
+education_strawberry_school,education,school,advanced,"casual,formal",action,바나나에 대해 이야기해요,Let's talk about strawberry,りんごについて話しましょう,我们来谈论草莓,Hablemos sobre plátano,바나나,strawberry,りんご,草莓,plátano
+daily_apple_family,daily,family,advanced,"casual,formal",description,바나나에 대해 이야기해요,Let's talk about apple,いちごについて話しましょう,我们来谈论香蕉,Hablemos sobre fresa,바나나,apple,いちご,香蕉,fresa
+technology_keyboard_computer,technology,computer,advanced,"casual,formal",question,노트북에 대해 이야기해요,Let's talk about keyboard,キーボードについて話しましょう,我们来谈论笔记本,Hablemos sobre computadora,노트북,keyboard,キーボード,笔记本,computadora
+daily_strawberry_routine,daily,routine,advanced,"casual,formal",description,사과에 대해 이야기해요,Let's talk about strawberry,バナナについて話しましょう,我们来谈论苹果,Hablemos sobre manzana,사과,strawberry,バナナ,苹果,manzana
+hobby_strawberry_game,hobby,game,advanced,casual,greeting,바나나에 대해 이야기해요,Let's talk about strawberry,バナナについて話しましょう,我们来谈论苹果,Hablemos sobre fresa,바나나,strawberry,バナナ,苹果,fresa
+daily_banana_home,daily,home,advanced,formal,action,사과에 대해 이야기해요,Let's talk about banana,りんごについて話しましょう,我们来谈论香蕉,Hablemos sobre plátano,사과,banana,りんご,香蕉,plátano

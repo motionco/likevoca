@@ -1,0 +1,6 @@
+﻿concept_id,domain,category,difficulty,situation,purpose,korean,english,japanese,chinese,spanish,korean_word,english_word,japanese_word,chinese_word,spanish_word
+education_banana_exam,education,exam,basic,"casual,formal",action,사과에 대해 이야기해요,Let's talk about banana,りんごについて話しましょう,我们来谈论苹果,Hablemos sobre fresa,사과,banana,りんご,苹果,fresa
+shopping_banana_payment,shopping,payment,advanced,"casual,formal",question,바나나에 대해 이야기해요,Let's talk about banana,りんごについて話しましょう,我们来谈论香蕉,Hablemos sobre plátano,바나나,banana,りんご,香蕉,plátano
+health_banana_body,health,body,basic,casual,description,바나나에 대해 이야기해요,Let's talk about banana,いちごについて話しましょう,我们来谈论苹果,Hablemos sobre fresa,바나나,banana,いちご,苹果,fresa
+shopping_banana_store,shopping,store,advanced,formal,question,딸기에 대해 이야기해요,Let's talk about banana,バナナについて話しましょう,我们来谈论香蕉,Hablemos sobre manzana,딸기,banana,バナナ,香蕉,manzana
+food_strawberry_meat,food,meat,basic,formal,question,바나나에 대해 이야기해요,Let's talk about strawberry,りんごについて話しましょう,我们来谈论苹果,Hablemos sobre fresa,바나나,strawberry,りんご,苹果,fresa

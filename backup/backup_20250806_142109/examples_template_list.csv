@@ -1,0 +1,5 @@
+﻿concept_id,domain,category,difficulty,situation,purpose,korean,english,japanese,chinese,spanish,korean_word,english_word,japanese_word,chinese_word,spanish_word
+nature_peach_plant,nature,plant,advanced,"casual,formal",greeting,키위에 대해 이야기해요,Let's talk about peach,ももについて話しましょう,我们来谈论梨,Hablemos sobre melón,키위,peach,もも,梨,melón
+nature_grape_environment,nature,environment,intermediate,formal,greeting,배에 대해 이야기해요,Let's talk about grape,なしについて話しましょう,我们来谈论桃子,Hablemos sobre naranja,배,grape,なし,桃子,naranja
+work_grape_office,work,office,advanced,"casual,formal",greeting,메론에 대해 이야기해요,Let's talk about grape,ぶどうについて話しましょう,我们来谈论草莓,Hablemos sobre pera,메론,grape,ぶどう,草莓,pera
+education_watermelon_subject,education,subject,intermediate,formal,description,키위에 대해 이야기해요,Let's talk about watermelon,オレンジについて話しましょう,我们来谈论桃子,Hablemos sobre manzana,키위,watermelon,オレンジ,桃子,manzana

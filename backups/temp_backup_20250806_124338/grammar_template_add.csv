@@ -1,0 +1,6 @@
+concept_id,korean_pattern,english_pattern,korean_example,english_example,japanese_example,chinese_example,spanish_example
+daily_hello_greeting,안녕하세요,hello,처음 만나는 사람에게 안녕하세요라고 말해요,We say hello to people we meet for the first time,初めて会う人にこんにちはと言います,我们对初次见面的人说你好,Decimos hola a las personas que conocemos por primera vez
+food_apple_fruit,사과를 먹다,eat apple,아침 식사로 사과 한 개를 먹었어요,I ate one apple for breakfast,朝食にりんごを一つ食べました,早餐我吃了一个苹果,Comí una manzana en el desayuno
+education_book_reading,책을 읽다,read book,매일 밤 잠자기 전에 책을 읽어요,I read a book every night before sleeping,毎晩寝る前に本を読みます,我每天晚上睡前都读书,Leo un libro todas las noches antes de dormir
+travel_train_transport,기차를 타다,take train,출근할 때 항상 지하철을 타고 가요,I always take the subway when going to work,通勤の時はいつも地下鉄に乗って行きます,上班时我总是坐地铁去,Siempre tomo el metro cuando voy al trabajo
+daily_family_relative,가족과 함께,with family,명절에는 가족과 함께 시간을 보내요,We spend time with family during holidays,祝日には家族と一緒に時間を過ごします,节假日我们和家人一起度过,Pasamos tiempo con la familia durante las fiestas
