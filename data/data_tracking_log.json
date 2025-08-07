@@ -1,11 +1,61 @@
 {
   "metadata": {
     "created": "2025-08-07",
-    "last_updated": "2025-08-07T13:20:26.502214Z",
+    "last_updated": "2025-08-07T13:48:30.768774Z",
     "system_version": "v2.0",
     "description": "LikeVoca 데이터 트랜잭션 로그"
   },
   "transactions": [
+    {
+      "transaction_id": "TX_20250807_134830",
+      "timestamp": "2025-08-07T13:48:30.768774Z",
+      "operation": "ADD",
+      "added_concepts": [
+        {
+          "concept_id": "travel_car_transport",
+          "domain": "travel",
+          "category": "sightseeing",
+          "korean_word": "자동차",
+          "english_word": "car"
+        }
+      ],
+      "summary": {
+        "concepts_added": 1,
+        "total_records_after": 9
+      }
+    },
+    {
+      "transaction_id": "TX_20250807_134427",
+      "timestamp": "2025-08-07T13:44:27.840533Z",
+      "operation": "ADD",
+      "added_concepts": [
+        {
+          "concept_id": "daily_sky_space",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "하늘",
+          "english_word": "sky"
+        },
+        {
+          "concept_id": "food_plane_transport",
+          "domain": "food",
+          "category": "drink",
+          "korean_word": "비행기",
+          "english_word": "plane"
+        },
+        {
+          "concept_id": "health_pencil_tool",
+          "domain": "health",
+          "category": "body",
+          "korean_word": "연필",
+          "english_word": "pencil"
+        }
+      ],
+      "summary": {
+        "concepts_added": 3,
+        "total_records_after": 8
+      }
+    },
     {
       "transaction_id": "TX_20250807_131859",
       "timestamp": "2025-08-07T13:18:59.775133Z",
@@ -65,8 +115,8 @@
     }
   ],
   "current_status": {
-    "total_transactions": 2,
-    "last_transaction": "TX_20250807_132026",
-    "last_update": "2025-08-07T13:20:26.502214Z"
+    "total_transactions": 4,
+    "last_transaction": "TX_20250807_134830",
+    "last_update": "2025-08-07T13:48:30.768774Z"
   }
 }

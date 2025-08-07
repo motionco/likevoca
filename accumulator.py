@@ -43,8 +43,8 @@ def update_transaction_log(added_concepts):
                     "system_version": "v2.0",
                     "description": "LikeVoca 데이터 트랜잭션 로그"
                 },
-                "transactions": [],
-                "current_status": {}
+                "current_status": {},
+                "transactions": []
             }
         
         # 실제 concepts_template_list.csv 파일의 데이터 개수 계산
@@ -68,7 +68,8 @@ def update_transaction_log(added_concepts):
             }
         }
         
-        log_data["transactions"].append(new_transaction)
+        # 새 트랜잭션을 맨 앞에 추가 (최신순 정렬)
+        log_data["transactions"].insert(0, new_transaction)
         log_data["metadata"]["last_updated"] = timestamp
         
         # 현재 상태 업데이트

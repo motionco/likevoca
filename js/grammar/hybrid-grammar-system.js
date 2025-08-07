@@ -1,4 +1,4 @@
-import { dynamicGrammarSystem } from "./grammar-tags-system-dynamic.js";
+import { GRAMMAR_TAGS, formatGrammarTags, getPOSList, getGrammarFeatures } from "./grammar-tags-system.js";
 
 /**
  * 하이브리드 문법 시스템
@@ -6,7 +6,7 @@ import { dynamicGrammarSystem } from "./grammar-tags-system-dynamic.js";
  */
 export class HybridGrammarSystem {
   constructor() {
-    this.dynamicSystem = dynamicGrammarSystem;
+    this.grammarTags = GRAMMAR_TAGS;
   }
 
   /**
@@ -59,7 +59,7 @@ export class HybridGrammarSystem {
     }
 
     // 유효성 검사
-    const validation = await this.dynamicSystem.validateGrammarTags(
+    const validation = this.validateGrammarTags(
       language,
       tags.pos,
       tags.raw_tags.filter((tag) => tag.includes(":"))
@@ -319,10 +319,39 @@ export class HybridGrammarSystem {
   }
 
   /**
+   * 문법 태그 유효성 검사
+   */
+  validateGrammarTags(language, pos, tags) {
+    const langTags = this.grammarTags[language];
+    if (!langTags) {
+      return { valid: false, error: `Unsupported language: ${language}` };
+    }
+
+    // POS 유효성 검사
+    if (!langTags.pos[pos]) {
+      return { valid: false, error: `Invalid POS for ${language}: ${pos}` };
+    }
+
+    // 태그 유효성 검사
+    for (const tag of tags) {
+      if (tag.includes(":")) {
+        const [category, value] = tag.split(":");
+        const categoryFeatures = langTags.grammar_features[category];
+        if (!categoryFeatures || !categoryFeatures.includes(value)) {
+          return { valid: false, error: `Invalid tag: ${tag}` };
+        }
+      }
+    }
+
+    return { valid: true };
+  }
+
+  /**
    * 문법 캐시 무효화
    */
   invalidateCache() {
-    this.dynamicSystem.invalidateCache();
+    // 현재는 캐시가 없으므로 빈 메서드
+    console.log("Grammar cache invalidated");
   }
 }
 

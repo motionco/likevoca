@@ -1,3 +1,2 @@
 ﻿concept_id,domain,category,difficulty,situation,purpose,korean,english,japanese,chinese,spanish,korean_word,english_word,japanese_word,chinese_word,spanish_word
-nature_cat_animal,nature,weather,advanced,formal,question,오늘 고양이에 대해 배웠습니다.,I learned about cat today.,고양이_日本語について話しましょう,我们来谈论고양이_中文,Hablemos sobre 고양이_español,고양이,cat,고양이_日本語,고양이_中文,고양이_español
-health_doctor_profession,health,fitness,intermediate,formal,greeting,오늘 의사에 대해 배웠습니다.,I learned about doctor today.,의사_日本語について話しましょう,我们来谈论의사_中文,Hablemos sobre 의사_español,의사,doctor,의사_日本語,의사_中文,의사_español
+travel_car_transport,travel,sightseeing,intermediate,formal,question,새 자동차를 구매했습니다.,I bought a new car.,자동차_日本語について話しましょう,我们来谈论자동차_中文,Hablemos sobre 자동차_español,자동차,car,자동차_日本語,자동차_中文,자동차_español
