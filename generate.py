@@ -14,8 +14,9 @@ import json
 def generate_differentiated_examples(korean_word, english_word, collection_type):
     """컬렉션별로 차별화된 예문 생성"""
     
-    # 단어별 예문 패턴 매핑
+    # 단어별 예문 패턴 매핑 (확장됨)
     word_patterns = {
+        # 기존 단어들
         "사과": {
             "concepts": ("사과는 맛있는 과일입니다.", "Apple is a delicious fruit."),
             "examples": ("오늘 점심에 사과를 먹었습니다.", "I ate an apple for lunch today."),
@@ -55,6 +56,33 @@ def generate_differentiated_examples(korean_word, english_word, collection_type)
             "concepts": ("나무는 산소를 만듭니다.", "Trees produce oxygen."),
             "examples": ("공원에 큰 나무가 있습니다.", "There is a big tree in the park."),
             "grammar": ("저 나무는 100년 되었습니다.", "That tree is 100 years old.")
+        },
+        
+        # 새로 추가된 단어들
+        "바나나": {
+            "concepts": ("바나나는 영양이 풍부한 과일입니다.", "Banana is a nutritious fruit."),
+            "examples": ("운동 후에 바나나를 먹었습니다.", "I ate a banana after exercising."),
+            "grammar": ("노란 바나나가 가장 달아요.", "Yellow bananas are the sweetest.")
+        },
+        "버스": {
+            "concepts": ("버스는 대중교통수단입니다.", "Bus is a public transportation."),
+            "examples": ("매일 버스로 출근합니다.", "I commute by bus every day."),
+            "grammar": ("다음 버스는 언제 와요?", "When does the next bus come?")
+        },
+        "꽃": {
+            "concepts": ("꽃은 아름다운 자연의 선물입니다.", "Flowers are beautiful gifts from nature."),
+            "examples": ("어머니께 꽃을 선물했습니다.", "I gave flowers to my mother."),
+            "grammar": ("이 꽃은 매우 향기롭습니다.", "This flower is very fragrant.")
+        },
+        "전화": {
+            "concepts": ("전화는 의사소통의 도구입니다.", "Phone is a tool for communication."),
+            "examples": ("친구에게 전화를 걸었습니다.", "I called my friend."),
+            "grammar": ("새 전화를 샀어요.", "I bought a new phone.")
+        },
+        "개": {
+            "concepts": ("개는 인간의 가장 친한 친구입니다.", "Dogs are man's best friend."),
+            "examples": ("공원에서 개와 산책했습니다.", "I walked the dog in the park."),
+            "grammar": ("그 개는 매우 똑똑해요.", "That dog is very smart.")
         }
     }
     
@@ -76,6 +104,23 @@ def generate_differentiated_examples(korean_word, english_word, collection_type)
 def generate_random_templates():
     """랜덤 템플릿 데이터 생성"""
     print("🎲 랜덤 템플릿 생성 시작...")
+    
+    # 사용자에게 생성할 데이터 개수 묻기
+    while True:
+        try:
+            count = input("📊 생성할 데이터 개수를 입력하세요 (기본값: 5): ").strip()
+            if not count:  # 엔터만 누른 경우
+                count = 5
+                break
+            count = int(count)
+            if count > 0:
+                break
+            else:
+                print("❌ 1 이상의 숫자를 입력해주세요.")
+        except ValueError:
+            print("❌ 유효한 숫자를 입력해주세요.")
+    
+    print(f"✅ {count}개 데이터 생성을 시작합니다.")
     
     # 기본 설정
     base_dir = Path(__file__).parent
@@ -128,36 +173,138 @@ def generate_random_templates():
     examples_data = []
     grammar_data = []
     
-    # 5개 랜덤 concept 생성
+    # 사용자 지정 개수만큼 랜덤 concept 생성
     generated_concept_ids = set()  # 이번 생성에서 concept_id 중복 방지
     generated_word_meanings = set()  # 이번 생성에서 단어+의미 중복 방지
     
-    for i in range(5):
-        max_attempts = 20  # 중복 시 최대 재시도 횟수 증가
+    for i in range(count):
+        max_attempts = 30  # 재시도 횟수 최적화 (100 → 30)
         attempt = 0
         
         while attempt < max_attempts:
             domain = random.choice(list(domains.keys()))
             category = random.choice(domains[domain])
             
-            # 단어와 의미 매핑 정의 (영어 단어 기준)
+            # 확장된 단어와 의미 매핑 정의 (영어 단어 기준)
             word_meaning_map = {
+                # 기존 단어들
                 "apple": "fruit",
                 "book": "knowledge", 
                 "car": "transport",
                 "house": "shelter",
-                "tree": "nature"
+                "tree": "nature",
+                
+                # 음식/음료 카테고리
+                "banana": "fruit",
+                "orange": "fruit", 
+                "rice": "food",
+                "bread": "food",
+                "water": "drink",
+                "coffee": "drink",
+                
+                # 교통/운송 카테고리  
+                "bus": "transport",
+                "train": "transport",
+                "bike": "transport",
+                "plane": "transport",
+                
+                # 자연/환경 카테고리
+                "flower": "beauty",
+                "mountain": "feature",
+                "ocean": "body",
+                "sky": "space",
+                
+                # 기술/도구 카테고리
+                "phone": "device",
+                "computer": "device",
+                "table": "furniture",
+                "chair": "furniture",
+                
+                # 교육/학습 카테고리  
+                "school": "institution",
+                "teacher": "profession",
+                "student": "role",
+                "pencil": "tool",
+                
+                # 사회/관계 카테고리
+                "mother": "parent",
+                "father": "parent", 
+                "friend": "relationship",
+                "doctor": "profession",
+                
+                # 동물 카테고리
+                "dog": "animal",
+                "cat": "animal",
+                "bird": "animal",
+                "fish": "animal",
+                
+                # 건물/시설 카테고리
+                "hospital": "building",
+                "market": "building",
+                "park": "place",
+                "library": "building"
             }
             
             korean_word_map = {
+                # 기존 단어들
                 "apple": "사과",
                 "book": "책",
                 "car": "자동차", 
                 "house": "집",
-                "tree": "나무"
+                "tree": "나무",
+                
+                # 확장된 단어들 - 음식/과일
+                "banana": "바나나",
+                "orange": "오렌지",
+                "rice": "쌀",
+                "bread": "빵",
+                "water": "물",
+                "coffee": "커피",
+                
+                # 교통/운송
+                "bus": "버스",
+                "train": "기차",
+                "bike": "자전거",
+                "plane": "비행기",
+                
+                # 자연/환경
+                "flower": "꽃",
+                "mountain": "산",
+                "ocean": "바다",
+                "sky": "하늘",
+                
+                # 일상용품
+                "phone": "전화",
+                "computer": "컴퓨터",
+                "table": "테이블",
+                "chair": "의자",
+                
+                # 교육/학습
+                "school": "학교",
+                "teacher": "선생님",
+                "student": "학생",
+                "pencil": "연필",
+                
+                # 가족/사람
+                "mother": "어머니",
+                "father": "아버지",
+                "friend": "친구",
+                "doctor": "의사",
+                
+                # 동물
+                "dog": "개",
+                "cat": "고양이",
+                "bird": "새",
+                "fish": "물고기",
+                
+                # 건물/장소
+                "hospital": "병원",
+                "market": "시장",
+                "park": "공원",
+                "library": "도서관"
             }
             
-            english_word = random.choice(["apple", "book", "car", "house", "tree"])
+            english_word = random.choice(list(word_meaning_map.keys()))
             korean_word = korean_word_map[english_word]
             meaning = word_meaning_map[english_word]
             

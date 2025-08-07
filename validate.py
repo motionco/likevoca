@@ -18,17 +18,47 @@ def ensure_directories():
     DATA_DIR.mkdir(exist_ok=True)
 
 def validate_duplicates():
-    """모든 CSV 파일에서 중복 검증 (concept_id + 단어+의미 조합)"""
-    print("🎯 중복 검증")
+    """_add.csv 파일들과 기존 _list.csv 파일들 간 교차 중복 검증"""
+    print("🎯 중복 검증 (_add.csv ↔ _list.csv 교차 검증)")
     print("="*50)
     
+    # 1. 기존 _list.csv 데이터 수집
+    existing_concept_ids = set()
+    existing_word_meanings = set()
+    
+    list_files = ["concepts_template_list.csv", "examples_template_list.csv", "grammar_template_list.csv"]
+    for file_name in list_files:
+        file_path = DATA_DIR / file_name
+        if file_path.exists():
+            try:
+                with open(file_path, "r", encoding="utf-8-sig") as f:
+                    reader = csv.DictReader(f)
+                    for row in reader:
+                        concept_id = row.get('concept_id', '')
+                        if concept_id:
+                            existing_concept_ids.add(concept_id)
+                            
+                            # concepts 파일에서 단어+의미 조합 수집
+                            if "concepts_template" in file_name:
+                                english_word = row.get('english_word', '')
+                                korean_word = row.get('korean_word', '')
+                                if english_word and korean_word:
+                                    parts = concept_id.split('_')
+                                    meaning = parts[-1] if len(parts) >= 3 else 'unknown'
+                                    en_combination = f"{english_word}_{meaning}"
+                                    ko_combination = f"{korean_word}_{meaning}"
+                                    existing_word_meanings.add(en_combination)
+                                    existing_word_meanings.add(ko_combination)
+            except Exception as e:
+                print(f"⚠️ {file_name} 읽기 오류: {e}")
+    
+    print(f"📊 기존 데이터: {len(existing_concept_ids)}개 concept_id, {len(existing_word_meanings)}개 단어+의미 조합")
+    
+    # 2. _add.csv 파일들 검증
     files_to_check = [
         "concepts_template_add.csv",
         "examples_template_add.csv", 
-        "grammar_template_add.csv",
-        "concepts_template_list.csv",
-        "examples_template_list.csv",
-        "grammar_template_list.csv"
+        "grammar_template_add.csv"
     ]
     
     all_clean = True
@@ -48,19 +78,26 @@ def validate_duplicates():
                 print(f"⚪ {file_name}: 데이터 없음")
                 continue
             
-            # 1. concept_id 중복 검사
+            # 1. concept_id 중복 검사 (내부 + 교차)
             concept_ids = [row.get('concept_id', '') for row in rows if row.get('concept_id')]
             concept_id_duplicates = []
+            cross_concept_id_duplicates = []
             seen_concept_ids = set()
             
             for concept_id in concept_ids:
+                # 내부 중복 검사
                 if concept_id in seen_concept_ids:
                     concept_id_duplicates.append(concept_id)
                 else:
                     seen_concept_ids.add(concept_id)
+                
+                # 기존 _list.csv와 교차 중복 검사
+                if concept_id in existing_concept_ids:
+                    cross_concept_id_duplicates.append(concept_id)
             
             # 2. 단어+의미 조합 중복 검사 (concepts 파일만)
             word_meaning_duplicates = []
+            cross_word_meaning_duplicates = []
             if "concepts_template" in file_name:
                 word_meaning_combinations = []
                 for row in rows:
@@ -77,6 +114,10 @@ def validate_duplicates():
                         en_combination = f"{english_word}_{meaning}"
                         ko_combination = f"{korean_word}_{meaning}"
                         word_meaning_combinations.append((en_combination, ko_combination, concept_id))
+                        
+                        # 기존 _list.csv와 교차 중복 검사
+                        if en_combination in existing_word_meanings or ko_combination in existing_word_meanings:
+                            cross_word_meaning_duplicates.append((concept_id, en_combination, ko_combination))
                 
                 # 중복 검사
                 seen_combinations = set()
@@ -88,32 +129,45 @@ def validate_duplicates():
                         seen_combinations.add(ko_combo)
             
             # 결과 출력
-            if concept_id_duplicates or word_meaning_duplicates:
+            has_duplicates = concept_id_duplicates or word_meaning_duplicates or cross_concept_id_duplicates or cross_word_meaning_duplicates
+            
+            if has_duplicates:
                 if concept_id_duplicates:
-                    print(f"❌ {file_name}: concept_id 중복 {len(concept_id_duplicates)}개")
+                    print(f"❌ {file_name}: 파일 내 concept_id 중복 {len(concept_id_duplicates)}개")
                     for dup in concept_id_duplicates[:3]:  # 최대 3개만 표시
                         print(f"   🔄 {dup}")
                 
+                if cross_concept_id_duplicates:
+                    print(f"❌ {file_name}: 기존 데이터와 concept_id 중복 {len(cross_concept_id_duplicates)}개")
+                    for dup in cross_concept_id_duplicates[:3]:  # 최대 3개만 표시
+                        print(f"   ⚠️ {dup}")
+                
                 if word_meaning_duplicates:
-                    print(f"❌ {file_name}: 단어+의미 중복 {len(word_meaning_duplicates)}개")
+                    print(f"❌ {file_name}: 파일 내 단어+의미 중복 {len(word_meaning_duplicates)}개")
                     for dup in word_meaning_duplicates[:3]:  # 최대 3개만 표시
                         print(f"   🔄 {dup}")
+                
+                if cross_word_meaning_duplicates:
+                    print(f"❌ {file_name}: 기존 데이터와 단어+의미 중복 {len(cross_word_meaning_duplicates)}개")
+                    for concept_id, en_combo, ko_combo in cross_word_meaning_duplicates[:3]:  # 최대 3개만 표시
+                        print(f"   ⚠️ {concept_id} ({en_combo} or {ko_combo})")
                 
                 all_clean = False
             else:
                 print(f"✅ {file_name}: 중복 없음 ({len(rows)}개 데이터)")
-                
+        
         except Exception as e:
             print(f"❌ {file_name}: 검증 실패 ({e})")
             all_clean = False
     
-    print(f"\n📊 검증 결과:")
+    print("\n📊 검증 결과:")
     if all_clean:
         print("✅ 모든 파일에서 중복 없음")
     else:
-        print("❌ 중복 또는 오류 발견됨")
+        print("❌ 중복 발견 - 수정 후 다시 실행하세요")
     
     return all_clean
+
 
 def validate_field_completeness():
     """필드 완성도 검증"""

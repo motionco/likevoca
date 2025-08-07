@@ -24,10 +24,17 @@ def update_transaction_log(added_concepts):
     
     try:
         # 기존 로그 파일 읽기
-        if log_path.exists():
+        if log_path.exists() and log_path.stat().st_size > 0:
             with open(log_path, "r", encoding="utf-8") as f:
-                log_data = json.load(f)
+                try:
+                    log_data = json.load(f)
+                except json.JSONDecodeError:
+                    # 파일이 손상되었거나 비어있는 경우 새로 생성
+                    log_data = None
         else:
+            log_data = None
+            
+        if log_data is None:
             # 새 로그 구조 생성
             log_data = {
                 "metadata": {
@@ -40,6 +47,15 @@ def update_transaction_log(added_concepts):
                 "current_status": {}
             }
         
+        # 실제 concepts_template_list.csv 파일의 데이터 개수 계산
+        list_file_path = DATA_DIR / "concepts_template_list.csv"
+        actual_records_count = 0
+        if list_file_path.exists():
+            with open(list_file_path, "r", encoding="utf-8-sig") as f:
+                reader = csv.reader(f)
+                next(reader, None)  # 헤더 스킵
+                actual_records_count = sum(1 for row in reader)
+        
         # 새 트랜잭션 추가
         new_transaction = {
             "transaction_id": transaction_id,
@@ -48,7 +64,7 @@ def update_transaction_log(added_concepts):
             "added_concepts": added_concepts,
             "summary": {
                 "concepts_added": len(added_concepts),
-                "total_records_after": len(log_data.get("transactions", [])) + 1
+                "total_records_after": actual_records_count
             }
         }
         
@@ -71,8 +87,79 @@ def update_transaction_log(added_concepts):
     except Exception as e:
         print(f"⚠️ 트랜잭션 로그 업데이트 실패: {e}")
 
+def identify_skipped_concepts(file_info):
+    """1단계: concepts 파일에서 스킵 대상 concept_id 식별"""
+    add_file, list_file = file_info
+    add_path = DATA_DIR / add_file
+    list_path = DATA_DIR / list_file
+    
+    skipped_concept_ids = set()
+    
+    if not add_path.exists():
+        print(f"❌ {add_file} 파일이 없습니다.")
+        return skipped_concept_ids
+    
+    # 기존 concepts 데이터 읽기
+    existing_concept_ids = set()
+    existing_word_meanings = set()
+    
+    if list_path.exists():
+        with open(list_path, 'r', encoding='utf-8-sig', newline='') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                concept_id = row.get('concept_id', '')
+                if concept_id:
+                    existing_concept_ids.add(concept_id)
+                    
+                    # 단어+의미 조합도 체크
+                    english_word = row.get('english_word', '')
+                    korean_word = row.get('korean_word', '')
+                    if english_word and korean_word and concept_id:
+                        parts = concept_id.split('_')
+                        meaning = parts[-1] if len(parts) >= 3 else 'unknown'
+                        en_combination = f"{english_word}_{meaning}"
+                        ko_combination = f"{korean_word}_{meaning}"
+                        existing_word_meanings.add(en_combination)
+                        existing_word_meanings.add(ko_combination)
+    
+    # 신규 concepts 데이터에서 스킵 대상 식별
+    with open(add_path, 'r', encoding='utf-8-sig', newline='') as f:
+        reader = csv.DictReader(f)
+        new_data = list(reader)
+    
+    print(f"🔍 스킵 대상 식별: {len(new_data)}개 신규 데이터, {len(existing_concept_ids)}개 기존 concept_id, {len(existing_word_meanings)}개 기존 단어+의미")
+    
+    for row in new_data:
+        concept_id = row.get('concept_id', '')
+        skip_reason = None
+        
+        # 1. concept_id 중복 검사
+        if concept_id in existing_concept_ids:
+            skip_reason = f"concept_id 중복: {concept_id}"
+            skipped_concept_ids.add(concept_id)
+        
+        # 2. 단어+의미 조합 중복 검사
+        elif concept_id:
+            english_word = row.get('english_word', '')
+            korean_word = row.get('korean_word', '')
+            if english_word and korean_word:
+                parts = concept_id.split('_')
+                meaning = parts[-1] if len(parts) >= 3 else 'unknown'
+                en_combination = f"{english_word}_{meaning}"
+                ko_combination = f"{korean_word}_{meaning}"
+                
+                if en_combination in existing_word_meanings or ko_combination in existing_word_meanings:
+                    skip_reason = f"단어+의미 중복: {en_combination} 또는 {ko_combination}"
+                    skipped_concept_ids.add(concept_id)
+        
+        if skip_reason:
+            print(f"  ⚠️ 스킵 대상 식별: {concept_id} ({skip_reason})")
+    
+    return skipped_concept_ids
+
+
 def accumulate_data():
-    """_add.csv 파일들의 데이터를 _list.csv 파일들에 누적"""
+    """_add.csv 파일들의 데이터를 _list.csv 파일들에 누적 (2단계 방식)"""
     file_pairs = [
         ("concepts_template_add.csv", "concepts_template_list.csv"),
         ("examples_template_add.csv", "examples_template_list.csv"), 
@@ -80,6 +167,14 @@ def accumulate_data():
     ]
     
     print("📁 데이터 누적 시작...")
+    
+    # 1단계: concepts 파일에서 스킵 대상 식별
+    print("\n🔍 1단계: Concepts 파일에서 스킵 대상 식별...")
+    skipped_concept_ids = identify_skipped_concepts(file_pairs[0])
+    print(f"📋 총 {len(skipped_concept_ids)}개 concept_id가 스킵 대상으로 식별됨")
+    
+    # 2단계: 모든 파일에서 스킵 대상 제외하고 처리
+    print(f"\n🔧 2단계: 모든 파일에서 스킵 대상 제외 처리...")
     total_added_concepts = []
     
     for add_file, list_file in file_pairs:
@@ -148,11 +243,15 @@ def accumulate_data():
                 concept_id = row.get('concept_id', '')
                 skip_reason = None
                 
-                # 1. concept_id 중복 검사
-                if concept_id in existing_concept_ids:
+                # 0. 1단계에서 식별된 스킵 대상 검사 (모든 파일 공통)
+                if concept_id in skipped_concept_ids:
+                    skip_reason = f"1단계에서 스킵된 concept_id: {concept_id}"
+                
+                # 1. concept_id 중복 검사 (기존 데이터와 비교)
+                elif concept_id in existing_concept_ids:
                     skip_reason = f"concept_id 중복: {concept_id}"
                 
-                # 2. 단어+의미 조합 중복 검사 (concepts 파일만)
+                # 2. 단어+의미 조합 중복 검사 (concepts 파일인 경우만 체크하지만 모든 파일에 적용)
                 elif add_file == "concepts_template_add.csv" and concept_id:
                     english_word = row.get('english_word', '')
                     korean_word = row.get('korean_word', '')
