@@ -3516,6 +3516,8 @@ function updateFlashcard() {
     sourceLanguage: currentSourceLanguage,
     targetLanguage: currentTargetLanguage,
     concept: concept,
+    domain: concept.domain || concept.concept_info?.domain,
+    category: concept.category || concept.concept_info?.category,
   });
 
   let frontText = "";
@@ -3554,6 +3556,7 @@ function updateFlashcard() {
   const backWordElement = document.getElementById("flashcard-back-word");
   const backDefElement = document.getElementById("flashcard-back-definition");
   const progressElement = document.getElementById("flashcard-mode-progress");
+  const categoryElement = document.getElementById("flashcard-back-category");
 
   if (frontWordElement) frontWordElement.textContent = frontText;
   if (frontPronElement) frontPronElement.textContent = frontPronunciation;
@@ -3561,6 +3564,31 @@ function updateFlashcard() {
   if (backDefElement) backDefElement.textContent = backDefinition;
   if (progressElement) {
     progressElement.textContent = `${currentIndex + 1} / ${currentData.length}`;
+  }
+
+  // 카테고리/도메인 정보 표시
+  if (categoryElement) {
+    const category = concept.category || concept.concept_info?.category || "일반";
+    const domain = concept.domain || concept.concept_info?.domain || "daily";
+    
+    // 번역된 도메인/카테고리 표시 (translateDomainCategory 함수 사용)
+    if (typeof window.translateDomainCategory === "function") {
+      categoryElement.textContent = window.translateDomainCategory(domain, category);
+    } else {
+      // fallback: 기본 형식으로 표시
+      categoryElement.textContent = `${domain} > ${category}`;
+    }
+  }
+
+  // 플래시카드 뒷면에서 발음과 예문 요소 숨기기
+  const backTranscriptionElement = document.getElementById("flashcard-back-transcription");
+  const backExampleElement = document.getElementById("flashcard-back-example");
+  
+  if (backTranscriptionElement) {
+    backTranscriptionElement.style.display = "none";
+  }
+  if (backExampleElement) {
+    backExampleElement.style.display = "none";
   }
 
   console.log("✅ 플래시카드 업데이트 완료:", {
