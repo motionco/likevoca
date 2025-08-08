@@ -400,10 +400,10 @@ export function resetForm() {
   }
 
   // 예제 초기화
-  // 현재 열린 모달 찾기
-  const openModal = document.querySelector("#concept-modal:not(.hidden)");
+  // 현재 열린 모달 찾기 (모달이 열린 후에만 실행)
+  const openModal = document.querySelector("#concept-modal:not(.hidden)") || document.getElementById("concept-modal");
   if (!openModal) {
-    console.error("❌ 열린 모달을 찾을 수 없습니다");
+    console.warn("⚠️ 모달을 찾을 수 없습니다 - 예제 초기화를 건너뜀");
     return;
   }
 

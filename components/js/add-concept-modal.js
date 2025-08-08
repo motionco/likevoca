@@ -161,13 +161,12 @@ async function saveConcept() {
 
 // 개념 추가 모달 열기 (전역 함수)
 window.openConceptModal = async function () {
-  resetForm();
-
   const modal = document.getElementById("concept-modal");
   if (modal) {
     modal.classList.remove("hidden");
 
-    // 모달이 열린 후 번역 적용
+    // 모달이 열린 후 폼 초기화 및 번역 적용
+    resetForm();
     await applyModalTranslations();
   } else {
     console.error("❌ concept-modal 요소를 찾을 수 없습니다");

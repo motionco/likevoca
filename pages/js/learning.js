@@ -3571,13 +3571,10 @@ function updateFlashcard() {
     const category = concept.category || concept.concept_info?.category || "일반";
     const domain = concept.domain || concept.concept_info?.domain || "daily";
     
-    // 번역된 도메인/카테고리 표시 (translateDomainCategory 함수 사용)
-    if (typeof window.translateDomainCategory === "function") {
-      categoryElement.textContent = window.translateDomainCategory(domain, category);
-    } else {
-      // fallback: 기본 형식으로 표시
-      categoryElement.textContent = `${domain} > ${category}`;
-    }
+    // locales 시스템을 사용한 번역
+    const translatedDomain = getTranslatedText(`domain_${domain}`) || domain;
+    const translatedCategory = getTranslatedText(`category_${category}`) || category;
+    categoryElement.textContent = `${translatedDomain} > ${translatedCategory}`;
   }
 
   // 플래시카드 뒷면에서 발음과 예문 요소 숨기기
@@ -3822,32 +3819,11 @@ function updateTyping() {
     const category =
       concept.category || concept.concept_info?.category || "일반";
     const domain = concept.domain || concept.concept_info?.domain || "daily";
-    // 번역된 도메인/카테고리 표시 (translateDomainCategory 함수 사용)
-    if (typeof window.translateDomainCategory === "function") {
-      categoryElement.textContent = window.translateDomainCategory(
-        domain,
-        category
-      );
-    } else {
-      // 기본 도메인 매핑 (하위 호환성) - 번역 키 사용
-      const domainNames = {
-        daily: getTranslatedText("category_daily") || "일상",
-        business: getTranslatedText("category_business") || "비즈니스",
-        academic: getTranslatedText("category_education") || "교육",
-        travel: getTranslatedText("category_travel") || "여행",
-        food: getTranslatedText("category_food") || "음식",
-        nature: getTranslatedText("category_nature") || "자연",
-        technology: getTranslatedText("category_technology") || "기술",
-        health: getTranslatedText("category_health") || "건강",
-        sports: getTranslatedText("category_sports") || "스포츠",
-        entertainment:
-          getTranslatedText("category_entertainment") || "엔터테인먼트",
-        other: getTranslatedText("category_other") || "기타",
-      };
-      categoryElement.textContent = `${category} • ${
-        domainNames[domain] || domain
-      }`;
-    }
+    
+    // locales 시스템을 사용한 번역
+    const translatedDomain = getTranslatedText(`domain_${domain}`) || domain;
+    const translatedCategory = getTranslatedText(`category_${category}`) || category;
+    categoryElement.textContent = `${translatedDomain} > ${translatedCategory}`;
   }
 
   // 정답 저장
