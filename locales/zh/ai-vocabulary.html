@@ -1,90 +1,50 @@
 ﻿<!DOCTYPE html>
 <html lang="zh">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LikeVoca - AI 定制化词汇本生成</title>
 
-    <!-- 기본 메타 태그 -->
-    <meta
-      name="description"
-      content="使用AI技术自动生成个人定制化词汇本。AI根据您的学习水平和兴趣推荐单词，提供高效的学习计划。通过智能词汇扩展快速提高语言技能。"
-    />
-    <meta
-      name="keywords"
-      content="AI单词生成, 定制化词汇本, AI语言学习, 智能词汇学习, 个性化单词推荐, AI学习工具, 自动词汇本生成, 多语言AI学习"
-    />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LikeVoca - AI 定制化词汇本生成</title>
 
-    <!-- Open Graph / 소셜 미디어 메타 태그 -->
-    <meta property="og:title" content="LikeVoca - AI 定制化词汇本生成" />
-    <meta
-      property="og:description"
-      content="使用AI技术自动生成个人定制化词汇本。AI根据您的学习水平和兴趣推荐单词，提供高效的学习计划。通过智能词汇扩展快速提高语言技能。"
-    />
-    <meta property="og:type" content="website" />
-    <meta
-      property="og:url"
-      content="https://likevoca.com/zh/ai-vocabulary"
-    />
-    <meta property="og:locale" content="zh" />
+  <!-- 기본 메타 태그 -->
+  <meta name="description" content="使用AI技术自动生成个人定制化词汇本。AI根据您的学习水平和兴趣推荐单词，提供高效的学习计划。通过智能词汇扩展快速提高语言技能。" />
+  <meta name="keywords" content="AI单词生成, 定制化词汇本, AI语言学习, 智能词汇学习, 个性化单词推荐, AI学习工具, 自动词汇本生成, 多语言AI学习" />
 
-    <!-- Twitter Card 태그 -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="LikeVoca - AI 定制化词汇本生成" />
-    <meta
-      name="twitter:description"
-      content="使用AI技术自动生成个人定制化词汇本。AI根据您的学习水平和兴趣推荐单词，提供高效的学习计划。通过智能词汇扩展快速提高语言技能。"
-    />
-    <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
+  <!-- Open Graph / 소셜 미디어 메타 태그 -->
+  <meta property="og:title" content="LikeVoca - AI 定制化词汇本生成" />
+  <meta property="og:description" content="使用AI技术自动生成个人定制化词汇本。AI根据您的学习水平和兴趣推荐单词，提供高效的学习计划。通过智能词汇扩展快速提高语言技能。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://likevoca.com/zh/ai-vocabulary" />
+  <meta property="og:locale" content="zh" />
 
-    <!-- 표준 링크 -->
-    <link
-      rel="canonical"
-      href="https://likevoca.com/zh/ai-vocabulary"
-    />
+  <!-- Twitter Card 태그 -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="LikeVoca - AI 定制化词汇本生成" />
+  <meta name="twitter:description" content="使用AI技术自动生成个人定制化词汇本。AI根据您的学习水平和兴趣推荐单词，提供高效的学习计划。通过智能词汇扩展快速提高语言技能。" />
+  <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
 
-    <!-- 대체 언어 링크 -->
-    <link
-      rel="alternate"
-      hreflang="ko"
-      href="https://likevoca.com/ko/ai-vocabulary"
-    />
-    <link
-      rel="alternate"
-      hreflang="en"
-      href="https://likevoca.com/en/ai-vocabulary"
-    />
-    <link
-      rel="alternate"
-      hreflang="ja"
-      href="https://likevoca.com/ja/ai-vocabulary"
-    />
-    <link
-      rel="alternate"
-      hreflang="zh"
-      href="https://likevoca.com/zh/ai-vocabulary"
-    />
-    <link
-      rel="alternate"
-      hreflang="x-default"
-      href="https://likevoca.com/en/ai-vocabulary"
-    />
+  <!-- 표준 링크 -->
+  <link rel="canonical" href="https://likevoca.com/zh/ai-vocabulary" />
 
-    <!-- 성능 최적화 - Resource Hints -->
-    <link rel="preconnect" href="https://cdn.tailwindcss.com">
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
-    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+  <!-- 대체 언어 링크 -->
+  <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/ai-vocabulary" />
+  <link rel="alternate" hreflang="en" href="https://likevoca.com/en/ai-vocabulary" />
+  <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/ai-vocabulary" />
+  <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/ai-vocabulary" />
+  <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/ai-vocabulary" />
 
-    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-    />
-    <link rel="stylesheet" href="../../css/style.css" />
-    
-    <!-- 구조화된 데이터 (JSON-LD) -->
-    <script type="application/ld+json">
+  <!-- 성능 최적화 - Resource Hints -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="../../css/style.css" />
+
+  <!-- 구조화된 데이터 (JSON-LD) -->
+  <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebPage",
@@ -105,234 +65,200 @@
     }
     </script>
 
-    <style>
-      .dropdown-container {
-        position: relative;
-      }
+  <style>
+    .dropdown-container {
+      position: relative;
+    }
 
-      .dropdown {
-        position: absolute;
-        z-index: 10;
-        width: 100%;
-      }
+    .dropdown {
+      position: absolute;
+      z-index: 10;
+      width: 100%;
+    }
 
-      .word-card {
-        transition: transform 0.3s;
-      }
+    .word-card {
+      transition: transform 0.3s;
+    }
 
-      .word-card:hover {
-        transform: translateY(-5px);
-      }
-    </style>
-    <script type="module" src="../../js/language-init.js"></script>
-  </head>
+    .word-card:hover {
+      transform: translateY(-5px);
+    }
+  </style>
+  <script type="module" src="../../js/language-init.js"></script>
+</head>
 
-  <body class="bg-gray-100">
-    <div id="navbar-container"></div>
+<body class="bg-gray-100">
+  <div id="navbar-container"></div>
 
-    <main class="container mx-auto max-w-7xl px-4 py-8">
-      <div class="flex justify-between items-start mb-8">
-        <div>
-          <h1 class="text-3xl font-bold text-gray-800 mb-2">
-            🤖 AI 词汇本
-          </h1>
-          <p class="text-gray-600">
-            通过AI推荐的个性化单词更智能地学习。
-          </p>
-        </div>
-        <button
-          id="ai-add-concept"
-          class="bg-[#4B63AC] text-white px-4 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300 flex items-center"
-        >
-          <i class="fas fa-robot mr-2"></i> 获取AI概念推荐
-        </button>
+  <main class="container mx-auto max-w-7xl px-4 py-8">
+    <div class="flex flex-col md:flex-row md:justify-between md:items-start mb-8">
+      <div class="mb-4 md:mb-0">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">
+          🤖 AI 词汇本
+        </h1>
+        <p class="text-gray-600">
+          通过AI推荐的个性化单词更智能地学习。
+        </p>
       </div>
+      <button id="ai-add-concept"
+        class="bg-[#4B63AC] text-white px-4 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300 flex items-center">
+        <i class="fas fa-robot mr-2"></i> 获取AI概念推荐
+      </button>
+    </div>
 
-      <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <!-- 검색 필터 -->
-          <div class="w-full">
-            <label
-              for="search-input"
-              class="hidden md:block text-sm font-medium mb-1 text-gray-700"
-            >搜索</label>
-            <div class="relative">
-              <input
-                type="text"
-                id="search-input"
-                class="w-full p-2 border rounded pl-8 h-10"
-                placeholder="输入搜索词..."
-              />
-              <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-            </div>
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <!-- 검색 필터 -->
+        <div class="w-full">
+          <label for="search-input" class="hidden md:block text-sm font-medium mb-1 text-gray-700">搜索</label>
+          <div class="relative">
+            <input type="text" id="search-input" class="w-full p-2 border rounded pl-8 h-10" placeholder="输入搜索词..." />
+            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
           </div>
+        </div>
 
-          <!-- 언어 필터 -->
-          <div class="w-full">
-            <label
-              class="block text-sm font-medium mb-1 text-gray-700"
-            >语言筛选</label>
-            <div class="grid grid-cols-5 gap-1 h-10">
-              <select
-                id="source-language"
-                class="col-span-2 p-2 border rounded text-sm"
-              >
-                <option value="korean">韩语</option>
-                <option value="english">英语</option>
-                <option value="japanese">日语</option>
-                <option value="chinese">中文</option>
-                <option value="spanish">西班牙语</option>
+        <!-- 언어 필터 -->
+        <div class="w-full">
+          <label class="block text-sm font-medium mb-1 text-gray-700">语言筛选</label>
+          <div class="grid grid-cols-5 gap-1 h-10">
+            <select id="source-language" class="col-span-2 p-2 border rounded text-sm">
+              <option value="korean">韩语</option>
+              <option value="english">英语</option>
+              <option value="japanese">日语</option>
+              <option value="chinese">中文</option>
+              <option value="spanish">西班牙语</option>
+            </select>
+
+            <button id="swap-languages"
+              class="w-full h-full text-gray-600 hover:text-[#4B63AC] hover:bg-gray-100 rounded-lg transition duration-200 border border-gray-300 hover:border-[#4B63AC] flex items-center justify-center"
+              title="交换语言">
+              <i class="fas fa-exchange-alt text-sm"></i>
+            </button>
+
+            <select id="target-language" class="col-span-2 p-2 border rounded text-sm">
+              <option value="english">英语</option>
+              <option value="korean">韩语</option>
+              <option value="japanese">日语</option>
+              <option value="chinese">中文</option>
+              <option value="spanish">西班牙语</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 도메인 및 정렬 -->
+        <div class="w-full">
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label for="domain-filter" class="block text-sm font-medium mb-1 text-gray-700">领域</label>
+              <select id="domain-filter" class="w-full p-2 border rounded h-10 text-sm">
+                <option value="all">所有领域</option>
+                <option value="daily">日常生活</option>
+                <option value="food">食物</option>
+                <option value="travel">旅行</option>
+                <option value="business">商务</option>
+                <option value="education">教育</option>
+                <option value="nature">自然</option>
+                <option value="technology">技术</option>
+                <option value="health">健康</option>
+                <option value="sports">运动</option>
+                <option value="entertainment">娱乐</option>
+                <option value="culture">文化</option>
+                <option value="other">其他</option>
               </select>
-
-              <button
-                id="swap-languages"
-                class="w-full h-full text-gray-600 hover:text-[#4B63AC] hover:bg-gray-100 rounded-lg transition duration-200 border border-gray-300 hover:border-[#4B63AC] flex items-center justify-center"
-                title="交换语言"
-              >
-                <i class="fas fa-exchange-alt text-sm"></i>
-              </button>
-
-              <select
-                id="target-language"
-                class="col-span-2 p-2 border rounded text-sm"
-              >
-                <option value="english">英语</option>
-                <option value="korean">韩语</option>
-                <option value="japanese">日语</option>
-                <option value="chinese">中文</option>
-                <option value="spanish">西班牙语</option>
+            </div>
+            <div>
+              <label for="sort-filter" class="block text-sm font-medium mb-1 text-gray-700">排序</label>
+              <select id="sort-filter" class="w-full p-2 border rounded h-10 text-sm">
+                <option value="latest">最新</option>
+                <option value="oldest">最旧</option>
+                <option value="alphabetical">字母顺序</option>
+                <option value="reverse_alphabetical">反字母顺序</option>
               </select>
             </div>
           </div>
-
-          <!-- 도메인 및 정렬 -->
-          <div class="w-full">
-            <div class="grid grid-cols-2 gap-2">
-              <div>
-                <label for="domain-filter" class="block text-sm font-medium mb-1 text-gray-700">领域</label>
-                <select id="domain-filter" class="w-full p-2 border rounded h-10 text-sm">
-                  <option value="all">所有领域</option>
-                  <option value="daily">日常生活</option>
-                  <option value="food">食物</option>
-                  <option value="travel">旅行</option>
-                  <option value="business">商务</option>
-                  <option value="education">教育</option>
-                  <option value="nature">自然</option>
-                  <option value="technology">技术</option>
-                  <option value="health">健康</option>
-                  <option value="sports">运动</option>
-                  <option value="entertainment">娱乐</option>
-                  <option value="culture">文化</option>
-                  <option value="other">其他</option>
-                </select>
-              </div>
-              <div>
-                <label for="sort-filter" class="block text-sm font-medium mb-1 text-gray-700">排序</label>
-                <select id="sort-filter" class="w-full p-2 border rounded h-10 text-sm">
-                  <option value="latest">最新</option>
-                  <option value="oldest">最旧</option>
-                  <option value="alphabetical">字母顺序</option>
-                  <option value="reverse_alphabetical">反字母顺序</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 개념 수 및 AI 사용량 표시 -->
-        <div
-          class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
-        >
-          <div class="text-sm text-gray-600">
-            <span id="concept-count">0</span><span> 个概念</span>
-          </div>
-
-          <div class="flex items-center gap-4 w-full md:w-auto">
-            <span 
-              class="text-sm font-medium text-gray-700 whitespace-nowrap"
-              data-i18n="ai_usage"
-            >AI 使用量:</span>
-            <div class="flex items-center gap-2 min-w-[200px]">
-              <div class="flex-1 bg-gray-200 rounded-full h-2.5">
-                <div
-                  id="ai-usage-bar"
-                  class="bg-[#4B63AC] h-2.5 rounded-full"
-                  style="width: 0%"
-                ></div>
-              </div>
-              <span id="ai-usage-text" class="text-sm font-medium whitespace-nowrap">0/10</span>
-            </div>
-          </div>
         </div>
       </div>
 
-      <!-- 개념 카드 표시 영역 -->
-      <div id="concept-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+      <!-- 개념 수 및 AI 사용량 표시 -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div class="text-sm text-gray-600">
+          <span id="concept-count">0</span><span> 个概念</span>
+        </div>
 
-      <!-- 더 보기 버튼 -->
-      <div class="flex justify-center mt-8">
-        <button
-          id="load-more"
-          class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-6 rounded-lg transition duration-300 hidden"
-        >
-          加载更多 <i class="fas fa-chevron-down ml-1"></i>
-        </button>
+        <div class="flex items-center gap-4 w-full md:w-auto">
+          <span class="text-sm font-medium text-gray-700 whitespace-nowrap" data-i18n="ai_usage">AI 使用量:</span>
+          <div class="flex items-center gap-2 min-w-[200px]">
+            <div class="flex-1 bg-gray-200 rounded-full h-2.5">
+              <div id="ai-usage-bar" class="bg-[#4B63AC] h-2.5 rounded-full" style="width: 0%"></div>
+            </div>
+            <span id="ai-usage-text" class="text-sm font-medium whitespace-nowrap">0/10</span>
+          </div>
+        </div>
       </div>
-    </main>
+    </div>
 
-    <div id="modal-container"></div>
+    <!-- 개념 카드 표시 영역 -->
+    <div id="concept-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 
-    <!-- Firebase -->
-    <script type="module" src="../../js/firebase/firebase-init.js"></script>
-    <script type="module" src="../../pages/js/ai-vocabulary.js"></script>
-    <script type="module">
-      import { updateMetadata, applyLanguage } from "../../utils/language-utils.js";
+    <!-- 더 보기 버튼 -->
+    <div class="flex justify-center mt-8">
+      <button id="load-more"
+        class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-6 rounded-lg transition duration-300 hidden">
+        加载更多 <i class="fas fa-chevron-down ml-1"></i>
+      </button>
+    </div>
+  </main>
 
-      // 페이지 로드 후 메타데이터 업데이트 및 네비게이션바 번역
-      document.addEventListener("DOMContentLoaded", async () => {
-        try {
-          // 네비게이션바 로드
-          if (typeof window.loadNavbar === 'function') {
-            await window.loadNavbar();
-          } else {
-            console.warn("window.loadNavbar 함수를 찾을 수 없습니다. 직접 로드 시도...");
-            
-            // 직접 네비게이션바 로드
-            try {
-              const response = await fetch('navbar.html');
-              const navbarHTML = await response.text();
-              const navbarContainer = document.getElementById('navbar-container');
-              if (navbarContainer) {
-                navbarContainer.innerHTML = navbarHTML;
-                
-                // navbar.js 스크립트 동적 로드
-                const script = document.createElement('script');
-                script.src = '../../components/js/navbar.js';
-                script.onload = () => {
-                  if (typeof window.initializeNavbar === 'function') {
-                    window.initializeNavbar('zh');
-                  }
-                };
-                document.head.appendChild(script);
-              }
-            } catch (error) {
-              console.error("네비게이션바 직접 로드 실패:", error);
+  <div id="modal-container"></div>
+
+  <!-- Firebase -->
+  <script type="module" src="../../js/firebase/firebase-init.js"></script>
+  <script type="module" src="../../pages/js/ai-vocabulary.js"></script>
+  <script type="module">
+    import { updateMetadata, applyLanguage } from "../../utils/language-utils.js";
+
+    // 페이지 로드 후 메타데이터 업데이트 및 네비게이션바 번역
+    document.addEventListener("DOMContentLoaded", async () => {
+      try {
+        // 네비게이션바 로드
+        if (typeof window.loadNavbar === 'function') {
+          await window.loadNavbar();
+        } else {
+          console.warn("window.loadNavbar 함수를 찾을 수 없습니다. 직접 로드 시도...");
+
+          // 직접 네비게이션바 로드
+          try {
+            const response = await fetch('navbar.html');
+            const navbarHTML = await response.text();
+            const navbarContainer = document.getElementById('navbar-container');
+            if (navbarContainer) {
+              navbarContainer.innerHTML = navbarHTML;
+
+              // navbar.js 스크립트 동적 로드
+              const script = document.createElement('script');
+              script.src = '../../components/js/navbar.js';
+              script.onload = () => {
+                if (typeof window.initializeNavbar === 'function') {
+                  window.initializeNavbar('zh');
+                }
+              };
+              document.head.appendChild(script);
             }
+          } catch (error) {
+            console.error("네비게이션바 직접 로드 실패:", error);
           }
-          
-          // 번역 적용
-          await applyLanguage();
-          
-          // 메타데이터 업데이트
-          await updateMetadata("ai-vocabulary");
-        } catch (error) {
-          console.error("페이지 초기화 중 오류:", error);
         }
-      });
-    </script>
-  </body>
+
+        // 번역 적용
+        await applyLanguage();
+
+        // 메타데이터 업데이트
+        await updateMetadata("ai-vocabulary");
+      } catch (error) {
+        console.error("페이지 초기화 중 오류:", error);
+      }
+    });
+  </script>
+</body>
+
 </html>
-
-
-
-

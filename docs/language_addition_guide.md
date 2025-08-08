@@ -8,9 +8,18 @@
 
 - **언어 코드**: ISO 639-1 표준에 따른 2자리 언어 코드 (예: `es` for Spanish)
 - **언어 이름**: 각 언어별로 표시될 언어명
-- **번역 키**: 모든 UI 텍스트의 번역
+- **번역 키**: 모든 UI 텍스트의 번역 (`locales` 시스템 기반)
 - **데이터 구조**: CSV/JSON 템플릿에 새로운 언어 필드 추가
 - **필터 옵션**: 모든 언어 버전의 필터 드롭다운에 새 언어 추가
+- **도메인/카테고리 번역**: locales 시스템을 통한 통합 관리
+
+## 🔄 최근 변경사항
+
+**번역 시스템 개편 (2025년 기준)**:
+- 도메인, 카테고리, 상황, 목적 번역이 `locales/{언어}/translations.json` 시스템으로 통합됨
+- 기존 JavaScript 파일 내 하드코딩된 번역 객체들이 제거됨
+- 모든 번역이 `window.getI18nText()` 함수를 통해 동적으로 로드됨
+- 모달 라벨 번역을 위한 `situation`, `purpose` 키가 필수로 요구됨
 
 ## 필수 파일 수정
 
@@ -90,25 +99,71 @@ const posMapping = {
 };
 ```
 
-### 4. components/js/domain-category-emoji.js
+### 4. 도메인/카테고리 번역 시스템 (locales 기반)
 
-```javascript
-// es 번역 객체 추가
-const translations = {
-  // 기존 언어들...
-  es: {
-    // 도메인 번역
-    daily: "Vida Diaria",
-    business: "Negocios",
-    // ... 기타 도메인들
+⚠️ **중요**: 기존 `components/js/domain-category-emoji.js` 파일의 하드코딩된 번역 객체는 **삭제되었습니다**. 현재는 **locales 시스템**을 통해 번역이 관리됩니다.
 
-    // 카테고리 번역
-    personal_care: "Cuidado Personal",
-    weather_talk: "Conversación sobre el Clima",
-    // ... 기타 카테고리들
-  },
-};
+#### 4.1 번역 키 추가 (`locales/[언어코드]/translations.json`)
+
+새로운 언어의 번역 파일에 도메인, 카테고리, 상황, 목적 관련 번역 키를 추가해야 합니다:
+
+```json
+{
+  // 기본 UI 번역들...
+  
+  // 도메인 번역 (필수)
+  "daily": "Vida Diaria",
+  "food": "Comida", 
+  "business": "Negocios",
+  "travel": "Viaje",
+  "education": "Educación",
+  "health": "Salud",
+  "technology": "Tecnología",
+  "entertainment": "Entretenimiento",
+  "sports": "Deportes",
+  "science": "Ciencia",
+  
+  // 카테고리 번역 (주요 카테고리만 예시)
+  "household": "Hogar",
+  "family": "Familia", 
+  "personal_care": "Cuidado Personal",
+  "weather_talk": "Conversación sobre el Clima",
+  "fruit": "Fruta",
+  "vegetable": "Verdura",
+  "transportation": "Transporte",
+  
+  // 상황/목적 번역 (모달 라벨용 - 필수)
+  "situation": "Situación",
+  "purpose": "Propósito",
+  
+  // 상황 값들
+  "greeting": "Saludo",
+  "business_meeting": "Reunión de Negocios", 
+  "casual_conversation": "Conversación Casual",
+  "presentation": "Presentación",
+  "phone_call": "Llamada Telefónica",
+  
+  // 목적 값들  
+  "purpose_greeting": "Saludo",
+  "purpose_business": "Negocios",
+  "purpose_learning": "Aprendizaje",
+  "purpose_presentation": "Presentación"
+}
 ```
+
+#### 4.2 번역 시스템 동작 방식
+
+현재 시스템은 `getTranslatedText()` 함수를 통해 다음 우선순위로 번역을 처리합니다:
+
+1. **1순위**: `window.getI18nText()` 함수 (locales 시스템)
+2. **2순위**: `window.translations` 전역 객체 (fallback)  
+3. **3순위**: 키 값 그대로 반환
+
+#### 4.3 주의사항
+
+- 도메인/카테고리 번역 키는 **영어 키 이름**을 그대로 사용합니다 (예: `daily`, `food`, `personal_care`)
+- 모달에서 사용되는 `situation`, `purpose` 키는 **반드시 포함**해야 합니다
+- 새로운 도메인/카테고리를 추가할 때는 모든 언어의 번역 파일에 해당 키를 추가해야 합니다
 
 ## HTML 페이지 생성
 
@@ -497,9 +552,11 @@ function parseConceptFromCSV(row) {
 ]
 ```
 
-### 3. samples/templates.js
+### samples/templates.js
 
-새로운 언어 데이터를 추가해야 합니다:
+**⚠️ 중요**: `samples/templates.js` 파일은 현재 시스템에서 더 이상 사용되지 않을 수 있습니다. 최신 구조를 확인한 후 필요시에만 업데이트하세요.
+
+새로운 언어 데이터를 추가해야 할 경우:
 
 ```javascript
 // CONCEPTS_TEMPLATE_CSV에 새 언어 컬럼 추가

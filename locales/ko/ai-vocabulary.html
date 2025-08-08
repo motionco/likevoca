@@ -1,283 +1,206 @@
 ﻿<!DOCTYPE html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LikeVoca - AI 맞춤형 단어장 생성</title>
 
-    <!-- 기본 메타 태그 -->
-    <meta
-      name="description"
-      content="AI 기술로 개인 맞춤형 단어장을 자동 생성하세요. 학습 수준과 관심사에 맞는 단어를 AI가 추천하고, 효율적인 학습 계획을 제공합니다. 스마트한 어휘 확장으로 언어 실력을 빠르게 향상시켜보세요."
-    />
-    <meta
-      name="keywords"
-      content="AI 단어 생성, 맞춤형 단어장, AI 언어 학습, 스마트 어휘 학습, 개인화 단어 추천, AI 학습 도구, 자동 단어장 생성, 다국어 AI 학습"
-    />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LikeVoca - AI 맞춤형 단어장 생성</title>
 
-    <!-- Open Graph / 소셜 미디어 메타 태그 -->
-    <meta property="og:title" content="LikeVoca - AI 맞춤형 단어장 생성" />
-    <meta
-      property="og:description"
-      content="AI 기술로 개인 맞춤형 단어장을 자동 생성하세요. 학습 수준과 관심사에 맞는 단어를 AI가 추천하고, 효율적인 학습 계획을 제공합니다. 스마트한 어휘 확장으로 언어 실력을 빠르게 향상시켜보세요."
-    />
-    <meta property="og:type" content="website" />
-    <meta
-      property="og:url"
-      content="https://likevoca.com/ai-vocabulary.html"
-    />
-    <meta property="og:locale" content="ko" />
+  <!-- 기본 메타 태그 -->
+  <meta name="description"
+    content="AI 기술로 개인 맞춤형 단어장을 자동 생성하세요. 학습 수준과 관심사에 맞는 단어를 AI가 추천하고, 효율적인 학습 계획을 제공합니다. 스마트한 어휘 확장으로 언어 실력을 빠르게 향상시켜보세요." />
+  <meta name="keywords" content="AI 단어 생성, 맞춤형 단어장, AI 언어 학습, 스마트 어휘 학습, 개인화 단어 추천, AI 학습 도구, 자동 단어장 생성, 다국어 AI 학습" />
 
-    <!-- 표준 링크 -->
-    <link
-      rel="canonical"
-      href="https://likevoca.com/ko/ai-vocabulary.html"
-    />
+  <!-- Open Graph / 소셜 미디어 메타 태그 -->
+  <meta property="og:title" content="LikeVoca - AI 맞춤형 단어장 생성" />
+  <meta property="og:description"
+    content="AI 기술로 개인 맞춤형 단어장을 자동 생성하세요. 학습 수준과 관심사에 맞는 단어를 AI가 추천하고, 효율적인 학습 계획을 제공합니다. 스마트한 어휘 확장으로 언어 실력을 빠르게 향상시켜보세요." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://likevoca.com/ai-vocabulary.html" />
+  <meta property="og:locale" content="ko" />
 
-    <!-- 대체 언어 링크 (초기값) -->
-    <link
-      rel="alternate"
-      hreflang="ko"
-      href="https://likevoca.com/ko/ai-vocabulary.html"
-    />
-    <link
-      rel="alternate"
-      hreflang="en"
-      href="https://likevoca.com/en/ai-vocabulary.html"
-    />
-    <link
-      rel="alternate"
-      hreflang="ja"
-      href="https://likevoca.com/ja/ai-vocabulary.html"
-    />
-    <link
-      rel="alternate"
-      hreflang="zh"
-      href="https://likevoca.com/zh/ai-vocabulary.html"
-    />
-    <link
-      rel="alternate"
-      hreflang="x-default"
-      href="https://likevoca.com/en/ai-vocabulary.html"
-    />
+  <!-- 표준 링크 -->
+  <link rel="canonical" href="https://likevoca.com/ko/ai-vocabulary.html" />
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-    />
-    <link rel="stylesheet" href="../../css/style.css" />
+  <!-- 대체 언어 링크 (초기값) -->
+  <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/ai-vocabulary.html" />
+  <link rel="alternate" hreflang="en" href="https://likevoca.com/en/ai-vocabulary.html" />
+  <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/ai-vocabulary.html" />
+  <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/ai-vocabulary.html" />
+  <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/ai-vocabulary.html" />
 
-    <style>
-      .dropdown-container {
-        position: relative;
-      }
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="../../css/style.css" />
 
-      .dropdown {
-        position: absolute;
-        z-index: 10;
-        width: 100%;
-      }
+  <style>
+    .dropdown-container {
+      position: relative;
+    }
 
-      .word-card {
-        transition: transform 0.3s;
-      }
+    .dropdown {
+      position: absolute;
+      z-index: 10;
+      width: 100%;
+    }
 
-      .word-card:hover {
-        transform: translateY(-5px);
-      }
-    </style>
-    <script type="module" src="../../js/language-init.js"></script>
-  </head>
+    .word-card {
+      transition: transform 0.3s;
+    }
 
-  <body class="bg-gray-100">
-    <div id="navbar-container"></div>
+    .word-card:hover {
+      transform: translateY(-5px);
+    }
+  </style>
+  <script type="module" src="../../js/language-init.js"></script>
+</head>
 
-    <main class="container mx-auto max-w-7xl px-4 py-8">
-      <div class="flex justify-between items-start mb-8">
-        <div>
-          <h1 class="text-3xl font-bold text-gray-800 mb-2" data-i18n="ai_vocabulary">
-            🤖 AI 단어장
-          </h1>
-          <p class="text-gray-600">
-            AI가 추천하는 맞춤형 단어로 더 스마트하게 학습하세요.
-          </p>
-        </div>
-        <button
-          id="ai-add-concept"
-          class="bg-[#2E7D32] text-white px-4 py-2 rounded-lg hover:bg-[#1B5E20] transition duration-300 flex items-center"
-          data-i18n="ai_generate_concept"
-        >
-          <i class="fas fa-robot mr-2"></i> AI 개념 생성
-        </button>
+<body class="bg-gray-100">
+  <div id="navbar-container"></div>
+
+  <main class="container mx-auto max-w-7xl px-4 py-8">
+    <div class="flex flex-col md:flex-row md:justify-between md:items-start mb-8">
+      <div class="mb-4 md:mb-0">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2" data-i18n="ai_vocabulary">
+          🤖 AI 단어장
+        </h1>
+        <p class="text-gray-600">
+          AI가 추천하는 맞춤형 단어로 더 스마트하게 학습하세요.
+        </p>
       </div>
+      <button id="ai-add-concept"
+        class="bg-[#2E7D32] text-white px-4 py-2 rounded-lg hover:bg-[#1B5E20] transition duration-300 flex items-center"
+        data-i18n="ai_generate_concept">
+        <i class="fas fa-robot mr-2"></i> AI 개념 생성
+      </button>
+    </div>
 
-      <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <!-- 검색 필터 -->
-          <div class="w-full">
-            <label
-              for="search-input"
-              class="hidden md:block text-sm font-medium mb-1 text-gray-700"
-              data-i18n="search"
-            >검색</label>
-            <div class="relative">
-              <input
-                type="text"
-                id="search-input"
-                class="w-full p-2 border rounded pl-8 h-10"
-                placeholder="검색어 입력..."
-                data-i18n-placeholder="search_placeholder"
-              />
-              <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-            </div>
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <!-- 검색 필터 -->
+        <div class="w-full">
+          <label for="search-input" class="hidden md:block text-sm font-medium mb-1 text-gray-700"
+            data-i18n="search">검색</label>
+          <div class="relative">
+            <input type="text" id="search-input" class="w-full p-2 border rounded pl-8 h-10" placeholder="검색어 입력..."
+              data-i18n-placeholder="search_placeholder" />
+            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
           </div>
+        </div>
 
-          <!-- 언어 필터 -->
-          <div class="w-full">
-            <label
-              for="language-filter"
-              class="text-sm font-medium text-gray-700"
-              data-i18n="language_filter"
-            >언어 필터</label>
-            <div class="grid grid-cols-5 gap-1 h-10">
-              <select
-                id="source-language"
-                class="col-span-2 p-2 border rounded text-sm"
-              >
-                <option value="korean" data-i18n="korean">한국어</option>
-                <option value="english" data-i18n="english">영어</option>
-                <option value="japanese" data-i18n="japanese">일본어</option>
-                <option value="chinese" data-i18n="chinese">중국어</option>
-                <option value="spanish" data-i18n="spanish">스페인어</option>
+        <!-- 언어 필터 -->
+        <div class="w-full">
+          <label for="language-filter" class="text-sm font-medium text-gray-700" data-i18n="language_filter">언어
+            필터</label>
+          <div class="grid grid-cols-5 gap-1 h-10">
+            <select id="source-language" class="col-span-2 p-2 border rounded text-sm">
+              <option value="korean" data-i18n="korean">한국어</option>
+              <option value="english" data-i18n="english">영어</option>
+              <option value="japanese" data-i18n="japanese">일본어</option>
+              <option value="chinese" data-i18n="chinese">중국어</option>
+              <option value="spanish" data-i18n="spanish">스페인어</option>
+            </select>
+
+            <button id="swap-languages"
+              class="w-full h-full text-gray-600 hover:text-[#4B63AC] hover:bg-gray-100 rounded-lg transition duration-200 border border-gray-300 hover:border-[#4B63AC] flex items-center justify-center"
+              title="" data-i18n-title="swap_languages">
+              <i class="fas fa-exchange-alt text-sm"></i>
+            </button>
+
+            <select id="target-language" class="col-span-2 p-2 border rounded text-sm">
+              <option value="english" data-i18n="english"></option>
+              <option value="korean" data-i18n="korean"></option>
+              <option value="japanese" data-i18n="japanese"></option>
+              <option value="chinese" data-i18n="chinese"></option>
+              <option value="spanish" data-i18n="spanish"></option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 도메인 및 정렬 -->
+        <div class="w-full">
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label for="domain-filter" class="block text-sm font-medium mb-1 text-gray-700"
+                data-i18n="domain"></label>
+              <select id="domain-filter" class="w-full p-2 border rounded h-10 text-sm">
+                <option value="all" data-i18n="all_domains"></option>
+                <option value="daily" data-i18n="domain_daily"></option>
+                <option value="food" data-i18n="domain_food"></option>
+                <option value="travel" data-i18n="domain_travel"></option>
+                <option value="business" data-i18n="domain_business"></option>
+                <option value="education" data-i18n="domain_education"></option>
+                <option value="nature" data-i18n="domain_nature"></option>
+                <option value="technology" data-i18n="domain_technology"></option>
+                <option value="health" data-i18n="domain_health"></option>
+                <option value="sports" data-i18n="domain_sports"></option>
+                <option value="entertainment" data-i18n="domain_entertainment"></option>
+                <option value="culture" data-i18n="domain_culture"></option>
+                <option value="other" data-i18n="domain_other"></option>
               </select>
-
-              <button
-                id="swap-languages"
-                class="w-full h-full text-gray-600 hover:text-[#4B63AC] hover:bg-gray-100 rounded-lg transition duration-200 border border-gray-300 hover:border-[#4B63AC] flex items-center justify-center"
-                title=""
-                data-i18n-title="swap_languages"
-              >
-                <i class="fas fa-exchange-alt text-sm"></i>
-              </button>
-
-              <select
-                id="target-language"
-                class="col-span-2 p-2 border rounded text-sm"
-              >
-                <option value="english" data-i18n="english"></option>
-                <option value="korean" data-i18n="korean"></option>
-                <option value="japanese" data-i18n="japanese"></option>
-                <option value="chinese" data-i18n="chinese"></option>
-                <option value="spanish" data-i18n="spanish"></option>
+            </div>
+            <div>
+              <label for="sort-filter" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="sort"></label>
+              <select id="sort-filter" class="w-full p-2 border rounded h-10 text-sm">
+                <option value="latest" data-i18n="latest"></option>
+                <option value="oldest" data-i18n="oldest"></option>
+                <option value="alphabetical" data-i18n="alphabetical"></option>
+                <option value="reverse_alphabetical" data-i18n="reverse_alphabetical"></option>
               </select>
             </div>
           </div>
-
-          <!-- 도메인 및 정렬 -->
-          <div class="w-full">
-            <div class="grid grid-cols-2 gap-2">
-              <div>
-                <label for="domain-filter" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="domain"></label>
-                <select id="domain-filter" class="w-full p-2 border rounded h-10 text-sm">
-                  <option value="all" data-i18n="all_domains"></option>
-                  <option value="daily" data-i18n="domain_daily"></option>
-                  <option value="food" data-i18n="domain_food"></option>
-                  <option value="travel" data-i18n="domain_travel"></option>
-                  <option value="business" data-i18n="domain_business"></option>
-                  <option value="education" data-i18n="domain_education"></option>
-                  <option value="nature" data-i18n="domain_nature"></option>
-                  <option value="technology" data-i18n="domain_technology"></option>
-                  <option value="health" data-i18n="domain_health"></option>
-                  <option value="sports" data-i18n="domain_sports"></option>
-                  <option value="entertainment" data-i18n="domain_entertainment"></option>
-                  <option value="culture" data-i18n="domain_culture"></option>
-                  <option value="other" data-i18n="domain_other"></option>
-                </select>
-              </div>
-              <div>
-                <label for="sort-filter" class="block text-sm font-medium mb-1 text-gray-700" data-i18n="sort"></label>
-                <select id="sort-filter" class="w-full p-2 border rounded h-10 text-sm">
-                  <option value="latest" data-i18n="latest"></option>
-                  <option value="oldest" data-i18n="oldest"></option>
-                  <option value="alphabetical" data-i18n="alphabetical"></option>
-                  <option value="reverse_alphabetical" data-i18n="reverse_alphabetical"></option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 개념 수 및 AI 사용량 표시 -->
-        <div
-          class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
-        >
-          <div class="text-sm text-gray-600">
-            <span id="filtered-count">0</span
-            ><span data-i18n="concept_count"></span>
-          </div>
-
-          <div class="flex items-center gap-4 w-full md:w-auto">
-            <span
-              class="text-sm font-medium text-gray-700 whitespace-nowrap"
-              data-i18n="ai_usage"
-            >AI 사용량:</span>
-            <div class="flex items-center gap-2 min-w-[200px]">
-              <div class="flex-1 bg-gray-200 rounded-full h-2.5">
-                <div
-                  id="ai-usage-bar"
-                  class="bg-[#4B63AC] h-2.5 rounded-full"
-                  style="width: 0%"
-                ></div>
-              </div>
-              <span
-                id="ai-usage-text"
-                class="text-sm font-medium whitespace-nowrap"
-                >0/0</span
-              >
-            </div>
-          </div>
         </div>
       </div>
 
-      <!-- 개념 카드 표시 영역 -->
-      <div
-        id="concept-list"
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-      ></div>
+      <!-- 개념 수 및 AI 사용량 표시 -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div class="text-sm text-gray-600">
+          <span id="filtered-count">0</span><span data-i18n="concept_count"></span>
+        </div>
 
-      <!-- 더 보기 버튼 -->
-      <div class="flex justify-center mt-8">
-        <button
-          id="load-more"
-          class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-6 rounded-lg transition duration-300 hidden"
-          data-i18n="load_more"
-        >
-          <i class="fas fa-chevron-down ml-1"></i>
-        </button>
+        <div class="flex items-center gap-4 w-full md:w-auto">
+          <span class="text-sm font-medium text-gray-700 whitespace-nowrap" data-i18n="ai_usage">AI 사용량:</span>
+          <div class="flex items-center gap-2 min-w-[200px]">
+            <div class="flex-1 bg-gray-200 rounded-full h-2.5">
+              <div id="ai-usage-bar" class="bg-[#4B63AC] h-2.5 rounded-full" style="width: 0%"></div>
+            </div>
+            <span id="ai-usage-text" class="text-sm font-medium whitespace-nowrap">0/0</span>
+          </div>
+        </div>
       </div>
-    </main>
+    </div>
 
-    <div id="modal-container"></div>
+    <!-- 개념 카드 표시 영역 -->
+    <div id="concept-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 
-    <!-- Firebase -->
-    <script type="module" src="../../js/firebase/firebase-init.js"></script>
-    <script type="module" src="../../utils/language-utils.js"></script>
-    <script type="module" src="../../pages/js/ai-vocabulary.js"></script>
-    <script type="module" src="../../components/js/navbar.js"></script>
-    <script type="module" src="../../utils/vocabulary-filter-shared.js"></script>
-    <script type="module" src="../../utils/ai-concept-utils.js"></script>
-    
-    <!-- 개념 모달 스크립트 -->
-    <script type="module" src="../../components/js/concept-modal-enhanced.js"></script>
-    <script type="module" src="../../components/js/concept-modal-utils.js"></script>
-    <script type="module" src="../../components/js/add-concept-modal.js"></script>
-    <script type="module" src="../../components/js/edit-concept-modal.js"></script>
-    <script type="module" src="../../components/js/ai-concept-modal.js"></script>
-    <script type="module" src="../../components/js/ai-edit-concept-modal.js"></script>
-    <script type="module" src="../../components/js/domain-category-emoji.js"></script>
-  </body>
+    <!-- 더 보기 버튼 -->
+    <div class="flex justify-center mt-8">
+      <button id="load-more"
+        class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-6 rounded-lg transition duration-300 hidden"
+        data-i18n="load_more">
+        <i class="fas fa-chevron-down ml-1"></i>
+      </button>
+    </div>
+  </main>
+
+  <div id="modal-container"></div>
+
+  <!-- Firebase -->
+  <script type="module" src="../../js/firebase/firebase-init.js"></script>
+  <script type="module" src="../../utils/language-utils.js"></script>
+  <script type="module" src="../../pages/js/ai-vocabulary.js"></script>
+  <script type="module" src="../../components/js/navbar.js"></script>
+  <script type="module" src="../../utils/vocabulary-filter-shared.js"></script>
+  <script type="module" src="../../utils/ai-concept-utils.js"></script>
+
+  <!-- 개념 모달 스크립트 -->
+  <script type="module" src="../../components/js/concept-modal-enhanced.js"></script>
+  <script type="module" src="../../components/js/concept-modal-utils.js"></script>
+  <script type="module" src="../../components/js/add-concept-modal.js"></script>
+  <script type="module" src="../../components/js/edit-concept-modal.js"></script>
+  <script type="module" src="../../components/js/ai-concept-modal.js"></script>
+  <script type="module" src="../../components/js/ai-edit-concept-modal.js"></script>
+  <script type="module" src="../../components/js/domain-category-emoji.js"></script>
+</body>
+
 </html>
-
-
-

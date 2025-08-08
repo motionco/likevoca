@@ -1,143 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LikeVoca - 게임으로 언어 마스터하기</title>
 
-    <!-- 기본 메타 태그 -->
-    <meta name="description" content="게임화된 학습으로 언어를 재미있게 마스터하세요. 단어 맞추기, 스피드 퀴즈, 메모리 게임 등 다양한 게임을 통해 자연스럽게 어휘력을 늘리고 언어 실력을 향상시킬 수 있습니다." />
-    <meta name="keywords" content="언어 학습 게임, 단어 게임, 게임화 학습, 어휘 게임, 맞춤형 게임, AI 게임, 다국어 게임, 영어 게임, 일본어 게임, 중국어 게임, 한국어 게임" />
-    
-    <!-- Open Graph / 소셜 미디어 메타 태그 -->
-    <meta property="og:title" content="LikeVoca - 게임으로 언어 마스터하기" />
-    <meta property="og:description" content="게임화된 학습으로 언어를 재미있게 마스터하세요. 단어 맞추기, 스피드 퀴즈, 메모리 게임 등 다양한 게임을 통해 자연스럽게 어휘력을 늘리고 언어 실력을 향상시킬 수 있습니다." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://likevoca.com/pages/games.html" />
-    <meta property="og:locale" content="ko" />
-    
-    <!-- 표준 링크 -->
-    <link rel="canonical" href="https://likevoca.com/ko/pages/games.html" />
-    
-    <!-- 대체 언어 링크 (초기값) -->
-    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/pages/games.html" />
-    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/pages/games.html" />
-    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/pages/games.html" />
-    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/pages/games.html" />
-    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/pages/games.html" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LikeVoca - 게임으로 언어 마스터하기</title>
 
-    <!-- 성능 최적화 - Resource Hints -->
-    <link rel="preconnect" href="https://cdn.tailwindcss.com">
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
-    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+  <!-- 기본 메타 태그 -->
+  <meta name="description"
+    content="게임화된 학습으로 언어를 재미있게 마스터하세요. 단어 맞추기, 스피드 퀴즈, 메모리 게임 등 다양한 게임을 통해 자연스럽게 어휘력을 늘리고 언어 실력을 향상시킬 수 있습니다." />
+  <meta name="keywords"
+    content="언어 학습 게임, 단어 게임, 게임화 학습, 어휘 게임, 맞춤형 게임, AI 게임, 다국어 게임, 영어 게임, 일본어 게임, 중국어 게임, 한국어 게임" />
 
-    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-    />
+  <!-- Open Graph / 소셜 미디어 메타 태그 -->
+  <meta property="og:title" content="LikeVoca - 게임으로 언어 마스터하기" />
+  <meta property="og:description"
+    content="게임화된 학습으로 언어를 재미있게 마스터하세요. 단어 맞추기, 스피드 퀴즈, 메모리 게임 등 다양한 게임을 통해 자연스럽게 어휘력을 늘리고 언어 실력을 향상시킬 수 있습니다." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://likevoca.com/pages/games.html" />
+  <meta property="og:locale" content="ko" />
 
-    <link rel="stylesheet" href="../../css/style.css" />
-    
-    <!-- Firebase -->
-    <script type="module" src="../../js/firebase/firebase-init.js"></script>
-    <script type="module" src="../../utils/language-utils.js"></script>
-    <script type="module" src="../../js/language-init.js"></script>
-    
-    <style>
-      .game-card {
-        transition: transform 0.3s, box-shadow 0.3s;
-      }
-      .game-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-      }
-      .game-container {
-        min-height: 400px;
-        display: none;
-      }
-      .game-card.active {
-        border: 3px solid #9C27B0;
-      }
-      .drag-item {
-        cursor: grab;
-        user-select: none;
-      }
-      .drag-item:active {
-        cursor: grabbing;
-      }
-      .drop-zone {
-        min-height: 50px;
-        border: 2px dashed #9C27B0;
-      }
-      .drop-zone.hover {
-        background-color: rgba(156, 39, 176, 0.1);
-      }
-      /* 카드 뒤집기 효과를 위한 CSS 추가 */
-      .backface-hidden {
-        backface-visibility: hidden;
-        -webkit-backface-visibility: hidden;
-      }
-    </style>
-  </head>
-  <body class="bg-gray-100">
-    <div id="navbar-container"></div>
+  <!-- 표준 링크 -->
+  <link rel="canonical" href="https://likevoca.com/ko/pages/games.html" />
 
-    <main class="container mx-auto max-w-7xl px-4 py-8">
-      <div class="flex justify-between items-start mb-8">
-        <div>
-          <h1 class="text-3xl font-bold text-gray-800 mb-2" data-i18n="games">🎮 게임</h1>
-          <p class="text-gray-600">
-            재미있는 게임을 통해 자연스럽게 언어를 학습하고 실력을 향상시켜보세요.
-          </p>
-        </div>
-        <div class="flex space-x-4">
-          <select id="source-language" class="border p-2 rounded">
-            <option value="korean" data-i18n="korean">한국어</option>
-            <option value="english" data-i18n="english">영어</option>
-            <option value="japanese" data-i18n="japanese">일본어</option>
-            <option value="chinese" data-i18n="chinese">중국어</option>
-            <option value="spanish" data-i18n="spanish">스페인어</option>
-          </select>
-          <select id="target-language" class="border p-2 rounded">
-            <option value="english" data-i18n="english">영어</option>
-            <option value="korean" data-i18n="korean">한국어</option>
-            <option value="japanese" data-i18n="japanese">일본어</option>
-            <option value="chinese" data-i18n="chinese">중국어</option>
-            <option value="spanish" data-i18n="spanish">스페인어</option>
-          </select>
-        </div>
+  <!-- 대체 언어 링크 (초기값) -->
+  <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/pages/games.html" />
+  <link rel="alternate" hreflang="en" href="https://likevoca.com/en/pages/games.html" />
+  <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/pages/games.html" />
+  <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/pages/games.html" />
+  <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/pages/games.html" />
+
+  <!-- 성능 최적화 - Resource Hints -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+  <link rel="stylesheet" href="../../css/style.css" />
+
+  <!-- Firebase -->
+  <script type="module" src="../../js/firebase/firebase-init.js"></script>
+  <script type="module" src="../../utils/language-utils.js"></script>
+  <script type="module" src="../../js/language-init.js"></script>
+
+  <style>
+    .game-card {
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .game-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .game-container {
+      min-height: 400px;
+      display: none;
+    }
+
+    .game-card.active {
+      border: 3px solid #9C27B0;
+    }
+
+    .drag-item {
+      cursor: grab;
+      user-select: none;
+    }
+
+    .drag-item:active {
+      cursor: grabbing;
+    }
+
+    .drop-zone {
+      min-height: 50px;
+      border: 2px dashed #9C27B0;
+    }
+
+    .drop-zone.hover {
+      background-color: rgba(156, 39, 176, 0.1);
+    }
+
+    /* 카드 뒤집기 효과를 위한 CSS 추가 */
+    .backface-hidden {
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100">
+  <div id="navbar-container"></div>
+
+  <main class="container mx-auto max-w-7xl px-4 py-8">
+    <div class="flex flex-col md:flex-row md:justify-between md:items-start mb-8">
+      <div class="mb-4 md:mb-0">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2" data-i18n="games">🎮 게임</h1>
+        <p class="text-gray-600">
+          재미있는 게임을 통해 자연스럽게 언어를 학습하고 실력을 향상시켜보세요.
+        </p>
+      </div>
+      <div class="flex flex-col sm:flex-row gap-4">
+        <select id="source-language" class="border p-2 rounded">
+          <option value="korean" data-i18n="korean">한국어</option>
+          <option value="english" data-i18n="english">영어</option>
+          <option value="japanese" data-i18n="japanese">일본어</option>
+          <option value="chinese" data-i18n="chinese">중국어</option>
+          <option value="spanish" data-i18n="spanish">스페인어</option>
+        </select>
+        <select id="target-language" class="border p-2 rounded">
+          <option value="english" data-i18n="english">영어</option>
+          <option value="korean" data-i18n="korean">한국어</option>
+          <option value="japanese" data-i18n="japanese">일본어</option>
+          <option value="chinese" data-i18n="chinese">중국어</option>
+          <option value="spanish" data-i18n="spanish">스페인어</option>
+        </select>
+      </div>
+    </div>
+
+
+
+    <!-- 게임 실행 영역 -->
+    <div id="game-play-area" class="hidden">
+      <div class="flex justify-between items-center mb-6">
+        <h2 id="current-game-title" class="text-2xl font-bold text-gray-800"></h2>
+        <button id="back-to-games"
+          class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+          <i class="fas fa-arrow-left mr-2"></i><span data-i18n="back_to_games">게임 선택으로 돌아가기</span>
+        </button>
       </div>
 
+      <!-- 게임별 컨테이너 -->
+      <div id="word-matching-container" class="game-container"></div>
+      <div id="word-scramble-container" class="game-container"></div>
+      <div id="memory-game-container" class="game-container"></div>
+    </div>
 
+    <!-- 게임 선택 영역 -->
+    <div id="game-selection-area">
 
-      <!-- 게임 실행 영역 -->
-      <div id="game-play-area" class="hidden">
-        <div class="flex justify-between items-center mb-6">
-          <h2 id="current-game-title" class="text-2xl font-bold text-gray-800"></h2>
-          <button id="back-to-games" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">
-            <i class="fas fa-arrow-left mr-2"></i><span data-i18n="back_to_games">게임 선택으로 돌아가기</span>
-          </button>
-        </div>
-        
-        <!-- 게임별 컨테이너 -->
-        <div id="word-matching-container" class="game-container"></div>
-        <div id="word-scramble-container" class="game-container"></div>
-        <div id="memory-game-container" class="game-container"></div>
-      </div>
-
-      <!-- 게임 선택 영역 -->
-      <div id="game-selection-area">
-        <!-- 게임 선택 안내 -->
-        <div class="text-center mb-8">
-          <h2 class="text-2xl font-bold mb-4" data-i18n="select_game_to_play">원하는 게임을 선택해주세요</h2>
-          <p class="text-gray-600 max-w-2xl mx-auto" data-i18n="game_selection_desc">
-            각 게임을 클릭하면 게임이 시작됩니다. 위에서 원본 언어와 대상 언어를 선택하면 
-            해당 설정이 게임에도 적용됩니다.
-          </p>
-        </div>
-        
       <!-- 게임 선택 카드 -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
         <div class="game-card bg-white rounded-xl p-6 shadow-lg cursor-pointer" data-game="word-matching">
@@ -150,13 +153,13 @@
               원본 언어와 대상 언어의 단어를 올바르게 연결하는 게임입니다.
             </p>
             <div class="mt-auto">
-                <div class="flex justify-between text-sm text-gray-500 mb-4">
-                  <span><i class="fas fa-stopwatch mr-1"></i> <span data-i18n="time_limit">제한시간</span></span>
-                  <span><i class="fas fa-star mr-1"></i> <span data-i18n="beginner">초급</span></span>
+              <div class="flex justify-between text-sm text-gray-500 mb-4">
+                <span><i class="fas fa-stopwatch mr-1"></i> <span data-i18n="time_limit">제한시간</span></span>
+                <span><i class="fas fa-star mr-1"></i> <span data-i18n="beginner">초급</span></span>
               </div>
-                <button class="w-full bg-[#9C27B0] text-white py-2 rounded-lg hover:bg-[#7B1FA2] transition-colors">
-                  <i class="fas fa-play mr-2"></i><span data-i18n="start_game">게임 시작</span>
-                </button>
+              <button class="w-full bg-[#9C27B0] text-white py-2 rounded-lg hover:bg-[#7B1FA2] transition-colors">
+                <i class="fas fa-play mr-2"></i><span data-i18n="start_game">게임 시작</span>
+              </button>
             </div>
           </div>
         </div>
@@ -171,13 +174,14 @@
               섞인 글자를 올바른 순서로 정렬하여 단어를 완성하세요.
             </p>
             <div class="mt-auto">
-                <div class="flex justify-between text-sm text-gray-500 mb-4">
-                  <span><i class="fas fa-stopwatch mr-1"></i> <span data-i18n="time_limit">제한시간</span></span>
-                  <span><i class="fas fa-star mr-1"></i><i class="fas fa-star mr-1"></i> <span data-i18n="intermediate">중급</span></span>
+              <div class="flex justify-between text-sm text-gray-500 mb-4">
+                <span><i class="fas fa-stopwatch mr-1"></i> <span data-i18n="time_limit">제한시간</span></span>
+                <span><i class="fas fa-star mr-1"></i><i class="fas fa-star mr-1"></i> <span
+                    data-i18n="intermediate">중급</span></span>
               </div>
-                <button class="w-full bg-[#9C27B0] text-white py-2 rounded-lg hover:bg-[#7B1FA2] transition-colors">
-                  <i class="fas fa-play mr-2"></i><span data-i18n="start_game">게임 시작</span>
-                </button>
+              <button class="w-full bg-[#9C27B0] text-white py-2 rounded-lg hover:bg-[#7B1FA2] transition-colors">
+                <i class="fas fa-play mr-2"></i><span data-i18n="start_game">게임 시작</span>
+              </button>
             </div>
           </div>
         </div>
@@ -192,62 +196,64 @@
               짝을 이루는 단어 카드를 찾아 매칭하는 메모리 게임입니다.
             </p>
             <div class="mt-auto">
-                <div class="flex justify-between text-sm text-gray-500 mb-4">
-                  <span><i class="fas fa-stopwatch mr-1"></i> <span data-i18n="time_limit">제한시간</span></span>
-                  <span><i class="fas fa-star mr-1"></i><i class="fas fa-star mr-1"></i><i class="fas fa-star mr-1"></i> <span data-i18n="advanced">고급</span></span>
+              <div class="flex justify-between text-sm text-gray-500 mb-4">
+                <span><i class="fas fa-stopwatch mr-1"></i> <span data-i18n="time_limit">제한시간</span></span>
+                <span><i class="fas fa-star mr-1"></i><i class="fas fa-star mr-1"></i><i class="fas fa-star mr-1"></i>
+                  <span data-i18n="advanced">고급</span></span>
               </div>
-                <button class="w-full bg-[#9C27B0] text-white py-2 rounded-lg hover:bg-[#7B1FA2] transition-colors">
-                  <i class="fas fa-play mr-2"></i><span data-i18n="start_game">게임 시작</span>
-                </button>
+              <button class="w-full bg-[#9C27B0] text-white py-2 rounded-lg hover:bg-[#7B1FA2] transition-colors">
+                <i class="fas fa-play mr-2"></i><span data-i18n="start_game">게임 시작</span>
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-        <!-- 게임 통계 -->
-        <div class="bg-white rounded-xl p-6 shadow-lg mb-6">
-          <h2 class="text-xl font-bold mb-4" data-i18n="game_stats">게임 통계</h2>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="text-center p-4 bg-purple-50 rounded-lg">
-              <div class="text-2xl font-bold text-[#9C27B0]" id="total-games-played">0</div>
-              <div class="text-sm text-gray-600" data-i18n="total_games_played">총 게임 횟수</div>
-            </div>
-            <div class="text-center p-4 bg-green-50 rounded-lg">
-              <div class="text-2xl font-bold text-green-600" id="best-score">0</div>
-              <div class="text-sm text-gray-600" data-i18n="best_score">최고 점수</div>
-            </div>
-            <div class="text-center p-4 bg-blue-50 rounded-lg">
-              <div class="text-2xl font-bold text-blue-600" id="average-score">0</div>
-              <div class="text-sm text-gray-600" data-i18n="average_score">평균 점수</div>
-            </div>
+      <!-- 게임 통계 -->
+      <div class="bg-white rounded-xl p-6 shadow-lg mb-6">
+        <h2 class="text-xl font-bold mb-4" data-i18n="game_stats">게임 통계</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="text-center p-4 bg-purple-50 rounded-lg">
+            <div class="text-2xl font-bold text-[#9C27B0]" id="total-games-played">0</div>
+            <div class="text-sm text-gray-600" data-i18n="total_games_played">총 게임 횟수</div>
           </div>
-        </div>
-
-        <!-- 최근 게임 활동 -->
-        <div class="bg-white rounded-xl p-6 shadow-lg">
-          <h2 class="text-xl font-bold mb-4" data-i18n="recent_game_activity">최근 게임 활동</h2>
-          <div id="recent-game-activity" class="space-y-3">
-            <p class="text-gray-500 text-center py-8" data-i18n="no_recent_game_activity">아직 게임 활동이 없습니다.</p>
+          <div class="text-center p-4 bg-green-50 rounded-lg">
+            <div class="text-2xl font-bold text-green-600" id="best-score">0</div>
+            <div class="text-sm text-gray-600" data-i18n="best_score">최고 점수</div>
+          </div>
+          <div class="text-center p-4 bg-blue-50 rounded-lg">
+            <div class="text-2xl font-bold text-blue-600" id="average-score">0</div>
+            <div class="text-sm text-gray-600" data-i18n="average_score">평균 점수</div>
           </div>
         </div>
       </div>
-    </main>
 
-    <!-- Firebase -->
-    <script type="module" src="../../js/firebase/firebase-init.js"></script>
-    <script type="module" src="../../utils/language-utils.js"></script>
-    <script type="module" src="../../js/language-init.js"></script>
-    <!-- 네비게이션바 스크립트 -->
-    <script type="module" src="../../components/js/navbar.js"></script>
-    <!-- 게임 선택 스크립트 -->
-    <script type="module" src="../../pages/js/games.js"></script>
-    <script type="module">
-      import { updateMetadata } from '../../utils/language-utils.js';
-      
-      // 페이지 로드 후 메타데이터 업데이트
-      document.addEventListener('DOMContentLoaded', async () => {
-        await updateMetadata('games');
-      });
-    </script>
-  </body>
-</html> 
+      <!-- 최근 게임 활동 -->
+      <div class="bg-white rounded-xl p-6 shadow-lg">
+        <h2 class="text-xl font-bold mb-4" data-i18n="recent_game_activity">최근 게임 활동</h2>
+        <div id="recent-game-activity" class="space-y-3">
+          <p class="text-gray-500 text-center py-8" data-i18n="no_recent_game_activity">아직 게임 활동이 없습니다.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Firebase -->
+  <script type="module" src="../../js/firebase/firebase-init.js"></script>
+  <script type="module" src="../../utils/language-utils.js"></script>
+  <script type="module" src="../../js/language-init.js"></script>
+  <!-- 네비게이션바 스크립트 -->
+  <script type="module" src="../../components/js/navbar.js"></script>
+  <!-- 게임 선택 스크립트 -->
+  <script type="module" src="../../pages/js/games.js"></script>
+  <script type="module">
+    import { updateMetadata } from '../../utils/language-utils.js';
+
+    // 페이지 로드 후 메타데이터 업데이트
+    document.addEventListener('DOMContentLoaded', async () => {
+      await updateMetadata('games');
+    });
+  </script>
+</body>
+
+</html>
