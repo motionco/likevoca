@@ -93,12 +93,10 @@
 
     <!-- 퀴즈 설정 섹션 -->
     <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-      <h2 class="text-xl font-semibold mb-4" data-i18n="quiz_settings">
-        퀴즈 설정
-      </h2>
 
-      <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-        <!-- 첫 번째 줄: 소스언어, 대상언어, 퀴즈 타입 -->
+      <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6">
+        <!-- 모바일: 3줄 구성, 데스크탑: 1줄에 6개 -->
+        <!-- 첫 번째 줄: 원어, 대상언어 -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="source_language">
             원어
@@ -121,12 +119,13 @@
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="english">English</option>
             <option value="korean">한국어</option>
-            <option value="japanese">日본語</option>
+            <option value="japanese">日本語</option>
             <option value="chinese">中文</option>
             <option value="spanish">Español</option>
           </select>
         </div>
 
+        <!-- 두 번째 줄: 퀴즈타입, 도메인 -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="quiz_type">
             퀴즈 타입
@@ -139,10 +138,7 @@
             <option value="fill_in_blank" data-i18n="quiz_fill_blank">빈칸 채우기</option>
           </select>
         </div>
-      </div>
 
-      <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-        <!-- 두 번째 줄: 도메인, 난이도, 문제 수 -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="domain">
             도메인
@@ -163,6 +159,7 @@
           </select>
         </div>
 
+        <!-- 세 번째 줄: 난이도, 문제수 -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="difficulty">
             난이도
@@ -170,9 +167,11 @@
           <select id="quiz-difficulty"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="all" data-i18n="all_levels">모든 레벨</option>
-            <option value="beginner" data-i18n="beginner">초급</option>
+            <option value="basic" data-i18n="basic">기초</option>
             <option value="intermediate" data-i18n="intermediate">중급</option>
             <option value="advanced" data-i18n="advanced">고급</option>
+            <option value="fluent" data-i18n="fluent">유창</option>
+            <option value="technical" data-i18n="technical">전문</option>
           </select>
         </div>
 
