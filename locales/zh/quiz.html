@@ -4,23 +4,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LikeVoca - 测验中掌握单词</title>
+  <title data-i18n="quiz_title">LikeVoca - 通过测验掌握单词</title>
 
   <!-- 기본 메타 태그 -->
-  <meta name="description" content="通过各种测验形式复习学习的单词并掌握它们。通过选择题、填空题、听力测验等有趣地提高语言技能。" />
+  <meta name="description" content="通过各种测验形式复习学过的单词并完美掌握它们。通过选择题、简答题、听力测验等有趣的方式提高语言技能。" />
   <meta name="keywords" content="语言测验, 单词测验, 词汇测试, 语言学习测验, 定制化测验, AI测验, 多语言测验, 英语测验, 日语测验, 中文测验" />
 
   <!-- Open Graph / 소셜 미디어 메타 태그 -->
-  <meta property="og:title" content="LikeVoca - 测验中掌握单词" />
-  <meta property="og:description" content="通过各种测验形式复习学习的单词并掌握它们。通过选择题、填空题、听力测验等有趣地提高语言技能。" />
+  <meta property="og:title" content="LikeVoca - 通过测验掌握单词" />
+  <meta property="og:description" content="通过各种测验形式复习学过的单词并完美掌握它们。通过选择题、简答题、听力测验等有趣的方式提高语言技能。" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://likevoca.com/zh/quiz" />
   <meta property="og:locale" content="zh" />
 
   <!-- Twitter Card 태그 -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="LikeVoca - 测验中掌握单词" />
-  <meta name="twitter:description" content="通过各种测验形式复习学习的单词并掌握它们。通过选择题、填空题、听力测验等有趣地提高语言技能。" />
+  <meta name="twitter:title" content="LikeVoca - 通过测验掌握单词" />
+  <meta name="twitter:description" content="通过各种测验形式复习学过的单词并完美掌握它们。通过选择题、简答题、听力测验等有趣的方式提高语言技能。" />
   <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
 
   <!-- 표준 링크 -->
@@ -49,22 +49,27 @@
     {
       "@context": "https://schema.org",
       "@type": "WebPage",
-      "name": "LikeVoca 测验",
-      "description": "通过各种测验形式复习学习的单词并掌握它们。通过选择题、填空题、听力测验等有趣地提高语言技能。",
-      "url": "https://likevoca.com/zh/quiz",
+      "name": "LikeVoca 퀴즈",
+      "description": "다양한 퀴즈 형식으로 학습한 단어들을 복습하고 완벽하게 마스터하세요. 객관식, 단답형, 듣기 퀴즈 등 재미있는 방식으로 언어 실력을 향상시킬 수 있습니다.",
+      "url": "https://likevoca.com/ko/quiz",
       "isPartOf": {
         "@type": "WebSite",
         "name": "LikeVoca",
         "url": "https://likevoca.com"
       },
-      "inLanguage": "zh",
+      "inLanguage": "ko",
       "potentialAction": {
         "@type": "InteractAction",
-        "name": "参加测验",
-        "description": "通过语言学习测验测试和提高单词技能"
+        "name": "퀴즈 풀기",
+        "description": "언어 학습 퀴즈를 통해 단어 실력을 테스트하고 향상시키세요"
       }
     }
     </script>
+
+  <!-- Firebase -->
+  <script type="module" src="../../js/firebase/firebase-init.js"></script>
+  <script type="module" src="../../utils/language-utils.js"></script>
+  <script type="module" src="../../js/language-init.js"></script>
 </head>
 
 <body class="bg-gray-50 min-h-screen">
@@ -75,26 +80,26 @@
   <main class="container mx-auto px-6 py-8">
     <!-- 페이지 헤더 -->
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-800 mb-2">
-        📝 测验
+      <h1 class="text-3xl font-bold text-gray-800 mb-2" data-i18n="quiz_title">
+        📝 퀴즈
       </h1>
       <p class="text-gray-600">
-        通过有趣的测验复习学习的单词并提高技能。
+        다양한 퀴즈로 학습한 단어를 재미있게 복습하고 실력을 향상시켜보세요.
       </p>
     </div>
 
     <!-- 퀴즈 설정 섹션 -->
     <div class="bg-white rounded-lg shadow-md p-6 mb-6">
 
-      <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6">
-        <!-- Mobile: 3 rows, Desktop: 1 row with 6 filters -->
-        <!-- First row: Source Language, Target Language -->
+      <div class="grid grid-cols-2 md:grid-cols-6 gap-3 md:gap-4 mb-6">
+        <!-- 모바일: 3줄 구성, 데스크탑: 1줄에 6개 -->
+        <!-- 첫 번째 줄: 원어, 대상언어 -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">
-            源语言
+          <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="source_language">
+            원어
           </label>
           <select id="quiz-source-language"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            class="w-full p-2 border border-gray-300 rounded-md text-sm h-10 focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="korean">한국어</option>
             <option value="english">English</option>
             <option value="japanese">日本語</option>
@@ -104,11 +109,11 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">
-            目标语言
+          <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="target_language">
+            대상 언어
           </label>
           <select id="quiz-target-language"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            class="w-full p-2 border border-gray-300 rounded-md text-sm h-10 focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="english">English</option>
             <option value="korean">한국어</option>
             <option value="japanese">日本語</option>
@@ -117,76 +122,76 @@
           </select>
         </div>
 
-        <!-- Second row: Quiz Type, Domain -->
+        <!-- 두 번째 줄: 퀴즈타입, 도메인 -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">
-            测验类型
+          <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="quiz_type">
+            퀴즈 타입
           </label>
           <select id="quiz-type"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="translation">翻译</option>
-            <option value="pronunciation">发音</option>
-            <option value="matching">匹配</option>
-            <option value="fill_in_blank">填空</option>
+            class="w-full p-2 border border-gray-300 rounded-md text-sm h-10 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="translation" data-i18n="quiz_translation">번역</option>
+            <option value="pronunciation" data-i18n="quiz_pronunciation">발음</option>
+            <option value="matching" data-i18n="quiz_matching">매칭</option>
+            <option value="fill_in_blank" data-i18n="quiz_fill_blank">빈칸 채우기</option>
           </select>
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">
-            领域
+          <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="domain">
+            도메인
           </label>
           <select id="quiz-domain"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="all">所有领域</option>
-            <option value="daily">日常生活</option>
-            <option value="food">食物</option>
-            <option value="business">商务</option>
-            <option value="travel">旅行</option>
-            <option value="education">教育</option>
-            <option value="health">健康</option>
-            <option value="technology">技术</option>
-            <option value="entertainment">娱乐</option>
-            <option value="sports">体育</option>
-            <option value="science">科学</option>
+            class="w-full p-2 border border-gray-300 rounded-md text-sm h-10 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="all" data-i18n="all_domains">모든 도메인</option>
+            <option value="daily" data-i18n="daily">일상</option>
+            <option value="food" data-i18n="food">음식</option>
+            <option value="business" data-i18n="business">비즈니스</option>
+            <option value="travel" data-i18n="travel">여행</option>
+            <option value="education" data-i18n="education">교육</option>
+            <option value="health" data-i18n="health">건강</option>
+            <option value="technology" data-i18n="technology">기술</option>
+            <option value="entertainment" data-i18n="entertainment">엔터테인먼트</option>
+            <option value="sports" data-i18n="sports">스포츠</option>
+            <option value="science" data-i18n="science">과학</option>
           </select>
         </div>
 
-        <!-- Third row: Difficulty, Question Count -->
+        <!-- 세 번째 줄: 난이도, 문제수 -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">
-            难度等级
+          <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="difficulty">
+            난이도
           </label>
           <select id="quiz-difficulty"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="all">所有等级</option>
-            <option value="basic">基础</option>
-            <option value="intermediate">中级</option>
-            <option value="advanced">高级</option>
-            <option value="fluent">流利</option>
-            <option value="technical">专业</option>
+            class="w-full p-2 border border-gray-300 rounded-md text-sm h-10 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="all" data-i18n="all_levels">모든 레벨</option>
+            <option value="basic" data-i18n="basic">기초</option>
+            <option value="intermediate" data-i18n="intermediate">중급</option>
+            <option value="advanced" data-i18n="advanced">고급</option>
+            <option value="fluent" data-i18n="fluent">유창</option>
+            <option value="technical" data-i18n="technical">전문</option>
           </select>
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">
-            题目数量
+          <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="question_count">
+            문제 수
           </label>
           <select id="quiz-question-count"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="5">5题</option>
-            <option value="10" selected>10题</option>
-            <option value="15">15题</option>
-            <option value="20">20题</option>
+            class="w-full p-2 border border-gray-300 rounded-md text-sm h-10 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="5">5문제</option>
+            <option value="10" selected>10문제</option>
+            <option value="15">15문제</option>
+            <option value="20">20문제</option>
           </select>
         </div>
       </div>
 
-      <!-- Start Quiz Button -->
+      <!-- 퀴즈 시작 버튼 -->
       <div class="text-center">
         <button id="start-quiz-btn"
           class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors"
           data-i18n="start_quiz">
-          开始测验
+          퀴즈 시작
         </button>
       </div>
     </div>
@@ -196,7 +201,7 @@
       <!-- 퀴즈 진행 헤더 -->
       <div class="bg-white rounded-lg shadow-md p-6 mb-6">
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-semibold">测验进行中</h2>
+          <h2 class="text-xl font-semibold" data-i18n="quiz_in_progress">퀴즈 진행 중</h2>
           <div class="text-sm text-gray-600">
             <span id="current-question">1</span> / <span id="total-questions">10</span>
           </div>
@@ -216,7 +221,7 @@
             class="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full inline-block mb-4"></div>
 
           <!-- 문제 제목 -->
-          <h3 id="question-text" class="text-3xl font-bold text-gray-800 mb-6">加载题目中...</h3>
+          <h3 id="question-text" class="text-3xl font-bold text-gray-800 mb-6">문제가 로딩 중입니다...</h3>
 
           <!-- 힌트 영역 -->
           <div id="question-hint" class="text-lg text-gray-600 mb-8 hidden">
@@ -240,8 +245,9 @@
       <div class="bg-white rounded-lg shadow-md p-6">
         <div class="flex justify-between items-center">
           <button id="skip-question-btn"
-            class="text-gray-600 hover:text-gray-800 px-4 py-2 rounded border border-gray-300 hover:border-gray-400">
-            跳过
+            class="text-gray-600 hover:text-gray-800 px-4 py-2 rounded border border-gray-300 hover:border-gray-400"
+            data-i18n="skip_question">
+            건너뛰기
           </button>
 
           <div class="text-center">
@@ -249,8 +255,9 @@
           </div>
 
           <button id="quit-quiz-btn"
-            class="text-red-600 hover:text-red-800 px-4 py-2 rounded border border-red-300 hover:border-red-400">
-            退出测验
+            class="text-red-600 hover:text-red-800 px-4 py-2 rounded border border-red-300 hover:border-red-400"
+            data-i18n="quit_quiz">
+            퀴즈 종료
           </button>
         </div>
       </div>
@@ -261,35 +268,37 @@
       <div class="bg-white rounded-lg shadow-md p-8 text-center">
         <div class="mb-6">
           <i class="fas fa-trophy text-6xl text-yellow-500 mb-4"></i>
-          <h2 class="text-2xl font-bold text-gray-800 mb-2">测验完成！</h2>
+          <h2 class="text-2xl font-bold text-gray-800 mb-2" data-i18n="quiz_completed">퀴즈 완료!</h2>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div class="bg-green-50 p-4 rounded-lg">
             <div class="text-3xl font-bold text-green-600" id="correct-answers">0</div>
-            <div class="text-sm text-gray-600">正确</div>
+            <div class="text-sm text-gray-600" data-i18n="correct_answers">정답</div>
           </div>
 
           <div class="bg-blue-50 p-4 rounded-lg">
             <div class="text-3xl font-bold text-blue-600" id="quiz-score">0%</div>
-            <div class="text-sm text-gray-600">得分</div>
+            <div class="text-sm text-gray-600" data-i18n="score">점수</div>
           </div>
 
           <div class="bg-purple-50 p-4 rounded-lg">
             <div class="text-3xl font-bold text-purple-600" id="time-taken">00:00</div>
-            <div class="text-sm text-gray-600">时间</div>
+            <div class="text-sm text-gray-600" data-i18n="time_taken">소요 시간</div>
           </div>
         </div>
 
         <div class="space-x-4">
           <button id="retry-quiz-btn"
-            class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
-            再试一次
+            class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+            data-i18n="retry_quiz">
+            다시 도전
           </button>
 
           <button id="new-quiz-btn"
-            class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors">
-            新测验
+            class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
+            data-i18n="new_quiz">
+            새 퀴즈
           </button>
         </div>
       </div>
@@ -297,9 +306,9 @@
 
     <!-- 최근 퀴즈 기록 -->
     <div class="bg-white rounded-lg shadow-md p-6 mt-8">
-      <h2 class="text-xl font-semibold mb-4">最近的测验记录</h2>
+      <h2 class="text-xl font-semibold mb-4" data-i18n="recent_quiz_history">최근 퀴즈 기록</h2>
       <div id="quiz-history" class="space-y-3">
-        <p class="text-gray-500 text-center py-8">还没有测验记录。</p>
+        <p class="text-gray-500 text-center py-8" data-i18n="no_quiz_history">아직 퀴즈 기록이 없습니다.</p>
       </div>
     </div>
   </main>
@@ -315,11 +324,6 @@
 
   <!-- 퀴즈 스크립트 -->
   <script type="module" src="../../pages/js/quiz.js"></script>
-
-  <!-- Firebase -->
-  <script type="module" src="../../js/firebase/firebase-init.js"></script>
-  <script type="module" src="../../utils/language-utils.js"></script>
-  <script type="module" src="../../js/language-init.js"></script>
 </body>
 
 </html>

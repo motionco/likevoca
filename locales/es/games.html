@@ -125,37 +125,29 @@
   <div id="navbar-container"></div>
 
   <main class="container mx-auto max-w-7xl px-4 py-8">
-    <div class="flex flex-col md:flex-row md:justify-between md:items-start mb-8">
-      <div class="mb-4 md:mb-0">
-        <h1 class="text-3xl font-bold text-gray-800 mb-2">🎮 Juegos</h1>
-        <p class="text-gray-600">
-          Aprende idiomas de manera natural a través de juegos divertidos e interactivos.
-        </p>
-      </div>
-      <div class="flex flex-row gap-4">
-        <select id="source-language" class="border p-2 rounded">
-          <option value="korean" data-i18n="korean">Coreano</option>
-          <option value="english" data-i18n="english">Inglés</option>
-          <option value="japanese" data-i18n="japanese">Japonés</option>
-          <option value="chinese" data-i18n="chinese">Chino</option>
-          <option value="spanish" data-i18n="spanish">Español</option>
-        </select>
-        <select id="target-language" class="border p-2 rounded">
-          <option value="english" data-i18n="english">Inglés</option>
-          <option value="korean" data-i18n="korean">Coreano</option>
-          <option value="japanese" data-i18n="japanese">Japonés</option>
-          <option value="chinese" data-i18n="chinese">Chino</option>
-          <option value="spanish" data-i18n="spanish">Español</option>
-        </select>
-        <select id="difficulty-level" class="border p-2 rounded">
-          <option value="all" data-i18n="all_levels">Todos los Niveles</option>
-          <option value="basic" data-i18n="basic">Básico</option>
-          <option value="intermediate" data-i18n="intermediate">Intermedio</option>
-          <option value="advanced" data-i18n="advanced">Avanzado</option>
-          <option value="fluent" data-i18n="fluent">Fluido</option>
-          <option value="technical" data-i18n="technical">Técnico</option>
-        </select>
-      </div>
+    <div class="flex flex-row gap-2 overflow-x-auto">
+      <select id="source-language" class="border p-2 rounded text-sm min-w-[100px] flex-shrink-0">
+        <option value="korean" data-i18n="korean">Coreano</option>
+        <option value="english" data-i18n="english">Inglés</option>
+        <option value="japanese" data-i18n="japanese">Japonés</option>
+        <option value="chinese" data-i18n="chinese">Chino</option>
+        <option value="spanish" data-i18n="spanish">Español</option>
+      </select>
+      <select id="target-language" class="border p-2 rounded text-sm min-w-[100px] flex-shrink-0">
+        <option value="english" data-i18n="english">Inglés</option>
+        <option value="korean" data-i18n="korean">Coreano</option>
+        <option value="japanese" data-i18n="japanese">Japonés</option>
+        <option value="chinese" data-i18n="chinese">Chino</option>
+        <option value="spanish" data-i18n="spanish">Español</option>
+      </select>
+      <select id="difficulty-level" class="border p-2 rounded text-sm min-w-[100px] flex-shrink-0">
+        <option value="all" data-i18n="all_levels">Todos los niveles</option>
+        <option value="basic" data-i18n="basic">Básico</option>
+        <option value="intermediate" data-i18n="intermediate">Intermedio</option>
+        <option value="advanced" data-i18n="advanced">Avanzado</option>
+        <option value="fluent" data-i18n="fluent">Fluido</option>
+        <option value="technical" data-i18n="technical">Técnico</option>
+      </select>
     </div>
 
     <!-- 게임 실행 영역 -->
