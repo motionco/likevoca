@@ -1,0 +1,51 @@
+concept_id,domain,category,difficulty,situation,purpose,korean,english,japanese,chinese,spanish,korean_word,english_word,japanese_word,chinese_word,spanish_word
+daily_morning_greeting,daily,routine,basic,"casual,home",greeting,"엄마, 아침이에요!","Mom, it's morning!","お母さん、朝ですよ！","妈妈，早上了！","¡Mamá, es de mañana!",아침,morning,朝,早晨,mañana
+daily_wake_action,daily,routine,basic,"casual,home",greeting,"이제 일어나야 해","I need to wake up now","もう起きなきゃ","现在该起床了","Ahora tengo que levantarme",일어나다,wake,起きる,起床,levantarse
+daily_greeting_word,daily,routine,basic,"casual,home",greeting,"안녕, 잘 잤어?","Hello, did you sleep well?","こんにちは、よく眠れた？","你好，睡得好吗？","Hola, ¿dormiste bien?",안녕,hello,こんにちは,你好,hola
+daily_start_action,daily,routine,basic,"casual,home",greeting,"새로운 하루를 시작해보자","Let's start a new day","新しい一日を始めよう","让我们开始新的一天","Empecemos un nuevo día",시작하다,start,始める,开始,empezar
+daily_family_greeting,daily,routine,basic,"casual,home",greeting,"가족들과 함께 인사해요","I greet together with my family","家族と一緒に挨拶します","和家人一起问候","Saludo junto con mi familia",가족,family,家族,家人,familia
+daily_breakfast_noun,daily,routine,basic,"casual,home",greeting,"아침식사 같이 해요","Let's have breakfast together","一緒に朝食を食べましょう","一起吃早餐吧","Desayunemos juntos",아침식사,breakfast,朝食,早餐,desayuno
+daily_good_morning,daily,routine,basic,"casual,home",greeting,"정말 좋은 아침이네요","It's really a good morning","本当に良い朝ですね","真是个好早晨","Realmente es una buena mañana",좋은,good,良い,好的,bueno
+daily_prepare_action,daily,routine,basic,"casual,home",greeting,"오늘 하루를 준비해볼까요","Shall we prepare for today?","今日一日の準備をしましょうか","我们准备今天吧","¿Preparamos el día de hoy?",준비하다,prepare,準備する,准备,preparar
+daily_today_noun,daily,routine,basic,"casual,home",greeting,"오늘도 화이팅!","Fighting for today too!","今日もファイト！","今天也要加油！","¡Ánimo para hoy también!",오늘,today,今日,今天,hoy
+daily_house_greeting,daily,routine,basic,"casual,home",greeting,"우리 집에서 좋은 아침","Good morning from our house","私たちの家から良い朝","从我们家里的美好早晨","Buenos días desde nuestra casa",집,house,家,家,casa
+daily_sleep_well,daily,routine,basic,"casual,home",greeting,"어젯밤 잠 잘 잤니?","Did you sleep well last night?","昨夜はよく眠れましたか？","昨晚睡得好吗？","¿Dormiste bien anoche?",잠,sleep,睡眠,睡觉,sueño
+daily_happy_greeting,daily,routine,basic,"casual,home",greeting,"행복한 하루 보내세요","Have a happy day","幸せな一日をお過ごしください","祝你度过愉快的一天","Que tengas un día feliz",행복하다,happy,幸せ,快乐,feliz
+daily_nice_weather,daily,routine,basic,"casual,home",greeting,"밖에 날씨가 참 좋아요","The weather outside is really nice","外の天気がとても良いです","外面天气真好","El tiempo afuera está muy bueno",날씨,weather,天気,天气,tiempo
+daily_fresh_morning,daily,routine,basic,"casual,home",greeting,"공기가 정말 상쾌해요","The air is really fresh","空気が本当に爽やかです","空气真清新","El aire está realmente fresco",상쾌하다,fresh,爽やか,清爽,fresco
+daily_energetic_greeting,daily,routine,basic,"casual,home",greeting,"오늘 하루도 힘내자!","Let's have energy for today too!","今日一日も頑張ろう！","今天也要努力！","¡Tengamos energía para hoy también!",힘내다,cheer,頑張る,加油,animar
+daily_beautiful_day,daily,routine,basic,"casual,home",greeting,"참 아름다운 하루가 될 것 같아","It seems like it will be a beautiful day","とても美しい一日になりそう","看起来会是美好的一天","Parece que será un día hermoso",아름답다,beautiful,美しい,美丽,hermoso
+daily_wonderful_morning,daily,routine,basic,"casual,home",greeting,"이런 멋진 아침이 또 있을까","Will there be another wonderful morning like this","こんな素晴らしい朝がまたあるでしょうか","还会有这样美好的早晨吗","¿Habrá otra mañana maravillosa como esta?",멋지다,wonderful,素晴らしい,精彩,maravilloso
+daily_bright_greeting,daily,routine,basic,"casual,home",greeting,"햇살이 너무 밝고 좋아","The sunlight is so bright and nice","日差しがとても明るくて良い","阳光很明亮很好","La luz del sol está muy brillante y buena",밝다,bright,明るい,明亮,brillante
+daily_peaceful_home,daily,routine,basic,"casual,home",greeting,"집이 정말 평화로워요","Our house is really peaceful","家が本当に平和です","家里真的很和平","Nuestra casa es realmente pacífica",평화롭다,peaceful,平和,和平,pacífico
+daily_comfortable_feeling,daily,routine,basic,"casual,home",greeting,"이 시간이 가장 편안해","This time is the most comfortable","この時間が一番快適","这个时候最舒适","Este momento es el más cómodo",편안하다,comfortable,快適,舒适,cómodo
+daily_shower_routine,daily,routine,basic,"casual,home",greeting,"샤워하고 기분이 좋아졌어","I feel good after showering","シャワーを浴びて気分が良くなった","洗澡后心情变好了","Me siento bien después de ducharme",샤워,shower,シャワー,洗澡,ducha
+daily_brush_teeth,daily,routine,basic,"casual,home",greeting,"양치하고 상쾌해졌네","I feel fresh after brushing my teeth","歯磨きをして爽やかになった","刷牙后感觉清爽","Me siento fresco después de cepillarme los dientes",양치,brushing,歯磨き,刷牙,cepillado
+daily_coffee_morning,daily,routine,basic,"casual,home",greeting,"커피 마시며 좋은 아침","Good morning while drinking coffee","コーヒーを飲みながら良い朝","喝着咖啡的美好早晨","Buenos días tomando café",커피,coffee,コーヒー,咖啡,café
+daily_stretch_morning,daily,routine,basic,"casual,home",greeting,"스트레칭으로 몸을 깨웠어","I woke up my body with stretching","ストレッチで体を目覚めさせた","用拉伸唤醒了身体","Desperté mi cuerpo con estiramientos",스트레칭,stretching,ストレッチ,拉伸,estiramiento
+daily_smile_greeting,daily,routine,basic,"casual,home",greeting,"미소로 하루를 시작해요","Start the day with a smile","笑顔で一日を始めます","用微笑开始一天","Empiezo el día con una sonrisa",미소,smile,笑顔,微笑,sonrisa
+daily_sunshine_bright,daily,routine,basic,"casual,home",greeting,"창문으로 들어오는 햇볕","Sunshine coming through the window","窓から入ってくる日光","从窗户进来的阳光","Luz solar entrando por la ventana",햇볕,sunshine,日光,阳光,luz solar
+daily_energy_morning,daily,routine,basic,"casual,home",greeting,"오늘은 기운이 넘치네요","I'm full of energy today","今日は元気があふれますね","今天精神充沛","Hoy estoy lleno de energía",기운,energy,元気,精神,energía
+daily_refresh_feeling,daily,routine,basic,"casual,home",greeting,"마음이 개운해진 것 같아","I feel like my mind is refreshed","心がすっきりしたような気がする","感觉心情爽快了","Siento que mi mente se refrescó",개운하다,refreshed,すっきり,爽快,refrescado
+daily_routine_start,daily,routine,basic,"casual,home",greeting,"규칙적인 일과가 시작돼","My regular routine begins","規則的な日課が始まる","规律的日程开始了","Mi rutina regular comienza",일과,routine,日課,日程,rutina
+daily_warm_greeting,daily,routine,basic,"casual,home",greeting,"마음까지 따뜻해지는 인사","A greeting that warms even the heart","心まで暖かくなる挨拶","连心都变暖的问候","Un saludo que calienta hasta el corazón",따뜻하다,warm,暖かい,温暖,cálido
+daily_hope_feeling,daily,routine,basic,"casual,home",greeting,"새로운 희망을 품고 시작해","Start with new hope","新しい希望を抱いて始める","怀着新希望开始","Empiezo con nueva esperanza",희망,hope,希望,希望,esperanza
+daily_grateful_morning,daily,routine,basic,"casual,home",greeting,"이런 평범한 일상이 고마워","I'm grateful for this ordinary daily life","こんな平凡な日常が有り難い","感谢这样平凡的日常","Estoy agradecido por esta vida cotidiana ordinaria",고맙다,grateful,感謝,感谢,agradecido
+daily_positive_energy,daily,routine,basic,"casual,home",greeting,"긍정적인 마음으로 출발","Starting with a positive mind","前向きな気持ちで出発","以积极的心态出发","Saliendo con una mente positiva",긍정적,positive,ポジティブ,积极,positivo
+daily_blessed_feeling,daily,routine,basic,"casual,home",greeting,"이렇게 건강한 게 축복이야","Being this healthy is a blessing","こんなに健康なのは祝福だ","这样健康是福气","Estar tan saludable es una bendición",축복받다,blessed,祝福される,被祝福,bendecido
+daily_sweet_morning,daily,routine,basic,"casual,home",greeting,"꿀처럼 달콤한 아침 시간","Morning time sweet like honey","蜂蜜のように甘い朝の時間","像蜂蜜一样甜美的早晨时光","Tiempo matutino dulce como la miel",달콤하다,sweet,甘い,甜美,dulce
+daily_joyful_start,daily,routine,basic,"casual,home",greeting,"즐거운 마음으로 하루 준비","Preparing for the day with a joyful heart","楽しい気持ちで一日の準備","以愉快的心情准备一天","Preparando el día con un corazón alegre",즐겁다,joyful,楽しい,快乐,alegre
+daily_love_feeling,daily,routine,basic,"casual,home",greeting,"사랑하는 사람들과 함께하는 아침","Morning together with loved ones","愛する人たちと一緒にいる朝","与所爱的人一起度过的早晨","Mañana junto con seres queridos",사랑,love,愛,爱,amor
+daily_dream_morning,daily,routine,basic,"casual,home",greeting,"어젯밤 좋은 꿈을 꿨어요","I had a good dream last night","昨夜良い夢を見ました","昨晚做了个好梦","Tuve un buen sueño anoche",꿈,dream,夢,梦,sueño
+daily_perfect_day,daily,routine,basic,"casual,home",greeting,"모든 게 완벽한 하루가 될 것 같아","It seems like everything will be a perfect day","すべてが完璧な一日になりそう","感觉一切都会是完美的一天","Parece que todo será un día perfecto",완벽하다,perfect,完璧,完美,perfecto
+daily_magic_morning,daily,routine,basic,"casual,home",greeting,"마법처럼 기분 좋은 아침","A magically pleasant morning","魔法のように気持ちの良い朝","像魔法一样令人愉快的早晨","Una mañana mágicamente agradable",마법,magic,魔法,魔法,magia
+daily_special_moment,daily,routine,basic,"casual,home",greeting,"오늘은 뭔가 특별할 것 같아","Today feels like something special","今日は何か特別な気がする","今天感觉会有特别的事","Hoy se siente como algo especial",특별하다,special,特別,特别,especial
+daily_amazing_start,daily,routine,basic,"casual,home",greeting,"정말 놀라운 하루의 시작","What an amazing start to the day","本当に驚くべき一日の始まり","真是惊人的一天开始","Qué comienzo tan asombroso del día",놀랍다,amazing,驚くべき,惊人,asombroso
+daily_fantastic_feeling,daily,routine,basic,"casual,home",greeting,"환상적인 기분으로 시작하는 하루","A day starting with fantastic feelings","幻想的な気分で始まる一日","以梦幻般的心情开始的一天","Un día que comienza con sentimientos fantásticos",환상적,fantastic,幻想的,梦幻,fantástico
+daily_inspiring_moment,daily,routine,basic,"casual,home",greeting,"영감을 주는 순간들이 기다려","Inspiring moments are waiting","インスピレーションを与える瞬間が待っている","等待着给人灵感的时刻","Momentos inspiradores están esperando",영감,inspiration,インスピレーション,灵感,inspiración
+daily_celebration_mood,daily,routine,basic,"casual,home",greeting,"매일이 축하할 일이 있어","Every day has something to celebrate","毎日がお祝いすることがある","每天都有值得庆祝的事","Cada día tiene algo que celebrar",축하,celebration,お祝い,庆祝,celebración
+daily_miracle_morning,daily,routine,basic,"casual,home",greeting,"작은 기적들로 가득한 아침","A morning full of small miracles","小さな奇跡でいっぱいの朝","充满小奇迹的早晨","Una mañana llena de pequeños milagros",기적,miracle,奇跡,奇迹,milagro
+daily_treasure_moment,daily,routine,basic,"casual,home",greeting,보물같은 시간을 보내고 있어요,I'm having a precious time like treasure,我正在度过像宝物一样的时光,宝物のような時間を過ごしています,Estoy pasando un tiempo precioso como un tesoro,보물,treasure,宝物,宝物,tesoro
+daily_wonderful_day,daily,routine,basic,"casual,home",greeting,정말 멋진 하루가 될 것 같아요,It seems like it will be a really wonderful day,感觉会是非常精彩的一天,本当に素晴らしい一日になりそうです,Parece que será un día realmente maravilloso,멋지다,wonderful,素晴らしい,精彩,maravilloso
+daily_peaceful_heart,daily,routine,basic,"casual,home",greeting,마음이 평화로워지는 아침이에요,It's a morning that makes my heart peaceful,这是让心情变得平和的早晨,心が平和になる朝です,Es una mañana que hace que mi corazón se sienta en paz,평화,peace,平和,和平,paz
+daily_bright_future,daily,routine,basic,"casual,home",greeting,앞으로 밝은 일들이 기다리고 있어요,Bright things are waiting ahead,前面等待着明亮的事情,これから明るいことが待っています,Cosas brillantes están esperando adelante,밝다,bright,明るい,明亮,brillante

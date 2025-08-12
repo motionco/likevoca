@@ -1,0 +1,51 @@
+concept_id,domain,category,difficulty,situation,purpose,korean,english,japanese,chinese,spanish,korean_word,english_word,japanese_word,chinese_word,spanish_word
+daily_evening_goodnight,daily,evening,basic,"polite,home",greeting,"안녕히 주무세요, 좋은 꿈 꾸세요.","Good night, have sweet dreams.","おやすみなさい、良い夢を見てください。","晚安，祝你好梦。","Buenas noches, que tengas dulces sueños.",안녕히 주무세요,good night,おやすみなさい,晚安,buenas noches
+daily_evening_family_dinner,daily,evening,basic,"polite,home",greeting,"온 가족이 함께 저녁식사를 해요.","The whole family has dinner together.","家族全員で夕食を食べます。","全家人一起吃晚餐。","Toda la familia cena junta.",저녁식사,dinner,夕食,晚餐,cena
+daily_evening_rest_time,daily,evening,basic,"polite,home",greeting,"이제 휴식 시간이에요.","Now it's rest time.","今は休憩時間です。","现在是休息时间。","Ahora es tiempo de descanso.",휴식,rest,休憩,休息,descanso
+daily_evening_peaceful,daily,evening,basic,"polite,home",greeting,"저녁이 정말 평화로워요.","The evening is very peaceful.","夜がとても平和です。","晚上非常平静。","La noche es muy pacífica.",평화롭다,peaceful,平和,平静,pacífico
+daily_evening_sunset,daily,evening,basic,"polite,home",greeting,"해질녘이 아름다워요.","The sunset is beautiful.","夕日がきれいです。","日落很美。","El atardecer es hermoso.",해질녘,sunset,夕日,日落,atardecer
+daily_evening_tomorrow,daily,evening,basic,"polite,home",greeting,"내일 또 만나요.","See you again tomorrow.","明日また会いましょう。","明天再见。","Nos vemos mañana otra vez.",내일,tomorrow,明日,明天,mañana
+daily_evening_comfortable,daily,evening,basic,"polite,home",greeting,"집에서 편안하게 쉬세요.","Rest comfortably at home.","家でゆっくり休んでください。","在家舒适地休息。","Descansa cómodamente en casa.",편안하다,comfortable,快適,舒服,cómodo
+daily_evening_gratitude,daily,evening,basic,"polite,home",greeting,"오늘 하루 감사했어요.","Thank you for today.","今日一日ありがとうございました。","感谢今天。","Gracias por el día de hoy.",감사합니다,thank you,ありがとうございます,谢谢,gracias
+daily_evening_reflection,daily,evening,basic,"polite,home",greeting,"하루를 돌아보는 시간이에요.","It's time to reflect on the day.","一日を振り返る時間です。","是回顾一天的时间。","Es tiempo de reflexionar sobre el día.",돌아보다,reflect,振り返る,回顾,reflexionar
+daily_evening_warmth,daily,evening,basic,"polite,home",greeting,"저녁 시간의 따뜻함을 느껴요.","I feel the warmth of evening time.","夜の時間の暖かさを感じます。","感受晚上时光的温暖。","Siento la calidez del tiempo nocturno.",따뜻함,warmth,暖かさ,温暖,calidez
+daily_evening_relax,daily,evening,basic,"polite,home",greeting,"편히 쉬세요.","Please relax.","ゆっくり休んでください。","请放松。","Por favor descansa.",편히 쉬세요,please relax,ゆっくり休んでください,请放松,por favor descansa
+daily_evening_togetherness,daily,evening,basic,"polite,home",greeting,"가족과 함께 있어서 좋아요.","It's nice to be with family.","家族と一緒にいて良いです。","和家人在一起真好。","Es bueno estar con la familia.",함께,together,一緒に,一起,juntos
+daily_evening_goodevening,daily,evening,basic,"polite,home",greeting,"좋은 저녁 되세요.","Have a good evening.","良い夜をお過ごしください。","祝你晚上愉快。","Que tengas buena noche.",좋은 저녁 되세요,have a good evening,良い夜を,祝你晚上愉快,que tengas buena noche
+daily_evening_sleepy,daily,evening,basic,"polite,home",greeting,"졸려서 잠자리에 들어요.","I'm sleepy so I'm going to bed.","眠いので寝ます。","困了，要睡觉了。","Tengo sueño, así que me voy a la cama.",졸리다,sleepy,眠い,困倦,soñoliento
+daily_evening_home,daily,evening,basic,"polite,home",greeting,"집이 가장 편안해요.","Home is the most comfortable.","家が一番快適です。","家是最舒适的。","El hogar es lo más cómodo.",집,home,家,家,hogar
+daily_evening_safety,daily,evening,basic,"polite,home",greeting,"집에서 안전하게 있어요.","I'm safely at home.","家で安全にいます。","在家里很安全。","Estoy seguro en casa.",안전하다,safe,安全,安全,seguro
+daily_evening_blessing,daily,evening,basic,"polite,home",greeting,"하루의 축복에 감사해요.","I'm grateful for the day's blessings.","一日の祝福に感謝します。","感谢一天的祝福。","Agradezco las bendiciones del día.",축복,blessing,祝福,祝福,bendición
+daily_evening_starlight,daily,evening,basic,"polite,home",greeting,"별빛이 아름다워요.","The starlight is beautiful.","星の光がきれいです。","星光很美。","La luz de las estrellas es hermosa.",별빛,starlight,星の光,星光,luz de estrellas
+daily_evening_completion,daily,evening,basic,"polite,home",greeting,"하루 일과를 완성했어요.","I completed my daily tasks.","一日の作業を完成しました。","完成了一天的工作。","Completé las tareas del día.",완성하다,complete,完成する,完成,completar
+daily_evening_serenity,daily,evening,basic,"polite,home",greeting,"저녁의 고요함이 좋아요.","I like the serenity of evening.","夜の静けさが良いです。","喜欢晚上的宁静。","Me gusta la serenidad de la noche.",고요함,serenity,静けさ,宁静,serenidad
+daily_evening_moonlight,daily,evening,basic,"polite,home",greeting,"달빛 아래서 산책해요.","I take a walk under the moonlight.","月の光の下で散歩します。","在月光下散步。","Camino bajo la luz de la luna.",달빛,moonlight,月の光,月光,luz de luna
+daily_evening_contentment,daily,evening,basic,"polite,home",greeting,"하루에 만족해요.","I'm satisfied with the day.","一日に満足しています。","对今天很满足。","Estoy satisfecho con el día.",만족,contentment,満足,满足,satisfacción
+daily_evening_dream,daily,evening,basic,"polite,home",greeting,"좋은 꿈을 꿔요.","I have good dreams.","良い夢を見ます。","做好梦。","Tengo buenos sueños.",꿈,dream,夢,梦,sueño
+daily_evening_lamplight,daily,evening,basic,"polite,home",greeting,"등불이 따뜻해요.","The lamplight is warm.","ランプの光が暖かいです。","灯光很温暖。","La luz de la lámpara es cálida.",등불,lamplight,ランプの光,灯光,luz de lámpara
+daily_evening_gratitude_heart,daily,evening,basic,"polite,home",greeting,"고마운 마음으로 하루를 마무리해요.","I end the day with a grateful heart.","感謝の気持ちで一日を終えます。","以感恩的心结束一天。","Termino el día con corazón agradecido.",고마운 마음,grateful heart,感謝の気持ち,感恩之心,corazón agradecido
+daily_evening_night_air,daily,evening,basic,"polite,home",greeting,"밤공기가 시원해요.","The night air is cool.","夜の空気が涼しいです。","夜晚的空气很凉爽。","El aire nocturno es fresco.",밤공기,night air,夜の空気,夜晚空气,aire nocturno
+daily_evening_bedtime,daily,evening,basic,"polite,home",greeting,"잠자리 시간이에요.","It's bedtime.","寝る時間です。","该睡觉了。","Es hora de dormir.",잠자리,bedtime,寝る時間,就寝时间,hora de dormir
+daily_evening_closeness,daily,evening,basic,"polite,home",greeting,"가족과의 친밀함을 느껴요.","I feel closeness with my family.","家族との親密さを感じます。","感受与家人的亲密。","Siento cercanía con mi familia.",친밀함,closeness,親密さ,亲密,cercanía
+daily_evening_tomorrow_hope,daily,evening,basic,"polite,home",greeting,"내일에 대한 희망을 가져요.","I have hope for tomorrow.","明日への希望を持ちます。","对明天抱有希望。","Tengo esperanza para mañana.",내일에 대한 희망,hope for tomorrow,明日への希望,对明天的希望,esperanza para mañana
+daily_evening_calmness,daily,evening,basic,"polite,home",greeting,"마음이 평온해요.","My heart is calm.","心が平静です。","心情很平静。","Mi corazón está tranquilo.",평온함,calmness,平静さ,平静,calma
+daily_evening_sweet_dreams,daily,evening,basic,"polite,home",greeting,"달콤한 꿈 꾸세요.","Have sweet dreams.","甘い夢を見てください。","祝你做甜美的梦。","Que tengas dulces sueños.",달콤한 꿈,sweet dreams,甘い夢,甜美的梦,dulces sueños
+daily_evening_goodbyes,daily,evening,basic,"polite,home",greeting,"오늘 하루 안녕히 가세요.","Have a good rest of today.","今日一日お疲れ様でした。","今天辛苦了。","Que tengas buen resto del día.",작별인사,goodbye,さようなら,再见,adiós
+daily_evening_family_bond,daily,evening,basic,"polite,home",greeting,"가족 유대가 깊어져요.","Family bonds grow deeper.","家族の絆が深まります。","家庭纽带更加深厚。","Los vínculos familiares se hacen más profundos.",가족유대,family bond,家族の絆,家庭纽带,vínculo familiar
+daily_evening_rest_well,daily,evening,basic,"polite,home",greeting,"잘 쉬세요.","Rest well.","よく休んでください。","好好休息。","Descansa bien.",잘 쉬세요,rest well,よく休んでください,好好休息,descansa bien
+daily_evening_peaceful_night,daily,evening,basic,"polite,home",greeting,"평화로운 밤 되세요.","Have a peaceful night.","平和な夜をお過ごしください。","祝你有个平静的夜晚。","Que tengas una noche pacífica.",평화로운 밤,peaceful night,平和な夜,平静的夜晚,noche pacífica
+daily_evening_comfortable_sleep,daily,evening,basic,"polite,home",greeting,"편안하게 주무세요.","Sleep comfortably.","ゆっくりお休みください。","舒适地睡觉。","Duerme cómodamente.",편안한 잠,comfortable sleep,快適な眠り,舒适的睡眠,sueño cómodo
+daily_evening_twilight_beauty,daily,evening,basic,"polite,home",greeting,"황혼이 아름다워요.","The twilight is beautiful.","黄昏がきれいです。","黄昏很美。","El crepúsculo es hermoso.",황혼의 아름다움,twilight beauty,黄昏の美しさ,黄昏之美,belleza del crepúsculo
+daily_evening_end_of_day,daily,evening,basic,"polite,home",greeting,"하루가 끝나가요.","The day is ending.","一日が終わります。","一天要结束了。","El día está terminando.",하루의 끝,end of day,一日の終わり,一天的结束,fin del día
+daily_evening_final_blessing,daily,evening,basic,"polite,home",greeting,"마지막 축복을 보내요.","I send final blessings.","最後の祝福を送ります。","送出最后的祝福。","Envío bendiciones finales.",마지막 축복,final blessing,最後の祝福,最后的祝福,bendición final
+daily_evening_until_tomorrow,daily,evening,basic,"polite,home",greeting,"내일까지 안녕히 계세요.","Stay well until tomorrow.","明日までお元気で。","直到明天保重。","Cuídate hasta mañana.",내일까지,until tomorrow,明日まで,直到明天,hasta mañana
+daily_evening_night_prayer,daily,evening,basic,"polite,home",greeting,"밤 기도를 해요.","I say night prayers.","夜の祈りをします。","做晚祷。","Hago oraciones nocturnas.",밤 기도,night prayer,夜の祈り,晚祷,oración nocturna
+daily_evening_see_you_tomorrow,daily,evening,basic,"polite,home",greeting,"내일 봐요.","See you tomorrow.","明日会いましょう。","明天见。","Nos vemos mañana.",내일 봐요,see you tomorrow,明日会いましょう,明天见,nos vemos mañana
+daily_evening_peaceful_rest,daily,evening,basic,"polite,home",greeting,"평화로운 휴식을 취해요.","I take peaceful rest.","平和な休息を取ります。","享受平静的休息。","Tomo descanso pacífico.",평화로운 휴식,peaceful rest,平和な休息,平静的休息,descanso pacífico
+daily_evening_golden_hour,daily,evening,basic,"polite,home",greeting,"황금시간을 즐겨요.","I enjoy the golden hour.","ゴールデンアワーを楽しみます。","享受黄金时间。","Disfruto la hora dorada.",황금시간,golden hour,ゴールデンアワー,黄金时间,hora dorada
+daily_evening_love_expression,daily,evening,basic,"polite,home",greeting,"사랑을 표현해요.","I express love.","愛を表現します。","表达爱意。","Expreso amor.",사랑 표현,love expression,愛の表現,爱的表达,expresión de amor
+daily_evening_gentle_breeze,daily,evening,basic,"polite,home",greeting,"부드러운 바람이 불어요.","A gentle breeze blows.","優しい風が吹きます。","吹着温柔的微风。","Sopla una brisa suave.",부드러운 바람,gentle breeze,優しい風,温柔的微风,brisa suave
+daily_evening_evening_star,daily,evening,basic,"polite,home",greeting,"저녁별이 떠요.","The evening star rises.","夕星が昇ります。","晚星升起。","La estrella vespertina se eleva.",저녁별,evening star,夕星,晚星,estrella vespertina
+daily_evening_precious_moment,daily,evening,basic,"polite,home",greeting,"소중한 순간이에요.","It's a precious moment.","大切な瞬間です。","这是珍贵的时刻。","Es un momento precioso.",소중한 순간,precious moment,大切な瞬間,珍贵的时刻,momento precioso
+daily_evening_loving_care,daily,evening,basic,"polite,home",greeting,"사랑스런 보살핌을 받아요.","I receive loving care.","愛情深いケアを受けます。","接受爱的关怀。","Recibo cuidado amoroso.",사랑스런 보살핌,loving care,愛情深いケア,爱的关怀,cuidado amoroso
+daily_evening_gentle_silence,daily,evening,basic,"polite,home",greeting,"부드러운 침묵이 흘러요.","Gentle silence flows.","優しい沈黙が流れます。","温柔的寂静流淌。","Fluye un silencio suave.",부드러운 침묵,gentle silence,優しい沈黙,温柔的寂静,silencio suave
