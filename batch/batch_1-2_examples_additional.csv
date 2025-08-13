@@ -1,0 +1,52 @@
+concept_id,domain,category,difficulty,situation,purpose,korean,english,japanese,chinese,spanish,korean_word,english_word,japanese_word,chinese_word,spanish_word
+daily_who_question,daily,family,basic,casual home,question,엄마가 누구세요?,Who is your mom?,お母さんは誰ですか?,你妈妈是谁?,¿Quién es tu mamá?,누구,who,誰,谁,quién
+daily_where_question,daily,family,basic,casual home,question,아빠가 어디에 계세요?,Where is your dad?,お父さんはどこにいますか?,爸爸在哪里?,¿Dónde está tu papá?,어디,where,どこ,哪里,dónde
+daily_when_question,daily,family,basic,casual home,question,가족 모임이 언제예요?,When is the family gathering?,家族の集まりはいつですか?,家庭聚会什么时候?,¿Cuándo es la reunión familiar?,언제,when,いつ,什么时候,cuándo
+daily_what_question,daily,family,basic,casual home,question,형이 무엇을 하고 있어요?,What is your brother doing?,お兄さんは何をしていますか?,哥哥在做什么?,¿Qué está haciendo tu hermano?,무엇,what,何,什么,qué
+daily_why_question,daily,family,basic,casual home,question,동생이 왜 울어요?,Why is your younger sibling crying?,弟/妹はなぜ泣いているのですか?,弟弟/妹妹为什么哭?,¿Por qué llora tu hermano menor?,왜,why,なぜ,为什么,por qué
+daily_how_question,daily,family,basic,casual home,question,할머니는 어떻게 지내세요?,How is your grandmother doing?,おばあちゃんはどうお過ごしですか?,奶奶怎么样?,¿Cómo está tu abuela?,어떻게,how,どう,怎么,cómo
+daily_how_much_question,daily,family,basic,casual home,question,용돈을 얼마나 받아요?,How much allowance do you get?,お小遣いはいくらもらいますか?,你得到多少零花钱?,¿Cuánto dinero de bolsillo recibes?,얼마,how much,いくら,多少,cuánto
+daily_which_question,daily,family,basic,casual home,question,어떤 가족이 더 좋아요?,Which family member do you like more?,どの家族がもっと好きですか?,你更喜欢哪个家人?,¿Qué miembro de la familia te gusta más?,어떤,which,どれ,哪个,cuál
+daily_live_verb,daily,family,basic,casual home,question,우리 가족은 아파트에 살아요,Our family lives in an apartment,私たちの家族はアパートに住んでいます,我们家住在公寓里,Nuestra familia vive en un apartamento,살다,live,住む,住,vivir
+daily_work_verb,daily,family,basic,casual home,question,부모님은 모두 일하세요,Both parents work,両親とも働いています,父母都工作,Ambos padres trabajan,일하다,work,働く,工作,trabajar
+daily_like_verb,daily,family,basic,casual home,question,우리 가족은 여행을 좋아해요,Our family likes traveling,私たちの家族は旅行が好きです,我们家喜欢旅行,A nuestra familia le gusta viajar,좋아하다,like,好き,喜欢,gustar
+daily_love_verb,daily,family,basic,casual home,question,모든 가족이 서로 사랑해요,All family members love each other,すべての家族がお互いを愛しています,所有家人都相爱,Todos los miembros de la familia se aman,사랑하다,love,愛する,爱,amar
+daily_care_verb,daily,family,basic,casual home,question,언니가 동생을 돌봐요,Sister takes care of her younger sibling,お姉さんが弟/妹の世話をします,姐姐照顾弟弟/妹妹,La hermana cuida a su hermano menor,돌보다,care,世話する,照顾,cuidar
+daily_meet_verb,daily,family,basic,casual home,question,주말에 친척들을 만나요,We meet relatives on weekends,週末に親戚に会います,周末见亲戚,Nos encontramos con parientes los fines de semana,만나다,meet,会う,见面,encontrar
+daily_father_noun,daily,family,basic,casual home,question,우리 아버지는 회사원이에요,Our father is an office worker,私たちの父は会社員です,我们父亲是上班族,Nuestro padre es empleado de oficina,아버지,father,父,父亲,padre
+daily_mother_noun,daily,family,basic,casual home,question,어머니는 집에서 일해요,Mother works from home,母は家で働いています,母亲在家工作,La madre trabaja desde casa,어머니,mother,母,母亲,madre
+daily_brother_noun,daily,family,basic,casual home,question,형제끼리 게임을 해요,Brothers play games together,兄弟でゲームをします,兄弟一起玩游戏,Los hermanos juegan juntos,형제,brother,兄弟,兄弟,hermano
+daily_sister_noun,daily,family,basic,casual home,question,자매가 함께 쇼핑을 가요,Sisters go shopping together,姉妹で一緒に買い物に行きます,姐妹一起去购物,Las hermanas van de compras juntas,자매,sister,姉妹,姐妹,hermana
+daily_family_noun,daily,family,basic,casual home,question,가족 사진을 찍어요,We take a family photo,家族写真を撮ります,拍家庭照片,Tomamos una foto familiar,가족,family,家族,家庭,familia
+daily_home_noun,daily,family,basic,casual home,question,집에서 가족과 시간을 보내요,I spend time with family at home,家で家族と時間を過ごします,在家和家人度过时间,Paso tiempo con la familia en casa,집,home,家,家,casa
+daily_grandfather_noun,daily,family,basic,casual home,question,?�아버�?�??��?�??��?봐요,I ask grandfather how he's doing,?�じ?�ち?�ん?�ご?�拶?�ま???�向?�爷???,Pregunto cómo está el abuelo,?�아버�?,grandfather,祖父,?�爷,abuelo
+daily_grandmother_noun,daily,family,basic,casual home,question,?�머?��? ?�께 차�? 마셔??I drink tea with grandmother,?�ば?�ち?�ん?�お?�を飲み?�す,?�和奶奶一起喝??Bebo té con la abuela,?�머??grandmother,祖母,奶奶,abuela
+daily_child_noun,daily,family,basic,casual home,question,?�이가 ?�마�?찾아??The child looks for mom,子供?�お母さ?�を?�し?�す,孩子?�妈�?El niño busca a mamá,?�이,child,子供,孩子,niño
+daily_uncle_noun,daily,family,basic,casual home,question,?�촌???�물??가?�왔?�요,Uncle brought a gift,?�じ?�ん?�プ?�ゼ?�ト?�持?�て?�ま?�た,?�叔带了礼物,El tío trajo un regalo,?�촌,uncle,?�父,?�叔,tío
+daily_aunt_noun,daily,family,basic,casual home,question,?�모?� ?�핑??가??I go shopping with aunt,?�ば?�ん?�買?�物?�行?�ま???�和?�姨?�购??Voy de compras con la tía,?�모,aunt,?�母,?�姨,tía
+daily_cousin_noun,daily,family,basic,casual home,question,?�촌�?게임???�요,I play games with cousin,?�と?�と?�ー?�を?�ま???�和表兄弟玩游戏,Juego con mi primo,?�촌,cousin,?�と??表兄�?primo
+daily_son_noun,daily,family,basic,casual home,question,?�들???�교?�서 ?�아?�??Son comes back from school,??��?��??�か?�帰?�て?�ま???�子从�??�回??El hijo regresa de la escuela,?�들,son,??��,?�子,hijo
+daily_daughter_noun,daily,family,basic,casual home,question,?�과 ?�책???�요,I take a walk with daughter,娘と?��??�し?�す,?�和女儿?��?,Camino con mi hija,??daughter,�?女儿,hija
+daily_husband_noun,daily,family,basic,casual home,question,?�편???�사?�서 ?�아?�??Husband comes back from work,夫が会社?�ら帰っ?�き?�す,丈夫从公?�回??El esposo regresa del trabajo,?�편,husband,�?丈夫,esposo
+daily_wife_noun,daily,family,basic,casual home,question,?�내?� ?�화�?봐요,I watch a movie with wife,妻と?�画?�見?�す,?�和妻子?�电�?Veo una película con mi esposa,?�내,wife,�?妻子,esposa
+daily_play_verb,daily,family,basic,casual home,question,공원?�서 ?�이?�과 ?�?�요,I play with children in the park,?�園?�子供た?�と?�び?�す,?�在?�园?��?子们??Juego con los niños en el parque,?�??play,?�ぶ,??jugar
+daily_help_verb,daily,family,basic,casual home,question,?�머?�의 집안?�을 ?��??�려??I help mother with housework,?�母?�ん???事を?�伝?�ま???�帮妈妈?��???Ayudo a mamá con las tareas del hogar,?�다,help,?�伝??�?��,ayudar
+daily_cook_verb,daily,family,basic,casual home,question,가족을 ?�해 ?�?�을 ?�리?�요,I cook dinner for family,家族??��?�に夕食?�料?�し?�す,?�为家人?�晚�?Cocino la cena para la familia,?�리?�다,cook,?�理?�る,?��?,cocinar
+daily_study_verb,daily,family,basic,casual home,question,?�생�??�께 공�??�요,I study together with younger sibling,�?妹と一緒に?�強?�ま???�和弟弟/妹妹一起�?�?Estudio junto con mi hermano menor,공�??�다,study,?�強?�る,学习,estudiar
+daily_sleep_verb,daily,family,basic,casual home,question,가�?모두 ?�찍 ?�요,The whole family sleeps early,家族?�ん?�早?�寝?�す,?��?人都?�睡,Toda la familia duerme temprano,?�다,sleep,寝る,?�觉,dormir
+daily_eat_verb,daily,family,basic,casual home,question,??가족이 ?�께 ?�사?�요,The whole family eats together,家族?�員?��?緒に食事?�ま???��?人�?起吃�?Toda la familia come junta,먹다,eat,食べ????comer
+daily_talk_verb,daily,family,basic,casual home,question,?�아버�??� ?�날 ?�야기�? ?�요,I talk about old stories with grandfather,?�じ?�ち?�ん?�昔話を?�ま???�和?�爷?��?�?Hablo de historias antiguas con el abuelo,?�야기하??talk,話す,说话,hablar
+daily_laugh_verb,daily,family,basic,casual home,question,가족과 ?�께 ?��??�게 ?�어??I laugh happily with family,家族?��?緒に楽し?�笑?�ま???�和家人开心地�?Río alegremente con la familia,?�다,laugh,笑う,�?reír
+daily_visit_verb,daily,family,basic,casual home,question,주말??친척?�을 방문?�요,I visit relatives on weekends,?�末?�親?�を訪問?�ま???�末?�拜访亲??Visito a los parientes los fines de semana,방문?�다,visit,訪問?�る,?��?,visitar
+daily_call_verb,daily,family,basic,casual home,question,멀�??�는 가족에�??�화?�요,I call family living far away,?�く?�住?�家族?�電話し?�す,?�给远方?��?人打?�话,Llamo a la familia que vive lejos,?�화?�다,call,?�話?�る,?�电�?llamar
+daily_birthday_noun,daily,family,basic,casual home,question,가족의 ?�일??축하?�요,We celebrate family's birthday,家族??��?�日?�お祝い?�ま???�们庆祝家人?�生??Celebramos el cumpleaños de la familia,?�일,birthday,誕生???�日,cumpleaños
+daily_gift_noun,daily,family,basic,casual home,question,?�별???�에 ?�물??줘요,We give gifts on special days,?�別?�日?�プ?�ゼ?�ト?�あ?�ま???�们?�特殊日子送礼??Damos regalos en días especiales,?�물,gift,?�レ?�ン??礼物,regalo
+daily_party_noun,daily,family,basic,casual home,question,집에???��? ?�티�??�어??We have a small party at home,家で小さ?�パ?�テ?�ー?�開?�ま???�们?��?举办小聚�?Hacemos una pequeña fiesta en casa,?�티,party,?�ー?�ィ???�会,fiesta
+daily_photo_noun,daily,family,basic,casual home,question,가�?모임 ???�진??찍어??We take photos during family gatherings,家族??��?�り?�写?�を??��?�す,?�们?��?�?��会时?�照,Tomamos fotos durante las reuniones familiares,?�진,photo,?�真,?�片,foto
+daily_memory_noun,daily,family,basic,casual home,question,?�린 ?�절 기억???�눠??We share childhood memories,子供??��??��?�を?�け?�い?�す,?�们?�享童年记忆,Compartimos recuerdos de la infancia,기억,memory,記憶,记忆,memoria
+daily_love_noun,daily,family,basic,casual home,question,가족에 ?�???�랑???�현?�요,We express love for family,家族?�の?�を表現?�ま???�们表达对�?人的??Expresamos amor por la familia,?�랑,love,????amor
+daily_happiness_noun,daily,family,basic,casual home,question,가족과 ?�께?�는 ?�복???�껴??We feel happiness being together with family,家族?��?緒に?�る幸せ?�感?�ま???�们?�受?��?人在一起的幸福,Sentimos felicidad al estar juntos en familia,?�복,happiness,幸せ,幸福,felicidad
+daily_together_adverb,daily,family,basic,casual home,question,?�리???�제???�께 ?�어??We are always together,私た?�は?�つ?��?緒に?�ま???�们?�是?��?�?Siempre estamos juntos,?�께,together,一緒に,一�?juntos
+daily_always_adverb,daily,family,basic,casual home,question,가족�? ??�� ?�로�?지켜봐??Family always looks after each other,家族??��?�も?�互?�を見守?�ま??家人?�是互相?�顾,La familia siempre se cuida mutuamente,??��,always,?�つ???�是,siempre
+daily_very_adverb,daily,family,basic,casual home,question,가족이 매우 ?�중?�요,Family is very precious,家族?�と?�も大切?�す,家人?�常?�贵,La familia es muy preciosa,매우,very,?�て???�常,muy
+daily_now_adverb,daily,family,basic,casual home,question,지�?가족과 ?�간??보내�??�어??I'm spending time with family now,今�??�と?�間?�過?�し?�い?�す,?�现?��??�和家人�?��?�光,Ahora estoy pasando tiempo con la familia,지�?now,�??�在,ahora

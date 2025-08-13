@@ -650,6 +650,85 @@ domain,category,difficulty,situation,purpose,korean_title,korean_structure,korea
 - ✅ **CSV 파싱 안정성**: 쉼표가 포함된 필드는 반드시 쌍따옴표로 감싸기
 - ✅ **문자 인코딩**: UTF-8 인코딩으로 한글 깨짐 방지
 
+## 📊 자동 검증 명령어
+
+### 빠른 검증 (권장)
+
+```bash
+# 검증 실행
+python validate.py
+```
+
+### 수동 검증
+
+```bash
+# CSV 헤더 검증
+head -1 samples/concepts_template.csv
+
+# 문자 인코딩 검증
+file samples/*.csv | grep -v UTF-8
+
+# 쉼표 포함 필드 검증 (따옴표 처리 확인)
+grep -n ",[^,\"]*,[^,\"]*," data/*.csv | grep -v "\""
+```
+
+## 📋 데이터 구조 개요
+
+### 🎯 현재 시스템 특징
+
+**주요 데이터 형식**: CSV 파일 중심
+- **Concepts 컬렉션**: `concepts_template_add.csv` → `concepts_template_list.csv`
+- **Examples 컬렉션**: `examples_template_add.csv` → `examples_template_list.csv`  
+- **Grammar 컬렉션**: `grammar_template_add.csv` → `grammar_template_list.csv`
+
+**트랜잭션 로그**: `data_tracking_log.json`
+- 모든 데이터 변경 기록
+- 백업 참조 및 복원 지원
+- 실시간 통계 및 검증 데이터
+
+### 📊 CSV 기반 워크플로우 (기술적 상세)
+
+1. **데이터 생성 (`generate.py`)**
+   - 랜덤 템플릿 생성 (concept_id: {domain}_{word}_{meaning})
+   - 47개 단어 풀에서 중복 방지 선택
+   - 30회 재시도 로직으로 중복 회피
+   - 58개 필드 완전 자동 생성
+
+2. **데이터 입력/수정**
+   - CSV 템플릿 파일 직접 편집 가능
+   - UTF-8-sig 인코딩 BOM 처리
+   - 58개 필드 구조 유지 필수
+
+3. **검증 (`validate.py`)**
+   - **범위**: `_add.csv` 파일들 검증 및 `_list.csv`와 교차 검증
+   - concept_id 형식 검증: `{domain}_{word}_{meaning}`
+   - 단어+의미 조합 중복 검사  
+   - 필드 완성도: 95% 이상 권장
+   - CSV 인코딩 및 구조 검증
+
+4. **누적 (`accumulator.py`)**
+   - **범위**: `_add.csv` ↔ `_list.csv` 교차 검증
+   - **2단계 중복 방지 아키텍처**:
+     - 1단계: concepts에서 스킵 대상 식별
+     - 2단계: 모든 파일에서 일관된 제외 처리
+   - **데이터 무결성**: 고아 레코드 방지
+   - **트랜잭션 로깅**: JSON 기반 메타데이터 추적
+
+5. **백업 (`backup.py`)**
+   - 타임스탬프 기반 백업 폴더 생성
+   - 모든 CSV 파일 일괄 백업
+   - 복원 시점 선택 가능
+
+> **💡 참고**: JSON 구조는 시스템 내부에서 자동 처리되며, 사용자는 CSV 파일만 관리하면 됩니다.
+
+#### **중복 방지 시스템 특징:**
+
+- **일관된 처리**: concepts에서 중복/스킵된 concept_id는 examples, grammar에서도 자동 제외
+- **고아 레코드 방지**: 부분적 데이터 추가로 인한 데이터 불일치 방지  
+- **실시간 로깅**: 스킵된 항목과 사유를 실시간으로 표시
+- **트랜잭션 보장**: 성공한 추가 작업만 로그에 기록
+```
+
 ## ✅ 데이터 생성 체크리스트
 
 ### 📝 Concepts 컬렉션 체크리스트
@@ -747,24 +826,8 @@ domain,category,difficulty,situation,purpose,korean_title,korean_structure,korea
 #### 예문 차별화 원칙
 
 1. **Concepts 컬렉션**: 단어/개념의 **기본 의미**를 보여주는 간단하고 명확한 예문
-   - **필수 조건**: 완전한 문장으로 작성 (주어+동사 포함, 문법적으로 완성된 문장)
 2. **Examples 컬렉션**: **실제 상황**에서 사용하는 실용적이고 자연스러운 예문
-   - **필수 조건**: 완전한 문장으로 작성 (주어+동사 포함, 문법적으로 완성된 문장)
 3. **Grammar 컬렉션**: **문법 패턴**을 설명하는 교육적 목적의 예문
-   - **필수 조건**: 완전한 문장으로 작성 (주어+동사 포함, 문법적으로 완성된 문장)
-
-#### 🚫 잘못된 예문 형태 (구문/단어만)
-- ❌ "Warm greeting" (불완전한 구문)
-- ❌ "Good morning" (인사말이지만 문장 구조 없음)
-- ❌ "Apple juice" (명사구만)
-
-#### ✅ 올바른 예문 형태 (완전한 문장)
-- ✅ "I give you a warm greeting." (주어+동사+목적어+목적어)
-- ✅ "Good morning, how are you?" (감탄사+의문문)
-- ✅ "I drink fresh apple juice." (주어+동사+목적어)
-- ✅ "The weather is nice today." (주어+동사+보어)
-- ✅ "Run quickly!" (명령문: 동사+부사)
-- ✅ "What a beautiful day!" (감탄문)
 
 #### 올바른 예문 분류 예시
 
@@ -778,48 +841,17 @@ domain,category,difficulty,situation,purpose,korean_title,korean_structure,korea
 - **Examples**: "안녕하세요? 오늘 날씨가 좋네요" (실제 상황 인사)
 - **Grammar**: "안녕하세요! 처음 뵙겠습니다" (문법 패턴)
 
-## 📢 발음 표기법 가이드
+#### 중복 예문 검증 방법
 
-### 5개 언어별 표준 발음 표기법 (브라우저 호환)
+```bash
+# 동일 concept_id 내 예문 중복 검사
+grep -A 1 "concept_id" concepts_template_add.csv > concepts_examples.txt
+grep -A 1 "concept_id" examples_template_add.csv > examples_examples.txt
+grep -A 1 "concept_id" grammar_template_add.csv > grammar_examples.txt
 
-#### 1. Korean (한국어)
-- **형식**: 하이픈 구분 로마자 표기
-- **예시**: `a-chim` (아침), `an-nyeong` (안녕), `sa-gwa` (사과)
-- **특징**: 음절별 하이픈 구분으로 읽기 쉽게
-
-#### 2. English (영어) 
-- **형식**: IPA (International Phonetic Alphabet) 표기
-- **예시**: `/ˈmɔːrnɪŋ/` (morning), `/weɪk/` (wake), `/ˈæp.əl/` (apple)
-- **특징**: 슬래시(/)로 감싸고 정확한 발음 기호 사용
-
-#### 3. Chinese (중국어)
-- **형식**: 성조 없는 pinyin 표기
-- **예시**: `zao chen` (早晨), `ni hao` (你好), `ping guo` (苹果)
-- **특징**: 공백으로 구분, 성조 표시 생략 (브라우저 호환성)
-
-#### 4. Japanese (일본어)
-- **형식**: 헵번식 로마자 표기
-- **예시**: `asa` (朝), `konnichiwa` (こんにちは), `ringo` (りんご)
-- **특징**: 표준 헵번식 로마자 사용
-
-#### 5. Spanish (스페인어)
-- **형식**: 하이픈 구분 로마자 표기  
-- **예시**: `ma-nya-na` (mañana), `o-la` (hola), `man-sa-na` (manzana)
-- **특징**: 음절별 하이픈 구분
-
-### UTF-8 인코딩 필수 준수사항
-
-#### CSV 파일 저장 시 주의사항
-1. **인코딩**: 반드시 UTF-8 BOM 없음(UTF-8 without BOM) 형식으로 저장
-2. **문제 원인**: ANSI, CP949 등 다른 인코딩 사용 시 다국어 문자 깨짐
-3. **확인 방법**: 파일 저장 후 텍스트 에디터에서 한중일 문자 정상 표시 확인
-4. **해결 방법**: 문자 깨짐 발견 시 UTF-8로 재저장 후 내용 복구
-5. **빈 필드 처리**: 데이터가 없는 경우 '없음' 대신 빈 칸("")으로 처리
-
-#### 권장 도구 및 설정
-- **VS Code**: 우하단 인코딩 표시에서 "UTF-8" 확인
-- **Excel**: CSV 가져오기 시 UTF-8 옵션 선택
-- **메모장**: "다른 이름으로 저장" → 인코딩 "UTF-8" 선택
+# 자동 검증 시스템 (권장)
+python validate.py
+```
 
 ---
 

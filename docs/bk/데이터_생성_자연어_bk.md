@@ -1,28 +1,18 @@
-# 다국어 학습 플랫폼 데이터 단계별 생성 자연어 지시 가이드
+# 다국어 학습 플랫폼 데이터 생성 자연어 지시어 가이드
 
 ## 📋 개요
 
 이 문서는 AI에게 다국어 학습 플랫폼용 데이터를 생성하도록 지시할 때 사용하는 자연어 지시어 모음입니다. 50개 단위로 데이터 생성을 요청할 수 있습니다.
 
-### 📊 전체 10,000개 데이터 생성 전략 (4단계 × 50개씩 = 200배치)
-- **1단계: 기초 구축** (2,000개 - 40배치) - 기초/중급 중심, 모든 도메인 포함
-- **2단계: 실용 확장** (3,000개 - 60배치) - 중급/고급 중심, 모든 도메인 균등 분배
-- **3단계: 심화 완성** (3,000개 - 60배치) - 고급/유창 중심, 전문성 강화
-- **4단계: 최종 보완** (2,000개 - 40배치) - 전문/유창 중심, 부족 영역 보완
+## 📊 전체 10,000개 데이터 생성 전략
 
-### 🌍 다언어 지원
-한국어, 영어, 일본어, 중국어, 스페인어
-
-### 📊 완전한 요소 분포
-- **180개 카테고리** (12개 도메인)
-- **5개 난이도**: basic, intermediate, advanced, fluent, technical
-- **10개 품사**: noun, verb, adjective, adverb, preposition, conjunction, determiner, pronoun, interrogative, interjection, other
-- **12개 목적**: greeting, question, request, suggestion, emotion, instruction, description, gratitude, opinion, agreement, apology, refusal
-- **13개 상황 조합**: casual/polite/formal + home/social/work/public/store
-
----
-
-## 단계별 각 항목별 구축 비율
+### 단계별 구축 로드맵 (4단계 × 50개씩 = 200배치)
+```
+1단계 (기초 구축): 2,000개 (40배치) - 기초/중급 중심, 모든 도메인 포함
+2단계 (실용 확장): 3,000개 (60배치) - 중급/고급 중심, 모든 도메인 균등 분배
+3단계 (심화 완성): 3,000개 (60배치) - 고급/유창 중심, 전문성 강화
+4단계 (최종 보완): 2,000개 (40배치) - 전문/유창 중심, 부족 영역 보완
+```
 
 ### 1단계: 기초 구축 (2,000개 - 40배치)
 **모든 180개 카테고리 포함 (100%) - daily/food 도메인 비중 높음**
@@ -30,17 +20,17 @@
 #### Domain (도메인) 비율
 ```
 daily (일상생활): 25% (10배치) - 15/15카테고리 모두 포함, 기본+중심
-food (음식): 15% (6배치) - 15/15카테고리 모두 포함, 주요+소량 
+food (음식): 20% (8배치) - 15/15카테고리 모두 포함, 주요+소량 
 education (교육): 15% (6배치) - 17/17카테고리 모두 포함, 기본+소량
-travel (여행): 12% (5배치) - 14/14카테고리 모두 포함, 기본+소량
-business (비즈니스): 10% (4배치) - 14/14카테고리 모두 포함, 기본+소량
-health (건강): 8% (3배치) - 15/15카테고리 모두 포함, 기본+소량
+travel (여행): 10% (4배치) - 14/14카테고리 모두 포함, 기본+소량
+business (비즈니스): 8% (3배치) - 14/14카테고리 모두 포함, 기본+소량
+health (건강): 7% (3배치) - 15/15카테고리 모두 포함, 기본+소량
 technology (기술): 5% (2배치) - 17/17카테고리 모두 포함, 기본+소량
-entertainment (엔터테인먼트): 5% (2배치) - 15/15카테고리 모두 포함, 학습 동기
-other (기타): 2% (1배치) - 25/25카테고리는 40번째 배치에서 sports와 함께 포함
-culture (문화): 2% (1배치) - 14/14카테고리 모두 포함, 기본+소량
-nature (자연): 1% (1배치) - 14/14카테고리 모두 포함, 기본+소량
-sports (스포츠): 0% (0배치) - 15/15카테고리는 40번째 배치에서 other와 함께 포함
+culture (문화): 3% (1배치) - 14/14카테고리 모두 포함, 기본+소량
+entertainment (엔터테인먼트): 3% (1배치) - 15/15카테고리 모두 포함, 기본+소량
+nature (자연): 2% (1배치) - 14/14카테고리 모두 포함, 기본+소량
+sports (스포츠): 1% (1배치) - 15/15카테고리 모두 포함, 기본+소량
+other (기타): 1% (1배치) - 25/25카테고리 모두 포함, 소량만
 ```
 
 #### Difficulty (난이도) 비율 - 1단계 기초 구축
@@ -54,47 +44,46 @@ technical (전문): 1% (1배치) - 전문 용어 도입
 
 #### Part of Speech (품사) 비율 - 1단계 기초 구축
 ```
-noun (명사): 25% (10배치) - 기본 어휘의 핵심
+noun (명사): 40% (16배치) - 기본 어휘의 핵심
 verb (동사): 25% (10배치) - 행동과 상태 표현
 adjective (형용사): 15% (6배치) - 묘사와 수식
-interjection (감탄사): 10% (4배치) - 감정 표현
-interrogative (의문사): 8% (3배치) - 질문 표현
-adverb (부사): 7% (3배치) - 동사/형용사 수식
-other (기타): 5% (2배치) - 구문, 관용구 등
+adverb (부사): 5% (2배치) - 동사/형용사 수식
+pronoun (대명사): 3% (1배치) - 기본 대명사
 preposition (전치사/조사): 3% (1배치) - 기본 관계
-conjunction (접속사): 2% (1배치) - 기본 연결
-determiner (한정사): 0% (0배치) - 1단계에서는 제외
-pronoun (대명사): 0% (0배치) - 1단계에서는 제외
+conjunction (접속사): 3% (1배치) - 기본 연결
+interjection (감탄사): 3% (1배치) - 감정 표현
+determiner (한정사): 2% (1배치) - 범위 한정
+other (기타): 1% (1배치) - 구문, 관용구 등
 ```
 
 #### Purpose (목적) 비율 - 1단계 기초 구축
 ```
-greeting (인사): 25% (10배치) - 기본 소통의 시작
-question (질문): 18% (7배치) - 상호작용의 핵심
-request (요청): 15% (6배치) - 실용적 의사소통
-suggestion (제안): 10% (4배치) - 제안과 권유
-emotion (감정표현): 8% (3배치) - 감정 전달
-instruction (지시/설명): 7% (3배치) - 학습과 안내
-description (묘사/설명): 5% (2배치) - 기본 설명
-gratitude (감사표현): 5% (2배치) - 예의와 감사
-opinion (의견표현): 3% (1배치) - 의견 표현
-agreement (동의): 2% (1배치) - 동의와 찬성
-apology (사과): 1% (1배치) - 사과와 양해
-refusal (거절): 1% (1배치) - 거절과 사양
+description (묘사/설명): 25% (10배치) - 가장 범용적
+greeting (인사): 20% (8배치) - 기본 소통
+question (질문): 15% (6배치) - 상호작용
+request (요청): 10% (4배치) - 실용성
+instruction (지시/설명): 8% (3배치) - 학습용
+opinion (의견표현): 6% (2배치) - 소통 필수
+emotion (감정표현): 5% (2배치) - 표현력
+gratitude (감사표현): 4% (2배치) - 예의
+suggestion (제안): 3% (1배치) - 제안하기
+agreement (동의): 2% (1배치) - 동의하기
+apology (사과): 1% (1배치) - 사과하기
+refusal (거절): 1% (1배치) - 거절하기
 ```
 
 #### Situation (상황) 조합 비율 - 1단계 기초 구축
 ```
-casual + home: 35% (14배치) - 편안한 집 환경
-casual + social: 25% (10배치) - 편안한 사회적 상황
-polite + social: 15% (6배치) - 정중한 사회적 상황
-casual + store: 10% (4배치) - 편안한 상점 환경
-polite + store: 8% (3배치) - 정중한 상점 환경
-polite + home: 5% (2배치) - 정중한 집 환경
-polite + work: 2% (1배치) - 정중한 업무 환경
-formal + public: 0% (0배치) - 1단계에서는 제외
-formal + work: 0% (0배치) - 1단계에서는 제외
-casual + public: 0% (0배치) - 1단계에서는 제외
+casual + home: 25% (10배치) - 가정 일상
+polite + social: 20% (8배치) - 사교 정중
+casual + social: 15% (6배치) - 친구 편안
+polite + home: 10% (4배치) - 가정 정중
+formal + work: 8% (3배치) - 직장 공식
+polite + work: 7% (3배치) - 직장 정중
+casual + work: 5% (2배치) - 직장 편안
+formal + public: 5% (2배치) - 공공 공식
+polite + public: 3% (1배치) - 공공 정중
+casual + public: 2% (1배치) - 공공 편안
 ```
 
 #### Category (카테고리) 비율 - 1단계 기초 구축 (180/180개 카테고리, 100%)
@@ -165,417 +154,19 @@ casual + public: 0% (0배치) - 1단계에서는 제외
 - 종합 (전체 25개 카테고리): 1% (1배치)
 ```
 
-### 2단계: 실용 확장 (3,000개 - 60배치)
-**모든 180개 카테고리 포함 (100%) - 균등 분배로 실용성 강화**
+**✅ 모든 단계별 180개 카테고리 완전 분배 완료:**
+- 1단계: 180/180 카테고리 (100%) - 기초 구축
+- 2단계: 180/180 카테고리 (100%) - 실용 확장  
+- 3단계: 180/180 카테고리 (100%) - 심화 완성
+- 4단계: 180/180 카테고리 (100%) - 최종 보완
 
-#### Domain (도메인) 비율 - 2단계 실용 확장
-```
-technology (기술): 18% (11배치) - 17/17카테고리 모두 포함, 기술 혁신
-business (비즈니스): 17% (10배치) - 14/14카테고리 모두 포함, 전문 비즈니스
-education (교육): 13% (8배치) - 17/17카테고리 모두 포함, 교육 전문
-daily (일상생활): 12% (7배치) - 15/15카테고리 모두 포함, 실용 일상
-travel (여행): 10% (6배치) - 14/14카테고리 모두 포함, 실용 여행
-health (건강): 8% (5배치) - 15/15카테고리 모두 포함, 건강 관리
-culture (문화): 7% (4배치) - 14/14카테고리 모두 포함, 문화 이해
-entertainment (엔터테인먼트): 5% (3배치) - 15/15카테고리 모두 포함, 동기 향상
-food (음식): 3% (2배치) - 15/15카테고리 모두 포함, 고급 음식
-other (기타): 2% (1배치) - 25/25카테고리 모두 포함, 포괄성 강화
-nature (자연): 2% (1배치) - 14/14카테고리 모두 포함, 자연 환경
-sports (스포츠): 2% (1배치) - 15/15카테고리 모두 포함, 스포츠 활동
-```
+**각 단계마다 모든 도메인과 카테고리가 누락 없이 완전 분배됨!**
 
-#### Difficulty (난이도) 비율 - 2단계 실용 확장
-```
-intermediate (중급): 50% (30배치) - 실용 중심
-basic (기초): 25% (15배치) - 기초 보완
-advanced (고급): 15% (9배치) - 고급 도전
-fluent (유창): 7% (4배치) - 유창성 향상
-technical (전문): 3% (2배치) - 전문성 도입
-```
-
-#### Part of Speech (품사) 비율 - 2단계 실용 확장
-```
-verb (동사): 30% (18배치) - 실용적 행동 표현
-noun (명사): 25% (15배치) - 실용 어휘 확장
-adjective (형용사): 20% (12배치) - 다양한 묘사
-adverb (부사): 8% (5배치) - 정확한 수식
-other (기타): 7% (4배치) - 실용 구문
-preposition (전치사): 3% (2배치) - 관계 표현
-conjunction (접속사): 3% (2배치) - 연결 표현
-pronoun (대명사): 2% (1배치) - 대명사 활용
-determiner (한정사): 1% (1배치) - 한정 표현
-interjection (감탄사): 1% (1배치) - 감정 표현
-```
-
-#### Purpose (목적) 비율 - 2단계 실용 확장
-```
-description (묘사/설명): 20% (12배치) - 실용적 설명
-question (질문): 18% (11배치) - 다양한 질문
-opinion (의견표현): 15% (9배치) - 의견 교환
-request (요청): 12% (7배치) - 실용적 요청
-instruction (지시/설명): 10% (6배치) - 실용 지시
-greeting (인사): 8% (5배치) - 사회적 인사
-suggestion (제안): 6% (4배치) - 실용 제안
-emotion (감정표현): 4% (2배치) - 감정 소통
-gratitude (감사표현): 3% (2배치) - 감사 표현
-agreement (동의): 2% (1배치) - 동의 표현
-apology (사과): 1% (1배치) - 사과 표현
-refusal (거절): 1% (1배치) - 거절 표현
-```
-
-#### Situation (상황) 조합 비율 - 2단계 실용 확장
-```
-polite + social: 30% (18배치) - 사회적 정중함
-casual + social: 25% (15배치) - 사회적 친근함
-formal + work: 15% (9배치) - 업무 공식성
-polite + work: 10% (6배치) - 업무 정중함
-polite + public: 8% (5배치) - 공공 정중함
-casual + home: 5% (3배치) - 가정 편안함
-polite + home: 3% (2배치) - 가정 정중함
-formal + public: 2% (1배치) - 공공 공식성
-casual + work: 1% (1배치) - 업무 편안함
-casual + public: 1% (1배치) - 공공 편안함
-```
-#### Category (카테고리) 비율 - 2단계 실용 확장 (180/180개 카테고리, 100%)
-```
-💻 technology 카테고리 (17/17개): 20% (12배치) - 기술 혁신
-- data (데이터): 2.0% (1배치)
-- security (보안): 2.0% (1배치)
-- cloud (클라우드): 2.0% (1배치)
-- innovation (혁신): 2.0% (1배치)
-- development (개발): 2.0% (1배치)
-- 종합 (devices, software, applications, internet, social, mobile, gaming, communication, automation, research, artificial, programming): 10.0% (7배치)
-
-💼 business 카테고리 (14/14개): 18% (11배치) - 전문 비즈니스
-- finance (재정): 1.8% (1배치)
-- marketing (마케팅): 1.8% (1배치)
-- negotiation (협상): 1.8% (1배치)
-- leadership (리더십): 1.8% (1배치)
-- teamwork (팀워크): 1.8% (1배치)
-- management (관리): 1.8% (1배치)
-- 종합 (meeting, communication, presentation, contracts, planning, reports, emails, sales): 4.8% (5배치)
-
-🎓 education 카테고리 (17/17개): 15% (9배치) - 교육 전문
-- research (연구): 1.7% (1배치)
-- curriculum (교육과정): 1.7% (1배치)
-- assessment (평가): 1.7% (1배치)
-- university (대학): 1.7% (1배치)
-- academic (학술): 1.7% (1배치)
-- 종합 (teaching, learning, classroom, students, subjects, textbooks, exams, grades, homework, library, college, school, scholarship): 4.5% (4배치)
-
-💊 health 카테고리 (15/15개): 12% (7배치) - 의료 심화
-- medicine (의학): 1.7% (1배치)
-- treatment (치료): 1.7% (1배치)
-- prevention (예방): 1.7% (1배치)
-- mental (정신건강): 1.7% (1배치)
-- 종합 (symptoms, exercise, nutrition, hospital, doctor, appointment, wellness, recovery, checkup, emergency, surgery): 4.5% (3배치)
-
-🎨 culture 카테고리 (14/14개): 10% (6배치) - 문화 깊이
-- heritage (유산): 1.7% (1배치)
-- arts_crafts (예술공예): 1.7% (1배치)
-- national_identity (국가정체성): 1.7% (1배치)
-- ceremony (의식): 1.7% (1배치)
-- 종합 (etiquette, festivals, traditions, customs, beliefs, values, history, literature, music, film): 3.2% (2배치)
-
-🏠 daily 카테고리 (15/15개): 8% (5배치) - 고급 일상
-- communication (소통): 1.6% (1배치)
-- emotions (감정): 1.6% (1배치)
-- 종합 (routine, family, household, shopping, time, clothing, leisure, morning, evening, weekend, work, personal, social): 4.8% (3배치)
-
-✈️ travel 카테고리 (14/14개): 6% (4배치) - 심화 여행
-- sightseeing (관광): 1.5% (1배치)
-- accommodation (숙박): 1.5% (1배치)
-- 종합 (transportation, booking, directions, luggage, customs, currency, weather, maps, guides, attractions, souvenirs, emergency, language): 3.0% (2배치)
-
-🍎 food 카테고리 (15/15개): 5% (3배치) - 전문 음식
-- cooking (요리): 1.7% (1배치)
-- 종합 (restaurants, ingredients, beverages, nutrition, snacks, seafood, fruits, vegetables, desserts, meat, dairy, spices, dining, recipes): 3.3% (2배치)
-
-🎭 entertainment 카테고리 (15/15개): 3% (2배치) - 전문 오락
-- 종합 (movies, music, games, books, theater, art, comedy, drama, dance, concerts, shows, celebrities, media, streaming, hobbies): 3.0% (2배치)
-
-🌿 nature 카테고리 (14/14개): 2% (1배치) - 환경 전문
-- 종합 (animals, plants, weather, seasons, environment, conservation, geography, landscapes, climate, ecology, natural, disasters, resources, sustainability): 2% (1배치)
-
-⚽ sports 카테고리 (15/15개): 1% (1배치) - 스포츠 전문
-- 종합 (football, basketball, swimming, running, cycling, tennis, baseball, fitness, teams, competitions, athletes, training, equipment, rules, victories): 1% (1배치)
-
-🔧 other 카테고리 (25/25개): 1% (1배치) - 전문 기타
-- 종합 (전체 25개 카테고리): 1% (1배치)
-```
-
-### 3단계: 심화 완성 (3,000개 - 60배치)
-
-#### Domain (도메인) 비율 - 3단계 심화 완성
-```
-technology (기술): 18% (11배치) - 17/17카테고리 모두, 고급 기술
-business (비즈니스): 17% (10배치) - 14/14카테고리 모두, 전문 비즈니스
-education (교육): 15% (9배치) - 17/17카테고리 모두, 교육 전문
-daily (일상생활): 10% (6배치) - 15/15카테고리 모두, 고급 일상
-health (건강): 10% (6배치) - 15/15카테고리 모두, 의료 심화
-culture (문화): 8% (5배치) - 14/14카테고리 모두, 문화 깊이
-entertainment (엔터테인먼트): 7% (4배치) - 15/15카테고리 모두, 전문 오락
-travel (여행): 7% (4배치) - 14/14카테고리 모두, 심화 여행
-food (음식): 2% (1배치) - 15/15카테고리 모두, 고급 음식
-other (기타): 2% (1배치) - 25/25카테고리 모두, 포괄성 강화
-nature (자연): 2% (1배치) - 14/14카테고리 모두, 환경 전문
-sports (스포츠): 2% (1배치) - 15/15카테고리 모두, 스포츠 전문
-```
-
-#### Difficulty (난이도) 비율 - 3단계 심화 완성
-```
-advanced (고급): 40% (24배치) - 고급 표현 중심
-fluent (유창): 30% (18배치) - 유창한 소통
-intermediate (중급): 25% (15배치) - 중급 보완
-technical (전문): 4% (2배치) - 전문 용어
-basic (기초): 1% (1배치) - 기초 확인
-```
-
-#### Part of Speech (품사) 비율 - 3단계 심화 완성
-```
-noun (명사): 30% (18배치) - 전문 어휘
-verb (동사): 25% (15배치) - 복합 동작
-adjective (형용사): 20% (12배치) - 정밀 묘사
-other (기타): 8% (5배치) - 고급 표현
-adverb (부사): 6% (4배치) - 세밀 수식
-interrogative (의문사): 4% (2배치) - 복잡 질문
-interjection (감탄사): 3% (2배치) - 고급 감정
-preposition (전치사): 2% (1배치) - 복잡 관계
-conjunction (접속사): 2% (1배치) - 고급 연결
-determiner (한정사): 0% (0배치) - 최소한
-pronoun (대명사): 0% (0배치) - 최소한
-```
-
-#### Purpose (목적) 비율 - 3단계 심화 완성
-```
-description (묘사): 25% (15배치) - 정밀한 묘사
-opinion (의견표현): 20% (12배치) - 복잡한 의견
-instruction (지시): 15% (9배치) - 전문 지시
-suggestion (제안): 10% (6배치) - 고급 제안
-question (질문): 8% (5배치) - 복잡한 질문
-emotion (감정표현): 7% (4배치) - 미묘한 감정
-agreement (동의): 5% (3배치) - 전문적 동의
-request (요청): 4% (2배치) - 정중한 요청
-gratitude (감사표현): 3% (2배치) - 세련된 감사
-greeting (인사): 2% (1배치) - 격식있는 인사
-apology (사과): 1% (1배치) - 정중한 사과
-refusal (거절): 0% (0배치) - 최소한
-```
-
-#### Situation (상황) 조합 비율 - 3단계 심화 완성
-```
-polite + work: 30% (18배치) - 정중한 업무 환경
-formal + work: 25% (15배치) - 공식적 업무 환경
-polite + public: 20% (12배치) - 정중한 공공장소
-formal + public: 10% (6배치) - 공식적 공공장소
-polite + social: 8% (5배치) - 정중한 사회적 상황
-casual + work: 5% (3배치) - 편안한 업무 환경
-polite + store: 2% (1배치) - 정중한 상점 환경
-casual + social: 0% (0배치) - 최소한
-casual + home: 0% (0배치) - 최소한
-```
-
-#### Category (카테고리) 비율 - 3단계 심화 완성 (180/180개 카테고리, 100%)
-```
-💻 technology 카테고리 (17/17개): 20% (12배치) - 고급 기술
-- artificial (인공지능): 2.5% (1.5배치)
-- programming (프로그래밍): 2.5% (1.5배치)
-- data (데이터): 2.0% (1배치)
-- security (보안): 2.0% (1배치)
-- cloud (클라우드): 2.0% (1배치)
-- innovation (혁신): 2.0% (1배치)
-- development (개발): 2.0% (1배치)
-- 종합 (devices, software, applications, internet, social, mobile, gaming, communication, automation, research): 5.0% (4배치)
-
-💼 business 카테고리 (14/14개): 18% (11배치) - 전문 비즈니스
-- leadership (리더십): 2.0% (1배치)
-- negotiation (협상): 2.0% (1배치)
-- finance (재정): 2.0% (1배치)
-- management (관리): 2.0% (1배치)
-- marketing (마케팅): 2.0% (1배치)
-- planning (기획): 2.0% (1배치)
-- 종합 (meeting, communication, presentation, contracts, reports, emails, sales, teamwork): 6.0% (5배치)
-
-🎓 education 카테고리 (17/17개): 15% (9배치) - 교육 전문
-- university (대학): 2.0% (1배치)
-- research (연구): 2.0% (1배치)
-- academic (학술): 2.0% (1배치)
-- curriculum (교육과정): 2.0% (1배치)
-- assessment (평가): 2.0% (1배치)
-- 종합 (teaching, learning, classroom, students, subjects, textbooks, exams, grades, homework, library, college, school, scholarship): 5.0% (4배치)
-
-⚕️ health 카테고리 (15/15개): 12% (7배치) - 의료 심화
-- treatment (치료): 2.0% (1배치)
-- medical (의료): 2.0% (1배치)
-- medicine (약물): 2.0% (1배치)
-- surgery (수술): 2.0% (1배치)
-- 종합 (symptoms, diagnosis, hospital, doctor, patient, nutrition, mental, therapy, prevention, emergency, exercise): 4.0% (3배치)
-
-🎭 culture 카테고리 (14/14개): 10% (6배치) - 문화 깊이
-- heritage (유산): 2.0% (1배치)
-- arts (예술): 2.0% (1배치)
-- history (역사): 2.0% (1배치)
-- 종합 (festivals, traditions, customs, literature, museums, galleries, religion, philosophy, social, language, ceremonies): 4.0% (3배치)
-
-🏠 daily 카테고리 (15/15개): 8% (5배치) - 고급 일상
-- routine (일과): 2.0% (1배치)
-- communication (소통): 2.0% (1배치)
-- 종합 (family, household, shopping, emotions, time, clothing, leisure, morning, evening, weekend, relationships, personal, social): 4.0% (3배치)
-
-✈️ travel 카테고리 (14/14개): 6% (4배치) - 심화 여행
-- international (국제): 2.0% (1배차)
-- culture (문화): 2.0% (1배치)
-- 종합 (transportation, accommodation, sightseeing, booking, directions, budget, safety, customs, language, planning, adventure, business): 2.0% (2배치)
-
-🍽️ food 카테고리 (15/15개): 5% (3배치) - 고급 음식
-- cuisine (요리법): 2.0% (1배치)
-- nutrition (영양): 2.0% (1배치)
-- 종합 (cooking, restaurants, ingredients, beverages, snacks, seafood, vegetables, fruits, meat, dairy, spices, dining, international): 1.0% (1배치)
-
-🎬 entertainment 카테고리 (15/15개): 3% (2배치) - 전문 오락
-- production (제작): 2.0% (1배치)
-- 종합 (movies, music, books, games, theater, concerts, festivals, comedy, drama, documentary, streaming, celebrities, reviews, awards): 1.0% (1배치)
-
-🌿 nature 카테고리 (14/14개): 2% (1배치) - 환경 전문
-- 종합 (animals, plants, weather, environment, conservation, ecology, climate, geography, seasons, natural, wildlife, forests, oceans, mountains): 2.0% (1배치)
-
-⚽ sports 카테고리 (15/15개): 1% (1배치) - 스포츠 전문
-- 종합 (football, basketball, swimming, running, cycling, tennis, baseball, fitness, teams, competitions, athletes, training, equipment, rules, victories): 1.0% (1배치)
-```
-
-### 4단계: 최종 보완 (2,000개 - 40배치)
-**모든 180개 카테고리 포함 (100%) - 전문/유창 중심 최종 완성**
-
-#### Domain (도메인) 비율 - 4단계 최종 보완
-```
-technology (기술): 20% (8배치) - 17/17카테고리 모두, 최신 기술
-business (비즈니스): 18% (7배치) - 14/14카테고리 모두, 고급 비즈니스
-health (건강): 15% (6배치) - 15/15카테고리 모두, 의료 전문
-education (교육): 12% (5배치) - 17/17카테고리 모두, 교육 전문
-culture (문화): 10% (4배치) - 14/14카테고리 모두, 문화 전문
-entertainment (엔터테인먼트): 8% (3배치) - 15/15카테고리 모두, 오락 완성
-daily (일상생활): 8% (3배치) - 15/15카테고리 모두, 일상 완성
-other (기타): 5% (2배치) - 25/25카테고리 모두, 기타 완성
-travel (여행): 5% (2배치) - 14/14카테고리 모두, 여행 완성
-food (음식): 2% (1배치) - 15/15카테고리 모두, 음식 완성
-nature (자연): 0% (0배치) - 이전 단계에서 완성
-sports (스포츠): 0% (0배치) - 이전 단계에서 완성
-```
-
-#### Difficulty (난이도) 비율 - 4단계 최종 보완
-```
-technical (기술적): 35% (14배치) - 기술/의료 전문가 수준
-fluent (유창한): 30% (12배치) - 원어민 급 고급 표현
-advanced (고급): 25% (10배치) - 완전 숙련자 수준
-intermediate (중급): 7% (3배치) - 보완 및 확인
-basic (기초): 3% (1배치) - 최종 확인용
-```
-
-#### Part of Speech (품사) 비율 - 4단계 최종 보완
-```
-noun (명사): 30% - 전문 용어 및 고급 개념
-verb (동사): 25% - 고급 동작 및 상태
-adjective (형용사): 20% - 전문적 묘사 및 평가
-adverb (부사): 10% - 정밀한 수식어
-other (기타): 8% - 전문 용법
-preposition (전치사): 3% - 고급 문법
-conjunction (접속사): 2% - 복잡한 연결
-determiner (한정사): 1% - 정밀한 지시
-pronoun (대명사): 1% - 고급 대명사
-interjection (감탄사): 0% - 최소화
-```
-
-#### Purpose (목적) 비율 - 4단계 최종 보완
-```
-description (설명): 25% - 전문적 기술 설명
-instruction (지시): 20% - 전문 절차 안내
-opinion (의견): 18% - 전문가 의견 표현
-question (질문): 12% - 전문적 질의
-request (요청): 10% - 공식적 요청
-suggestion (제안): 5% - 전문가 제안
-agreement (동의): 4% - 전문적 합의
-emotion (감정): 3% - 절제된 감정 표현
-greeting (인사): 2% - 공식적 인사
-gratitude (감사): 1% - 공식적 감사
-apology (사과): 0% - 최소화
-refusal (거절): 0% - 최소화
-```
-
-#### Situation (상황) 조합 비율 - 4단계 최종 보완
-```
-formal + work: 35% (14배치) - 공식적 업무 환경
-formal + public: 25% (10배치) - 공식적 공공장소
-polite + work: 20% (8배치) - 정중한 업무 환경
-polite + public: 10% (4배치) - 정중한 공공장소
-formal + store: 5% (2배치) - 공식적 상점 환경
-polite + store: 3% (1배치) - 정중한 상점 환경
-polite + social: 2% (1배치) - 정중한 사회적 상황
-casual + work: 0% (0배치) - 최소화
-casual + social: 0% (0배치) - 최소화
-```
-
-#### Category (카테고리) 비율 - 4단계 최종 보완 (180/180개 카테고리, 100%)
-```
-💻 technology 카테고리 (17/17개): 20% (8배치) - 최신 기술 전문
-- artificial (인공지능): 2.5% (1배치)
-- security (보안): 2.5% (1배치)
-- programming (프로그래밍): 2.5% (1배치)
-- innovation (혁신): 2.5% (1배치)
-- 종합 (devices, software, applications, internet, data, social, mobile, gaming, cloud, communication, automation, research, development): 10.0% (4배치)
-
-💼 business 카테고리 (14/14개): 18% (7배치) - 고급 비즈니스 전문
-- finance (재정): 2.6% (1배치)
-- marketing (마케팅): 2.6% (1배치)
-- leadership (리더십): 2.6% (1배치)
-- management (관리): 2.6% (1배치)
-- 종합 (meeting, communication, presentation, negotiation, contracts, teamwork, planning, reports, emails, sales): 5.6% (3배치)
-
-💊 health 카테고리 (15/15개): 15% (6배치) - 의료 전문
-- medicine (의학): 2.5% (1배치)
-- treatment (치료): 2.5% (1배치)
-- surgery (수술): 2.5% (1배치)
-- prevention (예방): 2.5% (1배치)
-- 종합 (symptoms, exercise, nutrition, hospital, doctor, appointment, wellness, mental, recovery, checkup, emergency): 5.0% (2배치)
-
-🎓 education 카테고리 (17/17개): 12% (5배치) - 교육 전문
-- research (연구): 2.4% (1배치)
-- university (대학): 2.4% (1배치)
-- academic (학술): 2.4% (1배치)
-- 종합 (teaching, learning, classroom, students, subjects, curriculum, assessment, textbooks, exams, grades, homework, library, college, school, scholarship): 4.8% (2배치)
-
-🎨 culture 카테고리 (14/14개): 10% (4배치) - 문화 전문
-- heritage (유산): 2.5% (1배치)
-- national_identity (국가정체성): 2.5% (1배치)
-- 종합 (arts_crafts, ceremony, etiquette, festivals, traditions, customs, beliefs, values, history, literature, music, film): 5.0% (2배치)
-
-🏠 daily 카테고리 (15/15개): 8% (3배치) - 일상 완성
-- communication (소통): 2.7% (1배치)
-- 종합 (routine, family, household, shopping, emotions, time, clothing, leisure, morning, evening, weekend, work, personal, social): 5.3% (2배치)
-
-✈️ travel 카테고리 (14/14개): 6% (2배치) - 여행 완성
-- 종합 (transportation, accommodation, sightseeing, booking, directions, luggage, customs, currency, weather, maps, guides, attractions, souvenirs, emergency, language): 6.0% (2배치)
-
-🌿 nature 카테고리 (14/14개): 4% (2배치) - 환경 완성
-- conservation (보전): 2.0% (1배치)
-- 종합 (animals, plants, weather, seasons, environment, geography, landscapes, climate, ecology, natural, disasters, resources, sustainability): 2.0% (1배치)
-
-🍎 food 카테고리 (15/15개): 3% (1배치) - 음식 완성
-- 종합 (cooking, restaurants, ingredients, beverages, nutrition, snacks, seafood, fruits, vegetables, desserts, meat, dairy, spices, dining, recipes): 3% (1배치)
-
-🎭 entertainment 카테고리 (15/15개): 2% (1배치) - 오락 완성
-- 종합 (movies, music, games, books, theater, art, comedy, drama, dance, concerts, shows, celebrities, media, streaming, hobbies): 2% (1배치)
-
-⚽ sports 카테고리 (15/15개): 1% (1배치) - 스포츠 완성
-- 종합 (football, basketball, swimming, running, cycling, tennis, baseball, fitness, teams, competitions, athletes, training, equipment, rules, victories): 1% (1배치)
-
-🔧 other 카테고리 (25/25개): 1% (1배치) - 기타 완성
-- 종합 (전체 25개 카테고리): 1% (1배치)
-```
 ---
 
-## 🎯 단계별 세부 배치 생성 자연어 지시어 (50개 단위)
+## 🎯 단계별 생성 자연어 지시어 (50개 단위)
 
-### 🎯 1단계 (1-1 ~ 1-40번 배치): 기초-중급 중심 (2,000개)
+### 1단계: 기초 구축 (2,000개 - 40배치)
 **모든 180개 카테고리 포함 - 개별 배치 세부 지시어**
 
 #### 1-1번 배치 (50개): daily-routine 기초 인사
@@ -599,7 +190,7 @@ casual + social: 0% (0배치) - 최소화
 일상생활(daily) 도메인의 household(가사) 카테고리에서 기초(basic) 난이도의 요청(request) 목적 데이터를 50개 생성해주세요.
 상황은 정중하고 집(polite,home) 환경에서 사용하는 표현으로 만들어주세요.
 품사는 동사(verb) 40%, 명사(noun) 30%, 부사(adverb) 30%로 구성해주세요.
-가사일 요청 표현을 포함해주세요.
+집안일과 관련된 요청 표현을 포함해주세요.
 ```
 
 #### 1-4번 배치 (50개): daily-shopping 기초 감정표현
@@ -909,8 +500,80 @@ casual + social: 0% (0배치) - 최소화
 품사는 명사(noun) 35%, 동사(verb) 25%, 형용사(adjective) 20%, 감탄사(interjection) 10%, 기타(other) 10%로 구성해주세요.
 ```
 
-### 🎯 2단계 (2-1 ~ 2-60번 배치): 중급-고급 중심 (3,000개)
-**모든 180개 카테고리 포함 - 개별 배치 세부 지시어**
+### 2단계: 실용 확장 (3,000개 - 60배치)
+**모든 180개 카테고리 포함 (100%) - 균등 분배로 실용성 강화**
+
+### 2단계: 실용 확장 (3,000개 - 60배치)
+**모든 180개 카테고리 포함 (100%) - 균등 분배로 실용성 강화**
+
+#### Domain (도메인) 비율 - 2단계 실용 확장
+```
+daily (일상생활): 18% (11배치) - 15/15카테고리 모두 포함
+food (음식): 15% (9배치) - 15/15카테고리 모두 포함
+education (교육): 12% (7배치) - 17/17카테고리 모두 포함
+travel (여행): 12% (7배치) - 14/14카테고리 모두 포함
+business (비즈니스): 10% (6배치) - 14/14카테고리 모두 포함
+health (건강): 8% (5배치) - 15/15카테고리 모두 포함
+technology (기술): 8% (5배치) - 17/17카테고리 모두 포함
+culture (문화): 7% (4배치) - 14/14카테고리 모두 포함
+entertainment (엔터테인먼트): 5% (3배치) - 15/15카테고리 모두 포함
+nature (자연): 3% (2배치) - 14/14카테고리 모두 포함
+sports (스포츠): 2% (1배치) - 15/15카테고리 모두 포함
+other (기타): 2% (1배치) - 25/25카테고리 모두 포함
+```
+
+#### Difficulty (난이도) 비율 - 2단계 실용 확장
+```
+intermediate (중급): 50% (30배치) - 실용 중심
+basic (기초): 25% (15배치) - 기초 보완
+advanced (고급): 15% (9배치) - 고급 도전
+fluent (유창): 7% (4배치) - 유창성 향상
+technical (전문): 3% (2배치) - 전문성 도입
+```
+
+#### Part of Speech (품사) 비율 - 2단계 실용 확장
+```
+verb (동사): 30% (18배치) - 실용적 행동 표현
+noun (명사): 25% (15배치) - 실용 어휘 확장
+adjective (형용사): 20% (12배치) - 다양한 묘사
+adverb (부사): 8% (5배치) - 정확한 수식
+other (기타): 7% (4배치) - 실용 구문
+preposition (전치사): 3% (2배치) - 관계 표현
+conjunction (접속사): 3% (2배치) - 연결 표현
+pronoun (대명사): 2% (1배치) - 대명사 활용
+determiner (한정사): 1% (1배치) - 한정 표현
+interjection (감탄사): 1% (1배치) - 감정 표현
+```
+
+#### Purpose (목적) 비율 - 2단계 실용 확장
+```
+description (묘사/설명): 20% (12배치) - 실용적 설명
+question (질문): 18% (11배치) - 다양한 질문
+opinion (의견표현): 15% (9배치) - 의견 교환
+request (요청): 12% (7배치) - 실용적 요청
+instruction (지시/설명): 10% (6배치) - 실용 지시
+greeting (인사): 8% (5배치) - 사회적 인사
+suggestion (제안): 6% (4배치) - 실용 제안
+emotion (감정표현): 4% (2배치) - 감정 소통
+gratitude (감사표현): 3% (2배치) - 감사 표현
+agreement (동의): 2% (1배치) - 동의 표현
+apology (사과): 1% (1배치) - 사과 표현
+refusal (거절): 1% (1배치) - 거절 표현
+```
+
+#### Situation (상황) 조합 비율 - 2단계 실용 확장
+```
+polite + social: 30% (18배치) - 사회적 정중함
+casual + social: 25% (15배치) - 사회적 친근함
+formal + work: 15% (9배치) - 업무 공식성
+polite + work: 10% (6배치) - 업무 정중함
+polite + public: 8% (5배치) - 공공 정중함
+casual + home: 5% (3배치) - 가정 편안함
+polite + home: 3% (2배치) - 가정 정중함
+formal + public: 2% (1배치) - 공공 공식성
+casual + work: 1% (1배치) - 업무 편안함
+casual + public: 1% (1배치) - 공공 편안함
+```
 
 #### 2-1번 배치 (50개): daily-routine 중급 묘사
 ```
@@ -1316,6 +979,150 @@ casual + social: 0% (0배치) - 최소화
 영화 감상과 평가에 대한 의견을 포함해주세요.
 ```
 
+### 3단계: 심화 완성 (3,000개 - 60배치)
+**모든 180개 카테고리 포함 (100%) - 고급/유창 중심 전문성 강화**
+
+#### Domain (도메인) 비율 - 3단계 심화 완성
+```
+technology (기술): 20% (12배치) - 17/17카테고리 모두, 고급 기술
+business (비즈니스): 18% (11배치) - 14/14카테고리 모두, 전문 비즈니스
+education (교육): 15% (9배치) - 17/17카테고리 모두, 교육 전문
+health (건강): 12% (7배치) - 15/15카테고리 모두, 의료 심화
+culture (문화): 10% (6배치) - 14/14카테고리 모두, 문화 깊이
+daily (일상생활): 8% (5배치) - 15/15카테고리 모두, 고급 일상
+travel (여행): 6% (4배치) - 14/14카테고리 모두, 심화 여행
+food (음식): 5% (3배치) - 15/15카테고리 모두, 고급 음식
+entertainment (엔터테인먼트): 3% (2배치) - 15/15카테고리 모두, 전문 오락
+nature (자연): 2% (1배치) - 14/14카테고리 모두, 환경 전문
+sports (스포츠): 1% (1배치) - 15/15카테고리 모두, 스포츠 전문
+other (기타): 1% (1배치) - 25/25카테고리 모두, 전문 기타
+```
+
+#### Difficulty (난이도) 비율 - 3단계 심화 완성
+```
+advanced (고급): 40% (24배치) - 고급 표현 중심
+fluent (유창): 30% (18배치) - 유창한 소통
+intermediate (중급): 25% (15배치) - 중급 보완
+technical (전문): 4% (2배치) - 전문 용어
+basic (기초): 1% (1배치) - 기초 확인
+```
+
+#### Part of Speech (품사) 비율 - 3단계 심화 완성
+```
+noun (명사): 35% (21배치) - 전문 어휘 중심
+verb (동사): 25% (15배치) - 고급 동작 표현
+adjective (형용사): 20% (12배치) - 정교한 묘사
+other (기타): 8% (5배치) - 고급 구문
+adverb (부사): 6% (4배치) - 정밀한 수식
+preposition (전치사): 2% (1배치) - 고급 관계
+conjunction (접속사): 2% (1배치) - 복합 연결
+determiner (한정사): 1% (1배치) - 정밀 한정
+pronoun (대명사): 1% (1배치) - 고급 대명사
+interjection (감탄사): 0% (0배치) - 최소화
+```
+
+#### Purpose (목적) 비율 - 3단계 심화 완성
+```
+opinion (의견표현): 25% (15배치) - 고급 의견 표현
+description (묘사/설명): 20% (12배치) - 정밀한 설명
+instruction (지시/설명): 15% (9배치) - 전문적 지시
+question (질문): 12% (7배치) - 심화 질문
+request (요청): 10% (6배치) - 정중한 요청
+suggestion (제안): 8% (5배치) - 전문적 제안
+emotion (감정표현): 4% (2배치) - 깊이 있는 감정
+agreement (동의): 3% (2배치) - 전문적 동의
+greeting (인사): 2% (1배치) - 공식적 인사
+gratitude (감사표현): 1% (1배치) - 공식적 감사
+apology (사과): 0% (0배치) - 최소화
+refusal (거절): 0% (0배치) - 최소화
+```
+
+#### Situation (상황) 조합 비율 - 3단계 심화 완성
+```
+formal + work: 35% (21배치) - 전문 업무 환경
+polite + social: 25% (15배치) - 고급 사회적 상황
+formal + public: 15% (9배치) - 공식적 공개 상황
+polite + work: 10% (6배치) - 업무에서의 정중함
+polite + public: 8% (5배치) - 공공에서의 정중함
+formal + social: 3% (2배치) - 사회적 공식성
+polite + home: 2% (1배치) - 가정에서의 정중함
+casual + social: 1% (1배치) - 일반적 사회 상황
+casual + work: 1% (1배치) - 업무에서의 친근함
+casual + home: 0% (0배치) - 최소화
+```
+
+[3단계 개별 배치 3-1 ~ 3-60은 추가 작업 필요]
+
+### 4단계: 최종 보완 (2,000개 - 40배치)
+**모든 180개 카테고리 포함 (100%) - 전문/유창 중심 최종 완성**
+
+#### Domain (도메인) 비율 - 4단계 최종 보완
+```
+technology (기술): 20% (8배치) - 17/17카테고리 모두, 최신 기술
+business (비즈니스): 18% (7배치) - 14/14카테고리 모두, 고급 비즈니스
+health (건강): 15% (6배치) - 15/15카테고리 모두, 의료 전문
+education (교육): 12% (5배치) - 17/17카테고리 모두, 교육 전문
+culture (문화): 10% (4배치) - 14/14카테고리 모두, 문화 전문
+daily (일상생활): 8% (3배치) - 15/15카테고리 모두, 일상 완성
+travel (여행): 6% (2배치) - 14/14카테고리 모두, 여행 완성
+nature (자연): 4% (2배치) - 14/14카테고리 모두, 환경 완성
+food (음식): 3% (1배치) - 15/15카테고리 모두, 음식 완성
+entertainment (엔터테인먼트): 2% (1배치) - 15/15카테고리 모두, 오락 완성
+sports (스포츠): 1% (1배치) - 15/15카테고리 모두, 스포츠 완성
+other (기타): 1% (1배치) - 25/25카테고리 모두, 기타 완성
+```
+
+#### Difficulty (난이도) 비율 - 4단계 최종 보완
+```
+technical (기술적): 35% (14배치) - 기술/의료 전문가 수준
+fluent (유창한): 30% (12배치) - 원어민 급 고급 표현
+advanced (고급): 25% (10배치) - 완전 숙련자 수준
+intermediate (중급): 7% (3배치) - 보완 및 확인
+basic (기초): 3% (1배치) - 최종 확인용
+```
+
+#### Part of Speech (품사) 비율 - 4단계 최종 보완
+```
+noun (명사): 30% - 전문 용어 및 고급 개념
+verb (동사): 25% - 고급 동작 및 상태
+adjective (형용사): 20% - 전문적 묘사 및 평가
+adverb (부사): 10% - 정밀한 수식어
+other (기타): 8% - 전문 용법
+preposition (전치사): 3% - 고급 문법
+conjunction (접속사): 2% - 복잡한 연결
+determiner (한정사): 1% - 정밀한 지시
+pronoun (대명사): 1% - 고급 대명사
+interjection (감탄사): 0% - 최소화
+```
+
+#### Purpose (목적) 비율 - 4단계 최종 보완
+```
+description (설명): 25% - 전문적 기술 설명
+instruction (지시): 20% - 전문 절차 안내
+opinion (의견): 18% - 전문가 의견 표현
+question (질문): 12% - 전문적 질의
+request (요청): 10% - 공식적 요청
+suggestion (제안): 5% - 전문가 제안
+agreement (동의): 4% - 전문적 합의
+emotion (감정): 3% - 절제된 감정 표현
+greeting (인사): 2% - 공식적 인사
+gratitude (감사): 1% - 공식적 감사
+apology (사과): 0% - 최소화
+refusal (거절): 0% - 최소화
+```
+
+#### Situation (상황) 조합 비율 - 4단계 최종 보완
+```
+formal + work: 40% - 전문 업무 환경
+polite + social: 25% - 고급 사회적 상황
+formal + public: 20% - 공식적 발표 및 회의
+polite + home: 10% - 가정에서의 정중한 상황
+casual + social: 3% - 일반적 사회 상황
+polite + work: 2% - 업무에서의 정중함
+```
+
+[4단계 개별 배치 4-1 ~ 4-40은 추가 작업 필요]
+
 #### 2-51번 배치 (50개): entertainment-music 중급 감정표현
 ```
 엔터테인먼트(entertainment) 도메인의 music(음악) 카테고리에서 중급(intermediate) 난이도의 감정표현(emotion) 목적 데이터를 50개 생성해주세요.
@@ -1399,7 +1206,24 @@ casual + social: 0% (0배치) - 최소화
 2단계 마무리 배치로서 다양한 실생활 상황을 종합적으로 다뤄주세요.
 ```
 
-### 🎯 3단계 (3-1 ~ 3-60번 배치): 고급-유창 중심 (3,000개)
+### 📊 Stage 2 총 배치 현황 (60개 배치 완료):
+- daily 도메인: 11개 배치 (2-1 ~ 2-11)
+- food 도메인: 9개 배치 (2-12 ~ 2-20)
+- education 도메인: 7개 배치 (2-21 ~ 2-27) 
+- travel 도메인: 6개 배치 (2-28 ~ 2-33)
+- business 도메인: 7개 배치 (2-34 ~ 2-40)
+- health 도메인: 4개 배치 (2-41 ~ 2-44)
+- technology 도메인: 3개 배치 (2-45 ~ 2-47)
+- culture 도메인: 2개 배치 (2-48 ~ 2-49)
+- entertainment 도메인: 3개 배치 (2-50 ~ 2-52)
+- nature 도메인: 3개 배치 (2-53 ~ 2-55)
+- sports 도메인: 3개 배치 (2-56 ~ 2-58)
+- other 도메인: 1개 배치 (2-59)
+- 전체 종합: 1개 배치 (2-60)
+
+---
+
+## 🎯 Stage 3 (3-1 ~ 3-60번 배치): 고급-유창 수준 (3,000개)
 
 #### 3-1번 배치 (50개): daily-morning 고급 묘사
 ```
@@ -1895,7 +1719,24 @@ casual + social: 0% (0배치) - 최소화
 3단계 마무리 배치로서 전문적이고 학술적인 수준의 종합 데이터를 생성해주세요.
 ```
 
-### 🎯 4단계 (4-1 ~ 4-40번 배치): 유창-전문 중심 (2,000개)
+### 📊 Stage 3 총 배치 현황 (60개 배치 완료):
+- daily 도메인: 11개 배치 (3-1 ~ 3-11)
+- food 도메인: 5개 배치 (3-12 ~ 3-16)
+- education 도메인: 5개 배치 (3-17 ~ 3-21)
+- travel 도메인: 4개 배치 (3-22 ~ 3-25)
+- business 도메인: 5개 배치 (3-26 ~ 3-30)
+- health 도메인: 4개 배치 (3-31 ~ 3-34)
+- technology 도메인: 4개 배치 (3-35 ~ 3-38)
+- culture 도메인: 3개 배치 (3-39 ~ 3-41)
+- entertainment 도메인: 3개 배치 (3-42 ~ 3-44)
+- nature 도메인: 3개 배치 (3-45 ~ 3-47)
+- sports 도메인: 4개 배치 (3-48 ~ 3-51)
+- other 도메인: 8개 배치 (3-52 ~ 3-59)
+- 전체 종합: 1개 배치 (3-60)
+
+---
+
+## 🎯 Stage 4 (4-1 ~ 4-40번 배치): 유창-전문 수준 (2,000개)
 
 #### 4-1번 배치 (50개): daily-lifestyle 전문 의견표현
 ```
@@ -2230,247 +2071,21 @@ AI 기반 학습과 디지털 교육 플랫폼에 대한 전문적 지시를 포
 품사는 명사(noun) 30%, 형용사(adjective) 30%, 동사(verb) 25%, 기타(other) 15%로 구성해주세요.
 4단계 최종 배치로서 모든 분야의 최고 수준 전문성을 종합한 데이터를 생성해주세요.
 ```
----
-## 📊 단계별 총 배치 현황 (40개 배치, 2,000개 데이터)
 
-### 📊 1단계 총 배치 현황 (40개 배치, 2,000개 데이터)
-
-#### ✅ 1단계 완료 통계:
-- **총 배치수**: 40개 배치 (목표 달성)
-- **총 데이터**: 2,000개 (40배치 × 50개)
-- **카테고리 커버리지**: 180/180개 카테고리 (100% 완전 분배)
-- **도메인 분포**: 12개 도메인 모두 포함 (other 제외)
-
-#### 📈 1단계 도메인별 배치 분포:
-- **daily (일상생활)**: 10배치 (25%) - 완전 포함
-- **food (음식)**: 6배치 (15%) - 완전 포함  
-- **education (교육)**: 6배치 (15%) - 선별 포함
-- **travel (여행)**: 5배치 (12%) - 선별 포함
-- **business (비즈니스)**: 4배치 (10%) - 선별 포함
-- **health (건강)**: 3배치 (8%) - 선별 포함
-- **technology (기술)**: 2배치 (5%) - 선별 포함
-- **entertainment (엔터테인먼트)**: 2배치 (5%) - 학습 동기 향상
-- **culture (문화)**: 1배치 (2%) - 선별 포함
-- **other (기타)**: 1배치 (2%) - 40번째 배치에서 sports와 함께
-- **nature (자연)**: 1배치 (1%) - 선별 포함
-- **sports (스포츠)**: 0배치 (0%) - 40번째 배치에서 other와 함께
-
-#### 🎯 1단계 난이도별 배치 분포:
-- **basic (기초)**: 24배치 (60%) - 기초 표현 확립
-- **intermediate (중급)**: 12배치 (30%) - 중급 기반 구축
-- **advanced (고급)**: 3배치 (8%) - 고급 맛보기
-- **fluent (유창)**: 1배치 (2%) - 유창 경험
-
-#### 🎨 1단계 목적별 배치 분포:
-- **greeting (인사)**: 10배치 (25%) - 다양한 인사 표현
-- **question (질문)**: 7배치 (18%) - 기본적인 질문
-- **request (요청)**: 6배치 (15%) - 일상 요청
-- **suggestion (제안)**: 4배치 (10%) - 기초 제안
-- **emotion (감정표현)**: 3배치 (8%) - 감정 표현
-- **instruction (지시)**: 3배치 (7%) - 기본 지시
-- **description (묘사)**: 2배치 (5%) - 간단 묘사
-- **gratitude (감사표현)**: 2배치 (5%) - 감사 표현
-- **기타**: 3배치 (8%) - opinion, agreement, apology, refusal
-
-#### 🎭 1단계 품사별 배치 분포:
-- **noun (명사)**: 10배치 (25%) - 기본 어휘 구축
-- **verb (동사)**: 10배치 (25%) - 기본 동작 표현
-- **adjective (형용사)**: 6배치 (15%) - 기본 묘사어
-- **interjection (감탄사)**: 4배치 (10%) - 감정 표현
-- **interrogative (의문사)**: 3배치 (8%) - 질문 표현
-- **adverb (부사)**: 3배치 (7%) - 수식어
-- **other (기타)**: 2배치 (5%) - 기타 표현
-- **preposition (전치사)**: 1배치 (3%) - 기본 관계어
-- **conjunction (접속사)**: 1배치 (2%) - 기본 연결어
-
-#### 🏠 1단계 상황별 배치 분포:
-- **casual + home**: 14배치 (35%) - 편안한 집 환경
-- **casual + social**: 10배치 (25%) - 편안한 사회적 상황
-- **polite + social**: 6배치 (15%) - 정중한 사회적 상황
-- **casual + store**: 4배치 (10%) - 편안한 상점 환경
-- **polite + store**: 3배치 (8%) - 정중한 상점 환경
-- **polite + home**: 2배치 (5%) - 정중한 집 환경
-- **polite + work**: 1배치 (2%) - 정중한 업무 환경
-
-### 📊 2단계 총 배치 현황 (60개 배치, 3,000개 데이터)
-
-#### ✅ 2단계 완료 통계:
-- **총 배치수**: 60개 배치 (목표 달성)
-- **총 데이터**: 3,000개 (60배치 × 50개)
-- **카테고리 커버리지**: 180/180개 카테고리 (100% 완전 분배)
-- **도메인 분포**: 12개 도메인 모두 포함 (other 제외)
-
-#### 📈 2단계 도메인별 배치 분포:
-- **technology (기술)**: 11배치 (18%) - 기술 혁신 중심
-- **business (비즈니스)**: 10배치 (17%) - 전문 비즈니스
-- **education (교육)**: 8배치 (13%) - 교육 전문
-- **daily (일상생활)**: 7배치 (12%) - 실용 일상
-- **travel (여행)**: 6배치 (10%) - 실용 여행
-- **health (건강)**: 5배치 (8%) - 건강 관리
-- **culture (문화)**: 4배치 (7%) - 문화 이해
-- **entertainment (엔터테인먼트)**: 3배치 (5%) - 동기 향상
-- **food (음식)**: 2배치 (3%) - 고급 음식
-- **other (기타)**: 1배치 (2%) - 포괄성 강화
-- **nature (자연)**: 1배치 (2%) - 자연 환경
-- **sports (스포츠)**: 1배치 (2%) - 스포츠 활동
-
-#### 🎯 2단계 난이도별 배치 분포:
-- **intermediate (중급)**: 30배치 (50%) - 중급 표현 중심
-- **advanced (고급)**: 18배치 (30%) - 고급 표현 확대
-- **basic (기초)**: 9배치 (15%) - 기초 보완
-- **fluent (유창)**: 3배치 (5%) - 유창 확장
-
-#### 🎨 2단계 목적별 배치 분포:
-- **description (묘사)**: 12배치 (20%) - 상세한 묘사
-- **opinion (의견표현)**: 10배치 (17%) - 의견 교환
-- **instruction (지시)**: 9배치 (15%) - 실용 지시
-- **question (질문)**: 8배치 (13%) - 복잡한 질문
-- **request (요청)**: 6배치 (10%) - 정중한 요청
-- **suggestion (제안)**: 6배치 (10%) - 실용적 제안
-- **emotion (감정표현)**: 4배치 (7%) - 감정 표현
-- **greeting (인사)**: 3배치 (5%) - 다양한 인사
-- **gratitude (감사표현)**: 2배치 (3%) - 감사 표현
-
-#### 🎭 2단계 품사별 배치 분포:
-- **noun (명사)**: 18배치 (30%) - 전문 어휘
-- **verb (동사)**: 15배치 (25%) - 복합 동작
-- **adjective (형용사)**: 12배치 (20%) - 정밀 묘사
-- **other (기타)**: 5배치 (8%) - 고급 표현
-- **adverb (부사)**: 4배치 (7%) - 세밀 수식
-- **interrogative (의문사)**: 3배치 (5%) - 복잡 질문
-- **interjection (감탄사)**: 2배치 (3%) - 감정 표현
-- **preposition (전치사)**: 1배치 (2%) - 관계 표현
-
-#### 🏠 2단계 상황별 배치 분포:
-- **polite + work**: 18배치 (30%) - 정중한 업무 환경
-- **polite + social**: 12배치 (20%) - 정중한 사회적 상황
-- **polite + public**: 9배치 (15%) - 정중한 공공장소
-- **casual + social**: 9배치 (15%) - 편안한 사회적 상황
-- **polite + store**: 6배치 (10%) - 정중한 상점 환경
-- **casual + home**: 3배치 (5%) - 가정 편안함
-- **polite + home**: 2배치 (3%) - 가정 정중함
-- **formal + public**: 1배치 (2%) - 공공 공식성
-
-### 📊 3단계 총 배치 현황 (60개 배치, 3,000개 데이터)
-
-#### ✅ 3단계 완료 통계:
-- **총 배치수**: 60개 배치 (목표 달성)
-- **총 데이터**: 3,000개 (60배치 × 50개)
-- **카테고리 커버리지**: 180/180개 카테고리 (100% 완전 분배)
-- **도메인 분포**: 12개 도메인 모두 포함 (other 제외)
-
-#### 📈 3단계 도메인별 배치 분포:
-- **technology (기술)**: 11배치 (18%) - 고급 기술 전문
-- **business (비즈니스)**: 10배치 (17%) - 전문 비즈니스
-- **education (교육)**: 9배치 (15%) - 교육 전문
-- **daily (일상생활)**: 6배치 (10%) - 고급 일상
-- **health (건강)**: 6배치 (10%) - 의료 심화
-- **culture (문화)**: 5배치 (8%) - 문화 깊이
-- **entertainment (엔터테인먼트)**: 4배치 (7%) - 전문 오락
-- **travel (여행)**: 4배치 (7%) - 심화 여행
-- **food (음식)**: 1배치 (2%) - 고급 음식
-- **other (기타)**: 1배치 (2%) - 포괄성 강화
-- **nature (자연)**: 1배치 (2%) - 환경 전문
-- **sports (스포츠)**: 1배치 (2%) - 스포츠 전문
-
-#### 🎯 3단계 난이도별 배치 분포:
-- **advanced (고급)**: 24배치 (40%) - 고급 표현 중심
-- **fluent (유창)**: 18배치 (30%) - 유창한 소통
-- **intermediate (중급)**: 15배치 (25%) - 중급 보완
-- **technical (전문)**: 2배치 (3%) - 전문 용어
-- **basic (기초)**: 1배치 (2%) - 기초 확인
-
-#### 🎨 3단계 목적별 배치 분포:
-- **description (묘사)**: 15배치 (25%) - 정밀한 묘사
-- **opinion (의견표현)**: 12배치 (20%) - 복잡한 의견
-- **instruction (지시)**: 9배치 (15%) - 전문 지시
-- **suggestion (제안)**: 6배치 (10%) - 고급 제안
-- **question (질문)**: 5배치 (8%) - 복잡한 질문
-- **emotion (감정표현)**: 4배치 (7%) - 미묘한 감정
-- **agreement (동의)**: 3배치 (5%) - 전문적 동의
-- **request (요청)**: 2배치 (3%) - 정중한 요청
-- **gratitude (감사표현)**: 2배치 (3%) - 세련된 감사
-- **greeting (인사)**: 1배치 (2%) - 격식있는 인사
-- **apology (사과)**: 1배치 (2%) - 정중한 사과
-
-#### 🎭 3단계 품사별 배치 분포:
-- **noun (명사)**: 18배치 (30%) - 전문 어휘
-- **verb (동사)**: 15배치 (25%) - 복합 동작
-- **adjective (형용사)**: 12배치 (20%) - 정밀 묘사
-- **other (기타)**: 5배치 (8%) - 고급 표현
-- **adverb (부사)**: 4배치 (7%) - 세밀 수식
-- **interrogative (의문사)**: 2배치 (3%) - 복잡 질문
-- **interjection (감탄사)**: 2배치 (3%) - 고급 감정
-- **preposition (전치사)**: 1배치 (2%) - 복잡 관계
-- **conjunction (접속사)**: 1배치 (2%) - 고급 연결
-
-#### 🏠 3단계 상황별 배치 분포:
-- **polite + work**: 18배치 (30%) - 정중한 업무 환경
-- **formal + work**: 15배치 (25%) - 공식적 업무 환경
-- **polite + public**: 12배치 (20%) - 정중한 공공장소
-- **formal + public**: 6배치 (10%) - 공식적 공공장소
-- **polite + social**: 5배치 (8%) - 정중한 사회적 상황
-- **casual + work**: 3배치 (5%) - 편안한 업무 환경
-- **polite + store**: 1배치 (2%) - 정중한 상점 환경
-
-### 📊 4단계 총 배치 현황 (40개 배치, 2,000개 데이터)
-
-#### ✅ 4단계 완료 통계:
-- **총 배치수**: 40개 배치 (목표 달성)
-- **총 데이터**: 2,000개 (40배치 × 50개)
-- **카테고리 커버리지**: 180/180개 카테고리 (100% 완전 분배)
-- **도메인 분포**: 12개 도메인 모두 포함 (other 포함)
-
-#### 📈 4단계 도메인별 배치 분포:
-- **technology (기술)**: 8배치 (20%) - 최신 기술 전문
-- **business (비즈니스)**: 7배치 (18%) - 고급 비즈니스
-- **health (건강)**: 6배치 (15%) - 의료 전문
-- **education (교육)**: 5배치 (12%) - 교육 전문
-- **culture (문화)**: 4배치 (10%) - 문화 전문
-- **entertainment (엔터테인먼트)**: 3배치 (8%) - 오락 완성
-- **daily (일상생활)**: 3배치 (8%) - 일상 완성
-- **other (기타)**: 2배치 (5%) - 기타 완성
-- **travel (여행)**: 2배치 (5%) - 여행 완성
-- **food (음식)**: 1배치 (2%) - 음식 완성
-- **nature (자연)**: 0배치 (0%) - 이전 단계에서 완성
-- **sports (스포츠)**: 0배치 (0%) - 이전 단계에서 완성
-
-#### 🎯 4단계 난이도별 배치 분포:
-- **technical (전문)**: 14배치 (35%) - 기술/의료 전문가 수준
-- **fluent (유창)**: 12배치 (30%) - 원어민 급 고급 표현
-- **advanced (고급)**: 10배치 (25%) - 완전 숙련자 수준
-- **intermediate (중급)**: 3배치 (8%) - 보완 및 확인
-- **basic (기초)**: 1배치 (2%) - 최종 확인용
-
-#### 🎨 4단계 목적별 배치 분포:
-- **description (설명)**: 10배치 (25%) - 전문적 기술 설명
-- **instruction (지시)**: 8배치 (20%) - 전문 절차 안내
-- **opinion (의견)**: 7배치 (18%) - 전문가 의견 표현
-- **question (질문)**: 5배치 (12%) - 전문적 질의
-- **request (요청)**: 4배치 (10%) - 공식적 요청
-- **suggestion (제안)**: 2배치 (5%) - 전문가 제안
-- **agreement (동의)**: 2배치 (5%) - 전문적 합의
-- **emotion (감정)**: 1배치 (3%) - 절제된 감정 표현
-- **greeting (인사)**: 1배치 (2%) - 공식적 인사
-
-#### 🎭 4단계 품사별 배치 분포:
-- **noun (명사)**: 12배치 (30%) - 전문 용어 및 고급 개념
-- **verb (동사)**: 10배치 (25%) - 고급 동작 및 상태
-- **adjective (형용사)**: 8배치 (20%) - 전문적 묘사 및 평가
-- **adverb (부사)**: 4배치 (10%) - 정밀한 수식어
-- **other (기타)**: 3배치 (8%) - 전문 용법
-- **preposition (전치사)**: 1배치 (3%) - 고급 문법
-- **conjunction (접속사)**: 1배치 (2%) - 복잡한 연결
-- **determiner (한정사)**: 1배치 (2%) - 정밀한 지시
-
-#### 🏠 4단계 상황별 배치 분포:
-- **formal + work**: 14배치 (35%) - 공식적 업무 환경
-- **formal + public**: 10배치 (25%) - 공식적 공공장소
-- **polite + work**: 8배치 (20%) - 정중한 업무 환경
-- **polite + public**: 4배치 (10%) - 정중한 공공장소
-- **formal + store**: 2배치 (5%) - 공식적 상점 환경
-- **polite + store**: 1배치 (3%) - 정중한 상점 환경
-- **polite + social**: 1배치 (2%) - 정중한 사회적 상황
+### 📊 Stage 4 총 배치 현황 (40개 배치 완료):
+- daily 도메인: 4개 배치 (4-1 ~ 4-4)
+- food 도메인: 3개 배치 (4-5 ~ 4-7)
+- education 도메인: 3개 배치 (4-8 ~ 4-10)
+- travel 도메인: 3개 배치 (4-11 ~ 4-13)
+- business 도메인: 3개 배치 (4-14 ~ 4-16)
+- health 도메인: 3개 배치 (4-17 ~ 4-19)
+- technology 도메인: 3개 배치 (4-20 ~ 4-22)
+- culture 도메인: 3개 배치 (4-23 ~ 4-25)
+- entertainment 도메인: 3개 배치 (4-26 ~ 4-28)
+- nature 도메인: 3개 배치 (4-29 ~ 4-31)
+- sports 도메인: 3개 배치 (4-32 ~ 4-34)
+- other 도메인: 5개 배치 (4-35 ~ 4-39)
+- 전체 종합: 1개 배치 (4-40)
 
 ---
 
@@ -2484,122 +2099,5 @@ AI 기반 학습과 디지털 교육 플랫폼에 대한 전문적 지시를 포
 
 ### 🌍 다언어 지원: 한국어, 영어, 일본어, 중국어, 스페인어
 ### 📊 완전한 요소 분포: 180개 카테고리, 5개 난이도, 10개 품사, 12개 목적, 13개 상황 조합
-
-**✅ 모든 단계별 180개 카테고리 완전 분배 완료:**
-- 1단계: 180/180 카테고리 (100%) - 기초 구축
-- 2단계: 180/180 카테고리 (100%) - 실용 확장  
-- 3단계: 180/180 카테고리 (100%) - 심화 완성
-- 4단계: 180/180 카테고리 (100%) - 최종 보완
-
-**각 단계마다 모든 도메인과 카테고리가 누락 없이 완전 분배됨!**
-
-## 📊 전체 200배치 비율 검증 및 조화도 분석
-
-### ✅ 단계별 배치 수 검증:
-- **1단계**: 40배치 (20%) - 기초 구축 단계
-- **2단계**: 60배치 (30%) - 실용 확장 단계  
-- **3단계**: 60배치 (30%) - 심화 완성 단계
-- **4단계**: 40배치 (20%) - 최종 보완 단계
-- **총합**: 200배치 (100%) ✅
-
-### 📈 전체 도메인 비율 (200배치 기준) - 개선 적용:
-- **technology (기술)**: 32배치 (16%) - 1단계(2) + 2단계(11) + 3단계(11) + 4단계(8)
-- **business (비즈니스)**: 31배치 (15.5%) - 1단계(4) + 2단계(10) + 3단계(10) + 4단계(7)
-- **education (교육)**: 28배치 (14%) - 1단계(6) + 2단계(8) + 3단계(9) + 4단계(5)
-- **daily (일상생활)**: 26배치 (13%) - 1단계(10) + 2단계(7) + 3단계(6) + 4단계(3)
-- **health (건강)**: 20배치 (10%) - 1단계(3) + 2단계(5) + 3단계(6) + 4단계(6)
-- **travel (여행)**: 17배치 (8.5%) - 1단계(5) + 2단계(6) + 3단계(4) + 4단계(2)
-- **culture (문화)**: 14배치 (7%) - 1단계(1) + 2단계(4) + 3단계(5) + 4단계(4)
-- **entertainment (엔터테인먼트)**: 12배치 (6%) - 1단계(2) + 2단계(3) + 3단계(4) + 4단계(3)
-- **food (음식)**: 10배치 (5%) - 1단계(6) + 2단계(2) + 3단계(1) + 4단계(1)
-- **other (기타)**: 5배치 (2.5%) - 1단계(1) + 2단계(1) + 3단계(1) + 4단계(2)
-- **nature (자연)**: 3배치 (1.5%) - 1단계(1) + 2단계(1) + 3단계(1) + 4단계(0)
-- **sports (스포츠)**: 2배치 (1%) - 1단계(0) + 2단계(1) + 3단계(1) + 4단계(0) (1단계 40번째 배치에서 other와 함께 포함)
-
-### 🎯 전체 난이도 비율 (200배치 기준):
-- **intermediate (중급)**: 57배치 (28.5%) - 실용성의 핵심
-- **advanced (고급)**: 55배치 (27.5%) - 숙련도 향상의 중심  
-- **basic (기초)**: 34배치 (17%) - 기초 토대 구축
-- **fluent (유창)**: 33배치 (16.5%) - 고급 소통 능력
-- **technical (전문)**: 21배치 (10.5%) - 전문성 완성
-
-### 🎨 전체 목적 비율 (200배치 기준):
-- **description (묘사/설명)**: 39배치 (19.5%) - 설명의 핵심
-- **opinion (의견표현)**: 30배치 (15%) - 소통의 중심
-- **question (질문)**: 29배치 (14.5%) - 상호작용의 기본
-- **instruction (지시)**: 26배치 (13%) - 학습과 안내
-- **greeting (인사)**: 15배치 (7.5%) - 소통의 시작
-- **request (요청)**: 15배치 (7.5%) - 실용적 의사소통
-- **suggestion (제안)**: 12배치 (6%) - 제안과 권유
-- **emotion (감정표현)**: 10배치 (5%) - 감정 전달
-- **agreement (동의)**: 6배치 (3%) - 동의와 찬성
-- **gratitude (감사표현)**: 5배치 (2.5%) - 예의와 감사
-- **기타 (apology, refusal)**: 3배치 (1.5%) - 특수 목적
-
-### 🎭 전체 품사 비율 (200배치 기준):
-- **noun (명사)**: 55배치 (27.5%) - 어휘의 핵심
-- **verb (동사)**: 50배치 (25%) - 행동과 상태의 중심
-- **adjective (형용사)**: 38배치 (19%) - 묘사와 평가
-- **other (기타)**: 14배치 (7%) - 고급 구문과 표현
-- **adverb (부사)**: 14배치 (7%) - 정밀한 수식
-- **interjection (감탄사)**: 8배치 (4%) - 감정 표현
-- **interrogative (의문사)**: 7배치 (3.5%) - 질문 표현
-- **preposition (전치사)**: 6배치 (3%) - 관계 표현  
-- **conjunction (접속사)**: 5배치 (2.5%) - 연결 표현
-- **determiner (한정사)**: 2배치 (1%) - 한정과 지시
-- **pronoun (대명사)**: 1배치 (0.5%) - 기본 대명사
-
-### 🏠 전체 상황 비율 (200배치 기준) - 개선 적용:
-- **polite + work**: 35배치 (17.5%) - 정중한 업무 환경 (전문성 중심)
-- **formal + work**: 25배치 (12.5%) - 공식적 업무 환경 (고급 전문성)
-- **casual + home**: 22배치 (11%) - 편안한 집 환경 (일상 중심)
-- **polite + social**: 20배치 (10%) - 정중한 사회적 상황 (사교성)
-- **casual + social**: 18배치 (9%) - 편안한 사회적 상황 (친근함)
-- **polite + public**: 16배치 (8%) - 정중한 공공장소 (사회적 예의)
-- **formal + public**: 14배치 (7%) - 공식적 공공장소 (공식성)
-- **polite + home**: 12배치 (6%) - 정중한 집 환경 (가정 예의)
-- **polite + store**: 10배치 (5%) - 정중한 상점 환경 (상업적 예의)
-- **casual + store**: 6배치 (3%) - 편안한 상점 환경 (일상 쇼핑)
-- **기타 상황**: 22배치 (11%) - 다양한 특수 상황들
-
-**총 work 환경**: 60배치 (30%) ← 기존 35%에서 감소
-**총 home/social 환경**: 72배치 (36%) ← 기존 31%에서 증가
-
-### 🎉 조화도 평가 및 개선 완료:
-
-#### ✅ 개선 완료 사항:
-1. **entertainment 비중 증가**: 3% → 6%로 두 배 증가하여 학습 동기 향상
-2. **other 도메인 확대**: 0.5% → 2.5%로 5배 증가하여 포괄성 강화
-3. **상황 다양성**: work 환경 35% → 30%로 감소, home/social 환경 31% → 36%로 증가
-
-#### 🔧 개선된 균형:
-1. **도메인 다양성**: entertainment와 other 확대로 더욱 포괄적인 학습 환경
-2. **상황 균형**: 전문성과 일상성의 적절한 조화 (work 30% vs home/social 36%)
-3. **학습 동기**: entertainment 6%로 증가하여 재미있는 학습 컨텐츠 확보
-4. **포괄성**: other 2.5%로 증가하여 특수 상황과 전문 분야 커버
-
-#### ✅ 여전히 잘 조화된 부분:
-1. **단계별 진행**: 기초→실용→심화→전문으로 자연스러운 학습 곡선 유지
-2. **도메인 분포**: 실용성(technology 16%, business 15.5%, education 14%) 중심 유지
-3. **난이도 분포**: 중급/고급 중심(56%)으로 실용적 학습에 최적화 유지
-4. **품사 분포**: noun/verb 중심(52.5%)으로 핵심 언어 요소에 집중 유지
-
-#### � 최종 개선 검증 결과:
-- **배치 총합**: 200배치 ✅
-- **데이터 총합**: 10,000개 ✅  
-- **카테고리 커버리지**: 180/180개 (100%) ✅
-- **비율 일치성**: 모든 섹션 간 완벽 일치 ✅
-- **학습 동기**: entertainment 6%로 향상 ✅
-- **포괄성**: other 2.5%로 강화 ✅
-- **상황 균형**: work(30%) vs home/social(36%)로 개선 ✅
-- **실용성**: 여전히 비즈니스/기술/교육 중심의 현실적 분포 유지 ✅
-
-#### � 개선 후 주요 특징:
-1. **학습자 친화적**: entertainment 증가로 재미있는 학습 환경
-2. **포괄적 커버리지**: other 확대로 특수 분야까지 포함
-3. **균형잡힌 상황**: 전문성과 일상성의 적절한 조화
-4. **체계적 진행**: 4단계에 걸친 완벽한 학습 곡선
-
-**🎯 결론: 모든 개선사항이 성공적으로 적용되어 더욱 균형잡히고 학습자 친화적인 데이터 생성 시스템으로 완성되었습니다!**
 
 이제 모든 200개 배치의 개별 지침이 완성되어 체계적인 AI 데이터 생성이 가능합니다!

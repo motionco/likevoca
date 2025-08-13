@@ -556,7 +556,7 @@ function showLanguageContent(lang, concept) {
     return languageCodeMap[langCode] || "korean";
   }
 
-  // 기본 정보 - 품사 옆 단어값은 환경 언어로 고정
+  // 기본 정보 -  옆 단어값은 환경 언어로 고정
   const envLanguage =
     localStorage.getItem("preferredLanguage") || userLanguage || "ko";
   const envLanguageCode = getLanguageCode(envLanguage);
