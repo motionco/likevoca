@@ -1,11 +1,372 @@
 {
   "metadata": {
     "created": "2025-08-07",
-    "last_updated": "2025-08-07T13:48:30.768774Z",
+    "last_updated": "2025-08-14T13:02:33.080935Z",
     "system_version": "v2.0",
     "description": "LikeVoca 데이터 트랜잭션 로그"
   },
   "transactions": [
+    {
+      "transaction_id": "TX_20250814_130233",
+      "timestamp": "2025-08-14T13:02:33.080935Z",
+      "operation": "ADD",
+      "added_concepts": [
+        {
+          "concept_id": "daily_hello_greeting",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "안녕하세요",
+          "english_word": "Hello"
+        },
+        {
+          "concept_id": "daily_hi_greeting",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "안녕",
+          "english_word": "Hi"
+        },
+        {
+          "concept_id": "daily_hey_there_casual_call",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "안녕 거기",
+          "english_word": "Hey there"
+        },
+        {
+          "concept_id": "daily_good_morning_morning_greeting",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "좋은 아침이에요",
+          "english_word": "Good morning"
+        },
+        {
+          "concept_id": "daily_good_afternoon_afternoon_greeting",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "좋은 오후예요",
+          "english_word": "Good afternoon"
+        },
+        {
+          "concept_id": "daily_good_evening_evening_greeting",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "좋은 저녁이에요",
+          "english_word": "Good evening"
+        },
+        {
+          "concept_id": "daily_good_night_night_wish",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "좋은 밤 되세요",
+          "english_word": "Good night"
+        },
+        {
+          "concept_id": "daily_welcome_welcome",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "환영합니다",
+          "english_word": "Welcome"
+        },
+        {
+          "concept_id": "daily_long_time_no_see_reunion_greeting",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "오랜만이에요",
+          "english_word": "Long time no see"
+        },
+        {
+          "concept_id": "daily_nice_to_meet_you_first_meeting",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "만나서 반가워요",
+          "english_word": "Nice to meet you"
+        },
+        {
+          "concept_id": "daily_pleasure_to_meet_you_polite_meeting",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "만나서 기쁩니다",
+          "english_word": "Pleasure to meet you"
+        },
+        {
+          "concept_id": "daily_hi_everyone_group_greeting",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "모두 안녕하세요",
+          "english_word": "Hi everyone"
+        },
+        {
+          "concept_id": "daily_greetings_formal_greeting",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "인사드립니다",
+          "english_word": "Greetings"
+        },
+        {
+          "concept_id": "daily_good_to_see_you_reunion_polite",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "뵙게 되어 반갑습니다",
+          "english_word": "Good to see you"
+        },
+        {
+          "concept_id": "daily_welcome_home_home_welcome",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "집에 오신 걸 환영해요",
+          "english_word": "Welcome home"
+        },
+        {
+          "concept_id": "daily_greeting_greeting_concept",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "인사",
+          "english_word": "Greeting"
+        },
+        {
+          "concept_id": "daily_handshake_gesture",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "악수",
+          "english_word": "Handshake"
+        },
+        {
+          "concept_id": "daily_bow_gesture",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "절",
+          "english_word": "Bow"
+        },
+        {
+          "concept_id": "daily_smile_expression",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "미소",
+          "english_word": "Smile"
+        },
+        {
+          "concept_id": "daily_introduction_first_meeting",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "소개",
+          "english_word": "Introduction"
+        },
+        {
+          "concept_id": "daily_courtesy_manner",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "예의",
+          "english_word": "Courtesy"
+        },
+        {
+          "concept_id": "daily_respect_manner",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "존중",
+          "english_word": "Respect"
+        },
+        {
+          "concept_id": "daily_salutation_formal_salute",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "경례",
+          "english_word": "Salutation"
+        },
+        {
+          "concept_id": "daily_politeness_manner",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "공손함",
+          "english_word": "Politeness"
+        },
+        {
+          "concept_id": "daily_hospitality_welcome",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "환대",
+          "english_word": "Hospitality"
+        },
+        {
+          "concept_id": "daily_reunion_meeting_again",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "재회",
+          "english_word": "Reunion"
+        },
+        {
+          "concept_id": "daily_small_talk_icebreaker",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "잡담",
+          "english_word": "Small talk"
+        },
+        {
+          "concept_id": "daily_first_meeting_start",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "첫만남",
+          "english_word": "First meeting"
+        },
+        {
+          "concept_id": "daily_farewell_goodbye",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "작별",
+          "english_word": "Farewell"
+        },
+        {
+          "concept_id": "daily_icebreaker_breaker",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "아이스브레이커",
+          "english_word": "Icebreaker"
+        },
+        {
+          "concept_id": "daily_greet_action",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "인사하다",
+          "english_word": "Greet"
+        },
+        {
+          "concept_id": "daily_meet_meet",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "만나다",
+          "english_word": "Meet"
+        },
+        {
+          "concept_id": "daily_introduce_introduce",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "소개하다",
+          "english_word": "Introduce"
+        },
+        {
+          "concept_id": "daily_welcome_back_welcome",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "다시 환영하다",
+          "english_word": "Welcome back"
+        },
+        {
+          "concept_id": "daily_wave_gesture",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "손을 흔들다",
+          "english_word": "Wave"
+        },
+        {
+          "concept_id": "daily_smile_verb_expression",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "미소짓다",
+          "english_word": "Smile verb"
+        },
+        {
+          "concept_id": "daily_nod_gesture",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "고개를 끄덕이다",
+          "english_word": "Nod"
+        },
+        {
+          "concept_id": "daily_shake_hands_gesture",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "악수하다",
+          "english_word": "Shake hands"
+        },
+        {
+          "concept_id": "daily_bow_verb_gesture",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "절하다",
+          "english_word": "Bow verb"
+        },
+        {
+          "concept_id": "daily_say_hello_utterance",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "'안녕하세요'라고 말하다",
+          "english_word": "Say hello"
+        },
+        {
+          "concept_id": "daily_ask_how_are_you_utterance",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "안부를 묻다",
+          "english_word": "Ask how are you"
+        },
+        {
+          "concept_id": "daily_respond_im_fine_reply",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "괜찮다고 답하다",
+          "english_word": "Respond im fine"
+        },
+        {
+          "concept_id": "daily_start_conversation_start",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "대화를 시작하다",
+          "english_word": "Start conversation"
+        },
+        {
+          "concept_id": "daily_make_small_talk_icebreaker",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "가벼운 대화를 나누다",
+          "english_word": "Make small talk"
+        },
+        {
+          "concept_id": "daily_check_in_on_you_care",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "안부를 확인하다",
+          "english_word": "Check in on you"
+        },
+        {
+          "concept_id": "daily_wish_good_day_wish",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "좋은 하루를 빌다",
+          "english_word": "Wish good day"
+        },
+        {
+          "concept_id": "daily_wish_good_night_wish",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "좋은 밤을 빌다",
+          "english_word": "Wish good night"
+        },
+        {
+          "concept_id": "daily_compliment_praise",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "칭찬하다",
+          "english_word": "Compliment"
+        },
+        {
+          "concept_id": "daily_thank_for_coming_thanks",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "와줘서 고맙다고 말하다",
+          "english_word": "Thank for coming"
+        },
+        {
+          "concept_id": "daily_welcome_verb_welcome",
+          "domain": "daily",
+          "category": "routine",
+          "korean_word": "환영하다",
+          "english_word": "Welcome verb"
+        }
+      ],
+      "summary": {
+        "concepts_added": 50,
+        "total_records_after": 59
+      }
+    },
     {
       "transaction_id": "TX_20250807_134830",
       "timestamp": "2025-08-07T13:48:30.768774Z",
@@ -115,8 +476,8 @@
     }
   ],
   "current_status": {
-    "total_transactions": 4,
-    "last_transaction": "TX_20250807_134830",
-    "last_update": "2025-08-07T13:48:30.768774Z"
+    "total_transactions": 5,
+    "last_transaction": "TX_20250814_130233",
+    "last_update": "2025-08-14T13:02:33.080935Z"
   }
 }

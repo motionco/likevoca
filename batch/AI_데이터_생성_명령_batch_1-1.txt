@@ -1,0 +1,21 @@
+일상생활(daily) 도메인의 routine(일과) 카테고리에서 기초(basic) 난이도의 인사(greeting) 목적 데이터를 50개 생성해주세요.
+상황은 캐주얼하고 집(casual,home) 환경에서 사용하는 표현으로 만들어주세요.
+품사는 동사(verb) 40%, 명사(noun) 30%, 감탄사(interjection) 30%로 구성해주세요.
+아침 인사, 일과 시작 표현 등을 포함해주세요.
+
+**참조 문서:**
+- 통합_데이터_가이드.md의 모든 규칙과 표준을 준수해주세요
+
+**데이터 구성:**
+- concepts: 58개 (동사 23개, 명사 17개, 감탄사 18개)
+- examples: 16개  
+- grammar: 31개
+
+**출력 형식:** UTF-8 without BOM 인코딩 CSV
+
+**파일명:**
+- batch_1-1_concepts_template_add.csv
+- batch_1-1_examples_template_add.csv  
+- batch_1-1_grammar_template_add.csv
+
+통합_데이터_가이드.md의 모든 표준을 준수하여 일상 루틴 관련 인사 표현 데이터를 생성해주세요.
