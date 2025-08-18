@@ -982,6 +982,11 @@ window.updateEditCategoryOptions = updateEditCategoryOptions;
 window.updateEditEmojiOptions = updateEditEmojiOptions;
 window.setupModalEventListeners = setupModalEventListeners;
 
+// 도메인 카테고리 매핑을 전역으로 내보내기
+window.domainCategoryMapping = domainCategoryMapping;
+window.categoryEmojiMapping = categoryEmojiMapping;
+window.domainEmojiMapping = domainEmojiMapping;
+
 // 도메인별 이모지 반환 함수
 window.getDomainEmoji = function(domain) {
   const domainEmojiMap = {

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Domain Mapping</title>
+</head>
+
+<body>
+    <h1>도메인 매핑 테스트</h1>
+    <p>콘솔을 확인하세요.</p>
+
+    <script type="module">
+        // domain-category-emoji.js 로드
+        import('../../components/js/domain-category-emoji.js').then(() => {
+            console.log('domain-category-emoji.js 로드 완료');
+
+            // 잠시 후 전역 객체 확인
+            setTimeout(() => {
+                console.log('window.domainCategoryMapping:', window.domainCategoryMapping);
+                console.log('food 카테고리:', window.domainCategoryMapping?.food);
+                console.log('daily 카테고리:', window.domainCategoryMapping?.daily);
+                console.log('business 카테고리:', window.domainCategoryMapping?.business);
+
+                if (window.domainCategoryMapping?.food) {
+                    console.log('✅ 매핑이 올바르게 로드되었습니다!');
+                } else {
+                    console.log('❌ 매핑 로드에 문제가 있습니다.');
+                }
+            }, 1000);
+        }).catch(error => {
+            console.error('모듈 로드 오류:', error);
+        });
+    </script>
+</body>
+
+</html>

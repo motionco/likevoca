@@ -1137,9 +1137,6 @@ async function showAIConceptSelectionModal() {
       getSystemLanguage() ||
       "ko";
 
-    // 도메인-카테고리 매핑 import (전역에서 사용 가능하다고 가정)
-    const { domainCategoryMapping } = window;
-
     // 다국어 텍스트 매핑
     const modalTexts = {
       ko: {
@@ -1456,9 +1453,12 @@ async function showAIConceptSelectionModal() {
       const selectedDomain = this.value;
       categorySelect.innerHTML = `<option value="">${texts.selectCategory}</option>`;
 
-      if (selectedDomain && domainCategoryMapping[selectedDomain]) {
+      // 전역 window 객체에서 도메인 카테고리 매핑 가져오기
+      const mapping = window.domainCategoryMapping;
+      
+      if (selectedDomain && mapping && mapping[selectedDomain]) {
         categorySelect.disabled = false;
-        domainCategoryMapping[selectedDomain].forEach((category) => {
+        mapping[selectedDomain].forEach((category) => {
           const option = document.createElement("option");
           option.value = category;
           // locales 시스템을 사용한 카테고리 번역

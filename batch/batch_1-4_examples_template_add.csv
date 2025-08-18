@@ -1,4 +1,0 @@
-concept_id,domain,category,difficulty,situation,purpose,korean,english,japanese,chinese,spanish,korean_word,english_word,japanese_word,chinese_word,spanish_word
-daily_morning_start,daily,routine,basic,"casual,home",greeting,"좋은 아침이에요! 잘 주무셨나요?","Good morning! Did you sleep well?","おはようございます！よく眠れましたか？","早上好！你睡得好吗？","¡Buenos días! ¿Dormiste bien?",아침,morning,朝,早晨,mañana
-daily_evening_end,daily,routine,basic,"casual,home",greeting,"저녁이 되니까 집에 갈 시간이네요.","It's evening so it's time to go home.","夕方になったので家に帰る時間ですね。","到了晚上，该回家了。","Es de noche, así que es hora de ir a casa.",저녁,evening,夕方,晚上,tarde
-daily_sleep_rest,daily,routine,basic,"casual,home",description,"피곤해서 일찍 잠자리에 들어야겠어요.","I'm tired so I should go to bed early.","疲れたので早く寝なければなりません。","我累了，应该早点睡觉。","Estoy cansado, así que debería acostarme temprano.",잠,sleep,眠り,睡觉,dormir
