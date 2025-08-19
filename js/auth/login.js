@@ -2,6 +2,7 @@ import {
   login,
   googleLogin,
   githubLogin,
+  facebookLogin,
 } from "../../utils/firebase/firebase-auth.js";
 
 import { auth } from "../../js/firebase/firebase-init.js";
@@ -282,6 +283,29 @@ document
       }
 
       // 일반 오류 메시지
+      showError(error.message);
+    }
+  });
+
+document
+  .getElementById("facebook-login-btn")
+  .addEventListener("click", async () => {
+    try {
+      hideError(); // 이전 오류 메시지 숨기기
+      const user = await facebookLogin();
+      if (user) {
+        const userName = user.displayName || "사용자";
+        alert(`환영합니다, ${userName}님!`);
+        goToLanguageSpecificPage("index.html");
+      }
+    } catch (error) {
+      console.error("Facebook 로그인 오류:", error);
+      logAuthError(
+        "facebook",
+        error.code || "custom-error",
+        error.message,
+        error.customData?.email
+      );
       showError(error.message);
     }
   });

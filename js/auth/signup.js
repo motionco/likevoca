@@ -1,5 +1,5 @@
 import { db, auth } from "../../js/firebase/firebase-init.js";
-import { signup } from "../../utils/firebase/firebase-auth.js";
+import { signup, googleLogin, githubLogin, facebookLogin } from "../../utils/firebase/firebase-auth.js";
 import {
   doc,
   setDoc,
@@ -37,6 +37,52 @@ const hideError = () => {
   errorMessage.textContent = "";
   errorMessage.classList.add("hidden");
 };
+
+// 소셜 로그인 버튼 이벤트 리스너들
+document.getElementById("google-signup-btn")?.addEventListener("click", async () => {
+  try {
+    hideError();
+    const user = await googleLogin();
+    if (user) {
+      const userName = user.displayName || "사용자";
+      alert(`환영합니다, ${userName}님! Google 계정으로 회원가입이 완료되었습니다.`);
+      goToLanguageSpecificPage("index.html");
+    }
+  } catch (error) {
+    console.error("Google 회원가입 오류:", error);
+    showError(error.message);
+  }
+});
+
+document.getElementById("github-signup-btn")?.addEventListener("click", async () => {
+  try {
+    hideError();
+    const user = await githubLogin();
+    if (user) {
+      const userName = user.displayName || "사용자";
+      alert(`환영합니다, ${userName}님! GitHub 계정으로 회원가입이 완료되었습니다.`);
+      goToLanguageSpecificPage("index.html");
+    }
+  } catch (error) {
+    console.error("GitHub 회원가입 오류:", error);
+    showError(error.message);
+  }
+});
+
+document.getElementById("facebook-signup-btn")?.addEventListener("click", async () => {
+  try {
+    hideError();
+    const user = await facebookLogin();
+    if (user) {
+      const userName = user.displayName || "사용자";
+      alert(`환영합니다, ${userName}님! Facebook 계정으로 회원가입이 완료되었습니다.`);
+      goToLanguageSpecificPage("index.html");
+    }
+  } catch (error) {
+    console.error("Facebook 회원가입 오류:", error);
+    showError(error.message);
+  }
+});
 
 submitButton.addEventListener("click", async () => {
   hideError();

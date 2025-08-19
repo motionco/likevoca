@@ -294,6 +294,110 @@ export const githubLogin = async () => {
   }
 };
 
+export const facebookLogin = async () => {
+  checkFirebaseInitialized();
+
+  try {
+    const provider = new FacebookAuthProvider();
+    provider.setCustomParameters({
+      prompt: "select_account",
+    });
+    provider.addScope("email");
+    provider.addScope("public_profile");
+
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+
+    await saveUserData(user);
+
+    // GitHub 자격 증명이 대기 중인지 확인 (Google 로그인과 유사한 로직)
+    const pendingCredentialJson = sessionStorage.getItem(
+      "pendingGithubCredential"
+    );
+    if (pendingCredentialJson) {
+      try {
+        const pendingCredential = JSON.parse(pendingCredentialJson);
+        const githubAuthCredential = GithubAuthProvider.credential(
+          pendingCredential.oauthAccessToken
+        );
+
+        // GitHub 계정 연결
+        await linkWithCredential(user, githubAuthCredential);
+        alert("GitHub 계정이 성공적으로 연결되었습니다!");
+
+        // 세션 스토리지 정리
+        sessionStorage.removeItem("pendingGithubCredential");
+        sessionStorage.removeItem("githubLoginEmail");
+      } catch (linkError) {
+        console.error("GitHub 계정 연결 오류:", linkError);
+
+        if (
+          linkError.code === "auth/credential-already-in-use" ||
+          linkError.code === "auth/provider-already-linked"
+        ) {
+          alert("이 GitHub 계정은 이미 다른 계정에 연결되어 있습니다.");
+        } else {
+          alert(`GitHub 계정 연결에 실패했습니다: ${linkError.message}`);
+        }
+
+        // 세션 스토리지 정리
+        sessionStorage.removeItem("pendingGithubCredential");
+        sessionStorage.removeItem("githubLoginEmail");
+      }
+    }
+
+    return user;
+  } catch (error) {
+    console.error("Facebook 로그인 오류:", error);
+
+    if (error.code === "auth/account-exists-with-different-credential") {
+      // 같은 이메일을 사용하는 다른 인증 방법으로 이미 계정이 있는 경우
+      try {
+        // 해당 이메일로 기존에 가입한 방법 확인
+        const email = error.customData.email;
+        alert(
+          `이 이메일(${email})은 이미 다른 로그인 방법으로 가입되어 있습니다. 이전에 사용하신 로그인 방법을 사용해 주세요.`
+        );
+
+        // 첫 번째 로그인 방법 제안
+        const methods = await fetchSignInMethodsForEmail(auth, email);
+        if (methods && methods.length > 0) {
+          const firstMethod = methods[0];
+          if (firstMethod === "github.com") {
+            alert("GitHub 계정으로 로그인해 주세요.");
+          } else if (firstMethod === "google.com") {
+            alert("Google 계정으로 로그인해 주세요.");
+          } else if (firstMethod === "password") {
+            alert("이메일/비밀번호로 로그인해 주세요.");
+          }
+        }
+      } catch (innerError) {
+        console.error("로그인 방법 확인 오류:", innerError);
+      }
+
+      throw new Error(
+        "이미 다른 로그인 방법으로 가입된 이메일입니다. 다른 로그인 방법을 시도해 주세요."
+      );
+    } else if (error.code === "auth/popup-closed-by-user") {
+      throw new Error("로그인 창이 닫혔습니다. 다시 시도해주세요.");
+    } else if (error.code === "auth/network-request-failed") {
+      throw new Error(
+        "네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요."
+      );
+    } else if (error.code === "auth/popup-blocked") {
+      throw new Error(
+        "팝업이 차단되었습니다. 팝업 차단을 해제하고 다시 시도해주세요."
+      );
+    } else if (error.code === "auth/cancelled-popup-request") {
+      throw new Error("로그인 요청이 취소되었습니다. 다시 시도해주세요.");
+    } else {
+      throw new Error(
+        `페이스북 로그인에 실패했습니다(${error.code}). 다시 시도해주세요`
+      );
+    }
+  }
+};
+
 const saveUserData = async (user) => {
   checkFirebaseInitialized();
 
@@ -385,6 +489,31 @@ export const linkGithubAccount = async () => {
     }
   } catch (error) {
     console.error("GitHub 계정 연결 실패:", error);
+    throw error;
+  }
+};
+
+/**
+ * Facebook 계정 연결 함수
+ */
+export const linkFacebookAccount = async () => {
+  checkFirebaseInitialized();
+  const provider = new FacebookAuthProvider();
+  const user = auth.currentUser;
+
+  if (!user) {
+    throw new Error("로그인된 사용자가 없습니다");
+  }
+
+  try {
+    // 모바일에서는 redirect, 데스크톱에서는 팝업 사용
+    if (isMobileDevice()) {
+      return linkWithRedirect(user, provider);
+    } else {
+      return linkWithPopup(user, provider);
+    }
+  } catch (error) {
+    console.error("Facebook 계정 연결 실패:", error);
     throw error;
   }
 };
