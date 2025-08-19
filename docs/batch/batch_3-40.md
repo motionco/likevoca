@@ -70,7 +70,7 @@ medical_research, clinical_trials, pharmaceutical_development를 **테마**로 �
 
 ### concept_id 형식
 ```
-건강_{word}_{meaning}
+health_{word}_{meaning}
 ```
 
 ### 중복 방지

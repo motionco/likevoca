@@ -70,7 +70,7 @@ media_theory, communication_studies, audience_research를 **테마**로 하되 �
 
 ### concept_id 형식
 ```
-엔터테인먼트_{word}_{meaning}
+entertainment_{word}_{meaning}
 ```
 
 ### 중복 방지

@@ -71,7 +71,7 @@ sports_philosophy, exercise_science_future, athletic_leadership를 **테마**로
 
 ### concept_id 형식
 ```
-스포츠_{word}_{meaning}
+sports_{word}_{meaning}
 ```
 
 ### 중복 방지

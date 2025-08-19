@@ -73,7 +73,7 @@ medical_research, clinical_trials, biomedical_engineering을 **테마**로 하�
 
 ### concept_id 형식
 ```
-건강_{word}_{meaning}
+health_{word}_{meaning}
 ```
 
 ### 중복 방지

@@ -71,7 +71,7 @@ climate_science, environmental_monitoring, adaptation_strategies를 **테마**�
 
 ### concept_id 형식
 ```
-자연_{word}_{meaning}
+nature_{word}_{meaning}
 ```
 
 ### 중복 방지

@@ -71,7 +71,7 @@ sustainable_agriculture, food_security, agricultural_innovation을 **테마**로
 
 ### concept_id 형식
 ```
-자연_{word}_{meaning}
+nature_{word}_{meaning}
 ```
 
 ### 중복 방지

@@ -72,7 +72,7 @@ educational_philosophy, future_learning, educational_leadership를 **테마**로
 
 ### concept_id 형식
 ```
-교육_{word}_{meaning}
+education_{word}_{meaning}
 ```
 
 ### 중복 방지

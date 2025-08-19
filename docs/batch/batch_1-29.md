@@ -78,7 +78,7 @@ running, swimming, equipment를 **테마**로 하되 가능한 한 다양한 언
 
 ### concept_id 형식
 ```
-스포츠_{word}_{meaning}
+sports_{word}_{meaning}
 ```
 
 ### 중복 방지

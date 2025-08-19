@@ -71,7 +71,7 @@ public_health_leadership, health_policy, global_health를 **테마**로 하되 �
 
 ### concept_id 형식
 ```
-건강_{word}_{meaning}
+health_{word}_{meaning}
 ```
 
 ### 중복 방지

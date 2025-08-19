@@ -71,7 +71,7 @@ lifestyle_innovation, smart_living, future_home_technology를 **테마**로 하�
 
 ### concept_id 형식
 ```
-일상_{word}_{meaning}
+daily_{word}_{meaning}
 ```
 
 ### 중복 방지

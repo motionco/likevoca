@@ -71,7 +71,7 @@ tourism_studies, cultural_tourism, sustainable_travel을 **테마**로 하되 �
 
 ### concept_id 형식
 ```
-여행_{word}_{meaning}
+travel_{word}_{meaning}
 ```
 
 ### 중복 방지

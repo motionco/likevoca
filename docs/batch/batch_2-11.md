@@ -76,7 +76,7 @@ database, networking, security를 **테마**로 하되 실용적이고 전문적
 
 ### concept_id 형식
 ```
-기술_{word}_{meaning}
+technology_{word}_{meaning}
 ```
 
 ### 중복 방지

@@ -70,7 +70,7 @@ cultural_theory, artistic_philosophy, cultural_future를 **테마**로 하되 �
 
 ### concept_id 형식
 ```
-문화_{word}_{meaning}
+culture_{word}_{meaning}
 ```
 
 ### 중복 방지

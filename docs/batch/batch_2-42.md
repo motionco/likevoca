@@ -76,7 +76,7 @@ miscellaneous, general, various를 **테마**로 하되 실용적이고 전문�
 
 ### concept_id 형식
 ```
-기타_{word}_{meaning}
+other_{word}_{meaning}
 ```
 
 ### 중복 방지

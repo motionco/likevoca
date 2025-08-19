@@ -71,7 +71,7 @@ content_strategy, audience_engagement, platform_innovation을 **테마**로 하�
 
 ### concept_id 형식
 ```
-엔터테인먼트_{word}_{meaning}
+entertainment_{word}_{meaning}
 ```
 
 ### 중복 방지

@@ -70,7 +70,7 @@ food_science, nutrition_research, culinary_arts를 **테마**로 하되 고급 �
 
 ### concept_id 형식
 ```
-음식_{word}_{meaning}
+food_{word}_{meaning}
 ```
 
 ### 중복 방지

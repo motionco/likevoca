@@ -75,7 +75,7 @@ game, hobby, leisure를 **테마**로 하되 실용적이고 전문적인 언어
 
 ### concept_id 형식
 ```
-엔터테인먼트_{word}_{meaning}
+entertainment_{word}_{meaning}
 ```
 
 ### 중복 방지

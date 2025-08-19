@@ -77,7 +77,7 @@ colleagues, responsibilities, schedules를 **테마**로 하되 가능한 한 �
 
 ### concept_id 형식
 ```
-업무_{word}_{meaning}
+work_{word}_{meaning}
 ```
 
 ### 중복 방지

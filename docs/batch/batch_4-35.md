@@ -71,7 +71,7 @@ gaming_industry, esports, interactive_entertainment를 **테마**로 하되 유�
 
 ### concept_id 형식
 ```
-엔터테인먼트_{word}_{meaning}
+entertainment_{word}_{meaning}
 ```
 
 ### 중복 방지

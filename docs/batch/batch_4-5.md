@@ -72,7 +72,7 @@ mergers_acquisitions, venture_capital, corporate_governance를 **테마**로 하
 
 ### concept_id 형식
 ```
-비즈니스_{word}_{meaning}
+business_{word}_{meaning}
 ```
 
 ### 중복 방지

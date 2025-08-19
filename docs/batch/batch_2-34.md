@@ -73,8 +73,8 @@ equipment, facility, rules를 **테마**로 하되 실용적이고 전문적인 
 ## 📝 참고사항
 
 ### concept_id 형식
-```
-스포츠_{word}_{meaning}
+```text
+sports_{word}_{meaning}
 ```
 
 ### 중복 방지

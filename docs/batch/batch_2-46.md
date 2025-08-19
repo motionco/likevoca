@@ -74,7 +74,7 @@ communication, client, service를 **테마**로 하되 실용적이고 전문적
 
 ### concept_id 형식
 ```
-비즈니스_{word}_{meaning}
+business_{word}_{meaning}
 ```
 
 ### 중복 방지

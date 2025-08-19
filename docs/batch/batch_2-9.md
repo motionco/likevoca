@@ -77,7 +77,7 @@ training, certification, educational_technology를 **테마**로 하되 실용�
 
 ### concept_id 형식
 ```
-교육_{word}_{meaning}
+education_{word}_{meaning}
 ```
 
 ### 중복 방지

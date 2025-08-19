@@ -70,7 +70,7 @@ sports_science, exercise_physiology, biomechanics를 **테마**로 하되 고급
 
 ### concept_id 형식
 ```
-스포츠_{word}_{meaning}
+sports_{word}_{meaning}
 ```
 
 ### 중복 방지

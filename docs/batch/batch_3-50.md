@@ -71,7 +71,7 @@ biodiversity, ecosystem_management, wildlife_conservation을 **테마**로 하�
 
 ### concept_id 형식
 ```
-자연_{word}_{meaning}
+nature_{word}_{meaning}
 ```
 
 ### 중복 방지

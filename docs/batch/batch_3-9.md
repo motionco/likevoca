@@ -71,7 +71,7 @@ iot, smart_city, automation을 **테마**로 하되 고급 수준의 전문적�
 
 ### concept_id 형식
 ```
-기술_{word}_{meaning}
+technology_{word}_{meaning}
 ```
 
 ### 중복 방지

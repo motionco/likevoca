@@ -70,7 +70,7 @@ sports_medicine, injury_prevention, rehabilitation을 **테마**로 하되 고�
 
 ### concept_id 형식
 ```
-스포츠_{word}_{meaning}
+sports_{word}_{meaning}
 ```
 
 ### 중복 방지

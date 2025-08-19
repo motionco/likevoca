@@ -71,7 +71,7 @@ robotics, automation, human_robot_interaction을 **테마**로 하되 고급 수
 
 ### concept_id 형식
 ```
-기술_{word}_{meaning}
+technology_{word}_{meaning}
 ```
 
 ### 중복 방지

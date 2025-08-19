@@ -71,7 +71,7 @@ work_life_integration, remote_work_culture, digital_nomadism을 **테마**로 �
 
 ### concept_id 형식
 ```
-일상_{word}_{meaning}
+daily_{word}_{meaning}
 ```
 
 ### 중복 방지

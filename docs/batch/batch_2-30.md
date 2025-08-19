@@ -74,7 +74,7 @@ ocean, mountain, forest를 **테마**로 하되 실용적이고 전문적인 언
 
 ### concept_id 형식
 ```
-자연_{word}_{meaning}
+nature_{word}_{meaning}
 ```
 
 ### 중복 방지

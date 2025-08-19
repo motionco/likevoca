@@ -71,7 +71,7 @@ supply_chain, logistics, global_trade를 **테마**로 하되 유창한 수준�
 
 ### concept_id 형식
 ```
-비즈니스_{word}_{meaning}
+business_{word}_{meaning}
 ```
 
 ### 중복 방지

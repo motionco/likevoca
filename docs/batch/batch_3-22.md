@@ -71,7 +71,7 @@ venture_capital, startup_ecosystem, entrepreneurship을 **테마**로 하되 고
 
 ### concept_id 형식
 ```
-비즈니스_{word}_{meaning}
+business_{word}_{meaning}
 ```
 
 ### 중복 방지

@@ -71,7 +71,7 @@ cultural_policy, arts_administration, creative_industries를 **테마**로 하�
 
 ### concept_id 형식
 ```
-문화_{word}_{meaning}
+culture_{word}_{meaning}
 ```
 
 ### 중복 방지

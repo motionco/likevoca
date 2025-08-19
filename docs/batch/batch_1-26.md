@@ -78,7 +78,7 @@ apps, software, troubleshooting을 **테마**로 하되 가능한 한 다양한 
 
 ### concept_id 형식
 ```
-기술_{word}_{meaning}
+technology_{word}_{meaning}
 ```
 
 ### 중복 방지

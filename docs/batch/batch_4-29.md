@@ -71,7 +71,7 @@ media_philosophy, content_creation, digital_storytelling을 **테마**로 하되
 
 ### concept_id 형식
 ```
-문화_{word}_{meaning}
+culture_{word}_{meaning}
 ```
 
 ### 중복 방지

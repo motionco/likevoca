@@ -82,7 +82,7 @@ beverages, nutrition, restaurants를 **테마**로 하되 가능한 한 다양�
 
 ### concept_id 형식
 ```
-음식_{word}_{meaning}
+food_{word}_{meaning}
 ```
 
 ### 중복 방지

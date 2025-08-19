@@ -71,7 +71,7 @@ personal_development, mindfulness, life_optimization을 **테마**로 하되 유
 
 ### concept_id 형식
 ```
-일상_{word}_{meaning}
+daily_{word}_{meaning}
 ```
 
 ### 중복 방지

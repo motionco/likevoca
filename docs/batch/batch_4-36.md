@@ -71,7 +71,7 @@ culinary_philosophy, gastronomy, food_culture_evolution을 **테마**로 하되 
 
 ### concept_id 형식
 ```
-음식_{word}_{meaning}
+food_{word}_{meaning}
 ```
 
 ### 중복 방지

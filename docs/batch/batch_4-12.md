@@ -71,7 +71,7 @@ robotics, automation, human_machine_interface를 **테마**로 하되 유창한 
 
 ### concept_id 형식
 ```
-기술_{word}_{meaning}
+technology_{word}_{meaning}
 ```
 
 ### 중복 방지

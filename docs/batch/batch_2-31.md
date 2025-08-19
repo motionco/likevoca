@@ -74,8 +74,8 @@ conservation, ecology, sustainability를 **테마**로 하되 실용적이고 �
 ## 📝 참고사항
 
 ### concept_id 형식
-```
-자연_{word}_{meaning}
+```text
+nature_{word}_{meaning}
 ```
 
 ### 중복 방지

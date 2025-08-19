@@ -84,7 +84,7 @@ basic, communication, culture를 **테마**로 하되 가능한 한 다양한 �
 
 ### concept_id 형식
 ```
-여행_{word}_{meaning}
+travel_{word}_{meaning}
 ```
 
 ### 중복 방지

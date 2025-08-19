@@ -71,7 +71,7 @@ medical_ethics, bioethics, healthcare_law를 **테마**로 하되 고급 수준�
 
 ### concept_id 형식
 ```
-건강_{word}_{meaning}
+health_{word}_{meaning}
 ```
 
 ### 중복 방지

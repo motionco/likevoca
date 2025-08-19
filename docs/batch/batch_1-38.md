@@ -78,7 +78,7 @@ arts, literature, history를 **테마**로 하되 가능한 한 다양한 언어
 
 ### concept_id 형식
 ```
-문화_{word}_{meaning}
+culture_{word}_{meaning}
 ```
 
 ### 중복 방지

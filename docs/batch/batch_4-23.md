@@ -71,7 +71,7 @@ telemedicine, digital_health, mobile_health_apps를 **테마**로 하되 유창�
 
 ### concept_id 형식
 ```
-건강_{word}_{meaning}
+health_{word}_{meaning}
 ```
 
 ### 중복 방지

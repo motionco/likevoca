@@ -71,7 +71,7 @@ financial_technology, cryptocurrency, digital_banking을 **테마**로 하되 �
 
 ### concept_id 형식
 ```
-비즈니스_{word}_{meaning}
+business_{word}_{meaning}
 ```
 
 ### 중복 방지

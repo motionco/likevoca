@@ -71,7 +71,7 @@ ecology, environmental_science, conservation_biology를 **테마**로 하되 고
 
 ### concept_id 형식
 ```
-자연_{word}_{meaning}
+nature_{word}_{meaning}
 ```
 
 ### 중복 방지

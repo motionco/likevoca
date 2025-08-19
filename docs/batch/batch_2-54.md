@@ -74,7 +74,7 @@ digital_transformation, e_commerce, online_business를 **테마**로 하되 실�
 
 ### concept_id 형식
 ```
-비즈니스_{word}_{meaning}
+business_{word}_{meaning}
 ```
 
 ### 중복 방지

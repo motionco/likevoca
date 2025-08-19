@@ -71,7 +71,7 @@ global_culture, cultural_exchange, intercultural_communication을 **테마**로 
 
 ### concept_id 형식
 ```
-문화_{word}_{meaning}
+culture_{word}_{meaning}
 ```
 
 ### 중복 방지

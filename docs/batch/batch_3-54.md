@@ -71,7 +71,7 @@ sports_management, event_organization, facility_management를 **테마**로 하�
 
 ### concept_id 형식
 ```
-스포츠_{word}_{meaning}
+sports_{word}_{meaning}
 ```
 
 ### 중복 방지

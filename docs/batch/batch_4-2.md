@@ -72,7 +72,7 @@ executive_leadership, global_strategy, corporate_transformation을 **테마**로
 
 ### concept_id 형식
 ```
-비즈니스_{word}_{meaning}
+business_{word}_{meaning}
 ```
 
 ### 중복 방지

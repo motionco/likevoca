@@ -78,7 +78,7 @@ events, celebrations, gatherings를 **테마**로 하되 가능한 한 다양한
 
 ### concept_id 형식
 ```
-사회_{word}_{meaning}
+social_{word}_{meaning}
 ```
 
 ### 중복 방지

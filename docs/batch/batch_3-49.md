@@ -71,7 +71,7 @@ sustainability, environmental_policy, green_technology를 **테마**로 하되 �
 
 ### concept_id 형식
 ```
-자연_{word}_{meaning}
+nature_{word}_{meaning}
 ```
 
 ### 중복 방지

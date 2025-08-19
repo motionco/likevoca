@@ -78,7 +78,7 @@ conservation, sustainability, marine_life를 **테마**로 하되 가능한 한 
 
 ### concept_id 형식
 ```
-자연_{word}_{meaning}
+nature_{word}_{meaning}
 ```
 
 ### 중복 방지

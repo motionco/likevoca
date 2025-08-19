@@ -71,7 +71,7 @@ online_education, personalized_learning, adaptive_technology를 **테마**로 �
 
 ### concept_id 형식
 ```
-교육_{word}_{meaning}
+education_{word}_{meaning}
 ```
 
 ### 중복 방지

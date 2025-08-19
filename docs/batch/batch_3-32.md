@@ -71,7 +71,7 @@ educational_technology, e_learning, digital_pedagogy를 **테마**로 하되 고
 
 ### concept_id 형식
 ```
-교육_{word}_{meaning}
+education_{word}_{meaning}
 ```
 
 ### 중복 방지
