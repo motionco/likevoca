@@ -439,15 +439,25 @@ export const facebookLogin = async () => {
           const loginChoice = confirm(manualLoginMessage);
 
           if (loginChoice) {
-            // 기존 로그인 방법 확인
-            const methods = await fetchSignInMethodsForEmail(auth, email);
-            
             // Facebook 자격 증명을 세션에 저장
             sessionStorage.setItem(
               "pendingFacebookCredential",
               JSON.stringify(pendingCredential)
             );
             sessionStorage.setItem("facebookLoginEmail", email);
+
+            // 기존 로그인 방법 확인
+            let methods = [];
+            try {
+              methods = await fetchSignInMethodsForEmail(auth, email);
+            } catch (fetchError) {
+              console.error("로그인 방법 확인 오류:", fetchError);
+              // fetchSignInMethodsForEmail이 실패해도 일반적인 로그인 방법들을 시도
+              alert(
+                "기존 로그인 방법을 자동으로 확인할 수 없습니다. Google 또는 GitHub 로그인을 시도해보세요."
+              );
+              throw new Error("기존 로그인 방법을 사용해주세요.");
+            }
 
             if (methods && methods.length > 0) {
               const firstMethod = methods[0];
@@ -487,17 +497,30 @@ export const facebookLogin = async () => {
                 throw new Error("기존 로그인 방법을 사용해주세요.");
               }
             } else {
-              throw new Error("기존 로그인 방법을 확인할 수 없습니다.");
+              // 로그인 방법을 확인할 수 없는 경우, 일반적인 방법들을 제안
+              alert(
+                "기존 로그인 방법을 확인할 수 없습니다. Google 또는 GitHub 로그인을 시도해보세요."
+              );
+              throw new Error("기존 로그인 방법을 사용해주세요.");
             }
           } else {
             throw new Error("기존 로그인 방법을 사용해주세요.");
           }
         } catch (innerError) {
           console.error("로그인 방법 확인 오류:", innerError);
-          alert(`로그인 확인 중 오류가 발생했습니다: ${innerError.message}`);
-          throw new Error(
-            "인증 과정에서 오류가 발생했습니다. 다른 로그인 방법을 시도해주세요."
-          );
+          
+          // 세션 스토리지 정리
+          sessionStorage.removeItem("pendingFacebookCredential");
+          sessionStorage.removeItem("facebookLoginEmail");
+          
+          if (innerError.message.includes("기존 로그인 방법을 사용해주세요")) {
+            throw innerError;
+          } else {
+            alert(`로그인 확인 중 오류가 발생했습니다. Google 또는 GitHub 로그인을 직접 시도해보세요.`);
+            throw new Error(
+              "인증 과정에서 오류가 발생했습니다. 다른 로그인 방법을 시도해주세요."
+            );
+          }
         }
       }
 
