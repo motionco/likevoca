@@ -7,6 +7,7 @@ import {
   sendPasswordResetEmail,
   GoogleAuthProvider,
   GithubAuthProvider,
+  FacebookAuthProvider,
   signInWithPopup,
   signOut,
   deleteUser,
