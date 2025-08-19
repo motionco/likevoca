@@ -433,7 +433,7 @@ export const facebookLogin = async () => {
           const manualLoginMessage =
             `이메일 ${email}은 이미 다른 방법으로 가입되어 있습니다.\n\n` +
             `선택 옵션:\n` +
-            `1. 기존 로그인 방법으로 로그인 후 Facebook 계정 연결\n` +
+            `1. Google로 로그인 후 Facebook 계정 연결\n` +
             `2. 기존 방법으로 로그인`;
 
           const loginChoice = confirm(manualLoginMessage);
@@ -446,86 +446,34 @@ export const facebookLogin = async () => {
             );
             sessionStorage.setItem("facebookLoginEmail", email);
 
-            // 기존 로그인 방법 확인
-            let methods = [];
-            try {
-              methods = await fetchSignInMethodsForEmail(auth, email);
-            } catch (fetchError) {
-              console.error("로그인 방법 확인 오류:", fetchError);
-              // fetchSignInMethodsForEmail이 실패해도 일반적인 로그인 방법들을 시도
-              alert(
-                "기존 로그인 방법을 자동으로 확인할 수 없습니다. Google 또는 GitHub 로그인을 시도해보세요."
-              );
-              throw new Error("기존 로그인 방법을 사용해주세요.");
-            }
+            alert(
+              "Google 로그인 페이지로 이동합니다. 로그인 후 Facebook 계정을 연결할 수 있습니다."
+            );
 
-            if (methods && methods.length > 0) {
-              const firstMethod = methods[0];
-              
-              if (firstMethod === "google.com") {
-                alert(
-                  "Google 로그인 버튼을 클릭하여 로그인하세요. 로그인 후 Facebook 계정이 자동으로 연결됩니다."
-                );
-                
-                // Google 로그인 버튼 클릭 이벤트 트리거
-                const googleLoginBtn = document.getElementById("google-login-btn");
-                if (googleLoginBtn) {
-                  googleLoginBtn.click();
-                  return null;
-                } else {
-                  throw new Error(
-                    "Google 로그인 버튼을 찾을 수 없습니다. 직접 Google 로그인을 시도해주세요."
-                  );
-                }
-              } else if (firstMethod === "github.com") {
-                alert(
-                  "GitHub 로그인 버튼을 클릭하여 로그인하세요. 로그인 후 Facebook 계정이 자동으로 연결됩니다."
-                );
-                
-                // GitHub 로그인 버튼 클릭 이벤트 트리거
-                const githubLoginBtn = document.getElementById("github-login-btn");
-                if (githubLoginBtn) {
-                  githubLoginBtn.click();
-                  return null;
-                } else {
-                  throw new Error(
-                    "GitHub 로그인 버튼을 찾을 수 없습니다. 직접 GitHub 로그인을 시도해주세요."
-                  );
-                }
-              } else {
-                alert("이메일/비밀번호로 로그인한 후 Facebook 계정을 연결하실 수 있습니다.");
-                throw new Error("기존 로그인 방법을 사용해주세요.");
-              }
+            // Google 로그인 버튼 클릭 이벤트 트리거
+            const googleLoginBtn = document.getElementById("google-login-btn");
+            if (googleLoginBtn) {
+              googleLoginBtn.click();
+              return null; // 반환 값 없음 - 다른 흐름으로 처리함
             } else {
-              // 로그인 방법을 확인할 수 없는 경우, 일반적인 방법들을 제안
-              alert(
-                "기존 로그인 방법을 확인할 수 없습니다. Google 또는 GitHub 로그인을 시도해보세요."
+              throw new Error(
+                "Google 로그인 버튼을 찾을 수 없습니다. 직접 Google 로그인을 시도해주세요."
               );
-              throw new Error("기존 로그인 방법을 사용해주세요.");
             }
           } else {
             throw new Error("기존 로그인 방법을 사용해주세요.");
           }
         } catch (innerError) {
           console.error("로그인 방법 확인 오류:", innerError);
-          
-          // 세션 스토리지 정리
-          sessionStorage.removeItem("pendingFacebookCredential");
-          sessionStorage.removeItem("facebookLoginEmail");
-          
-          if (innerError.message.includes("기존 로그인 방법을 사용해주세요")) {
-            throw innerError;
-          } else {
-            alert(`로그인 확인 중 오류가 발생했습니다. Google 또는 GitHub 로그인을 직접 시도해보세요.`);
-            throw new Error(
-              "인증 과정에서 오류가 발생했습니다. 다른 로그인 방법을 시도해주세요."
-            );
-          }
+          alert(`로그인 확인 중 오류가 발생했습니다: ${innerError.message}`);
+          throw new Error(
+            "인증 과정에서 오류가 발생했습니다. 다른 로그인 방법을 시도해주세요."
+          );
         }
       }
 
       throw new Error(
-        "이미 다른 로그인 방법으로 가입된 이메일입니다. 다른 로그인 방법을 시도해 주세요."
+        "이미 다른 로그인 방법으로 가입된 이메일입니다. 다른 로그인 방법을 시도해주세요."
       );
     } else if (error.code === "auth/popup-closed-by-user") {
       throw new Error("로그인 창이 닫혔습니다. 다시 시도해주세요.");

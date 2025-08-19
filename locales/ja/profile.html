@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,6 +19,7 @@
   <link rel="stylesheet" href="../../css/style.css">
   <link rel="stylesheet" href="../../css/profile.css">
 </head>
+
 <body class="bg-gray-100">
   <!-- 네비게이션바 컨테이너 -->
   <div id="navbar-container"></div>
@@ -25,12 +27,12 @@
   <main class="container mx-auto px-4 py-8">
     <div id="profile-container" class="bg-white rounded-lg shadow-md p-6">
       <h1 class="text-2xl font-bold mb-6">プロフィール管理</h1>
-      
+
       <div id="auth-required" class="p-6 bg-yellow-100 rounded-lg border border-yellow-300 mb-4">
         <p class="text-lg">このページを表示するにはログインが必要です。</p>
         <a href="#" onclick="window.redirectToLogin()" class="btn btn-primary mt-3 inline-block">ログイン</a>
       </div>
-      
+
       <div id="profile-content">
         <div class="profile-section">
           <h2>個人情報</h2>
@@ -46,7 +48,7 @@
             <button type="submit" id="update-profile" class="btn btn-primary">情報を更新</button>
           </form>
         </div>
-        
+
         <div class="profile-section">
           <h2>アカウント接続</h2>
           <div class="account-connections">
@@ -61,7 +63,7 @@
                 <button id="google-disconnect" class="btn btn-outline btn-danger hidden">接続解除</button>
               </div>
             </div>
-            
+
             <div class="connection-item">
               <div class="connection-info">
                 <i class="fab fa-github provider-icon"></i>
@@ -73,9 +75,21 @@
                 <button id="github-disconnect" class="btn btn-outline btn-danger hidden">接続解除</button>
               </div>
             </div>
+
+            <div class="connection-item">
+              <div class="connection-info">
+                <i class="fab fa-facebook provider-icon" style="color: #1877F2;"></i>
+                <span>Facebookアカウント</span>
+              </div>
+              <div class="connection-status">
+                <span id="facebook-status" class="status-badge">未接続</span>
+                <button id="facebook-connect" class="btn btn-outline">接続</button>
+                <button id="facebook-disconnect" class="btn btn-outline btn-danger hidden">接続解除</button>
+              </div>
+            </div>
           </div>
         </div>
-        
+
         <div class="profile-section danger-zone">
           <h2>危険なエリア</h2>
           <div class="danger-actions">
@@ -86,7 +100,7 @@
       </div>
     </div>
   </main>
-  
+
   <footer class="footer bg-gray-200 mt-8 py-4">
     <div class="container mx-auto text-center">
       <p>&copy; 2025 LikeVoca. All rights reserved.</p>
@@ -100,4 +114,5 @@
   <script type="module" src="../../js/profile.js"></script>
   <script type="module" src="../../components/js/navbar.js"></script>
 </body>
-</html> 
+
+</html>

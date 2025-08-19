@@ -8,6 +8,7 @@ import {
   deleteAccount,
   linkGoogleAccount,
   linkGithubAccount,
+  linkFacebookAccount,
   unlinkProvider,
 } from "../utils/firebase/firebase-auth.js";
 
@@ -26,6 +27,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   const githubStatus = document.getElementById("github-status");
   const githubConnect = document.getElementById("github-connect");
   const githubDisconnect = document.getElementById("github-disconnect");
+
+  const facebookStatus = document.getElementById("facebook-status");
+  const facebookConnect = document.getElementById("facebook-connect");
+  const facebookDisconnect = document.getElementById("facebook-disconnect");
 
   const logoutBtn = document.getElementById("logout-btn");
   const deleteAccountBtn = document.getElementById("delete-account");
@@ -171,6 +176,36 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
+  // Facebook 계정 연결
+  if (facebookConnect) {
+    facebookConnect.addEventListener("click", async () => {
+      try {
+        await linkFacebookAccount();
+        updateProviderStatus();
+      } catch (error) {
+        console.error("Facebook 계정 연결 오류:", error);
+        alert(`Facebook 계정 연결 실패: ${error.message}`);
+      }
+    });
+  }
+
+  // Facebook 계정 연결 해제
+  if (facebookDisconnect) {
+    facebookDisconnect.addEventListener("click", async () => {
+      if (!confirm("Facebook 계정 연결을 해제하시겠습니까?")) {
+        return;
+      }
+
+      try {
+        await unlinkProvider("facebook.com");
+        updateProviderStatus();
+      } catch (error) {
+        console.error("Facebook 계정 연결 해제 오류:", error);
+        alert(`Facebook 계정 연결 해제 실패: ${error.message}`);
+      }
+    });
+  }
+
   // 로그아웃 버튼
   if (logoutBtn) {
     logoutBtn.addEventListener("click", async () => {
@@ -277,6 +312,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         githubStatus.classList.remove("connected");
         githubConnect.classList.remove("hidden");
         githubDisconnect.classList.add("hidden");
+      }
+    }
+
+    // Facebook 상태 업데이트
+    if (facebookStatus && facebookConnect && facebookDisconnect) {
+      if (providers.includes("facebook.com")) {
+        facebookStatus.textContent = "연결됨";
+        facebookStatus.classList.add("connected");
+        facebookConnect.classList.add("hidden");
+        facebookDisconnect.classList.remove("hidden");
+      } else {
+        facebookStatus.textContent = "연결되지 않음";
+        facebookStatus.classList.remove("connected");
+        facebookConnect.classList.remove("hidden");
+        facebookDisconnect.classList.add("hidden");
       }
     }
   }
