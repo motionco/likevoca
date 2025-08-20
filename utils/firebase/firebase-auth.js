@@ -604,7 +604,30 @@ export const linkGoogleAccount = async () => {
     }
   } catch (error) {
     console.error("Google 계정 연결 실패:", error);
-    throw error;
+    
+    if (error.code === "auth/credential-already-in-use") {
+      // 해당 구글 계정이 이미 다른 Firebase 계정에 연결되어 있는 경우
+      const email = error.customData?.email;
+      if (email) {
+        throw new Error(
+          `이 Google 계정(${email})은 이미 다른 계정에 연결되어 있습니다.\n` +
+          `다른 Google 계정을 사용하거나, 해당 계정으로 로그인한 후 현재 계정과 병합해주세요.`
+        );
+      } else {
+        throw new Error(
+          "이 Google 계정은 이미 다른 계정에 연결되어 있습니다.\n" +
+          "다른 Google 계정을 사용해주세요."
+        );
+      }
+    } else if (error.code === "auth/provider-already-linked") {
+      throw new Error("Google 계정이 이미 연결되어 있습니다.");
+    } else if (error.code === "auth/popup-closed-by-user") {
+      throw new Error("팝업이 닫혔습니다. 다시 시도해주세요.");
+    } else if (error.code === "auth/popup-blocked") {
+      throw new Error("팝업이 차단되었습니다. 팝업 차단을 해제하고 다시 시도해주세요.");
+    } else {
+      throw new Error(`Google 계정 연결에 실패했습니다: ${error.message}`);
+    }
   }
 };
 
@@ -629,7 +652,30 @@ export const linkGithubAccount = async () => {
     }
   } catch (error) {
     console.error("GitHub 계정 연결 실패:", error);
-    throw error;
+    
+    if (error.code === "auth/credential-already-in-use") {
+      // 해당 GitHub 계정이 이미 다른 Firebase 계정에 연결되어 있는 경우
+      const email = error.customData?.email;
+      if (email) {
+        throw new Error(
+          `이 GitHub 계정(${email})은 이미 다른 계정에 연결되어 있습니다.\n` +
+          `다른 GitHub 계정을 사용하거나, 해당 계정으로 로그인한 후 현재 계정과 병합해주세요.`
+        );
+      } else {
+        throw new Error(
+          "이 GitHub 계정은 이미 다른 계정에 연결되어 있습니다.\n" +
+          "다른 GitHub 계정을 사용해주세요."
+        );
+      }
+    } else if (error.code === "auth/provider-already-linked") {
+      throw new Error("GitHub 계정이 이미 연결되어 있습니다.");
+    } else if (error.code === "auth/popup-closed-by-user") {
+      throw new Error("팝업이 닫혔습니다. 다시 시도해주세요.");
+    } else if (error.code === "auth/popup-blocked") {
+      throw new Error("팝업이 차단되었습니다. 팝업 차단을 해제하고 다시 시도해주세요.");
+    } else {
+      throw new Error(`GitHub 계정 연결에 실패했습니다: ${error.message}`);
+    }
   }
 };
 
@@ -654,7 +700,30 @@ export const linkFacebookAccount = async () => {
     }
   } catch (error) {
     console.error("Facebook 계정 연결 실패:", error);
-    throw error;
+    
+    if (error.code === "auth/credential-already-in-use") {
+      // 해당 Facebook 계정이 이미 다른 Firebase 계정에 연결되어 있는 경우
+      const email = error.customData?.email;
+      if (email) {
+        throw new Error(
+          `이 Facebook 계정(${email})은 이미 다른 계정에 연결되어 있습니다.\n` +
+          `다른 Facebook 계정을 사용하거나, 해당 계정으로 로그인한 후 현재 계정과 병합해주세요.`
+        );
+      } else {
+        throw new Error(
+          "이 Facebook 계정은 이미 다른 계정에 연결되어 있습니다.\n" +
+          "다른 Facebook 계정을 사용해주세요."
+        );
+      }
+    } else if (error.code === "auth/provider-already-linked") {
+      throw new Error("Facebook 계정이 이미 연결되어 있습니다.");
+    } else if (error.code === "auth/popup-closed-by-user") {
+      throw new Error("팝업이 닫혔습니다. 다시 시도해주세요.");
+    } else if (error.code === "auth/popup-blocked") {
+      throw new Error("팝업이 차단되었습니다. 팝업 차단을 해제하고 다시 시도해주세요.");
+    } else {
+      throw new Error(`Facebook 계정 연결에 실패했습니다: ${error.message}`);
+    }
   }
 };
 
