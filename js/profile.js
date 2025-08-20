@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         updateProviderStatus();
       } catch (error) {
         console.error("Google 계정 연결 오류:", error);
-        alert(`Google 계정 연결 실패: ${error.message}`);
+        alert(error.message);
       }
     });
   }
@@ -154,7 +154,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         updateProviderStatus();
       } catch (error) {
         console.error("GitHub 계정 연결 오류:", error);
-        alert(`GitHub 계정 연결 실패: ${error.message}`);
+        alert(error.message);
       }
     });
   }
@@ -184,7 +184,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         updateProviderStatus();
       } catch (error) {
         console.error("Facebook 계정 연결 오류:", error);
-        alert(`Facebook 계정 연결 실패: ${error.message}`);
+        alert(error.message);
       }
     });
   }
