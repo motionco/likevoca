@@ -166,11 +166,15 @@ export const googleLogin = async () => {
     provider.addScope("email");
     provider.addScope("profile");
 
+    // Google 로그인을 임시로 진행하여 이메일 정보 획득
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
     const email = user.email;
 
-    // Google 로그인 성공 후 기존 계정 확인
+    // 즉시 로그아웃하여 자동 연동 방지
+    await signOut(auth);
+
+    // 기존 계정 확인
     if (email) {
       try {
         const methods = await fetchSignInMethodsForEmail(auth, email);
@@ -179,9 +183,6 @@ export const googleLogin = async () => {
         const nonGoogleMethods = methods.filter(method => method !== "google.com");
         
         if (nonGoogleMethods.length > 0) {
-          // 다른 방법으로 이미 가입된 계정이 있으면 로그아웃하고 안내
-          await signOut(auth);
-          
           const firstMethod = nonGoogleMethods[0];
           let existingMethodText = "다른 로그인 방법";
           
@@ -205,12 +206,16 @@ export const googleLogin = async () => {
       }
     }
 
-    await saveUserData(user);
+    // 기존 계정이 없으면 다시 로그인
+    const finalResult = await signInWithPopup(auth, provider);
+    const finalUser = finalResult.user;
+
+    await saveUserData(finalUser);
 
     // 계정 연결 로직은 프로필 페이지에서만 처리
     // 로그인 시에는 자동 연동하지 않음
 
-    return user;
+    return finalUser;
   } catch (error) {
     if (error.code === "auth/account-exists-with-different-credential") {
       // 같은 이메일을 사용하는 다른 인증 방법으로 이미 계정이 있는 경우
