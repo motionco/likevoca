@@ -429,35 +429,70 @@ export const facebookLogin = async () => {
 
       if (email && pendingCredential) {
         try {
+          // 해당 이메일로 기존에 가입한 방법 확인
+          const methods = await fetchSignInMethodsForEmail(auth, email);
+          let existingMethodText = "다른 로그인 방법";
+          
+          if (methods && methods.length > 0) {
+            const firstMethod = methods[0];
+            if (firstMethod === "google.com") {
+              existingMethodText = "Google 계정";
+            } else if (firstMethod === "github.com") {
+              existingMethodText = "GitHub 계정";
+            } else if (firstMethod === "password") {
+              existingMethodText = "이메일/비밀번호";
+            }
+          }
+
           // 사용자에게 메시지 표시 및 선택지 제공
           const manualLoginMessage =
-            `이메일 ${email}은 이미 다른 방법으로 가입되어 있습니다.\n\n` +
+            `이메일 ${email}은 이미 ${existingMethodText}으로 가입되어 있습니다.\n\n` +
             `선택 옵션:\n` +
-            `1. Google로 로그인 후 Facebook 계정 연결\n` +
+            `1. ${existingMethodText}으로 로그인 후 Facebook 계정 연결\n` +
             `2. 기존 방법으로 로그인`;
 
           const loginChoice = confirm(manualLoginMessage);
 
           if (loginChoice) {
-            // Facebook 자격 증명을 세션에 저장
+            // Facebook 자격 증명을 세션에 저장 (직렬화 가능한 형태로)
             sessionStorage.setItem(
               "pendingFacebookCredential",
-              JSON.stringify(pendingCredential)
+              JSON.stringify({
+                accessToken: pendingCredential.accessToken,
+                providerId: pendingCredential.providerId
+              })
             );
             sessionStorage.setItem("facebookLoginEmail", email);
 
             alert(
-              "Google 로그인 페이지로 이동합니다. 로그인 후 Facebook 계정을 연결할 수 있습니다."
+              `${existingMethodText} 로그인 페이지로 이동합니다. 로그인 후 Facebook 계정을 연결할 수 있습니다.`
             );
 
-            // Google 로그인 버튼 클릭 이벤트 트리거
+            // 기존 계정 로그인 방법에 따라 적절한 버튼 클릭
+            if (methods && methods.length > 0) {
+              const firstMethod = methods[0];
+              let loginBtn = null;
+              
+              if (firstMethod === "google.com") {
+                loginBtn = document.getElementById("google-login-btn");
+              } else if (firstMethod === "github.com") {
+                loginBtn = document.getElementById("github-login-btn");
+              }
+              
+              if (loginBtn) {
+                loginBtn.click();
+                return null;
+              }
+            }
+            
+            // 기본적으로 Google 로그인 버튼 시도
             const googleLoginBtn = document.getElementById("google-login-btn");
             if (googleLoginBtn) {
               googleLoginBtn.click();
-              return null; // 반환 값 없음 - 다른 흐름으로 처리함
+              return null;
             } else {
               throw new Error(
-                "Google 로그인 버튼을 찾을 수 없습니다. 직접 Google 로그인을 시도해주세요."
+                "로그인 버튼을 찾을 수 없습니다. 직접 기존 로그인 방법을 시도해주세요."
               );
             }
           } else {
@@ -465,10 +500,7 @@ export const facebookLogin = async () => {
           }
         } catch (innerError) {
           console.error("로그인 방법 확인 오류:", innerError);
-          alert(`로그인 확인 중 오류가 발생했습니다: ${innerError.message}`);
-          throw new Error(
-            "인증 과정에서 오류가 발생했습니다. 다른 로그인 방법을 시도해주세요."
-          );
+          throw new Error("기존 로그인 방법을 사용해주세요.");
         }
       }
 
