@@ -610,13 +610,19 @@ export const linkGoogleAccount = async () => {
       const email = error.customData?.email;
       if (email) {
         throw new Error(
-          `이 Google 계정(${email})은 이미 다른 계정에 연결되어 있습니다.\n` +
-          `다른 Google 계정을 사용하거나, 해당 계정으로 로그인한 후 현재 계정과 병합해주세요.`
+          `⚠️ 계정 연결 불가\n\n` +
+          `선택하신 Google 계정(${email})은 이미 다른 사용자 계정에서 사용 중입니다.\n\n` +
+          `📌 해결 방법:\n` +
+          `• 다른 Google 계정을 사용해 주세요\n` +
+          `• 또는 해당 Google 계정으로 직접 로그인해 주세요\n\n` +
+          `💡 참고: 보안상 하나의 이메일은 하나의 계정에만 연결할 수 있습니다.`
         );
       } else {
         throw new Error(
-          "이 Google 계정은 이미 다른 계정에 연결되어 있습니다.\n" +
-          "다른 Google 계정을 사용해주세요."
+          `⚠️ 계정 연결 불가\n\n` +
+          `선택하신 Google 계정은 이미 다른 사용자 계정에서 사용 중입니다.\n\n` +
+          `📌 다른 Google 계정을 선택해 주세요.\n\n` +
+          `💡 참고: 보안상 하나의 이메일은 하나의 계정에만 연결할 수 있습니다.`
         );
       }
     } else if (error.code === "auth/provider-already-linked") {
@@ -658,13 +664,19 @@ export const linkGithubAccount = async () => {
       const email = error.customData?.email;
       if (email) {
         throw new Error(
-          `이 GitHub 계정(${email})은 이미 다른 계정에 연결되어 있습니다.\n` +
-          `다른 GitHub 계정을 사용하거나, 해당 계정으로 로그인한 후 현재 계정과 병합해주세요.`
+          `⚠️ 계정 연결 불가\n\n` +
+          `선택하신 GitHub 계정(${email})은 이미 다른 사용자 계정에서 사용 중입니다.\n\n` +
+          `📌 해결 방법:\n` +
+          `• 다른 GitHub 계정을 사용해 주세요\n` +
+          `• 또는 해당 GitHub 계정으로 직접 로그인해 주세요\n\n` +
+          `💡 참고: 보안상 하나의 이메일은 하나의 계정에만 연결할 수 있습니다.`
         );
       } else {
         throw new Error(
-          "이 GitHub 계정은 이미 다른 계정에 연결되어 있습니다.\n" +
-          "다른 GitHub 계정을 사용해주세요."
+          `⚠️ 계정 연결 불가\n\n` +
+          `선택하신 GitHub 계정은 이미 다른 사용자 계정에서 사용 중입니다.\n\n` +
+          `📌 다른 GitHub 계정을 선택해 주세요.\n\n` +
+          `💡 참고: 보안상 하나의 이메일은 하나의 계정에만 연결할 수 있습니다.`
         );
       }
     } else if (error.code === "auth/provider-already-linked") {
@@ -706,13 +718,19 @@ export const linkFacebookAccount = async () => {
       const email = error.customData?.email;
       if (email) {
         throw new Error(
-          `이 Facebook 계정(${email})은 이미 다른 계정에 연결되어 있습니다.\n` +
-          `다른 Facebook 계정을 사용하거나, 해당 계정으로 로그인한 후 현재 계정과 병합해주세요.`
+          `⚠️ 계정 연결 불가\n\n` +
+          `선택하신 Facebook 계정(${email})은 이미 다른 사용자 계정에서 사용 중입니다.\n\n` +
+          `📌 해결 방법:\n` +
+          `• 다른 Facebook 계정을 사용해 주세요\n` +
+          `• 또는 해당 Facebook 계정으로 직접 로그인해 주세요\n\n` +
+          `💡 참고: 보안상 하나의 이메일은 하나의 계정에만 연결할 수 있습니다.`
         );
       } else {
         throw new Error(
-          "이 Facebook 계정은 이미 다른 계정에 연결되어 있습니다.\n" +
-          "다른 Facebook 계정을 사용해주세요."
+          `⚠️ 계정 연결 불가\n\n` +
+          `선택하신 Facebook 계정은 이미 다른 사용자 계정에서 사용 중입니다.\n\n` +
+          `📌 다른 Facebook 계정을 선택해 주세요.\n\n` +
+          `💡 참고: 보안상 하나의 이메일은 하나의 계정에만 연결할 수 있습니다.`
         );
       }
     } else if (error.code === "auth/provider-already-linked") {
