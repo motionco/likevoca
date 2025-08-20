@@ -675,21 +675,23 @@ export const linkGoogleAccount = async () => {
   const user = auth.currentUser;
 
   if (!user) {
+    const msg = getLocalizedMessage();
     throw new Error("로그인된 사용자가 없습니다");
   }
+
+  const msg = getLocalizedMessage();
 
   try {
     // 모바일에서는 redirect, 데스크톱에서는 팝업 사용
     if (isMobileDevice()) {
-      return linkWithRedirect(user, provider);
+      await linkWithRedirect(user, provider);
     } else {
-      return linkWithPopup(user, provider);
+      await linkWithPopup(user, provider);
     }
   } catch (error) {
     console.error("Google 계정 연결 실패:", error);
     
-    const msg = getLocalizedMessage();
-    
+    // Firebase 오류 코드에 따른 사용자 친화적인 메시지 처리
     if (error.code === "auth/credential-already-in-use") {
       // 해당 구글 계정이 이미 다른 Firebase 계정에 연결되어 있는 경우
       const email = error.customData?.email;
@@ -717,7 +719,8 @@ export const linkGoogleAccount = async () => {
     } else if (error.code === "auth/popup-blocked") {
       throw new Error(msg.popupBlocked);
     } else {
-      throw new Error(formatMessage(msg.linkFailedGeneric, {provider: 'Google', message: error.message}));
+      // 다른 모든 Firebase 오류는 사용자 친화적인 메시지로 변환
+      throw new Error(formatMessage(msg.linkFailedGeneric, {provider: 'Google', message: '연결 중 오류가 발생했습니다'}));
     }
   }
 };
@@ -731,21 +734,23 @@ export const linkGithubAccount = async () => {
   const user = auth.currentUser;
 
   if (!user) {
+    const msg = getLocalizedMessage();
     throw new Error("로그인된 사용자가 없습니다");
   }
+
+  const msg = getLocalizedMessage();
 
   try {
     // 모바일에서는 redirect, 데스크톱에서는 팝업 사용
     if (isMobileDevice()) {
-      return linkWithRedirect(user, provider);
+      await linkWithRedirect(user, provider);
     } else {
-      return linkWithPopup(user, provider);
+      await linkWithPopup(user, provider);
     }
   } catch (error) {
     console.error("GitHub 계정 연결 실패:", error);
     
-    const msg = getLocalizedMessage();
-    
+    // Firebase 오류 코드에 따른 사용자 친화적인 메시지 처리
     if (error.code === "auth/credential-already-in-use") {
       // 해당 GitHub 계정이 이미 다른 Firebase 계정에 연결되어 있는 경우
       const email = error.customData?.email;
@@ -773,7 +778,8 @@ export const linkGithubAccount = async () => {
     } else if (error.code === "auth/popup-blocked") {
       throw new Error(msg.popupBlocked);
     } else {
-      throw new Error(formatMessage(msg.linkFailedGeneric, {provider: 'GitHub', message: error.message}));
+      // 다른 모든 Firebase 오류는 사용자 친화적인 메시지로 변환
+      throw new Error(formatMessage(msg.linkFailedGeneric, {provider: 'GitHub', message: '연결 중 오류가 발생했습니다'}));
     }
   }
 };
@@ -787,21 +793,23 @@ export const linkFacebookAccount = async () => {
   const user = auth.currentUser;
 
   if (!user) {
+    const msg = getLocalizedMessage();
     throw new Error("로그인된 사용자가 없습니다");
   }
+
+  const msg = getLocalizedMessage();
 
   try {
     // 모바일에서는 redirect, 데스크톱에서는 팝업 사용
     if (isMobileDevice()) {
-      return linkWithRedirect(user, provider);
+      await linkWithRedirect(user, provider);
     } else {
-      return linkWithPopup(user, provider);
+      await linkWithPopup(user, provider);
     }
   } catch (error) {
     console.error("Facebook 계정 연결 실패:", error);
     
-    const msg = getLocalizedMessage();
-    
+    // Firebase 오류 코드에 따른 사용자 친화적인 메시지 처리
     if (error.code === "auth/credential-already-in-use") {
       // 해당 Facebook 계정이 이미 다른 Firebase 계정에 연결되어 있는 경우
       const email = error.customData?.email;
@@ -829,7 +837,8 @@ export const linkFacebookAccount = async () => {
     } else if (error.code === "auth/popup-blocked") {
       throw new Error(msg.popupBlocked);
     } else {
-      throw new Error(formatMessage(msg.linkFailedGeneric, {provider: 'Facebook', message: error.message}));
+      // 다른 모든 Firebase 오류는 사용자 친화적인 메시지로 변환
+      throw new Error(formatMessage(msg.linkFailedGeneric, {provider: 'Facebook', message: '연결 중 오류가 발생했습니다'}));
     }
   }
 };
