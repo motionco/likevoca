@@ -451,53 +451,64 @@ export const facebookLogin = async () => {
             `1. ${existingMethodText}으로 로그인 후 Facebook 계정 연결\n` +
             `2. 기존 방법으로 로그인`;
 
-          const loginChoice = confirm(manualLoginMessage);
+          // Facebook 자격 증명을 세션에 저장 (직렬화 가능한 형태로)
+          sessionStorage.setItem(
+            "pendingFacebookCredential",
+            JSON.stringify({
+              accessToken: pendingCredential.accessToken,
+              providerId: pendingCredential.providerId
+            })
+          );
+          sessionStorage.setItem("facebookLoginEmail", email);
 
-          if (loginChoice) {
-            // Facebook 자격 증명을 세션에 저장 (직렬화 가능한 형태로)
-            sessionStorage.setItem(
-              "pendingFacebookCredential",
-              JSON.stringify({
-                accessToken: pendingCredential.accessToken,
-                providerId: pendingCredential.providerId
-              })
-            );
-            sessionStorage.setItem("facebookLoginEmail", email);
+          // 사용자에게 안내 메시지 표시
+          alert(
+            `이메일 ${email}은 이미 ${existingMethodText}으로 가입되어 있습니다.\n\n` +
+            `${existingMethodText} 버튼을 클릭하여 로그인하시면, Facebook 계정이 자동으로 연결됩니다.`
+          );
 
-            alert(
-              `${existingMethodText} 로그인 페이지로 이동합니다. 로그인 후 Facebook 계정을 연결할 수 있습니다.`
-            );
+          // Facebook 로그인 버튼 비활성화하고 메시지 표시
+          const facebookBtn = document.getElementById("facebook-login-btn");
+          if (facebookBtn) {
+            facebookBtn.disabled = true;
+            facebookBtn.innerHTML = `${existingMethodText}으로 로그인해주세요`;
+            facebookBtn.style.backgroundColor = "#ccc";
+            facebookBtn.style.cursor = "not-allowed";
+          }
 
-            // 기존 계정 로그인 방법에 따라 적절한 버튼 클릭
-            if (methods && methods.length > 0) {
-              const firstMethod = methods[0];
-              let loginBtn = null;
-              
-              if (firstMethod === "google.com") {
-                loginBtn = document.getElementById("google-login-btn");
-              } else if (firstMethod === "github.com") {
-                loginBtn = document.getElementById("github-login-btn");
-              }
-              
-              if (loginBtn) {
-                loginBtn.click();
-                return null;
-              }
+          // 해당 로그인 방법 버튼 강조
+          if (methods && methods.length > 0) {
+            const firstMethod = methods[0];
+            let loginBtnId = null;
+            
+            if (firstMethod === "google.com") {
+              loginBtnId = "google-login-btn";
+            } else if (firstMethod === "github.com") {
+              loginBtnId = "github-login-btn";
             }
             
-            // 기본적으로 Google 로그인 버튼 시도
-            const googleLoginBtn = document.getElementById("google-login-btn");
-            if (googleLoginBtn) {
-              googleLoginBtn.click();
-              return null;
-            } else {
-              throw new Error(
-                "로그인 버튼을 찾을 수 없습니다. 직접 기존 로그인 방법을 시도해주세요."
-              );
+            if (loginBtnId) {
+              const loginBtn = document.getElementById(loginBtnId);
+              if (loginBtn) {
+                // 버튼 강조 효과
+                loginBtn.style.animation = "pulse 2s infinite";
+                loginBtn.style.boxShadow = "0 0 20px #007bff";
+                
+                // CSS 애니메이션 추가
+                const style = document.createElement('style');
+                style.textContent = `
+                  @keyframes pulse {
+                    0% { transform: scale(1); }
+                    50% { transform: scale(1.05); }
+                    100% { transform: scale(1); }
+                  }
+                `;
+                document.head.appendChild(style);
+              }
             }
-          } else {
-            throw new Error("기존 로그인 방법을 사용해주세요.");
           }
+
+          throw new Error(`${existingMethodText}으로 로그인한 후 Facebook 계정을 연결할 수 있습니다.`);
         } catch (innerError) {
           console.error("로그인 방법 확인 오류:", innerError);
           throw new Error("기존 로그인 방법을 사용해주세요.");

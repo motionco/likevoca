@@ -363,6 +363,30 @@ if (loginForm) {
   }
 });
 
+// Facebook 버튼 초기화 함수
+const initializeFacebookButton = () => {
+  const facebookBtn = document.getElementById("facebook-login-btn");
+  if (facebookBtn && facebookBtn.disabled) {
+    // 버튼 상태 복원
+    facebookBtn.disabled = false;
+    facebookBtn.innerHTML = "Facebook으로 로그인";
+    facebookBtn.style.backgroundColor = "";
+    facebookBtn.style.cursor = "";
+    
+    // 다른 버튼들의 강조 효과 제거
+    ["google-login-btn", "github-login-btn"].forEach(btnId => {
+      const btn = document.getElementById(btnId);
+      if (btn) {
+        btn.style.animation = "";
+        btn.style.boxShadow = "";
+      }
+    });
+  }
+};
+
+// 페이지 로드 시 Facebook 버튼 초기화
+document.addEventListener("DOMContentLoaded", initializeFacebookButton);
+
 // 로그인 상태 체크 - 이미 로그인되어 있으면 홈으로 리디렉션
 onAuthStateChanged(auth, (user) => {
   if (user) {
