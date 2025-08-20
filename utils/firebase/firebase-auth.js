@@ -27,6 +27,89 @@ import {
   getDoc,
 } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 
+// 다국어 지원 메시지
+const getLocalizedMessage = () => {
+  const lang = navigator.language.toLowerCase();
+  
+  const messages = {
+    'ko': {
+      accountLinkFailed: '⚠️ 계정 연결 불가',
+      alreadyInUse: '선택하신 {provider} 계정({email})은 이미 다른 사용자 계정에서 사용 중입니다.',
+      alreadyInUseNoEmail: '선택하신 {provider} 계정은 이미 다른 사용자 계정에서 사용 중입니다.',
+      solutions: '📌 해결 방법:',
+      useAnotherAccount: '• 다른 {provider} 계정을 사용해 주세요',
+      loginDirectly: '• 또는 해당 {provider} 계정으로 직접 로그인해 주세요',
+      securityNote: '💡 참고: 보안상 하나의 이메일은 하나의 계정에만 연결할 수 있습니다.',
+      alreadyLinked: '{provider} 계정이 이미 연결되어 있습니다.',
+      popupClosed: '팝업이 닫혔습니다. 다시 시도해주세요.',
+      popupBlocked: '팝업이 차단되었습니다. 팝업 차단을 해제하고 다시 시도해주세요.',
+      linkFailedGeneric: '{provider} 계정 연결에 실패했습니다: {message}'
+    },
+    'en': {
+      accountLinkFailed: '⚠️ Account Link Failed',
+      alreadyInUse: 'The selected {provider} account ({email}) is already in use by another user account.',
+      alreadyInUseNoEmail: 'The selected {provider} account is already in use by another user account.',
+      solutions: '📌 Solutions:',
+      useAnotherAccount: '• Please use a different {provider} account',
+      loginDirectly: '• Or log in directly with that {provider} account',
+      securityNote: '💡 Note: For security reasons, one email can only be linked to one account.',
+      alreadyLinked: '{provider} account is already linked.',
+      popupClosed: 'Popup was closed. Please try again.',
+      popupBlocked: 'Popup was blocked. Please disable popup blocker and try again.',
+      linkFailedGeneric: '{provider} account linking failed: {message}'
+    },
+    'zh': {
+      accountLinkFailed: '⚠️ 账户关联失败',
+      alreadyInUse: '所选的 {provider} 账户 ({email}) 已被其他用户账户使用。',
+      alreadyInUseNoEmail: '所选的 {provider} 账户已被其他用户账户使用。',
+      solutions: '📌 解决方案：',
+      useAnotherAccount: '• 请使用其他 {provider} 账户',
+      loginDirectly: '• 或直接使用该 {provider} 账户登录',
+      securityNote: '💡 注意：出于安全考虑，一个邮箱只能关联一个账户。',
+      alreadyLinked: '{provider} 账户已经关联。',
+      popupClosed: '弹窗已关闭。请重试。',
+      popupBlocked: '弹窗被阻止。请禁用弹窗阻止器后重试。',
+      linkFailedGeneric: '{provider} 账户关联失败：{message}'
+    },
+    'ja': {
+      accountLinkFailed: '⚠️ アカウント連携失敗',
+      alreadyInUse: '選択された {provider} アカウント ({email}) は既に他のユーザーアカウントで使用されています。',
+      alreadyInUseNoEmail: '選択された {provider} アカウントは既に他のユーザーアカウントで使用されています。',
+      solutions: '📌 解決方法：',
+      useAnotherAccount: '• 別の {provider} アカウントをご使用ください',
+      loginDirectly: '• またはその {provider} アカウントで直接ログインしてください',
+      securityNote: '💡 注意：セキュリティ上、1つのメールアドレスは1つのアカウントにのみ連携できます。',
+      alreadyLinked: '{provider} アカウントは既に連携されています。',
+      popupClosed: 'ポップアップが閉じられました。再試行してください。',
+      popupBlocked: 'ポップアップがブロックされました。ポップアップブロッカーを無効にして再試行してください。',
+      linkFailedGeneric: '{provider} アカウント連携に失敗しました：{message}'
+    },
+    'es': {
+      accountLinkFailed: '⚠️ Error al Vincular Cuenta',
+      alreadyInUse: 'La cuenta de {provider} seleccionada ({email}) ya está siendo utilizada por otra cuenta de usuario.',
+      alreadyInUseNoEmail: 'La cuenta de {provider} seleccionada ya está siendo utilizada por otra cuenta de usuario.',
+      solutions: '📌 Soluciones:',
+      useAnotherAccount: '• Por favor use una cuenta de {provider} diferente',
+      loginDirectly: '• O inicie sesión directamente con esa cuenta de {provider}',
+      securityNote: '💡 Nota: Por razones de seguridad, un email solo puede estar vinculado a una cuenta.',
+      alreadyLinked: 'La cuenta de {provider} ya está vinculada.',
+      popupClosed: 'La ventana emergente se cerró. Inténtelo de nuevo.',
+      popupBlocked: 'La ventana emergente fue bloqueada. Desactive el bloqueador de ventanas emergentes e inténtelo de nuevo.',
+      linkFailedGeneric: 'Error al vincular cuenta de {provider}: {message}'
+    }
+  };
+
+  // 언어 코드에서 기본 언어 추출 (예: ko-KR -> ko)
+  const baseLang = lang.split('-')[0];
+  
+  return messages[baseLang] || messages['en']; // 기본값은 영어
+};
+
+// 메시지 템플릿 처리 함수
+const formatMessage = (template, params = {}) => {
+  return template.replace(/\{(\w+)\}/g, (match, key) => params[key] || match);
+};
+
 // Firebase가 초기화되었는지 확인하는 함수
 function checkFirebaseInitialized() {
   if (!auth || !db) {
@@ -605,34 +688,36 @@ export const linkGoogleAccount = async () => {
   } catch (error) {
     console.error("Google 계정 연결 실패:", error);
     
+    const msg = getLocalizedMessage();
+    
     if (error.code === "auth/credential-already-in-use") {
       // 해당 구글 계정이 이미 다른 Firebase 계정에 연결되어 있는 경우
       const email = error.customData?.email;
       if (email) {
-        throw new Error(
-          `⚠️ 계정 연결 불가\n\n` +
-          `선택하신 Google 계정(${email})은 이미 다른 사용자 계정에서 사용 중입니다.\n\n` +
-          `📌 해결 방법:\n` +
-          `• 다른 Google 계정을 사용해 주세요\n` +
-          `• 또는 해당 Google 계정으로 직접 로그인해 주세요\n\n` +
-          `💡 참고: 보안상 하나의 이메일은 하나의 계정에만 연결할 수 있습니다.`
-        );
+        const message = 
+          `${msg.accountLinkFailed}\n\n` +
+          `${formatMessage(msg.alreadyInUse, {provider: 'Google', email})}\n\n` +
+          `${msg.solutions}\n` +
+          `${formatMessage(msg.useAnotherAccount, {provider: 'Google'})}\n` +
+          `${formatMessage(msg.loginDirectly, {provider: 'Google'})}\n\n` +
+          `${msg.securityNote}`;
+        throw new Error(message);
       } else {
-        throw new Error(
-          `⚠️ 계정 연결 불가\n\n` +
-          `선택하신 Google 계정은 이미 다른 사용자 계정에서 사용 중입니다.\n\n` +
-          `📌 다른 Google 계정을 선택해 주세요.\n\n` +
-          `💡 참고: 보안상 하나의 이메일은 하나의 계정에만 연결할 수 있습니다.`
-        );
+        const message = 
+          `${msg.accountLinkFailed}\n\n` +
+          `${formatMessage(msg.alreadyInUseNoEmail, {provider: 'Google'})}\n\n` +
+          `${formatMessage(msg.useAnotherAccount, {provider: 'Google'})}\n\n` +
+          `${msg.securityNote}`;
+        throw new Error(message);
       }
     } else if (error.code === "auth/provider-already-linked") {
-      throw new Error("Google 계정이 이미 연결되어 있습니다.");
+      throw new Error(formatMessage(msg.alreadyLinked, {provider: 'Google'}));
     } else if (error.code === "auth/popup-closed-by-user") {
-      throw new Error("팝업이 닫혔습니다. 다시 시도해주세요.");
+      throw new Error(msg.popupClosed);
     } else if (error.code === "auth/popup-blocked") {
-      throw new Error("팝업이 차단되었습니다. 팝업 차단을 해제하고 다시 시도해주세요.");
+      throw new Error(msg.popupBlocked);
     } else {
-      throw new Error(`Google 계정 연결에 실패했습니다: ${error.message}`);
+      throw new Error(formatMessage(msg.linkFailedGeneric, {provider: 'Google', message: error.message}));
     }
   }
 };
@@ -659,34 +744,36 @@ export const linkGithubAccount = async () => {
   } catch (error) {
     console.error("GitHub 계정 연결 실패:", error);
     
+    const msg = getLocalizedMessage();
+    
     if (error.code === "auth/credential-already-in-use") {
       // 해당 GitHub 계정이 이미 다른 Firebase 계정에 연결되어 있는 경우
       const email = error.customData?.email;
       if (email) {
-        throw new Error(
-          `⚠️ 계정 연결 불가\n\n` +
-          `선택하신 GitHub 계정(${email})은 이미 다른 사용자 계정에서 사용 중입니다.\n\n` +
-          `📌 해결 방법:\n` +
-          `• 다른 GitHub 계정을 사용해 주세요\n` +
-          `• 또는 해당 GitHub 계정으로 직접 로그인해 주세요\n\n` +
-          `💡 참고: 보안상 하나의 이메일은 하나의 계정에만 연결할 수 있습니다.`
-        );
+        const message = 
+          `${msg.accountLinkFailed}\n\n` +
+          `${formatMessage(msg.alreadyInUse, {provider: 'GitHub', email})}\n\n` +
+          `${msg.solutions}\n` +
+          `${formatMessage(msg.useAnotherAccount, {provider: 'GitHub'})}\n` +
+          `${formatMessage(msg.loginDirectly, {provider: 'GitHub'})}\n\n` +
+          `${msg.securityNote}`;
+        throw new Error(message);
       } else {
-        throw new Error(
-          `⚠️ 계정 연결 불가\n\n` +
-          `선택하신 GitHub 계정은 이미 다른 사용자 계정에서 사용 중입니다.\n\n` +
-          `📌 다른 GitHub 계정을 선택해 주세요.\n\n` +
-          `💡 참고: 보안상 하나의 이메일은 하나의 계정에만 연결할 수 있습니다.`
-        );
+        const message = 
+          `${msg.accountLinkFailed}\n\n` +
+          `${formatMessage(msg.alreadyInUseNoEmail, {provider: 'GitHub'})}\n\n` +
+          `${formatMessage(msg.useAnotherAccount, {provider: 'GitHub'})}\n\n` +
+          `${msg.securityNote}`;
+        throw new Error(message);
       }
     } else if (error.code === "auth/provider-already-linked") {
-      throw new Error("GitHub 계정이 이미 연결되어 있습니다.");
+      throw new Error(formatMessage(msg.alreadyLinked, {provider: 'GitHub'}));
     } else if (error.code === "auth/popup-closed-by-user") {
-      throw new Error("팝업이 닫혔습니다. 다시 시도해주세요.");
+      throw new Error(msg.popupClosed);
     } else if (error.code === "auth/popup-blocked") {
-      throw new Error("팝업이 차단되었습니다. 팝업 차단을 해제하고 다시 시도해주세요.");
+      throw new Error(msg.popupBlocked);
     } else {
-      throw new Error(`GitHub 계정 연결에 실패했습니다: ${error.message}`);
+      throw new Error(formatMessage(msg.linkFailedGeneric, {provider: 'GitHub', message: error.message}));
     }
   }
 };
@@ -713,34 +800,36 @@ export const linkFacebookAccount = async () => {
   } catch (error) {
     console.error("Facebook 계정 연결 실패:", error);
     
+    const msg = getLocalizedMessage();
+    
     if (error.code === "auth/credential-already-in-use") {
       // 해당 Facebook 계정이 이미 다른 Firebase 계정에 연결되어 있는 경우
       const email = error.customData?.email;
       if (email) {
-        throw new Error(
-          `⚠️ 계정 연결 불가\n\n` +
-          `선택하신 Facebook 계정(${email})은 이미 다른 사용자 계정에서 사용 중입니다.\n\n` +
-          `📌 해결 방법:\n` +
-          `• 다른 Facebook 계정을 사용해 주세요\n` +
-          `• 또는 해당 Facebook 계정으로 직접 로그인해 주세요\n\n` +
-          `💡 참고: 보안상 하나의 이메일은 하나의 계정에만 연결할 수 있습니다.`
-        );
+        const message = 
+          `${msg.accountLinkFailed}\n\n` +
+          `${formatMessage(msg.alreadyInUse, {provider: 'Facebook', email})}\n\n` +
+          `${msg.solutions}\n` +
+          `${formatMessage(msg.useAnotherAccount, {provider: 'Facebook'})}\n` +
+          `${formatMessage(msg.loginDirectly, {provider: 'Facebook'})}\n\n` +
+          `${msg.securityNote}`;
+        throw new Error(message);
       } else {
-        throw new Error(
-          `⚠️ 계정 연결 불가\n\n` +
-          `선택하신 Facebook 계정은 이미 다른 사용자 계정에서 사용 중입니다.\n\n` +
-          `📌 다른 Facebook 계정을 선택해 주세요.\n\n` +
-          `💡 참고: 보안상 하나의 이메일은 하나의 계정에만 연결할 수 있습니다.`
-        );
+        const message = 
+          `${msg.accountLinkFailed}\n\n` +
+          `${formatMessage(msg.alreadyInUseNoEmail, {provider: 'Facebook'})}\n\n` +
+          `${formatMessage(msg.useAnotherAccount, {provider: 'Facebook'})}\n\n` +
+          `${msg.securityNote}`;
+        throw new Error(message);
       }
     } else if (error.code === "auth/provider-already-linked") {
-      throw new Error("Facebook 계정이 이미 연결되어 있습니다.");
+      throw new Error(formatMessage(msg.alreadyLinked, {provider: 'Facebook'}));
     } else if (error.code === "auth/popup-closed-by-user") {
-      throw new Error("팝업이 닫혔습니다. 다시 시도해주세요.");
+      throw new Error(msg.popupClosed);
     } else if (error.code === "auth/popup-blocked") {
-      throw new Error("팝업이 차단되었습니다. 팝업 차단을 해제하고 다시 시도해주세요.");
+      throw new Error(msg.popupBlocked);
     } else {
-      throw new Error(`Facebook 계정 연결에 실패했습니다: ${error.message}`);
+      throw new Error(formatMessage(msg.linkFailedGeneric, {provider: 'Facebook', message: error.message}));
     }
   }
 };
