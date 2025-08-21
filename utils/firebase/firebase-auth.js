@@ -166,21 +166,19 @@ export const googleLogin = async () => {
     provider.addScope("email");
     provider.addScope("profile");
 
-    // Google 팝업을 열어서 credential만 획득 (실제 로그인은 하지 않음)
     const result = await signInWithPopup(auth, provider);
-    const credential = GoogleAuthProvider.credentialFromResult(result);
-    const email = result.user.email;
+    const user = result.user;
+    const email = user.email;
 
-    // 즉시 로그아웃하여 자동 로그인 취소
-    await signOut(auth);
-
-    // 기존 계정 확인
+    // 로그인 직후 즉시 기존 계정 확인
     if (email) {
       try {
         const methods = await fetchSignInMethodsForEmail(auth, email);
+        // 현재 로그인한 Google 계정 외의 다른 제공자가 있는지 확인
         const nonGoogleMethods = methods.filter(method => method !== "google.com");
         
         if (nonGoogleMethods.length > 0) {
+          // 다른 제공자로 이미 가입된 계정이 있음
           const firstMethod = nonGoogleMethods[0];
           let existingMethodText = "다른 로그인 방법";
           
@@ -192,6 +190,20 @@ export const googleLogin = async () => {
             existingMethodText = "이메일/비밀번호";
           }
 
+          // 계정이 자동으로 생성된 경우, 계정을 삭제하여 원상태로 복구
+          try {
+            // 현재 로그인한 사용자를 삭제 (Google 제공자만 새로 추가된 경우)
+            if (user && result._tokenResponse?.isNewUser) {
+              await user.delete();
+            } else {
+              // 기존 계정에 자동 연결된 경우, 로그아웃만 수행
+              await signOut(auth);
+            }
+          } catch (deleteError) {
+            // 삭제에 실패해도 로그아웃은 수행
+            await signOut(auth);
+          }
+          
           throw new Error(
             `이 이메일 (${email})은 이미 ${existingMethodText}으로 가입되어 있습니다. ${existingMethodText}으로 로그인해주세요.`
           );
@@ -204,17 +216,10 @@ export const googleLogin = async () => {
       }
     }
 
-    // 기존 계정이 없으면 credential로 수동 로그인
-    if (credential) {
-      const finalResult = await signInWithCredential(auth, credential);
-      await saveUserData(finalResult.user);
-      return finalResult.user;
-    } else {
-      // credential이 없으면 다시 팝업으로 로그인
-      const retryResult = await signInWithPopup(auth, provider);
-      await saveUserData(retryResult.user);
-      return retryResult.user;
-    }
+    // 기존 계정이 없으면 정상 로그인 처리
+    await saveUserData(user);
+    return user;
+    
   } catch (error) {
     if (error.code === "auth/account-exists-with-different-credential") {
       // 같은 이메일을 사용하는 다른 인증 방법으로 이미 계정이 있는 경우
