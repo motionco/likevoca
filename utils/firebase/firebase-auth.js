@@ -45,7 +45,8 @@ const getLocalizedMessage = () => {
       alreadyLinked: '{provider} 계정이 이미 연결되어 있습니다.',
       popupClosed: '팝업이 닫혔습니다. 다시 시도해주세요.',
       popupBlocked: '팝업이 차단되었습니다. 팝업 차단을 해제하고 다시 시도해주세요.',
-      linkFailed: '{provider} 계정 연결 중 오류가 발생했습니다.'
+      linkFailed: '{provider} 계정 연결 중 오류가 발생했습니다.',
+      emailMismatch: '연결하려는 {provider} 계정의 이메일 ({providerEmail})이 현재 계정의 이메일 ({currentEmail})과 다릅니다. 같은 이메일의 {provider} 계정을 사용해주세요.'
     },
     'en': {
       credentialInUse: 'This {provider} account is already in use by another account. Please use a different {provider} account.',
@@ -53,7 +54,8 @@ const getLocalizedMessage = () => {
       alreadyLinked: '{provider} account is already linked.',
       popupClosed: 'Popup was closed. Please try again.',
       popupBlocked: 'Popup was blocked. Please disable popup blocker and try again.',
-      linkFailed: 'An error occurred while linking {provider} account.'
+      linkFailed: 'An error occurred while linking {provider} account.',
+      emailMismatch: 'The email of the {provider} account you are trying to link ({providerEmail}) differs from your current account email ({currentEmail}). Please use a {provider} account with the same email.'
     },
     'zh': {
       credentialInUse: '此 {provider} 账户已被其他账户使用。请使用其他 {provider} 账户。',
@@ -61,7 +63,8 @@ const getLocalizedMessage = () => {
       alreadyLinked: '{provider} 账户已关联。',
       popupClosed: '弹窗已关闭。请重试。',
       popupBlocked: '弹窗被阻止。请禁用弹窗阻止器后重试。',
-      linkFailed: '关联 {provider} 账户时发生错误。'
+      linkFailed: '关联 {provider} 账户时发生错误。',
+      emailMismatch: '您要关联的 {provider} 账户邮箱 ({providerEmail}) 与当前账户邮箱 ({currentEmail}) 不同。请使用相同邮箱的 {provider} 账户。'
     },
     'ja': {
       credentialInUse: 'この {provider} アカウントは既に他のアカウントで使用されています。別の {provider} アカウントをご使用ください。',
@@ -69,7 +72,8 @@ const getLocalizedMessage = () => {
       alreadyLinked: '{provider} アカウントは既に連携されています。',
       popupClosed: 'ポップアップが閉じられました。再試行してください。',
       popupBlocked: 'ポップアップがブロックされました。ポップアップブロッカーを無効にして再試行してください。',
-      linkFailed: '{provider} アカウント連携中にエラーが発生しました。'
+      linkFailed: '{provider} アカウント連携中にエラーが発生しました。',
+      emailMismatch: '連携しようとしている {provider} アカウントのメールアドレス ({providerEmail}) が現在のアカウントのメールアドレス ({currentEmail}) と異なります。同じメールアドレスの {provider} アカウントをご使用ください。'
     },
     'es': {
       credentialInUse: 'Esta cuenta de {provider} ya está siendo utilizada por otra cuenta. Por favor use una cuenta de {provider} diferente.',
@@ -77,7 +81,8 @@ const getLocalizedMessage = () => {
       alreadyLinked: 'La cuenta de {provider} ya está vinculada.',
       popupClosed: 'La ventana emergente se cerró. Inténtelo de nuevo.',
       popupBlocked: 'La ventana emergente fue bloqueada. Desactive el bloqueador de ventanas emergentes e inténtelo de nuevo.',
-      linkFailed: 'Se produjo un error al vincular la cuenta de {provider}.'
+      linkFailed: 'Se produjo un error al vincular la cuenta de {provider}.',
+      emailMismatch: 'El email de la cuenta de {provider} que intenta vincular ({providerEmail}) es diferente al email de su cuenta actual ({currentEmail}). Por favor use una cuenta de {provider} con el mismo email.'
     }
   };
 
@@ -423,12 +428,32 @@ export const linkGoogleAccount = async () => {
 
   try {
     // 모바일에서는 redirect, 데스크톱에서는 팝업 사용
+    let result;
     if (isMobileDevice()) {
-      await linkWithRedirect(user, provider);
+      result = await linkWithRedirect(user, provider);
     } else {
-      await linkWithPopup(user, provider);
+      result = await linkWithPopup(user, provider);
+    }
+
+    // 연결된 계정의 이메일과 현재 사용자 이메일 비교
+    if (result && result.user) {
+      const linkedProviderData = result.user.providerData.find(p => p.providerId === 'google.com');
+      if (linkedProviderData && linkedProviderData.email !== user.email) {
+        // 이메일이 다르면 연결 해제하고 에러 표시
+        await unlink(user, 'google.com');
+        throw new Error(formatMessage(msg.emailMismatch, {
+          provider: 'Google',
+          providerEmail: linkedProviderData.email,
+          currentEmail: user.email
+        }));
+      }
     }
   } catch (error) {
+    // 사용자가 직접 발생시킨 이메일 불일치 에러는 그대로 전달
+    if (error.message && error.message.includes('다릅니다')) {
+      throw error;
+    }
+
     // Firebase 오류 코드에 따른 사용자 친화적인 메시지 처리
     if (error.code === "auth/credential-already-in-use") {
       // 해당 구글 계정이 이미 다른 Firebase 계정에 연결되어 있는 경우
@@ -468,12 +493,32 @@ export const linkGithubAccount = async () => {
 
   try {
     // 모바일에서는 redirect, 데스크톱에서는 팝업 사용
+    let result;
     if (isMobileDevice()) {
-      await linkWithRedirect(user, provider);
+      result = await linkWithRedirect(user, provider);
     } else {
-      await linkWithPopup(user, provider);
+      result = await linkWithPopup(user, provider);
+    }
+
+    // 연결된 계정의 이메일과 현재 사용자 이메일 비교
+    if (result && result.user) {
+      const linkedProviderData = result.user.providerData.find(p => p.providerId === 'github.com');
+      if (linkedProviderData && linkedProviderData.email !== user.email) {
+        // 이메일이 다르면 연결 해제하고 에러 표시
+        await unlink(user, 'github.com');
+        throw new Error(formatMessage(msg.emailMismatch, {
+          provider: 'GitHub',
+          providerEmail: linkedProviderData.email,
+          currentEmail: user.email
+        }));
+      }
     }
   } catch (error) {
+    // 사용자가 직접 발생시킨 이메일 불일치 에러는 그대로 전달
+    if (error.message && error.message.includes('다릅니다')) {
+      throw error;
+    }
+
     // Firebase 오류 코드에 따른 사용자 친화적인 메시지 처리
     if (error.code === "auth/credential-already-in-use") {
       // 해당 GitHub 계정이 이미 다른 Firebase 계정에 연결되어 있는 경우
@@ -513,12 +558,32 @@ export const linkFacebookAccount = async () => {
 
   try {
     // 모바일에서는 redirect, 데스크톱에서는 팝업 사용
+    let result;
     if (isMobileDevice()) {
-      await linkWithRedirect(user, provider);
+      result = await linkWithRedirect(user, provider);
     } else {
-      await linkWithPopup(user, provider);
+      result = await linkWithPopup(user, provider);
+    }
+
+    // 연결된 계정의 이메일과 현재 사용자 이메일 비교
+    if (result && result.user) {
+      const linkedProviderData = result.user.providerData.find(p => p.providerId === 'facebook.com');
+      if (linkedProviderData && linkedProviderData.email !== user.email) {
+        // 이메일이 다르면 연결 해제하고 에러 표시
+        await unlink(user, 'facebook.com');
+        throw new Error(formatMessage(msg.emailMismatch, {
+          provider: 'Facebook',
+          providerEmail: linkedProviderData.email,
+          currentEmail: user.email
+        }));
+      }
     }
   } catch (error) {
+    // 사용자가 직접 발생시킨 이메일 불일치 에러는 그대로 전달
+    if (error.message && error.message.includes('다릅니다')) {
+      throw error;
+    }
+
     // Firebase 오류 코드에 따른 사용자 친화적인 메시지 처리
     if (error.code === "auth/credential-already-in-use") {
       // 해당 Facebook 계정이 이미 다른 Firebase 계정에 연결되어 있는 경우
