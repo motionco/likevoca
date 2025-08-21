@@ -165,61 +165,19 @@ export const googleLogin = async () => {
     });
     provider.addScope("email");
     provider.addScope("profile");
+    
+    // Google의 자동 계정 연결 방지를 위한 설정
+    // Firebase 프로젝트에서 자동 연결이 비활성화되어야 함
 
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
-    const email = user.email;
 
-    // 로그인 직후 즉시 기존 계정 확인
-    if (email) {
-      try {
-        const methods = await fetchSignInMethodsForEmail(auth, email);
-        // 현재 로그인한 Google 계정 외의 다른 제공자가 있는지 확인
-        const nonGoogleMethods = methods.filter(method => method !== "google.com");
-        
-        if (nonGoogleMethods.length > 0) {
-          // 다른 제공자로 이미 가입된 계정이 있음
-          const firstMethod = nonGoogleMethods[0];
-          let existingMethodText = "다른 로그인 방법";
-          
-          if (firstMethod === "facebook.com") {
-            existingMethodText = "Facebook 계정";
-          } else if (firstMethod === "github.com") {
-            existingMethodText = "GitHub 계정";
-          } else if (firstMethod === "password") {
-            existingMethodText = "이메일/비밀번호";
-          }
-
-          // 계정이 자동으로 생성된 경우, 계정을 삭제하여 원상태로 복구
-          try {
-            // 현재 로그인한 사용자를 삭제 (Google 제공자만 새로 추가된 경우)
-            if (user && result._tokenResponse?.isNewUser) {
-              await user.delete();
-            } else {
-              // 기존 계정에 자동 연결된 경우, 로그아웃만 수행
-              await signOut(auth);
-            }
-          } catch (deleteError) {
-            // 삭제에 실패해도 로그아웃은 수행
-            await signOut(auth);
-          }
-          
-          throw new Error(
-            `이 이메일 (${email})은 이미 ${existingMethodText}으로 가입되어 있습니다. ${existingMethodText}으로 로그인해주세요.`
-          );
-        }
-      } catch (methodError) {
-        if (methodError.message.includes("이미")) {
-          throw methodError;
-        }
-        // fetchSignInMethodsForEmail 오류는 무시하고 계속 진행
-      }
-    }
-
-    // 기존 계정이 없으면 정상 로그인 처리
     await saveUserData(user);
+
+    // 계정 연결 로직은 프로필 페이지에서만 처리
+    // 로그인 시에는 자동 연동하지 않음
+
     return user;
-    
   } catch (error) {
     if (error.code === "auth/account-exists-with-different-credential") {
       // 같은 이메일을 사용하는 다른 인증 방법으로 이미 계정이 있는 경우
