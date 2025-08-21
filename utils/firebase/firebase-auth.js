@@ -46,7 +46,10 @@ const getLocalizedMessage = () => {
       popupClosed: '팝업이 닫혔습니다. 다시 시도해주세요.',
       popupBlocked: '팝업이 차단되었습니다. 팝업 차단을 해제하고 다시 시도해주세요.',
       linkFailed: '{provider} 계정 연결 중 오류가 발생했습니다.',
-      emailMismatch: '연결하려는 {provider} 계정의 이메일 ({providerEmail})이 현재 계정의 이메일 ({currentEmail})과 다릅니다. 같은 이메일의 {provider} 계정을 사용해주세요.'
+      emailMismatch: '연결하려는 {provider} 계정의 이메일 ({providerEmail})이 현재 계정의 이메일 ({currentEmail})과 다릅니다. 같은 이메일의 {provider} 계정을 사용해주세요.',
+      emailAlreadyInUse: '이 이메일 ({email})은 이미 다른 로그인 방법으로 가입되어 있습니다. 다른 로그인 방법으로 로그인해주세요.',
+      userNotFound: '이 이메일 ({email})로 가입된 회원정보가 없습니다.',
+      existingProvider: '이 이메일 ({email})은 이미 {provider}으로 가입되어 있습니다. {provider}으로 로그인해주세요.'
     },
     'en': {
       credentialInUse: 'This {provider} account is already in use by another account. Please use a different {provider} account.',
@@ -55,7 +58,10 @@ const getLocalizedMessage = () => {
       popupClosed: 'Popup was closed. Please try again.',
       popupBlocked: 'Popup was blocked. Please disable popup blocker and try again.',
       linkFailed: 'An error occurred while linking {provider} account.',
-      emailMismatch: 'The email of the {provider} account you are trying to link ({providerEmail}) differs from your current account email ({currentEmail}). Please use a {provider} account with the same email.'
+      emailMismatch: 'The email of the {provider} account you are trying to link ({providerEmail}) differs from your current account email ({currentEmail}). Please use a {provider} account with the same email.',
+      emailAlreadyInUse: 'This email ({email}) is already registered with a different login method. Please sign in with the existing login method.',
+      userNotFound: 'No account found with this email ({email}).',
+      existingProvider: 'This email ({email}) is already registered with {provider}. Please sign in with {provider}.'
     },
     'zh': {
       credentialInUse: '此 {provider} 账户已被其他账户使用。请使用其他 {provider} 账户。',
@@ -64,7 +70,10 @@ const getLocalizedMessage = () => {
       popupClosed: '弹窗已关闭。请重试。',
       popupBlocked: '弹窗被阻止。请禁用弹窗阻止器后重试。',
       linkFailed: '关联 {provider} 账户时发生错误。',
-      emailMismatch: '您要关联的 {provider} 账户邮箱 ({providerEmail}) 与当前账户邮箱 ({currentEmail}) 不同。请使用相同邮箱的 {provider} 账户。'
+      emailMismatch: '您要关联的 {provider} 账户邮箱 ({providerEmail}) 与当前账户邮箱 ({currentEmail}) 不同。请使用相同邮箱的 {provider} 账户。',
+      emailAlreadyInUse: '此邮箱 ({email}) 已使用其他登录方式注册。请使用现有的登录方式登录。',
+      userNotFound: '未找到此邮箱 ({email}) 的注册信息。',
+      existingProvider: '此邮箱 ({email}) 已使用 {provider} 注册。请使用 {provider} 登录。'
     },
     'ja': {
       credentialInUse: 'この {provider} アカウントは既に他のアカウントで使用されています。別の {provider} アカウントをご使用ください。',
@@ -73,7 +82,10 @@ const getLocalizedMessage = () => {
       popupClosed: 'ポップアップが閉じられました。再試行してください。',
       popupBlocked: 'ポップアップがブロックされました。ポップアップブロッカーを無効にして再試行してください。',
       linkFailed: '{provider} アカウント連携中にエラーが発生しました。',
-      emailMismatch: '連携しようとしている {provider} アカウントのメールアドレス ({providerEmail}) が現在のアカウントのメールアドレス ({currentEmail}) と異なります。同じメールアドレスの {provider} アカウントをご使用ください。'
+      emailMismatch: '連携しようとしている {provider} アカウントのメールアドレス ({providerEmail}) が現在のアカウントのメールアドレス ({currentEmail}) と異なります。同じメールアドレスの {provider} アカウントをご使用ください。',
+      emailAlreadyInUse: 'このメールアドレス ({email}) は既に他のログイン方法で登録されています。既存のログイン方法でログインしてください。',
+      userNotFound: 'このメールアドレス ({email}) で登録された情報が見つかりません。',
+      existingProvider: 'このメールアドレス ({email}) は既に {provider} で登録されています。{provider} でログインしてください。'
     },
     'es': {
       credentialInUse: 'Esta cuenta de {provider} ya está siendo utilizada por otra cuenta. Por favor use una cuenta de {provider} diferente.',
@@ -82,7 +94,10 @@ const getLocalizedMessage = () => {
       popupClosed: 'La ventana emergente se cerró. Inténtelo de nuevo.',
       popupBlocked: 'La ventana emergente fue bloqueada. Desactive el bloqueador de ventanas emergentes e inténtelo de nuevo.',
       linkFailed: 'Se produjo un error al vincular la cuenta de {provider}.',
-      emailMismatch: 'El email de la cuenta de {provider} que intenta vincular ({providerEmail}) es diferente al email de su cuenta actual ({currentEmail}). Por favor use una cuenta de {provider} con el mismo email.'
+      emailMismatch: 'El email de la cuenta de {provider} que intenta vincular ({providerEmail}) es diferente al email de su cuenta actual ({currentEmail}). Por favor use una cuenta de {provider} con el mismo email.',
+      emailAlreadyInUse: 'Este email ({email}) ya está registrado con un método de inicio de sesión diferente. Por favor inicie sesión con el método existente.',
+      userNotFound: 'No se encontró ninguna cuenta con este email ({email}).',
+      existingProvider: 'Este email ({email}) ya está registrado con {provider}. Por favor inicie sesión con {provider}.'
     }
   };
 
@@ -109,25 +124,35 @@ function checkFirebaseInitialized() {
 // 회원가입 함수
 export const signup = async (email, password, displayName) => {
   checkFirebaseInitialized();
+  const msg = getLocalizedMessage();
 
-  const userCredential = await createUserWithEmailAndPassword(
-    auth,
-    email,
-    password
-  );
+  try {
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
 
-  await updateProfile(userCredential.user, {
-    displayName: displayName,
-  });
+    await updateProfile(userCredential.user, {
+      displayName: displayName,
+    });
 
-  await sendEmailVerification(userCredential.user);
+    await sendEmailVerification(userCredential.user);
 
-  return userCredential.user;
+    return userCredential.user;
+  } catch (error) {
+    if (error.code === "auth/email-already-in-use") {
+      throw new Error(formatMessage(msg.emailAlreadyInUse, { email }));
+    } else {
+      throw error;
+    }
+  }
 };
 
 // 로그인 함수
 export const login = async (email, password) => {
   checkFirebaseInitialized();
+  const msg = getLocalizedMessage();
 
   try {
     const userCredential = await signInWithEmailAndPassword(
@@ -143,7 +168,43 @@ export const login = async (email, password) => {
     return userCredential.user;
   } catch (error) {
     if (error.code === "auth/invalid-credential") {
-      throw new Error("이메일 또는 비밀번호가 올바르지 않습니다.");
+      // 이메일이 다른 제공자로 가입되어 있는지 확인
+      try {
+        const methods = await fetchSignInMethodsForEmail(auth, email);
+        
+        if (methods && methods.length > 0) {
+          // 다른 제공자로 가입된 경우
+          const firstMethod = methods[0];
+          if (firstMethod !== "password") {
+            let providerText = "다른 로그인 방법";
+            
+            if (firstMethod === "google.com") {
+              providerText = "Google 계정";
+            } else if (firstMethod === "facebook.com") {
+              providerText = "Facebook 계정";
+            } else if (firstMethod === "github.com") {
+              providerText = "GitHub 계정";
+            }
+
+            throw new Error(formatMessage(msg.existingProvider, {
+              email,
+              provider: providerText
+            }));
+          } else {
+            // 이메일/비밀번호 계정이지만 비밀번호가 틀린 경우
+            throw new Error("이메일 또는 비밀번호가 올바르지 않습니다.");
+          }
+        } else {
+          // 가입되지 않은 이메일
+          throw new Error(formatMessage(msg.userNotFound, { email }));
+        }
+      } catch (fetchError) {
+        // fetchSignInMethodsForEmail 실패 시 기본 메시지
+        if (fetchError.message.includes('가입된') || fetchError.message.includes('이미')) {
+          throw fetchError; // 이미 처리된 메시지는 그대로 전달
+        }
+        throw new Error("이메일 또는 비밀번호가 올바르지 않습니다.");
+      }
     } else if (error.code === "auth/too-many-requests") {
       throw new Error(
         "너무 많은 로그인 시도가 있었습니다. 잠시 후 다시 시도해주세요."
