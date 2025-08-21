@@ -156,6 +156,7 @@ export const resetPassword = async (email) => {
 
 export const googleLogin = async () => {
   checkFirebaseInitialized();
+  const msg = getLocalizedMessage();
 
   try {
     const provider = new GoogleAuthProvider();
@@ -164,186 +165,99 @@ export const googleLogin = async () => {
     });
     provider.addScope("email");
     provider.addScope("profile");
+    
+    // Google의 자동 계정 연결 방지를 위한 설정
+    // Firebase 프로젝트에서 자동 연결이 비활성화되어야 함
 
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
+    const email = user.email;
+
+    // Google 로그인 성공 후 즉시 다른 제공자 확인
+    if (email) {
+      try {
+        const methods = await fetchSignInMethodsForEmail(auth, email);
+        // Google 외의 다른 제공자가 있는지 확인
+        const nonGoogleMethods = methods.filter(method => method !== "google.com");
+        
+        if (nonGoogleMethods.length > 0) {
+          // 다른 제공자로 이미 가입된 계정이 있음 - 로그아웃하고 에러 표시
+          const firstMethod = nonGoogleMethods[0];
+          let existingMethodText = "다른 로그인 방법";
+          
+          if (firstMethod === "facebook.com") {
+            existingMethodText = "Facebook 계정";
+          } else if (firstMethod === "github.com") {
+            existingMethodText = "GitHub 계정";
+          } else if (firstMethod === "password") {
+            existingMethodText = "이메일/비밀번호";
+          }
+
+          // 자동 연결된 상태를 취소하기 위해 로그아웃
+          await signOut(auth);
+          
+          throw new Error(
+            `이 이메일 (${email})은 이미 ${existingMethodText}으로 가입되어 있습니다. ${existingMethodText}으로 로그인해주세요.`
+          );
+        }
+      } catch (methodError) {
+        if (methodError.message.includes("이미")) {
+          throw methodError;
+        }
+        // fetchSignInMethodsForEmail 오류는 무시하고 계속 진행
+      }
+    }
 
     await saveUserData(user);
 
-    // GitHub 자격 증명이 대기 중인지 확인
-    const pendingGithubCredentialJson = sessionStorage.getItem(
-      "pendingGithubCredential"
-    );
-    if (pendingGithubCredentialJson) {
-      try {
-        const pendingCredential = JSON.parse(pendingGithubCredentialJson);
-        const githubAuthCredential = GithubAuthProvider.credential(
-          pendingCredential.oauthAccessToken
-        );
-
-        // GitHub 계정 연결
-        await linkWithCredential(user, githubAuthCredential);
-        alert("GitHub 계정이 성공적으로 연결되었습니다!");
-
-        // 세션 스토리지 정리
-        sessionStorage.removeItem("pendingGithubCredential");
-        sessionStorage.removeItem("githubLoginEmail");
-      } catch (linkError) {
-        console.error("GitHub 계정 연결 오류:", linkError);
-
-        if (
-          linkError.code === "auth/credential-already-in-use" ||
-          linkError.code === "auth/provider-already-linked"
-        ) {
-          alert("이 GitHub 계정은 이미 다른 계정에 연결되어 있습니다.");
-        } else {
-          alert(`GitHub 계정 연결에 실패했습니다: ${linkError.message}`);
-        }
-
-        // 세션 스토리지 정리
-        sessionStorage.removeItem("pendingGithubCredential");
-        sessionStorage.removeItem("githubLoginEmail");
-      }
-    }
-
-    // Facebook 자격 증명이 대기 중인지 확인
-    const pendingFacebookCredentialJson = sessionStorage.getItem(
-      "pendingFacebookCredential"
-    );
-    if (pendingFacebookCredentialJson) {
-      try {
-        const pendingCredential = JSON.parse(pendingFacebookCredentialJson);
-        const facebookAuthCredential = FacebookAuthProvider.credential(
-          pendingCredential.accessToken
-        );
-
-        // Facebook 계정 연결
-        await linkWithCredential(user, facebookAuthCredential);
-        alert("Facebook 계정이 성공적으로 연결되었습니다!");
-
-        // 세션 스토리지 정리
-        sessionStorage.removeItem("pendingFacebookCredential");
-        sessionStorage.removeItem("facebookLoginEmail");
-      } catch (linkError) {
-        console.error("Facebook 계정 연결 오류:", linkError);
-
-        if (
-          linkError.code === "auth/credential-already-in-use" ||
-          linkError.code === "auth/provider-already-linked"
-        ) {
-          alert("이 Facebook 계정은 이미 다른 계정에 연결되어 있습니다.");
-        } else {
-          alert(`Facebook 계정 연결에 실패했습니다: ${linkError.message}`);
-        }
-
-        // 세션 스토리지 정리
-        sessionStorage.removeItem("pendingFacebookCredential");
-        sessionStorage.removeItem("facebookLoginEmail");
-      }
-    }
+    // 계정 연결 로직은 프로필 페이지에서만 처리
+    // 로그인 시에는 자동 연동하지 않음
 
     return user;
   } catch (error) {
-    console.error("Google 로그인 오류:", error);
-
     if (error.code === "auth/account-exists-with-different-credential") {
-      // 이메일 정보 추출
+      // 같은 이메일을 사용하는 다른 인증 방법으로 이미 계정이 있는 경우
       const email = error.customData?.email;
-      const pendingCredential = GoogleAuthProvider.credentialFromError(error);
-
-      if (email && pendingCredential) {
+      
+      if (email) {
         try {
-          // 사용자에게 메시지 표시 및 선택지 제공
-          const manualLoginMessage =
-            `이메일 ${email}은 이미 다른 방법으로 가입되어 있습니다.\n\n` +
-            `선택 옵션:\n` +
-            `1. 기존 로그인 방법으로 로그인 후 Google 계정 연결\n` +
-            `2. 기존 방법으로 로그인`;
-
-          const loginChoice = confirm(manualLoginMessage);
-
-          if (loginChoice) {
-            // Google 자격 증명을 세션에 저장
-            sessionStorage.setItem(
-              "pendingGoogleCredential",
-              JSON.stringify(pendingCredential)
-            );
-            sessionStorage.setItem("googleLoginEmail", email);
-
-            // 기존 로그인 방법 확인
-            const methods = await fetchSignInMethodsForEmail(auth, email);
-            
-            if (methods && methods.length > 0) {
-              const firstMethod = methods[0];
-              
-              if (firstMethod === "facebook.com") {
-                alert(
-                  "Facebook 로그인 버튼을 클릭하여 로그인하세요. 로그인 후 Google 계정이 자동으로 연결됩니다."
-                );
-                
-                // Facebook 로그인 버튼 클릭 이벤트 트리거
-                const facebookLoginBtn = document.getElementById("facebook-login-btn");
-                if (facebookLoginBtn) {
-                  facebookLoginBtn.click();
-                  return null;
-                } else {
-                  throw new Error(
-                    "Facebook 로그인 버튼을 찾을 수 없습니다. 직접 Facebook 로그인을 시도해주세요."
-                  );
-                }
-              } else if (firstMethod === "github.com") {
-                alert(
-                  "GitHub 로그인 버튼을 클릭하여 로그인하세요. 로그인 후 Google 계정이 자동으로 연결됩니다."
-                );
-                
-                // GitHub 로그인 버튼 클릭 이벤트 트리거
-                const githubLoginBtn = document.getElementById("github-login-btn");
-                if (githubLoginBtn) {
-                  githubLoginBtn.click();
-                  return null;
-                } else {
-                  throw new Error(
-                    "GitHub 로그인 버튼을 찾을 수 없습니다. 직접 GitHub 로그인을 시도해주세요."
-                  );
-                }
-              } else {
-                alert("이메일/비밀번호로 로그인한 후 Google 계정을 연결하실 수 있습니다.");
-                throw new Error("기존 로그인 방법을 사용해주세요.");
-              }
-            } else {
-              throw new Error("기존 로그인 방법을 확인할 수 없습니다.");
+          // 해당 이메일로 기존에 가입한 방법 확인
+          const methods = await fetchSignInMethodsForEmail(auth, email);
+          let existingMethodText = "다른 로그인 방법";
+          
+          if (methods && methods.length > 0) {
+            const firstMethod = methods[0];
+            if (firstMethod === "facebook.com") {
+              existingMethodText = "Facebook 계정";
+            } else if (firstMethod === "github.com") {
+              existingMethodText = "GitHub 계정";
+            } else if (firstMethod === "password") {
+              existingMethodText = "이메일/비밀번호";
             }
-          } else {
-            throw new Error("기존 로그인 방법을 사용해주세요.");
           }
-        } catch (innerError) {
-          console.error("로그인 방법 확인 오류:", innerError);
-          alert(`로그인 확인 중 오류가 발생했습니다: ${innerError.message}`);
-          throw new Error(
-            "인증 과정에서 오류가 발생했습니다. 다른 로그인 방법을 시도해주세요."
-          );
-        }
-      }
 
-      throw new Error(
-        "이미 다른 로그인 방법으로 가입된 이메일입니다. 다른 로그인 방법을 시도해주세요."
-      );
+          throw new Error(
+            `이 이메일 (${email})은 이미 ${existingMethodText}으로 가입되어 있습니다. ${existingMethodText}으로 로그인해주세요.`
+          );
+        } catch (innerError) {
+          if (innerError.message.includes("이미")) {
+            throw innerError; // 이미 처리한 메시지는 그대로 전달
+          }
+          throw new Error("기존 로그인 방법을 사용해주세요.");
+        }
+      } else {
+        throw new Error("기존 로그인 방법을 사용해주세요.");
+      }
     } else if (error.code === "auth/popup-closed-by-user") {
-      throw new Error("로그인 창이 닫혔습니다. 다시 시도해주세요.");
-    } else if (error.code === "auth/network-request-failed") {
-      throw new Error(
-        "네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요."
-      );
+      throw new Error(msg.popupClosed);
     } else if (error.code === "auth/popup-blocked") {
-      throw new Error(
-        "팝업이 차단되었습니다. 팝업 차단을 해제하고 다시 시도해주세요."
-      );
+      throw new Error(msg.popupBlocked);
     } else if (error.code === "auth/cancelled-popup-request") {
       throw new Error("로그인 요청이 취소되었습니다. 다시 시도해주세요.");
+    } else if (error.code === "auth/network-request-failed") {
+      throw new Error("네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요.");
     } else {
-      throw new Error(
-        `구글 로그인에 실패했습니다(${error.code}). 다시 시도해주세요`
-      );
+      throw new Error(`구글 로그인에 실패했습니다. 다시 시도해주세요.`);
     }
   }
 };
@@ -363,164 +277,59 @@ export const githubLogin = async () => {
 
     await saveUserData(user);
 
-    // Google 자격 증명이 대기 중인지 확인
-    const pendingGoogleCredentialJson = sessionStorage.getItem(
-      "pendingGoogleCredential"
-    );
-    if (pendingGoogleCredentialJson) {
-      try {
-        const pendingCredential = JSON.parse(pendingGoogleCredentialJson);
-        const googleAuthCredential = GoogleAuthProvider.credential(
-          pendingCredential.idToken,
-          pendingCredential.accessToken
-        );
-
-        // Google 계정 연결
-        await linkWithCredential(user, googleAuthCredential);
-        alert("Google 계정이 성공적으로 연결되었습니다!");
-
-        // 세션 스토리지 정리
-        sessionStorage.removeItem("pendingGoogleCredential");
-        sessionStorage.removeItem("googleLoginEmail");
-      } catch (linkError) {
-        console.error("Google 계정 연결 오류:", linkError);
-
-        if (
-          linkError.code === "auth/credential-already-in-use" ||
-          linkError.code === "auth/provider-already-linked"
-        ) {
-          alert("이 Google 계정은 이미 다른 계정에 연결되어 있습니다.");
-        } else {
-          alert(`Google 계정 연결에 실패했습니다: ${linkError.message}`);
-        }
-
-        // 세션 스토리지 정리
-        sessionStorage.removeItem("pendingGoogleCredential");
-        sessionStorage.removeItem("googleLoginEmail");
-      }
-    }
-
-    // Facebook 자격 증명이 대기 중인지 확인
-    const pendingFacebookCredentialJson = sessionStorage.getItem(
-      "pendingFacebookCredential"
-    );
-    if (pendingFacebookCredentialJson) {
-      try {
-        const pendingCredential = JSON.parse(pendingFacebookCredentialJson);
-        const facebookAuthCredential = FacebookAuthProvider.credential(
-          pendingCredential.accessToken
-        );
-
-        // Facebook 계정 연결
-        await linkWithCredential(user, facebookAuthCredential);
-        alert("Facebook 계정이 성공적으로 연결되었습니다!");
-
-        // 세션 스토리지 정리
-        sessionStorage.removeItem("pendingFacebookCredential");
-        sessionStorage.removeItem("facebookLoginEmail");
-      } catch (linkError) {
-        console.error("Facebook 계정 연결 오류:", linkError);
-
-        if (
-          linkError.code === "auth/credential-already-in-use" ||
-          linkError.code === "auth/provider-already-linked"
-        ) {
-          alert("이 Facebook 계정은 이미 다른 계정에 연결되어 있습니다.");
-        } else {
-          alert(`Facebook 계정 연결에 실패했습니다: ${linkError.message}`);
-        }
-
-        // 세션 스토리지 정리
-        sessionStorage.removeItem("pendingFacebookCredential");
-        sessionStorage.removeItem("facebookLoginEmail");
-      }
-    }
+    // 계정 연결 로직은 프로필 페이지에서만 처리
+    // 로그인 시에는 자동 연동하지 않음
 
     return user;
   } catch (error) {
-    console.error("Github 로그인 오류:", error);
-
     // GitHub API 속도 제한 오류 감지
-    if (
-      error.message &&
-      error.message.includes("exceeded a secondary rate limit")
-    ) {
-      throw new Error(
-        "GitHub 로그인 속도 제한에 도달했습니다. 잠시 후 다시 시도하거나 다른 로그인 방법을 사용하세요."
-      );
+    if (error.message && error.message.includes("exceeded a secondary rate limit")) {
+      throw new Error("GitHub 로그인 속도 제한에 도달했습니다. 잠시 후 다시 시도하거나 다른 로그인 방법을 사용하세요.");
     }
 
     if (error.code === "auth/account-exists-with-different-credential") {
-      // 이메일 정보 추출
+      // 같은 이메일을 사용하는 다른 인증 방법으로 이미 계정이 있는 경우
       const email = error.customData?.email;
-      const pendingCredential = GithubAuthProvider.credentialFromError(error);
-
-      if (email && pendingCredential) {
+      
+      if (email) {
         try {
-          // 사용자에게 메시지 표시 및 선택지 제공
-          const manualLoginMessage =
-            `이메일 ${email}은 이미 다른 방법으로 가입되어 있습니다.\n\n` +
-            `선택 옵션:\n` +
-            `1. Google로 로그인 후 GitHub 계정 연결\n` +
-            `2. 기존 방법으로 로그인`;
-
-          const loginChoice = confirm(manualLoginMessage);
-
-          if (loginChoice) {
-            // GitHub 자격 증명을 세션에 저장
-            sessionStorage.setItem(
-              "pendingGithubCredential",
-              JSON.stringify(pendingCredential)
-            );
-            sessionStorage.setItem("githubLoginEmail", email);
-
-            alert(
-              "Google 로그인 페이지로 이동합니다. 로그인 후 GitHub 계정을 연결할 수 있습니다."
-            );
-
-            // Google 로그인 버튼 클릭 이벤트 트리거
-            const googleLoginBtn = document.getElementById("google-login-btn");
-            if (googleLoginBtn) {
-              googleLoginBtn.click();
-              return null; // 반환 값 없음 - 다른 흐름으로 처리함
-            } else {
-              throw new Error(
-                "Google 로그인 버튼을 찾을 수 없습니다. 직접 Google 로그인을 시도해주세요."
-              );
+          // 해당 이메일로 기존에 가입한 방법 확인
+          const methods = await fetchSignInMethodsForEmail(auth, email);
+          let existingMethodText = "다른 로그인 방법";
+          
+          if (methods && methods.length > 0) {
+            const firstMethod = methods[0];
+            if (firstMethod === "google.com") {
+              existingMethodText = "Google 계정";
+            } else if (firstMethod === "facebook.com") {
+              existingMethodText = "Facebook 계정";
+            } else if (firstMethod === "password") {
+              existingMethodText = "이메일/비밀번호";
             }
-          } else {
-            throw new Error("기존 로그인 방법을 사용해주세요.");
           }
-        } catch (innerError) {
-          console.error("로그인 방법 확인 오류:", innerError);
-          alert(`로그인 확인 중 오류가 발생했습니다: ${innerError.message}`);
-          throw new Error(
-            "인증 과정에서 오류가 발생했습니다. 다른 로그인 방법을 시도해주세요."
-          );
-        }
-      }
 
-      throw new Error(
-        "이미 다른 로그인 방법으로 가입된 이메일입니다. 다른 로그인 방법을 시도해주세요."
-      );
+          throw new Error(
+            `이 이메일 (${email})은 이미 ${existingMethodText}으로 가입되어 있습니다. ${existingMethodText}으로 로그인해주세요.`
+          );
+        } catch (innerError) {
+          if (innerError.message.includes("이미")) {
+            throw innerError; // 이미 처리한 메시지는 그대로 전달
+          }
+          throw new Error("기존 로그인 방법을 사용해주세요.");
+        }
+      } else {
+        throw new Error("기존 로그인 방법을 사용해주세요.");
+      }
     } else if (error.code === "auth/popup-closed-by-user") {
-      throw new Error("로그인 창이 닫혔습니다. 다시 시도해주세요.");
-    } else if (error.code === "auth/network-request-failed") {
-      throw new Error(
-        "네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요."
-      );
+      throw new Error(msg.popupClosed);
     } else if (error.code === "auth/popup-blocked") {
-      throw new Error(
-        "팝업이 차단되었습니다. 팝업 차단을 해제하고 다시 시도해주세요."
-      );
+      throw new Error(msg.popupBlocked);
     } else if (error.code === "auth/cancelled-popup-request") {
-      throw new Error(
-        "로그인 요청이 취소되었습니다. 새로고침 후 다시 시도해주세요."
-      );
+      throw new Error("로그인 요청이 취소되었습니다. 다시 시도해주세요.");
+    } else if (error.code === "auth/network-request-failed") {
+      throw new Error("네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요.");
     } else {
-      throw new Error(
-        `깃허브 로그인에 실패했습니다(${error.code}). 다시 시도해주세요`
-      );
+      throw new Error(`깃허브 로그인에 실패했습니다. 다시 시도해주세요.`);
     }
   }
 };
@@ -542,78 +351,8 @@ export const facebookLogin = async () => {
 
     await saveUserData(user);
 
-    // Google 자격 증명이 대기 중인지 확인
-    const pendingGoogleCredentialJson = sessionStorage.getItem(
-      "pendingGoogleCredential"
-    );
-    if (pendingGoogleCredentialJson) {
-      try {
-        const pendingCredential = JSON.parse(pendingGoogleCredentialJson);
-        const googleAuthCredential = GoogleAuthProvider.credential(
-          pendingCredential.idToken,
-          pendingCredential.accessToken
-        );
-
-        // Google 계정 연결
-        await linkWithCredential(user, googleAuthCredential);
-        alert("Google 계정이 성공적으로 연결되었습니다!");
-
-        // 세션 스토리지 정리
-        sessionStorage.removeItem("pendingGoogleCredential");
-        sessionStorage.removeItem("googleLoginEmail");
-      } catch (linkError) {
-        console.error("Google 계정 연결 오류:", linkError);
-
-        if (
-          linkError.code === "auth/credential-already-in-use" ||
-          linkError.code === "auth/provider-already-linked"
-        ) {
-          alert("이 Google 계정은 이미 다른 계정에 연결되어 있습니다.");
-        } else {
-          alert(`Google 계정 연결에 실패했습니다: ${linkError.message}`);
-        }
-
-        // 세션 스토리지 정리
-        sessionStorage.removeItem("pendingGoogleCredential");
-        sessionStorage.removeItem("googleLoginEmail");
-      }
-    }
-
-    // GitHub 자격 증명이 대기 중인지 확인 (Google 로그인과 유사한 로직)
-    const pendingCredentialJson = sessionStorage.getItem(
-      "pendingGithubCredential"
-    );
-    if (pendingCredentialJson) {
-      try {
-        const pendingCredential = JSON.parse(pendingCredentialJson);
-        const githubAuthCredential = GithubAuthProvider.credential(
-          pendingCredential.oauthAccessToken
-        );
-
-        // GitHub 계정 연결
-        await linkWithCredential(user, githubAuthCredential);
-        alert("GitHub 계정이 성공적으로 연결되었습니다!");
-
-        // 세션 스토리지 정리
-        sessionStorage.removeItem("pendingGithubCredential");
-        sessionStorage.removeItem("githubLoginEmail");
-      } catch (linkError) {
-        console.error("GitHub 계정 연결 오류:", linkError);
-
-        if (
-          linkError.code === "auth/credential-already-in-use" ||
-          linkError.code === "auth/provider-already-linked"
-        ) {
-          alert("이 GitHub 계정은 이미 다른 계정에 연결되어 있습니다.");
-        } else {
-          alert(`GitHub 계정 연결에 실패했습니다: ${linkError.message}`);
-        }
-
-        // 세션 스토리지 정리
-        sessionStorage.removeItem("pendingGithubCredential");
-        sessionStorage.removeItem("githubLoginEmail");
-      }
-    }
+    // 계정 연결 로직은 프로필 페이지에서만 처리
+    // 로그인 시에는 자동 연동하지 않음
 
     return user;
   } catch (error) {
