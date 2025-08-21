@@ -162,8 +162,12 @@ export const signup = async (email, password, displayName) => {
     // 이메일 인증을 위해 즉시 로그아웃
     await signOut(auth);
 
-    // 이메일 인증 완료 메시지를 에러로 던져서 프론트엔드에서 처리하도록 함
-    throw new Error(formatMessage(msg.emailVerificationSent, {}));
+    // 성공 메시지 반환 (에러가 아닌 성공으로 처리)
+    return {
+      success: true,
+      message: formatMessage(msg.emailVerificationSent, {}),
+      requiresEmailVerification: true
+    };
     
   } catch (error) {
     if (error.code === "auth/email-already-in-use") {
@@ -186,8 +190,12 @@ export const login = async (email, password) => {
       password
     );
 
-    // 이메일/비밀번호 로그인은 이메일 인증 체크 제거
-    // (소셜 로그인과 차별화)
+    // 이메일/비밀번호 로그인은 이메일 인증 필수
+    if (!userCredential.user.emailVerified) {
+      // 이메일 인증이 안 된 경우 로그아웃하고 에러 표시
+      await signOut(auth);
+      throw new Error(formatMessage(msg.emailVerificationRequired, {}));
+    }
 
     return userCredential.user;
   } catch (error) {
