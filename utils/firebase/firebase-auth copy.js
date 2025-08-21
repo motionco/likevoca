@@ -162,26 +162,11 @@ export const googleLogin = async () => {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({
       prompt: "select_account",
-      // 자동 연결 방지를 위한 추가 매개변수
-      include_granted_scopes: 'false',
-      enable_granular_consent: 'false'
     });
     provider.addScope("email");
     provider.addScope("profile");
 
-    // Cross-Origin-Opener-Policy 문제 해결을 위한 시도
-    let result;
-    try {
-      result = await signInWithPopup(auth, provider);
-    } catch (popupError) {
-      // 팝업 에러 시 더 구체적인 에러 처리
-      if (popupError.code === "auth/popup-blocked" || 
-          popupError.message?.includes("Cross-Origin-Opener-Policy")) {
-        throw new Error("팝업이 차단되었습니다. 팝업 차단을 해제하고 다시 시도해주세요.");
-      }
-      throw popupError;
-    }
-    
+    const result = await signInWithPopup(auth, provider);
     const user = result.user;
 
     await saveUserData(user);
