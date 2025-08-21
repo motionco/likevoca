@@ -147,6 +147,7 @@ export const signup = async (email, password, displayName) => {
   const msg = getLocalizedMessage();
 
   try {
+    // Firebase의 createUserWithEmailAndPassword는 자동으로 로그인됨
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       email,
@@ -157,17 +158,16 @@ export const signup = async (email, password, displayName) => {
       displayName: displayName,
     });
 
+    // 이메일 인증 발송
     await sendEmailVerification(userCredential.user);
 
-    // 이메일 인증을 위해 즉시 로그아웃
+    // Firebase가 자동으로 로그인시킨 것을 로그아웃
     await signOut(auth);
 
-    // 성공 메시지 반환 (에러가 아닌 성공으로 처리)
-    return {
-      success: true,
-      message: formatMessage(msg.emailVerificationSent, {}),
-      requiresEmailVerification: true
-    };
+    // 이메일 인증 안내를 위해 특별한 에러로 던짐
+    const emailVerificationMessage = new Error(formatMessage(msg.emailVerificationSent, {}));
+    emailVerificationMessage.isEmailVerification = true;
+    throw emailVerificationMessage;
     
   } catch (error) {
     if (error.code === "auth/email-already-in-use") {
@@ -190,13 +190,14 @@ export const login = async (email, password) => {
       password
     );
 
-    // 이메일/비밀번호 로그인은 이메일 인증 필수
+    // 이메일 인증 여부 확인
     if (!userCredential.user.emailVerified) {
       // 이메일 인증이 안 된 경우 로그아웃하고 에러 표시
       await signOut(auth);
       throw new Error(formatMessage(msg.emailVerificationRequired, {}));
     }
 
+    // 이메일 인증 완료된 사용자는 로그인 성공
     return userCredential.user;
   } catch (error) {
     // 간단하고 안전한 에러 처리

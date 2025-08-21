@@ -103,29 +103,48 @@ submitButton.addEventListener("click", async () => {
   }
 
   try {
-    const user = await signup(email, password, name);
-    alert("인증 이메일을 발송했습니다. 이메일을 확인해주세요!");
-
-    await setDoc(doc(db, "users", email), {
-      wordCount: 0,
-      aiUsage: 0,
-      maxWordCount: 50,
-      maxAiUsage: 10,
-    });
-    if (typeof window.redirectToLogin === "function") {
-      window.redirectToLogin();
-    } else {
-      goToLanguageSpecificPage("login.html");
-    }
+    isSignupInProgress = true;
+    await signup(email, password, name);
+    // signup 함수는 성공시 이메일 인증 에러를 던짐
   } catch (error) {
-    console.error("회원가입 실패: ", error.message);
-    showError(`회원가입 실패: ${error.message}`);
+    if (error.isEmailVerification) {
+      // 이메일 인증 안내 - 성공적인 회원가입
+      alert(error.message);
+      
+      // 유저 문서 생성
+      try {
+        await setDoc(doc(db, "users", email), {
+          wordCount: 0,
+          aiUsage: 0,
+          maxWordCount: 50,
+          maxAiUsage: 10,
+        });
+      } catch (dbError) {
+        console.error("사용자 문서 생성 실패:", dbError);
+      }
+      
+      // 로그인 페이지로 리디렉션
+      if (typeof window.redirectToLogin === "function") {
+        window.redirectToLogin();
+      } else {
+        goToLanguageSpecificPage("login.html");
+      }
+    } else {
+      // 실제 회원가입 실패
+      console.error("회원가입 실패: ", error.message);
+      showError(`회원가입 실패: ${error.message}`);
+    }
+  } finally {
+    isSignupInProgress = false;
   }
 });
 
+// 회원가입 진행 중인지 추적하는 플래그
+let isSignupInProgress = false;
+
 // 로그인 상태 체크 - 이미 로그인되어 있으면 홈으로 리디렉션
 onAuthStateChanged(auth, (user) => {
-  if (user) {
+  if (user && !isSignupInProgress) {
     console.log("이미 로그인되어 있습니다. 홈으로 리디렉션합니다.");
     goToLanguageSpecificPage("index.html");
   }
