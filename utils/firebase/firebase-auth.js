@@ -162,35 +162,56 @@ export const googleLogin = async () => {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({
       prompt: "select_account",
-      // 자동 연결 방지를 위한 추가 매개변수
-      include_granted_scopes: 'false',
-      enable_granular_consent: 'false'
     });
     provider.addScope("email");
     provider.addScope("profile");
 
-    // Cross-Origin-Opener-Policy 문제 해결을 위한 시도
-    let result;
-    try {
-      result = await signInWithPopup(auth, provider);
-    } catch (popupError) {
-      // 팝업 에러 시 더 구체적인 에러 처리
-      if (popupError.code === "auth/popup-blocked" || 
-          popupError.message?.includes("Cross-Origin-Opener-Policy")) {
-        throw new Error("팝업이 차단되었습니다. 팝업 차단을 해제하고 다시 시도해주세요.");
-      }
-      throw popupError;
-    }
-    
+    const result = await signInWithPopup(auth, provider);
     const user = result.user;
+    const email = user.email;
+
+    // 로그인 성공 후 즉시 다른 제공자가 있는지 확인
+    if (email) {
+      try {
+        const methods = await fetchSignInMethodsForEmail(auth, email);
+        // Google 외의 다른 제공자가 있는지 확인
+        const nonGoogleMethods = methods.filter(method => method !== "google.com");
+        
+        if (nonGoogleMethods.length > 0) {
+          // 다른 제공자로 이미 가입된 계정이 있음
+          const firstMethod = nonGoogleMethods[0];
+          let existingMethodText = "다른 로그인 방법";
+          
+          if (firstMethod === "facebook.com") {
+            existingMethodText = "Facebook 계정";
+          } else if (firstMethod === "github.com") {
+            existingMethodText = "GitHub 계정";
+          } else if (firstMethod === "password") {
+            existingMethodText = "이메일/비밀번호";
+          }
+
+          // 자동 연결된 상태를 취소하기 위해 로그아웃
+          await signOut(auth);
+          
+          throw new Error(
+            `이 이메일 (${email})은 이미 ${existingMethodText}으로 가입되어 있습니다. ${existingMethodText}으로 로그인해주세요.`
+          );
+        }
+      } catch (methodError) {
+        if (methodError.message.includes("이미") && methodError.message.includes("가입되어")) {
+          throw methodError;
+        }
+        // fetchSignInMethodsForEmail 오류는 무시하고 계속 진행
+        console.warn("로그인 방법 확인 중 오류 발생:", methodError);
+      }
+    }
 
     await saveUserData(user);
 
-    // 계정 연결 로직은 프로필 페이지에서만 처리
-    // 로그인 시에는 자동 연동하지 않음
-
     return user;
   } catch (error) {
+    console.error("Google 로그인 오류:", error);
+
     if (error.code === "auth/account-exists-with-different-credential") {
       // 같은 이메일을 사용하는 다른 인증 방법으로 이미 계정이 있는 경우
       const email = error.customData?.email;
