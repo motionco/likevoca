@@ -178,127 +178,22 @@ export const login = async (email, password) => {
 
     return userCredential.user;
   } catch (error) {
-    if (error.code === "auth/invalid-credential" || error.code === "auth/user-not-found") {
-      console.log("로그인 실패 에러 코드:", error.code); // 디버깅용
+    // 간단하고 안전한 에러 처리
+    if (error.code === "auth/invalid-credential") {
+      // 자격 증명 무효 - 이메일/비밀번호가 틀렸거나 다른 제공자로 가입됨
+      console.log("로그인 실패: auth/invalid-credential");
+      throw new Error(formatMessage(msg.invalidCredential, {}));
       
-      // 먼저 fetchSignInMethodsForEmail으로 가입 정보 확인
-      try {
-        const methods = await fetchSignInMethodsForEmail(auth, email);
-        console.log("Sign-in methods for", email, ":", methods); // 디버깅용
-        
-        if (methods && methods.length > 0) {
-          // 가입된 계정이 있음
-          const firstMethod = methods[0];
-          
-          if (firstMethod === "password") {
-            // 이메일/비밀번호 계정이지만 비밀번호가 틀림
-            throw new Error(formatMessage(msg.invalidCredential, {}));
-          } else {
-            // 다른 제공자로 가입된 경우
-            let providerText = msg.otherLoginMethod;
-            
-            if (firstMethod === "google.com") {
-              providerText = "Google";
-            } else if (firstMethod === "facebook.com") {
-              providerText = "Facebook";
-            } else if (firstMethod === "github.com") {
-              providerText = "GitHub";
-            }
-
-            throw new Error(formatMessage(msg.existingProvider, {
-              email,
-              provider: providerText
-            }));
-          }
-        } else {
-          // fetchSignInMethodsForEmail에서 빈 배열 반환
-          // Firebase의 보안 설정으로 인해 다른 제공자 정보가 숨겨질 수 있음
-          console.log("No methods found from fetchSignInMethodsForEmail"); // 디버깅용
-          
-          // 더 강력한 비밀번호로 회원가입 시도하여 확인
-          try {
-            // 강력한 비밀번호로 실제 회원가입 시도
-            const tempPassword = "TempPass123!@#" + Date.now();
-            const userCredential = await createUserWithEmailAndPassword(auth, email, tempPassword);
-            
-            // 성공하면 즉시 계정 삭제 (가입되지 않은 이메일이었음)
-            if (userCredential.user) {
-              await deleteUser(userCredential.user);
-              console.log("Temporary account created and deleted - email was not registered");
-            }
-            throw new Error(formatMessage(msg.userNotFound, { email }));
-            
-          } catch (signupError) {
-            console.log("Strong password signup test result:", signupError.code); // 디버깅용
-            
-            if (signupError.code === "auth/email-already-in-use") {
-              // 이메일이 이미 사용 중 = 확실히 다른 제공자로 가입되어 있음
-              console.log("Email confirmed as already in use - checking providers again");
-              
-              // 마지막으로 fetchSignInMethodsForEmail 재시도
-              try {
-                const finalMethods = await fetchSignInMethodsForEmail(auth, email);
-                console.log("Final methods check:", finalMethods);
-                
-                if (finalMethods && finalMethods.length > 0) {
-                  const method = finalMethods[0];
-                  if (method === "password") {
-                    // 이메일/비밀번호 계정 - 비밀번호 틀림
-                    throw new Error(formatMessage(msg.invalidCredential, {}));
-                  } else {
-                    // 다른 제공자
-                    let providerText = method === "google.com" ? "Google" : 
-                                     method === "facebook.com" ? "Facebook" :
-                                     method === "github.com" ? "GitHub" : msg.otherLoginMethod;
-                    throw new Error(formatMessage(msg.existingProvider, { email, provider: providerText }));
-                  }
-                } else {
-                  // 여전히 빈 배열이지만 email-already-in-use 에러가 확실함
-                  // Firebase 보안 설정으로 제공자 정보가 숨겨진 것으로 판단
-                  console.log("Provider info hidden due to security settings");
-                  throw new Error(formatMessage(msg.existingProvider, { email, provider: msg.otherLoginMethod }));
-                }
-              } catch (finalError) {
-                if (finalError.message && (finalError.message.includes('이미') || finalError.message.includes('올바르지'))) {
-                  throw finalError;
-                }
-                // fetchSignInMethodsForEmail이 실패해도 email-already-in-use는 확실
-                throw new Error(formatMessage(msg.existingProvider, { email, provider: msg.otherLoginMethod }));
-              }
-            } else {
-              // auth/email-already-in-use가 아닌 다른 에러
-              // 실제로 가입되지 않은 이메일일 가능성이 높음
-              console.log("Signup failed with different error - likely unregistered email");
-              throw new Error(formatMessage(msg.userNotFound, { email }));
-            }
-          }
-        }
-      } catch (methodsError) {
-        console.error("fetchSignInMethodsForEmail 에러:", methodsError);
-        
-        // 이미 처리된 메시지인지 확인
-        if (methodsError.message && (
-            methodsError.message.includes('가입된') || methodsError.message.includes('이미') || 
-            methodsError.message.includes('registered') || methodsError.message.includes('found') ||
-            methodsError.message.includes('No account') || methodsError.message.includes('未找到') ||
-            methodsError.message.includes('올바르지') || methodsError.message.includes('Invalid')
-        )) {
-          throw methodsError; // 이미 처리된 메시지는 그대로 전달
-        }
-        
-        // fetchSignInMethodsForEmail 자체가 실패한 경우
-        // 원본 에러 코드에 따라 처리
-        if (error.code === "auth/user-not-found") {
-          throw new Error(formatMessage(msg.userNotFound, { email }));
-        } else {
-          throw new Error(formatMessage(msg.invalidCredential, {}));
-        }
-      }
+    } else if (error.code === "auth/user-not-found") {
+      // 사용자 없음 - 가입되지 않은 이메일
+      console.log("로그인 실패: auth/user-not-found");  
+      throw new Error(formatMessage(msg.userNotFound, { email }));
+      
     } else if (error.code === "auth/too-many-requests") {
-      throw new Error(
-        "너무 많은 로그인 시도가 있었습니다. 잠시 후 다시 시도해주세요."
-      );
+      throw new Error("너무 많은 로그인 시도가 있었습니다. 잠시 후 다시 시도해주세요.");
+      
     } else {
+      console.log("로그인 실패: 기타 에러", error.code);
       throw error;
     }
   }
