@@ -166,32 +166,29 @@ export const googleLogin = async () => {
     provider.addScope("email");
     provider.addScope("profile");
 
+    // Google 팝업을 열어서 credential만 획득 (실제 로그인은 하지 않음)
     const result = await signInWithPopup(auth, provider);
-    const user = result.user;
-    const email = user.email;
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+    const email = result.user.email;
 
-    // Google 로그인 직후 자동 연동 확인
+    // 즉시 로그아웃하여 자동 로그인 취소
+    await signOut(auth);
+
+    // 기존 계정 확인
     if (email) {
       try {
-        // 현재 사용자의 모든 제공자 확인
-        const providerData = user.providerData || [];
-        const providers = providerData.map(provider => provider.providerId);
+        const methods = await fetchSignInMethodsForEmail(auth, email);
+        const nonGoogleMethods = methods.filter(method => method !== "google.com");
         
-        // Google 이외의 다른 제공자가 이미 연결되어 있는지 확인 (자동 연동 감지)
-        const nonGoogleProviders = providers.filter(providerId => providerId !== "google.com");
-        
-        if (nonGoogleProviders.length > 0) {
-          // 자동 연동이 발생했으므로 로그아웃하고 안내 (계정은 삭제하지 않음)
-          await signOut(auth);
-          
-          const firstProvider = nonGoogleProviders[0];
+        if (nonGoogleMethods.length > 0) {
+          const firstMethod = nonGoogleMethods[0];
           let existingMethodText = "다른 로그인 방법";
           
-          if (firstProvider === "facebook.com") {
+          if (firstMethod === "facebook.com") {
             existingMethodText = "Facebook 계정";
-          } else if (firstProvider === "github.com") {
+          } else if (firstMethod === "github.com") {
             existingMethodText = "GitHub 계정";
-          } else if (firstProvider === "password") {
+          } else if (firstMethod === "password") {
             existingMethodText = "이메일/비밀번호";
           }
 
@@ -201,15 +198,23 @@ export const googleLogin = async () => {
         }
       } catch (methodError) {
         if (methodError.message.includes("이미")) {
-          throw methodError; // 이미 처리한 메시지는 그대로 전달
+          throw methodError;
         }
-        // 다른 오류는 무시하고 계속 진행
+        // fetchSignInMethodsForEmail 오류는 무시하고 계속 진행
       }
     }
 
-    await saveUserData(user);
-
-    return user;
+    // 기존 계정이 없으면 credential로 수동 로그인
+    if (credential) {
+      const finalResult = await signInWithCredential(auth, credential);
+      await saveUserData(finalResult.user);
+      return finalResult.user;
+    } else {
+      // credential이 없으면 다시 팝업으로 로그인
+      const retryResult = await signInWithPopup(auth, provider);
+      await saveUserData(retryResult.user);
+      return retryResult.user;
+    }
   } catch (error) {
     if (error.code === "auth/account-exists-with-different-credential") {
       // 같은 이메일을 사용하는 다른 인증 방법으로 이미 계정이 있는 경우
