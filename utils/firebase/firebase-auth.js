@@ -51,7 +51,9 @@ const getLocalizedMessage = () => {
       userNotFound: '이 이메일 ({email})로 가입된 회원정보가 없습니다.',
       existingProvider: '이 이메일 ({email})은 이미 {provider}으로 가입되어 있습니다. {provider}으로 로그인해주세요.',
       invalidCredential: '이메일 또는 비밀번호가 올바르지 않습니다.',
-      otherLoginMethod: '다른 로그인 방법'
+      otherLoginMethod: '다른 로그인 방법',
+      emailVerificationRequired: '이메일 인증이 필요합니다. 이메일을 확인해주세요.',
+      emailVerificationSent: '회원가입이 완료되었습니다. 이메일 인증을 완료해주세요.'
     },
     'en': {
       credentialInUse: 'This {provider} account is already in use by another account. Please use a different {provider} account.',
@@ -65,7 +67,9 @@ const getLocalizedMessage = () => {
       userNotFound: 'No account found with this email ({email}).',
       existingProvider: 'This email ({email}) is already registered with {provider}. Please sign in with {provider}.',
       invalidCredential: 'Invalid email or password.',
-      otherLoginMethod: 'another login method'
+      otherLoginMethod: 'another login method',
+      emailVerificationRequired: 'Email verification is required. Please check your email.',
+      emailVerificationSent: 'Registration completed. Please complete email verification.'
     },
     'zh': {
       credentialInUse: '此 {provider} 账户已被其他账户使用。请使用其他 {provider} 账户。',
@@ -79,7 +83,9 @@ const getLocalizedMessage = () => {
       userNotFound: '未找到此邮箱 ({email}) 的注册信息。',
       existingProvider: '此邮箱 ({email}) 已使用 {provider} 注册。请使用 {provider} 登录。',
       invalidCredential: '邮箱或密码无效。',
-      otherLoginMethod: '其他登录方式'
+      otherLoginMethod: '其他登录方式',
+      emailVerificationRequired: '需要邮箱验证。请检查您的邮箱。',
+      emailVerificationSent: '注册完成。请完成邮箱验证。'
     },
     'ja': {
       credentialInUse: 'この {provider} アカウントは既に他のアカウントで使用されています。別の {provider} アカウントをご使用ください。',
@@ -93,7 +99,9 @@ const getLocalizedMessage = () => {
       userNotFound: 'このメールアドレス ({email}) で登録された情報が見つかりません。',
       existingProvider: 'このメールアドレス ({email}) は既に {provider} で登録されています。{provider} でログインしてください。',
       invalidCredential: 'メールアドレスまたはパスワードが正しくありません。',
-      otherLoginMethod: '他のログイン方法'
+      otherLoginMethod: '他のログイン方法',
+      emailVerificationRequired: 'メール認証が必要です。メールをご確認ください。',
+      emailVerificationSent: '登録が完了しました。メール認証を完了してください。'
     },
     'es': {
       credentialInUse: 'Esta cuenta de {provider} ya está siendo utilizada por otra cuenta. Por favor use una cuenta de {provider} diferente.',
@@ -107,7 +115,9 @@ const getLocalizedMessage = () => {
       userNotFound: 'No se encontró ninguna cuenta con este email ({email}).',
       existingProvider: 'Este email ({email}) ya está registrado con {provider}. Por favor inicie sesión con {provider}.',
       invalidCredential: 'Email o contraseña inválidos.',
-      otherLoginMethod: 'otro método de inicio de sesión'
+      otherLoginMethod: 'otro método de inicio de sesión',
+      emailVerificationRequired: 'Se requiere verificación de email. Por favor revise su correo.',
+      emailVerificationSent: 'Registro completado. Por favor complete la verificación de email.'
     }
   };
 
@@ -149,7 +159,12 @@ export const signup = async (email, password, displayName) => {
 
     await sendEmailVerification(userCredential.user);
 
-    return userCredential.user;
+    // 이메일 인증을 위해 즉시 로그아웃
+    await signOut(auth);
+
+    // 이메일 인증 완료 메시지를 에러로 던져서 프론트엔드에서 처리하도록 함
+    throw new Error(formatMessage(msg.emailVerificationSent, {}));
+    
   } catch (error) {
     if (error.code === "auth/email-already-in-use") {
       throw new Error(formatMessage(msg.emailAlreadyInUse, { email }));
@@ -171,10 +186,8 @@ export const login = async (email, password) => {
       password
     );
 
-    if (!userCredential.user.emailVerified) {
-      // 다국어 지원을 위해 메시지 추가 필요할 수 있음
-      throw new Error("이메일 인증이 필요합니다. 이메일을 확인해주세요.");
-    }
+    // 이메일/비밀번호 로그인은 이메일 인증 체크 제거
+    // (소셜 로그인과 차별화)
 
     return userCredential.user;
   } catch (error) {
