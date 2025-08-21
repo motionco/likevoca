@@ -293,9 +293,9 @@ export const githubLogin = async () => {
     if (pendingGoogleCredentialJson) {
       try {
         const pendingCredential = JSON.parse(pendingGoogleCredentialJson);
+        // Google 자격 증명 재생성 (idToken만 사용)
         const googleAuthCredential = GoogleAuthProvider.credential(
-          pendingCredential.idToken,
-          pendingCredential.accessToken
+          pendingCredential.idToken
         );
 
         // Google 계정 연결
@@ -486,9 +486,9 @@ export const facebookLogin = async () => {
     if (pendingGoogleCredentialJson) {
       try {
         const pendingCredential = JSON.parse(pendingGoogleCredentialJson);
+        // Google 자격 증명 재생성 (idToken만 사용)
         const googleAuthCredential = GoogleAuthProvider.credential(
-          pendingCredential.idToken,
-          pendingCredential.accessToken
+          pendingCredential.idToken
         );
 
         // Google 계정 연결
