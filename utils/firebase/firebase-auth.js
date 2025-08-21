@@ -166,56 +166,12 @@ export const googleLogin = async () => {
     provider.addScope("email");
     provider.addScope("profile");
 
-    // Google 로그인을 임시로 진행하여 이메일 정보 획득
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
-    const email = user.email;
 
-    // 즉시 로그아웃하여 자동 연동 방지
-    await signOut(auth);
+    await saveUserData(user);
 
-    // 기존 계정 확인
-    if (email) {
-      try {
-        const methods = await fetchSignInMethodsForEmail(auth, email);
-        
-        // Google 이외의 다른 로그인 방법이 이미 있는지 확인
-        const nonGoogleMethods = methods.filter(method => method !== "google.com");
-        
-        if (nonGoogleMethods.length > 0) {
-          const firstMethod = nonGoogleMethods[0];
-          let existingMethodText = "다른 로그인 방법";
-          
-          if (firstMethod === "facebook.com") {
-            existingMethodText = "Facebook 계정";
-          } else if (firstMethod === "github.com") {
-            existingMethodText = "GitHub 계정";
-          } else if (firstMethod === "password") {
-            existingMethodText = "이메일/비밀번호";
-          }
-
-          throw new Error(
-            `이 이메일 (${email})은 이미 ${existingMethodText}으로 가입되어 있습니다. ${existingMethodText}으로 로그인해주세요.`
-          );
-        }
-      } catch (methodError) {
-        if (methodError.message.includes("이미")) {
-          throw methodError; // 이미 처리한 메시지는 그대로 전달
-        }
-        // fetchSignInMethodsForEmail 오류는 무시하고 계속 진행
-      }
-    }
-
-    // 기존 계정이 없으면 다시 로그인
-    const finalResult = await signInWithPopup(auth, provider);
-    const finalUser = finalResult.user;
-
-    await saveUserData(finalUser);
-
-    // 계정 연결 로직은 프로필 페이지에서만 처리
-    // 로그인 시에는 자동 연동하지 않음
-
-    return finalUser;
+    return user;
   } catch (error) {
     if (error.code === "auth/account-exists-with-different-credential") {
       // 같은 이메일을 사용하는 다른 인증 방법으로 이미 계정이 있는 경우
