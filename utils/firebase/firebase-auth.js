@@ -181,13 +181,8 @@ export const googleLogin = async () => {
         const nonGoogleProviders = providers.filter(providerId => providerId !== "google.com");
         
         if (nonGoogleProviders.length > 0) {
-          // 자동 연동이 발생했으므로 사용자 계정을 삭제하고 안내
-          try {
-            await user.delete(); // Firebase에서 자동 생성된 계정 삭제
-          } catch (deleteError) {
-            console.warn("계정 삭제 중 오류:", deleteError);
-            await signOut(auth); // 삭제가 안되면 최소한 로그아웃
-          }
+          // 자동 연동이 발생했으므로 로그아웃하고 안내 (계정은 삭제하지 않음)
+          await signOut(auth);
           
           const firstProvider = nonGoogleProviders[0];
           let existingMethodText = "다른 로그인 방법";
