@@ -171,6 +171,42 @@ export const googleLogin = async () => {
 
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
+    const email = user.email;
+
+    // Google 로그인 성공 후 즉시 다른 제공자 확인
+    if (email) {
+      try {
+        const methods = await fetchSignInMethodsForEmail(auth, email);
+        // Google 외의 다른 제공자가 있는지 확인
+        const nonGoogleMethods = methods.filter(method => method !== "google.com");
+        
+        if (nonGoogleMethods.length > 0) {
+          // 다른 제공자로 이미 가입된 계정이 있음 - 로그아웃하고 에러 표시
+          const firstMethod = nonGoogleMethods[0];
+          let existingMethodText = "다른 로그인 방법";
+          
+          if (firstMethod === "facebook.com") {
+            existingMethodText = "Facebook 계정";
+          } else if (firstMethod === "github.com") {
+            existingMethodText = "GitHub 계정";
+          } else if (firstMethod === "password") {
+            existingMethodText = "이메일/비밀번호";
+          }
+
+          // 자동 연결된 상태를 취소하기 위해 로그아웃
+          await signOut(auth);
+          
+          throw new Error(
+            `이 이메일 (${email})은 이미 ${existingMethodText}으로 가입되어 있습니다. ${existingMethodText}으로 로그인해주세요.`
+          );
+        }
+      } catch (methodError) {
+        if (methodError.message.includes("이미")) {
+          throw methodError;
+        }
+        // fetchSignInMethodsForEmail 오류는 무시하고 계속 진행
+      }
+    }
 
     await saveUserData(user);
 
