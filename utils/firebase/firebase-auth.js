@@ -50,7 +50,8 @@ const getLocalizedMessage = () => {
       emailAlreadyInUse: '이 이메일 ({email})은 이미 다른 로그인 방법으로 가입되어 있습니다. 다른 로그인 방법으로 로그인해주세요.',
       userNotFound: '이 이메일 ({email})로 가입된 회원정보가 없습니다.',
       existingProvider: '이 이메일 ({email})은 이미 {provider}으로 가입되어 있습니다. {provider}으로 로그인해주세요.',
-      invalidCredential: '이메일 또는 비밀번호가 올바르지 않습니다.'
+      invalidCredential: '이메일 또는 비밀번호가 올바르지 않습니다.',
+      otherLoginMethod: '다른 로그인 방법'
     },
     'en': {
       credentialInUse: 'This {provider} account is already in use by another account. Please use a different {provider} account.',
@@ -63,7 +64,8 @@ const getLocalizedMessage = () => {
       emailAlreadyInUse: 'This email ({email}) is already registered with a different login method. Please sign in with the existing login method.',
       userNotFound: 'No account found with this email ({email}).',
       existingProvider: 'This email ({email}) is already registered with {provider}. Please sign in with {provider}.',
-      invalidCredential: 'Invalid email or password.'
+      invalidCredential: 'Invalid email or password.',
+      otherLoginMethod: 'another login method'
     },
     'zh': {
       credentialInUse: '此 {provider} 账户已被其他账户使用。请使用其他 {provider} 账户。',
@@ -76,7 +78,8 @@ const getLocalizedMessage = () => {
       emailAlreadyInUse: '此邮箱 ({email}) 已使用其他登录方式注册。请使用现有的登录方式登录。',
       userNotFound: '未找到此邮箱 ({email}) 的注册信息。',
       existingProvider: '此邮箱 ({email}) 已使用 {provider} 注册。请使用 {provider} 登录。',
-      invalidCredential: '邮箱或密码无效。'
+      invalidCredential: '邮箱或密码无效。',
+      otherLoginMethod: '其他登录方式'
     },
     'ja': {
       credentialInUse: 'この {provider} アカウントは既に他のアカウントで使用されています。別の {provider} アカウントをご使用ください。',
@@ -89,7 +92,8 @@ const getLocalizedMessage = () => {
       emailAlreadyInUse: 'このメールアドレス ({email}) は既に他のログイン方法で登録されています。既存のログイン方法でログインしてください。',
       userNotFound: 'このメールアドレス ({email}) で登録された情報が見つかりません。',
       existingProvider: 'このメールアドレス ({email}) は既に {provider} で登録されています。{provider} でログインしてください。',
-      invalidCredential: 'メールアドレスまたはパスワードが正しくありません。'
+      invalidCredential: 'メールアドレスまたはパスワードが正しくありません。',
+      otherLoginMethod: '他のログイン方法'
     },
     'es': {
       credentialInUse: 'Esta cuenta de {provider} ya está siendo utilizada por otra cuenta. Por favor use una cuenta de {provider} diferente.',
@@ -102,7 +106,8 @@ const getLocalizedMessage = () => {
       emailAlreadyInUse: 'Este email ({email}) ya está registrado con un método de inicio de sesión diferente. Por favor inicie sesión con el método existente.',
       userNotFound: 'No se encontró ninguna cuenta con este email ({email}).',
       existingProvider: 'Este email ({email}) ya está registrado con {provider}. Por favor inicie sesión con {provider}.',
-      invalidCredential: 'Email o contraseña inválidos.'
+      invalidCredential: 'Email o contraseña inválidos.',
+      otherLoginMethod: 'otro método de inicio de sesión'
     }
   };
 
@@ -174,16 +179,23 @@ export const login = async (email, password) => {
     return userCredential.user;
   } catch (error) {
     if (error.code === "auth/invalid-credential" || error.code === "auth/user-not-found") {
-      // 이메일이 다른 제공자로 가입되어 있는지 확인
+      console.log("로그인 실패 에러 코드:", error.code); // 디버깅용
+      
+      // 먼저 fetchSignInMethodsForEmail으로 가입 정보 확인
       try {
         const methods = await fetchSignInMethodsForEmail(auth, email);
         console.log("Sign-in methods for", email, ":", methods); // 디버깅용
         
         if (methods && methods.length > 0) {
-          // 다른 제공자로 가입된 경우
+          // 가입된 계정이 있음
           const firstMethod = methods[0];
-          if (firstMethod !== "password") {
-            let providerText = "Google";
+          
+          if (firstMethod === "password") {
+            // 이메일/비밀번호 계정이지만 비밀번호가 틀림
+            throw new Error(formatMessage(msg.invalidCredential, {}));
+          } else {
+            // 다른 제공자로 가입된 경우
+            let providerText = msg.otherLoginMethod;
             
             if (firstMethod === "google.com") {
               providerText = "Google";
@@ -197,34 +209,78 @@ export const login = async (email, password) => {
               email,
               provider: providerText
             }));
-          } else {
-            // 이메일/비밀번호 계정이지만 비밀번호가 틀린 경우
-            throw new Error(formatMessage(msg.invalidCredential, {}));
           }
         } else {
-          // 가입되지 않은 이메일인지 확인하기 위해 다른 방법으로 시도
-          // Firebase의 fetchSignInMethodsForEmail이 빈 배열을 반환하는 경우가 있음
-          console.log("No methods found, trying alternative approach"); // 디버깅용
+          // fetchSignInMethodsForEmail에서 빈 배열 반환
+          // Firebase의 보안 설정으로 인해 다른 제공자 정보가 숨겨질 수 있음
+          console.log("No methods found from fetchSignInMethodsForEmail"); // 디버깅용
           
-          // auth/user-not-found 에러가 있다면 실제로 사용자가 없는 것
-          if (error.code === "auth/user-not-found") {
-            throw new Error(formatMessage(msg.userNotFound, { email }));
-          } else {
-            // auth/invalid-credential의 경우 다른 제공자로 가입되었을 가능성이 높음
-            // 하지만 fetchSignInMethodsForEmail에서 찾을 수 없는 경우
-            throw new Error(formatMessage(msg.userNotFound, { email }));
+          // 회원가입 시도를 통해 확인 (실제 계정 생성하지 않고 에러만 확인)
+          try {
+            // 매우 약한 비밀번호로 회원가입 시도 (실패할 것을 예상)
+            await createUserWithEmailAndPassword(auth, email, "123");
+          } catch (signupError) {
+            console.log("Signup test result:", signupError.code); // 디버깅용
+            
+            if (signupError.code === "auth/email-already-in-use") {
+              // 이메일이 이미 사용 중 = 다른 제공자로 가입되어 있음
+              // fetchSignInMethodsForEmail을 다시 시도
+              try {
+                const retryMethods = await fetchSignInMethodsForEmail(auth, email);
+                console.log("Retry methods after signup test:", retryMethods);
+                
+                if (retryMethods && retryMethods.length > 0) {
+                  const method = retryMethods[0];
+                  if (method === "password") {
+                    // 이메일/비밀번호 계정
+                    throw new Error(formatMessage(msg.invalidCredential, {}));
+                  } else {
+                    // 다른 제공자
+                    let providerText = method === "google.com" ? "Google" : 
+                                     method === "facebook.com" ? "Facebook" :
+                                     method === "github.com" ? "GitHub" : msg.otherLoginMethod;
+                    throw new Error(formatMessage(msg.existingProvider, { email, provider: providerText }));
+                  }
+                } else {
+                  // 여전히 빈 배열이면 일반적인 메시지
+                  throw new Error(formatMessage(msg.existingProvider, { email, provider: msg.otherLoginMethod }));
+                }
+              } catch (retryError) {
+                if (retryError.message && (retryError.message.includes('이미') || retryError.message.includes('올바르지'))) {
+                  throw retryError;
+                }
+                // fetchSignInMethodsForEmail 재시도 실패시 일반적인 메시지
+                throw new Error(formatMessage(msg.existingProvider, { email, provider: msg.otherLoginMethod }));
+              }
+            } else if (signupError.code === "auth/weak-password") {
+              // 비밀번호가 약함 = 가입 가능 = 가입되지 않은 이메일
+              throw new Error(formatMessage(msg.userNotFound, { email }));
+            } else {
+              // 다른 에러 - 가입되지 않은 것으로 간주
+              throw new Error(formatMessage(msg.userNotFound, { email }));
+            }
           }
         }
-      } catch (fetchError) {
-        console.error("fetchSignInMethodsForEmail error:", fetchError); // 디버깅용
-        // fetchSignInMethodsForEmail 실패 시
-        if (fetchError.message && (fetchError.message.includes('가입된') || fetchError.message.includes('이미') || 
-            fetchError.message.includes('registered') || fetchError.message.includes('found') ||
-            fetchError.message.includes('No account') || fetchError.message.includes('未找到'))) {
-          throw fetchError; // 이미 처리된 메시지는 그대로 전달
+      } catch (methodsError) {
+        console.error("fetchSignInMethodsForEmail 에러:", methodsError);
+        
+        // 이미 처리된 메시지인지 확인
+        if (methodsError.message && (
+            methodsError.message.includes('가입된') || methodsError.message.includes('이미') || 
+            methodsError.message.includes('registered') || methodsError.message.includes('found') ||
+            methodsError.message.includes('No account') || methodsError.message.includes('未找到') ||
+            methodsError.message.includes('올바르지') || methodsError.message.includes('Invalid')
+        )) {
+          throw methodsError; // 이미 처리된 메시지는 그대로 전달
         }
+        
         // fetchSignInMethodsForEmail 자체가 실패한 경우
-        throw new Error(formatMessage(msg.invalidCredential, {}));
+        // 원본 에러 코드에 따라 처리
+        if (error.code === "auth/user-not-found") {
+          throw new Error(formatMessage(msg.userNotFound, { email }));
+        } else {
+          throw new Error(formatMessage(msg.invalidCredential, {}));
+        }
       }
     } else if (error.code === "auth/too-many-requests") {
       throw new Error(
