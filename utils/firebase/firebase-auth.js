@@ -215,24 +215,35 @@ export const login = async (email, password) => {
           // Firebase의 보안 설정으로 인해 다른 제공자 정보가 숨겨질 수 있음
           console.log("No methods found from fetchSignInMethodsForEmail"); // 디버깅용
           
-          // 회원가입 시도를 통해 확인 (실제 계정 생성하지 않고 에러만 확인)
+          // 더 강력한 비밀번호로 회원가입 시도하여 확인
           try {
-            // 매우 약한 비밀번호로 회원가입 시도 (실패할 것을 예상)
-            await createUserWithEmailAndPassword(auth, email, "123");
+            // 강력한 비밀번호로 실제 회원가입 시도
+            const tempPassword = "TempPass123!@#" + Date.now();
+            const userCredential = await createUserWithEmailAndPassword(auth, email, tempPassword);
+            
+            // 성공하면 즉시 계정 삭제 (가입되지 않은 이메일이었음)
+            if (userCredential.user) {
+              await deleteUser(userCredential.user);
+              console.log("Temporary account created and deleted - email was not registered");
+            }
+            throw new Error(formatMessage(msg.userNotFound, { email }));
+            
           } catch (signupError) {
-            console.log("Signup test result:", signupError.code); // 디버깅용
+            console.log("Strong password signup test result:", signupError.code); // 디버깅용
             
             if (signupError.code === "auth/email-already-in-use") {
-              // 이메일이 이미 사용 중 = 다른 제공자로 가입되어 있음
-              // fetchSignInMethodsForEmail을 다시 시도
+              // 이메일이 이미 사용 중 = 확실히 다른 제공자로 가입되어 있음
+              console.log("Email confirmed as already in use - checking providers again");
+              
+              // 마지막으로 fetchSignInMethodsForEmail 재시도
               try {
-                const retryMethods = await fetchSignInMethodsForEmail(auth, email);
-                console.log("Retry methods after signup test:", retryMethods);
+                const finalMethods = await fetchSignInMethodsForEmail(auth, email);
+                console.log("Final methods check:", finalMethods);
                 
-                if (retryMethods && retryMethods.length > 0) {
-                  const method = retryMethods[0];
+                if (finalMethods && finalMethods.length > 0) {
+                  const method = finalMethods[0];
                   if (method === "password") {
-                    // 이메일/비밀번호 계정
+                    // 이메일/비밀번호 계정 - 비밀번호 틀림
                     throw new Error(formatMessage(msg.invalidCredential, {}));
                   } else {
                     // 다른 제공자
@@ -242,21 +253,22 @@ export const login = async (email, password) => {
                     throw new Error(formatMessage(msg.existingProvider, { email, provider: providerText }));
                   }
                 } else {
-                  // 여전히 빈 배열이면 일반적인 메시지
+                  // 여전히 빈 배열이지만 email-already-in-use 에러가 확실함
+                  // Firebase 보안 설정으로 제공자 정보가 숨겨진 것으로 판단
+                  console.log("Provider info hidden due to security settings");
                   throw new Error(formatMessage(msg.existingProvider, { email, provider: msg.otherLoginMethod }));
                 }
-              } catch (retryError) {
-                if (retryError.message && (retryError.message.includes('이미') || retryError.message.includes('올바르지'))) {
-                  throw retryError;
+              } catch (finalError) {
+                if (finalError.message && (finalError.message.includes('이미') || finalError.message.includes('올바르지'))) {
+                  throw finalError;
                 }
-                // fetchSignInMethodsForEmail 재시도 실패시 일반적인 메시지
+                // fetchSignInMethodsForEmail이 실패해도 email-already-in-use는 확실
                 throw new Error(formatMessage(msg.existingProvider, { email, provider: msg.otherLoginMethod }));
               }
-            } else if (signupError.code === "auth/weak-password") {
-              // 비밀번호가 약함 = 가입 가능 = 가입되지 않은 이메일
-              throw new Error(formatMessage(msg.userNotFound, { email }));
             } else {
-              // 다른 에러 - 가입되지 않은 것으로 간주
+              // auth/email-already-in-use가 아닌 다른 에러
+              // 실제로 가입되지 않은 이메일일 가능성이 높음
+              console.log("Signup failed with different error - likely unregistered email");
               throw new Error(formatMessage(msg.userNotFound, { email }));
             }
           }
