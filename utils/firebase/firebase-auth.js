@@ -168,6 +168,49 @@ export const googleLogin = async () => {
 
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
+    const email = user.email;
+
+    // Google 로그인 직후 자동 연동 확인
+    if (email) {
+      try {
+        // 현재 사용자의 모든 제공자 확인
+        const providerData = user.providerData || [];
+        const providers = providerData.map(provider => provider.providerId);
+        
+        // Google 이외의 다른 제공자가 이미 연결되어 있는지 확인 (자동 연동 감지)
+        const nonGoogleProviders = providers.filter(providerId => providerId !== "google.com");
+        
+        if (nonGoogleProviders.length > 0) {
+          // 자동 연동이 발생했으므로 사용자 계정을 삭제하고 안내
+          try {
+            await user.delete(); // Firebase에서 자동 생성된 계정 삭제
+          } catch (deleteError) {
+            console.warn("계정 삭제 중 오류:", deleteError);
+            await signOut(auth); // 삭제가 안되면 최소한 로그아웃
+          }
+          
+          const firstProvider = nonGoogleProviders[0];
+          let existingMethodText = "다른 로그인 방법";
+          
+          if (firstProvider === "facebook.com") {
+            existingMethodText = "Facebook 계정";
+          } else if (firstProvider === "github.com") {
+            existingMethodText = "GitHub 계정";
+          } else if (firstProvider === "password") {
+            existingMethodText = "이메일/비밀번호";
+          }
+
+          throw new Error(
+            `이 이메일 (${email})은 이미 ${existingMethodText}으로 가입되어 있습니다. ${existingMethodText}으로 로그인해주세요.`
+          );
+        }
+      } catch (methodError) {
+        if (methodError.message.includes("이미")) {
+          throw methodError; // 이미 처리한 메시지는 그대로 전달
+        }
+        // 다른 오류는 무시하고 계속 진행
+      }
+    }
 
     await saveUserData(user);
 
