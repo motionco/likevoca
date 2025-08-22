@@ -364,10 +364,14 @@ if (loginForm) {
 });
 
 
-// 로그인 상태 체크 - 이미 로그인되어 있으면 홈으로 리디렉션
+// 로그인 상태 체크 - 이메일 인증이 완료된 사용자만 홈으로 리디렉션
 onAuthStateChanged(auth, (user) => {
-  if (user) {
-    console.log("이미 로그인되어 있습니다. 홈으로 리디렉션합니다.");
+  if (user && user.emailVerified) {
+    console.log("이미 로그인되어 있고 이메일 인증이 완료되었습니다. 홈으로 리디렉션합니다.");
     goToLanguageSpecificPage("index.html");
+  } else if (user && !user.emailVerified) {
+    console.log("로그인되었지만 이메일 인증이 필요합니다.");
+    // 이메일 인증이 안된 경우 로그아웃
+    auth.signOut();
   }
 });
