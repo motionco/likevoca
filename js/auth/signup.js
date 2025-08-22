@@ -9,8 +9,21 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/fi
 // 현재 언어의 번역 가져오기
 async function getTranslations() {
   const userLanguage = localStorage.getItem("userLanguage") || "ko";
+  
+  // 현재 경로 확인 및 올바른 경로 생성
+  const currentPath = window.location.pathname;
+  let basePath;
+  
+  if (currentPath.includes("/locales/")) {
+    // locales 폴더 내부에 있는 경우 (/locales/ja/signup.html)
+    basePath = "../../";
+  } else {
+    // 루트나 다른 폴더에 있는 경우
+    basePath = "./";
+  }
+  
   try {
-    const response = await fetch(`locales/${userLanguage}/translations.json`);
+    const response = await fetch(`${basePath}locales/${userLanguage}/translations.json`);
     if (response.ok) {
       return await response.json();
     }
@@ -20,12 +33,25 @@ async function getTranslations() {
   
   // 기본값으로 한국어 번역 반환
   try {
-    const response = await fetch(`locales/ko/translations.json`);
-    return await response.json();
+    const response = await fetch(`${basePath}locales/ko/translations.json`);
+    if (response.ok) {
+      return await response.json();
+    }
   } catch (error) {
     console.error("기본 번역 파일 로드 실패:", error);
-    return {};
   }
+  
+  // 모든 시도가 실패하면 기본 메시지 반환
+  return {
+    fields_required: "모든 필드를 채워주세요.",
+    passwords_do_not_match: "비밀번호가 일치하지 않습니다.",
+    invalid_email: "유효한 이메일 주소를 입력해주세요.",
+    signup_failed: "회원가입 실패",
+    google_signup_success: "환영합니다, {name}님! Google 계정으로 회원가입이 완료되었습니다.",
+    github_signup_success: "환영합니다, {name}님! GitHub 계정으로 회원가입이 완료되었습니다.",
+    facebook_signup_success: "환영합니다, {name}님! Facebook 계정으로 회원가입이 완료되었습니다.",
+    database_error: "사용자 문서 생성 실패"
+  };
 }
 
 // 메시지 템플릿 처리 함수
@@ -63,11 +89,18 @@ const submitButton = document.getElementById("signup-button");
 
 // 브라우저 기본 이메일 검증 비활성화
 if (emailInput) {
-  emailInput.setAttribute('novalidate', '');
+  // input type을 text로 변경하여 브라우저 검증 완전 비활성화
+  emailInput.setAttribute('type', 'text');
+  emailInput.setAttribute('inputmode', 'email');
   // 폼 요소가 있다면 novalidate 속성 추가
   const form = emailInput.closest('form');
   if (form) {
     form.setAttribute('novalidate', '');
+    // 폼 제출 이벤트를 완전히 막기
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      return false;
+    });
   }
 }
 
@@ -93,7 +126,8 @@ document.getElementById("google-signup-btn")?.addEventListener("click", async ()
       goToLanguageSpecificPage("index.html");
     }
   } catch (error) {
-    console.error("Google 회원가입 오류:", error);
+    const errorCode = error.code || "unknown";
+    console.error("Google 회원가입 오류:", errorCode, error.message);
     showError(error.message);
   }
 });
@@ -109,7 +143,8 @@ document.getElementById("github-signup-btn")?.addEventListener("click", async ()
       goToLanguageSpecificPage("index.html");
     }
   } catch (error) {
-    console.error("GitHub 회원가입 오류:", error);
+    const errorCode = error.code || "unknown";
+    console.error("GitHub 회원가입 오류:", errorCode, error.message);
     showError(error.message);
   }
 });
@@ -125,7 +160,8 @@ document.getElementById("facebook-signup-btn")?.addEventListener("click", async 
       goToLanguageSpecificPage("index.html");
     }
   } catch (error) {
-    console.error("Facebook 회원가입 오류:", error);
+    const errorCode = error.code || "unknown";
+    console.error("Facebook 회원가입 오류:", errorCode, error.message);
     showError(error.message);
   }
 });
@@ -183,7 +219,8 @@ submitButton.addEventListener("click", async () => {
       }
     } else {
       // 실제 회원가입 실패
-      console.error(t.signup_failed + ": ", error.message);
+      const errorCode = error.code || "unknown";
+      console.error(t.signup_failed + ": ", errorCode, error.message);
       showError(`${t.signup_failed}: ${error.message}`);
     }
   } finally {

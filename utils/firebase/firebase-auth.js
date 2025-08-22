@@ -53,7 +53,8 @@ const getLocalizedMessage = () => {
       invalidCredential: '이메일 또는 비밀번호가 올바르지 않습니다.',
       otherLoginMethod: '다른 로그인 방법',
       emailVerificationRequired: '이메일 인증이 필요합니다. 이메일을 확인해주세요.',
-      emailVerificationSent: '회원가입이 완료되었습니다. 이메일 인증을 완료해주세요.'
+      emailVerificationSent: '회원가입이 완료되었습니다. 이메일 인증을 완료해주세요.',
+      weakPassword: '비밀번호는 최소 6자 이상이어야 합니다'
     },
     'en': {
       credentialInUse: 'This {provider} account is already in use by another account. Please use a different {provider} account.',
@@ -69,7 +70,8 @@ const getLocalizedMessage = () => {
       invalidCredential: 'Invalid email or password.',
       otherLoginMethod: 'another login method',
       emailVerificationRequired: 'Email verification is required. Please check your email.',
-      emailVerificationSent: 'Registration completed. Please complete email verification.'
+      emailVerificationSent: 'Registration completed. Please complete email verification.',
+      weakPassword: 'Password should be at least 6 characters'
     },
     'zh': {
       credentialInUse: '此 {provider} 账户已被其他账户使用。请使用其他 {provider} 账户。',
@@ -85,7 +87,8 @@ const getLocalizedMessage = () => {
       invalidCredential: '邮箱或密码无效。',
       otherLoginMethod: '其他登录方式',
       emailVerificationRequired: '需要邮箱验证。请检查您的邮箱。',
-      emailVerificationSent: '注册完成。请完成邮箱验证。'
+      emailVerificationSent: '注册完成。请完成邮箱验证。',
+      weakPassword: '密码至少需要6个字符'
     },
     'ja': {
       credentialInUse: 'この {provider} アカウントは既に他のアカウントで使用されています。別の {provider} アカウントをご使用ください。',
@@ -101,7 +104,8 @@ const getLocalizedMessage = () => {
       invalidCredential: 'メールアドレスまたはパスワードが正しくありません。',
       otherLoginMethod: '他のログイン方法',
       emailVerificationRequired: 'メール認証が必要です。メールをご確認ください。',
-      emailVerificationSent: '登録が完了しました。メール認証を完了してください。'
+      emailVerificationSent: '登録が完了しました。メール認証を完了してください。',
+      weakPassword: 'パスワードは6文字以上で入力してください'
     },
     'es': {
       credentialInUse: 'Esta cuenta de {provider} ya está siendo utilizada por otra cuenta. Por favor use una cuenta de {provider} diferente.',
@@ -117,7 +121,8 @@ const getLocalizedMessage = () => {
       invalidCredential: 'Email o contraseña inválidos.',
       otherLoginMethod: 'otro método de inicio de sesión',
       emailVerificationRequired: 'Se requiere verificación de email. Por favor revise su correo.',
-      emailVerificationSent: 'Registro completado. Por favor complete la verificación de email.'
+      emailVerificationSent: 'Registro completado. Por favor complete la verificación de email.',
+      weakPassword: 'La contraseña debe tener al menos 6 caracteres'
     }
   };
 
@@ -175,7 +180,13 @@ export const signup = async (email, password, displayName) => {
     
   } catch (error) {
     if (error.code === "auth/email-already-in-use") {
-      throw new Error(formatMessage(msg.emailAlreadyInUse, { email }));
+      const customError = new Error(formatMessage(msg.emailAlreadyInUse, { email }));
+      customError.code = error.code;
+      throw customError;
+    } else if (error.code === "auth/weak-password") {
+      const customError = new Error(formatMessage(msg.weakPassword, {}));
+      customError.code = error.code;
+      throw customError;
     } else {
       throw error;
     }
@@ -207,19 +218,22 @@ export const login = async (email, password) => {
     // 간단하고 안전한 에러 처리
     if (error.code === "auth/invalid-credential") {
       // 자격 증명 무효 - 이메일/비밀번호가 틀렸거나 다른 제공자로 가입됨
-      console.log("로그인 실패: auth/invalid-credential");
-      throw new Error(formatMessage(msg.invalidCredential, {}));
+      const customError = new Error(formatMessage(msg.invalidCredential, {}));
+      customError.code = error.code;
+      throw customError;
       
     } else if (error.code === "auth/user-not-found") {
       // 사용자 없음 - 가입되지 않은 이메일
-      console.log("로그인 실패: auth/user-not-found");  
-      throw new Error(formatMessage(msg.userNotFound, { email }));
+      const customError = new Error(formatMessage(msg.userNotFound, { email }));
+      customError.code = error.code;
+      throw customError;
       
     } else if (error.code === "auth/too-many-requests") {
-      throw new Error("너무 많은 로그인 시도가 있었습니다. 잠시 후 다시 시도해주세요.");
+      const customError = new Error("너무 많은 로그인 시도가 있었습니다. 잠시 후 다시 시도해주세요.");
+      customError.code = error.code;
+      throw customError;
       
     } else {
-      console.log("로그인 실패: 기타 에러", error.code);
       throw error;
     }
   }

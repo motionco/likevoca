@@ -134,6 +134,7 @@
   "invalid_email_format": "Invalid email format",
   "too_many_requests": "Too many login attempts. Please try again later",
   "login_error": "An error occurred during login. Please try again",
+  "weak_password": "Password should be at least 6 characters",
   "no_account": "Don't have an account?",
   "create_account": "Create Account",
   "name": "Name",

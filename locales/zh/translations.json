@@ -689,5 +689,22 @@
   "category_volunteering": "志愿服务",
   "category_weather": "天气",
   "category_weather_talk": "天气对话",
-  "category_wellness": "健康"
+  "category_wellness": "健康",
+  "fields_required": "请填写所有字段",
+  "passwords_do_not_match": "密码不匹配",
+  "invalid_email": "请输入有效的邮箱地址",
+  "signup_failed": "注册失败",
+  "login_success": "登录成功！欢迎，{name}！",
+  "google_signup_success": "欢迎，{name}！您的Google账户注册已完成",
+  "github_signup_success": "欢迎，{name}！您的GitHub账户注册已完成",
+  "facebook_signup_success": "欢迎，{name}！您的Facebook账户注册已完成",
+  "database_error": "创建用户文档失败",
+  "email_verification_required": "需要邮箱验证。请检查您的邮箱",
+  "user_not_found": "此邮箱未注册",
+  "wrong_password": "密码不正确",
+  "invalid_credential": "邮箱或密码不正确",
+  "invalid_email_format": "邮箱格式无效",
+  "too_many_requests": "登录尝试次数过多。请稍后再试",
+  "login_error": "登录过程中发生错误。请重试",
+  "weak_password": "密码至少需要6个字符"
 }

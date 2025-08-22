@@ -689,5 +689,22 @@
   "category_volunteering": "ボランティア",
   "category_weather": "天気",
   "category_weather_talk": "天気の話",
-  "category_wellness": "ウェルネス"
+  "category_wellness": "ウェルネス",
+  "fields_required": "すべてのフィールドを入力してください",
+  "passwords_do_not_match": "パスワードが一致しません",
+  "invalid_email": "有効なメールアドレスを入力してください",
+  "signup_failed": "会員登録失敗",
+  "login_success": "ログイン成功！ようこそ、{name}さん！",
+  "google_signup_success": "ようこそ、{name}さん！Googleアカウントでの会員登録が完了しました",
+  "github_signup_success": "ようこそ、{name}さん！GitHubアカウントでの会員登録が完了しました",
+  "facebook_signup_success": "ようこそ、{name}さん！Facebookアカウントでの会員登録が完了しました",
+  "database_error": "ユーザー文書の作成に失敗しました",
+  "email_verification_required": "メール認証が必要です。メールをご確認ください",
+  "user_not_found": "登録されていないメールアドレスです",
+  "wrong_password": "パスワードが正しくありません",
+  "invalid_credential": "メールアドレスまたはパスワードが正しくありません",
+  "invalid_email_format": "無効なメールアドレス形式です",
+  "too_many_requests": "ログイン試行回数が多すぎます。しばらく時間をおいてから再試行してください",
+  "login_error": "ログイン中にエラーが発生しました。再試行してください",
+  "weak_password": "パスワードは6文字以上で入力してください"
 }
