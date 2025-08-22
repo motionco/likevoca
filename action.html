@@ -124,7 +124,11 @@
                 invalidError: '유효하지 않은 인증 링크입니다. 새로운 인증 이메일을 요청해주세요.',
                 disabledError: '비활성화된 계정입니다. 관리자에게 문의해주세요.',
                 notFoundError: '사용자를 찾을 수 없습니다. 회원가입을 다시 진행해주세요.',
-                invalidRequest: '잘못된 요청입니다.'
+                invalidRequest: '잘못된 요청입니다.',
+                validationRequired: '모든 필드를 입력해주세요.',
+                passwordTooShort: '비밀번호는 최소 6자 이상이어야 합니다.',
+                passwordMismatch: '비밀번호가 일치하지 않습니다.',
+                passwordResetError: '비밀번호 재설정 중 오류가 발생했습니다.'
             },
             'en': {
                 title: 'Email Verification - Like Voca',
@@ -146,7 +150,11 @@
                 invalidError: 'Invalid verification link. Please request a new verification email.',
                 disabledError: 'This account has been disabled. Please contact support.',
                 notFoundError: 'User not found. Please sign up again.',
-                invalidRequest: 'Invalid request.'
+                invalidRequest: 'Invalid request.',
+                validationRequired: 'Please fill in all fields.',
+                passwordTooShort: 'Password must be at least 6 characters long.',
+                passwordMismatch: 'Passwords do not match.',
+                passwordResetError: 'An error occurred while resetting password.'
             },
             'zh': {
                 title: '邮箱验证 - Like Voca',
@@ -168,7 +176,11 @@
                 invalidError: '无效的验证链接。请请求新的验证邮件。',
                 disabledError: '此账户已被禁用。请联系客服。',
                 notFoundError: '未找到用户。请重新注册。',
-                invalidRequest: '无效请求。'
+                invalidRequest: '无效请求。',
+                validationRequired: '请填写所有字段。',
+                passwordTooShort: '密码至少需要6个字符。',
+                passwordMismatch: '密码不匹配。',
+                passwordResetError: '重置密码时发生错误。'
             },
             'ja': {
                 title: 'メール認証 - Like Voca',
@@ -190,7 +202,11 @@
                 invalidError: '無効な認証リンクです。新しい認証メールをリクエストしてください。',
                 disabledError: 'このアカウントは無効化されています。サポートにお問い合わせください。',
                 notFoundError: 'ユーザーが見つかりません。再度サインアップしてください。',
-                invalidRequest: '無効なリクエストです。'
+                invalidRequest: '無効なリクエストです。',
+                validationRequired: 'すべてのフィールドを入力してください。',
+                passwordTooShort: 'パスワードは少なくとも6文字以上である必要があります。',
+                passwordMismatch: 'パスワードが一致しません。',
+                passwordResetError: 'パスワードリセット中にエラーが発生しました。'
             },
             'es': {
                 title: 'Verificación de Email - Like Voca',
@@ -212,7 +228,11 @@
                 invalidError: 'Enlace de verificación inválido. Por favor solicite un nuevo email de verificación.',
                 disabledError: 'Esta cuenta ha sido deshabilitada. Por favor contacte soporte.',
                 notFoundError: 'Usuario no encontrado. Por favor regístrese nuevamente.',
-                invalidRequest: 'Solicitud inválida.'
+                invalidRequest: 'Solicitud inválida.',
+                validationRequired: 'Por favor complete todos los campos.',
+                passwordTooShort: 'La contraseña debe tener al menos 6 caracteres.',
+                passwordMismatch: 'Las contraseñas no coinciden.',
+                passwordResetError: 'Ocurrió un error al restablecer la contraseña.'
             }
         };
 
@@ -324,19 +344,19 @@
             
             // 비밀번호 유효성 검사
             if (!newPassword || !confirmPassword) {
-                passwordError.textContent = '모든 필드를 입력해주세요.';
+                passwordError.textContent = t.validationRequired;
                 passwordError.classList.remove('hidden');
                 return;
             }
             
             if (newPassword.length < 6) {
-                passwordError.textContent = '비밀번호는 최소 6자 이상이어야 합니다.';
+                passwordError.textContent = t.passwordTooShort;
                 passwordError.classList.remove('hidden');
                 return;
             }
             
             if (newPassword !== confirmPassword) {
-                passwordError.textContent = '비밀번호가 일치하지 않습니다.';
+                passwordError.textContent = t.passwordMismatch;
                 passwordError.classList.remove('hidden');
                 return;
             }
@@ -353,7 +373,7 @@
                 
             } catch (error) {
                 console.error('비밀번호 재설정 오류:', error);
-                passwordError.textContent = '비밀번호 재설정 중 오류가 발생했습니다.';
+                passwordError.textContent = t.passwordResetError;
                 passwordError.classList.remove('hidden');
             }
         };
