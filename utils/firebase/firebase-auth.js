@@ -147,6 +147,10 @@ export const signup = async (email, password, displayName) => {
   const msg = getLocalizedMessage();
 
   try {
+    // 언어 코드 설정
+    const userLanguage = localStorage.getItem('userLanguage') || 'ko';
+    auth.languageCode = userLanguage;
+
     // Firebase의 createUserWithEmailAndPassword는 자동으로 로그인됨
     const userCredential = await createUserWithEmailAndPassword(
       auth,

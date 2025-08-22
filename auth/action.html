@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이메일 인증 - Like Voca</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white shadow-2xl rounded-lg p-8 max-w-md w-full mx-4">
+        <!-- 로딩 상태 -->
+        <div id="loading" class="text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p class="text-gray-600">처리 중입니다...</p>
+        </div>
+
+        <!-- 성공 상태 -->
+        <div id="success" class="hidden text-center">
+            <div class="mb-6">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-800 mb-2">이메일 인증 완료!</h1>
+                <p class="text-gray-600 mb-6">
+                    이메일 인증이 성공적으로 완료되었습니다.<br>
+                    이제 새 계정으로 로그인할 수 있습니다.
+                </p>
+            </div>
+            
+            <div class="space-y-3">
+                <button onclick="goToLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200">
+                    로그인 페이지로 이동
+                </button>
+                <button onclick="goToHome()" class="w-full border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold py-3 px-4 rounded-lg transition duration-200">
+                    홈페이지로 이동
+                </button>
+            </div>
+        </div>
+
+        <!-- 에러 상태 -->
+        <div id="error" class="hidden text-center">
+            <div class="mb-6">
+                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-800 mb-2">인증 실패</h1>
+                <p id="error-message" class="text-gray-600 mb-6">
+                    이메일 인증 처리 중 오류가 발생했습니다.
+                </p>
+            </div>
+            
+            <div class="space-y-3">
+                <button onclick="goToLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200">
+                    로그인 페이지로 이동
+                </button>
+                <button onclick="goToSignup()" class="w-full border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold py-3 px-4 rounded-lg transition duration-200">
+                    회원가입 페이지로 이동
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js';
+        import { getAuth, applyActionCode } from 'https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js';
+
+        // Firebase 설정
+        const firebaseConfig = {
+            apiKey: "AIzaSyCPQVYE7h7odTDCkoH6mrsEtT1giWk8yDM",
+            authDomain: "uploadfile-e6f81.firebaseapp.com",
+            projectId: "uploadfile-e6f81",
+            storageBucket: "uploadfile-e6f81.firebasestorage.app",
+            messagingSenderId: "488821013554",
+            appId: "1:488821013554:web:98b5ff8c8823e8e26e96e9",
+            measurementId: "G-N0QE8SRZ0V"
+        };
+
+        // Firebase 초기화
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // URL 파라미터 파싱
+        function getParameterByName(name) {
+            const url = window.location.href;
+            name = name.replace(/[\[\]]/g, '\\$&');
+            const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+            const results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+
+        // 페이지 이동 함수들을 전역으로 설정
+        window.goToLogin = function() {
+            const userLanguage = localStorage.getItem('userLanguage') || 'ko';
+            const isDev = window.location.hostname === 'localhost' || 
+                         window.location.hostname === '127.0.0.1' || 
+                         window.location.port === '5595';
+            
+            if (isDev) {
+                window.location.href = `/locales/${userLanguage}/login.html`;
+            } else {
+                window.location.href = `/${userLanguage}/login.html`;
+            }
+        };
+
+        window.goToHome = function() {
+            const userLanguage = localStorage.getItem('userLanguage') || 'ko';
+            const isDev = window.location.hostname === 'localhost' || 
+                         window.location.hostname === '127.0.0.1' || 
+                         window.location.port === '5595';
+            
+            if (isDev) {
+                window.location.href = `/locales/${userLanguage}/index.html`;
+            } else {
+                window.location.href = `/${userLanguage}/index.html`;
+            }
+        };
+
+        window.goToSignup = function() {
+            const userLanguage = localStorage.getItem('userLanguage') || 'ko';
+            const isDev = window.location.hostname === 'localhost' || 
+                         window.location.hostname === '127.0.0.1' || 
+                         window.location.port === '5595';
+            
+            if (isDev) {
+                window.location.href = `/locales/${userLanguage}/signup.html`;
+            } else {
+                window.location.href = `/${userLanguage}/signup.html`;
+            }
+        };
+
+        // 액션 처리
+        async function handleAction() {
+            const mode = getParameterByName('mode');
+            const actionCode = getParameterByName('oobCode');
+            const lang = getParameterByName('lang');
+
+            // 언어 설정 저장
+            if (lang) {
+                localStorage.setItem('userLanguage', lang);
+            }
+
+            const loadingDiv = document.getElementById('loading');
+            const successDiv = document.getElementById('success');
+            const errorDiv = document.getElementById('error');
+            const errorMessage = document.getElementById('error-message');
+
+            try {
+                if (mode === 'verifyEmail' && actionCode) {
+                    // 이메일 인증 적용
+                    await applyActionCode(auth, actionCode);
+                    
+                    // 성공 화면 표시
+                    loadingDiv.classList.add('hidden');
+                    successDiv.classList.remove('hidden');
+                } else {
+                    throw new Error('잘못된 요청입니다.');
+                }
+            } catch (error) {
+                console.error('이메일 인증 오류:', error);
+                
+                // 에러 메시지 설정
+                let errorText = '이메일 인증 처리 중 오류가 발생했습니다.';
+                
+                if (error.code === 'auth/expired-action-code') {
+                    errorText = '인증 링크가 만료되었습니다. 새로운 인증 이메일을 요청해주세요.';
+                } else if (error.code === 'auth/invalid-action-code') {
+                    errorText = '유효하지 않은 인증 링크입니다. 새로운 인증 이메일을 요청해주세요.';
+                } else if (error.code === 'auth/user-disabled') {
+                    errorText = '비활성화된 계정입니다. 관리자에게 문의해주세요.';
+                } else if (error.code === 'auth/user-not-found') {
+                    errorText = '사용자를 찾을 수 없습니다. 회원가입을 다시 진행해주세요.';
+                }
+                
+                errorMessage.textContent = errorText;
+                
+                // 에러 화면 표시
+                loadingDiv.classList.add('hidden');
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        // 페이지 로드 시 액션 처리
+        handleAction();
+    </script>
+</body>
+</html>
