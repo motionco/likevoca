@@ -378,36 +378,11 @@
             }
         };
 
-        // 로컬 개발 환경 감지 및 리다이렉션
-        function checkAndRedirectToLocal() {
-            // 로컬 개발 서버가 실행 중인지 확인
-            const currentUrl = window.location.href;
-            const urlParams = new URLSearchParams(window.location.search);
-            
-            // 이미 로컬에서 접속한 경우는 리다이렉션하지 않음
-            if (window.location.hostname === 'localhost' || 
-                window.location.hostname === '127.0.0.1' || 
-                window.location.port === '5595') {
-                return false;
-            }
-            
-            // 로컬 리다이렉션 시도
-            const localUrl = `http://127.0.0.1:5595/action.html${window.location.search}`;
-            
-            // 새 창으로 로컬 URL 열기 (사용자가 선택할 수 있도록)
-            if (confirm('로컬 개발 서버에서 테스트하시겠습니까?\n\n로컬 서버 URL: ' + localUrl)) {
-                window.open(localUrl, '_blank');
-            }
-        }
-
         // 액션 처리
         async function handleAction() {
             const mode = getParameterByName('mode');
             const actionCode = getParameterByName('oobCode');
             const lang = getParameterByName('lang');
-
-            // 로컬 개발 환경 리다이렉션 체크
-            checkAndRedirectToLocal();
 
             // 언어 설정 및 페이지 업데이트
             const userLanguage = lang || localStorage.getItem('userLanguage') || 'ko';
