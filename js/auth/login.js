@@ -8,6 +8,87 @@ import {
 import { auth } from "../../js/firebase/firebase-init.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
 
+// 다국어 지원
+const translations = {
+  'ko': {
+    fieldsRequired: '이메일과 비밀번호를 모두 입력해주세요.',
+    invalidEmail: '유효한 이메일 주소를 입력해주세요.',
+    loginSuccess: '로그인 성공! 환영합니다. {name}님!',
+    emailVerificationRequired: '이메일 인증이 필요합니다. 이메일을 확인해주세요.',
+    userNotFound: '등록되지 않은 이메일입니다.',
+    wrongPassword: '비밀번호가 올바르지 않습니다.',
+    invalidCredential: '이메일 또는 비밀번호가 올바르지 않습니다.',
+    invalidEmailFormat: '유효하지 않은 이메일 형식입니다.',
+    tooManyRequests: '너무 많은 로그인 시도가 있었습니다. 잠시 후 다시 시도해주세요.',
+    defaultError: '로그인 중 오류가 발생했습니다. 다시 시도해주세요.'
+  },
+  'en': {
+    fieldsRequired: 'Please enter both email and password.',
+    invalidEmail: 'Please enter a valid email address.',
+    loginSuccess: 'Login successful! Welcome, {name}!',
+    emailVerificationRequired: 'Email verification required. Please check your email.',
+    userNotFound: 'This email is not registered.',
+    wrongPassword: 'Incorrect password.',
+    invalidCredential: 'Email or password is incorrect.',
+    invalidEmailFormat: 'Invalid email format.',
+    tooManyRequests: 'Too many login attempts. Please try again later.',
+    defaultError: 'An error occurred during login. Please try again.'
+  },
+  'zh': {
+    fieldsRequired: '请输入邮箱和密码。',
+    invalidEmail: '请输入有效的邮箱地址。',
+    loginSuccess: '登录成功！欢迎，{name}！',
+    emailVerificationRequired: '需要邮箱验证。请检查您的邮箱。',
+    userNotFound: '此邮箱未注册。',
+    wrongPassword: '密码不正确。',
+    invalidCredential: '邮箱或密码不正确。',
+    invalidEmailFormat: '无效的邮箱格式。',
+    tooManyRequests: '登录尝试过多。请稍后再试。',
+    defaultError: '登录时发生错误。请重试。'
+  },
+  'ja': {
+    fieldsRequired: 'メールアドレスとパスワードを入力してください。',
+    invalidEmail: '有効なメールアドレスを入力してください。',
+    loginSuccess: 'ログイン成功！ようこそ、{name}さん！',
+    emailVerificationRequired: 'メール認証が必要です。メールを確認してください。',
+    userNotFound: 'このメールアドレスは登録されていません。',
+    wrongPassword: 'パスワードが正しくありません。',
+    invalidCredential: 'メールアドレスまたはパスワードが正しくありません。',
+    invalidEmailFormat: '無効なメール形式です。',
+    tooManyRequests: 'ログイン試行回数が多すぎます。しばらく待ってから再試行してください。',
+    defaultError: 'ログイン中にエラーが発生しました。再試行してください。'
+  },
+  'es': {
+    fieldsRequired: 'Por favor ingrese email y contraseña.',
+    invalidEmail: 'Por favor ingrese una dirección de email válida.',
+    loginSuccess: '¡Inicio de sesión exitoso! ¡Bienvenido, {name}!',
+    emailVerificationRequired: 'Se requiere verificación de email. Por favor revise su correo.',
+    userNotFound: 'Este email no está registrado.',
+    wrongPassword: 'Contraseña incorrecta.',
+    invalidCredential: 'Email o contraseña incorrectos.',
+    invalidEmailFormat: 'Formato de email inválido.',
+    tooManyRequests: 'Demasiados intentos de inicio de sesión. Por favor intente más tarde.',
+    defaultError: 'Ocurrió un error durante el inicio de sesión. Por favor intente nuevamente.'
+  }
+};
+
+// 현재 언어의 번역 가져오기
+function getTranslations() {
+  const userLanguage = localStorage.getItem("userLanguage") || "ko";
+  return translations[userLanguage] || translations['ko'];
+}
+
+// 메시지 템플릿 처리 함수
+function formatMessage(template, params = {}) {
+  return template.replace(/\{(\w+)\}/g, (match, key) => params[key] || match);
+}
+
+// 이메일 유효성 검사 함수
+function isValidEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
 // 언어별 페이지로 이동하는 함수
 function goToLanguageSpecificPage(filename) {
   const userLanguage = localStorage.getItem("userLanguage") || "ko";
