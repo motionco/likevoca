@@ -44,6 +44,34 @@
             </div>
         </div>
 
+        <!-- 비밀번호 재설정 상태 -->
+        <div id="password-reset" class="hidden text-center">
+            <div class="mb-6">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-800 mb-2">비밀번호 재설정</h1>
+                <p class="text-gray-600 mb-6">새 비밀번호를 입력해주세요.</p>
+            </div>
+            
+            <div class="space-y-4 text-left">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">새 비밀번호</label>
+                    <input type="password" id="new-password" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" minlength="6">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">비밀번호 확인</label>
+                    <input type="password" id="confirm-password" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" minlength="6">
+                </div>
+                <div id="password-error" class="hidden text-red-600 text-sm"></div>
+                <button onclick="updatePassword()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200">
+                    비밀번호 변경
+                </button>
+            </div>
+        </div>
+
         <!-- 에러 상태 -->
         <div id="error" class="hidden text-center">
             <div class="mb-6">
@@ -72,7 +100,7 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js';
-        import { getAuth, applyActionCode } from 'https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js';
+        import { getAuth, applyActionCode, verifyPasswordResetCode, confirmPasswordReset } from 'https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js';
 
         // 다국어 지원
         const translations = {
@@ -81,6 +109,12 @@
                 processing: '처리 중입니다...',
                 successTitle: '이메일 인증 완료!',
                 successMessage: '이메일 인증이 성공적으로 완료되었습니다.<br>이제 새 계정으로 로그인할 수 있습니다.',
+                passwordResetTitle: '비밀번호 재설정',
+                passwordResetMessage: '새 비밀번호를 입력해주세요.',
+                passwordResetSuccess: '비밀번호가 성공적으로 변경되었습니다.',
+                passwordLabel: '새 비밀번호',
+                confirmPasswordLabel: '비밀번호 확인',
+                updatePasswordButton: '비밀번호 변경',
                 loginButton: '로그인 페이지로 이동',
                 homeButton: '홈페이지로 이동',
                 errorTitle: '인증 실패',
@@ -97,6 +131,12 @@
                 processing: 'Processing...',
                 successTitle: 'Email Verified!',
                 successMessage: 'Your email has been successfully verified.<br>You can now sign in with your new account.',
+                passwordResetTitle: 'Reset Password',
+                passwordResetMessage: 'Please enter your new password.',
+                passwordResetSuccess: 'Your password has been successfully updated.',
+                passwordLabel: 'New Password',
+                confirmPasswordLabel: 'Confirm Password',
+                updatePasswordButton: 'Update Password',
                 loginButton: 'Go to Login Page',
                 homeButton: 'Go to Home Page',
                 errorTitle: 'Verification Failed',
@@ -113,6 +153,12 @@
                 processing: '处理中...',
                 successTitle: '邮箱验证完成！',
                 successMessage: '您的邮箱已成功验证。<br>现在您可以使用新账户登录。',
+                passwordResetTitle: '重置密码',
+                passwordResetMessage: '请输入新密码。',
+                passwordResetSuccess: '密码已成功更新。',
+                passwordLabel: '新密码',
+                confirmPasswordLabel: '确认密码',
+                updatePasswordButton: '更新密码',
                 loginButton: '前往登录页面',
                 homeButton: '前往首页',
                 errorTitle: '验证失败',
@@ -129,6 +175,12 @@
                 processing: '処理中...',
                 successTitle: 'メール認証完了！',
                 successMessage: 'メール認証が正常に完了しました。<br>新しいアカウントでログインできます。',
+                passwordResetTitle: 'パスワードリセット',
+                passwordResetMessage: '新しいパスワードを入力してください。',
+                passwordResetSuccess: 'パスワードが正常に更新されました。',
+                passwordLabel: '新しいパスワード',
+                confirmPasswordLabel: 'パスワード確認',
+                updatePasswordButton: 'パスワード更新',
                 loginButton: 'ログインページへ',
                 homeButton: 'ホームページへ',
                 errorTitle: '認証失敗',
@@ -145,6 +197,12 @@
                 processing: 'Procesando...',
                 successTitle: '¡Email Verificado!',
                 successMessage: 'Su email ha sido verificado exitosamente.<br>Ahora puede iniciar sesión con su nueva cuenta.',
+                passwordResetTitle: 'Restablecer Contraseña',
+                passwordResetMessage: 'Por favor ingrese su nueva contraseña.',
+                passwordResetSuccess: 'Su contraseña ha sido actualizada exitosamente.',
+                passwordLabel: 'Nueva Contraseña',
+                confirmPasswordLabel: 'Confirmar Contraseña',
+                updatePasswordButton: 'Actualizar Contraseña',
                 loginButton: 'Ir a Página de Inicio de Sesión',
                 homeButton: 'Ir a Página de Inicio',
                 errorTitle: 'Verificación Fallida',
@@ -224,9 +282,14 @@
             }
         };
 
+        // 전역 변수
+        let currentActionCode = null;
+        let currentLanguage = 'ko';
+
         // 언어별 텍스트 업데이트 함수
         function updatePageLanguage(lang) {
             const t = translations[lang] || translations['ko'];
+            currentLanguage = lang;
             
             // 페이지 제목과 언어 속성 변경
             document.title = t.title;
@@ -238,10 +301,62 @@
             document.querySelector('#success p').innerHTML = t.successMessage;
             document.querySelector('#success button:first-of-type').textContent = t.loginButton;
             document.querySelector('#success button:last-of-type').textContent = t.homeButton;
+            
+            // 비밀번호 재설정 텍스트
+            document.querySelector('#password-reset h1').textContent = t.passwordResetTitle;
+            document.querySelector('#password-reset p').textContent = t.passwordResetMessage;
+            document.querySelector('#password-reset label:first-of-type').textContent = t.passwordLabel;
+            document.querySelector('#password-reset label:last-of-type').textContent = t.confirmPasswordLabel;
+            document.querySelector('#password-reset button').textContent = t.updatePasswordButton;
+            
+            // 에러 텍스트
             document.querySelector('#error h1').textContent = t.errorTitle;
             document.querySelector('#error button:first-of-type').textContent = t.loginButton;
             document.querySelector('#error button:last-of-type').textContent = t.signupButton;
         }
+
+        // 비밀번호 업데이트 함수
+        window.updatePassword = async function() {
+            const t = translations[currentLanguage] || translations['ko'];
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const passwordError = document.getElementById('password-error');
+            
+            // 비밀번호 유효성 검사
+            if (!newPassword || !confirmPassword) {
+                passwordError.textContent = '모든 필드를 입력해주세요.';
+                passwordError.classList.remove('hidden');
+                return;
+            }
+            
+            if (newPassword.length < 6) {
+                passwordError.textContent = '비밀번호는 최소 6자 이상이어야 합니다.';
+                passwordError.classList.remove('hidden');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                passwordError.textContent = '비밀번호가 일치하지 않습니다.';
+                passwordError.classList.remove('hidden');
+                return;
+            }
+            
+            try {
+                // 비밀번호 재설정
+                await confirmPasswordReset(auth, currentActionCode, newPassword);
+                
+                // 성공 메시지 표시
+                document.getElementById('password-reset').classList.add('hidden');
+                document.querySelector('#success h1').textContent = t.passwordResetSuccess;
+                document.querySelector('#success p').textContent = '';
+                document.getElementById('success').classList.remove('hidden');
+                
+            } catch (error) {
+                console.error('비밀번호 재설정 오류:', error);
+                passwordError.textContent = '비밀번호 재설정 중 오류가 발생했습니다.';
+                passwordError.classList.remove('hidden');
+            }
+        };
 
         // 액션 처리
         async function handleAction() {
@@ -256,6 +371,7 @@
 
             const loadingDiv = document.getElementById('loading');
             const successDiv = document.getElementById('success');
+            const passwordResetDiv = document.getElementById('password-reset');
             const errorDiv = document.getElementById('error');
             const errorMessage = document.getElementById('error-message');
             const t = translations[userLanguage] || translations['ko'];
@@ -268,6 +384,14 @@
                     // 성공 화면 표시
                     loadingDiv.classList.add('hidden');
                     successDiv.classList.remove('hidden');
+                } else if (mode === 'resetPassword' && actionCode) {
+                    // 비밀번호 재설정 코드 검증
+                    await verifyPasswordResetCode(auth, actionCode);
+                    currentActionCode = actionCode;
+                    
+                    // 비밀번호 재설정 화면 표시
+                    loadingDiv.classList.add('hidden');
+                    passwordResetDiv.classList.remove('hidden');
                 } else {
                     throw new Error(t.invalidRequest);
                 }
