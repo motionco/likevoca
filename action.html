@@ -74,6 +74,90 @@
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js';
         import { getAuth, applyActionCode } from 'https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js';
 
+        // 다국어 지원
+        const translations = {
+            'ko': {
+                title: '이메일 인증 - Like Voca',
+                processing: '처리 중입니다...',
+                successTitle: '이메일 인증 완료!',
+                successMessage: '이메일 인증이 성공적으로 완료되었습니다.<br>이제 새 계정으로 로그인할 수 있습니다.',
+                loginButton: '로그인 페이지로 이동',
+                homeButton: '홈페이지로 이동',
+                errorTitle: '인증 실패',
+                errorMessage: '이메일 인증 처리 중 오류가 발생했습니다.',
+                signupButton: '회원가입 페이지로 이동',
+                expiredError: '인증 링크가 만료되었습니다. 새로운 인증 이메일을 요청해주세요.',
+                invalidError: '유효하지 않은 인증 링크입니다. 새로운 인증 이메일을 요청해주세요.',
+                disabledError: '비활성화된 계정입니다. 관리자에게 문의해주세요.',
+                notFoundError: '사용자를 찾을 수 없습니다. 회원가입을 다시 진행해주세요.',
+                invalidRequest: '잘못된 요청입니다.'
+            },
+            'en': {
+                title: 'Email Verification - Like Voca',
+                processing: 'Processing...',
+                successTitle: 'Email Verified!',
+                successMessage: 'Your email has been successfully verified.<br>You can now sign in with your new account.',
+                loginButton: 'Go to Login Page',
+                homeButton: 'Go to Home Page',
+                errorTitle: 'Verification Failed',
+                errorMessage: 'An error occurred while processing email verification.',
+                signupButton: 'Go to Sign Up Page',
+                expiredError: 'The verification link has expired. Please request a new verification email.',
+                invalidError: 'Invalid verification link. Please request a new verification email.',
+                disabledError: 'This account has been disabled. Please contact support.',
+                notFoundError: 'User not found. Please sign up again.',
+                invalidRequest: 'Invalid request.'
+            },
+            'zh': {
+                title: '邮箱验证 - Like Voca',
+                processing: '处理中...',
+                successTitle: '邮箱验证完成！',
+                successMessage: '您的邮箱已成功验证。<br>现在您可以使用新账户登录。',
+                loginButton: '前往登录页面',
+                homeButton: '前往首页',
+                errorTitle: '验证失败',
+                errorMessage: '邮箱验证处理时发生错误。',
+                signupButton: '前往注册页面',
+                expiredError: '验证链接已过期。请请求新的验证邮件。',
+                invalidError: '无效的验证链接。请请求新的验证邮件。',
+                disabledError: '此账户已被禁用。请联系客服。',
+                notFoundError: '未找到用户。请重新注册。',
+                invalidRequest: '无效请求。'
+            },
+            'ja': {
+                title: 'メール認証 - Like Voca',
+                processing: '処理中...',
+                successTitle: 'メール認証完了！',
+                successMessage: 'メール認証が正常に完了しました。<br>新しいアカウントでログインできます。',
+                loginButton: 'ログインページへ',
+                homeButton: 'ホームページへ',
+                errorTitle: '認証失敗',
+                errorMessage: 'メール認証処理中にエラーが発生しました。',
+                signupButton: 'サインアップページへ',
+                expiredError: '認証リンクの有効期限が切れています。新しい認証メールをリクエストしてください。',
+                invalidError: '無効な認証リンクです。新しい認証メールをリクエストしてください。',
+                disabledError: 'このアカウントは無効化されています。サポートにお問い合わせください。',
+                notFoundError: 'ユーザーが見つかりません。再度サインアップしてください。',
+                invalidRequest: '無効なリクエストです。'
+            },
+            'es': {
+                title: 'Verificación de Email - Like Voca',
+                processing: 'Procesando...',
+                successTitle: '¡Email Verificado!',
+                successMessage: 'Su email ha sido verificado exitosamente.<br>Ahora puede iniciar sesión con su nueva cuenta.',
+                loginButton: 'Ir a Página de Inicio de Sesión',
+                homeButton: 'Ir a Página de Inicio',
+                errorTitle: 'Verificación Fallida',
+                errorMessage: 'Ocurrió un error al procesar la verificación del email.',
+                signupButton: 'Ir a Página de Registro',
+                expiredError: 'El enlace de verificación ha expirado. Por favor solicite un nuevo email de verificación.',
+                invalidError: 'Enlace de verificación inválido. Por favor solicite un nuevo email de verificación.',
+                disabledError: 'Esta cuenta ha sido deshabilitada. Por favor contacte soporte.',
+                notFoundError: 'Usuario no encontrado. Por favor regístrese nuevamente.',
+                invalidRequest: 'Solicitud inválida.'
+            }
+        };
+
         // Firebase 설정
         const firebaseConfig = {
             apiKey: "AIzaSyCPQVYE7h7odTDCkoH6mrsEtT1giWk8yDM",
@@ -140,21 +224,41 @@
             }
         };
 
+        // 언어별 텍스트 업데이트 함수
+        function updatePageLanguage(lang) {
+            const t = translations[lang] || translations['ko'];
+            
+            // 페이지 제목과 언어 속성 변경
+            document.title = t.title;
+            document.documentElement.lang = lang;
+            
+            // 텍스트 업데이트
+            document.querySelector('#loading p').textContent = t.processing;
+            document.querySelector('#success h1').textContent = t.successTitle;
+            document.querySelector('#success p').innerHTML = t.successMessage;
+            document.querySelector('#success button:first-of-type').textContent = t.loginButton;
+            document.querySelector('#success button:last-of-type').textContent = t.homeButton;
+            document.querySelector('#error h1').textContent = t.errorTitle;
+            document.querySelector('#error button:first-of-type').textContent = t.loginButton;
+            document.querySelector('#error button:last-of-type').textContent = t.signupButton;
+        }
+
         // 액션 처리
         async function handleAction() {
             const mode = getParameterByName('mode');
             const actionCode = getParameterByName('oobCode');
             const lang = getParameterByName('lang');
 
-            // 언어 설정 저장
-            if (lang) {
-                localStorage.setItem('userLanguage', lang);
-            }
+            // 언어 설정 및 페이지 업데이트
+            const userLanguage = lang || localStorage.getItem('userLanguage') || 'ko';
+            localStorage.setItem('userLanguage', userLanguage);
+            updatePageLanguage(userLanguage);
 
             const loadingDiv = document.getElementById('loading');
             const successDiv = document.getElementById('success');
             const errorDiv = document.getElementById('error');
             const errorMessage = document.getElementById('error-message');
+            const t = translations[userLanguage] || translations['ko'];
 
             try {
                 if (mode === 'verifyEmail' && actionCode) {
@@ -165,22 +269,24 @@
                     loadingDiv.classList.add('hidden');
                     successDiv.classList.remove('hidden');
                 } else {
-                    throw new Error('잘못된 요청입니다.');
+                    throw new Error(t.invalidRequest);
                 }
             } catch (error) {
                 console.error('이메일 인증 오류:', error);
                 
                 // 에러 메시지 설정
-                let errorText = '이메일 인증 처리 중 오류가 발생했습니다.';
+                let errorText = t.errorMessage;
                 
                 if (error.code === 'auth/expired-action-code') {
-                    errorText = '인증 링크가 만료되었습니다. 새로운 인증 이메일을 요청해주세요.';
+                    errorText = t.expiredError;
                 } else if (error.code === 'auth/invalid-action-code') {
-                    errorText = '유효하지 않은 인증 링크입니다. 새로운 인증 이메일을 요청해주세요.';
+                    errorText = t.invalidError;
                 } else if (error.code === 'auth/user-disabled') {
-                    errorText = '비활성화된 계정입니다. 관리자에게 문의해주세요.';
+                    errorText = t.disabledError;
                 } else if (error.code === 'auth/user-not-found') {
-                    errorText = '사용자를 찾을 수 없습니다. 회원가입을 다시 진행해주세요.';
+                    errorText = t.notFoundError;
+                } else if (error.message === t.invalidRequest) {
+                    errorText = t.invalidRequest;
                 }
                 
                 errorMessage.textContent = errorText;
