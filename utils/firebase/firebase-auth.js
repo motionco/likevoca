@@ -227,6 +227,11 @@ export const login = async (email, password) => {
 
 export const resetPassword = async (email) => {
   checkFirebaseInitialized();
+  
+  // 언어 코드 설정
+  const userLanguage = localStorage.getItem('userLanguage') || 'ko';
+  auth.languageCode = userLanguage;
+  
   await sendPasswordResetEmail(auth, email);
 };
 

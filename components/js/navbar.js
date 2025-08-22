@@ -431,12 +431,21 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       // 현재 경로에 따라 네비게이션바 경로 결정
       let navbarPath;
+      const isDev = window.location.hostname === 'localhost' || 
+                   window.location.hostname === '127.0.0.1' || 
+                   window.location.port === '5595';
+      
       if (window.location.pathname.includes("/locales/")) {
         // locales 폴더 내부인 경우 (예: /locales/ko/quiz.html)
         navbarPath = "navbar.html";
       } else {
-        // 루트 또는 다른 폴더인 경우
-        navbarPath = `locales/${currentLanguage}/navbar.html`;
+        // Vercel에서 언어별 경로 (예: /ko/forgotpassword.html)
+        if (isDev) {
+          navbarPath = `locales/${currentLanguage}/navbar.html`;
+        } else {
+          // Vercel에서는 절대경로 사용
+          navbarPath = `/${currentLanguage}/navbar.html`;
+        }
       }
 
       try {
