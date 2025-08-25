@@ -368,6 +368,7 @@ function createConceptCard(concept) {
           </div>
         </div>
         <div class="flex items-center space-x-2">
+          ${currentUser ? `
           <button 
             class="bookmark-btn p-2 rounded-full hover:bg-gray-100 transition-colors duration-200" 
             onclick="event.stopPropagation(); toggleBookmark('${conceptId}')"
@@ -376,6 +377,7 @@ function createConceptCard(concept) {
           >
             <i class="fas fa-bookmark text-gray-400"></i>
           </button>
+          ` : ''}
         <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
           ${getTranslatedDomainCategory(
             conceptInfo.domain,
@@ -459,7 +461,7 @@ async function toggleBookmark(conceptId) {
   try {
     const currentUser = window.auth?.currentUser;
     if (!currentUser) {
-      showMessage("로그인이 필요합니다.", "warning");
+      showMessage("북마크 기능을 사용하려면 로그인이 필요합니다.", "warning");
       return;
     }
 
@@ -641,7 +643,7 @@ function displayConceptList() {
 async function updateBookmarkStates() {
   try {
     const currentUser = window.auth?.currentUser;
-    if (!currentUser) return;
+    if (!currentUser) return; // 로그인하지 않은 경우 북마크 상태 업데이트 안함
 
     const userEmail = currentUser.email;
     const bookmarksRef = window.firebaseInit.doc(
@@ -711,6 +713,36 @@ async function loadModals(modalPaths) {
     }
   } catch (error) {
     console.error("모달 로드 중 오류 발생:", error);
+  }
+}
+
+// 관리자 UI 업데이트 함수
+async function updateAdminUI(user) {
+  try {
+    const userEmail = user.email;
+    const userRef = doc(db, "users", userEmail);
+    const userDoc = await getDoc(userRef);
+
+    const isAdmin = userDoc.exists() && userDoc.data().role === "admin";
+    
+    // 관리자 기능 버튼 표시/숨김
+    const addConceptBtn = document.getElementById("add-concept-btn");
+    const bulkImportBtn = document.getElementById("bulk-add-btn");
+    
+    if (isAdmin) {
+      if (addConceptBtn) addConceptBtn.style.display = 'block';
+      if (bulkImportBtn) bulkImportBtn.style.display = 'block';
+    } else {
+      if (addConceptBtn) addConceptBtn.style.display = 'none';
+      if (bulkImportBtn) bulkImportBtn.style.display = 'none';
+    }
+  } catch (error) {
+    console.error("관리자 UI 업데이트 실패:", error);
+    // 오류 시 기본적으로 버튼 숨김
+    const addConceptBtn = document.getElementById("add-concept-btn");
+    const bulkImportBtn = document.getElementById("bulk-add-btn");
+    if (addConceptBtn) addConceptBtn.style.display = 'none';
+    if (bulkImportBtn) bulkImportBtn.style.display = 'none';
   }
 }
 
@@ -1244,21 +1276,25 @@ async function initializePage() {
 
         // 사용자 로그인 후 사용량 UI 업데이트
         await updateUsageUI();
+        
+        // 관리자 기능 버튼 표시 (관리자인 경우에만)
+        await updateAdminUI(user);
       } else {
-        // 현재 언어 감지
-        const currentLanguage =
-          (typeof getCurrentUILanguage === "function"
-            ? getCurrentUILanguage()
-            : null) ||
-          localStorage.getItem("userLanguage") ||
-          "ko";
-
-        // 언어별 로그인 페이지로 리디렉션
-        if (
-          window.location.pathname !== `/locales/${currentLanguage}/login.html`
-        ) {
-          window.location.href = `../../locales/${currentLanguage}/login.html`;
+        // 로그인하지 않은 사용자도 단어장 볼 수 있도록 개념 로드
+        currentUser = null;
+        await fetchAndDisplayConcepts();
+        
+        // 로그인 없이는 사용량 UI 숨김
+        const usageSection = document.querySelector('.usage-section');
+        if (usageSection) {
+          usageSection.style.display = 'none';
         }
+        
+        // 관리자 기능 버튼 숨김
+        const addConceptBtn = document.getElementById("add-concept-btn");
+        const bulkImportBtn = document.getElementById("bulk-add-btn");
+        if (addConceptBtn) addConceptBtn.style.display = 'none';
+        if (bulkImportBtn) bulkImportBtn.style.display = 'none';
       }
     });
   } catch (error) {

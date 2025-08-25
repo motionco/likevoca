@@ -17,43 +17,56 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   onAuthStateChanged(auth, async (user) => {
+    const nameField = document.getElementById("name");
+    
     if (user) {
-      document.getElementById("name").value = user.email;
+      nameField.value = user.email;
+      // 로그인한 사용자는 이메일 필드를 읽기 전용으로 설정
+      nameField.readOnly = true;
+      nameField.className = "w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-600";
     } else {
-      // alert 메시지 제거하고 바로 리디렉션
-      if (typeof window.redirectToLogin === "function") {
-        window.redirectToLogin();
-      } else {
-        // 대체 방법: 직접 언어별 로그인 페이지로 리디렉션
-        const currentLanguage = localStorage.getItem("userLanguage") || "ko";
-        window.location.href = `/locales/${currentLanguage}/login.html`;
-      }
+      // 로그인하지 않은 사용자도 문의하기 페이지 접근 가능
+      // 이메일 필드를 편집 가능하게 설정
+      nameField.readOnly = false;
+      nameField.className = "w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
+      nameField.placeholder = getEmailPlaceholder();
     }
   });
+
+  // 언어별 이메일 플레이스홀더 함수
+  function getEmailPlaceholder() {
+    const lang = localStorage.getItem("userLanguage") || "ko";
+    const placeholders = {
+      ko: "이메일 주소를 입력해주세요",
+      en: "Please enter your email address", 
+      zh: "请输入您的邮箱地址",
+      ja: "メールアドレスを入力してください",
+      es: "Por favor ingrese su dirección de correo electrónico"
+    };
+    return placeholders[lang] || placeholders.ko;
+  }
 
   const inquiryForm = document.getElementById("inquiry-form");
   inquiryForm.addEventListener("submit", async (event) => {
     event.preventDefault(); // 폼 기본 제출 동작 방지
 
     const user = auth.currentUser;
-    if (!user) {
-      // alert 메시지 제거하고 바로 리디렉션
-      if (typeof window.redirectToLogin === "function") {
-        window.redirectToLogin();
-      } else {
-        // 대체 방법: 직접 언어별 로그인 페이지로 리디렉션
-        const currentLanguage = localStorage.getItem("userLanguage") || "ko";
-        window.location.href = `/locales/${currentLanguage}/login.html`;
-      }
-      return;
-    }
-
+    const email = document.getElementById("name").value.trim();
     const title = document.getElementById("title").value.trim();
     const message = document.getElementById("message").value.trim();
 
-    if (!title || !message) {
+    if (!email || !title || !message) {
       alert("모든 필드를 입력해주세요.");
       return;
+    }
+
+    // 이메일 형식 검증 (로그인하지 않은 사용자용)
+    if (!user) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        alert("올바른 이메일 형식을 입력해주세요.");
+        return;
+      }
     }
 
     try {
@@ -61,12 +74,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       const newInquiryId = inquirySnapshot.size + 1;
 
       const inquiryData = {
-        id: user.uid,
-        email: user.email,
+        id: user ? user.uid : `guest_${Date.now()}`, // 비로그인 사용자용 ID
+        email: user ? user.email : email,
         title: title,
         message: message,
         timestamp: serverTimestamp(),
         status: "접수 완료",
+        isGuest: !user // 게스트 사용자 표시
       };
 
       await setDoc(doc(db, "inquiries", newInquiryId.toString()), inquiryData);
@@ -75,6 +89,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       // 폼 리셋
       inquiryForm.reset();
+      
+      // 로그인하지 않은 사용자의 경우 이메일 필드 플레이스홀더 재설정
+      if (!user) {
+        const nameField = document.getElementById("name");
+        nameField.placeholder = getEmailPlaceholder();
+      }
 
       // URL에서 파라미터 제거
       const url = new URL(window.location);
