@@ -132,58 +132,6 @@ function showAuthenticatedFeatures(isAuthenticated) {
           <a href="../login.html" class="text-blue-600 hover:text-blue-800 underline">로그인하러 가기</a>
         </div>
       `;
-// DOM 요소 초기화
-function initializeElements() {
-  elements = {
-    sourceLanguage: document.getElementById("quiz-source-language"),
-    targetLanguage: document.getElementById("quiz-target-language"),
-    quizType: document.getElementById("quiz-type"),
-    difficulty: document.getElementById("quiz-difficulty"),
-    questionCount: document.getElementById("quiz-question-count"),
-    startQuizBtn: document.getElementById("start-quiz-btn"),
-    quizContainer: document.getElementById("quiz-container"),
-    currentQuestion: document.getElementById("current-question"),
-    totalQuestions: document.getElementById("total-questions"),
-    quizProgress: document.getElementById("quiz-progress"),
-    questionText: document.getElementById("question-text"),
-    questionOptions: document.getElementById("question-options"),
-    quizTimer: document.getElementById("quiz-timer"),
-    skipBtn: document.getElementById("skip-question-btn"),
-    quitBtn: document.getElementById("quit-quiz-btn"),
-    quizResults: document.getElementById("quiz-results"),
-    correctAnswers: document.getElementById("correct-answers"),
-    quizScore: document.getElementById("quiz-score"),
-    timeTaken: document.getElementById("time-taken"),
-    retryBtn: document.getElementById("retry-quiz-btn"),
-    newQuizBtn: document.getElementById("new-quiz-btn"),
-    quizHistory: document.getElementById("quiz-history"),
-  };
-
-  // 언어 필터 초기화
-  setTimeout(() => {
-    initializeLanguageFilters();
-  }, 100);
-}
-
-// 로그인 상태에 따라 기능 표시/숨김
-function showAuthenticatedFeatures(isAuthenticated) {
-  // 퀴즈 히스토리 관련 요소들
-  const historySection = document.getElementById("quiz-history");
-  const loginNotice = document.getElementById("login-notice");
-  
-  if (isAuthenticated) {
-    if (historySection) historySection.style.display = "block";
-    if (loginNotice) loginNotice.style.display = "none";
-  } else {
-    if (historySection) historySection.style.display = "none";
-    if (loginNotice) {
-      loginNotice.style.display = "block";
-      loginNotice.innerHTML = `
-        <div class="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <p class="text-blue-700 mb-2">퀴즈 결과 저장 및 히스토리 확인은 로그인 후 이용 가능합니다.</p>
-          <a href="../login.html" class="text-blue-600 hover:text-blue-800 underline">로그인하러 가기</a>
-        </div>
-      `;
     }
   }
 }

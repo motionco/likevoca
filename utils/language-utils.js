@@ -263,6 +263,39 @@ const seoMetadata = {
       canonical: "https://likevoca.com/zh/pages/my-word-list.html",
     },
   },
+  // 게임 페이지 메타데이터
+  games: {
+    ko: {
+      title: "LikeVoca - 언어 학습 게임",
+      description: "재미있는 게임으로 언어를 학습하세요. 단어 맞추기, 번역 게임 등 다양한 학습 게임을 제공합니다.",
+      keywords: "언어 학습 게임, 단어 게임, 번역 게임, 영어 게임, 일본어 게임, 중국어 게임",
+      canonical: "https://likevoca.com/ko/games.html",
+    },
+    en: {
+      title: "LikeVoca - Language Learning Games",
+      description: "Learn languages through fun games. We offer various learning games including word matching and translation games.",
+      keywords: "language learning games, word games, translation games, English games, Japanese games, Chinese games",
+      canonical: "https://likevoca.com/en/games.html",
+    },
+    ja: {
+      title: "LikeVoca - 言語学習ゲーム",
+      description: "楽しいゲームで言語を学習しましょう。単語当てゲーム、翻訳ゲームなど様々な学習ゲームを提供しています。",
+      keywords: "言語学習ゲーム, 単語ゲーム, 翻訳ゲーム, 英語ゲーム, 日本語ゲーム, 中国語ゲーム",
+      canonical: "https://likevoca.com/ja/games.html",
+    },
+    zh: {
+      title: "LikeVoca - 语言学习游戏",
+      description: "通过有趣的游戏学习语言。我们提供各种学习游戏，包括单词匹配、翻译游戏等。",
+      keywords: "语言学习游戏, 单词游戏, 翻译游戏, 英语游戏, 日语游戏, 中文游戏",
+      canonical: "https://likevoca.com/zh/games.html",
+    },
+    es: {
+      title: "LikeVoca - Juegos de Aprendizaje de Idiomas",
+      description: "Aprende idiomas a través de juegos divertidos. Ofrecemos varios juegos de aprendizaje incluyendo emparejamiento de palabras y juegos de traducción.",
+      keywords: "juegos de aprendizaje de idiomas, juegos de palabras, juegos de traducción, juegos de inglés, juegos de japonés, juegos de chino",
+      canonical: "https://likevoca.com/es/games.html",
+    },
+  },
 };
 
 // 번역 텍스트 저장소 - 분리된 JSON 파일에서 로드
@@ -988,11 +1021,22 @@ function updateHreflangTags(pageType, currentLangCode) {
 
 // 대체 언어 링크 업데이트 함수
 function updateAlternateLanguageLinks(pageType, currentLangCode) {
+  // 페이지 타입이 seoMetadata에 존재하는지 확인
+  if (!seoMetadata[pageType]) {
+    console.warn(`⚠️ seoMetadata에 '${pageType}' 페이지 타입이 없습니다.`);
+    return;
+  }
+  
   // 다른 언어 버전에 대한 링크 업데이트
   Object.entries(SUPPORTED_LANGUAGES).forEach(([langCode, langInfo]) => {
     if (langCode !== currentLangCode) {
-      const href = seoMetadata[pageType][langCode].canonical;
-      updateOrCreateLinkTag(`alternate-${langCode}`, href);
+      // 해당 언어 코드에 대한 메타데이터가 존재하는지 확인
+      if (seoMetadata[pageType][langCode] && seoMetadata[pageType][langCode].canonical) {
+        const href = seoMetadata[pageType][langCode].canonical;
+        updateOrCreateLinkTag(`alternate-${langCode}`, href);
+      } else {
+        console.warn(`⚠️ ${pageType} 페이지의 ${langCode} 언어 메타데이터가 없습니다.`);
+      }
     }
   });
 }
