@@ -97,7 +97,7 @@ async function getTranslations() {
     invalid_email: "유효한 이메일 주소를 입력해주세요.",
     login_success: "로그인 성공! 환영합니다, {name}님!",
     invalid_credential: "이메일 또는 비밀번호가 올바르지 않습니다.",
-    user_not_found: "등록되지 않은 이메일입니다.",
+    user_not_found: " 이메일입니다.",
     wrong_password: "비밀번호가 올바르지 않습니다.",
     invalid_email_format: "유효하지 않은 이메일 형식입니다.",
     too_many_requests: "너무 많은 로그인 시도가 있었습니다. 잠시 후 다시 시도해주세요.",

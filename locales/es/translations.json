@@ -709,7 +709,6 @@
   "facebook_signup_success": "¡Bienvenido/a, {name}! Su registro con cuenta de Facebook está completo",
   "database_error": "Falló la creación del documento de usuario",
   "email_verification_required": "Se requiere verificación de correo electrónico. Por favor revise su correo",
-  "user_not_found": "Este correo electrónico no está registrado",
   "wrong_password": "Contraseña incorrecta",
   "invalid_credential": "El correo electrónico o la contraseña son incorrectos",
   "invalid_email_format": "Formato de correo electrónico inválido",

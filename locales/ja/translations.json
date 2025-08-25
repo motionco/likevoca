@@ -700,7 +700,6 @@
   "facebook_signup_success": "ようこそ、{name}さん！Facebookアカウントでの会員登録が完了しました",
   "database_error": "ユーザー文書の作成に失敗しました",
   "email_verification_required": "メール認証が必要です。メールをご確認ください",
-  "user_not_found": "登録されていないメールアドレスです",
   "wrong_password": "パスワードが正しくありません",
   "invalid_credential": "メールアドレスまたはパスワードが正しくありません",
   "invalid_email_format": "無効なメールアドレス形式です",

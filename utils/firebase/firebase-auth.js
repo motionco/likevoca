@@ -48,7 +48,6 @@ const getLocalizedMessage = () => {
       linkFailed: '{provider} 계정 연결 중 오류가 발생했습니다.',
       emailMismatch: '연결하려는 {provider} 계정의 이메일 ({providerEmail})이 현재 계정의 이메일 ({currentEmail})과 다릅니다. 같은 이메일의 {provider} 계정을 사용해주세요.',
       emailAlreadyInUse: '이 이메일 ({email})은 이미 다른 로그인 방법으로 가입되어 있습니다. 다른 로그인 방법으로 로그인해주세요.',
-      userNotFound: '이 이메일 ({email})로 가입된 회원정보가 없습니다.',
       existingProvider: '이 이메일 ({email})은 이미 {provider}으로 가입되어 있습니다. {provider}으로 로그인해주세요.',
       invalidCredential: '이메일 또는 비밀번호가 올바르지 않습니다.',
       otherLoginMethod: '다른 로그인 방법',
@@ -65,8 +64,7 @@ const getLocalizedMessage = () => {
       linkFailed: 'An error occurred while linking {provider} account.',
       emailMismatch: 'The email of the {provider} account you are trying to link ({providerEmail}) differs from your current account email ({currentEmail}). Please use a {provider} account with the same email.',
       emailAlreadyInUse: 'This email ({email}) is already registered with a different login method. Please sign in with the existing login method.',
-      userNotFound: 'No account found with this email ({email}).',
-      existingProvider: 'This email ({email}) is already registered with {provider}. Please sign in with {provider}.',
+      existingProvider: 'This email ({email}) is already registered with {provider}. Please sign in with {provider}',
       invalidCredential: 'Invalid email or password.',
       otherLoginMethod: 'another login method',
       emailVerificationRequired: 'Email verification is required. Please check your email.',
@@ -82,7 +80,6 @@ const getLocalizedMessage = () => {
       linkFailed: '关联 {provider} 账户时发生错误。',
       emailMismatch: '您要关联的 {provider} 账户邮箱 ({providerEmail}) 与当前账户邮箱 ({currentEmail}) 不同。请使用相同邮箱的 {provider} 账户。',
       emailAlreadyInUse: '此邮箱 ({email}) 已使用其他登录方式注册。请使用现有的登录方式登录。',
-      userNotFound: '未找到此邮箱 ({email}) 的注册信息。',
       existingProvider: '此邮箱 ({email}) 已使用 {provider} 注册。请使用 {provider} 登录。',
       invalidCredential: '邮箱或密码无效。',
       otherLoginMethod: '其他登录方式',
@@ -99,7 +96,6 @@ const getLocalizedMessage = () => {
       linkFailed: '{provider} アカウント連携中にエラーが発生しました。',
       emailMismatch: '連携しようとしている {provider} アカウントのメールアドレス ({providerEmail}) が現在のアカウントのメールアドレス ({currentEmail}) と異なります。同じメールアドレスの {provider} アカウントをご使用ください。',
       emailAlreadyInUse: 'このメールアドレス ({email}) は既に他のログイン方法で登録されています。既存のログイン方法でログインしてください。',
-      userNotFound: 'このメールアドレス ({email}) で登録された情報が見つかりません。',
       existingProvider: 'このメールアドレス ({email}) は既に {provider} で登録されています。{provider} でログインしてください。',
       invalidCredential: 'メールアドレスまたはパスワードが正しくありません。',
       otherLoginMethod: '他のログイン方法',
@@ -116,7 +112,6 @@ const getLocalizedMessage = () => {
       linkFailed: 'Se produjo un error al vincular la cuenta de {provider}.',
       emailMismatch: 'El email de la cuenta de {provider} que intenta vincular ({providerEmail}) es diferente al email de su cuenta actual ({currentEmail}). Por favor use una cuenta de {provider} con el mismo email.',
       emailAlreadyInUse: 'Este email ({email}) ya está registrado con un método de inicio de sesión diferente. Por favor inicie sesión con el método existente.',
-      userNotFound: 'No se encontró ninguna cuenta con este email ({email}).',
       existingProvider: 'Este email ({email}) ya está registrado con {provider}. Por favor inicie sesión con {provider}.',
       invalidCredential: 'Email o contraseña inválidos.',
       otherLoginMethod: 'otro método de inicio de sesión',
@@ -215,16 +210,8 @@ export const login = async (email, password) => {
     // 이메일 인증 완료된 사용자는 로그인 성공
     return userCredential.user;
   } catch (error) {
-    // 간단하고 안전한 에러 처리
     if (error.code === "auth/invalid-credential") {
-      // 자격 증명 무효 - 이메일/비밀번호가 틀렸거나 다른 제공자로 가입됨
       const customError = new Error(formatMessage(msg.invalidCredential, {}));
-      customError.code = error.code;
-      throw customError;
-      
-    } else if (error.code === "auth/user-not-found") {
-      // 사용자 없음 - 가입되지 않은 이메일
-      const customError = new Error(formatMessage(msg.userNotFound, { email }));
       customError.code = error.code;
       throw customError;
       
