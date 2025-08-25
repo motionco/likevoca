@@ -588,7 +588,17 @@ async function initializeProgressPage() {
     const user = await checkUserAuth();
 
     if (!user) {
-      console.log("사용자가 인증되지 않았습니다.");
+      console.log("사용자가 인증되지 않았습니다. 로그인 페이지로 리디렉션합니다.");
+      
+      // 현재 언어 감지
+      const currentLanguage = localStorage.getItem("userLanguage") || "ko";
+      
+      // 언어별 로그인 페이지로 리디렉션
+      if (typeof window.redirectToLogin === "function") {
+        window.redirectToLogin();
+      } else {
+        window.location.href = `../../locales/${currentLanguage}/login.html`;
+      }
       return;
     }
 

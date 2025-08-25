@@ -99,6 +99,54 @@ function initializeElements() {
     quizProgress: document.getElementById("quiz-progress"),
     questionText: document.getElementById("question-text"),
     questionOptions: document.getElementById("question-options"),
+    skipBtn: document.getElementById("skip-question-btn"),
+    quitBtn: document.getElementById("quit-quiz-btn"),
+    quizResults: document.getElementById("quiz-results"),
+    correctAnswers: document.getElementById("correct-answers"),
+    quizScore: document.getElementById("quiz-score"),
+    timeTaken: document.getElementById("time-taken"),
+    retryBtn: document.getElementById("retry-quiz-btn"),
+    newQuizBtn: document.getElementById("new-quiz-btn"),
+    quizHistory: document.getElementById("quiz-history"),
+  };
+
+  console.log("📋 DOM 요소 초기화 완료");
+}
+
+// 로그인 상태에 따라 기능 표시/숨김
+function showAuthenticatedFeatures(isAuthenticated) {
+  // 퀴즈 히스토리 관련 요소들
+  const historySection = document.getElementById("quiz-history");
+  const loginNotice = document.getElementById("login-notice");
+  
+  if (isAuthenticated) {
+    if (historySection) historySection.style.display = "block";
+    if (loginNotice) loginNotice.style.display = "none";
+  } else {
+    if (historySection) historySection.style.display = "none";
+    if (loginNotice) {
+      loginNotice.style.display = "block";
+      loginNotice.innerHTML = `
+        <div class="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <p class="text-blue-700 mb-2">퀴즈 결과 저장 및 히스토리 확인은 로그인 후 이용 가능합니다.</p>
+          <a href="../login.html" class="text-blue-600 hover:text-blue-800 underline">로그인하러 가기</a>
+        </div>
+      `;
+// DOM 요소 초기화
+function initializeElements() {
+  elements = {
+    sourceLanguage: document.getElementById("quiz-source-language"),
+    targetLanguage: document.getElementById("quiz-target-language"),
+    quizType: document.getElementById("quiz-type"),
+    difficulty: document.getElementById("quiz-difficulty"),
+    questionCount: document.getElementById("quiz-question-count"),
+    startQuizBtn: document.getElementById("start-quiz-btn"),
+    quizContainer: document.getElementById("quiz-container"),
+    currentQuestion: document.getElementById("current-question"),
+    totalQuestions: document.getElementById("total-questions"),
+    quizProgress: document.getElementById("quiz-progress"),
+    questionText: document.getElementById("question-text"),
+    questionOptions: document.getElementById("question-options"),
     quizTimer: document.getElementById("quiz-timer"),
     skipBtn: document.getElementById("skip-question-btn"),
     quitBtn: document.getElementById("quit-quiz-btn"),
@@ -115,6 +163,29 @@ function initializeElements() {
   setTimeout(() => {
     initializeLanguageFilters();
   }, 100);
+}
+
+// 로그인 상태에 따라 기능 표시/숨김
+function showAuthenticatedFeatures(isAuthenticated) {
+  // 퀴즈 히스토리 관련 요소들
+  const historySection = document.getElementById("quiz-history");
+  const loginNotice = document.getElementById("login-notice");
+  
+  if (isAuthenticated) {
+    if (historySection) historySection.style.display = "block";
+    if (loginNotice) loginNotice.style.display = "none";
+  } else {
+    if (historySection) historySection.style.display = "none";
+    if (loginNotice) {
+      loginNotice.style.display = "block";
+      loginNotice.innerHTML = `
+        <div class="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <p class="text-blue-700 mb-2">퀴즈 결과 저장 및 히스토리 확인은 로그인 후 이용 가능합니다.</p>
+          <a href="../login.html" class="text-blue-600 hover:text-blue-800 underline">로그인하러 가기</a>
+        </div>
+      `;
+    }
+  }
 }
 
 // 언어 필터 초기화
@@ -168,16 +239,13 @@ function registerEventListeners() {
     if (user) {
       currentUser = user;
       await loadQuizHistory();
+      // 로그인한 사용자는 퀴즈 결과 저장 가능
+      showAuthenticatedFeatures(true);
     } else {
-      console.log("❌ 사용자가 로그인되지 않았습니다.");
-      // alert 메시지 제거하고 바로 리디렉션
-      if (typeof window.redirectToLogin === "function") {
-        window.redirectToLogin();
-      } else {
-        // 대체 방법: 직접 언어별 로그인 페이지로 리디렉션
-        const currentLanguage = localStorage.getItem("userLanguage") || "ko";
-        window.location.href = `/locales/${currentLanguage}/login.html`;
-      }
+      // 로그인하지 않은 사용자도 퀴즈 가능, 단 결과 저장 불가
+      currentUser = null;
+      console.log("ℹ️ 게스트 모드로 퀴즈를 진행합니다. 결과 저장은 로그인 후 가능합니다.");
+      showAuthenticatedFeatures(false);
     }
   });
 
@@ -287,9 +355,9 @@ async function generateQuizQuestions(settings) {
   try {
     console.log("📝 개인화된 퀴즈 문제 생성 중:", settings);
 
-    // 현재 사용자 확인
+    // 현재 사용자 확인 (로그인하지 않은 사용자도 퀴즈 가능)
     if (!currentUser) {
-      throw new Error("사용자가 로그인되지 않았습니다.");
+      console.log("ℹ️ 게스트 모드로 퀴즈 문제를 생성합니다.");
     }
 
     // 🎯 개념 데이터 조회 (최적화된 캐싱 방법)
@@ -1189,17 +1257,25 @@ async function finishQuiz() {
     const totalCount = quizData.userAnswers.length;
     const score = Math.round((correctCount / totalCount) * 100);
 
-    await saveQuizResult({
-      settings: quizData.settings,
-      answers: quizData.userAnswers,
-      score,
-      correctCount,
-      totalCount,
-      totalTime,
-      completedAt: endTime,
-    });
-
-    // 퀴즈 기록 캐시 무효화 및 새로고침
+    // 로그인한 사용자만 결과 저장
+    if (currentUser) {
+      await saveQuizResult({
+        settings: quizData.settings,
+        answers: quizData.userAnswers,
+        score,
+        correctCount,
+        totalCount,
+        totalTime,
+        completedAt: endTime,
+      });
+      
+      // 퀴즈 기록 캐시 무효화 및 새로고침
+      quizHistoryCache = null;
+      quizHistoryCacheTimestamp = null;
+      await loadQuizHistory(); // 퀴즈 히스토리 다시 로드
+    } else {
+      console.log("ℹ️ 게스트 사용자는 퀴즈 결과가 저장되지 않습니다.");
+    }
     console.log("🔄 퀴즈 기록 캐시 무효화 및 새로고침 시작");
     quizHistoryCache = null;
     quizHistoryCacheTimestamp = null;
