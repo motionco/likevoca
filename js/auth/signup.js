@@ -10,20 +10,11 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/fi
 async function getTranslations() {
   const userLanguage = localStorage.getItem("userLanguage") || "ko";
   
-  // 현재 경로 확인 및 올바른 경로 생성
-  const currentPath = window.location.pathname;
-  let basePath;
-  
-  if (currentPath.includes("/locales/")) {
-    // locales 폴더 내부에 있는 경우 (/locales/ja/signup.html)
-    basePath = "../../";
-  } else {
-    // 루트나 다른 폴더에 있는 경우
-    basePath = "./";
-  }
+  // 절대 경로로 번역 파일 로드 (Vercel 배포 환경 대응)
+  const rootPath = window.location.origin;
   
   try {
-    const response = await fetch(`${basePath}locales/${userLanguage}/translations.json`);
+    const response = await fetch(`${rootPath}/locales/${userLanguage}/translations.json`);
     if (response.ok) {
       return await response.json();
     }
@@ -33,7 +24,7 @@ async function getTranslations() {
   
   // 기본값으로 한국어 번역 반환
   try {
-    const response = await fetch(`${basePath}locales/ko/translations.json`);
+    const response = await fetch(`${rootPath}/locales/ko/translations.json`);
     if (response.ok) {
       return await response.json();
     }

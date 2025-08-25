@@ -73,7 +73,7 @@ async function getTranslations() {
   }
   
   try {
-    const response = await fetch(`${basePath}locales/${userLanguage}/translations.json`);
+    const response = await fetch(`${window.location.origin}/locales/${userLanguage}/translations.json`);
     if (response.ok) {
       return await response.json();
     }
@@ -83,7 +83,7 @@ async function getTranslations() {
   
   // 기본값으로 한국어 번역 반환
   try {
-    const response = await fetch(`${basePath}locales/ko/translations.json`);
+    const response = await fetch(`${window.location.origin}/locales/ko/translations.json`);
     if (response.ok) {
       return await response.json();
     }

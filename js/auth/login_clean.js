@@ -63,7 +63,7 @@ async function getTranslations() {
   }
   
   try {
-    const response = await fetch(`${basePath}locales/${userLanguage}/translations.json`);
+    const response = await fetch(`${window.location.origin}/locales/${userLanguage}/translations.json`);
     if (response.ok) {
       return await response.json();
     }
