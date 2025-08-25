@@ -115,25 +115,6 @@ const hideError = () => {
   errorMessage.classList.add("hidden");
 };
 
-// 로그인 오류 로깅 함수
-const logAuthError = async (provider, errorCode, errorMessage, email) => {
-  try {
-    await fetch("/api/log-auth-error", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        provider,
-        errorCode,
-        errorMessage,
-        email,
-      }),
-    });
-  } catch (error) {
-    console.error("오류 로깅 실패:", error);
-  }
-};
 
 document
   .getElementById("google-login-btn")
@@ -156,12 +137,6 @@ document
       }
     } catch (error) {
       console.error("Google 로그인 오류:", error);
-      logAuthError(
-        "google",
-        error.code || "custom-error",
-        error.message,
-        error.customData?.email
-      );
       showError(error.message);
     }
   });
@@ -226,13 +201,6 @@ document
     } catch (error) {
       console.error("GitHub 로그인 오류 세부 정보:", error);
 
-      // 서버에 오류 로깅
-      logAuthError(
-        "github",
-        error.code || "custom-error",
-        error.message,
-        error.customData?.email
-      );
 
       // GitHub 속도 제한 오류 처리
       if (
@@ -377,18 +345,17 @@ document
       }
     } catch (error) {
       console.error("Facebook 로그인 오류:", error);
-      logAuthError(
-        "facebook",
-        error.code || "custom-error",
-        error.message,
-        error.customData?.email
-      );
       showError(error.message);
     }
   });
 
 // 로그인 처리 함수
+let isLoggingIn = false; // 중복 로그인 방지 플래그
+
 async function handleLogin() {
+  if (isLoggingIn) return; // 이미 로그인 중이면 리턴
+  
+  isLoggingIn = true;
   hideError();
 
   const t = await getTranslations();
@@ -397,11 +364,13 @@ async function handleLogin() {
 
   if (!email || !password) {
     showError(t.fields_required || "이메일과 비밀번호를 모두 입력해주세요.");
+    isLoggingIn = false;
     return;
   }
 
   if (!isValidEmail(email)) {
     showError(t.invalid_email || "유효한 이메일 주소를 입력해주세요.");
+    isLoggingIn = false;
     return;
   }
 
@@ -410,11 +379,11 @@ async function handleLogin() {
 
     const userName = user.displayName || "사용자";
     alert(formatMessage(t.login_success || "로그인 성공! 환영합니다. {name}님!", { name: userName }));
+    isLoggingIn = false;
     goToLanguageSpecificPage("index.html");
   } catch (error) {
     const errorCode = error.code || "unknown";
-    console.error("로그인 실패:", errorCode);
-    logAuthError("email", errorCode, error.message, email);
+    console.error("로그인 실패:", errorCode, error.message);
 
     // Firebase 에러 코드에 따른 사용자 친화적 메시지
     let errorMessage = t.login_error || "로그인 중 오류가 발생했습니다. 다시 시도해주세요.";
@@ -434,11 +403,15 @@ async function handleLogin() {
     }
 
     showError(errorMessage);
+    isLoggingIn = false;
   }
 }
 
 // 로그인 버튼 클릭 이벤트
-submitButton.addEventListener("click", handleLogin);
+submitButton.addEventListener("click", (e) => {
+  e.preventDefault(); // 폼 제출 방지
+  handleLogin();
+});
 
 // 로그인 폼 제출 이벤트 (Enter 키 지원)
 const loginForm = document.getElementById("login-form");
@@ -448,18 +421,6 @@ if (loginForm) {
     handleLogin();
   });
 }
-
-// Enter 키 이벤트 리스너 추가
-[emailInput, passwordInput].forEach((input) => {
-  if (input) {
-    input.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        handleLogin();
-      }
-    });
-  }
-});
 
 
 // 로그인 상태 체크 - 이메일 인증이 완료된 사용자만 홈으로 리디렉션
