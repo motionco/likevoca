@@ -1729,6 +1729,7 @@ async function finishLearningHandler(e) {
     currentLearningArea = null;
     currentLearningMode = null;
     currentIndex = 0;
+    sessionOffset = 0; // 세션 오프셋 리셋
     isFlipped = false;
     isNavigating = false;
 
