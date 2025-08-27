@@ -6360,41 +6360,35 @@ async function showLearningCompleteWithStats(sessionStats) {
   const completionMessage = generateCompletionMessage(sessionStats);
   console.log("📝 완료 메시지 생성:", completionMessage);
 
-  // 완료 화면 HTML 생성
+  // 완료 화면 HTML 생성 (data-i18n 속성 사용)
   const completionHTML = `
     <div class="learning-completion-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="bg-white rounded-lg p-8 max-w-md mx-4 text-center shadow-2xl">
         <div class="mb-6">
           <div class="text-6xl mb-4">🎉</div>
-          <h2 class="text-2xl font-bold text-gray-800 mb-2">학습 완료!</h2>
+          <h2 class="text-2xl font-bold text-gray-800 mb-2" data-i18n="learning_completed">학습 완료!</h2>
           <p class="text-gray-600">${completionMessage}</p>
         </div>
         
         <div class="bg-gray-50 rounded-lg p-4 mb-6">
           <div class="grid grid-cols-3 gap-4 text-sm">
             <div>
-              <div class="text-gray-500">제시된 개념</div>
-              <div class="font-bold text-lg">${
-                sessionStats.conceptsCount
-              }개</div>
+              <div class="text-gray-500" data-i18n="concepts_presented">제시된 개념</div>
+              <div class="font-bold text-lg">${sessionStats.conceptsCount}<span data-i18n="concepts_unit"></span></div>
             </div>
             <div>
-              <div class="text-gray-500">학습 시간</div>
-              <div class="font-bold text-lg">${sessionStats.duration}분</div>
+              <div class="text-gray-500" data-i18n="learning_time">학습 시간</div>
+              <div class="font-bold text-lg">${sessionStats.duration}<span data-i18n="minutes_unit">분</span></div>
             </div>
             <div>
-              <div class="text-gray-500">상호작용</div>
-              <div class="font-bold text-lg">${
-                sessionStats.interactions
-              }회</div>
+              <div class="text-gray-500" data-i18n="interactions">상호작용</div>
+              <div class="font-bold text-lg">${sessionStats.interactions}<span data-i18n="times_unit">회</span></div>
             </div>
           </div>
           <div class="mt-4 pt-4 border-t border-gray-200">
             <div class="text-center">
-              <div class="text-gray-500 text-sm">학습 효율</div>
-              <div class="font-bold text-2xl text-blue-600">${Math.round(
-                sessionStats.efficiency
-              )}%</div>
+              <div class="text-gray-500 text-sm" data-i18n="learning_efficiency">학습 효율</div>
+              <div class="font-bold text-2xl text-blue-600">${Math.round(sessionStats.efficiency)}%</div>
             </div>
           </div>
         </div>
@@ -6403,9 +6397,7 @@ async function showLearningCompleteWithStats(sessionStats) {
           <button id="restart-learning-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-lg font-medium transition-colors">
             ${getRestartButtonText(learningSessionData.area)}
           </button>
-          <button id="back-to-areas-btn" class="w-full bg-gray-500 hover:bg-gray-600 text-white py-2 px-6 rounded-lg font-medium transition-colors">
-            🏠 영역 선택으로 돌아가기
-          </button>
+          <button id="back-to-areas-btn" class="w-full bg-gray-500 hover:bg-gray-600 text-white py-2 px-6 rounded-lg font-medium transition-colors" data-i18n="back_to_areas">🏠 영역 선택으로 돌아가기</button>
         </div>
       </div>
     </div>
@@ -6414,6 +6406,12 @@ async function showLearningCompleteWithStats(sessionStats) {
   // 완료 화면을 DOM에 추가
   document.body.insertAdjacentHTML("beforeend", completionHTML);
   console.log("🎨 완료 화면 DOM에 추가됨");
+
+  // 🌐 번역 적용
+  setTimeout(() => {
+    applyTranslations();
+    console.log("🌐 학습 완료 모달 번역 적용됨");
+  }, 50);
 
   // 추가된 요소 확인
   const addedOverlay = document.querySelector(".learning-completion-overlay");
@@ -6497,41 +6495,35 @@ async function showLearningComplete() {
   // 현재 학습 모드와 영역에 따라 다른 완료 메시지 표시
   const completionMessage = generateCompletionMessage(sessionStats);
 
-  // 완료 화면 HTML 생성
+  // 완료 화면 HTML 생성 (data-i18n 속성 사용)
   const completionHTML = `
     <div class="learning-completion-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="bg-white rounded-lg p-8 max-w-md mx-4 text-center shadow-2xl">
         <div class="mb-6">
           <div class="text-6xl mb-4">🎉</div>
-          <h2 class="text-2xl font-bold text-gray-800 mb-2">학습 완료!</h2>
+          <h2 class="text-2xl font-bold text-gray-800 mb-2" data-i18n="learning_completed">학습 완료!</h2>
           <p class="text-gray-600">${completionMessage}</p>
         </div>
         
         <div class="bg-gray-50 rounded-lg p-4 mb-6">
           <div class="grid grid-cols-3 gap-4 text-sm">
             <div>
-              <div class="text-gray-500">제시된 개념</div>
-              <div class="font-bold text-lg">${
-                sessionStats.conceptsCount
-              }개</div>
+              <div class="text-gray-500" data-i18n="concepts_presented">제시된 개념</div>
+              <div class="font-bold text-lg">${sessionStats.conceptsCount}<span data-i18n="concepts_unit"></span></div>
             </div>
             <div>
-              <div class="text-gray-500">학습 시간</div>
-              <div class="font-bold text-lg">${sessionStats.duration}분</div>
+              <div class="text-gray-500" data-i18n="learning_time">학습 시간</div>
+              <div class="font-bold text-lg">${sessionStats.duration}<span data-i18n="minutes_unit">분</span></div>
             </div>
             <div>
-              <div class="text-gray-500">상호작용</div>
-              <div class="font-bold text-lg">${
-                sessionStats.interactions
-              }회</div>
+              <div class="text-gray-500" data-i18n="interactions">상호작용</div>
+              <div class="font-bold text-lg">${sessionStats.interactions}<span data-i18n="times_unit">회</span></div>
             </div>
           </div>
           <div class="mt-4 pt-4 border-t border-gray-200">
             <div class="text-center">
-              <div class="text-gray-500 text-sm">학습 효율</div>
-              <div class="font-bold text-2xl text-blue-600">${
-                sessionStats.efficiency
-              }%</div>
+              <div class="text-gray-500 text-sm" data-i18n="learning_efficiency">학습 효율</div>
+              <div class="font-bold text-2xl text-blue-600">${sessionStats.efficiency}%</div>
             </div>
           </div>
         </div>
@@ -6540,9 +6532,7 @@ async function showLearningComplete() {
           <button id="restart-learning-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-lg font-medium transition-colors">
             ${getRestartButtonText(learningSessionData.area)}
           </button>
-          <button id="back-to-areas-btn" class="w-full bg-gray-500 hover:bg-gray-600 text-white py-2 px-6 rounded-lg font-medium transition-colors">
-            🏠 영역 선택으로 돌아가기
-          </button>
+          <button id="back-to-areas-btn" class="w-full bg-gray-500 hover:bg-gray-600 text-white py-2 px-6 rounded-lg font-medium transition-colors" data-i18n="back_to_areas">🏠 영역 선택으로 돌아가기</button>
         </div>
       </div>
     </div>
@@ -6550,6 +6540,12 @@ async function showLearningComplete() {
 
   // 완료 화면을 DOM에 추가
   document.body.insertAdjacentHTML("beforeend", completionHTML);
+  
+  // 🌐 번역 적용
+  setTimeout(() => {
+    applyTranslations();
+    console.log("🌐 학습 완료 모달 번역 적용됨");
+  }, 50);
 
   // 이벤트 리스너 등록
   document
@@ -6753,32 +6749,39 @@ function calculateSessionStats() {
 function generateCompletionMessage(stats) {
   const area = learningSessionData.area;
   const mode = learningSessionData.mode;
+  const currentLang = getCurrentLanguage();
 
-  const areaNames = {
-    vocabulary: "단어",
-    grammar: "문법",
-    reading: "독해",
-  };
+  // 번역된 영역 이름 가져오기
+  const areaName = getTranslatedText(`area_${area}`) || getTranslatedText(area) || area;
+  const modeName = getTranslatedText(`mode_${mode}`) || getTranslatedText(mode) || mode;
 
-  const modeNames = {
-    flashcard: "플래시카드",
-    typing: "타이핑",
-    pattern: "패턴 분석",
-    practice: "실습",
-    example: "예문 학습",
-    flash: "플래시 학습",
-  };
-
-  const areaName = areaNames[area] || area;
-  const modeName = modeNames[mode] || mode;
-
+  // 완료 메시지 번역 키 선택
+  let messageKey = 'completion_message_basic';
   if (stats.efficiency >= 80) {
-    return `${areaName} ${modeName}을 훌륭하게 완료했습니다!`;
+    messageKey = 'completion_message_excellent';
   } else if (stats.efficiency >= 60) {
-    return `${areaName} ${modeName}을 잘 완료했습니다!`;
-  } else {
-    return `${areaName} ${modeName}을 완료했습니다!`;
+    messageKey = 'completion_message_good';
   }
+
+  // 번역된 완료 메시지 가져오기
+  const messageTemplate = getTranslatedText(messageKey);
+  
+  // 메시지가 번역되지 않은 경우 기본 메시지 반환
+  if (messageTemplate === messageKey) {
+    // 기본 메시지 (한국어)
+    if (stats.efficiency >= 80) {
+      return `${areaName} ${modeName}을 훌륭하게 완료했습니다!`;
+    } else if (stats.efficiency >= 60) {
+      return `${areaName} ${modeName}을 잘 완료했습니다!`;
+    } else {
+      return `${areaName} ${modeName}을 완료했습니다!`;
+    }
+  }
+  
+  // {area}와 {mode} 플레이스홀더를 실제 값으로 치환
+  return messageTemplate
+    .replace('{area}', areaName)
+    .replace('{mode}', modeName);
 }
 
 // 🔄 다시 학습 버튼 텍스트 생성
@@ -6786,20 +6789,37 @@ function getRestartButtonText(area) {
   const allData = areaData[area] || [];
   const hasNextSession = (sessionOffset + 10) < allData.length;
   
+  // 번역된 영역 이름 가져오기
+  const areaName = getTranslatedText(`area_${area}`) || getTranslatedText(area) || area;
+  
   if (hasNextSession) {
-    const nextTexts = {
+    // "다음 10개 [영역] 학습" 번역
+    const nextButtonText = getTranslatedText('next_10_items_learning');
+    if (nextButtonText !== 'next_10_items_learning') {
+      return nextButtonText.replace('{area}', areaName);
+    }
+    
+    // 기본 텍스트 (번역이 없는 경우)
+    const defaultNextTexts = {
       vocabulary: "📚 다음 10개 단어 학습",
       grammar: "📚 다음 10개 문법 학습", 
       reading: "📚 다음 10개 독해 학습",
     };
-    return nextTexts[area] || "📚 다음 10개 학습";
+    return defaultNextTexts[area] || "📚 다음 10개 학습";
   } else {
-    const restartTexts = {
+    // "새로운 [영역]으로 다시 학습" 번역
+    const restartButtonText = getTranslatedText('restart_with_new_items');
+    if (restartButtonText !== 'restart_with_new_items') {
+      return restartButtonText.replace('{area}', areaName);
+    }
+    
+    // 기본 텍스트 (번역이 없는 경우)
+    const defaultRestartTexts = {
       vocabulary: "🔄 새로운 단어로 다시 학습",
       grammar: "🔄 새로운 문법으로 다시 학습",
       reading: "🔄 새로운 독해로 다시 학습",
     };
-    return restartTexts[area] || "🔄 다시 학습";
+    return defaultRestartTexts[area] || "🔄 다시 학습";
   }
 }
 
