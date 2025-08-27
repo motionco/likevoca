@@ -68,6 +68,9 @@ let isFlipped = false;
 // 언어 스왑 중복 이벤트 방지 플래그
 let isLanguageSwapping = false;
 
+// 세션별 데이터 오프셋 (10개씩 세션 관리)
+let sessionOffset = 0;
+
 // 영역별 데이터 분리 저장
 let areaData = {
   vocabulary: [],
@@ -75,23 +78,26 @@ let areaData = {
   reading: [],
 };
 
-// 현재 데이터 getter 함수
+// 현재 데이터 getter 함수 (세션별 10개씩 반환)
 function getCurrentData() {
   console.log(
-    `🔍 getCurrentData 호출 - currentLearningArea: ${currentLearningArea}`
+    `🔍 getCurrentData 호출 - currentLearningArea: ${currentLearningArea}, sessionOffset: ${sessionOffset}`
   );
-  console.log(`🔍 areaData 전체:`, areaData);
 
-  const data = areaData[currentLearningArea] || [];
+  const allData = areaData[currentLearningArea] || [];
+  
+  // 현재 세션의 10개만 반환 (sessionOffset부터 sessionOffset+10까지)
+  const sessionData = allData.slice(sessionOffset, sessionOffset + 10);
+  
   console.log(
-    `🔍 getCurrentData: area=${currentLearningArea}, length=${data.length}`
+    `🔍 getCurrentData: 전체=${allData.length}개, 세션=${sessionData.length}개 (${sessionOffset}~${sessionOffset + 10})`
   );
 
-  if (data.length > 0) {
-    console.log(`🔍 첫 번째 데이터 샘플:`, data[0]);
+  if (sessionData.length > 0) {
+    console.log(`🔍 세션 데이터 샘플:`, sessionData[0]);
   }
 
-  return data;
+  return sessionData;
 }
 
 // 현재 데이터 setter 함수
@@ -1224,10 +1230,10 @@ function setupEventListeners() {
     prevFlashcardBtn &&
     !prevFlashcardBtn.hasAttribute("data-listener-added")
   ) {
-    prevFlashcardBtn.addEventListener("click", (e) => {
+    prevFlashcardBtn.addEventListener("click", async (e) => {
       e.preventDefault();
       e.stopPropagation();
-      navigateContent(-1);
+      await navigateContent(-1);
     });
     prevFlashcardBtn.setAttribute("data-listener-added", "true");
   }
@@ -1236,10 +1242,10 @@ function setupEventListeners() {
     nextFlashcardBtn &&
     !nextFlashcardBtn.hasAttribute("data-listener-added")
   ) {
-    nextFlashcardBtn.addEventListener("click", (e) => {
+    nextFlashcardBtn.addEventListener("click", async (e) => {
       e.preventDefault();
       e.stopPropagation();
-      navigateContent(1);
+      await navigateContent(1);
     });
     nextFlashcardBtn.setAttribute("data-listener-added", "true");
   }
@@ -1333,11 +1339,11 @@ function setupEventListeners() {
   // 플래시카드 모드 버튼들 (기존 변수 사용)
   if (prevFlashcardBtn) {
     prevFlashcardBtn.removeEventListener("click", () => navigateContent(-1));
-    prevFlashcardBtn.addEventListener("click", () => navigateContent(-1));
+    prevFlashcardBtn.addEventListener("click", async () => await navigateContent(-1));
   }
   if (nextFlashcardBtn) {
     nextFlashcardBtn.removeEventListener("click", () => navigateContent(1));
-    nextFlashcardBtn.addEventListener("click", () => navigateContent(1));
+    nextFlashcardBtn.addEventListener("click", async () => await navigateContent(1));
   }
   if (flipFlashcardBtn) {
     flipFlashcardBtn.removeEventListener("click", flipCard);
@@ -1369,11 +1375,11 @@ function setupEventListeners() {
 
   if (prevTypingBtnNew) {
     prevTypingBtnNew.removeEventListener("click", () => navigateContent(-1));
-    prevTypingBtnNew.addEventListener("click", () => navigateContent(-1));
+    prevTypingBtnNew.addEventListener("click", async () => await navigateContent(-1));
   }
   if (nextTypingBtnNew) {
     nextTypingBtnNew.removeEventListener("click", () => navigateContent(1));
-    nextTypingBtnNew.addEventListener("click", () => navigateContent(1));
+    nextTypingBtnNew.addEventListener("click", async () => await navigateContent(1));
   }
   if (checkTypingAnswerBtn) {
     checkTypingAnswerBtn.removeEventListener("click", checkTypingAnswer);
@@ -1385,11 +1391,11 @@ function setupEventListeners() {
   const nextListeningBtn = document.getElementById("next-listening-btn");
   if (prevListeningBtn) {
     prevListeningBtn.removeEventListener("click", () => navigateContent(-1));
-    prevListeningBtn.addEventListener("click", () => navigateContent(-1));
+    prevListeningBtn.addEventListener("click", async () => await navigateContent(-1));
   }
   if (nextListeningBtn) {
     nextListeningBtn.removeEventListener("click", () => navigateContent(1));
-    nextListeningBtn.addEventListener("click", () => navigateContent(1));
+    nextListeningBtn.addEventListener("click", async () => await navigateContent(1));
   }
 
   // 문법 실습 뒤집기 버튼
@@ -1441,70 +1447,70 @@ function setupEventListeners() {
 }
 
 // 이벤트 핸들러 함수들 정의
-function prevGrammarHandler(e) {
+async function prevGrammarHandler(e) {
   e.preventDefault();
   e.stopPropagation();
-  navigateContent(-1);
+  await navigateContent(-1);
 }
 
-function nextGrammarHandler(e) {
+async function nextGrammarHandler(e) {
   e.preventDefault();
   e.stopPropagation();
-  navigateContent(1);
+  await navigateContent(1);
 }
 
-function prevPatternHandler(e) {
+async function prevPatternHandler(e) {
   e.preventDefault();
   e.stopPropagation();
-  navigateContent(-1);
+  await navigateContent(-1);
 }
 
-function nextPatternHandler(e) {
+async function nextPatternHandler(e) {
   e.preventDefault();
   e.stopPropagation();
-  navigateContent(1);
+  await navigateContent(1);
 }
 
-function prevPracticeHandler(e) {
+async function prevPracticeHandler(e) {
   e.preventDefault();
   e.stopPropagation();
-  navigateContent(-1);
+  await navigateContent(-1);
 }
 
-function nextPracticeHandler(e) {
+async function nextPracticeHandler(e) {
   e.preventDefault();
   e.stopPropagation();
-  navigateContent(1);
+  await navigateContent(1);
 }
 
-function prevCardHandler(e) {
+async function prevCardHandler(e) {
   e.preventDefault();
   e.stopPropagation();
-  navigateContent(-1);
+  await navigateContent(-1);
 }
 
-function nextCardHandler(e) {
+async function nextCardHandler(e) {
   e.preventDefault();
   e.stopPropagation();
-  navigateContent(1);
+  await navigateContent(1);
 }
 
-function prevReadingHandler(e) {
+async function prevReadingHandler(e) {
   e.preventDefault();
   e.stopPropagation();
-  navigateContent(-1);
+  await navigateContent(-1);
 }
 
-function nextReadingHandler(e) {
+async function nextReadingHandler(e) {
   e.preventDefault();
   e.stopPropagation();
-  navigateContent(1);
+  await navigateContent(1);
 }
 
-function nextTypingHandler(e) {
+async function nextTypingHandler(e) {
   e.preventDefault();
   e.stopPropagation();
-  navigateContent(1);
+  await navigateContent(1);
   // 결과 숨기기
   const resultDiv = document.getElementById("typing-mode-result");
   if (resultDiv) {
@@ -2320,13 +2326,13 @@ async function preloadAreaData(area) {
     let data = [];
     switch (area) {
       case "vocabulary":
-        data = await loadVocabularyData();
+        data = await loadVocabularyData(20); // 프리로딩 시 20개
         break;
       case "grammar":
-        data = await loadGrammarData();
+        data = await loadGrammarData(20); // 프리로딩 시 20개
         break;
       case "reading":
-        data = await loadReadingData();
+        data = await loadReadingData(20); // 프리로딩 시 20개
         break;
     }
 
@@ -2839,9 +2845,14 @@ window.startLearningMode = async function startLearningMode(area, mode) {
   // 데이터 로드
   await loadLearningData(area);
 
+  // 데이터 검증 (areaData와 getCurrentData 모두 확인)
+  const allAreaData = areaData[area] || [];
   const currentData = getCurrentData();
+  
+  console.log(`🔍 데이터 검증: areaData[${area}]=${allAreaData.length}개, currentData=${currentData?.length || 0}개`);
+  
   if (!currentData || currentData.length === 0) {
-    console.log(`❌ ${area} 영역에 데이터가 없습니다.`);
+    console.log(`❌ ${area} 영역에 학습할 데이터가 없습니다.`);
     showNoDataMessage(area);
     return;
   }
@@ -2934,15 +2945,15 @@ async function loadLearningData(area) {
     console.log(`🔄 ${area} DB에서 새로운 데이터 로드`);
     switch (area) {
       case "vocabulary":
-        await loadVocabularyData();
+        areaData[area] = await loadVocabularyData(); // 일반 학습 시 10개
         break;
 
       case "grammar":
-        await loadGrammarData();
+        areaData[area] = await loadGrammarData(); // 일반 학습 시 10개
         break;
 
       case "reading":
-        await loadReadingData();
+        areaData[area] = await loadReadingData(); // 일반 학습 시 10개
         break;
 
       default:
@@ -2970,8 +2981,8 @@ async function loadLearningData(area) {
   }
 }
 
-async function loadVocabularyData() {
-  console.log("🔍 학습용 단어 데이터 로드 시작 (10개 제한)...");
+async function loadVocabularyData(limitCount = 10) {
+  console.log(`🔍 학습용 단어 데이터 로드 시작 (${limitCount}개 제한)...`);
 
   let data = [];
 
@@ -2992,17 +3003,17 @@ async function loadVocabularyData() {
 
       console.log("🚀 randomField를 활용한 효율적인 조회 시작...");
 
-      // 효율적인 랜덤 쿼리 (최대 10개만 읽음)
+      // 효율적인 랜덤 쿼리 (매개변수로 전달받은 개수만큼 읽음)
       const randomValue = Math.random();
       const randomQuery = window.firebaseInit.query(
         conceptsRef,
         window.firebaseInit.where("randomField", ">=", randomValue),
-        window.firebaseInit.limit(10)
+        window.firebaseInit.limit(limitCount)
       );
 
       const randomSnapshot = await window.firebaseInit.getDocs(randomQuery);
 
-      if (randomSnapshot.size >= 10) {
+      if (randomSnapshot.size >= limitCount) {
         // 충분한 데이터가 있는 경우
         data = randomSnapshot.docs.map((doc) => ({
           id: doc.id,
@@ -3015,7 +3026,7 @@ async function loadVocabularyData() {
         const additionalQuery = window.firebaseInit.query(
           conceptsRef,
           window.firebaseInit.where("randomField", "<", randomValue),
-          window.firebaseInit.limit(10 - randomSnapshot.size)
+          window.firebaseInit.limit(limitCount - randomSnapshot.size)
         );
 
         const additionalSnapshot = await window.firebaseInit.getDocs(
@@ -3064,13 +3075,13 @@ async function loadVocabularyData() {
       try {
         const parsedData = JSON.parse(sessionData);
         if (Array.isArray(parsedData) && parsedData.length > 0) {
-          // sessionStorage 데이터도 랜덤하게 10개만 선택
+          // sessionStorage 데이터도 랜덤하게 지정된 개수만 선택
           const shuffled = [...parsedData];
           for (let i = shuffled.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
           }
-          data = shuffled.slice(0, 10);
+          data = shuffled.slice(0, limitCount);
           console.log(`📦 sessionStorage에서 랜덤 ${data.length}개 단어 선택`);
         }
       } catch (parseError) {
@@ -3091,7 +3102,7 @@ async function loadVocabularyData() {
   return filteredData;
 }
 
-async function loadGrammarData() {
+async function loadGrammarData(limitCount = 10) {
   console.log("📝 문법 패턴 데이터 로딩 시작...");
 
   try {
@@ -3118,12 +3129,12 @@ async function loadGrammarData() {
       const randomQuery = window.firebaseInit.query(
         grammarRef,
         window.firebaseInit.where("randomField", ">=", randomValue),
-        window.firebaseInit.limit(10) // ✅ 20개에서 10개로 최적화
+        window.firebaseInit.limit(limitCount)
       );
 
       const randomSnapshot = await window.firebaseInit.getDocs(randomQuery);
 
-      if (randomSnapshot.size >= 10) {
+      if (randomSnapshot.size >= limitCount) {
         // 충분한 데이터가 있는 경우
         grammarData = randomSnapshot.docs.map((doc) => {
           const docData = doc.data();
@@ -3146,7 +3157,7 @@ async function loadGrammarData() {
         const additionalQuery = window.firebaseInit.query(
           grammarRef,
           window.firebaseInit.where("randomField", "<", randomValue),
-          window.firebaseInit.limit(10 - randomSnapshot.size) // ✅ 20에서 10으로 최적화
+          window.firebaseInit.limit(limitCount - randomSnapshot.size)
         );
 
         const additionalSnapshot = await window.firebaseInit.getDocs(
@@ -3221,7 +3232,7 @@ async function loadGrammarData() {
   return [];
 }
 
-async function loadReadingData() {
+async function loadReadingData(limitCount = 10) {
   console.log("📖 독해 예문 데이터 로딩 시작...");
 
   // 현재 언어 설정 가져오기
@@ -3256,12 +3267,12 @@ async function loadReadingData() {
       const randomQuery = window.firebaseInit.query(
         examplesRef,
         window.firebaseInit.where("randomField", ">=", randomValue),
-        window.firebaseInit.limit(10) // ✅ 15개에서 10개로 최적화
+        window.firebaseInit.limit(limitCount) // 매개변수로 제어
       );
 
       const randomSnapshot = await window.firebaseInit.getDocs(randomQuery);
 
-      if (randomSnapshot.size >= 10) {
+      if (randomSnapshot.size >= limitCount) {
         // 충분한 데이터가 있는 경우
         exampleData = randomSnapshot.docs
           .map((doc) => {
@@ -3905,8 +3916,8 @@ function checkTypingAnswer() {
   }
 
   // 2초 후 다음 문제로
-  setTimeout(() => {
-    navigateContent(1);
+  setTimeout(async () => {
+    await navigateContent(1);
   }, 2000);
 }
 
@@ -4462,7 +4473,7 @@ function updateReadingFlash() {
   // trackLearningInteraction(conceptId, false, "view"); // 중복 방지를 위해 주석 처리
 }
 
-function navigateContent(direction) {
+async function navigateContent(direction) {
   if (isNavigating) {
     console.log("⚠️ 네비게이션 진행 중, 중복 실행 방지");
     return;
@@ -4537,7 +4548,7 @@ function navigateContent(direction) {
 
   currentIndex += direction;
 
-  // 🚫 순환 처리 제거 - 범위 제한
+  // 🚫 범위 제한 - 데이터 끝에서 멈춤
   if (currentIndex >= currentData.length) {
     currentIndex = currentData.length - 1; // 마지막에서 멈춤
     showLearningComplete(); // 학습 완료 UI 표시
@@ -6264,8 +6275,8 @@ function checkSessionCompletion() {
   const currentData = getCurrentData();
   const totalAvailableData = currentData ? currentData.length : 0;
 
-  // 🎯 모드별 완료 조건 정의 - 모든 모드에서 10개 개념 기준
-  let completionThreshold = Math.min(10, totalAvailableData); // 기본값: 10개 또는 전체 데이터
+  // 🎯 10개씩 세션으로 나누어 학습 - 10개 완료 시 자동 종료
+  let completionThreshold = 10; // 항상 10개로 고정
   let shouldAutoComplete = false;
 
   if (
@@ -6278,7 +6289,7 @@ function checkSessionCompletion() {
     // 타이핑 모드: 실제 정답 확인한 개념 수가 10개 이상이어야 완료
     shouldAutoComplete = conceptsCount >= completionThreshold;
   } else {
-    // 기타 모드: 기존 방식 (10개 또는 전체 데이터)
+    // 기타 모드: 10개 완료 시 자동 종료
     shouldAutoComplete = conceptsCount >= completionThreshold;
   }
 
@@ -6422,10 +6433,24 @@ async function showLearningCompleteWithStats(sessionStats) {
   document.getElementById("back-to-areas-btn").addEventListener("click", () => {
     // 🔧 학습 상태 초기화 (영역 선택으로 돌아갈 때)
     currentIndex = 0;
+    sessionOffset = 0; // 세션 오프셋 리셋
     isFlipped = false;
     isNavigating = false;
     currentLearningArea = null;
     currentLearningMode = null;
+
+    // 🎲 프리로드 데이터 랜덤화 (다음 학습을 위해)
+    Object.keys(preloadedData).forEach(area => {
+      if (preloadedData[area] && preloadedData[area].length > 0) {
+        const shuffled = [...preloadedData[area]];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        preloadedData[area] = shuffled;
+        console.log(`🎲 ${area} 프리로드 데이터 랜덤화 완료`);
+      }
+    });
 
     // 🔄 학습 데이터 초기화
     areaData = {
@@ -6535,10 +6560,24 @@ async function showLearningComplete() {
   document.getElementById("back-to-areas-btn").addEventListener("click", () => {
     // 🔧 학습 상태 초기화 (영역 선택으로 돌아갈 때)
     currentIndex = 0;
+    sessionOffset = 0; // 세션 오프셋 리셋
     isFlipped = false;
     isNavigating = false;
     currentLearningArea = null;
     currentLearningMode = null;
+
+    // 🎲 프리로드 데이터 랜덤화 (다음 학습을 위해)
+    Object.keys(preloadedData).forEach(area => {
+      if (preloadedData[area] && preloadedData[area].length > 0) {
+        const shuffled = [...preloadedData[area]];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        preloadedData[area] = shuffled;
+        console.log(`🎲 ${area} 프리로드 데이터 랜덤화 완료`);
+      }
+    });
 
     // 🔄 학습 데이터 초기화
     areaData = {
@@ -6743,62 +6782,127 @@ function generateCompletionMessage(stats) {
 
 // 🔄 다시 학습 버튼 텍스트 생성
 function getRestartButtonText(area) {
-  const restartTexts = {
-    vocabulary: "🔄 새로운 단어로 다시 학습",
-    grammar: "🔄 새로운 문법으로 다시 학습",
-    reading: "🔄 새로운 독해로 다시 학습",
-  };
-
-  return restartTexts[area] || "🔄 다시 학습";
+  const allData = areaData[area] || [];
+  const hasNextSession = (sessionOffset + 10) < allData.length;
+  
+  if (hasNextSession) {
+    const nextTexts = {
+      vocabulary: "📚 다음 10개 단어 학습",
+      grammar: "📚 다음 10개 문법 학습", 
+      reading: "📚 다음 10개 독해 학습",
+    };
+    return nextTexts[area] || "📚 다음 10개 학습";
+  } else {
+    const restartTexts = {
+      vocabulary: "🔄 새로운 단어로 다시 학습",
+      grammar: "🔄 새로운 문법으로 다시 학습",
+      reading: "🔄 새로운 독해로 다시 학습",
+    };
+    return restartTexts[area] || "🔄 다시 학습";
+  }
 }
 
-// 🔄 새로운 데이터로 다시 학습 시작
+// 🔄 다음 세션 또는 새로운 데이터로 학습 시작
 async function restartLearningWithNewData() {
   try {
-    console.log("🔄 새로운 데이터로 다시 학습 시작...");
+    const area = learningSessionData.area;
+    const mode = learningSessionData.mode;
+    const allData = areaData[area] || [];
+    const hasNextSession = (sessionOffset + 10) < allData.length;
 
     // 완료 화면 제거
     removeCompletionOverlay();
 
-    // 로딩 상태 표시
-    showRestartLoading();
+    if (hasNextSession) {
+      // 다음 10개 세션으로 이동
+      console.log(`📚 다음 10개 세션으로 이동: ${sessionOffset} → ${sessionOffset + 10}`);
+      
+      sessionOffset += 10;
+      currentIndex = 0;
+      isFlipped = false;
+      isNavigating = false;
 
-    // 현재 학습 상태 초기화
-    currentIndex = 0;
-    isFlipped = false;
-    isNavigating = false; // 🔧 네비게이션 플래그 초기화
+      // 🔄 모든 플래시카드 DOM 요소의 뒤집기 상태 초기화
+      const flashcardElements = [
+        document.getElementById("flashcard-mode-card"),
+        document.querySelector(".flashcard"),
+        document.getElementById("reading-flash-card")
+      ];
+      flashcardElements.forEach(element => {
+        if (element) {
+          element.classList.remove("flipped");
+        }
+      });
 
-    // 새로운 데이터 로드
-    const area = learningSessionData.area;
-    const mode = learningSessionData.mode;
+      // 세션 데이터 초기화
+      learningSessionData.conceptsStudied.clear();
+      learningSessionData.totalInteractions = 0;
+      learningSessionData.correctAnswers = 0;
+      learningSessionData.trackedInteractions.clear();
 
-    console.log(`🔄 ${area} 영역의 완전히 새로운 데이터 로드...`);
+      // 새로운 세션 시작
+      startLearningSession(area, mode);
+      await startLearningMode(area, mode);
+      
+      console.log("✅ 다음 세션 시작 완료");
+    } else {
+      // 모든 세션 완료 - 새로운 데이터 로드
+      console.log("🔄 모든 세션 완료. 새로운 데이터로 다시 학습 시작...");
 
-    // ✅ 캐시 무효화 - 새로운 데이터 강제 로드
-    preloadedData[area] = null;
-    if (window.cachedData) {
-      window.cachedData[area] = null;
+      // 로딩 상태 표시
+      showRestartLoading();
+
+      // 세션 오프셋 리셋
+      sessionOffset = 0;
+      currentIndex = 0;
+      isFlipped = false;
+      isNavigating = false;
+
+      // 🔄 모든 플래시카드 DOM 요소의 뒤집기 상태 초기화
+      const flashcardElements = [
+        document.getElementById("flashcard-mode-card"),
+        document.querySelector(".flashcard"),
+        document.getElementById("reading-flash-card")
+      ];
+      flashcardElements.forEach(element => {
+        if (element) {
+          element.classList.remove("flipped");
+        }
+      });
+
+      // ✅ 모든 캐시 무효화 - 새로운 데이터 강제 로드
+      preloadedData[area] = null;
+      
+      if (typeof cachedData !== 'undefined' && cachedData[area]) {
+        cachedData[area] = { data: null, timestamp: 0 };
+      }
+      
+      if (window.cachedData && window.cachedData[area]) {
+        window.cachedData[area] = null;
+      }
+      
+      sessionStorage.removeItem("conceptsData");
+      sessionStorage.removeItem("vocabularyData");
+      console.log("🗑️ 모든 캐시 무효화 완료");
+
+      // 영역별 새로운 데이터 로드
+      await loadLearningData(area);
+
+      // 새로운 세션 시작
+      startLearningSession(area, mode);
+
+      // 로딩 화면 제거
+      hideRestartLoading();
+
+      // 학습 모드 다시 시작
+      await startLearningMode(area, mode);
+
+      console.log("✅ 새로운 데이터로 학습 재시작 완료");
     }
-
-    // 영역별 새로운 데이터 로드
-    await loadLearningData(area);
-
-    // 새로운 세션 시작
-    startLearningSession(area, mode);
-
-    // 로딩 화면 제거
-    hideRestartLoading();
-
-    // 학습 모드 다시 시작
-    await startLearningMode(area, mode);
-
-    console.log("✅ 새로운 데이터로 학습 재시작 완료");
   } catch (error) {
     console.error("❌ 학습 재시작 중 오류:", error);
     hideRestartLoading();
-    alert(
-      "새로운 학습 데이터를 불러오는 중 오류가 발생했습니다. 다시 시도해주세요."
-    );
+    alert("학습 재시작 중 오류가 발생했습니다. 다시 시도해주세요.");
   }
 }
 
@@ -6830,3 +6934,4 @@ function hideRestartLoading() {
     loading.remove();
   }
 }
+

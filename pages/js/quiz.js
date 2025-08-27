@@ -108,6 +108,7 @@ function initializeElements() {
     retryBtn: document.getElementById("retry-quiz-btn"),
     newQuizBtn: document.getElementById("new-quiz-btn"),
     quizHistory: document.getElementById("quiz-history"),
+    quizTimer: document.getElementById("quiz-timer"),
   };
 
   console.log("📋 DOM 요소 초기화 완료");
