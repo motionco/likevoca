@@ -1,6 +1,6 @@
 ﻿<nav class="bg-[#4B63AC] p-4 shadow-md">
   <div class="container mx-auto flex justify-between items-center max-w-6xl">
-    <!-- 왼쪽: 햄버거 메뉴 (모바일) + 로고 -->
+    <!-- 左側: ハンバーガーメニュー (モバイル) + ロゴ -->
     <div class="flex items-center">
       <button id="menu-toggle" class="text-white text-2xl lg:hidden mr-3">
         <i class="fa-solid fa-bars"></i>
@@ -13,7 +13,7 @@
       >
     </div>
 
-    <!-- 중앙: 네비게이션 메뉴 (데스크톱만) -->
+    <!-- 中央: ナビゲーションメニュー (デスクトップのみ) -->
     <ul id="nav-menu" class="hidden lg:flex space-x-10 items-center">
       <li>
         <a
@@ -56,9 +56,9 @@
       </li>
     </ul>
 
-    <!-- 오른쪽: 언어 설정 + 로그인/회원가입 버튼 + 유저 프로필 -->
+    <!-- 右側: 言語設定 + ログイン/会員登録ボタン + ユーザープロフィール -->
     <div class="flex items-center space-x-1.5 lg:space-x-3">
-      <!-- 언어 설정 버튼 (반응형) -->
+      <!-- 言語設定ボタン (レスポンシブ) -->
       <button
         id="language-button"
         class="text-white font-semibold transition duration-300 hover:text-yellow-400 text-xl lg:text-base p-2 lg:p-2"
@@ -67,7 +67,7 @@
         <span class="hidden lg:inline lg:ml-1">🇯🇵</span>
       </button>
 
-      <!-- 로그인/회원가입 버튼 (로그인 전) -->
+      <!-- ログイン/会員登録ボタン (ログイン前) -->
       <div id="desktop-login-section" class="hidden space-x-2">
         <a
           href="#"
@@ -85,7 +85,7 @@
         >
       </div>
 
-      <!-- 유저 프로필 (반응형) -->
+      <!-- ユーザープロフィール (レスポンシブ) -->
       <div id="desktop-user-section" class="hidden">
         <div id="user-profile" class="relative flex items-center text-white">
           <div id="avatar-container" class="cursor-pointer">
@@ -149,7 +149,7 @@
       >お問い合わせ</a
     >
 
-    <!-- 모바일 로그인 버튼들 -->
+    <!-- モバイルログインボタン -->
     <div id="mobile-login-buttons" class="hidden flex space-x-3">
       <a
         href="#"
@@ -168,7 +168,7 @@
 </nav>
 
 <script>
-  // 개발 환경 감지
+  // 開発環境の検知
   function isDevelopment() {
     return (
       window.location.hostname === "localhost" ||
@@ -211,7 +211,7 @@
     window.location.href = `/${filename}`;
   }
 
-  // 언어별 페이지로 이동하는 함수
+  // 言語別ページへの移動関数
   function goToLanguageSpecificPage(filename) {
     const userLanguage = localStorage.getItem("userLanguage") || "ko";
     const isDev =
@@ -226,9 +226,9 @@
     }
   }
 
-  // 네비게이션바 초기화 함수
+  // ナビゲーションバーの初期化関数
   function initializeNavbar() {
-    // navbar.js의 초기화 함수들이 이미 로드되었는지 확인
+    // navbar.jsの初期化関数がすでにロードされているか確認
     if (typeof window.setupNavbarAuth === "function") {
       window.setupNavbarAuth();
     }
@@ -238,7 +238,7 @@
     }
   }
 
-  // DOM이 로드된 후 초기화
+  // DOMがロードされた後の初期化
   document.addEventListener("DOMContentLoaded", function () {
     initializeNavbar();
   });
