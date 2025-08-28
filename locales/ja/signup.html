@@ -135,6 +135,56 @@
             />
           </div>
 
+          <!-- 約款同意チェックボックス -->
+          <div class="space-y-3 py-4 border-t border-gray-200">
+            <div class="flex items-start space-x-3">
+              <input
+                type="checkbox"
+                id="terms-checkbox"
+                name="terms"
+                class="mt-1 h-4 w-4 text-[#4B63AC] focus:ring-[#4B63AC] border-gray-300 rounded"
+              />
+              <label for="terms-checkbox" class="text-sm text-gray-700">
+                <a href="#" class="text-[#4B63AC] hover:underline" onclick="showTermsModal(); return false;">利用規約</a>に同意します <span class="text-red-500">(必須)</span>
+              </label>
+            </div>
+            
+            <div class="flex items-start space-x-3">
+              <input
+                type="checkbox"
+                id="privacy-checkbox"
+                name="privacy"
+                class="mt-1 h-4 w-4 text-[#4B63AC] focus:ring-[#4B63AC] border-gray-300 rounded"
+              />
+              <label for="privacy-checkbox" class="text-sm text-gray-700">
+                <a href="#" class="text-[#4B63AC] hover:underline" onclick="showPrivacyModal(); return false;">個人情報収集及び利用</a>に同意します <span class="text-red-500">(必須)</span>
+              </label>
+            </div>
+            
+            <div class="flex items-start space-x-3">
+              <input
+                type="checkbox"
+                id="marketing-checkbox"
+                name="marketing"
+                class="mt-1 h-4 w-4 text-[#4B63AC] focus:ring-[#4B63AC] border-gray-300 rounded"
+              />
+              <label for="marketing-checkbox" class="text-sm text-gray-700">
+                マーケティング情報の受信に同意します (選択)
+              </label>
+            </div>
+            
+            <div class="flex items-start space-x-3 pt-2">
+              <input
+                type="checkbox"
+                id="all-checkbox"
+                class="mt-1 h-4 w-4 text-[#4B63AC] focus:ring-[#4B63AC] border-gray-300 rounded"
+              />
+              <label for="all-checkbox" class="text-sm font-medium text-gray-700">
+                全て同意
+              </label>
+            </div>
+          </div>
+
           <div
             id="error-message"
             class="hidden text-red-500 text-sm text-center"
@@ -160,6 +210,61 @@
       </div>
     </div>
 
+    <!-- 利用規約モーダル -->
+    <div id="terms-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+      <div class="bg-white rounded-lg p-6 max-w-2xl w-11/12 max-h-96 overflow-y-auto">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-bold text-gray-800">利用規約</h3>
+          <button onclick="closeTermsModal()" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="text-sm text-gray-600 space-y-3">
+          <h4 class="font-semibold">第1条（目的）</h4>
+          <p>この利用規約は、LikeVoca（以下「当社」）が提供する言語学習サービスの利用に関して、当社と利用者との間の権利、義務及び責任事項を規定することを目的とします。</p>
+          
+          <h4 class="font-semibold">第2条（定義）</h4>
+          <p>「サービス」とは、当社が提供するオンライン言語学習プラットフォーム及び関連サービスを意味します。</p>
+          <p>「利用者」とは、本規約に従って当社が提供するサービスを受ける会員及び非会員をいいます。</p>
+          
+          <h4 class="font-semibold">第3条（規約の効力と変更）</h4>
+          <p>本規約は、サービス画面に掲載するか、その他の方法で通知することによって効力が生じます。</p>
+          
+          <h4 class="font-semibold">第4条（サービスの提供及び変更）</h4>
+          <p>当社は、様々な言語学習コンテンツとツールを提供します。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 個人情報取扱方針モーダル -->
+    <div id="privacy-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+      <div class="bg-white rounded-lg p-6 max-w-2xl w-11/12 max-h-96 overflow-y-auto">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-bold text-gray-800">個人情報収集及び利用</h3>
+          <button onclick="closePrivacyModal()" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="text-sm text-gray-600 space-y-3">
+          <h4 class="font-semibold">1. 個人情報収集目的</h4>
+          <p>会員登録、サービス利用、学習進捗管理、顧客サポート</p>
+          
+          <h4 class="font-semibold">2. 収集する個人情報項目</h4>
+          <p>必須項目：メールアドレス、お名前、パスワード</p>
+          <p>選択項目：学習言語設定、学習進捗データ</p>
+          
+          <h4 class="font-semibold">3. 個人情報保有及び利用期間</h4>
+          <p>会員退会時まで、または関連法令で定められた保存期間</p>
+          
+          <h4 class="font-semibold">4. 個人情報の第三者提供</h4>
+          <p>利用者の同意なしに個人情報を第三者に提供しません。</p>
+          
+          <h4 class="font-semibold">5. 個人情報処理委託</h4>
+          <p>サービス提供に必要な場合に限り委託することがあります。</p>
+        </div>
+      </div>
+    </div>
+
     <script>
       // 언어별 페이지로 이동하는 함수
       function goToLanguageSpecificPage(filename) {
@@ -175,6 +280,85 @@
           window.location.href = `/${userLanguage}/${filename}`;
         }
       }
+
+      // モーダル管理関数
+      function showTermsModal() {
+        document.getElementById('terms-modal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeTermsModal() {
+        document.getElementById('terms-modal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+      }
+
+      function showPrivacyModal() {
+        document.getElementById('privacy-modal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closePrivacyModal() {
+        document.getElementById('privacy-modal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+      }
+
+      // モーダル外クリック時閉じる
+      document.getElementById('terms-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+          closeTermsModal();
+        }
+      });
+
+      document.getElementById('privacy-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+          closePrivacyModal();
+        }
+      });
+
+      // ESCキーでモーダル閉じる
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          closeTermsModal();
+          closePrivacyModal();
+        }
+      });
+
+      // 全て同意チェックボックス機能
+      document.addEventListener('DOMContentLoaded', function() {
+        const allCheckbox = document.getElementById('all-checkbox');
+        const termsCheckbox = document.getElementById('terms-checkbox');
+        const privacyCheckbox = document.getElementById('privacy-checkbox');
+        const marketingCheckbox = document.getElementById('marketing-checkbox');
+
+        // 全て同意クリック時
+        allCheckbox.addEventListener('change', function() {
+          const isChecked = this.checked;
+          termsCheckbox.checked = isChecked;
+          privacyCheckbox.checked = isChecked;
+          marketingCheckbox.checked = isChecked;
+        });
+
+        // 個別チェックボックス状態変更時全体同意状態更新
+        function updateAllCheckbox() {
+          const allRequired = termsCheckbox.checked && privacyCheckbox.checked;
+          const allOptional = marketingCheckbox.checked;
+          
+          if (allRequired && allOptional) {
+            allCheckbox.checked = true;
+            allCheckbox.indeterminate = false;
+          } else if (allRequired) {
+            allCheckbox.checked = false;
+            allCheckbox.indeterminate = true;
+          } else {
+            allCheckbox.checked = false;
+            allCheckbox.indeterminate = false;
+          }
+        }
+
+        [termsCheckbox, privacyCheckbox, marketingCheckbox].forEach(checkbox => {
+          checkbox.addEventListener('change', updateAllCheckbox);
+        });
+      });
     </script>
   </body>
 </html>

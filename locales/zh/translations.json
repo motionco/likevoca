@@ -692,6 +692,8 @@
   "fields_required": "请填写所有字段",
   "passwords_do_not_match": "密码不匹配",
   "invalid_email": "请输入有效的邮箱地址",
+  "terms_agreement_required": "请同意服务条款",
+  "privacy_agreement_required": "请同意隐私收集",
   "signup_failed": "注册失败",
   "login_success": "登录成功！欢迎，{name}！",
   "google_signup_success": "欢迎，{name}！您的Google账户注册已完成",

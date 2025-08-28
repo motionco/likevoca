@@ -120,6 +120,8 @@
   "fields_required": "Please fill in all fields",
   "passwords_do_not_match": "Passwords do not match",
   "invalid_email": "Please enter a valid email address",
+  "terms_agreement_required": "Please agree to the terms of service",
+  "privacy_agreement_required": "Please agree to privacy collection",
   "signup_failed": "Sign up failed",
   "login_success": "Login successful! Welcome, {name}!",
   "google_signup_success": "Welcome, {name}! Your Google account registration is complete",

@@ -692,6 +692,8 @@
   "fields_required": "すべてのフィールドを入力してください",
   "passwords_do_not_match": "パスワードが一致しません",
   "invalid_email": "有効なメールアドレスを入力してください",
+  "terms_agreement_required": "利用規約に同意してください",
+  "privacy_agreement_required": "個人情報収集に同意してください",
   "signup_failed": "会員登録失敗",
   "login_success": "ログイン成功！ようこそ、{name}さん！",
   "google_signup_success": "ようこそ、{name}さん！Googleアカウントでの会員登録が完了しました",

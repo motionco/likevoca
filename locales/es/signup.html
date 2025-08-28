@@ -137,6 +137,56 @@
             />
           </div>
 
+          <!-- Casillas de verificación de consentimiento -->
+          <div class="space-y-3 py-4 border-t border-gray-200">
+            <div class="flex items-start space-x-3">
+              <input
+                type="checkbox"
+                id="terms-checkbox"
+                name="terms"
+                class="mt-1 h-4 w-4 text-[#4B63AC] focus:ring-[#4B63AC] border-gray-300 rounded"
+              />
+              <label for="terms-checkbox" class="text-sm text-gray-700">
+                Acepto los <a href="#" class="text-[#4B63AC] hover:underline" onclick="showTermsModal(); return false;">Términos de Servicio</a> <span class="text-red-500">(Obligatorio)</span>
+              </label>
+            </div>
+            
+            <div class="flex items-start space-x-3">
+              <input
+                type="checkbox"
+                id="privacy-checkbox"
+                name="privacy"
+                class="mt-1 h-4 w-4 text-[#4B63AC] focus:ring-[#4B63AC] border-gray-300 rounded"
+              />
+              <label for="privacy-checkbox" class="text-sm text-gray-700">
+                Acepto la <a href="#" class="text-[#4B63AC] hover:underline" onclick="showPrivacyModal(); return false;">Recolección y Uso de Privacidad</a> <span class="text-red-500">(Obligatorio)</span>
+              </label>
+            </div>
+            
+            <div class="flex items-start space-x-3">
+              <input
+                type="checkbox"
+                id="marketing-checkbox"
+                name="marketing"
+                class="mt-1 h-4 w-4 text-[#4B63AC] focus:ring-[#4B63AC] border-gray-300 rounded"
+              />
+              <label for="marketing-checkbox" class="text-sm text-gray-700">
+                Acepto recibir información de marketing (Opcional)
+              </label>
+            </div>
+            
+            <div class="flex items-start space-x-3 pt-2">
+              <input
+                type="checkbox"
+                id="all-checkbox"
+                class="mt-1 h-4 w-4 text-[#4B63AC] focus:ring-[#4B63AC] border-gray-300 rounded"
+              />
+              <label for="all-checkbox" class="text-sm font-medium text-gray-700">
+                Aceptar Todo
+              </label>
+            </div>
+          </div>
+
           <div
             id="error-message"
             class="hidden text-red-500 text-sm text-center"

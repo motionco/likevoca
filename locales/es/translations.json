@@ -701,6 +701,8 @@
   "fields_required": "Por favor complete todos los campos",
   "passwords_do_not_match": "Las contraseñas no coinciden",
   "invalid_email": "Por favor ingrese una dirección de correo válida",
+  "terms_agreement_required": "Por favor acepte los términos de servicio",
+  "privacy_agreement_required": "Por favor acepte la recolección de privacidad",
   "signup_failed": "Falló el registro",
   "login_success": "¡Inicio de sesión exitoso! ¡Bienvenido/a, {name}!",
   "google_signup_success": "¡Bienvenido/a, {name}! Su registro con cuenta de Google está completo",

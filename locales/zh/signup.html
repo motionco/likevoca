@@ -131,6 +131,56 @@
             />
           </div>
 
+          <!-- 条款同意复选框 -->
+          <div class="space-y-3 py-4 border-t border-gray-200">
+            <div class="flex items-start space-x-3">
+              <input
+                type="checkbox"
+                id="terms-checkbox"
+                name="terms"
+                class="mt-1 h-4 w-4 text-[#4B63AC] focus:ring-[#4B63AC] border-gray-300 rounded"
+              />
+              <label for="terms-checkbox" class="text-sm text-gray-700">
+                我同意<a href="#" class="text-[#4B63AC] hover:underline" onclick="showTermsModal(); return false;">服务条款</a> <span class="text-red-500">(必填)</span>
+              </label>
+            </div>
+            
+            <div class="flex items-start space-x-3">
+              <input
+                type="checkbox"
+                id="privacy-checkbox"
+                name="privacy"
+                class="mt-1 h-4 w-4 text-[#4B63AC] focus:ring-[#4B63AC] border-gray-300 rounded"
+              />
+              <label for="privacy-checkbox" class="text-sm text-gray-700">
+                我同意<a href="#" class="text-[#4B63AC] hover:underline" onclick="showPrivacyModal(); return false;">隐私收集及使用</a> <span class="text-red-500">(必填)</span>
+              </label>
+            </div>
+            
+            <div class="flex items-start space-x-3">
+              <input
+                type="checkbox"
+                id="marketing-checkbox"
+                name="marketing"
+                class="mt-1 h-4 w-4 text-[#4B63AC] focus:ring-[#4B63AC] border-gray-300 rounded"
+              />
+              <label for="marketing-checkbox" class="text-sm text-gray-700">
+                我同意接收营销信息 (可选)
+              </label>
+            </div>
+            
+            <div class="flex items-start space-x-3 pt-2">
+              <input
+                type="checkbox"
+                id="all-checkbox"
+                class="mt-1 h-4 w-4 text-[#4B63AC] focus:ring-[#4B63AC] border-gray-300 rounded"
+              />
+              <label for="all-checkbox" class="text-sm font-medium text-gray-700">
+                全部同意
+              </label>
+            </div>
+          </div>
+
           <div
             id="error-message"
             class="hidden text-red-500 text-sm text-center"
@@ -154,6 +204,61 @@
             >登录</a
           >
         </p>
+      </div>
+    </div>
+
+    <!-- 服务条款模态框 -->
+    <div id="terms-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+      <div class="bg-white rounded-lg p-6 max-w-2xl w-11/12 max-h-96 overflow-y-auto">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-bold text-gray-800">服务条款</h3>
+          <button onclick="closeTermsModal()" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="text-sm text-gray-600 space-y-3">
+          <h4 class="font-semibold">第一条 (目的)</h4>
+          <p>本服务条款旨在规定LikeVoca（以下称"公司"）与用户之间关于使用公司提供的语言学习服务的权利、义务及责任事项。</p>
+          
+          <h4 class="font-semibold">第二条 (定义)</h4>
+          <p>"服务"是指公司提供的在线语言学习平台及相关服务。</p>
+          <p>"用户"是指根据本条款接受公司提供服务的会员及非会员。</p>
+          
+          <h4 class="font-semibold">第三条 (条款的效力与变更)</h4>
+          <p>本条款通过在服务界面发布或以其他方式通知而产生效力。</p>
+          
+          <h4 class="font-semibold">第四条 (服务的提供及变更)</h4>
+          <p>公司提供各种语言学习内容和工具。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 隐私政策模态框 -->
+    <div id="privacy-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+      <div class="bg-white rounded-lg p-6 max-w-2xl w-11/12 max-h-96 overflow-y-auto">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-bold text-gray-800">隐私收集及使用</h3>
+          <button onclick="closePrivacyModal()" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="text-sm text-gray-600 space-y-3">
+          <h4 class="font-semibold">1. 个人信息收集目的</h4>
+          <p>会员注册、服务使用、学习进度管理、客户支持</p>
+          
+          <h4 class="font-semibold">2. 收集的个人信息项目</h4>
+          <p>必填项目：邮箱、姓名、密码</p>
+          <p>选填项目：学习语言设置、学习进度数据</p>
+          
+          <h4 class="font-semibold">3. 个人信息保存及使用期限</h4>
+          <p>直至会员退出或相关法律规定的保存期限</p>
+          
+          <h4 class="font-semibold">4. 个人信息第三方提供</h4>
+          <p>不会在未经用户同意的情况下向第三方提供个人信息。</p>
+          
+          <h4 class="font-semibold">5. 个人信息处理委托</h4>
+          <p>仅在提供服务所必需的情况下可以委托处理。</p>
+        </div>
       </div>
     </div>
 
