@@ -135,6 +135,56 @@
             />
           </div>
 
+          <!-- 약관 동의 체크박스들 -->
+          <div class="space-y-3 py-4 border-t border-gray-200">
+            <div class="flex items-start space-x-3">
+              <input
+                type="checkbox"
+                id="terms-checkbox"
+                name="terms"
+                class="mt-1 h-4 w-4 text-[#4B63AC] focus:ring-[#4B63AC] border-gray-300 rounded"
+              />
+              <label for="terms-checkbox" class="text-sm text-gray-700">
+                <a href="#" class="text-[#4B63AC] hover:underline" onclick="showTermsModal(); return false;">이용약관</a>에 동의합니다 <span class="text-red-500">(필수)</span>
+              </label>
+            </div>
+            
+            <div class="flex items-start space-x-3">
+              <input
+                type="checkbox"
+                id="privacy-checkbox"
+                name="privacy"
+                class="mt-1 h-4 w-4 text-[#4B63AC] focus:ring-[#4B63AC] border-gray-300 rounded"
+              />
+              <label for="privacy-checkbox" class="text-sm text-gray-700">
+                <a href="#" class="text-[#4B63AC] hover:underline" onclick="showPrivacyModal(); return false;">개인정보 수집 및 이용</a>에 동의합니다 <span class="text-red-500">(필수)</span>
+              </label>
+            </div>
+            
+            <div class="flex items-start space-x-3">
+              <input
+                type="checkbox"
+                id="marketing-checkbox"
+                name="marketing"
+                class="mt-1 h-4 w-4 text-[#4B63AC] focus:ring-[#4B63AC] border-gray-300 rounded"
+              />
+              <label for="marketing-checkbox" class="text-sm text-gray-700">
+                마케팅 정보 수신에 동의합니다 (선택)
+              </label>
+            </div>
+            
+            <div class="flex items-start space-x-3 pt-2">
+              <input
+                type="checkbox"
+                id="all-checkbox"
+                class="mt-1 h-4 w-4 text-[#4B63AC] focus:ring-[#4B63AC] border-gray-300 rounded"
+              />
+              <label for="all-checkbox" class="text-sm font-medium text-gray-700">
+                전체 동의
+              </label>
+            </div>
+          </div>
+
           <div
             id="error-message"
             class="hidden text-red-500 text-sm text-center"
@@ -160,6 +210,61 @@
       </div>
     </div>
 
+    <!-- 이용약관 모달 -->
+    <div id="terms-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+      <div class="bg-white rounded-lg p-6 max-w-2xl w-11/12 max-h-96 overflow-y-auto">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-bold text-gray-800">이용약관</h3>
+          <button onclick="closeTermsModal()" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="text-sm text-gray-600 space-y-3">
+          <h4 class="font-semibold">제1조 (목적)</h4>
+          <p>본 약관은 LikeVoca(이하 "회사")가 제공하는 언어 학습 서비스의 이용과 관련하여 회사와 이용자 간의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.</p>
+          
+          <h4 class="font-semibold">제2조 (정의)</h4>
+          <p>"서비스"란 회사가 제공하는 온라인 언어 학습 플랫폼 및 관련 서비스를 의미합니다.</p>
+          <p>"이용자"란 본 약관에 따라 회사가 제공하는 서비스를 받는 회원 및 비회원을 말합니다.</p>
+          
+          <h4 class="font-semibold">제3조 (약관의 효력과 변경)</h4>
+          <p>본 약관은 서비스 화면에 게시하거나 기타의 방법으로 공지함으로써 효력이 발생합니다.</p>
+          
+          <h4 class="font-semibold">제4조 (서비스의 제공 및 변경)</h4>
+          <p>회사는 다양한 언어 학습 콘텐츠와 도구를 제공합니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 개인정보처리방침 모달 -->
+    <div id="privacy-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+      <div class="bg-white rounded-lg p-6 max-w-2xl w-11/12 max-h-96 overflow-y-auto">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-bold text-gray-800">개인정보 수집 및 이용</h3>
+          <button onclick="closePrivacyModal()" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="text-sm text-gray-600 space-y-3">
+          <h4 class="font-semibold">1. 개인정보 수집 목적</h4>
+          <p>회원가입, 서비스 이용, 학습 진도 관리, 고객 지원</p>
+          
+          <h4 class="font-semibold">2. 수집하는 개인정보 항목</h4>
+          <p>필수 항목: 이메일, 이름, 비밀번호</p>
+          <p>선택 항목: 학습 언어 설정, 학습 진도 데이터</p>
+          
+          <h4 class="font-semibold">3. 개인정보 보유 및 이용기간</h4>
+          <p>회원탈퇴 시까지 또는 관련 법령에서 정한 보존기간</p>
+          
+          <h4 class="font-semibold">4. 개인정보 제3자 제공</h4>
+          <p>이용자의 동의 없이 개인정보를 제3자에게 제공하지 않습니다.</p>
+          
+          <h4 class="font-semibold">5. 개인정보 처리 위탁</h4>
+          <p>서비스 제공을 위해 필요한 경우에 한하여 위탁할 수 있습니다.</p>
+        </div>
+      </div>
+    </div>
+
     <script>
       // 언어별 페이지로 이동하는 함수
       function goToLanguageSpecificPage(filename) {
@@ -175,6 +280,85 @@
           window.location.href = `/${userLanguage}/${filename}`;
         }
       }
+
+      // 모달 관리 함수들
+      function showTermsModal() {
+        document.getElementById('terms-modal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeTermsModal() {
+        document.getElementById('terms-modal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+      }
+
+      function showPrivacyModal() {
+        document.getElementById('privacy-modal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closePrivacyModal() {
+        document.getElementById('privacy-modal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+      }
+
+      // 모달 외부 클릭시 닫기
+      document.getElementById('terms-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+          closeTermsModal();
+        }
+      });
+
+      document.getElementById('privacy-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+          closePrivacyModal();
+        }
+      });
+
+      // ESC 키로 모달 닫기
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          closeTermsModal();
+          closePrivacyModal();
+        }
+      });
+
+      // 전체 동의 체크박스 기능
+      document.addEventListener('DOMContentLoaded', function() {
+        const allCheckbox = document.getElementById('all-checkbox');
+        const termsCheckbox = document.getElementById('terms-checkbox');
+        const privacyCheckbox = document.getElementById('privacy-checkbox');
+        const marketingCheckbox = document.getElementById('marketing-checkbox');
+
+        // 전체 동의 클릭시
+        allCheckbox.addEventListener('change', function() {
+          const isChecked = this.checked;
+          termsCheckbox.checked = isChecked;
+          privacyCheckbox.checked = isChecked;
+          marketingCheckbox.checked = isChecked;
+        });
+
+        // 개별 체크박스 상태 변경시 전체 동의 상태 업데이트
+        function updateAllCheckbox() {
+          const allRequired = termsCheckbox.checked && privacyCheckbox.checked;
+          const allOptional = marketingCheckbox.checked;
+          
+          if (allRequired && allOptional) {
+            allCheckbox.checked = true;
+            allCheckbox.indeterminate = false;
+          } else if (allRequired) {
+            allCheckbox.checked = false;
+            allCheckbox.indeterminate = true;
+          } else {
+            allCheckbox.checked = false;
+            allCheckbox.indeterminate = false;
+          }
+        }
+
+        [termsCheckbox, privacyCheckbox, marketingCheckbox].forEach(checkbox => {
+          checkbox.addEventListener('change', updateAllCheckbox);
+        });
+      });
     </script>
   </body>
 </html>

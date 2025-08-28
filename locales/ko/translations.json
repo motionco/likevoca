@@ -121,6 +121,8 @@
   "fields_required": "모든 필드를 채워주세요",
   "passwords_do_not_match": "비밀번호가 일치하지 않습니다",
   "invalid_email": "유효한 이메일 주소를 입력해주세요",
+  "terms_agreement_required": "이용약관에 동의해주세요",
+  "privacy_agreement_required": "개인정보 수집에 동의해주세요",
   "signup_failed": "회원가입 실패",
   "login_success": "로그인 성공! 환영합니다, {name}님!",
   "google_signup_success": "환영합니다, {name}님! Google 계정으로 회원가입이 완료되었습니다",

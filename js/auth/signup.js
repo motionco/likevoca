@@ -37,6 +37,8 @@ async function getTranslations() {
     fields_required: "모든 필드를 채워주세요.",
     passwords_do_not_match: "비밀번호가 일치하지 않습니다.",
     invalid_email: "유효한 이메일 주소를 입력해주세요.",
+    terms_agreement_required: "이용약관에 동의해주세요.",
+    privacy_agreement_required: "개인정보 수집 및 이용에 동의해주세요.",
     signup_failed: "회원가입 실패",
     google_signup_success: "환영합니다, {name}님! Google 계정으로 회원가입이 완료되었습니다.",
     github_signup_success: "환영합니다, {name}님! GitHub 계정으로 회원가입이 완료되었습니다.",
@@ -75,6 +77,9 @@ const nameInput = document.getElementById("name");
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const confirmPasswordInput = document.getElementById("confirm-password");
+const termsCheckbox = document.getElementById("terms-checkbox");
+const privacyCheckbox = document.getElementById("privacy-checkbox");
+const marketingCheckbox = document.getElementById("marketing-checkbox");
 const errorMessage = document.getElementById("error-message");
 const submitButton = document.getElementById("signup-button");
 
@@ -181,6 +186,17 @@ submitButton.addEventListener("click", async () => {
     return;
   }
 
+  // 필수 약관 동의 확인
+  if (!termsCheckbox.checked) {
+    showError(t.terms_agreement_required);
+    return;
+  }
+
+  if (!privacyCheckbox.checked) {
+    showError(t.privacy_agreement_required);
+    return;
+  }
+
   try {
     isSignupInProgress = true;
     await signup(email, password, name);
@@ -197,6 +213,15 @@ submitButton.addEventListener("click", async () => {
           aiUsage: 0,
           maxWordCount: 50,
           maxAiUsage: 10,
+          // 동의 정보 저장
+          agreements: {
+            privacy: true, // 개인정보 수집 동의 (필수 - 항상 true)
+            marketing: marketingCheckbox.checked, // 마케팅 동의 (선택)
+            agreedAt: new Date().toISOString(), // 동의 시점
+            termsVersion: "1.0", // 약관 버전
+            privacyVersion: "1.0", // 개인정보처리방침 버전
+            loginMethod: "email" // 로그인 방법 구분
+          }
         });
       } catch (dbError) {
         console.error(t.database_error + ":", dbError);

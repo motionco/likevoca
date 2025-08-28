@@ -456,6 +456,15 @@ const saveUserData = async (user) => {
         aiUsage: 0,
         maxWordCount: 50,
         maxAiUsage: 10,
+        // 소셜 로그인 시 동의 정보 (기본값 설정)
+        agreements: {
+          privacy: true, // 개인정보 수집 동의 (소셜 로그인 시 자동 동의로 간주)
+          marketing: false, // 마케팅 동의 (소셜 로그인 시 기본값 false)
+          agreedAt: new Date().toISOString(), // 동의 시점
+          termsVersion: "1.0", // 약관 버전
+          privacyVersion: "1.0", // 개인정보처리방침 버전
+          loginMethod: "social" // 로그인 방법 구분
+        }
       });
 
       console.log("사용자 데이터 생성 성공");
