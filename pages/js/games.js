@@ -291,6 +291,16 @@ const LANGUAGE_SETTINGS_KEY = "likevoca_game_language_settings";
 
 // 페이지 초기화
 document.addEventListener("DOMContentLoaded", async () => {
+  // 네비게이션바 로드
+  if (typeof window.loadNavbar === 'function') {
+    await window.loadNavbar();
+  }
+  
+  // Footer 로드
+  if (typeof window.loadFooter === 'function') {
+    await window.loadFooter();
+  }
+  
   // 네비게이션바 이벤트 설정 (햄버거 메뉴 등)
   if (typeof window.setupBasicNavbarEvents === "function") {
     window.setupBasicNavbarEvents();

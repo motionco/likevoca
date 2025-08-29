@@ -272,6 +272,18 @@
       alert('Lista de palabras importada exitosamente');
     }
   </script>
+
+  <!-- Footer 컨테이너 -->
+  <div id="footer-container"></div>
+
+  <!-- Footer 스크립트 -->
+  <script src="../../components/js/footer.js"></script>
+  <script>
+    // Footer 로드
+    if (typeof window.loadFooter === 'function') {
+      window.loadFooter();
+    }
+  </script>
 </body>
 
 </html>

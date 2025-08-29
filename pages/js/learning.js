@@ -124,7 +124,17 @@ async function waitForFirebaseInit() {
 }
 
 // DOM 로드 완료 시 초기화
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
+  // 네비게이션바 로드
+  if (typeof window.loadNavbar === 'function') {
+    await window.loadNavbar();
+  }
+  
+  // Footer 로드
+  if (typeof window.loadFooter === 'function') {
+    await window.loadFooter();
+  }
+  
   // CollectionManager 초기화
   collectionManager = new CollectionManager();
 

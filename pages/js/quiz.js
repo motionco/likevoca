@@ -71,6 +71,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     console.log("🎯 퀴즈 페이지 초기화 시작");
 
+    // 네비게이션바 로드
+    if (typeof window.loadNavbar === 'function') {
+      await window.loadNavbar();
+    }
+    
+    // Footer 로드
+    if (typeof window.loadFooter === 'function') {
+      await window.loadFooter();
+    }
+
     // DOM 요소 초기화
     initializeElements();
 

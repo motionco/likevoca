@@ -584,6 +584,16 @@ function calculateConceptMastery(concept, records) {
 // 페이지 초기화
 async function initializeProgressPage() {
   try {
+    // 네비게이션바 로드
+    if (typeof window.loadNavbar === 'function') {
+      await window.loadNavbar();
+    }
+    
+    // Footer 로드
+    if (typeof window.loadFooter === 'function') {
+      await window.loadFooter();
+    }
+    
     await waitForFirebase();
     const user = await checkUserAuth();
 

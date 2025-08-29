@@ -10,6 +10,16 @@ import {
 
 document.addEventListener("DOMContentLoaded", async () => {
   try {
+    // 네비게이션바 로드
+    if (typeof window.loadNavbar === 'function') {
+      await window.loadNavbar();
+    }
+    
+    // Footer 로드
+    if (typeof window.loadFooter === 'function') {
+      await window.loadFooter();
+    }
+    
     // navbar.js가 일반 스크립트로 로드되므로 자동으로 초기화됨
     // 별도의 네비게이션바 로딩 로직 불필요
   } catch (error) {

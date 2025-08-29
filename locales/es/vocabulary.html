@@ -254,6 +254,11 @@
           await window.loadNavbar();
         }
 
+        // Footer 로드
+        if (typeof window.loadFooter === 'function') {
+          await window.loadFooter();
+        }
+
         // 번역 적용
         if (typeof window.applyLanguage === 'function') {
           await window.applyLanguage();
@@ -269,6 +274,12 @@
       }
     });
   </script>
+
+  <!-- Footer 컨테이너 -->
+  <div id="footer-container"></div>
+
+  <!-- Footer 스크립트 -->
+  <script src="../../components/js/footer.js"></script>
 </body>
 
 </html>

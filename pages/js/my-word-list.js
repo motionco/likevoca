@@ -106,6 +106,16 @@ function setupLanguageChangeListener() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  // 네비게이션바 로드
+  if (typeof window.loadNavbar === 'function') {
+    await window.loadNavbar();
+  }
+  
+  // Footer 로드
+  if (typeof window.loadFooter === 'function') {
+    await window.loadFooter();
+  }
+  
   // 사용자 언어 설정
   userLanguage = getCurrentUILanguage();
 

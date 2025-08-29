@@ -310,9 +310,14 @@
         </div>
       </div>
     </main>
+
+    <!-- Footer 컨테이너 -->
+    <div id="footer-container"></div>
     
     <!-- Navbar 스크립트 -->
     <script src="../../components/js/navbar.js"></script>
+    <!-- Footer 스크립트 -->
+    <script src="../../components/js/footer.js"></script>
     
     <!-- Firebase 초기화 스크립트 -->
     <script type="module" src="../../js/firebase/firebase-init.js"></script>
@@ -381,6 +386,11 @@
           // 네비게이션바 로드 (language-utils.js에서 import된 함수 사용)
           if (typeof window.loadNavbar === 'function') {
             await window.loadNavbar();
+          }
+          
+          // Footer 로드
+          if (typeof window.loadFooter === 'function') {
+            await window.loadFooter();
           } else {
             console.warn("window.loadNavbar 함수를 찾을 수 없습니다. 직접 로드 시도...");
             

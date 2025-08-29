@@ -13,6 +13,16 @@ import {
 } from "../utils/firebase/firebase-auth.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
+  // 네비게이션바 로드
+  if (typeof window.loadNavbar === 'function') {
+    await window.loadNavbar();
+  }
+  
+  // Footer 로드
+  if (typeof window.loadFooter === 'function') {
+    await window.loadFooter();
+  }
+  
   // DOM 요소 가져오기
   const displayNameInput = document.getElementById("displayName");
   const emailInput = document.getElementById("email");

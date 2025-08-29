@@ -230,3 +230,18 @@
     </script>
   </body>
 </html> 
+n  <!-- Footer 컨테이너 -->
+  <div id="footer-container"></div>
+
+  <!-- Footer 스크립트 -->
+  <script src="../../components/js/footer.js"></script>
+  <script>
+    // Footer 로드
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (typeof window.loadFooter === 'function') {
+        await window.loadFooter();
+      }
+    });
+  </script>
+</body>
+</html>
