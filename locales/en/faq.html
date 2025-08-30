@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FAQ - LikeVoca Language Learning Help Center</title>
+    
+    <!-- 기본 메타 태그 -->
+    <meta name="description" content="Frequently asked questions and answers about LikeVoca language learning platform. Get help with account creation, learning features, technical support, privacy, and billing." />
+    <meta name="keywords" content="LikeVoca FAQ, frequently asked questions, language learning help, account setup, AI vocabulary, technical support, privacy policy, subscription billing" />
+    
+    <!-- Open Graph / 소셜 미디어 메타 태그 -->
+    <meta property="og:title" content="FAQ - LikeVoca Language Learning Help Center" />
+    <meta property="og:description" content="Find answers to all your questions about using LikeVoca, managing your account, learning features, and technical support. Quick and accurate solutions." />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://likevoca.com/en/faq" />
+    <meta property="og:locale" content="en" />
+    
+    <!-- Twitter Card 태그 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="FAQ - LikeVoca Language Learning Help Center" />
+    <meta name="twitter:description" content="Find answers to all your questions about using LikeVoca and managing your language learning experience." />
+    
+    <!-- 표준 링크 -->
+    <link rel="canonical" href="https://likevoca.com/en/faq" />
+    
+    <!-- 대체 언어 링크 -->
+    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/faq" />
+    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/faq" />
+    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/faq" />
+    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/faq" />
+    <link rel="alternate" hreflang="es" href="https://likevoca.com/es/faq" />
+    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/faq" />
+
+    <!-- 성능 최적화 - Resource Hints -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+
+    <link rel="stylesheet" href="../../css/style.css" />
+    
+    <!-- 구조화된 데이터 (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "name": "LikeVoca Frequently Asked Questions",
+      "description": "Frequently asked questions and answers about LikeVoca language learning platform",
+      "url": "https://likevoca.com/en/faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How do I create an account?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "You can sign up directly with an email address or quickly register using Google, Facebook, or Apple accounts."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does the AI vocabulary feature work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "AI analyzes your learning level, goals, and interests to recommend optimized vocabulary and provide personalized learning experiences."
+          }
+        }
+      ],
+      "inLanguage": "en"
+    }
+    </script>
+  </head>
+  <body class="bg-gray-50">
+    <div id="navbar-container"></div>
+
+    <main class="container mx-auto max-w-4xl px-4 md:px-6 lg:px-8 py-8 md:py-12">
+      <!-- 헤더 섹션 -->
+      <header class="text-center mb-12">
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
+          Frequently Asked <span class="text-[#4B63AC]">Questions</span>
+        </h1>
+        <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
+          Find quick answers to your questions about using LikeVoca
+        </p>
+      </header>
+
+      <!-- 빠른 검색 -->
+      <section class="mb-12">
+        <div class="bg-white rounded-xl p-6 shadow-lg">
+          <div class="relative">
+            <input 
+              type="text" 
+              id="faq-search" 
+              placeholder="Search for answers..." 
+              class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B63AC] focus:border-transparent"
+            />
+            <i class="fas fa-search absolute left-4 top-4 text-gray-400"></i>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ 카테고리 -->
+      <section class="mb-8">
+        <div class="flex flex-wrap gap-4 justify-center">
+          <button onclick="filterFAQ('all')" class="faq-filter-btn bg-[#4B63AC] text-white px-6 py-2 rounded-full font-medium transition duration-300">
+            All
+          </button>
+          <button onclick="filterFAQ('account')" class="faq-filter-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full font-medium hover:bg-[#4B63AC] hover:text-white transition duration-300">
+            Account & Registration
+          </button>
+          <button onclick="filterFAQ('learning')" class="faq-filter-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full font-medium hover:bg-[#4B63AC] hover:text-white transition duration-300">
+            Learning Features
+          </button>
+          <button onclick="filterFAQ('technical')" class="faq-filter-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full font-medium hover:bg-[#4B63AC] hover:text-white transition duration-300">
+            Technical Support
+          </button>
+          <button onclick="filterFAQ('privacy')" class="faq-filter-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full font-medium hover:bg-[#4B63AC] hover:text-white transition duration-300">
+            Privacy & Security
+          </button>
+          <button onclick="filterFAQ('billing')" class="faq-filter-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full font-medium hover:bg-[#4B63AC] hover:text-white transition duration-300">
+            Subscription & Billing
+          </button>
+        </div>
+      </section>
+
+      <!-- FAQ 목록 -->
+      <section class="space-y-4">
+        <!-- Account & Registration -->
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="account">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('account-1')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">How do I create an account?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-account-1"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-account-1">
+            <p class="mb-4">There are two ways to sign up for LikeVoca:</p>
+            <ul class="list-disc pl-6 space-y-2">
+              <li><strong>Email Registration:</strong> Create an account directly by entering your email address and password.</li>
+              <li><strong>Social Login:</strong> Sign up quickly using your Google, Facebook, or Apple account.</li>
+            </ul>
+            <p class="mt-4">After registration, complete email verification to access all features.</p>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="account">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('account-2')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">What's the difference between OAuth and email registration?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-account-2"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-account-2">
+            <div class="overflow-x-auto">
+              <table class="w-full border-collapse border border-gray-300 mt-4">
+                <thead>
+                  <tr class="bg-gray-50">
+                    <th class="border border-gray-300 px-4 py-2 text-left">Feature</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">OAuth Registration</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Email Registration</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="border border-gray-300 px-4 py-2 font-semibold">Convenience</td>
+                    <td class="border border-gray-300 px-4 py-2">Instant login with existing account</td>
+                    <td class="border border-gray-300 px-4 py-2">Requires separate password setup</td>
+                  </tr>
+                  <tr>
+                    <td class="border border-gray-300 px-4 py-2 font-semibold">Security</td>
+                    <td class="border border-gray-300 px-4 py-2">Platform's security policies applied</td>
+                    <td class="border border-gray-300 px-4 py-2">Direct security management</td>
+                  </tr>
+                  <tr>
+                    <td class="border border-gray-300 px-4 py-2 font-semibold">Privacy</td>
+                    <td class="border border-gray-300 px-4 py-2">Minimal information sharing</td>
+                    <td class="border border-gray-300 px-4 py-2">Complete privacy control</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="account">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('account-3')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">What should I do if I forgot my password?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-account-3"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-account-3">
+            <p class="mb-4">Password reset process:</p>
+            <ol class="list-decimal pl-6 space-y-2">
+              <li>Click the "Forgot your password?" link on the login page.</li>
+              <li>Enter your registered email address.</li>
+              <li>Click the reset link sent to your email.</li>
+              <li>Set up a new password.</li>
+            </ol>
+            <div class="mt-4 p-4 bg-blue-50 rounded-lg">
+              <p class="text-sm"><i class="fas fa-info-circle text-blue-500 mr-2"></i>
+              The reset link is valid for 24 hours only. If you don't receive the email, check your spam folder.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="account">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('account-4')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">How do I delete my account?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-account-4"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-account-4">
+            <p class="mb-4">Account deletion is irreversible, so please consider carefully:</p>
+            <ol class="list-decimal pl-6 space-y-2">
+              <li>Go to the Settings page.</li>
+              <li>Find the "Account Management" section.</li>
+              <li>Click the "Delete Account" button.</li>
+              <li>Select a reason for deletion and enter your password.</li>
+              <li>Your account will be permanently deleted after final confirmation.</li>
+            </ol>
+            <div class="mt-4 p-4 bg-red-50 rounded-lg">
+              <p class="text-sm"><i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>
+              All learning data and progress will be permanently deleted and cannot be recovered after account deletion.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Learning Features -->
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="learning">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('learning-1')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">How does the AI vocabulary feature work?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-learning-1"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-learning-1">
+            <p class="mb-4">The AI vocabulary feature works as follows:</p>
+            <div class="grid md:grid-cols-2 gap-6">
+              <div class="bg-blue-50 rounded-lg p-4">
+                <h4 class="font-semibold text-gray-800 mb-3">
+                  <i class="fas fa-brain text-[#4B63AC] mr-2"></i>Personalized Analysis
+                </h4>
+                <ul class="text-sm space-y-1">
+                  <li>• Current vocabulary level analysis</li>
+                  <li>• Learning goal identification</li>
+                  <li>• Interest area consideration</li>
+                  <li>• Learning pattern analysis</li>
+                </ul>
+              </div>
+              <div class="bg-green-50 rounded-lg p-4">
+                <h4 class="font-semibold text-gray-800 mb-3">
+                  <i class="fas fa-magic text-[#2E7D32] mr-2"></i>Smart Recommendations
+                </h4>
+                <ul class="text-sm space-y-1">
+                  <li>• Optimal difficulty word selection</li>
+                  <li>• Practical usage priority</li>
+                  <li>• Gradual difficulty progression</li>
+                  <li>• Automatic review cycle adjustment</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="learning">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('learning-2')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">How do I create custom word lists?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-learning-2"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-learning-2">
+            <p class="mb-4">Creating personal word lists:</p>
+            <ol class="list-decimal pl-6 space-y-2">
+              <li>Click the "My Word Lists" button from the main dashboard.</li>
+              <li>Enter the word list name and description.</li>
+              <li>Add words directly or get AI recommendations for words you want to learn.</li>
+              <li>Check and modify the meaning, example sentences, and pronunciation for each word.</li>
+              <li>Organize systematically by categories for better management.</li>
+            </ol>
+            <div class="mt-4 p-4 bg-green-50 rounded-lg">
+              <p class="text-sm"><i class="fas fa-lightbulb text-green-500 mr-2"></i>
+              You can create up to 1,000 word lists, with up to 500 words per list.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="learning">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('learning-3')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">What quiz and game modes are available?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-learning-3"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-learning-3">
+            <div class="grid md:grid-cols-2 gap-6">
+              <div>
+                <h4 class="font-semibold text-gray-800 mb-3">
+                  <i class="fas fa-question-circle text-[#F57C00] mr-2"></i>Quiz Modes
+                </h4>
+                <ul class="space-y-2">
+                  <li>• Multiple choice questions</li>
+                  <li>• Fill in the blanks</li>
+                  <li>• Word matching</li>
+                  <li>• Sentence completion</li>
+                  <li>• Pronunciation listening</li>
+                </ul>
+              </div>
+              <div>
+                <h4 class="font-semibold text-gray-800 mb-3">
+                  <i class="fas fa-gamepad text-[#9C27B0] mr-2"></i>Game Modes
+                </h4>
+                <ul class="space-y-2">
+                  <li>• Word matching games</li>
+                  <li>• Speed quiz</li>
+                  <li>• Word search games</li>
+                  <li>• Crossword puzzles</li>
+                  <li>• Battle mode (compete with other users)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="learning">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('learning-4')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">How do I track my learning progress?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-learning-4"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-learning-4">
+            <p class="mb-4">Learning progress tracking features:</p>
+            <div class="grid md:grid-cols-3 gap-4">
+              <div class="bg-blue-50 rounded-lg p-4 text-center">
+                <i class="fas fa-chart-line text-2xl text-[#4B63AC] mb-2"></i>
+                <h4 class="font-semibold">Daily Stats</h4>
+                <p class="text-sm mt-2">Daily words learned, accuracy rate, and study time</p>
+              </div>
+              <div class="bg-green-50 rounded-lg p-4 text-center">
+                <i class="fas fa-calendar-week text-2xl text-[#2E7D32] mb-2"></i>
+                <h4 class="font-semibold">Weekly Reports</h4>
+                <p class="text-sm mt-2">Weekly learning patterns and performance analysis</p>
+              </div>
+              <div class="bg-orange-50 rounded-lg p-4 text-center">
+                <i class="fas fa-trophy text-2xl text-[#E65100] mb-2"></i>
+                <h4 class="font-semibold">Achievements</h4>
+                <p class="text-sm mt-2">Goal completion rate and earned badges</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Technical Support -->
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="technical">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('technical-1')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">Which browsers are supported?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-technical-1"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-technical-1">
+            <p class="mb-4">LikeVoca works optimally on the following browsers:</p>
+            <div class="grid md:grid-cols-2 gap-6">
+              <div>
+                <h4 class="font-semibold text-gray-800 mb-3">
+                  <i class="fas fa-check-circle text-green-500 mr-2"></i>Recommended Browsers
+                </h4>
+                <ul class="space-y-2">
+                  <li>• Chrome 90 or higher</li>
+                  <li>• Firefox 88 or higher</li>
+                  <li>• Safari 14 or higher</li>
+                  <li>• Edge 90 or higher</li>
+                </ul>
+              </div>
+              <div>
+                <h4 class="font-semibold text-gray-800 mb-3">
+                  <i class="fas fa-mobile-alt text-[#4B63AC] mr-2"></i>Mobile Support
+                </h4>
+                <ul class="space-y-2">
+                  <li>• iOS Safari</li>
+                  <li>• Android Chrome</li>
+                  <li>• Samsung Internet</li>
+                  <li>• Responsive web design</li>
+                </ul>
+              </div>
+            </div>
+            <div class="mt-4 p-4 bg-yellow-50 rounded-lg">
+              <p class="text-sm"><i class="fas fa-exclamation-triangle text-yellow-500 mr-2"></i>
+              Internet Explorer is not supported. We recommend using the latest browsers.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="technical">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('technical-2')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">Is there a mobile app available?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-technical-2"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-technical-2">
+            <p class="mb-4">Current mobile app development status:</p>
+            <div class="bg-blue-50 rounded-lg p-6">
+              <h4 class="font-semibold text-gray-800 mb-3">
+                <i class="fas fa-mobile-alt text-[#4B63AC] mr-2"></i>PWA (Progressive Web App)
+              </h4>
+              <p class="mb-4">LikeVoca uses PWA technology to provide an app-like experience on mobile devices:</p>
+              <ul class="space-y-2">
+                <li>• Can be added to home screen as a shortcut</li>
+                <li>• Some features available offline</li>
+                <li>• Push notification support</li>
+                <li>• Fast loading speeds</li>
+              </ul>
+            </div>
+            <div class="mt-4 p-4 bg-green-50 rounded-lg">
+              <p class="text-sm"><i class="fas fa-info-circle text-green-500 mr-2"></i>
+              Native apps are planned for release in the second half of 2024, with simultaneous iOS and Android support.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="technical">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('technical-3')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">How does data synchronization work?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-technical-3"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-technical-3">
+            <p class="mb-4">LikeVoca supports cloud-based real-time synchronization:</p>
+            <div class="grid md:grid-cols-2 gap-6">
+              <div class="bg-blue-50 rounded-lg p-4">
+                <h4 class="font-semibold text-gray-800 mb-3">
+                  <i class="fas fa-sync text-[#4B63AC] mr-2"></i>Auto Sync
+                </h4>
+                <ul class="text-sm space-y-1">
+                  <li>• Real-time learning progress saves</li>
+                  <li>• Automatic word list backups</li>
+                  <li>• Settings synchronization</li>
+                  <li>• Multi-device support</li>
+                </ul>
+              </div>
+              <div class="bg-green-50 rounded-lg p-4">
+                <h4 class="font-semibold text-gray-800 mb-3">
+                  <i class="fas fa-shield-alt text-[#2E7D32] mr-2"></i>Secure Storage
+                </h4>
+                <ul class="text-sm space-y-1">
+                  <li>• Encrypted data transmission</li>
+                  <li>• Regular backups</li>
+                  <li>• Data loss prevention</li>
+                  <li>• Recovery features provided</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="technical">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('technical-4')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">What should I do when I encounter issues?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-technical-4"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-technical-4">
+            <p class="mb-4">Troubleshooting steps:</p>
+            <ol class="list-decimal pl-6 space-y-2 mb-4">
+              <li>Refresh the browser (Ctrl+F5 or Cmd+Shift+R)</li>
+              <li>Clear browser cache and cookies</li>
+              <li>Try accessing from a different browser</li>
+              <li>Check your internet connection</li>
+            </ol>
+            <div class="bg-orange-50 rounded-lg p-4">
+              <h4 class="font-semibold text-gray-800 mb-3">
+                <i class="fas fa-headset text-[#E65100] mr-2"></i>Customer Support Contact
+              </h4>
+              <ul class="space-y-2">
+                <li>• Email: support@likevoca.com</li>
+                <li>• Live Chat: Chat button at bottom-right of website</li>
+                <li>• Response Time: Weekdays 09:00-18:00 (Within 24 hours)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Privacy & Security -->
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="privacy">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('privacy-1')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">What data do you collect?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-privacy-1"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-privacy-1">
+            <p class="mb-4">Types of data collected by LikeVoca:</p>
+            <div class="grid md:grid-cols-2 gap-6">
+              <div class="bg-blue-50 rounded-lg p-4">
+                <h4 class="font-semibold text-gray-800 mb-3">
+                  <i class="fas fa-user text-[#4B63AC] mr-2"></i>Required Information
+                </h4>
+                <ul class="text-sm space-y-1">
+                  <li>• Email address</li>
+                  <li>• Username</li>
+                  <li>• Password (encrypted)</li>
+                  <li>• Learning language settings</li>
+                </ul>
+              </div>
+              <div class="bg-green-50 rounded-lg p-4">
+                <h4 class="font-semibold text-gray-800 mb-3">
+                  <i class="fas fa-chart-bar text-[#2E7D32] mr-2"></i>Learning Data
+                </h4>
+                <ul class="text-sm space-y-1">
+                  <li>• Learning progress and performance</li>
+                  <li>• Word lists and bookmarks</li>
+                  <li>• Quiz results</li>
+                  <li>• Usage patterns (anonymized)</li>
+                </ul>
+              </div>
+            </div>
+            <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+              <p class="text-sm"><i class="fas fa-shield-alt text-gray-600 mr-2"></i>
+              All personal information is processed securely in accordance with GDPR and privacy protection laws.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="privacy">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('privacy-2')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">How is account security protected?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-privacy-2"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-privacy-2">
+            <p class="mb-4">Multi-layered protection system for account security:</p>
+            <div class="grid md:grid-cols-2 gap-6">
+              <div class="bg-red-50 rounded-lg p-4">
+                <h4 class="font-semibold text-gray-800 mb-3">
+                  <i class="fas fa-lock text-[#D32F2F] mr-2"></i>Technical Security
+                </h4>
+                <ul class="text-sm space-y-1">
+                  <li>• SSL/TLS encrypted communication</li>
+                  <li>• Password hashing</li>
+                  <li>• Regular security updates</li>
+                  <li>• Intrusion detection system</li>
+                </ul>
+              </div>
+              <div class="bg-orange-50 rounded-lg p-4">
+                <h4 class="font-semibold text-gray-800 mb-3">
+                  <i class="fas fa-user-shield text-[#E65100] mr-2"></i>User Controls
+                </h4>
+                <ul class="text-sm space-y-1">
+                  <li>• Strong password recommendations</li>
+                  <li>• Two-factor authentication (coming soon)</li>
+                  <li>• Login notifications</li>
+                  <li>• Session management</li>
+                </ul>
+              </div>
+            </div>
+            <div class="mt-4 p-4 bg-blue-50 rounded-lg">
+              <h4 class="font-semibold text-gray-800 mb-2">
+                <i class="fas fa-lightbulb text-[#1976D2] mr-2"></i>Security Tips
+              </h4>
+              <ul class="text-sm space-y-1">
+                <li>• Change your password regularly</li>
+                <li>• Use a different password than other sites</li>
+                <li>• Report suspicious activities immediately</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="privacy">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('privacy-3')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">What is the cookie policy?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-privacy-3"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-privacy-3">
+            <p class="mb-4">Types of cookies used by LikeVoca:</p>
+            <div class="space-y-4">
+              <div class="bg-green-50 rounded-lg p-4">
+                <h4 class="font-semibold text-gray-800 mb-2">
+                  <i class="fas fa-cog text-[#2E7D32] mr-2"></i>Essential Cookies
+                </h4>
+                <p class="text-sm">Necessary cookies for basic website functions such as maintaining login status and language settings.</p>
+              </div>
+              <div class="bg-blue-50 rounded-lg p-4">
+                <h4 class="font-semibold text-gray-800 mb-2">
+                  <i class="fas fa-chart-line text-[#1976D2] mr-2"></i>Analytics Cookies (Optional)
+                </h4>
+                <p class="text-sm">Cookies for user behavior analysis and service improvement, collecting only non-personally identifiable statistical data.</p>
+              </div>
+              <div class="bg-purple-50 rounded-lg p-4">
+                <h4 class="font-semibold text-gray-800 mb-2">
+                  <i class="fas fa-bullseye text-[#7B1FA2] mr-2"></i>Personalization Cookies (Optional)
+                </h4>
+                <p class="text-sm">Cookies for providing personalized content and advertisements to users.</p>
+              </div>
+            </div>
+            <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+              <p class="text-sm"><i class="fas fa-info-circle text-gray-600 mr-2"></i>
+              You can manage and change cookie usage in settings at any time.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subscription & Billing -->
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="billing">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('billing-1')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">What's the difference between free and premium versions?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-billing-1"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-billing-1">
+            <div class="overflow-x-auto">
+              <table class="w-full border-collapse border border-gray-300 mt-4">
+                <thead>
+                  <tr class="bg-gray-50">
+                    <th class="border border-gray-300 px-4 py-2 text-left">Feature</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Free</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Premium</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="border border-gray-300 px-4 py-2 font-semibold">AI Word Recommendations</td>
+                    <td class="border border-gray-300 px-4 py-2">10 per day</td>
+                    <td class="border border-gray-300 px-4 py-2">Unlimited</td>
+                  </tr>
+                  <tr>
+                    <td class="border border-gray-300 px-4 py-2 font-semibold">Word Lists</td>
+                    <td class="border border-gray-300 px-4 py-2">5 lists</td>
+                    <td class="border border-gray-300 px-4 py-2">Unlimited</td>
+                  </tr>
+                  <tr>
+                    <td class="border border-gray-300 px-4 py-2 font-semibold">Game Modes</td>
+                    <td class="border border-gray-300 px-4 py-2">Basic 2 games</td>
+                    <td class="border border-gray-300 px-4 py-2">All games</td>
+                  </tr>
+                  <tr>
+                    <td class="border border-gray-300 px-4 py-2 font-semibold">Statistics Analysis</td>
+                    <td class="border border-gray-300 px-4 py-2">Basic</td>
+                    <td class="border border-gray-300 px-4 py-2">Detailed analysis</td>
+                  </tr>
+                  <tr>
+                    <td class="border border-gray-300 px-4 py-2 font-semibold">Advertisements</td>
+                    <td class="border border-gray-300 px-4 py-2">Yes</td>
+                    <td class="border border-gray-300 px-4 py-2">No</td>
+                  </tr>
+                  <tr>
+                    <td class="border border-gray-300 px-4 py-2 font-semibold">Priority Support</td>
+                    <td class="border border-gray-300 px-4 py-2">-</td>
+                    <td class="border border-gray-300 px-4 py-2">24-hour support</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="billing">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('billing-2')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">What payment methods are supported?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-billing-2"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-billing-2">
+            <p class="mb-4">We support various payment methods:</p>
+            <div class="grid md:grid-cols-2 gap-6">
+              <div class="bg-blue-50 rounded-lg p-4">
+                <h4 class="font-semibold text-gray-800 mb-3">
+                  <i class="fas fa-credit-card text-[#1976D2] mr-2"></i>Card Payments
+                </h4>
+                <ul class="text-sm space-y-1">
+                  <li>• Credit cards (Visa, MasterCard, AMEX)</li>
+                  <li>• Debit cards</li>
+                  <li>• International cards</li>
+                </ul>
+              </div>
+              <div class="bg-green-50 rounded-lg p-4">
+                <h4 class="font-semibold text-gray-800 mb-3">
+                  <i class="fas fa-mobile-alt text-[#2E7D32] mr-2"></i>Digital Wallets
+                </h4>
+                <ul class="text-sm space-y-1">
+                  <li>• Apple Pay</li>
+                  <li>• Google Pay</li>
+                  <li>• PayPal</li>
+                  <li>• Stripe</li>
+                </ul>
+              </div>
+            </div>
+            <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+              <p class="text-sm"><i class="fas fa-shield-alt text-gray-600 mr-2"></i>
+              All payments are processed securely through SSL encryption.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="billing">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('billing-3')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">What is the refund policy?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-billing-3"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-billing-3">
+            <p class="mb-4">LikeVoca refund policy:</p>
+            <div class="space-y-4">
+              <div class="bg-green-50 rounded-lg p-4">
+                <h4 class="font-semibold text-gray-800 mb-2">
+                  <i class="fas fa-calendar-check text-[#2E7D32] mr-2"></i>7-Day Full Refund
+                </h4>
+                <p class="text-sm">100% refund is available within 7 days of subscription start, regardless of usage.</p>
+              </div>
+              <div class="bg-blue-50 rounded-lg p-4">
+                <h4 class="font-semibold text-gray-800 mb-2">
+                  <i class="fas fa-clock text-[#1976D2] mr-2"></i>Partial Refund
+                </h4>
+                <p class="text-sm">After 7 days, refunds are calculated on a pro-rata basis for unused periods.</p>
+              </div>
+              <div class="bg-orange-50 rounded-lg p-4">
+                <h4 class="font-semibold text-gray-800 mb-2">
+                  <i class="fas fa-exclamation-triangle text-[#E65100] mr-2"></i>Non-Refundable Cases
+                </h4>
+                <ul class="text-sm space-y-1">
+                  <li>• Account suspension due to policy violations</li>
+                  <li>• Discounted subscriptions (separate terms apply)</li>
+                </ul>
+              </div>
+            </div>
+            <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+              <p class="text-sm"><i class="fas fa-info-circle text-gray-600 mr-2"></i>
+              Refund processing takes 3-5 business days and may vary depending on the payment method.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 추가 도움말 -->
+      <section class="mt-12 bg-gradient-to-r from-[#4B63AC] to-[#3A4F8B] rounded-xl p-8 md:p-12 text-white text-center">
+        <h2 class="text-3xl md:text-4xl font-bold mb-6">
+          Need More Help?
+        </h2>
+        <p class="text-lg md:text-xl mb-8 opacity-90">
+          If you can't find the answer you're looking for, feel free to contact our support team anytime
+        </p>
+        <div class="flex flex-col md:flex-row gap-4 justify-center">
+          <a href="mailto:support@likevoca.com" class="inline-flex items-center justify-center bg-white text-[#4B63AC] px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition duration-300">
+            <i class="fas fa-envelope mr-2"></i>
+            Email Support
+          </a>
+          <button onclick="openLiveChat()" class="inline-flex items-center justify-center bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-[#4B63AC] transition duration-300">
+            <i class="fas fa-comments mr-2"></i>
+            Live Chat
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer 컨테이너 -->
+    <div id="footer-container"></div>
+
+    <!-- FAQ 기능 스크립트 -->
+    <script>
+      // FAQ 토글 함수
+      function toggleFAQ(id) {
+        const answer = document.getElementById(`answer-${id}`);
+        const arrow = document.getElementById(`arrow-${id}`);
+        
+        if (answer.classList.contains('hidden')) {
+          answer.classList.remove('hidden');
+          arrow.classList.add('rotate-180');
+        } else {
+          answer.classList.add('hidden');
+          arrow.classList.remove('rotate-180');
+        }
+      }
+
+      // FAQ 필터 함수
+      function filterFAQ(category) {
+        const faqItems = document.querySelectorAll('.faq-item');
+        const filterBtns = document.querySelectorAll('.faq-filter-btn');
+        
+        // 버튼 상태 업데이트
+        filterBtns.forEach(btn => {
+          btn.classList.remove('bg-[#4B63AC]', 'text-white');
+          btn.classList.add('bg-gray-200', 'text-gray-700');
+        });
+        
+        event.target.classList.remove('bg-gray-200', 'text-gray-700');
+        event.target.classList.add('bg-[#4B63AC]', 'text-white');
+        
+        // FAQ 아이템 필터링
+        faqItems.forEach(item => {
+          if (category === 'all' || item.dataset.category === category) {
+            item.style.display = 'block';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+      }
+
+      // FAQ 검색 함수
+      function initFAQSearch() {
+        const searchInput = document.getElementById('faq-search');
+        const faqItems = document.querySelectorAll('.faq-item');
+        
+        searchInput.addEventListener('input', function(e) {
+          const searchTerm = e.target.value.toLowerCase();
+          
+          faqItems.forEach(item => {
+            const question = item.querySelector('h3').textContent.toLowerCase();
+            const answer = item.querySelector('.text-gray-600').textContent.toLowerCase();
+            
+            if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+              item.style.display = 'block';
+            } else {
+              item.style.display = 'none';
+            }
+          });
+        });
+      }
+
+      // 실시간 채팅 열기
+      function openLiveChat() {
+        // 실제 구현시 채팅 위젯 열기
+        alert('Live chat feature is coming soon. Please contact us via email.');
+      }
+
+      // 초기화
+      document.addEventListener('DOMContentLoaded', function() {
+        initFAQSearch();
+      });
+    </script>
+
+    <!-- 네비게이션바 스크립트 -->
+    <script src="../../components/js/navbar.js"></script>
+    <!-- Footer 스크립트 -->
+    <script src="../../components/js/footer.js"></script>
+    
+    <!-- 언어 유틸리티 -->
+    <script type="module">
+      import { applyLanguage, updateMetadata, getActiveLanguage } from '../../utils/language-utils.js';
+      
+      document.addEventListener('DOMContentLoaded', async () => {
+        try {
+          // 네비게이션바 로드
+          if (typeof window.loadNavbar === 'function') {
+            await window.loadNavbar();
+          }
+          
+          // Footer 로드
+          if (typeof window.loadFooter === 'function') {
+            await window.loadFooter();
+          }
+          
+          // 언어 적용
+          await applyLanguage();
+          await updateMetadata('faq');
+          
+        } catch (error) {
+          console.error('Error applying language settings:', error);
+        }
+      });
+    </script>
+  </body>
+</html>

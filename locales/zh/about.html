@@ -229,8 +229,13 @@
       </section>
     </main>
 
+    <!-- Footer 컨테이너 -->
+    <div id="footer-container"></div>
+
     <!-- 네비게이션바 스크립트 -->
     <script src="../../components/js/navbar.js"></script>
+    <!-- Footer 스크립트 -->
+    <script src="../../components/js/footer.js"></script>
     
     <!-- 언어 유틸리티 -->
     <script type="module">
@@ -241,6 +246,11 @@
           // 네비게이션바 로드
           if (typeof window.loadNavbar === 'function') {
             await window.loadNavbar();
+          }
+          
+          // Footer 로드
+          if (typeof window.loadFooter === 'function') {
+            await window.loadFooter();
           }
           
           // 언어 적용
