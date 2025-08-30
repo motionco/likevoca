@@ -43,7 +43,9 @@
       "Bash(do echo \"=== $lang ===\")",
       "Bash(do echo \"=== $lang inquiry ===\")",
       "Bash(do echo \"=== $lang login ===\")",
-      "Bash(do echo \"=== $lang signup ===\")"
+      "Bash(do echo \"=== $lang signup ===\")",
+      "Bash(do echo \"Updating privacy modal in $lang signup page...\")",
+      "Bash(then echo \"File exists, updating...\")"
     ],
     "deny": [],
     "ask": []

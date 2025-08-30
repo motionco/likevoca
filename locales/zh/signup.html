@@ -217,18 +217,19 @@
           </button>
         </div>
         <div class="text-sm text-gray-600 space-y-3">
-          <h4 class="font-semibold">第一条 (目的)</h4>
-          <p>本服务条款旨在规定LikeVoca（以下称"公司"）与用户之间关于使用公司提供的语言学习服务的权利、义务及责任事项。</p>
+          <h4 class="font-semibold">服务概述</h4>
+          <p>LikeVoca是基于AI的个性化语言学习平台，提供多样化的学习内容和工具。</p>
           
-          <h4 class="font-semibold">第二条 (定义)</h4>
-          <p>"服务"是指公司提供的在线语言学习平台及相关服务。</p>
-          <p>"用户"是指根据本条款接受公司提供服务的会员及非会员。</p>
+          <h4 class="font-semibold">会员注册及义务</h4>
+          <p><strong>注册限制：</strong> 虚假信息注册、盗用他人信息时拒绝注册</p>
+          <p><strong>禁止行为：</strong> 服务误用、侵犯著作权、发布淫秽内容等</p>
           
-          <h4 class="font-semibold">第三条 (条款的效力与变更)</h4>
-          <p>本条款通过在服务界面发布或以其他方式通知而产生效力。</p>
+          <h4 class="font-semibold">著作权及内容使用</h4>
+          <p>学习内容的著作权归公司所有，禁止未经许可的复制、分发、商业用途使用。</p>
           
-          <h4 class="font-semibold">第四条 (服务的提供及变更)</h4>
-          <p>公司提供各种语言学习内容和工具。</p>
+          <h4 class="font-semibold">服务中断及争议解决</h4>
+          <p>因系统维护、技术问题等原因，服务可能暂时中断。</p>
+          <p>国际用户可能适用居住国家的消费者保护法。</p>
         </div>
       </div>
     </div>
@@ -243,21 +244,23 @@
           </button>
         </div>
         <div class="text-sm text-gray-600 space-y-3">
-          <h4 class="font-semibold">1. 个人信息收集目的</h4>
-          <p>会员注册、服务使用、学习进度管理、客户支持</p>
+          <h4 class="font-semibold">1. 个人信息处理目的</h4>
+          <p>会员注册、服务使用、学习进度管理、客户咨询及支持、营销活用(同意时)</p>
           
           <h4 class="font-semibold">2. 收集的个人信息项目</h4>
-          <p>必填项目：邮箱、姓名、密码</p>
-          <p>选填项目：学习语言设置、学习进度数据</p>
+          <p><strong>必选(邮箱注册)：</strong> 邮箱、密码、服务使用记录</p>
+          <p><strong>必选(OAuth注册)：</strong> 邮箱、外部认证者识别符、服务使用记录</p>
+          <p><strong>可选：</strong> 姓名/昵称、学习目标语言、学习进度数据</p>
+          <p><strong>非个人信息：</strong> 语言设置等浏览器本地存储(用户直接管理)</p>
           
           <h4 class="font-semibold">3. 个人信息保存及使用期限</h4>
-          <p>直至会员退出或相关法律规定的保存期限</p>
+          <p>会员信息：至退会时 / 学习记录：退会后1年 / 服务使用记录：3个月</p>
           
           <h4 class="font-semibold">4. 个人信息第三方提供</h4>
-          <p>不会在未经用户同意的情况下向第三方提供个人信息。</p>
+          <p>除用户同意或法律法规情况外，不向第三方提供。</p>
           
           <h4 class="font-semibold">5. 个人信息处理委托</h4>
-          <p>仅在提供服务所必需的情况下可以委托处理。</p>
+          <p>仅限于云服务、邮件发送等提供服务所必需情况下委托</p>
         </div>
       </div>
     </div>
@@ -277,6 +280,85 @@
           window.location.href = `/${userLanguage}/${filename}`;
         }
       }
+
+      // 모달 관리 함수들
+      function showTermsModal() {
+        document.getElementById('terms-modal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeTermsModal() {
+        document.getElementById('terms-modal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+      }
+
+      function showPrivacyModal() {
+        document.getElementById('privacy-modal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closePrivacyModal() {
+        document.getElementById('privacy-modal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+      }
+
+      // 모달 외부 클릭시 닫기
+      document.getElementById('terms-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+          closeTermsModal();
+        }
+      });
+
+      document.getElementById('privacy-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+          closePrivacyModal();
+        }
+      });
+
+      // ESC 키로 모달 닫기
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          closeTermsModal();
+          closePrivacyModal();
+        }
+      });
+
+      // 전체 동의 체크박스 기능
+      document.addEventListener('DOMContentLoaded', function() {
+        const allCheckbox = document.getElementById('all-checkbox');
+        const termsCheckbox = document.getElementById('terms-checkbox');
+        const privacyCheckbox = document.getElementById('privacy-checkbox');
+        const marketingCheckbox = document.getElementById('marketing-checkbox');
+
+        // 전체 동의 클릭시
+        allCheckbox.addEventListener('change', function() {
+          const isChecked = this.checked;
+          termsCheckbox.checked = isChecked;
+          privacyCheckbox.checked = isChecked;
+          marketingCheckbox.checked = isChecked;
+        });
+
+        // 개별 체크박스 상태 변경시 전체 동의 상태 업데이트
+        function updateAllCheckbox() {
+          const allRequired = termsCheckbox.checked && privacyCheckbox.checked;
+          const allOptional = marketingCheckbox.checked;
+          
+          if (allRequired && allOptional) {
+            allCheckbox.checked = true;
+            allCheckbox.indeterminate = false;
+          } else if (allRequired) {
+            allCheckbox.checked = false;
+            allCheckbox.indeterminate = true;
+          } else {
+            allCheckbox.checked = false;
+            allCheckbox.indeterminate = false;
+          }
+        }
+
+        [termsCheckbox, privacyCheckbox, marketingCheckbox].forEach(checkbox => {
+          checkbox.addEventListener('change', updateAllCheckbox);
+        });
+      });
     </script>
   </body>
 </html>
