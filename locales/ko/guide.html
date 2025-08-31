@@ -222,12 +222,12 @@
                   </div>
                   <div class="bg-red-50 rounded-lg p-6">
                     <h4 class="font-semibold text-gray-800 mb-3">
-                      <i class="fas fa-bullseye text-[#D32F2F] mr-2"></i>약점 보완 시스템
+                      <i class="fas fa-bullseye text-[#D32F2F] mr-2"></i>학습 성과 확인
                     </h4>
                     <ul class="text-gray-600 space-y-2">
-                      <li>• 틀린 문제 자동 복습</li>
-                      <li>• 어려운 단어 집중 학습</li>
-                      <li>• 맞춤형 복습 스케줄</li>
+                      <li>• 틀린 문제 체크 및 확인</li>
+                      <li>• 퀴즈 결과 분석</li>
+                      <li>• 학습 기록 검토</li>
                     </ul>
                   </div>
                 </div>
@@ -280,47 +280,21 @@
         </div>
       </section>
 
-      <!-- 자주 묻는 질문 -->
-      <section class="mb-12">
-        <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-10">
-          자주 묻는 <span class="text-[#4B63AC]">질문</span>
+      <!-- 더 많은 정보 -->
+      <section class="mb-12 bg-blue-50 rounded-xl p-8 text-center">
+        <h2 class="text-3xl font-bold text-gray-800 mb-4">
+          더 자세한 정보가 필요하신가요?
         </h2>
-        <div class="space-y-4">
-          <div class="bg-white rounded-lg shadow-md">
-            <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ(1)">
-              <div class="flex justify-between items-center">
-                <h3 class="font-semibold text-lg text-gray-800">하루에 얼마나 학습해야 하나요?</h3>
-                <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-1"></i>
-              </div>
-            </button>
-            <div class="hidden px-6 pb-6 text-gray-600" id="answer-1">
-              <p>개인의 상황에 따라 다르지만, 일반적으로 하루 15-30분의 꾸준한 학습을 권장합니다. 짧더라도 매일 규칙적으로 학습하는 것이 효과적입니다.</p>
-            </div>
-          </div>
-          
-          <div class="bg-white rounded-lg shadow-md">
-            <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ(2)">
-              <div class="flex justify-between items-center">
-                <h3 class="font-semibold text-lg text-gray-800">AI가 추천하는 단어는 어떻게 결정되나요?</h3>
-                <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-2"></i>
-              </div>
-            </button>
-            <div class="hidden px-6 pb-6 text-gray-600" id="answer-2">
-              <p>AI는 당신의 현재 어휘 수준, 학습 목표, 관심 분야, 학습 패턴을 종합적으로 분석하여 가장 효율적인 학습 순서로 단어를 추천합니다.</p>
-            </div>
-          </div>
-          
-          <div class="bg-white rounded-lg shadow-md">
-            <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ(3)">
-              <div class="flex justify-between items-center">
-                <h3 class="font-semibold text-lg text-gray-800">학습 진도를 어떻게 확인할 수 있나요?</h3>
-                <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-3"></i>
-              </div>
-            </button>
-            <div class="hidden px-6 pb-6 text-gray-600" id="answer-3">
-              <p>진도 페이지에서 일일, 주간, 월간 학습 통계를 확인할 수 있으며, 학습한 단어 수, 정답률, 연속 학습 일수 등 다양한 지표를 제공합니다.</p>
-            </div>
-          </div>
+        <p class="text-lg text-gray-600 mb-6">
+          LikeVoca 사용법과 관련된 더 많은 정보를 확인해보세요
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="faq.html" class="bg-[#4B63AC] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#3A4F8B] transition duration-300">
+            자주 묻는 질문
+          </a>
+          <a href="manual.html" class="bg-white text-[#4B63AC] border-2 border-[#4B63AC] px-6 py-3 rounded-lg font-semibold hover:bg-[#4B63AC] hover:text-white transition duration-300">
+            사용자 매뉴얼
+          </a>
         </div>
       </section>
 

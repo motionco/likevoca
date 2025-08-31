@@ -121,9 +121,6 @@
           <button onclick="filterFAQ('privacy')" class="faq-filter-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full font-medium hover:bg-[#4B63AC] hover:text-white transition duration-300">
             개인정보 & 보안
           </button>
-          <button onclick="filterFAQ('billing')" class="faq-filter-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full font-medium hover:bg-[#4B63AC] hover:text-white transition duration-300">
-            구독 & 결제
-          </button>
         </div>
       </section>
 
@@ -261,7 +258,7 @@
                   <li>• 최적 난이도 단어 선별</li>
                   <li>• 실용적 활용도 우선</li>
                   <li>• 점진적 난이도 상승</li>
-                  <li>• 복습 주기 자동 조정</li>
+                  <li>• 사용자 기반 단어 추천</li>
                 </ul>
               </div>
             </div>
@@ -286,7 +283,7 @@
             </ol>
             <div class="mt-4 p-4 bg-green-50 rounded-lg">
               <p class="text-sm"><i class="fas fa-lightbulb text-green-500 mr-2"></i>
-              단어장은 최대 1,000개까지 생성할 수 있으며, 각 단어장당 최대 500개의 단어를 추가할 수 있습니다.</p>
+              개인 단어장을 생성하여 체계적으로 단어를 관리할 수 있습니다.</p>
             </div>
           </div>
         </div>
@@ -306,10 +303,8 @@
                 </h4>
                 <ul class="space-y-2">
                   <li>• 객관식 문제</li>
-                  <li>• 빈칸 채우기</li>
-                  <li>• 단어 맞추기</li>
-                  <li>• 문장 완성하기</li>
-                  <li>• 발음 듣고 맞추기</li>
+                  <li>• 단어 뜻 맞추기</li>
+                  <li>• 학습 확인 테스트</li>
                 </ul>
               </div>
               <div>
@@ -317,11 +312,8 @@
                   <i class="fas fa-gamepad text-[#9C27B0] mr-2"></i>게임 모드
                 </h4>
                 <ul class="space-y-2">
-                  <li>• 단어 매칭 게임</li>
-                  <li>• 스피드 퀴즈</li>
-                  <li>• 단어 찾기 게임</li>
-                  <li>• 크로스워드 퍼즐</li>
-                  <li>• 배틀 모드 (다른 사용자와 대결)</li>
+                  <li>• 기본 학습 게임</li>
+                  <li>• 단어 복습 모드</li>
                 </ul>
               </div>
             </div>
@@ -479,12 +471,11 @@
             </ol>
             <div class="bg-orange-50 rounded-lg p-4">
               <h4 class="font-semibold text-gray-800 mb-3">
-                <i class="fas fa-headset text-[#E65100] mr-2"></i>고객 지원 연락처
+                <i class="fas fa-headset text-[#E65100] mr-2"></i>고객 지원
               </h4>
               <ul class="space-y-2">
-                <li>• 이메일: support@likevoca.com</li>
-                <li>• 실시간 채팅: 웹사이트 우하단 채팅 버튼</li>
-                <li>• 응답 시간: 평일 09:00-18:00 (24시간 이내)</li>
+                <li>• 웹사이트 문의하기 페이지 이용</li>
+                <li>• 문의 내용 검토 후 답변</li>
               </ul>
             </div>
           </div>
@@ -499,34 +490,22 @@
             </div>
           </button>
           <div class="hidden px-6 pb-6 text-gray-600" id="answer-privacy-1">
-            <p class="mb-4">LikeVoca에서 수집하는 데이터 유형:</p>
-            <div class="grid md:grid-cols-2 gap-6">
-              <div class="bg-blue-50 rounded-lg p-4">
-                <h4 class="font-semibold text-gray-800 mb-3">
-                  <i class="fas fa-user text-[#4B63AC] mr-2"></i>필수 정보
-                </h4>
-                <ul class="text-sm space-y-1">
-                  <li>• 이메일 주소</li>
-                  <li>• 사용자명</li>
-                  <li>• 비밀번호 (암호화됨)</li>
-                  <li>• 학습 언어 설정</li>
-                </ul>
-              </div>
-              <div class="bg-green-50 rounded-lg p-4">
-                <h4 class="font-semibold text-gray-800 mb-3">
-                  <i class="fas fa-chart-bar text-[#2E7D32] mr-2"></i>학습 데이터
-                </h4>
-                <ul class="text-sm space-y-1">
-                  <li>• 학습 진도와 성과</li>
-                  <li>• 단어장과 북마크</li>
-                  <li>• 퀴즈 결과</li>
-                  <li>• 사용 패턴 (익명화됨)</li>
-                </ul>
-              </div>
+            <p class="mb-4">LikeVoca에서 수집하는 기본적인 데이터:</p>
+            <div class="bg-blue-50 rounded-lg p-4">
+              <h4 class="font-semibold text-gray-800 mb-3">
+                <i class="fas fa-user text-[#4B63AC] mr-2"></i>수집 정보
+              </h4>
+              <ul class="text-sm space-y-1">
+                <li>• 이메일 주소</li>
+                <li>• 사용자명</li>
+                <li>• 학습 진도와 성과</li>
+                <li>• 단어장과 북마크</li>
+                <li>• 퀴즈 결과</li>
+              </ul>
             </div>
             <div class="mt-4 p-4 bg-gray-50 rounded-lg">
               <p class="text-sm"><i class="fas fa-shield-alt text-gray-600 mr-2"></i>
-              모든 개인정보는 GDPR 및 개인정보보호법에 따라 안전하게 처리됩니다.</p>
+              모든 개인정보는 개인정보보호법에 따라 안전하게 처리됩니다.</p>
             </div>
           </div>
         </div>
@@ -546,10 +525,9 @@
                   <i class="fas fa-lock text-[#D32F2F] mr-2"></i>기술적 보안
                 </h4>
                 <ul class="text-sm space-y-1">
-                  <li>• SSL/TLS 암호화 통신</li>
-                  <li>• 비밀번호 해시 처리</li>
-                  <li>• 정기적인 보안 업데이트</li>
-                  <li>• 침입 탐지 시스템</li>
+                  <li>• HTTPS 암호화 통신</li>
+                  <li>• Firebase 보안 시스템</li>
+                  <li>• 안전한 인증 처리</li>
                 </ul>
               </div>
               <div class="bg-orange-50 rounded-lg p-4">
@@ -557,10 +535,9 @@
                   <i class="fas fa-user-shield text-[#E65100] mr-2"></i>사용자 권한
                 </h4>
                 <ul class="text-sm space-y-1">
-                  <li>• 강력한 비밀번호 권장</li>
-                  <li>• 2단계 인증 (준비 중)</li>
-                  <li>• 로그인 알림</li>
-                  <li>• 세션 관리</li>
+                  <li>• 비밀번호 재설정 가능</li>
+                  <li>• 소셜 로그인 지원</li>
+                  <li>• 안전한 세션 관리</li>
                 </ul>
               </div>
             </div>
@@ -577,174 +554,7 @@
           </div>
         </div>
 
-        <div class="faq-item bg-white rounded-lg shadow-md" data-category="privacy">
-          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('privacy-3')">
-            <div class="flex justify-between items-center">
-              <h3 class="font-semibold text-lg text-gray-800">쿠키 정책은 어떻게 되나요?</h3>
-              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-privacy-3"></i>
-            </div>
-          </button>
-          <div class="hidden px-6 pb-6 text-gray-600" id="answer-privacy-3">
-            <p class="mb-4">LikeVoca에서 사용하는 쿠키 유형:</p>
-            <div class="space-y-4">
-              <div class="bg-green-50 rounded-lg p-4">
-                <h4 class="font-semibold text-gray-800 mb-2">
-                  <i class="fas fa-cog text-[#2E7D32] mr-2"></i>필수 쿠키
-                </h4>
-                <p class="text-sm">로그인 상태 유지, 언어 설정 등 웹사이트 기본 기능을 위해 꼭 필요한 쿠키입니다.</p>
-              </div>
-              <div class="bg-blue-50 rounded-lg p-4">
-                <h4 class="font-semibold text-gray-800 mb-2">
-                  <i class="fas fa-chart-line text-[#1976D2] mr-2"></i>분석 쿠키 (선택사항)
-                </h4>
-                <p class="text-sm">사용자 행동 분석과 서비스 개선을 위한 쿠키로, 개인식별 불가능한 통계 데이터만 수집합니다.</p>
-              </div>
-              <div class="bg-purple-50 rounded-lg p-4">
-                <h4 class="font-semibold text-gray-800 mb-2">
-                  <i class="fas fa-bullseye text-[#7B1FA2] mr-2"></i>개인화 쿠키 (선택사항)
-                </h4>
-                <p class="text-sm">사용자 맞춤형 콘텐츠와 광고 제공을 위한 쿠키입니다.</p>
-              </div>
-            </div>
-            <div class="mt-4 p-4 bg-gray-50 rounded-lg">
-              <p class="text-sm"><i class="fas fa-info-circle text-gray-600 mr-2"></i>
-              설정에서 언제든지 쿠키 사용을 관리하고 변경할 수 있습니다.</p>
-            </div>
-          </div>
-        </div>
 
-        <!-- 구독 & 결제 -->
-        <div class="faq-item bg-white rounded-lg shadow-md" data-category="billing">
-          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('billing-1')">
-            <div class="flex justify-between items-center">
-              <h3 class="font-semibold text-lg text-gray-800">무료 버전과 프리미엄 버전의 차이는 무엇인가요?</h3>
-              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-billing-1"></i>
-            </div>
-          </button>
-          <div class="hidden px-6 pb-6 text-gray-600" id="answer-billing-1">
-            <div class="overflow-x-auto">
-              <table class="w-full border-collapse border border-gray-300 mt-4">
-                <thead>
-                  <tr class="bg-gray-50">
-                    <th class="border border-gray-300 px-4 py-2 text-left">기능</th>
-                    <th class="border border-gray-300 px-4 py-2 text-left">무료</th>
-                    <th class="border border-gray-300 px-4 py-2 text-left">프리미엄</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2 font-semibold">AI 단어 추천</td>
-                    <td class="border border-gray-300 px-4 py-2">일 10개</td>
-                    <td class="border border-gray-300 px-4 py-2">무제한</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2 font-semibold">단어장 개수</td>
-                    <td class="border border-gray-300 px-4 py-2">5개</td>
-                    <td class="border border-gray-300 px-4 py-2">무제한</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2 font-semibold">게임 모드</td>
-                    <td class="border border-gray-300 px-4 py-2">기본 2개</td>
-                    <td class="border border-gray-300 px-4 py-2">모든 게임</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2 font-semibold">통계 분석</td>
-                    <td class="border border-gray-300 px-4 py-2">기본</td>
-                    <td class="border border-gray-300 px-4 py-2">상세 분석</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2 font-semibold">광고</td>
-                    <td class="border border-gray-300 px-4 py-2">있음</td>
-                    <td class="border border-gray-300 px-4 py-2">없음</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2 font-semibold">우선 지원</td>
-                    <td class="border border-gray-300 px-4 py-2">-</td>
-                    <td class="border border-gray-300 px-4 py-2">24시간 지원</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <div class="faq-item bg-white rounded-lg shadow-md" data-category="billing">
-          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('billing-2')">
-            <div class="flex justify-between items-center">
-              <h3 class="font-semibold text-lg text-gray-800">어떤 결제 방법을 지원하나요?</h3>
-              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-billing-2"></i>
-            </div>
-          </button>
-          <div class="hidden px-6 pb-6 text-gray-600" id="answer-billing-2">
-            <p class="mb-4">다양한 결제 방법을 지원합니다:</p>
-            <div class="grid md:grid-cols-2 gap-6">
-              <div class="bg-blue-50 rounded-lg p-4">
-                <h4 class="font-semibold text-gray-800 mb-3">
-                  <i class="fas fa-credit-card text-[#1976D2] mr-2"></i>카드 결제
-                </h4>
-                <ul class="text-sm space-y-1">
-                  <li>• 신용카드 (Visa, MasterCard, AMEX)</li>
-                  <li>• 체크카드</li>
-                  <li>• 해외 카드</li>
-                </ul>
-              </div>
-              <div class="bg-green-50 rounded-lg p-4">
-                <h4 class="font-semibold text-gray-800 mb-3">
-                  <i class="fas fa-mobile-alt text-[#2E7D32] mr-2"></i>간편 결제
-                </h4>
-                <ul class="text-sm space-y-1">
-                  <li>• 카카오페이</li>
-                  <li>• 네이버페이</li>
-                  <li>• 토스페이</li>
-                  <li>• PayPal (해외)</li>
-                </ul>
-              </div>
-            </div>
-            <div class="mt-4 p-4 bg-gray-50 rounded-lg">
-              <p class="text-sm"><i class="fas fa-shield-alt text-gray-600 mr-2"></i>
-              모든 결제는 SSL 암호화를 통해 안전하게 처리됩니다.</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="faq-item bg-white rounded-lg shadow-md" data-category="billing">
-          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('billing-3')">
-            <div class="flex justify-between items-center">
-              <h3 class="font-semibold text-lg text-gray-800">환불 정책은 어떻게 되나요?</h3>
-              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-billing-3"></i>
-            </div>
-          </button>
-          <div class="hidden px-6 pb-6 text-gray-600" id="answer-billing-3">
-            <p class="mb-4">LikeVoca 환불 정책:</p>
-            <div class="space-y-4">
-              <div class="bg-green-50 rounded-lg p-4">
-                <h4 class="font-semibold text-gray-800 mb-2">
-                  <i class="fas fa-calendar-check text-[#2E7D32] mr-2"></i>7일 무조건 환불
-                </h4>
-                <p class="text-sm">구독 시작일로부터 7일 이내에는 사용량과 관계없이 100% 환불이 가능합니다.</p>
-              </div>
-              <div class="bg-blue-50 rounded-lg p-4">
-                <h4 class="font-semibold text-gray-800 mb-2">
-                  <i class="fas fa-clock text-[#1976D2] mr-2"></i>부분 환불
-                </h4>
-                <p class="text-sm">7일 이후에는 사용하지 않은 기간에 대해 일할 계산으로 환불됩니다.</p>
-              </div>
-              <div class="bg-orange-50 rounded-lg p-4">
-                <h4 class="font-semibold text-gray-800 mb-2">
-                  <i class="fas fa-exclamation-triangle text-[#E65100] mr-2"></i>환불 불가 사항
-                </h4>
-                <ul class="text-sm space-y-1">
-                  <li>• 정책 위반으로 인한 계정 정지</li>
-                  <li>• 할인 혜택을 받은 구독 (별도 약관 적용)</li>
-                </ul>
-              </div>
-            </div>
-            <div class="mt-4 p-4 bg-gray-50 rounded-lg">
-              <p class="text-sm"><i class="fas fa-info-circle text-gray-600 mr-2"></i>
-              환불 처리는 영업일 기준 3-5일이 소요되며, 결제 수단에 따라 차이가 있을 수 있습니다.</p>
-            </div>
-          </div>
-        </div>
       </section>
 
       <!-- 추가 도움말 -->
@@ -753,17 +563,13 @@
           더 많은 도움이 필요하신가요?
         </h2>
         <p class="text-lg md:text-xl mb-8 opacity-90">
-          찾으시는 답변이 없다면 언제든 저희 고객 지원팀에 문의해주세요
+          찾으시는 답변이 없다면 문의하기 페이지를 이용해주세요
         </p>
-        <div class="flex flex-col md:flex-row gap-4 justify-center">
-          <a href="mailto:support@likevoca.com" class="inline-flex items-center justify-center bg-white text-[#4B63AC] px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition duration-300">
-            <i class="fas fa-envelope mr-2"></i>
-            이메일 문의
-          </a>
-          <button onclick="openLiveChat()" class="inline-flex items-center justify-center bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-[#4B63AC] transition duration-300">
+        <div class="flex justify-center">
+          <a href="inquiry.html" class="inline-flex items-center justify-center bg-white text-[#4B63AC] px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition duration-300">
             <i class="fas fa-comments mr-2"></i>
-            실시간 채팅
-          </button>
+            문의하기
+          </a>
         </div>
       </section>
     </main>
@@ -832,11 +638,6 @@
         });
       }
 
-      // 실시간 채팅 열기
-      function openLiveChat() {
-        // 실제 구현시 채팅 위젯 열기
-        alert('실시간 채팅 기능은 준비 중입니다. 이메일로 문의해주세요.');
-      }
 
       // 초기화
       document.addEventListener('DOMContentLoaded', function() {

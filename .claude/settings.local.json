@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Read(C:\\c\\practice\\likevoca\\locales\\zh/**)"
+      "Bash(find:*)",
+      "Bash(dir /b C:practicelikevocalocales)"
     ],
     "deny": [],
     "ask": []
