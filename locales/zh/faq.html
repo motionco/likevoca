@@ -7,7 +7,7 @@
     
     <!-- 基本元标签 -->
     <meta name="description" content="LikeVoca语言学习平台的常见问题和答案。解决账户创建、学习功能、技术支持、隐私保护相关的所有疑问。" />
-    <meta name="keywords" content="LikeVoca FAQ, 常见问题, 语言学习帮助, 账户创建, AI单词学习, 技术支持, 隐私保护, 订阅费用" />
+    <meta name="keywords" content="LikeVoca FAQ, 常见问题, 语言学习帮助, 账户创建, AI单词学习, 技术支持, 隐私保护" />
     
     <!-- Open Graph / 社交媒体元标签 -->
     <meta property="og:title" content="常见问题 (FAQ) - LikeVoca 语言学习帮助" />
@@ -120,9 +120,6 @@
           </button>
           <button onclick="filterFAQ('privacy')" class="faq-filter-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full font-medium hover:bg-[#4B63AC] hover:text-white transition duration-300">
             隐私安全
-          </button>
-          <button onclick="filterFAQ('billing')" class="faq-filter-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full font-medium hover:bg-[#4B63AC] hover:text-white transition duration-300">
-            订阅付费
           </button>
         </div>
       </section>
@@ -286,7 +283,7 @@
             </ol>
             <div class="mt-4 p-4 bg-green-50 rounded-lg">
               <p class="text-sm"><i class="fas fa-lightbulb text-green-500 mr-2"></i>
-              最多可创建1,000个单词本，每个单词本最多可添加500个单词。</p>
+              可以创建多个单词本，按不同主题和难度分类管理学习内容。</p>
             </div>
           </div>
         </div>
@@ -406,22 +403,18 @@
             </div>
           </button>
           <div class="hidden px-6 pb-6 text-gray-600" id="answer-technical-2">
-            <p class="mb-4">当前移动应用开发情况：</p>
+            <p class="mb-4">移动端访问支持：</p>
             <div class="bg-blue-50 rounded-lg p-6">
               <h4 class="font-semibold text-gray-800 mb-3">
-                <i class="fas fa-mobile-alt text-[#4B63AC] mr-2"></i>PWA (渐进式网页应用)
+                <i class="fas fa-mobile-alt text-[#4B63AC] mr-2"></i>响应式网页设计
               </h4>
-              <p class="mb-4">LikeVoca使用PWA技术在移动端也提供类似应用的体验：</p>
+              <p class="mb-4">LikeVoca采用响应式设计，在移动设备上提供良好的使用体验：</p>
               <ul class="space-y-2">
-                <li>• 可添加到主屏幕快捷方式</li>
-                <li>• 离线也可使用部分功能</li>
-                <li>• 支持推送通知</li>
-                <li>• 快速加载速度</li>
+                <li>• 自适应屏幕尺寸</li>
+                <li>• 触摸优化界面</li>
+                <li>• 移动端友好操作</li>
+                <li>• 快速加载性能</li>
               </ul>
-            </div>
-            <div class="mt-4 p-4 bg-green-50 rounded-lg">
-              <p class="text-sm"><i class="fas fa-info-circle text-green-500 mr-2"></i>
-              原生应用预计2024年下半年发布。计划同时支持iOS和Android。</p>
             </div>
           </div>
         </div>
@@ -429,33 +422,33 @@
         <div class="faq-item bg-white rounded-lg shadow-md" data-category="technical">
           <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('technical-3')">
             <div class="flex justify-between items-center">
-              <h3 class="font-semibold text-lg text-gray-800">数据同步如何进行？</h3>
+              <h3 class="font-semibold text-lg text-gray-800">数据存储如何保障？</h3>
               <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-technical-3"></i>
             </div>
           </button>
           <div class="hidden px-6 pb-6 text-gray-600" id="answer-technical-3">
-            <p class="mb-4">LikeVoca支持基于云的实时同步：</p>
+            <p class="mb-4">LikeVoca使用Firebase云数据库保障数据安全：</p>
             <div class="grid md:grid-cols-2 gap-6">
               <div class="bg-blue-50 rounded-lg p-4">
                 <h4 class="font-semibold text-gray-800 mb-3">
-                  <i class="fas fa-sync text-[#4B63AC] mr-2"></i>自动同步
+                  <i class="fas fa-cloud text-[#4B63AC] mr-2"></i>云端存储
                 </h4>
                 <ul class="text-sm space-y-1">
-                  <li>• 学习进度实时保存</li>
-                  <li>• 单词本自动备份</li>
-                  <li>• 设置信息同步</li>
-                  <li>• 多设备支持</li>
+                  <li>• Firebase云数据库</li>
+                  <li>• 学习进度自动保存</li>
+                  <li>• 单词本云端存储</li>
+                  <li>• 多设备访问支持</li>
                 </ul>
               </div>
               <div class="bg-green-50 rounded-lg p-4">
                 <h4 class="font-semibold text-gray-800 mb-3">
-                  <i class="fas fa-shield-alt text-[#2E7D32] mr-2"></i>安全存储
+                  <i class="fas fa-shield-alt text-[#2E7D32] mr-2"></i>数据安全
                 </h4>
                 <ul class="text-sm space-y-1">
-                  <li>• 加密数据传输</li>
-                  <li>• 定期备份</li>
-                  <li>• 数据丢失防护</li>
-                  <li>• 提供恢复功能</li>
+                  <li>• 加密传输协议</li>
+                  <li>• 自动数据备份</li>
+                  <li>• 数据丢失保护</li>
+                  <li>• 可靠性保障</li>
                 </ul>
               </div>
             </div>
@@ -482,8 +475,7 @@
                 <i class="fas fa-headset text-[#E65100] mr-2"></i>客服联系方式
               </h4>
               <ul class="space-y-2">
-                <li>• 邮箱: support@likevoca.com</li>
-                <li>• 实时聊天: 网站右下角聊天按钮</li>
+                <li>• 咨询页面: 通过网站咨询表单联系我们</li>
                 <li>• 响应时间: 工作日 09:00-18:00（24小时内）</li>
               </ul>
             </div>
@@ -549,7 +541,7 @@
                   <li>• SSL/TLS加密通信</li>
                   <li>• 密码哈希处理</li>
                   <li>• 定期安全更新</li>
-                  <li>• 入侵检测系统</li>
+                  <li>• 安全会话管理</li>
                 </ul>
               </div>
               <div class="bg-orange-50 rounded-lg p-4">
@@ -557,10 +549,10 @@
                   <i class="fas fa-user-shield text-[#E65100] mr-2"></i>用户权限
                 </h4>
                 <ul class="text-sm space-y-1">
-                  <li>• 推荐强密码</li>
-                  <li>• 双重认证（准备中）</li>
-                  <li>• 登录通知</li>
-                  <li>• 会话管理</li>
+                  <li>• 密码重置功能</li>
+                  <li>• 社交登录支持</li>
+                  <li>• 安全会话管理</li>
+                  <li>• 强密码建议</li>
                 </ul>
               </div>
             </div>
@@ -577,174 +569,7 @@
           </div>
         </div>
 
-        <div class="faq-item bg-white rounded-lg shadow-md" data-category="privacy">
-          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('privacy-3')">
-            <div class="flex justify-between items-center">
-              <h3 class="font-semibold text-lg text-gray-800">Cookie政策如何？</h3>
-              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-privacy-3"></i>
-            </div>
-          </button>
-          <div class="hidden px-6 pb-6 text-gray-600" id="answer-privacy-3">
-            <p class="mb-4">LikeVoca使用的Cookie类型：</p>
-            <div class="space-y-4">
-              <div class="bg-green-50 rounded-lg p-4">
-                <h4 class="font-semibold text-gray-800 mb-2">
-                  <i class="fas fa-cog text-[#2E7D32] mr-2"></i>必需Cookie
-                </h4>
-                <p class="text-sm">维持登录状态、语言设置等网站基本功能所必需的Cookie。</p>
-              </div>
-              <div class="bg-blue-50 rounded-lg p-4">
-                <h4 class="font-semibold text-gray-800 mb-2">
-                  <i class="fas fa-chart-line text-[#1976D2] mr-2"></i>分析Cookie（可选）
-                </h4>
-                <p class="text-sm">用于用户行为分析和服务改进的Cookie，仅收集无法识别个人身份的统计数据。</p>
-              </div>
-              <div class="bg-purple-50 rounded-lg p-4">
-                <h4 class="font-semibold text-gray-800 mb-2">
-                  <i class="fas fa-bullseye text-[#7B1FA2] mr-2"></i>个性化Cookie（可选）
-                </h4>
-                <p class="text-sm">用于为用户提供个性化内容和广告的Cookie。</p>
-              </div>
-            </div>
-            <div class="mt-4 p-4 bg-gray-50 rounded-lg">
-              <p class="text-sm"><i class="fas fa-info-circle text-gray-600 mr-2"></i>
-              可在设置中随时管理和更改Cookie使用。</p>
-            </div>
-          </div>
-        </div>
 
-        <!-- 订阅付费 -->
-        <div class="faq-item bg-white rounded-lg shadow-md" data-category="billing">
-          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('billing-1')">
-            <div class="flex justify-between items-center">
-              <h3 class="font-semibold text-lg text-gray-800">免费版和高级版有什么区别？</h3>
-              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-billing-1"></i>
-            </div>
-          </button>
-          <div class="hidden px-6 pb-6 text-gray-600" id="answer-billing-1">
-            <div class="overflow-x-auto">
-              <table class="w-full border-collapse border border-gray-300 mt-4">
-                <thead>
-                  <tr class="bg-gray-50">
-                    <th class="border border-gray-300 px-4 py-2 text-left">功能</th>
-                    <th class="border border-gray-300 px-4 py-2 text-left">免费</th>
-                    <th class="border border-gray-300 px-4 py-2 text-left">高级</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2 font-semibold">AI单词推荐</td>
-                    <td class="border border-gray-300 px-4 py-2">每日10个</td>
-                    <td class="border border-gray-300 px-4 py-2">无限制</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2 font-semibold">单词本数量</td>
-                    <td class="border border-gray-300 px-4 py-2">5个</td>
-                    <td class="border border-gray-300 px-4 py-2">无限制</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2 font-semibold">游戏模式</td>
-                    <td class="border border-gray-300 px-4 py-2">基础2个</td>
-                    <td class="border border-gray-300 px-4 py-2">所有游戏</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2 font-semibold">统计分析</td>
-                    <td class="border border-gray-300 px-4 py-2">基础</td>
-                    <td class="border border-gray-300 px-4 py-2">详细分析</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2 font-semibold">广告</td>
-                    <td class="border border-gray-300 px-4 py-2">有</td>
-                    <td class="border border-gray-300 px-4 py-2">无</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2 font-semibold">优先支持</td>
-                    <td class="border border-gray-300 px-4 py-2">-</td>
-                    <td class="border border-gray-300 px-4 py-2">24小时支持</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <div class="faq-item bg-white rounded-lg shadow-md" data-category="billing">
-          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('billing-2')">
-            <div class="flex justify-between items-center">
-              <h3 class="font-semibold text-lg text-gray-800">支持哪些支付方式？</h3>
-              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-billing-2"></i>
-            </div>
-          </button>
-          <div class="hidden px-6 pb-6 text-gray-600" id="answer-billing-2">
-            <p class="mb-4">支持多种支付方式：</p>
-            <div class="grid md:grid-cols-2 gap-6">
-              <div class="bg-blue-50 rounded-lg p-4">
-                <h4 class="font-semibold text-gray-800 mb-3">
-                  <i class="fas fa-credit-card text-[#1976D2] mr-2"></i>卡片支付
-                </h4>
-                <ul class="text-sm space-y-1">
-                  <li>• 信用卡（Visa、MasterCard、AMEX）</li>
-                  <li>• 借记卡</li>
-                  <li>• 国际卡</li>
-                </ul>
-              </div>
-              <div class="bg-green-50 rounded-lg p-4">
-                <h4 class="font-semibold text-gray-800 mb-3">
-                  <i class="fas fa-mobile-alt text-[#2E7D32] mr-2"></i>便捷支付
-                </h4>
-                <ul class="text-sm space-y-1">
-                  <li>• 支付宝</li>
-                  <li>• 微信支付</li>
-                  <li>• Apple Pay</li>
-                  <li>• PayPal（海外）</li>
-                </ul>
-              </div>
-            </div>
-            <div class="mt-4 p-4 bg-gray-50 rounded-lg">
-              <p class="text-sm"><i class="fas fa-shield-alt text-gray-600 mr-2"></i>
-              所有支付都通过SSL加密安全处理。</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="faq-item bg-white rounded-lg shadow-md" data-category="billing">
-          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('billing-3')">
-            <div class="flex justify-between items-center">
-              <h3 class="font-semibold text-lg text-gray-800">退款政策如何？</h3>
-              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-billing-3"></i>
-            </div>
-          </button>
-          <div class="hidden px-6 pb-6 text-gray-600" id="answer-billing-3">
-            <p class="mb-4">LikeVoca退款政策：</p>
-            <div class="space-y-4">
-              <div class="bg-green-50 rounded-lg p-4">
-                <h4 class="font-semibold text-gray-800 mb-2">
-                  <i class="fas fa-calendar-check text-[#2E7D32] mr-2"></i>7天无条件退款
-                </h4>
-                <p class="text-sm">订阅开始日起7天内，无论使用情况如何都可100%退款。</p>
-              </div>
-              <div class="bg-blue-50 rounded-lg p-4">
-                <h4 class="font-semibold text-gray-800 mb-2">
-                  <i class="fas fa-clock text-[#1976D2] mr-2"></i>部分退款
-                </h4>
-                <p class="text-sm">7天后对未使用期间按日计算退款。</p>
-              </div>
-              <div class="bg-orange-50 rounded-lg p-4">
-                <h4 class="font-semibold text-gray-800 mb-2">
-                  <i class="fas fa-exclamation-triangle text-[#E65100] mr-2"></i>不可退款情况
-                </h4>
-                <ul class="text-sm space-y-1">
-                  <li>• 因政策违规导致的账户暂停</li>
-                  <li>• 享受折扣优惠的订阅（适用单独条款）</li>
-                </ul>
-              </div>
-            </div>
-            <div class="mt-4 p-4 bg-gray-50 rounded-lg">
-              <p class="text-sm"><i class="fas fa-info-circle text-gray-600 mr-2"></i>
-              退款处理需要3-5个工作日，根据支付方式可能有所差异。</p>
-            </div>
-          </div>
-        </div>
       </section>
 
       <!-- 额外帮助 -->
@@ -755,15 +580,11 @@
         <p class="text-lg md:text-xl mb-8 opacity-90">
           如果找不到您要的答案，请随时联系我们的客服团队
         </p>
-        <div class="flex flex-col md:flex-row gap-4 justify-center">
-          <a href="mailto:support@likevoca.com" class="inline-flex items-center justify-center bg-white text-[#4B63AC] px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition duration-300">
-            <i class="fas fa-envelope mr-2"></i>
-            邮件咨询
+        <div class="flex justify-center">
+          <a href="/inquiry" class="inline-flex items-center justify-center bg-white text-[#4B63AC] px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition duration-300">
+            <i class="fas fa-paper-plane mr-2"></i>
+            咨询表单
           </a>
-          <button onclick="openLiveChat()" class="inline-flex items-center justify-center bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-[#4B63AC] transition duration-300">
-            <i class="fas fa-comments mr-2"></i>
-            实时聊天
-          </button>
         </div>
       </section>
     </main>
@@ -832,11 +653,6 @@
         });
       }
 
-      // 打开实时聊天
-      function openLiveChat() {
-        // 实际实现时打开聊天小部件
-        alert('实时聊天功能准备中。请通过邮件联系我们。');
-      }
 
       // 初始化
       document.addEventListener('DOMContentLoaded', function() {

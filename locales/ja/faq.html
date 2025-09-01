@@ -6,8 +6,8 @@
     <title>よくある質問 (FAQ) - LikeVoca 言語学習ヘルプセンター</title>
     
     <!-- 基本メタタグ -->
-    <meta name="description" content="LikeVoca言語学習プラットフォームに関するよくある質問と回答です。アカウント作成、学習機能、技術サポート、プライバシー保護、課金に関するすべての疑問を解決します。" />
-    <meta name="keywords" content="LikeVoca FAQ, よくある質問, 言語学習ヘルプ, アカウント作成, AI単語学習, 技術サポート, プライバシー保護, サブスクリプション" />
+    <meta name="description" content="LikeVoca言語学習プラットフォームに関するよくある質問と回答です。アカウント作成、学習機能、技術サポート、プライバシー保護に関するすべての疑問を解決します。" />
+    <meta name="keywords" content="LikeVoca FAQ, よくある質問, 言語学習ヘルプ, アカウント作成, AI単語学習, 技術サポート, プライバシー保護" />
     
     <!-- Open Graph / ソーシャルメディアメタタグ -->
     <meta property="og:title" content="よくある質問 (FAQ) - LikeVoca 言語学習ヘルプセンター" />
@@ -120,9 +120,6 @@
           </button>
           <button onclick="filterFAQ('privacy')" class="faq-filter-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full font-medium hover:bg-[#4B63AC] hover:text-white transition duration-300">
             プライバシー・セキュリティ
-          </button>
-          <button onclick="filterFAQ('billing')" class="faq-filter-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full font-medium hover:bg-[#4B63AC] hover:text-white transition duration-300">
-            サブスクリプション・課金
           </button>
         </div>
       </section>
@@ -284,10 +281,6 @@
               <li>各単語の意味、例文、発音を確認・修正できます。</li>
               <li>カテゴリー別に整理して体系的に管理できます。</li>
             </ol>
-            <div class="mt-4 p-4 bg-green-50 rounded-lg">
-              <p class="text-sm"><i class="fas fa-lightbulb text-green-500 mr-2"></i>
-              単語帳は最大1,000個まで作成でき、各単語帳には最大500個の単語を追加できます。</p>
-            </div>
           </div>
         </div>
 
@@ -406,22 +399,17 @@
             </div>
           </button>
           <div class="hidden px-6 pb-6 text-gray-600" id="answer-technical-2">
-            <p class="mb-4">現在のモバイルアプリ開発状況：</p>
+            <p class="mb-4">LikeVocaはモバイルブラウザで最適化されたレスポンシブウェブアプリケーションです。</p>
             <div class="bg-blue-50 rounded-lg p-6">
               <h4 class="font-semibold text-gray-800 mb-3">
-                <i class="fas fa-mobile-alt text-[#4B63AC] mr-2"></i>PWA (Progressive Web App)
+                <i class="fas fa-mobile-alt text-[#4B63AC] mr-2"></i>レスポンシブウェブサポート
               </h4>
-              <p class="mb-4">LikeVocaはPWA技術を使用してモバイルでもアプリのような体験を提供します：</p>
               <ul class="space-y-2">
-                <li>• ホーム画面にショートカットを追加可能</li>
-                <li>• オフラインでも一部機能が使用可能</li>
-                <li>• プッシュ通知サポート</li>
-                <li>• 高速ローディング速度</li>
+                <li>• モバイルブラウザで最適化されたインターフェース</li>
+                <li>• タッチスクリーン友好的なデザイン</li>
+                <li>• スマートフォン、タブレットでのシームレスな体験</li>
+                <li>• どこでもアクセス可能な学習環境</li>
               </ul>
-            </div>
-            <div class="mt-4 p-4 bg-green-50 rounded-lg">
-              <p class="text-sm"><i class="fas fa-info-circle text-green-500 mr-2"></i>
-              ネイティブアプリは2024年下半期リリース予定です。iOSとAndroidの同時サポートを計画しています。</p>
             </div>
           </div>
         </div>
@@ -429,33 +417,33 @@
         <div class="faq-item bg-white rounded-lg shadow-md" data-category="technical">
           <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('technical-3')">
             <div class="flex justify-between items-center">
-              <h3 class="font-semibold text-lg text-gray-800">データ同期はどのように行われますか？</h3>
+              <h3 class="font-semibold text-lg text-gray-800">データ保存はどのように行われますか？</h3>
               <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-technical-3"></i>
             </div>
           </button>
           <div class="hidden px-6 pb-6 text-gray-600" id="answer-technical-3">
-            <p class="mb-4">LikeVocaはクラウドベースのリアルタイム同期をサポートします：</p>
+            <p class="mb-4">LikeVocaはFirebaseクラウドデータベースを使用して安全なデータ保存を提供します：</p>
             <div class="grid md:grid-cols-2 gap-6">
               <div class="bg-blue-50 rounded-lg p-4">
                 <h4 class="font-semibold text-gray-800 mb-3">
-                  <i class="fas fa-sync text-[#4B63AC] mr-2"></i>自動同期
+                  <i class="fas fa-cloud text-[#4B63AC] mr-2"></i>クラウド保存
                 </h4>
                 <ul class="text-sm space-y-1">
-                  <li>• 学習進度のリアルタイム保存</li>
-                  <li>• 単語帳の自動バックアップ</li>
-                  <li>• 設定情報の同期</li>
+                  <li>• Firebaseリアルタイムデータベース</li>
+                  <li>• 学習進度の自動保存</li>
+                  <li>• 単語帳と設定情報</li>
                   <li>• マルチデバイスサポート</li>
                 </ul>
               </div>
               <div class="bg-green-50 rounded-lg p-4">
                 <h4 class="font-semibold text-gray-800 mb-3">
-                  <i class="fas fa-shield-alt text-[#2E7D32] mr-2"></i>安全な保存
+                  <i class="fas fa-shield-alt text-[#2E7D32] mr-2"></i>安全性
                 </h4>
                 <ul class="text-sm space-y-1">
                   <li>• 暗号化されたデータ転送</li>
-                  <li>• 定期的なバックアップ</li>
-                  <li>• データ損失防止</li>
-                  <li>• 復旧機能提供</li>
+                  <li>• Googleの企業級セキュリティ</li>
+                  <li>• 自動バックアップシステム</li>
+                  <li>• 99.9%のアップタイム保証</li>
                 </ul>
               </div>
             </div>
@@ -479,13 +467,9 @@
             </ol>
             <div class="bg-orange-50 rounded-lg p-4">
               <h4 class="font-semibold text-gray-800 mb-3">
-                <i class="fas fa-headset text-[#E65100] mr-2"></i>カスタマーサポート連絡先
+                <i class="fas fa-headset text-[#E65100] mr-2"></i>カスタマーサポート
               </h4>
-              <ul class="space-y-2">
-                <li>• メール: support@likevoca.com</li>
-                <li>• リアルタイムチャット: ウェブサイト右下のチャットボタン</li>
-                <li>• 応答時間: 平日 09:00-18:00（24時間以内）</li>
-              </ul>
+              <p class="text-sm">問題が継続して解決されない場合は、ウェブサイトのお問い合わせページを通じてサポートチームにご連絡ください。</p>
             </div>
           </div>
         </div>
@@ -549,7 +533,7 @@
                   <li>• SSL/TLS暗号化通信</li>
                   <li>• パスワードハッシュ処理</li>
                   <li>• 定期的なセキュリティ更新</li>
-                  <li>• 侵入検知システム</li>
+                  <li>• 安全なセッション管理</li>
                 </ul>
               </div>
               <div class="bg-orange-50 rounded-lg p-4">
@@ -557,10 +541,10 @@
                   <i class="fas fa-user-shield text-[#E65100] mr-2"></i>ユーザー権限
                 </h4>
                 <ul class="text-sm space-y-1">
-                  <li>• 強力なパスワードの推奨</li>
-                  <li>• 2段階認証（準備中）</li>
-                  <li>• ログイン通知</li>
-                  <li>• セッション管理</li>
+                  <li>• パスワードリセット機能</li>
+                  <li>• ソーシャルログイン連携</li>
+                  <li>• 安全なセッション管理</li>
+                  <li>• アカウント保護機能</li>
                 </ul>
               </div>
             </div>
@@ -571,180 +555,13 @@
               <ul class="text-sm space-y-1">
                 <li>• 定期的にパスワードを変更してください</li>
                 <li>• 他のサイトとは異なるパスワードを使用してください</li>
-                <li>• 疑わしい活動を発見したら即座に報告してください</li>
+                <li>• 疑わしい活動を発見したらお問い合わせフォームでご報告ください</li>
               </ul>
             </div>
           </div>
         </div>
 
-        <div class="faq-item bg-white rounded-lg shadow-md" data-category="privacy">
-          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('privacy-3')">
-            <div class="flex justify-between items-center">
-              <h3 class="font-semibold text-lg text-gray-800">クッキーポリシーはどのようになっていますか？</h3>
-              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-privacy-3"></i>
-            </div>
-          </button>
-          <div class="hidden px-6 pb-6 text-gray-600" id="answer-privacy-3">
-            <p class="mb-4">LikeVocaで使用するクッキータイプ：</p>
-            <div class="space-y-4">
-              <div class="bg-green-50 rounded-lg p-4">
-                <h4 class="font-semibold text-gray-800 mb-2">
-                  <i class="fas fa-cog text-[#2E7D32] mr-2"></i>必須クッキー
-                </h4>
-                <p class="text-sm">ログイン状態維持、言語設定などウェブサイト基本機能のために必要なクッキーです。</p>
-              </div>
-              <div class="bg-blue-50 rounded-lg p-4">
-                <h4 class="font-semibold text-gray-800 mb-2">
-                  <i class="fas fa-chart-line text-[#1976D2] mr-2"></i>分析クッキー（オプション）
-                </h4>
-                <p class="text-sm">ユーザー行動分析とサービス改善のためのクッキーで、個人識別不可能な統計データのみ収集します。</p>
-              </div>
-              <div class="bg-purple-50 rounded-lg p-4">
-                <h4 class="font-semibold text-gray-800 mb-2">
-                  <i class="fas fa-bullseye text-[#7B1FA2] mr-2"></i>個人化クッキー（オプション）
-                </h4>
-                <p class="text-sm">ユーザー向けカスタマイズコンテンツと広告提供のためのクッキーです。</p>
-              </div>
-            </div>
-            <div class="mt-4 p-4 bg-gray-50 rounded-lg">
-              <p class="text-sm"><i class="fas fa-info-circle text-gray-600 mr-2"></i>
-              設定でいつでもクッキー使用を管理・変更できます。</p>
-            </div>
-          </div>
-        </div>
 
-        <!-- サブスクリプション・課金 -->
-        <div class="faq-item bg-white rounded-lg shadow-md" data-category="billing">
-          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('billing-1')">
-            <div class="flex justify-between items-center">
-              <h3 class="font-semibold text-lg text-gray-800">無料版とプレミアム版の違いは何ですか？</h3>
-              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-billing-1"></i>
-            </div>
-          </button>
-          <div class="hidden px-6 pb-6 text-gray-600" id="answer-billing-1">
-            <div class="overflow-x-auto">
-              <table class="w-full border-collapse border border-gray-300 mt-4">
-                <thead>
-                  <tr class="bg-gray-50">
-                    <th class="border border-gray-300 px-4 py-2 text-left">機能</th>
-                    <th class="border border-gray-300 px-4 py-2 text-left">無料</th>
-                    <th class="border border-gray-300 px-4 py-2 text-left">プレミアム</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2 font-semibold">AI単語推薦</td>
-                    <td class="border border-gray-300 px-4 py-2">1日10個</td>
-                    <td class="border border-gray-300 px-4 py-2">無制限</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2 font-semibold">単語帳数</td>
-                    <td class="border border-gray-300 px-4 py-2">5個</td>
-                    <td class="border border-gray-300 px-4 py-2">無制限</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2 font-semibold">ゲームモード</td>
-                    <td class="border border-gray-300 px-4 py-2">基本2個</td>
-                    <td class="border border-gray-300 px-4 py-2">すべてのゲーム</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2 font-semibold">統計分析</td>
-                    <td class="border border-gray-300 px-4 py-2">基本</td>
-                    <td class="border border-gray-300 px-4 py-2">詳細分析</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2 font-semibold">広告</td>
-                    <td class="border border-gray-300 px-4 py-2">あり</td>
-                    <td class="border border-gray-300 px-4 py-2">なし</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2 font-semibold">優先サポート</td>
-                    <td class="border border-gray-300 px-4 py-2">-</td>
-                    <td class="border border-gray-300 px-4 py-2">24時間サポート</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <div class="faq-item bg-white rounded-lg shadow-md" data-category="billing">
-          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('billing-2')">
-            <div class="flex justify-between items-center">
-              <h3 class="font-semibold text-lg text-gray-800">どのような決済方法をサポートしていますか？</h3>
-              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-billing-2"></i>
-            </div>
-          </button>
-          <div class="hidden px-6 pb-6 text-gray-600" id="answer-billing-2">
-            <p class="mb-4">様々な決済方法をサポートしています：</p>
-            <div class="grid md:grid-cols-2 gap-6">
-              <div class="bg-blue-50 rounded-lg p-4">
-                <h4 class="font-semibold text-gray-800 mb-3">
-                  <i class="fas fa-credit-card text-[#1976D2] mr-2"></i>カード決済
-                </h4>
-                <ul class="text-sm space-y-1">
-                  <li>• クレジットカード（Visa、MasterCard、AMEX）</li>
-                  <li>• デビットカード</li>
-                  <li>• 海外カード</li>
-                </ul>
-              </div>
-              <div class="bg-green-50 rounded-lg p-4">
-                <h4 class="font-semibold text-gray-800 mb-3">
-                  <i class="fas fa-mobile-alt text-[#2E7D32] mr-2"></i>電子決済
-                </h4>
-                <ul class="text-sm space-y-1">
-                  <li>• Apple Pay</li>
-                  <li>• Google Pay</li>
-                  <li>• PayPal</li>
-                  <li>• 楽天ペイ</li>
-                </ul>
-              </div>
-            </div>
-            <div class="mt-4 p-4 bg-gray-50 rounded-lg">
-              <p class="text-sm"><i class="fas fa-shield-alt text-gray-600 mr-2"></i>
-              すべての決済はSSL暗号化を通じて安全に処理されます。</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="faq-item bg-white rounded-lg shadow-md" data-category="billing">
-          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('billing-3')">
-            <div class="flex justify-between items-center">
-              <h3 class="font-semibold text-lg text-gray-800">返金ポリシーはどのようになっていますか？</h3>
-              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-billing-3"></i>
-            </div>
-          </button>
-          <div class="hidden px-6 pb-6 text-gray-600" id="answer-billing-3">
-            <p class="mb-4">LikeVoca返金ポリシー：</p>
-            <div class="space-y-4">
-              <div class="bg-green-50 rounded-lg p-4">
-                <h4 class="font-semibold text-gray-800 mb-2">
-                  <i class="fas fa-calendar-check text-[#2E7D32] mr-2"></i>7日間無条件返金
-                </h4>
-                <p class="text-sm">サブスクリプション開始日から7日以内は使用量に関係なく100%返金が可能です。</p>
-              </div>
-              <div class="bg-blue-50 rounded-lg p-4">
-                <h4 class="font-semibold text-gray-800 mb-2">
-                  <i class="fas fa-clock text-[#1976D2] mr-2"></i>部分返金
-                </h4>
-                <p class="text-sm">7日後は使用していない期間について日割り計算で返金されます。</p>
-              </div>
-              <div class="bg-orange-50 rounded-lg p-4">
-                <h4 class="font-semibold text-gray-800 mb-2">
-                  <i class="fas fa-exclamation-triangle text-[#E65100] mr-2"></i>返金不可事項
-                </h4>
-                <ul class="text-sm space-y-1">
-                  <li>• ポリシー違反によるアカウント停止</li>
-                  <li>• 割引特典を受けたサブスクリプション（別途約款適用）</li>
-                </ul>
-              </div>
-            </div>
-            <div class="mt-4 p-4 bg-gray-50 rounded-lg">
-              <p class="text-sm"><i class="fas fa-info-circle text-gray-600 mr-2"></i>
-              返金処理は営業日基準3-5日かかり、決済手段によって差があります。</p>
-            </div>
-          </div>
-        </div>
       </section>
 
       <!-- 追加ヘルプ -->
@@ -755,15 +572,11 @@
         <p class="text-lg md:text-xl mb-8 opacity-90">
           お探しの回答が見つからない場合は、いつでもカスタマーサポートチームにお問い合わせください
         </p>
-        <div class="flex flex-col md:flex-row gap-4 justify-center">
-          <a href="mailto:support@likevoca.com" class="inline-flex items-center justify-center bg-white text-[#4B63AC] px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition duration-300">
-            <i class="fas fa-envelope mr-2"></i>
-            メールでお問い合わせ
+        <div class="flex justify-center">
+          <a href="/inquiry" class="inline-flex items-center justify-center bg-white text-[#4B63AC] px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition duration-300">
+            <i class="fas fa-edit mr-2"></i>
+            お問い合わせフォーム
           </a>
-          <button onclick="openLiveChat()" class="inline-flex items-center justify-center bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-[#4B63AC] transition duration-300">
-            <i class="fas fa-comments mr-2"></i>
-            リアルタイムチャット
-          </button>
         </div>
       </section>
     </main>
@@ -832,11 +645,6 @@
         });
       }
 
-      // リアルタイムチャット開く
-      function openLiveChat() {
-        // 実際の実装時にチャットウィジェットを開く
-        alert('リアルタイムチャット機能は準備中です。メールでお問い合わせください。');
-      }
 
       // 初期化
       document.addEventListener('DOMContentLoaded', function() {
