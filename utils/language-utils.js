@@ -296,6 +296,279 @@ const seoMetadata = {
       canonical: "https://likevoca.com/es/games.html",
     },
   },
+  // 학습 가이드 페이지 메타데이터
+  guide: {
+    ko: {
+      title: "LikeVoca - 학습 가이드",
+      description: "Firebase 클라우드 저장소 기반 AI 단어장, 퀴즈 모드, 실시간 진도 추적으로 체계적인 언어학습을 경험하세요. LikeVoca의 완전한 학습 가이드입니다.",
+      keywords: "언어 학습 가이드, 학습 방법, AI 단어장, 다국어 학습, 효과적인 학습법, 언어 습득",
+      canonical: "https://likevoca.com/ko/guide",
+    },
+    en: {
+      title: "LikeVoca - Learning Guide",
+      description: "Experience systematic vocabulary learning with Firebase cloud storage-based AI vocabulary, quiz modes, and real-time progress tracking. LikeVoca's complete learning guide.",
+      keywords: "language learning guide, learning methods, AI vocabulary, multilingual learning, effective learning, language acquisition",
+      canonical: "https://likevoca.com/en/guide",
+    },
+    ja: {
+      title: "LikeVoca - 学習ガイド",
+      description: "Firebaseクラウドストレージベースのアイ単語帳、クイズモード、リアルタイム進行追跡で体系的な言語学習を体験してください。LikeVocaの完全な学習ガイドです。",
+      keywords: "言語学習ガイド, 学習方法, AI単語帳, 多言語学習, 効果的な学習法, 言語習得",
+      canonical: "https://likevoca.com/ja/guide",
+    },
+    zh: {
+      title: "LikeVoca - 学习指南",
+      description: "通过基于Firebase云存储的AI词汇本、测验模式和实时进度跟踪体验系统性词汇学习。LikeVoca的完整学习指南。",
+      keywords: "语言学习指南, 学习方法, AI词汇本, 多语言学习, 有效学习法, 语言习得",
+      canonical: "https://likevoca.com/zh/guide",
+    },
+    es: {
+      title: "LikeVoca - Guía de Aprendizaje",
+      description: "Experimenta el aprendizaje sistemático de vocabulario con vocabulario IA basado en almacenamiento en la nube Firebase, modos de cuestionarios y seguimiento de progreso en tiempo real. La guía de aprendizaje completa de LikeVoca.",
+      keywords: "guía de aprendizaje de idiomas, métodos de aprendizaje, vocabulario IA, aprendizaje multilingüe, aprendizaje efectivo, adquisición de idiomas",
+      canonical: "https://likevoca.com/es/guide",
+    },
+  },
+  // 사용자 매뉴얼 페이지 메타데이터
+  manual: {
+    ko: {
+      title: "LikeVoca - 사용자 매뉴얼",
+      description: "LikeVoca의 모든 기능을 활용하는 방법을 배우세요. 상세한 사용법과 팁이 담긴 완전한 사용자 매뉴얼입니다.",
+      keywords: "사용자 매뉴얼, 사용법, 기능 설명, 도움말, LikeVoca 가이드, 사용 방법",
+      canonical: "https://likevoca.com/ko/manual",
+    },
+    en: {
+      title: "LikeVoca - User Manual",
+      description: "Learn how to utilize all features of LikeVoca. A complete user manual with detailed usage instructions and tips.",
+      keywords: "user manual, how to use, feature guide, help, LikeVoca guide, usage instructions",
+      canonical: "https://likevoca.com/en/manual",
+    },
+    ja: {
+      title: "LikeVoca - ユーザーマニュアル",
+      description: "LikeVocaのすべての機能を活用する方法を学びましょう。詳細な使用法とヒントが含まれた完全なユーザーマニュアルです。",
+      keywords: "ユーザーマニュアル, 使用方法, 機能ガイド, ヘルプ, LikeVocaガイド, 使用説明",
+      canonical: "https://likevoca.com/ja/manual",
+    },
+    zh: {
+      title: "LikeVoca - 用户手册",
+      description: "学习如何充分利用LikeVoca的所有功能。包含详细使用说明和技巧的完整用户手册。",
+      keywords: "用户手册, 使用方法, 功能指南, 帮助, LikeVoca指南, 使用说明",
+      canonical: "https://likevoca.com/zh/manual",
+    },
+    es: {
+      title: "LikeVoca - Manual del Usuario",
+      description: "Aprende a utilizar todas las características de LikeVoca. Un manual del usuario completo con instrucciones de uso detalladas y consejos.",
+      keywords: "manual del usuario, cómo usar, guía de características, ayuda, guía LikeVoca, instrucciones de uso",
+      canonical: "https://likevoca.com/es/manual",
+    },
+  },
+  // FAQ 페이지 메타데이터
+  faq: {
+    ko: {
+      title: "LikeVoca - 자주 묻는 질문",
+      description: "LikeVoca에 대한 자주 묻는 질문과 답변을 찾아보세요. 사용법, 기능, 문제 해결 방법 등을 확인할 수 있습니다.",
+      keywords: "자주 묻는 질문, FAQ, 도움말, 문제 해결, LikeVoca 지원, 사용법 문의",
+      canonical: "https://likevoca.com/ko/faq",
+    },
+    en: {
+      title: "LikeVoca - Frequently Asked Questions",
+      description: "Find frequently asked questions and answers about LikeVoca. You can check usage, features, troubleshooting methods, and more.",
+      keywords: "frequently asked questions, FAQ, help, troubleshooting, LikeVoca support, usage inquiries",
+      canonical: "https://likevoca.com/en/faq",
+    },
+    ja: {
+      title: "LikeVoca - よくある質問",
+      description: "LikeVocaについてのよくある質問と回答を見つけてください。使用法、機能、トラブルシューティング方法などを確認できます。",
+      keywords: "よくある質問, FAQ, ヘルプ, トラブルシューティング, LikeVocaサポート, 使用法に関するお問い合わせ",
+      canonical: "https://likevoca.com/ja/faq",
+    },
+    zh: {
+      title: "LikeVoca - 常见问题",
+      description: "查找关于LikeVoca的常见问题和答案。您可以查看使用方法、功能、故障排除方法等。",
+      keywords: "常见问题, FAQ, 帮助, 故障排除, LikeVoca支持, 使用咨询",
+      canonical: "https://likevoca.com/zh/faq",
+    },
+    es: {
+      title: "LikeVoca - Preguntas Frecuentes",
+      description: "Encuentra preguntas frecuentes y respuestas sobre LikeVoca. Puedes consultar el uso, características, métodos de solución de problemas y más.",
+      keywords: "preguntas frecuentes, FAQ, ayuda, solución de problemas, soporte LikeVoca, consultas de uso",
+      canonical: "https://likevoca.com/es/faq",
+    },
+  },
+  // 소개 페이지 메타데이터
+  about: {
+    ko: {
+      title: "LikeVoca - 소개",
+      description: "LikeVoca는 AI 기반 다국어 단어장 서비스입니다. 효과적인 언어 학습을 위한 혁신적인 기능들을 만나보세요.",
+      keywords: "LikeVoca 소개, AI 단어장, 다국어 학습, 언어 학습 서비스, 회사 소개",
+      canonical: "https://likevoca.com/ko/about",
+    },
+    en: {
+      title: "LikeVoca - About",
+      description: "LikeVoca is an AI-powered multilingual vocabulary service. Discover innovative features for effective language learning.",
+      keywords: "about LikeVoca, AI vocabulary, multilingual learning, language learning service, company info",
+      canonical: "https://likevoca.com/en/about",
+    },
+    ja: {
+      title: "LikeVoca - 概要",
+      description: "LikeVocaはAIベースの多言語単語帳サービスです。効果的な言語学習のための革新的な機能をご紹介します。",
+      keywords: "LikeVoca紹介, AI単語帳, 多言語学習, 言語学習サービス, 会社概要",
+      canonical: "https://likevoca.com/ja/about",
+    },
+    zh: {
+      title: "LikeVoca - 关于我们",
+      description: "LikeVoca是基于AI的多语言词汇本服务。发现用于有效语言学习的创新功能。",
+      keywords: "LikeVoca介绍, AI词汇本, 多语言学习, 语言学习服务, 公司介绍",
+      canonical: "https://likevoca.com/zh/about",
+    },
+    es: {
+      title: "LikeVoca - Acerca de",
+      description: "LikeVoca es un servicio de vocabulario multilingüe impulsado por IA. Descubre características innovadoras para el aprendizaje efectivo de idiomas.",
+      keywords: "acerca de LikeVoca, vocabulario IA, aprendizaje multilingüe, servicio de aprendizaje de idiomas, información de la empresa",
+      canonical: "https://likevoca.com/es/about",
+    },
+  },
+  // 이용약관 페이지 메타데이터
+  terms: {
+    ko: {
+      title: "LikeVoca - 이용약관",
+      description: "LikeVoca 서비스 이용약관을 확인하세요. 서비스 이용 시 준수해야 할 규정과 정책을 안내합니다.",
+      keywords: "이용약관, 서비스 약관, LikeVoca 정책, 이용 규정, 법적 고지",
+      canonical: "https://likevoca.com/ko/terms",
+    },
+    en: {
+      title: "LikeVoca - Terms of Service",
+      description: "Check LikeVoca's terms of service. We guide regulations and policies to be followed when using the service.",
+      keywords: "terms of service, service terms, LikeVoca policy, usage regulations, legal notice",
+      canonical: "https://likevoca.com/en/terms",
+    },
+    ja: {
+      title: "LikeVoca - 利用規約",
+      description: "LikeVocaのサービス利用規約をご確認ください。サービス利用時に遵守すべき規定とポリシーをご案内します。",
+      keywords: "利用規約, サービス規約, LikeVocaポリシー, 利用規定, 法的通知",
+      canonical: "https://likevoca.com/ja/terms",
+    },
+    zh: {
+      title: "LikeVoca - 服务条款",
+      description: "查看LikeVoca的服务条款。我们指导在使用服务时应遵守的规定和政策。",
+      keywords: "服务条款, 服务条件, LikeVoca政策, 使用规定, 法律通知",
+      canonical: "https://likevoca.com/zh/terms",
+    },
+    es: {
+      title: "LikeVoca - Términos de Servicio",
+      description: "Consulta los términos de servicio de LikeVoca. Proporcionamos regulaciones y políticas que deben seguirse al usar el servicio.",
+      keywords: "términos de servicio, términos del servicio, política LikeVoca, regulaciones de uso, aviso legal",
+      canonical: "https://likevoca.com/es/terms",
+    },
+  },
+  // 개인정보처리방침 페이지 메타데이터
+  privacy: {
+    ko: {
+      title: "LikeVoca - 개인정보처리방침",
+      description: "LikeVoca의 개인정보처리방침을 확인하세요. 개인정보 수집, 이용, 보관 및 보호 정책에 대해 안내합니다.",
+      keywords: "개인정보처리방침, 개인정보보호, 프라이버시 정책, 데이터 보호, 정보 보안",
+      canonical: "https://likevoca.com/ko/privacy",
+    },
+    en: {
+      title: "LikeVoca - Privacy Policy",
+      description: "Check LikeVoca's privacy policy. We guide personal information collection, use, storage and protection policies.",
+      keywords: "privacy policy, personal data protection, privacy protection, data security, information security",
+      canonical: "https://likevoca.com/en/privacy",
+    },
+    ja: {
+      title: "LikeVoca - プライバシーポリシー",
+      description: "LikeVocaのプライバシーポリシーをご確認ください。個人情報の収集、利用、保管および保護ポリシーについてご案内します。",
+      keywords: "プライバシーポリシー, 個人情報保護, プライバシー保護, データセキュリティ, 情報セキュリティ",
+      canonical: "https://likevoca.com/ja/privacy",
+    },
+    zh: {
+      title: "LikeVoca - 隐私政策",
+      description: "查看LikeVoca的隐私政策。我们指导个人信息收集、使用、存储和保护政策。",
+      keywords: "隐私政策, 个人数据保护, 隐私保护, 数据安全, 信息安全",
+      canonical: "https://likevoca.com/zh/privacy",
+    },
+    es: {
+      title: "LikeVoca - Política de Privacidad",
+      description: "Consulta la política de privacidad de LikeVoca. Proporcionamos políticas de recopilación, uso, almacenamiento y protección de información personal.",
+      keywords: "política de privacidad, protección de datos personales, protección de privacidad, seguridad de datos, seguridad de información",
+      canonical: "https://likevoca.com/es/privacy",
+    },
+  },
+  // 나만의 단어장 페이지 메타데이터 (HTML 파일명에 맞춘 키)
+  "my-word-list": {
+    ko: {
+      title: "LikeVoca - 나만의 단어장",
+      description: "북마크한 단어들을 모아서 나만의 단어장을 만들고 효과적으로 학습하세요.",
+      keywords: "나만의 단어장, 북마크 단어장, 다국어 단어장, 개인 단어장, 언어 학습",
+      canonical: "https://likevoca.com/ko/my-word-list",
+    },
+    en: {
+      title: "LikeVoca - My Word List",
+      description: "Collect your bookmarked words to create your own word list and learn effectively.",
+      keywords: "my word list, bookmarked words, multilingual vocabulary, personal vocabulary, language learning",
+      canonical: "https://likevoca.com/en/my-word-list",
+    },
+    ja: {
+      title: "LikeVoca - 私の単語帳",
+      description: "ブックマークした単語を集めて自分だけの単語帳を作成し、効果的に学習しましょう。",
+      keywords: "私の単語帳, ブックマーク単語, 多言語単語帳, 個人単語帳, 言語学習",
+      canonical: "https://likevoca.com/ja/my-word-list",
+    },
+    zh: {
+      title: "LikeVoca - 我的单词本",
+      description: "收集您收藏的单词，创建您自己的单词本并有效学习。",
+      keywords: "我的单词本, 收藏单词, 多语言词汇本, 个人词汇本, 语言学习",
+      canonical: "https://likevoca.com/zh/my-word-list",
+    },
+    es: {
+      title: "LikeVoca - Mi Lista de Palabras",
+      description: "Recopila tus palabras marcadas para crear tu propia lista de palabras y aprender de manera efectiva.",
+      keywords: "mi lista de palabras, palabras marcadas, vocabulario multilingüe, vocabulario personal, aprendizaje de idiomas",
+      canonical: "https://likevoca.com/es/my-word-list",
+    },
+  },
+  // 단어장 페이지 메타데이터
+  vocabulary: {
+    ko: {
+      title: "LikeVoca - 단어장",
+      description: "다양한 주제별 단어장을 탐색하고 학습하세요. AI 추천 단어부터 사용자 생성 단어장까지 다양한 학습 자료를 제공합니다.",
+      keywords: "단어장, 어휘 학습, 주제별 단어, 언어 학습 자료, 다국어 단어",
+      canonical: "https://likevoca.com/ko/vocabulary",
+    },
+    en: {
+      title: "LikeVoca - Vocabulary",
+      description: "Explore and learn various topic-based vocabularies. We provide diverse learning materials from AI-recommended words to user-generated vocabularies.",
+      keywords: "vocabulary, vocabulary learning, topic words, language learning materials, multilingual words",
+      canonical: "https://likevoca.com/en/vocabulary",
+    },
+    ja: {
+      title: "LikeVoca - 単語帳",
+      description: "様々なトピック別単語帳を探索し学習しましょう。AI推薦単語からユーザー生成単語帳まで、多様な学習材料を提供します。",
+      keywords: "単語帳, 語彙学習, トピック別単語, 言語学習材料, 多言語単語",
+      canonical: "https://likevoca.com/ja/vocabulary",
+    },
+    zh: {
+      title: "LikeVoca - 词汇本",
+      description: "探索和学习各种主题词汇本。我们提供从AI推荐单词到用户创建词汇本的各种学习材料。",
+      keywords: "词汇本, 词汇学习, 主题单词, 语言学习材料, 多语言单词",
+      canonical: "https://likevoca.com/zh/vocabulary",
+    },
+    es: {
+      title: "LikeVoca - Vocabulario",
+      description: "Explora y aprende varios vocabularios basados en temas. Proporcionamos diversos materiales de aprendizaje desde palabras recomendadas por IA hasta vocabularios generados por usuarios.",
+      keywords: "vocabulario, aprendizaje de vocabulario, palabras temáticas, materiales de aprendizaje de idiomas, palabras multilingües",
+      canonical: "https://likevoca.com/es/vocabulary",
+    },
+  },
+  // 정보 페이지 메타데이터 (스페인어 info.html용)
+  info: {
+    es: {
+      title: "LikeVoca - Información",
+      description: "Obtén información detallada sobre LikeVoca y sus funciones de aprendizaje de idiomas. Conoce más sobre nuestro servicio de vocabulario multilingüe.",
+      keywords: "información LikeVoca, información del servicio, aprendizaje de idiomas, vocabulario multilingüe, información detallada",
+      canonical: "https://likevoca.com/es/info",
+    },
+  },
 };
 
 // 번역 텍스트 저장소 - 분리된 JSON 파일에서 로드

@@ -623,64 +623,64 @@
     <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/about"/>
   </url>
   
-  <!-- 한국어 학습 방법 페이지 -->
+  <!-- 한국어 학습 가이드 페이지 -->
   <url>
-    <loc>https://likevoca.com/ko/how-to-learn</loc>
+    <loc>https://likevoca.com/ko/guide</loc>
     <lastmod>2025-08-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/how-to-learn"/>
-    <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/how-to-learn"/>
-    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/how-to-learn"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/how-to-learn"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/guide"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/guide"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/guide"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/guide"/>
   </url>
   
-  <!-- 영어 학습 방법 페이지 -->
+  <!-- 영어 학습 가이드 페이지 -->
   <url>
-    <loc>https://likevoca.com/en/how-to-learn</loc>
+    <loc>https://likevoca.com/en/guide</loc>
     <lastmod>2025-08-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/how-to-learn"/>
-    <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/how-to-learn"/>
-    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/how-to-learn"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/how-to-learn"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/guide"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/guide"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/guide"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/guide"/>
   </url>
   
-  <!-- 일본어 학습 방법 페이지 -->
+  <!-- 일본어 학습 가이드 페이지 -->
   <url>
-    <loc>https://likevoca.com/ja/how-to-learn</loc>
+    <loc>https://likevoca.com/ja/guide</loc>
     <lastmod>2025-08-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/how-to-learn"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/how-to-learn"/>
-    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/how-to-learn"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/how-to-learn"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/guide"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/guide"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/guide"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/guide"/>
   </url>
   
-  <!-- 중국어 학습 방법 페이지 -->
+  <!-- 중국어 학습 가이드 페이지 -->
   <url>
-    <loc>https://likevoca.com/zh/how-to-learn</loc>
+    <loc>https://likevoca.com/zh/guide</loc>
     <lastmod>2025-08-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/how-to-learn"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/how-to-learn"/>
-    <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/how-to-learn"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/how-to-learn"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/guide"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/guide"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/guide"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/guide"/>
   </url>
   
-  <!-- 스페인어 학습 방법 페이지 -->
+  <!-- 스페인어 학습 가이드 페이지 -->
   <url>
-    <loc>https://likevoca.com/es/how-to-learn</loc>
+    <loc>https://likevoca.com/es/guide</loc>
     <lastmod>2025-08-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/how-to-learn"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/how-to-learn"/>
-    <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/how-to-learn"/>
-    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/how-to-learn"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/guide"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/guide"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/guide"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/guide"/>
   </url>
   
   <!-- ===== 법적 페이지들 (모든 언어) ===== -->

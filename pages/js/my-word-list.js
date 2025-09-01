@@ -154,7 +154,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }, 100);
 
   // 메타데이터 업데이트
-  await updateMetadata("my-vocabulary");
+  await updateMetadata("my-word-list");
 
   // 사용자 인증 상태 관찰
   onAuthStateChanged(auth, async (user) => {
