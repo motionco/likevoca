@@ -60,6 +60,7 @@ let currentUser = null; // 현재 로그인된 사용자
 let displayCount = 12; // 표시할 개념 수
 let lastVisibleConcept = null;
 let firstVisibleConcept = null;
+let likeInfoCache = {}; // 좋아요 정보 캐시
 
 // 전역에서 접근 가능하도록 설정
 window.allConcepts = allConcepts;
@@ -350,7 +351,7 @@ function createConceptCard(concept) {
   return `
     <div 
       class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200 cursor-pointer concept-card"
-      onclick="showConceptViewModal(window.allConcepts.find(c => c.id === '${conceptId}' || c._id === '${conceptId}'), '${sourceLanguage}', '${targetLanguage}')"
+      onclick="handleConceptClick('${conceptId}', '${sourceLanguage}', '${targetLanguage}')"
       style="border-left: 4px solid ${colorTheme}"
     >
       <div class="flex items-start justify-between mb-4">
@@ -377,7 +378,25 @@ function createConceptCard(concept) {
           >
             <i class="fas fa-bookmark text-gray-400"></i>
           </button>
-          ` : ''}
+          <button 
+            class="like-btn p-2 rounded-full hover:bg-gray-100 transition-colors duration-200" 
+            onclick="event.stopPropagation(); toggleLike('${conceptId}')"
+            data-concept-id="${conceptId}"
+            title="좋아요"
+          >
+            <i class="fas fa-heart text-gray-400"></i>
+            <span class="like-count text-xs ml-1">0</span>
+          </button>
+          ` : `
+          <button 
+            class="like-display-btn p-2 rounded-full hover:bg-gray-100 transition-colors duration-200" 
+            onclick="event.stopPropagation(); showLoginPrompt()"
+            title="로그인하여 좋아요하기"
+          >
+            <i class="fas fa-heart text-gray-400"></i>
+            <span class="like-count text-xs ml-1">0</span>
+          </button>
+          `}
         <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
           ${getTranslatedDomainCategory(
             conceptInfo.domain,
@@ -478,21 +497,17 @@ async function toggleBookmark(conceptId) {
     const isCurrentlyBookmarked = icon.classList.contains("text-yellow-500");
 
     try {
-      // Firebase 업데이트 - 올바른 방식으로 접근
+      // users 컬렉션 사용으로 변경
       const userEmail = currentUser.email;
-      const bookmarksRef = window.firebaseInit.doc(
-        window.firebaseInit.db,
-        "bookmarks",
-        userEmail
-      );
+      const userRef = doc(db, "users", userEmail);
 
-      // 현재 북마크 목록 가져오기
-      const bookmarkDoc = await window.firebaseInit.getDoc(bookmarksRef);
+      // 현재 사용자 데이터 가져오기
+      const userDoc = await getDoc(userRef);
       let currentBookmarks = [];
 
-      if (bookmarkDoc.exists()) {
-        const data = bookmarkDoc.data();
-        currentBookmarks = data.concept_ids || [];
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        currentBookmarks = data.bookmarked_concepts || [];
       }
 
       let updatedBookmarks;
@@ -506,10 +521,9 @@ async function toggleBookmark(conceptId) {
         showMessage("북마크가 추가되었습니다.", "success");
       }
 
-      // Firebase에 저장
-      await window.firebaseInit.setDoc(bookmarksRef, {
-        user_email: userEmail,
-        concept_ids: updatedBookmarks,
+      // users 컬렉션에 북마크 업데이트
+      await updateDoc(userRef, {
+        bookmarked_concepts: updatedBookmarks,
         updated_at: new Date().toISOString(),
       });
 
@@ -560,8 +574,234 @@ function showMessage(message, type = "info") {
   }, 4000);
 }
 
+// 좋아요 토글 함수 (users 컬렉션 통합)
+async function toggleLike(conceptId) {
+  try {
+    const currentUser = window.auth?.currentUser;
+    if (!currentUser) {
+      showMessage("좋아요 기능을 사용하려면 로그인이 필요합니다.", "warning");
+      return;
+    }
+
+    const likeButton = document.querySelector(
+      `.like-btn[data-concept-id="${conceptId}"]`
+    );
+    if (!likeButton) {
+      console.error("좋아요 버튼을 찾을 수 없습니다:", conceptId);
+      return;
+    }
+
+    const icon = likeButton.querySelector("i");
+    const countSpan = likeButton.querySelector(".like-count");
+    
+    // 임시로 버튼 비활성화
+    likeButton.disabled = true;
+    icon.classList.add("animate-pulse");
+
+    try {
+      const userEmail = currentUser.email;
+      const userRef = doc(db, "users", userEmail);
+      
+      // 현재 사용자 데이터 가져오기
+      const userDoc = await getDoc(userRef);
+      let currentLikes = [];
+      
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        currentLikes = data.liked_concepts || [];
+      }
+
+      const isCurrentlyLiked = currentLikes.includes(conceptId);
+      let updatedLikes;
+
+      if (isCurrentlyLiked) {
+        // 좋아요 제거
+        updatedLikes = currentLikes.filter(id => id !== conceptId);
+      } else {
+        // 좋아요 추가
+        updatedLikes = [...currentLikes, conceptId];
+      }
+
+      // users 컬렉션에 좋아요 업데이트
+      await updateDoc(userRef, {
+        liked_concepts: updatedLikes,
+        updated_at: new Date().toISOString()
+      });
+
+      // 해당 개념의 전체 좋아요 수 계산
+      const likeCount = await getLikeCount(conceptId);
+
+      // UI 업데이트 with 애니메이션
+      if (!isCurrentlyLiked) {
+        // 좋아요 추가 - 하트 애니메이션
+        icon.className = "fas fa-heart text-red-500";
+        
+        // 하트 펄스 애니메이션
+        icon.style.transform = "scale(1.3)";
+        icon.style.transition = "transform 0.2s ease-in-out";
+        
+        setTimeout(() => {
+          icon.style.transform = "scale(1)";
+        }, 200);
+        
+        // 좋아요 파티클 효과 (선택사항)
+        createHeartParticles(likeButton);
+        
+      } else {
+        // 좋아요 제거 - 부드러운 전환
+        icon.style.transition = "color 0.3s ease-in-out";
+        icon.className = "fas fa-heart text-gray-400";
+      }
+      
+      countSpan.textContent = likeCount;
+      
+      // 캐시 업데이트
+      likeInfoCache[conceptId] = {
+        liked: !isCurrentlyLiked,
+        likeCount: likeCount
+      };
+
+    } catch (error) {
+      console.error("좋아요 토글 실패:", error);
+      showMessage("좋아요 처리 중 오류가 발생했습니다.", "error");
+    } finally {
+      // 버튼 활성화
+      likeButton.disabled = false;
+      icon.classList.remove("animate-pulse");
+    }
+  } catch (error) {
+    console.error("좋아요 토글 오류:", error);
+    showMessage("좋아요 기능 오류가 발생했습니다.", "error");
+  }
+}
+
+// 개념 카드 클릭 시 모달 열기 함수 (클릭 추적 제거)
+function handleConceptClick(conceptId, sourceLanguage, targetLanguage) {
+  try {
+    // 모달 열기
+    const concept = window.allConcepts.find(c => 
+      c.id === conceptId || c._id === conceptId
+    );
+    
+    if (concept) {
+      showConceptViewModal(concept, sourceLanguage, targetLanguage);
+    }
+  } catch (error) {
+    console.error("개념 클릭 처리 오류:", error);
+  }
+}
+
+// 비로그인 사용자용 로그인 프롬프트
+function showLoginPrompt() {
+  const loginModal = document.createElement('div');
+  loginModal.id = 'login-prompt-modal';
+  loginModal.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50';
+  
+  loginModal.innerHTML = `
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+      <div class="text-center">
+        <div class="mb-4">
+          <i class="fas fa-heart text-red-500 text-4xl mb-3"></i>
+          <h3 class="text-lg font-semibold text-gray-900">좋아요 기능</h3>
+        </div>
+        <p class="text-gray-600 mb-6">
+          마음에 드는 단어에 좋아요를 누르려면<br>
+          로그인이 필요합니다.
+        </p>
+        <div class="flex space-x-3">
+          <button 
+            onclick="closeLoginPrompt()" 
+            class="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition duration-200"
+          >
+            취소
+          </button>
+          <button 
+            onclick="goToLogin()" 
+            class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200"
+          >
+            로그인
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(loginModal);
+}
+
+// 로그인 프롬프트 닫기
+function closeLoginPrompt() {
+  const modal = document.getElementById('login-prompt-modal');
+  if (modal) {
+    modal.remove();
+  }
+}
+
+// 로그인 페이지로 이동
+function goToLogin() {
+  closeLoginPrompt();
+  
+  // 로그인 페이지로 이동 (기존 함수 활용)
+  if (typeof window.redirectToLogin === "function") {
+    window.redirectToLogin();
+  } else {
+    // 대체 방법: 직접 언어별 로그인 페이지로 리디렉션
+    const currentLanguage = localStorage.getItem("userLanguage") || "ko";
+    window.location.href = `/locales/${currentLanguage}/login.html`;
+  }
+}
+
+// 하트 파티클 효과 생성
+function createHeartParticles(buttonElement) {
+  const rect = buttonElement.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+  
+  // 작은 하트들 생성
+  for (let i = 0; i < 6; i++) {
+    const heart = document.createElement('div');
+    heart.innerHTML = '♥';
+    heart.style.cssText = `
+      position: fixed;
+      left: ${centerX - 8}px;
+      top: ${centerY - 8}px;
+      color: #ef4444;
+      font-size: 12px;
+      pointer-events: none;
+      z-index: 1000;
+      transition: all 0.8s ease-out;
+      opacity: 1;
+    `;
+    
+    document.body.appendChild(heart);
+    
+    // 랜덤한 방향으로 이동
+    const angle = (i * 60) * (Math.PI / 180); // 60도씩 나누어서
+    const distance = 30 + Math.random() * 20;
+    const moveX = Math.cos(angle) * distance;
+    const moveY = Math.sin(angle) * distance - 20; // 위쪽으로 더 이동
+    
+    setTimeout(() => {
+      heart.style.transform = `translate(${moveX}px, ${moveY}px)`;
+      heart.style.opacity = '0';
+    }, 50);
+    
+    // 애니메이션 완료 후 제거
+    setTimeout(() => {
+      if (heart.parentNode) {
+        heart.parentNode.removeChild(heart);
+      }
+    }, 900);
+  }
+}
+
 // 전역 함수로 노출
 window.toggleBookmark = toggleBookmark;
+window.toggleLike = toggleLike;
+window.handleConceptClick = handleConceptClick;
+window.showLoginPrompt = showLoginPrompt;
+window.closeLoginPrompt = closeLoginPrompt;
+window.goToLogin = goToLogin;
 
 // 검색 및 필터링 함수 (공유 모듈 사용)
 function handleSearch() {
@@ -628,6 +868,9 @@ function displayConceptList() {
 
   // 북마크 상태 업데이트
   updateBookmarkStates();
+  
+  // 좋아요 상태 업데이트
+  updateLikeStates();
 
   // 더 보기 버튼 표시/숨김
   if (loadMoreBtn) {
@@ -639,25 +882,21 @@ function displayConceptList() {
   }
 }
 
-// 북마크 상태 업데이트 함수
+// 북마크 상태 업데이트 함수 (users 컬렉션 사용)
 async function updateBookmarkStates() {
   try {
     const currentUser = window.auth?.currentUser;
     if (!currentUser) return; // 로그인하지 않은 경우 북마크 상태 업데이트 안함
 
     const userEmail = currentUser.email;
-    const bookmarksRef = window.firebaseInit.doc(
-      window.firebaseInit.db,
-      "bookmarks",
-      userEmail
-    );
+    const userRef = doc(db, "users", userEmail);
 
-    const bookmarkDoc = await window.firebaseInit.getDoc(bookmarksRef);
+    const userDoc = await getDoc(userRef);
     let bookmarkedIds = [];
 
-    if (bookmarkDoc.exists()) {
-      const data = bookmarkDoc.data();
-      bookmarkedIds = data.concept_ids || [];
+    if (userDoc.exists()) {
+      const data = userDoc.data();
+      bookmarkedIds = data.bookmarked_concepts || [];
     }
 
     // 모든 북마크 버튼 업데이트
@@ -678,6 +917,178 @@ async function updateBookmarkStates() {
     console.error("북마크 상태 업데이트 실패:", error);
   }
 }
+
+// 좋아요 수 계산 함수 (users 컬렉션 사용)
+async function getLikeCount(conceptId) {
+  try {
+    const q = query(
+      collection(db, "users"),
+      where("liked_concepts", "array-contains", conceptId)
+    );
+    
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.size;
+    
+  } catch (error) {
+    console.error('좋아요 수 계산 중 오류 발생:', error);
+    return 0;
+  }
+}
+
+// 개념의 좋아요 정보 가져오기 (users 컬렉션 사용)
+async function getLikeInfo(conceptId) {
+  try {
+    const user = window.auth?.currentUser;
+    let isLiked = false;
+    
+    // 사용자가 로그인한 경우에만 좋아요 여부 확인
+    if (user) {
+      const userRef = doc(db, "users", user.email);
+      const userDoc = await getDoc(userRef);
+      
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        const likedConcepts = data.liked_concepts || [];
+        isLiked = likedConcepts.includes(conceptId);
+      }
+    }
+
+    // 전체 좋아요 수 계산
+    const likeCount = await getLikeCount(conceptId);
+
+    return {
+      liked: isLiked,
+      likeCount: likeCount
+    };
+
+  } catch (error) {
+    console.error('좋아요 정보 가져오기 중 오류 발생:', error);
+    return {
+      liked: false,
+      likeCount: 0
+    };
+  }
+}
+
+// 여러 개념의 좋아요 정보 한번에 가져오기 (users 컬렉션 사용)
+async function getBatchLikeInfo(conceptIds) {
+  if (!conceptIds || conceptIds.length === 0) {
+    return {};
+  }
+
+  try {
+    const user = window.auth?.currentUser;
+    let userLikedConcepts = [];
+    
+    // 사용자가 로그인한 경우 좋아요한 개념들 가져오기
+    if (user) {
+      const userRef = doc(db, "users", user.email);
+      const userDoc = await getDoc(userRef);
+      
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        userLikedConcepts = data.liked_concepts || [];
+      }
+    }
+
+    const likeInfoMap = {};
+    
+    // 각 개념의 좋아요 수를 병렬로 계산
+    const likeCountPromises = conceptIds.map(async (conceptId) => {
+      try {
+        const likeCount = await getLikeCount(conceptId);
+        return { conceptId, likeCount };
+      } catch (error) {
+        console.error(`좋아요 수 계산 실패 (${conceptId}):`, error);
+        return { conceptId, likeCount: 0 };
+      }
+    });
+
+    const likeCountResults = await Promise.all(likeCountPromises);
+    
+    // 결과 맵 생성
+    likeCountResults.forEach(({ conceptId, likeCount }) => {
+      likeInfoMap[conceptId] = {
+        liked: userLikedConcepts.includes(conceptId),
+        likeCount: likeCount
+      };
+    });
+    
+    return likeInfoMap;
+
+  } catch (error) {
+    console.error('배치 좋아요 정보 가져오기 중 오류 발생:', error);
+    
+    // 오류 시 기본값 반환
+    const defaultMap = {};
+    conceptIds.forEach(conceptId => {
+      defaultMap[conceptId] = {
+        liked: false,
+        likeCount: 0
+      };
+    });
+    return defaultMap;
+  }
+}
+
+// 좋아요 상태 업데이트 함수 (통합된 함수 사용)
+async function updateLikeStates() {
+  try {
+    const conceptElements = document.querySelectorAll(".concept-card");
+    const conceptIds = Array.from(conceptElements).map(element => {
+      const onclick = element.getAttribute("onclick");
+      const match = onclick?.match(/handleConceptClick\('([^']+)'/);
+      return match ? match[1] : null;
+    }).filter(id => id);
+
+    if (conceptIds.length === 0) return;
+
+    // 배치로 좋아요 정보 가져오기
+    const likeInfoMap = await getBatchLikeInfo(conceptIds);
+    
+    // UI 업데이트
+    conceptIds.forEach(conceptId => {
+      const likeInfo = likeInfoMap[conceptId];
+      if (!likeInfo) return;
+
+      // 좋아요 버튼 업데이트 (로그인 사용자용)
+      const likeButton = document.querySelector(`.like-btn[data-concept-id="${conceptId}"]`);
+      if (likeButton) {
+        const icon = likeButton.querySelector("i");
+        const countSpan = likeButton.querySelector(".like-count");
+        
+        if (likeInfo.liked) {
+          icon.className = "fas fa-heart text-red-500";
+        } else {
+          icon.className = "fas fa-heart text-gray-400";
+        }
+        countSpan.textContent = likeInfo.likeCount;
+      }
+
+      // 좋아요 표시 업데이트 (비로그인 사용자용)
+      const likeDisplay = document.querySelector(`.like-display[data-concept-id="${conceptId}"] .like-count`);
+      if (likeDisplay) {
+        likeDisplay.textContent = likeInfo.likeCount;
+      }
+
+      // 부모 요소에서 찾기
+      const conceptCard = document.querySelector(`[onclick*="${conceptId}"]`);
+      if (conceptCard) {
+        const likeCountSpan = conceptCard.querySelector(".like-count");
+        if (likeCountSpan) {
+          likeCountSpan.textContent = likeInfo.likeCount;
+        }
+      }
+
+      // 캐시 업데이트
+      likeInfoCache[conceptId] = likeInfo;
+    });
+
+  } catch (error) {
+    console.error("좋아요 상태 업데이트 실패:", error);
+  }
+}
+
 
 // 더 보기 버튼 처리
 function handleLoadMore() {

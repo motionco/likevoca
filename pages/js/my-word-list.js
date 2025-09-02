@@ -259,19 +259,19 @@ async function loadBookmarkedConcepts() {
 
   try {
     const userEmail = currentUser.email;
-    // 1. 사용자의 북마크 목록 가져오기
-    const bookmarksRef = doc(db, "bookmarks", userEmail);
-    const bookmarkDoc = await getDoc(bookmarksRef);
+    // 1. 사용자의 북마크 목록 가져오기 (users 컬렉션 사용)
+    const userRef = doc(db, "users", userEmail);
+    const userDoc = await getDoc(userRef);
 
-    if (!bookmarkDoc.exists()) {
+    if (!userDoc.exists()) {
       userBookmarks = [];
       bookmarkedConcepts = [];
       updateUI(); // UI 업데이트 추가
       return;
     }
 
-    const bookmarkData = bookmarkDoc.data();
-    userBookmarks = bookmarkData.concept_ids || [];
+    const userData = userDoc.data();
+    userBookmarks = userData.bookmarked_concepts || [];
 
     if (userBookmarks.length === 0) {
       bookmarkedConcepts = [];
@@ -321,8 +321,8 @@ async function loadBookmarkedConcepts() {
       );
 
       try {
-        await updateDoc(bookmarksRef, {
-          concept_ids: validBookmarkIds,
+        await updateDoc(userRef, {
+          bookmarked_concepts: validBookmarkIds,
           updated_at: new Date().toISOString(),
         });
 
@@ -1997,21 +1997,19 @@ async function toggleBookmark(conceptId) {
   updateBookmarkUI();
 }
 
-// 북마크 즉시 추가
+// 북마크 즉시 추가 (users 컬렉션 사용)
 async function addBookmarkImmediately(conceptId) {
   try {
     const userEmail = currentUser.email;
-    const bookmarksRef = doc(db, "bookmarks", userEmail);
+    const userRef = doc(db, "users", userEmail);
 
     const updatedBookmarks = [...userBookmarks, conceptId];
 
-    const bookmarkData = {
-      user_email: userEmail,
-      concept_ids: updatedBookmarks,
+    await updateDoc(userRef, {
+      bookmarked_concepts: updatedBookmarks,
       updated_at: new Date().toISOString(),
-    };
+    });
 
-    await setDoc(bookmarksRef, bookmarkData);
     userBookmarks = updatedBookmarks;
 
     showMessage("북마크가 추가되었습니다.", "success");
@@ -2024,21 +2022,19 @@ async function addBookmarkImmediately(conceptId) {
   }
 }
 
-// 북마크 즉시 제거
+// 북마크 즉시 제거 (users 컬렉션 사용)
 async function removeBookmarkImmediately(conceptId) {
   try {
     const userEmail = currentUser.email;
-    const bookmarksRef = doc(db, "bookmarks", userEmail);
+    const userRef = doc(db, "users", userEmail);
 
     const updatedBookmarks = userBookmarks.filter((id) => id !== conceptId);
 
-    const bookmarkData = {
-      user_email: userEmail,
-      concept_ids: updatedBookmarks,
+    await updateDoc(userRef, {
+      bookmarked_concepts: updatedBookmarks,
       updated_at: new Date().toISOString(),
-    };
+    });
 
-    await setDoc(bookmarksRef, bookmarkData);
     userBookmarks = updatedBookmarks;
   } catch (error) {
     console.error("❌ 북마크 제거 오류:", error);
@@ -2046,26 +2042,23 @@ async function removeBookmarkImmediately(conceptId) {
   }
 }
 
-// 지연된 북마크 해제 처리
+// 지연된 북마크 해제 처리 (users 컬렉션 사용)
 async function processPendingUnbookmarks() {
   if (pendingUnbookmarks.size === 0) return;
 
   try {
     const userEmail = currentUser.email;
-    const bookmarksRef = doc(db, "bookmarks", userEmail);
+    const userRef = doc(db, "users", userEmail);
 
     // 해제 대기 중인 북마크들을 제거
     const updatedBookmarks = userBookmarks.filter(
       (id) => !pendingUnbookmarks.has(id)
     );
 
-    const bookmarkData = {
-      user_email: userEmail,
-      concept_ids: updatedBookmarks,
+    await updateDoc(userRef, {
+      bookmarked_concepts: updatedBookmarks,
       updated_at: new Date().toISOString(),
-    };
-
-    await setDoc(bookmarksRef, bookmarkData);
+    });
 
     // 상태 초기화
     pendingUnbookmarks.clear();
