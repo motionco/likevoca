@@ -1,0 +1,117 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 관리자 이메일 목록 (하드코딩된 관리자)
+    function isAdmin() {
+      return request.auth != null && 
+        request.auth.token.email in [
+          'admin@likevoca.com',
+          'manager@likevoca.com', 
+          'motioncomc@gmail.com'
+        ];
+    }
+    
+    // 인증된 사용자 확인
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // 문서 소유자 확인
+    function isOwner() {
+      return request.auth != null && 
+        request.auth.token.email == resource.data.userId;
+    }
+
+    // 사용자 컬렉션 - 본인 데이터만 접근 가능
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.token.email == userId;
+      allow read: if isAdmin(); // 관리자는 모든 사용자 데이터 읽기 가능
+    }
+
+    // 개념 컬렉션 - 읽기는 모든 인증 사용자, 쓰기는 본인 것만
+    match /concepts/{conceptId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && request.auth.token.email == request.resource.data.userId;
+      allow update, delete: if isAuthenticated() && (isOwner() || isAdmin());
+    }
+
+    // 콘텐츠 컬렉션 - 관리자만 관리 가능
+    match /content/{contentId} {
+      allow read: if true; // 모든 사람이 콘텐츠 읽기 가능
+      allow create, update, delete: if isAdmin(); // 관리자만 생성, 수정, 삭제 가능
+    }
+
+    // 예문 컬렉션 - 읽기는 모든 인증 사용자, 쓰기는 본인 것만
+    match /examples/{exampleId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && (isOwner() || isAdmin());
+    }
+
+    // 문법 패턴 컬렉션
+    match /grammar/{grammarId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && (isOwner() || isAdmin());
+    }
+
+    // 퀴즈 템플릿 컬렉션
+    match /quiz_templates/{templateId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && (isOwner() || isAdmin());
+    }
+
+    // 게임 데이터 컬렉션
+    match /game_data/{gameDataId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && (isOwner() || isAdmin());
+    }
+
+    // 통계 컬렉션 - 관리자와 시스템만 쓰기 가능
+    match /stats/{statId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // 개념 통계 컬렉션 - 인증된 사용자 읽기, 관리자 쓰기
+    match /concept_stats/{conceptStatId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAdmin();
+    }
+
+    // AI 추천 컬렉션 - 본인 것만 접근 가능
+    match /ai-recommend/{userEmail} {
+      allow read, write: if request.auth != null && request.auth.token.email == userEmail;
+      allow read: if isAdmin(); // 관리자는 모든 AI 추천 데이터 읽기 가능
+    }
+
+    // 추가 예문 컬렉션
+    match /additional_examples/{exampleId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && (isOwner() || isAdmin());
+    }
+
+    // 언어별 인덱스 컬렉션들 - 읽기는 모든 인증 사용자, 쓰기는 관리자만
+    match /{language}_index/{indexId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // 언어별 문법 인덱스 컬렉션들
+    match /{language}_grammar_index/{indexId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // 기본 규칙: 다른 모든 문서는 관리자만 접근 가능
+    match /{document=**} {
+      allow read, write: if isAdmin();
+    }
+  }
+}

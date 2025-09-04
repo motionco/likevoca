@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>공지사항 - LikeVoca 언어학습 플랫폼</title>
+    
+    <!-- 기본 메타 태그 -->
+    <meta name="description" content="LikeVoca 언어학습 플랫폼의 최신 공지사항과 업데이트 소식을 확인하세요. 새로운 기능, 이벤트, 시스템 점검 안내 등을 제공합니다." />
+    <meta name="keywords" content="LikeVoca 공지사항, 업데이트, 새로운 기능, 이벤트, 시스템 점검, 언어학습 소식" />
+    
+    <!-- Open Graph / 소셜 미디어 메타 태그 -->
+    <meta property="og:title" content="공지사항 - LikeVoca 언어학습 플랫폼" />
+    <meta property="og:description" content="LikeVoca의 최신 소식과 업데이트 정보를 확인하세요. Firebase 저장소 기반 AI 단어학습, 새로운 기능, 이벤트 소식을 제공합니다." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://likevoca.com/ko/notices" />
+    <meta property="og:locale" content="ko" />
+    
+    <!-- Twitter Card 태그 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="공지사항 - LikeVoca 언어학습 플랫폼" />
+    <meta name="twitter:description" content="LikeVoca의 최신 소식과 업데이트 정보를 확인하세요." />
+    
+    <!-- 표준 링크 -->
+    <link rel="canonical" href="https://likevoca.com/ko/notices" />
+    
+    <!-- 대체 언어 링크 -->
+    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/notices" />
+    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/notices" />
+    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/notices" />
+    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/notices" />
+    <link rel="alternate" hreflang="es" href="https://likevoca.com/es/notices" />
+    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/notices" />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+      .notice-card {
+        transition: all 0.2s ease;
+      }
+      .notice-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+      }
+      .notice-important {
+        border-left: 4px solid #ef4444;
+        background: linear-gradient(135deg, #fef2f2 0%, #ffffff 100%);
+      }
+      .notice-normal {
+        border-left: 4px solid #3b82f6;
+        background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
+      }
+      .notice-event {
+        border-left: 4px solid #10b981;
+        background: linear-gradient(135deg, #ecfdf5 0%, #ffffff 100%);
+      }
+    </style>
+  </head>
+  
+  <body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav id="navbar-container" class="sticky top-0 z-50"></nav>
+
+    <!-- Header Section -->
+    <section class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-16">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <i class="fas fa-bullhorn text-5xl mb-6 opacity-90"></i>
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">
+          공지사항
+        </h1>
+        <p class="text-xl md:text-2xl text-blue-100">
+          LikeVoca의 최신 소식과 업데이트를 확인하세요
+        </p>
+      </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <!-- 중요 공지사항 -->
+      <section class="mb-12">
+        <div class="flex items-center mb-6">
+          <i class="fas fa-exclamation-triangle text-red-500 mr-3"></i>
+          <h2 class="text-2xl font-bold text-gray-900">중요 공지사항</h2>
+        </div>
+        
+        <div id="importantNotices" class="space-y-4">
+          <!-- 중요 공지사항이 여기에 동적으로 로드됩니다 -->
+        </div>
+      </section>
+
+      <!-- 일반 공지사항 -->
+      <section>
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center">
+            <i class="fas fa-list text-blue-500 mr-3"></i>
+            <h2 class="text-2xl font-bold text-gray-900">전체 공지사항</h2>
+          </div>
+          <div class="flex items-center space-x-4">
+            <select id="categoryFilter" onchange="filterNotices()" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+              <option value="all">전체</option>
+              <option value="update">업데이트</option>
+              <option value="event">이벤트</option>
+              <option value="maintenance">점검</option>
+              <option value="feature">새 기능</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="allNotices" class="space-y-6">
+          <!-- 전체 공지사항이 여기에 동적으로 로드됩니다 -->
+        </div>
+
+        <!-- 로딩 상태 -->
+        <div id="loadingSpinner" class="text-center py-12">
+          <i class="fas fa-spinner fa-spin text-3xl text-gray-400 mb-4"></i>
+          <p class="text-gray-600">공지사항을 불러오는 중...</p>
+        </div>
+
+        <!-- 공지사항이 없을 때 -->
+        <div id="emptyState" class="text-center py-12 hidden">
+          <i class="fas fa-inbox text-6xl text-gray-300 mb-6"></i>
+          <h3 class="text-xl font-semibold text-gray-700 mb-2">공지사항이 없습니다</h3>
+          <p class="text-gray-500">새로운 소식이 있을 때 알려드리겠습니다.</p>
+        </div>
+      </section>
+
+      <!-- 페이지네이션 -->
+      <div id="pagination" class="flex justify-center mt-12">
+        <!-- 페이지네이션이 여기에 동적으로 추가됩니다 -->
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer id="footer-container"></footer>
+
+    <!-- Scripts -->
+    <script type="module">
+      import { loadComponent } from '../../utils/component-loader.js';
+      
+      // 컴포넌트 로드
+      await loadComponent('#navbar-container', '../../components/navbar.html');
+      await loadComponent('#footer-container', '../../components/footer-ko.html');
+    </script>
+    <script type="module" src="../../js/notices/notices.js"></script>
+  </body>
+</html>

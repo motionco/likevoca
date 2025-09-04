@@ -70,6 +70,17 @@
 
         <!-- 매뉴얼 내용 -->
         <div class="lg:w-3/4">
+          <!-- 동적 콘텐츠 컨테이너 -->
+          <div id="dynamic-content-container">
+            <!-- 로딩 상태 -->
+            <div id="manual-loading" class="text-center py-12">
+              <i class="fas fa-spinner fa-spin text-3xl text-gray-400 mb-4"></i>
+              <p class="text-gray-600">매뉴얼을 불러오는 중...</p>
+            </div>
+          </div>
+          
+          <!-- 기존 정적 매뉴얼 (fallback) -->
+          <div id="static-manual-fallback" class="hidden">
           <!-- 시작하기 -->
           <section id="getting-started" class="manual-section bg-white rounded-xl p-8 shadow-lg mb-8">
             <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
@@ -379,8 +390,27 @@
           await applyLanguage();
           await updateMetadata('manual');
           
+          // 동적 콘텐츠 로드
+          const { ContentIntegration } = await import('../../js/content-integration.js');
+          const contentIntegration = new ContentIntegration();
+          await contentIntegration.initializePage('manual');
+          
+          // 로딩 스피너 숨김
+          const loadingElement = document.getElementById('manual-loading');
+          if (loadingElement) {
+            loadingElement.style.display = 'none';
+          }
+          
         } catch (error) {
-          console.error('언어 설정 적용 중 오류:', error);
+          console.error('페이지 초기화 중 오류:', error);
+          
+          // 오류 발생 시 정적 매뉴얼로 폴백
+          const dynamicContainer = document.getElementById('dynamic-content-container');
+          const staticFallback = document.getElementById('static-manual-fallback');
+          if (dynamicContainer && staticFallback) {
+            dynamicContainer.style.display = 'none';
+            staticFallback.classList.remove('hidden');
+          }
         }
       });
 

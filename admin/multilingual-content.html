@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌐 다국어 콘텐츠 관리 - LikeVoca Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Quill WYSIWYG Editor -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <style>
+        .content-card {
+            transition: all 0.2s ease;
+        }
+        .content-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .loading-skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* 상태 배지 스타일 */
+        .status-badge { @apply px-2 py-1 text-xs font-semibold rounded-full; }
+        .status-published { @apply bg-green-100 text-green-800; }
+        .status-draft { @apply bg-yellow-100 text-yellow-800; }
+        .status-archived { @apply bg-gray-100 text-gray-800; }
+        
+        /* 번역 상태 배지 */
+        .translation-badge { @apply px-2 py-1 text-xs font-medium rounded; }
+        .translation-updated { @apply bg-green-50 text-green-700 border border-green-200; }
+        .translation-outdated { @apply bg-orange-50 text-orange-700 border border-orange-200; }
+        .translation-missing { @apply bg-red-50 text-red-700 border border-red-200; }
+        
+        /* 콘텐츠 타입 배지 */
+        .content-type-badge { @apply px-2 py-1 text-xs font-medium rounded; }
+        .type-faq { @apply bg-blue-50 text-blue-700 border border-blue-200; }
+        .type-manual { @apply bg-green-50 text-green-700 border border-green-200; }
+        .type-guide { @apply bg-purple-50 text-purple-700 border border-purple-200; }
+        .type-notice { @apply bg-red-50 text-red-700 border border-red-200; }
+
+        /* 언어 배지 */
+        .language-badge { @apply px-2 py-1 text-xs font-medium rounded-full; }
+        .lang-ko { @apply bg-blue-100 text-blue-800; }
+        .lang-en { @apply bg-green-100 text-green-800; }
+        .lang-ja { @apply bg-red-100 text-red-800; }
+        .lang-zh { @apply bg-yellow-100 text-yellow-800; }
+        .lang-es { @apply bg-purple-100 text-purple-800; }
+
+        .quill-editor { min-height: 200px; }
+        .ql-editor { min-height: 200px; }
+        
+        /* 탭 스타일 */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .language-tab { @apply px-4 py-2 text-sm font-medium rounded-t-lg border-b-2; }
+        .language-tab.active { @apply bg-blue-50 border-blue-500 text-blue-600; }
+        .language-tab:not(.active) { @apply bg-gray-50 border-gray-200 text-gray-600 hover:text-gray-800; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <a href="../admin.html" class="text-gray-400 hover:text-gray-600 mr-4">
+                        <i class="fas fa-arrow-left text-xl"></i>
+                    </a>
+                    <i class="fas fa-globe text-2xl text-blue-600 mr-3"></i>
+                    <h1 class="text-2xl font-bold text-gray-900">다국어 콘텐츠 관리</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="showCreateModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+                        <i class="fas fa-plus mr-2"></i>새 콘텐츠
+                    </button>
+                    <button onclick="refreshContent()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition duration-200">
+                        <i class="fas fa-sync-alt mr-2"></i>새로고침
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- 필터 및 통계 -->
+        <div class="mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-white rounded-xl p-6 shadow-sm border-l-4 border-l-blue-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm">총 콘텐츠</p>
+                            <p id="totalContent" class="text-2xl font-bold text-blue-600">-</p>
+                        </div>
+                        <i class="fas fa-file-alt text-2xl text-blue-500"></i>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-6 shadow-sm border-l-4 border-l-green-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm">게시중</p>
+                            <p id="publishedContent" class="text-2xl font-bold text-green-600">-</p>
+                        </div>
+                        <i class="fas fa-eye text-2xl text-green-500"></i>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-6 shadow-sm border-l-4 border-l-yellow-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm">번역 필요</p>
+                            <p id="translationNeeded" class="text-2xl font-bold text-yellow-600">-</p>
+                        </div>
+                        <i class="fas fa-language text-2xl text-yellow-500"></i>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-6 shadow-sm border-l-4 border-l-purple-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm">언어 지원</p>
+                            <p id="languageSupport" class="text-2xl font-bold text-purple-600">5</p>
+                        </div>
+                        <i class="fas fa-globe text-2xl text-purple-500"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 필터 -->
+            <div class="bg-white rounded-xl p-4 shadow-sm mb-6">
+                <div class="flex flex-wrap items-center gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">콘텐츠 타입</label>
+                        <select id="contentTypeFilter" onchange="filterContent()" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="all">전체</option>
+                            <option value="faq">FAQ</option>
+                            <option value="manual">매뉴얼</option>
+                            <option value="guide">가이드</option>
+                            <option value="notice">공지사항</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">언어</label>
+                        <select id="languageFilter" onchange="filterContent()" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="all">전체 언어</option>
+                            <option value="ko">🇰🇷 한국어</option>
+                            <option value="en">🇺🇸 English</option>
+                            <option value="ja">🇯🇵 日本語</option>
+                            <option value="zh">🇨🇳 中文</option>
+                            <option value="es">🇪🇸 Español</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">상태</label>
+                        <select id="statusFilter" onchange="filterContent()" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="all">전체 상태</option>
+                            <option value="published">게시됨</option>
+                            <option value="draft">초안</option>
+                            <option value="archived">보관됨</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">번역 상태</label>
+                        <select id="translationFilter" onchange="filterContent()" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="all">전체</option>
+                            <option value="updated">최신</option>
+                            <option value="outdated">업데이트 필요</option>
+                            <option value="missing">번역 필요</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 콘텐츠 목록 -->
+        <div class="bg-white rounded-xl shadow-sm">
+            <div class="p-6 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">콘텐츠 목록</h3>
+            </div>
+            <div class="p-6">
+                <div id="contentList" class="space-y-4">
+                    <!-- 콘텐츠 목록이 여기에 동적으로 추가됩니다 -->
+                </div>
+                <div id="loadingSpinner" class="text-center py-8">
+                    <i class="fas fa-spinner fa-spin text-2xl text-gray-400"></i>
+                    <p class="text-gray-600 mt-2">콘텐츠를 불러오는 중...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 콘텐츠 생성/편집 모달 -->
+    <div id="contentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl max-w-4xl w-full max-h-screen overflow-y-auto">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <h2 id="modalTitle" class="text-xl font-semibold text-gray-900">새 콘텐츠 작성</h2>
+                        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="p-6">
+                    <!-- 작성 방식 선택 -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-3">작성 방식</label>
+                        <div class="flex space-x-4">
+                            <label class="flex items-center">
+                                <input type="radio" name="creationMode" value="individual" checked onchange="toggleCreationMode()" class="mr-2">
+                                <span class="text-sm">언어별 개별 작성</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="creationMode" value="auto_translate" onchange="toggleCreationMode()" class="mr-2">
+                                <span class="text-sm">기본 언어 작성 + 자동 번역</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 자동 번역 설정 -->
+                    <div id="autoTranslateSettings" class="mb-6 hidden">
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <div class="flex items-center mb-3">
+                                <i class="fas fa-language text-blue-600 mr-2"></i>
+                                <span class="font-medium text-blue-800">자동 번역 설정</span>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">원본 언어</label>
+                                    <select id="sourceLanguage" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                        <option value="ko">🇰🇷 한국어</option>
+                                        <option value="en">🇺🇸 English</option>
+                                        <option value="ja">🇯🇵 日本語</option>
+                                        <option value="zh">🇨🇳 中文</option>
+                                        <option value="es">🇪🇸 Español</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">번역 대상 언어</label>
+                                    <div class="space-y-2">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" name="targetLanguages" value="en" checked class="mr-2">
+                                            <span class="text-sm">🇺🇸 English</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" name="targetLanguages" value="ja" checked class="mr-2">
+                                            <span class="text-sm">🇯🇵 日本語</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" name="targetLanguages" value="zh" checked class="mr-2">
+                                            <span class="text-sm">🇨🇳 中文</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" name="targetLanguages" value="es" checked class="mr-2">
+                                            <span class="text-sm">🇪🇸 Español</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 기본 정보 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">콘텐츠 타입</label>
+                            <select id="contentType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="faq">FAQ</option>
+                                <option value="manual">사용자 매뉴얼</option>
+                                <option value="guide">학습 가이드</option>
+                                <option value="notice">공지사항</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">우선순위</label>
+                            <select id="priority" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="normal">일반</option>
+                                <option value="high">높음</option>
+                                <option value="urgent">긴급</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 언어별 탭 -->
+                    <div class="mb-6">
+                        <div class="border-b border-gray-200 mb-4">
+                            <nav class="-mb-px flex space-x-2" id="languageTabs">
+                                <button onclick="switchLanguageTab('ko')" class="language-tab active" data-lang="ko">
+                                    🇰🇷 한국어
+                                </button>
+                                <button onclick="switchLanguageTab('en')" class="language-tab" data-lang="en">
+                                    🇺🇸 English
+                                </button>
+                                <button onclick="switchLanguageTab('ja')" class="language-tab" data-lang="ja">
+                                    🇯🇵 日本語
+                                </button>
+                                <button onclick="switchLanguageTab('zh')" class="language-tab" data-lang="zh">
+                                    🇨🇳 中文
+                                </button>
+                                <button onclick="switchLanguageTab('es')" class="language-tab" data-lang="es">
+                                    🇪🇸 Español
+                                </button>
+                            </nav>
+                        </div>
+
+                        <!-- 언어별 콘텐츠 입력 -->
+                        <div id="languageContents">
+                            <!-- 한국어 -->
+                            <div class="tab-content active" data-lang="ko">
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">제목 (한국어)</label>
+                                        <input type="text" id="title_ko" placeholder="콘텐츠 제목을 입력하세요" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">내용 (한국어)</label>
+                                        <div id="editor_ko" class="quill-editor"></div>
+                                    </div>
+                                    <div class="flex items-center space-x-4">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" id="published_ko" class="mr-2">
+                                            <span class="text-sm">게시</span>
+                                        </label>
+                                        <div class="text-sm text-gray-600">
+                                            상태: <span class="font-medium" id="status_ko">초안</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 영어 -->
+                            <div class="tab-content" data-lang="en">
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Title (English)</label>
+                                        <input type="text" id="title_en" placeholder="Enter content title" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Content (English)</label>
+                                        <div id="editor_en" class="quill-editor"></div>
+                                    </div>
+                                    <div class="flex items-center space-x-4">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" id="published_en" class="mr-2">
+                                            <span class="text-sm">Publish</span>
+                                        </label>
+                                        <div class="text-sm text-gray-600">
+                                            Status: <span class="font-medium" id="status_en">Draft</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 일본어 -->
+                            <div class="tab-content" data-lang="ja">
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">タイトル (日本語)</label>
+                                        <input type="text" id="title_ja" placeholder="コンテンツのタイトルを入力" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">内容 (日本語)</label>
+                                        <div id="editor_ja" class="quill-editor"></div>
+                                    </div>
+                                    <div class="flex items-center space-x-4">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" id="published_ja" class="mr-2">
+                                            <span class="text-sm">公開</span>
+                                        </label>
+                                        <div class="text-sm text-gray-600">
+                                            状態: <span class="font-medium" id="status_ja">下書き</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 중국어 -->
+                            <div class="tab-content" data-lang="zh">
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">标题 (中文)</label>
+                                        <input type="text" id="title_zh" placeholder="请输入内容标题" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">内容 (中文)</label>
+                                        <div id="editor_zh" class="quill-editor"></div>
+                                    </div>
+                                    <div class="flex items-center space-x-4">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" id="published_zh" class="mr-2">
+                                            <span class="text-sm">发布</span>
+                                        </label>
+                                        <div class="text-sm text-gray-600">
+                                            状态: <span class="font-medium" id="status_zh">草稿</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 스페인어 -->
+                            <div class="tab-content" data-lang="es">
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Título (Español)</label>
+                                        <input type="text" id="title_es" placeholder="Ingrese el título del contenido" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Contenido (Español)</label>
+                                        <div id="editor_es" class="quill-editor"></div>
+                                    </div>
+                                    <div class="flex items-center space-x-4">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" id="published_es" class="mr-2">
+                                            <span class="text-sm">Publicar</span>
+                                        </label>
+                                        <div class="text-sm text-gray-600">
+                                            Estado: <span class="font-medium" id="status_es">Borrador</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 자동 번역 버튼 -->
+                    <div id="autoTranslateSection" class="mb-6 hidden">
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="font-medium text-yellow-800">자동 번역</h4>
+                                    <p class="text-sm text-yellow-700">기본 언어 콘텐츠를 다른 언어로 자동 번역합니다.</p>
+                                </div>
+                                <button onclick="performAutoTranslation()" class="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition duration-200">
+                                    <i class="fas fa-language mr-2"></i>자동 번역 실행
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 액션 버튼 -->
+                    <div class="flex justify-end space-x-3">
+                        <button onclick="closeModal()" class="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition duration-200">
+                            취소
+                        </button>
+                        <button onclick="saveContent()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200">
+                            <i class="fas fa-save mr-2"></i>저장
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Config -->
+    <script type="module" src="../js/firebase/firebase-init.js"></script>
+    <script type="module" src="js/admin-multilingual-content.js"></script>
+</body>
+</html>
