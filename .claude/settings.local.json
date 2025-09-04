@@ -3,7 +3,11 @@
     "allow": [
       "Bash(find:*)",
       "Bash(dir /b C:practicelikevocalocales)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Read(/C:\\practice\\likevoca\\admin/**)",
+      "Read(/C:\\practice\\likevoca\\admin\\js/**)",
+      "Read(/C:\\practice\\likevoca\\admin\\js/**)",
+      "Read(/C:\\practice\\likevoca\\admin\\js/**)"
     ],
     "deny": [],
     "ask": []

@@ -14,14 +14,22 @@ import {
 let db;
 let charts = {};
 
-// Firebase 초기화 대기
-window.addEventListener('firebaseInitialized', async (event) => {
-    db = event.detail.db;
-    console.log('📊 통계 대시보드 Firebase 연결 완료');
-    
-    // 초기 데이터 로드
-    await loadStatsData();
-});
+// Firebase 초기화 완료 확인 및 데이터 로드
+function initializeStatsBoard() {
+    // Firebase가 전역으로 초기화되었는지 확인
+    if (window.db) {
+        db = window.db;
+        console.log('📊 통계 대시보드 Firebase 연결 완료');
+        loadStatsData();
+    } else {
+        // Firebase 초기화를 기다림
+        console.log('⏳ Firebase 초기화 대기 중...');
+        setTimeout(initializeStatsBoard, 100);
+    }
+}
+
+// 페이지 로드 후 초기화
+window.addEventListener('DOMContentLoaded', initializeStatsBoard);
 
 // 통계 데이터 로드 함수
 async function loadStatsData() {

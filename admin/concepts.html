@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 개념 관리 - LikeVoca Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .concept-card {
+            transition: all 0.2s ease;
+        }
+        .concept-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .loading-skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .badge {
+            @apply px-2 py-1 text-xs font-semibold rounded-full;
+        }
+        .badge-beginner { @apply bg-green-100 text-green-800; }
+        .badge-intermediate { @apply bg-yellow-100 text-yellow-800; }
+        .badge-advanced { @apply bg-red-100 text-red-800; }
+        .badge-approved { @apply bg-blue-100 text-blue-800; }
+        .badge-pending { @apply bg-gray-100 text-gray-800; }
+        .concept-preview {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .modal-overlay {
+            backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <a href="../admin.html" class="text-gray-400 hover:text-gray-600 mr-4">
+                        <i class="fas fa-arrow-left text-xl"></i>
+                    </a>
+                    <i class="fas fa-book-open text-2xl text-green-600 mr-3"></i>
+                    <h1 class="text-2xl font-bold text-gray-900">개념 관리</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="showCreateConcept()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200">
+                        <i class="fas fa-plus mr-2"></i>새 개념 생성
+                    </button>
+                    <button onclick="refreshConcepts()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+                        <i class="fas fa-sync-alt mr-2"></i>새로고침
+                    </button>
+                    <span id="conceptCount" class="text-gray-600">총 - 개</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- 검색 및 필터 -->
+        <div class="bg-white rounded-xl p-6 shadow-sm mb-6">
+            <div class="flex flex-col lg:flex-row gap-4">
+                <div class="flex-1">
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input 
+                            type="text" 
+                            id="searchInput"
+                            placeholder="단어, 의미, 카테고리로 검색..." 
+                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                            onkeyup="handleSearch()"
+                        >
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <select id="languageFilter" onchange="applyFilters()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                        <option value="all">모든 언어</option>
+                        <option value="ko">한국어</option>
+                        <option value="en">영어</option>
+                        <option value="ja">일본어</option>
+                        <option value="zh">중국어</option>
+                    </select>
+                    <select id="categoryFilter" onchange="applyFilters()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                        <option value="all">모든 카테고리</option>
+                        <option value="daily">일상</option>
+                        <option value="business">비즈니스</option>
+                        <option value="academic">학술</option>
+                        <option value="casual">캐주얼</option>
+                    </select>
+                    <select id="difficultyFilter" onchange="applyFilters()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                        <option value="all">모든 난이도</option>
+                        <option value="beginner">초급</option>
+                        <option value="intermediate">중급</option>
+                        <option value="advanced">고급</option>
+                    </select>
+                    <select id="sortBy" onchange="applyFilters()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                        <option value="newest">최근 생성순</option>
+                        <option value="oldest">오래된 생성순</option>
+                        <option value="popularity">인기순</option>
+                        <option value="alphabetical">알파벳순</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 통계 카드 -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white rounded-xl p-6 shadow-sm border-l-4 border-l-blue-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">총 개념</p>
+                        <p id="totalConcepts" class="text-2xl font-bold text-blue-600">-</p>
+                    </div>
+                    <i class="fas fa-book text-2xl text-blue-500"></i>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-6 shadow-sm border-l-4 border-l-green-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">승인된 개념</p>
+                        <p id="approvedConcepts" class="text-2xl font-bold text-green-600">-</p>
+                    </div>
+                    <i class="fas fa-check-circle text-2xl text-green-500"></i>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-6 shadow-sm border-l-4 border-l-yellow-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">대기 중</p>
+                        <p id="pendingConcepts" class="text-2xl font-bold text-yellow-600">-</p>
+                    </div>
+                    <i class="fas fa-clock text-2xl text-yellow-500"></i>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-6 shadow-sm border-l-4 border-l-red-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">인기 개념</p>
+                        <p id="popularConcepts" class="text-2xl font-bold text-red-600">-</p>
+                    </div>
+                    <i class="fas fa-fire text-2xl text-red-500"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- 대량 작업 도구 -->
+        <div id="bulkActions" class="hidden bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas fa-info-circle text-yellow-600 mr-2"></i>
+                    <span class="text-yellow-800">
+                        <span id="selectedCount">0</span>개 개념이 선택되었습니다
+                    </span>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="bulkApprove()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200">
+                        <i class="fas fa-check mr-1"></i>일괄 승인
+                    </button>
+                    <button onclick="bulkReject()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-200">
+                        <i class="fas fa-times mr-1"></i>일괄 거부
+                    </button>
+                    <button onclick="bulkDelete()" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition duration-200">
+                        <i class="fas fa-trash mr-1"></i>일괄 삭제
+                    </button>
+                    <button onclick="clearSelection()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition duration-200">
+                        선택 해제
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 개념 목록 -->
+        <div class="bg-white rounded-xl shadow-sm">
+            <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+                <h2 class="text-xl font-bold text-gray-900">개념 목록</h2>
+                <div class="flex items-center space-x-4">
+                    <label class="flex items-center">
+                        <input type="checkbox" id="selectAll" onchange="toggleSelectAll()" class="mr-2">
+                        <span class="text-sm text-gray-600">전체 선택</span>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- 로딩 상태 -->
+            <div id="loadingConcepts" class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="concept-card border border-gray-200 rounded-lg p-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-12 h-12 rounded-lg loading-skeleton"></div>
+                            <div class="flex-1">
+                                <div class="h-4 w-3/4 loading-skeleton rounded mb-2"></div>
+                                <div class="h-3 w-1/2 loading-skeleton rounded mb-2"></div>
+                                <div class="h-3 w-full loading-skeleton rounded"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="concept-card border border-gray-200 rounded-lg p-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-12 h-12 rounded-lg loading-skeleton"></div>
+                            <div class="flex-1">
+                                <div class="h-4 w-3/4 loading-skeleton rounded mb-2"></div>
+                                <div class="h-3 w-1/2 loading-skeleton rounded mb-2"></div>
+                                <div class="h-3 w-full loading-skeleton rounded"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 개념 목록 컨테이너 -->
+            <div id="conceptsList" class="hidden p-6">
+                <!-- JavaScript로 동적 생성 -->
+            </div>
+
+            <!-- 에러 상태 -->
+            <div id="conceptsError" class="hidden p-6 text-center">
+                <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
+                <p class="text-gray-600 mb-4">개념 목록을 불러오는데 실패했습니다.</p>
+                <button onclick="refreshConcepts()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                    다시 시도
+                </button>
+            </div>
+
+            <!-- 페이지네이션 -->
+            <div id="pagination" class="hidden p-6 border-t border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div class="text-sm text-gray-600">
+                        <span id="paginationInfo">1-20 / 총 - 개</span>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button id="prevPage" onclick="changePage(-1)" class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button id="nextPage" onclick="changePage(1)" class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50" disabled>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 개념 상세/편집 모달 -->
+    <div id="conceptModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 modal-overlay flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl max-w-6xl w-full mx-4 max-h-[95vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+                <h3 id="modalTitle" class="text-xl font-bold text-gray-900">개념 상세 정보</h3>
+                <button onclick="closeConceptModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div id="conceptModalContent" class="p-6">
+                <!-- JavaScript로 동적 생성 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 개념 생성 모달 -->
+    <div id="createConceptModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 modal-overlay flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl max-w-4xl w-full mx-4 max-h-[95vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+                <h3 class="text-xl font-bold text-gray-900">새 개념 생성</h3>
+                <button onclick="closeCreateModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div id="createConceptContent" class="p-6">
+                <!-- JavaScript로 동적 생성 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Config -->
+    <script type="module" src="../js/firebase/firebase-init.js"></script>
+    <script type="module" src="js/admin-concepts.js"></script>
+</body>
+</html>

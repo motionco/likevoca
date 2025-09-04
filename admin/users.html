@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👥 사용자 관리 - LikeVoca Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .user-card {
+            transition: all 0.2s ease;
+        }
+        .user-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .loading-skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .badge {
+            @apply px-2 py-1 text-xs font-semibold rounded-full;
+        }
+        .badge-active { @apply bg-green-100 text-green-800; }
+        .badge-inactive { @apply bg-gray-100 text-gray-800; }
+        .badge-admin { @apply bg-purple-100 text-purple-800; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <a href="../admin.html" class="text-gray-400 hover:text-gray-600 mr-4">
+                        <i class="fas fa-arrow-left text-xl"></i>
+                    </a>
+                    <i class="fas fa-users text-2xl text-blue-600 mr-3"></i>
+                    <h1 class="text-2xl font-bold text-gray-900">사용자 관리</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="refreshUsers()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+                        <i class="fas fa-sync-alt mr-2"></i>새로고침
+                    </button>
+                    <span id="userCount" class="text-gray-600">총 - 명</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- 검색 및 필터 -->
+        <div class="bg-white rounded-xl p-6 shadow-sm mb-6">
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="flex-1">
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input 
+                            type="text" 
+                            id="searchInput"
+                            placeholder="이메일 또는 이름으로 검색..." 
+                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            onkeyup="handleSearch()"
+                        >
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <select id="statusFilter" onchange="applyFilters()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="all">모든 상태</option>
+                        <option value="active">활성</option>
+                        <option value="inactive">비활성</option>
+                        <option value="admin">관리자</option>
+                    </select>
+                    <select id="sortBy" onchange="applyFilters()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="newest">최근 가입순</option>
+                        <option value="oldest">오래된 가입순</option>
+                        <option value="email">이메일순</option>
+                        <option value="activity">최근 활동순</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 통계 카드 -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white rounded-xl p-6 shadow-sm border-l-4 border-l-blue-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">총 사용자</p>
+                        <p id="totalUsersCount" class="text-2xl font-bold text-blue-600">-</p>
+                    </div>
+                    <i class="fas fa-users text-2xl text-blue-500"></i>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-6 shadow-sm border-l-4 border-l-green-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">활성 사용자</p>
+                        <p id="activeUsersCount" class="text-2xl font-bold text-green-600">-</p>
+                    </div>
+                    <i class="fas fa-user-check text-2xl text-green-500"></i>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-6 shadow-sm border-l-4 border-l-yellow-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">이번 주 신규</p>
+                        <p id="weeklyNewUsers" class="text-2xl font-bold text-yellow-600">-</p>
+                    </div>
+                    <i class="fas fa-user-plus text-2xl text-yellow-500"></i>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-6 shadow-sm border-l-4 border-l-purple-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">관리자</p>
+                        <p id="adminUsersCount" class="text-2xl font-bold text-purple-600">-</p>
+                    </div>
+                    <i class="fas fa-shield-alt text-2xl text-purple-500"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- 사용자 목록 -->
+        <div class="bg-white rounded-xl shadow-sm">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-xl font-bold text-gray-900">사용자 목록</h2>
+            </div>
+            
+            <!-- 로딩 상태 -->
+            <div id="loadingUsers" class="p-6">
+                <div class="space-y-4">
+                    <div class="user-card border border-gray-200 rounded-lg p-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 rounded-full loading-skeleton"></div>
+                                <div>
+                                    <div class="h-4 w-48 loading-skeleton rounded mb-2"></div>
+                                    <div class="h-3 w-32 loading-skeleton rounded"></div>
+                                </div>
+                            </div>
+                            <div class="h-6 w-16 loading-skeleton rounded"></div>
+                        </div>
+                    </div>
+                    <div class="user-card border border-gray-200 rounded-lg p-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 rounded-full loading-skeleton"></div>
+                                <div>
+                                    <div class="h-4 w-48 loading-skeleton rounded mb-2"></div>
+                                    <div class="h-3 w-32 loading-skeleton rounded"></div>
+                                </div>
+                            </div>
+                            <div class="h-6 w-16 loading-skeleton rounded"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 사용자 목록 컨테이너 -->
+            <div id="usersList" class="hidden p-6">
+                <!-- JavaScript로 동적 생성 -->
+            </div>
+
+            <!-- 에러 상태 -->
+            <div id="usersError" class="hidden p-6 text-center">
+                <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
+                <p class="text-gray-600 mb-4">사용자 목록을 불러오는데 실패했습니다.</p>
+                <button onclick="refreshUsers()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                    다시 시도
+                </button>
+            </div>
+
+            <!-- 페이지네이션 -->
+            <div id="pagination" class="hidden p-6 border-t border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div class="text-sm text-gray-600">
+                        <span id="paginationInfo">1-20 / 총 - 명</span>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button id="prevPage" onclick="changePage(-1)" class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button id="nextPage" onclick="changePage(1)" class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50" disabled>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 사용자 상세 모달 -->
+    <div id="userDetailModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+                <h3 class="text-xl font-bold text-gray-900">사용자 상세 정보</h3>
+                <button onclick="closeUserDetail()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div id="userDetailContent" class="p-6">
+                <!-- JavaScript로 동적 생성 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Config -->
+    <script type="module" src="../js/firebase/firebase-init.js"></script>
+    <script type="module" src="js/admin-users.js"></script>
+</body>
+</html>
