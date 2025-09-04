@@ -387,6 +387,10 @@ function createConceptCard(concept) {
             <i class="fas fa-heart text-gray-400"></i>
             <span class="like-count text-xs ml-1">0</span>
           </button>
+          <div class="view-count-display p-2 rounded-full hover:bg-gray-100 transition-colors duration-200 cursor-default" title="조회수">
+            <i class="fas fa-eye text-gray-500"></i>
+            <span class="view-count text-xs ml-1">0</span>
+          </div>
           ` : `
           <button 
             class="like-display-btn p-2 rounded-full hover:bg-gray-100 transition-colors duration-200" 
@@ -396,6 +400,10 @@ function createConceptCard(concept) {
             <i class="fas fa-heart text-gray-400"></i>
             <span class="like-count text-xs ml-1">0</span>
           </button>
+          <div class="view-count-display p-2 rounded-full hover:bg-gray-100 transition-colors duration-200 cursor-default" title="조회수">
+            <i class="fas fa-eye text-gray-500"></i>
+            <span class="view-count text-xs ml-1">0</span>
+          </div>
           `}
         <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
           ${getTranslatedDomainCategory(
@@ -628,7 +636,37 @@ async function toggleLike(conceptId) {
         updated_at: new Date().toISOString()
       });
 
-      // 해당 개념의 전체 좋아요 수 계산
+      // concept_stats 컬렉션 업데이트 (집계 데이터)
+      const statsRef = doc(db, "concept_stats", conceptId);
+      const increment = isCurrentlyLiked ? -1 : 1;
+      
+      try {
+        const statsDoc = await getDoc(statsRef);
+        
+        if (!statsDoc.exists()) {
+          // 첫 좋아요인 경우 문서 생성
+          await setDoc(statsRef, {
+            concept_id: conceptId,
+            like_count: Math.max(1, increment), // 최소 0으로 유지
+            view_count: 0, // 조회수 초기값
+            updated_at: new Date().toISOString()
+          });
+        } else {
+          // 기존 문서 업데이트
+          const currentCount = statsDoc.data().like_count || 0;
+          const newCount = Math.max(0, currentCount + increment); // 음수 방지
+          
+          await updateDoc(statsRef, {
+            like_count: newCount,
+            updated_at: new Date().toISOString()
+          });
+        }
+      } catch (statsError) {
+        console.error('좋아요 통계 업데이트 실패:', statsError);
+        // 통계 업데이트 실패해도 좋아요 기능 자체는 동작하도록
+      }
+
+      // 업데이트된 좋아요 수 가져오기
       const likeCount = await getLikeCount(conceptId);
 
       // UI 업데이트 with 애니메이션
@@ -675,9 +713,79 @@ async function toggleLike(conceptId) {
   }
 }
 
-// 개념 카드 클릭 시 모달 열기 함수 (클릭 추적 제거)
-function handleConceptClick(conceptId, sourceLanguage, targetLanguage) {
+// 조회수 증가 함수 (세션 기반 중복 방지)
+async function incrementViewCount(conceptId) {
   try {
+    // 세션 스토리지에서 이미 조회한 개념들 확인
+    const sessionKey = 'viewed_concepts';
+    const viewedConcepts = JSON.parse(sessionStorage.getItem(sessionKey) || '[]');
+    
+    // 이미 이번 세션에서 조회한 개념이면 카운트하지 않음
+    if (viewedConcepts.includes(conceptId)) {
+      console.log(`이미 조회한 개념입니다: ${conceptId}`);
+      return;
+    }
+    
+    const statsRef = doc(db, "concept_stats", conceptId);
+    
+    // 현재 통계 가져오기
+    const statsDoc = await getDoc(statsRef);
+    
+    if (!statsDoc.exists()) {
+      // 첫 조회인 경우 문서 생성
+      await setDoc(statsRef, {
+        concept_id: conceptId,
+        like_count: 0,
+        view_count: 1,
+        updated_at: new Date().toISOString()
+      });
+    } else {
+      // 조회수 증가
+      const currentViewCount = statsDoc.data().view_count || 0;
+      await updateDoc(statsRef, {
+        view_count: currentViewCount + 1,
+        updated_at: new Date().toISOString()
+      });
+    }
+    
+    // 세션 스토리지에 조회한 개념 추가
+    viewedConcepts.push(conceptId);
+    sessionStorage.setItem(sessionKey, JSON.stringify(viewedConcepts));
+    
+    console.log(`조회수 증가: ${conceptId}`);
+    
+  } catch (error) {
+    console.error('조회수 업데이트 실패:', error);
+    // 조회수 업데이트 실패해도 모달은 정상 동작하도록
+  }
+}
+
+// 조회수 조회 함수 (집계 컬렉션 방식)
+async function getViewCount(conceptId) {
+  try {
+    const statsRef = doc(db, "concept_stats", conceptId);
+    const statsDoc = await getDoc(statsRef);
+    
+    if (statsDoc.exists()) {
+      return statsDoc.data().view_count || 0;
+    }
+    
+    return 0;
+  } catch (error) {
+    console.error('조회수 조회 실패:', error);
+    return 0;
+  }
+}
+
+// 개념 카드 클릭 시 모달 열기 함수 (조회수 증가 + 통계 추적)
+async function handleConceptClick(conceptId, sourceLanguage, targetLanguage) {
+  try {
+    // 조회수 증가
+    await incrementViewCount(conceptId);
+    
+    // 통계 추적 (비동기로 성능 영향 최소화)
+    trackConceptView(sourceLanguage, targetLanguage);
+    
     // 모달 열기
     const concept = window.allConcepts.find(c => 
       c.id === conceptId || c._id === conceptId
@@ -871,6 +979,9 @@ function displayConceptList() {
   
   // 좋아요 상태 업데이트
   updateLikeStates();
+  
+  // 조회수 업데이트
+  updateViewCounts();
 
   // 더 보기 버튼 표시/숨김
   if (loadMoreBtn) {
@@ -921,13 +1032,14 @@ async function updateBookmarkStates() {
 // 좋아요 수 계산 함수 (users 컬렉션 사용)
 async function getLikeCount(conceptId) {
   try {
-    const q = query(
-      collection(db, "users"),
-      where("liked_concepts", "array-contains", conceptId)
-    );
+    const statsRef = doc(db, "concept_stats", conceptId);
+    const statsDoc = await getDoc(statsRef);
     
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.size;
+    if (statsDoc.exists()) {
+      return statsDoc.data().like_count || 0;
+    }
+    
+    return 0;
     
   } catch (error) {
     console.error('좋아요 수 계산 중 오류 발생:', error);
@@ -970,7 +1082,7 @@ async function getLikeInfo(conceptId) {
   }
 }
 
-// 여러 개념의 좋아요 정보 한번에 가져오기 (users 컬렉션 사용)
+// 여러 개념의 좋아요 + 조회수 정보 한번에 가져오기 (concept_stats 컬렉션 사용 - 효율적!)
 async function getBatchLikeInfo(conceptIds) {
   if (!conceptIds || conceptIds.length === 0) {
     return {};
@@ -991,41 +1103,93 @@ async function getBatchLikeInfo(conceptIds) {
       }
     }
 
-    const likeInfoMap = {};
+    const infoMap = {};
     
-    // 각 개념의 좋아요 수를 병렬로 계산
-    const likeCountPromises = conceptIds.map(async (conceptId) => {
+    // concept_stats 컬렉션에서 배치로 좋아요수 + 조회수 가져오기 (훨씬 효율적!)
+    const statsPromises = conceptIds.map(async (conceptId) => {
       try {
-        const likeCount = await getLikeCount(conceptId);
-        return { conceptId, likeCount };
+        const statsRef = doc(db, "concept_stats", conceptId);
+        const statsDoc = await getDoc(statsRef);
+        
+        const likeCount = statsDoc.exists() ? (statsDoc.data().like_count || 0) : 0;
+        const viewCount = statsDoc.exists() ? (statsDoc.data().view_count || 0) : 0;
+        
+        return { conceptId, likeCount, viewCount };
       } catch (error) {
-        console.error(`좋아요 수 계산 실패 (${conceptId}):`, error);
-        return { conceptId, likeCount: 0 };
+        console.error(`통계 조회 실패 (${conceptId}):`, error);
+        return { conceptId, likeCount: 0, viewCount: 0 };
       }
     });
 
-    const likeCountResults = await Promise.all(likeCountPromises);
+    const statsResults = await Promise.all(statsPromises);
     
     // 결과 맵 생성
-    likeCountResults.forEach(({ conceptId, likeCount }) => {
-      likeInfoMap[conceptId] = {
+    statsResults.forEach(({ conceptId, likeCount, viewCount }) => {
+      infoMap[conceptId] = {
         liked: userLikedConcepts.includes(conceptId),
-        likeCount: likeCount
+        likeCount: likeCount,
+        viewCount: viewCount
       };
     });
     
-    return likeInfoMap;
+    return infoMap;
 
   } catch (error) {
-    console.error('배치 좋아요 정보 가져오기 중 오류 발생:', error);
+    console.error('배치 통계 정보 가져오기 중 오류 발생:', error);
     
     // 오류 시 기본값 반환
     const defaultMap = {};
     conceptIds.forEach(conceptId => {
       defaultMap[conceptId] = {
         liked: false,
-        likeCount: 0
+        likeCount: 0,
+        viewCount: 0
       };
+    });
+    return defaultMap;
+  }
+}
+
+// 여러 개념의 조회수 정보 한번에 가져오기 (concept_stats 컬렉션 사용)
+async function getBatchViewInfo(conceptIds) {
+  if (!conceptIds || conceptIds.length === 0) {
+    return {};
+  }
+
+  try {
+    const viewInfoMap = {};
+    
+    // concept_stats 컬렉션에서 배치로 조회수 가져오기
+    const statsPromises = conceptIds.map(async (conceptId) => {
+      try {
+        const statsRef = doc(db, "concept_stats", conceptId);
+        const statsDoc = await getDoc(statsRef);
+        
+        const viewCount = statsDoc.exists() ? (statsDoc.data().view_count || 0) : 0;
+        
+        return { conceptId, viewCount };
+      } catch (error) {
+        console.error(`조회수 통계 조회 실패 (${conceptId}):`, error);
+        return { conceptId, viewCount: 0 };
+      }
+    });
+
+    const statsResults = await Promise.all(statsPromises);
+    
+    // 결과 맵 생성
+    statsResults.forEach(({ conceptId, viewCount }) => {
+      viewInfoMap[conceptId] = viewCount;
+    });
+    
+    return viewInfoMap;
+
+  } catch (error) {
+    console.error('배치 조회수 정보 가져오기 중 오류 발생:', error);
+    
+    // 오류 시 기본값 반환
+    const defaultMap = {};
+    conceptIds.forEach(conceptId => {
+      defaultMap[conceptId] = 0;
     });
     return defaultMap;
   }
@@ -1043,13 +1207,13 @@ async function updateLikeStates() {
 
     if (conceptIds.length === 0) return;
 
-    // 배치로 좋아요 정보 가져오기
-    const likeInfoMap = await getBatchLikeInfo(conceptIds);
+    // 배치로 좋아요 + 조회수 정보 가져오기
+    const infoMap = await getBatchLikeInfo(conceptIds);
     
     // UI 업데이트
     conceptIds.forEach(conceptId => {
-      const likeInfo = likeInfoMap[conceptId];
-      if (!likeInfo) return;
+      const info = infoMap[conceptId];
+      if (!info) return;
 
       // 좋아요 버튼 업데이트 (로그인 사용자용)
       const likeButton = document.querySelector(`.like-btn[data-concept-id="${conceptId}"]`);
@@ -1057,18 +1221,18 @@ async function updateLikeStates() {
         const icon = likeButton.querySelector("i");
         const countSpan = likeButton.querySelector(".like-count");
         
-        if (likeInfo.liked) {
+        if (info.liked) {
           icon.className = "fas fa-heart text-red-500";
         } else {
           icon.className = "fas fa-heart text-gray-400";
         }
-        countSpan.textContent = likeInfo.likeCount;
+        countSpan.textContent = info.likeCount;
       }
 
       // 좋아요 표시 업데이트 (비로그인 사용자용)
       const likeDisplay = document.querySelector(`.like-display[data-concept-id="${conceptId}"] .like-count`);
       if (likeDisplay) {
-        likeDisplay.textContent = likeInfo.likeCount;
+        likeDisplay.textContent = info.likeCount;
       }
 
       // 부모 요소에서 찾기
@@ -1076,16 +1240,258 @@ async function updateLikeStates() {
       if (conceptCard) {
         const likeCountSpan = conceptCard.querySelector(".like-count");
         if (likeCountSpan) {
-          likeCountSpan.textContent = likeInfo.likeCount;
+          likeCountSpan.textContent = info.likeCount;
+        }
+        
+        // 조회수 업데이트
+        const viewCountSpan = conceptCard.querySelector(".view-count");
+        if (viewCountSpan) {
+          viewCountSpan.textContent = info.viewCount;
         }
       }
 
       // 캐시 업데이트
-      likeInfoCache[conceptId] = likeInfo;
+      likeInfoCache[conceptId] = {
+        liked: info.liked,
+        likeCount: info.likeCount
+      };
     });
 
   } catch (error) {
     console.error("좋아요 상태 업데이트 실패:", error);
+  }
+}
+
+// 익명 통계 추적 함수들
+
+// 브라우저 환경 정보 수집 (완전 익명)
+function getBrowserInfo() {
+  const ua = navigator.userAgent;
+  let browser = 'unknown';
+  
+  if (ua.includes('Chrome') && !ua.includes('Edg')) browser = 'chrome';
+  else if (ua.includes('Firefox')) browser = 'firefox';
+  else if (ua.includes('Safari') && !ua.includes('Chrome')) browser = 'safari';
+  else if (ua.includes('Edg')) browser = 'edge';
+  
+  return browser;
+}
+
+// 디바이스 타입 감지 (완전 익명)
+function getDeviceType() {
+  const width = window.innerWidth;
+  if (width < 768) return 'mobile';
+  if (width < 1024) return 'tablet';
+  return 'desktop';
+}
+
+// 유입 경로 추출 (개인정보 제거)
+function getReferrerDomain() {
+  const referrer = document.referrer;
+  if (!referrer) return 'direct';
+  
+  try {
+    const domain = new URL(referrer).hostname;
+    // 개인정보가 포함될 수 있는 도메인은 'other'로 처리
+    const allowedDomains = ['google.com', 'naver.com', 'daum.net', 'bing.com', 'yahoo.com'];
+    const mainDomain = domain.replace('www.', '').split('.').slice(-2).join('.');
+    
+    return allowedDomains.includes(mainDomain) ? mainDomain : 'other';
+  } catch (error) {
+    return 'direct';
+  }
+}
+
+// 시스템 언어 추출 (개인정보 아님)
+function getUserLanguage() {
+  const lang = navigator.language || navigator.userLanguage;
+  return lang.split('-')[0]; // 'ko-KR' -> 'ko'
+}
+
+// 사이트 방문 통계 추적 (세션 기반 중복 방지)
+async function trackSiteVisit() {
+  try {
+    // 세션 스토리지에서 이미 추적했는지 확인
+    const sessionKey = 'site_visit_tracked';
+    if (sessionStorage.getItem(sessionKey)) {
+      return; // 이미 이번 세션에서 추적함
+    }
+    
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    const statsRef = doc(db, "stats", `daily_${today}`);
+    
+    // 현재 통계 가져오기
+    const statsDoc = await getDoc(statsRef);
+    const currentData = statsDoc.exists() ? statsDoc.data() : {};
+    
+    // 새로운 통계 데이터 생성
+    const updateData = {
+      type: "daily_stats",
+      date: today,
+      visitors: (currentData.visitors || 0) + 1,
+      concept_views: currentData.concept_views || 0,
+      
+      // 언어쌍 학습 통계 (초기화)
+      language_learning: currentData.language_learning || {},
+      
+      // 시스템 언어 사용자
+      user_languages: {
+        ...currentData.user_languages,
+        [getUserLanguage()]: (currentData.user_languages?.[getUserLanguage()] || 0) + 1
+      },
+      
+      // 유입 경로
+      referrers: {
+        ...currentData.referrers,
+        [getReferrerDomain()]: (currentData.referrers?.[getReferrerDomain()] || 0) + 1
+      },
+      
+      // 디바이스 유형
+      devices: {
+        ...currentData.devices,
+        [getDeviceType()]: (currentData.devices?.[getDeviceType()] || 0) + 1
+      },
+      
+      // 브라우저
+      browsers: {
+        ...currentData.browsers,
+        [getBrowserInfo()]: (currentData.browsers?.[getBrowserInfo()] || 0) + 1
+      },
+      
+      updated_at: new Date().toISOString()
+    };
+    
+    // 통계 업데이트
+    if (statsDoc.exists()) {
+      await updateDoc(statsRef, updateData);
+    } else {
+      await setDoc(statsRef, updateData);
+    }
+    
+    // 세션 스토리지에 추적 완료 표시
+    sessionStorage.setItem(sessionKey, 'true');
+    
+    console.log(`사이트 방문 통계 추적 완료: ${today}`);
+    
+  } catch (error) {
+    console.error('사이트 방문 통계 추적 실패:', error);
+  }
+}
+
+// 개념 조회 통계 추적 (언어쌍 학습 패턴)
+async function trackConceptView(sourceLanguage, targetLanguage) {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const statsRef = doc(db, "stats", `daily_${today}`);
+    
+    // 언어쌍 키 생성 (예: "ko_en", "en_ko")
+    const languagePair = `${sourceLanguage}_${targetLanguage}`;
+    
+    const statsDoc = await getDoc(statsRef);
+    const currentData = statsDoc.exists() ? statsDoc.data() : {};
+    
+    const updateData = {
+      concept_views: (currentData.concept_views || 0) + 1,
+      language_learning: {
+        ...currentData.language_learning,
+        [languagePair]: (currentData.language_learning?.[languagePair] || 0) + 1
+      },
+      updated_at: new Date().toISOString()
+    };
+    
+    if (statsDoc.exists()) {
+      await updateDoc(statsRef, updateData);
+    } else {
+      // 문서가 없으면 기본 구조와 함께 생성
+      await setDoc(statsRef, {
+        type: "daily_stats",
+        date: today,
+        visitors: 0,
+        ...updateData
+      });
+    }
+    
+    console.log(`개념 조회 통계 추적: ${languagePair}`);
+    
+  } catch (error) {
+    console.error('개념 조회 통계 추적 실패:', error);
+  }
+}
+
+// 페이지 조회 통계 추적
+async function trackPageView(pagePath) {
+  try {
+    // 세션 기반 중복 방지
+    const sessionKey = `page_view_${pagePath}`;
+    if (sessionStorage.getItem(sessionKey)) {
+      return;
+    }
+    
+    const today = new Date().toISOString().split('T')[0];
+    const statsRef = doc(db, "stats", `daily_${today}`);
+    
+    const statsDoc = await getDoc(statsRef);
+    const currentData = statsDoc.exists() ? statsDoc.data() : {};
+    
+    const updateData = {
+      page_views: {
+        ...currentData.page_views,
+        [pagePath]: (currentData.page_views?.[pagePath] || 0) + 1
+      },
+      updated_at: new Date().toISOString()
+    };
+    
+    if (statsDoc.exists()) {
+      await updateDoc(statsRef, updateData);
+    } else {
+      await setDoc(statsRef, {
+        type: "daily_stats",
+        date: today,
+        visitors: 0,
+        concept_views: 0,
+        ...updateData
+      });
+    }
+    
+    sessionStorage.setItem(sessionKey, 'true');
+    console.log(`페이지 조회 통계 추적: ${pagePath}`);
+    
+  } catch (error) {
+    console.error('페이지 조회 통계 추적 실패:', error);
+  }
+}
+
+// 조회수 업데이트 함수
+async function updateViewCounts() {
+  try {
+    const conceptElements = document.querySelectorAll(".concept-card");
+    const conceptIds = Array.from(conceptElements).map(element => {
+      const onclick = element.getAttribute("onclick");
+      const match = onclick?.match(/handleConceptClick\('([^']+)'/);
+      return match ? match[1] : null;
+    }).filter(id => id);
+
+    if (conceptIds.length === 0) return;
+
+    // 배치로 조회수 정보 가져오기
+    const viewInfoMap = await getBatchViewInfo(conceptIds);
+    
+    // UI 업데이트
+    conceptIds.forEach(conceptId => {
+      const viewCount = viewInfoMap[conceptId] || 0;
+      
+      // 조회수 표시 업데이트
+      const conceptCard = document.querySelector(`[onclick*="${conceptId}"]`);
+      if (conceptCard) {
+        const viewCountSpan = conceptCard.querySelector(".view-count");
+        if (viewCountSpan) {
+          viewCountSpan.textContent = viewCount;
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error("조회수 업데이트 실패:", error);
   }
 }
 
@@ -1237,6 +1643,13 @@ async function fetchAndDisplayConcepts() {
           allConcepts.push(data);
         }
       });
+
+      // 사이트 방문 통계 추적 (페이지 로드 시)
+      await trackSiteVisit();
+      
+      // 페이지 조회 통계 추적
+      const currentPath = window.location.pathname;
+      await trackPageView(currentPath);
 
       if (allConcepts.length === 0) {
         // 빈 상태 표시

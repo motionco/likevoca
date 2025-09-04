@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 통계 대시보드 - LikeVoca</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 2rem;
+        }
+        .loading {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <i class="fas fa-chart-line text-2xl text-blue-600 mr-3"></i>
+                    <h1 class="text-2xl font-bold text-gray-900">LikeVoca 통계 대시보드</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="refreshData()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+                        <i class="fas fa-sync-alt mr-2"></i>새로고침
+                    </button>
+                    <a href="../pages/vocabulary.html" class="text-gray-600 hover:text-gray-900">
+                        <i class="fas fa-home mr-2"></i>메인으로
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Loading Indicator -->
+        <div id="loading" class="text-center py-12 loading">
+            <i class="fas fa-spinner fa-spin text-4xl text-blue-600 mb-4"></i>
+            <p class="text-gray-600">통계 데이터를 불러오는 중...</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div id="statsCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 hidden">
+            <!-- 총 방문자 수 -->
+            <div class="stat-card rounded-xl p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-blue-100">총 방문자</p>
+                        <p id="totalVisitors" class="text-3xl font-bold">-</p>
+                    </div>
+                    <i class="fas fa-users text-4xl text-blue-200"></i>
+                </div>
+            </div>
+
+            <!-- 오늘 방문자 -->
+            <div class="bg-green-500 rounded-xl p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-green-100">오늘 방문자</p>
+                        <p id="todayVisitors" class="text-3xl font-bold">-</p>
+                    </div>
+                    <i class="fas fa-user-clock text-4xl text-green-200"></i>
+                </div>
+            </div>
+
+            <!-- 총 개념 조회 -->
+            <div class="bg-purple-500 rounded-xl p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-purple-100">총 개념 조회</p>
+                        <p id="totalConceptViews" class="text-3xl font-bold">-</p>
+                    </div>
+                    <i class="fas fa-eye text-4xl text-purple-200"></i>
+                </div>
+            </div>
+
+            <!-- 총 좋아요 -->
+            <div class="bg-red-500 rounded-xl p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-red-100">총 좋아요</p>
+                        <p id="totalLikes" class="text-3xl font-bold">-</p>
+                    </div>
+                    <i class="fas fa-heart text-4xl text-red-200"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div id="chartsContainer" class="hidden">
+            <!-- 일별 방문자 추이 -->
+            <div class="bg-white rounded-xl p-6 shadow-sm mb-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-chart-line text-blue-600 mr-2"></i>
+                    일별 방문자 추이 (최근 7일)
+                </h2>
+                <div class="chart-container">
+                    <canvas id="dailyVisitorsChart"></canvas>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- 언어별 사용자 분포 -->
+                <div class="bg-white rounded-xl p-6 shadow-sm">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-globe text-green-600 mr-2"></i>
+                        시스템 언어 사용자
+                    </h2>
+                    <div class="chart-container">
+                        <canvas id="userLanguagesChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- 디바이스 타입 분포 -->
+                <div class="bg-white rounded-xl p-6 shadow-sm">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-mobile-alt text-purple-600 mr-2"></i>
+                        디바이스 타입
+                    </h2>
+                    <div class="chart-container">
+                        <canvas id="devicesChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- 브라우저 분포 -->
+                <div class="bg-white rounded-xl p-6 shadow-sm">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-window-restore text-orange-600 mr-2"></i>
+                        브라우저 분포
+                    </h2>
+                    <div class="chart-container">
+                        <canvas id="browsersChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- 유입 경로 -->
+                <div class="bg-white rounded-xl p-6 shadow-sm">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-external-link-alt text-indigo-600 mr-2"></i>
+                        유입 경로
+                    </h2>
+                    <div class="chart-container">
+                        <canvas id="referrersChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 언어 학습 패턴 -->
+            <div class="bg-white rounded-xl p-6 shadow-sm mt-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-language text-teal-600 mr-2"></i>
+                    언어 학습 패턴 (오늘)
+                </h2>
+                <div class="chart-container">
+                    <canvas id="languageLearningChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 인기 페이지 -->
+            <div class="bg-white rounded-xl p-6 shadow-sm mt-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-file-alt text-yellow-600 mr-2"></i>
+                    페이지별 조회수 (오늘)
+                </h2>
+                <div class="chart-container">
+                    <canvas id="pageViewsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="text-center py-12 hidden">
+            <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
+            <p class="text-gray-600">통계 데이터를 불러오는데 실패했습니다.</p>
+            <button onclick="refreshData()" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+                다시 시도
+            </button>
+        </div>
+    </main>
+
+    <!-- Firebase Config -->
+    <script type="module" src="../js/firebase/firebase-init.js"></script>
+    <script type="module" src="stats.js"></script>
+</body>
+</html>
