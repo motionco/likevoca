@@ -7,6 +7,12 @@
       "Read(/C:\\practice\\likevoca\\admin/**)",
       "Read(/C:\\practice\\likevoca\\admin\\js/**)",
       "Read(/C:\\practice\\likevoca\\admin\\js/**)",
+      "Read(/C:\\practice\\likevoca\\admin\\js/**)",
+      "Read(/C:\\practice\\likevoca\\admin/**)",
+      "Read(/C:\\practice\\likevoca\\admin/**)",
+      "Read(/C:\\practice\\likevoca/**)",
+      "Read(/C:\\practice\\likevoca\\admin\\js/**)",
+      "Read(/C:\\practice\\likevoca\\js\\firebase/**)",
       "Read(/C:\\practice\\likevoca\\admin\\js/**)"
     ],
     "deny": [],

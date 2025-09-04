@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📰 콘텐츠 관리 - LikeVoca Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Quill WYSIWYG Editor -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <style>
+        .content-card {
+            transition: all 0.2s ease;
+        }
+        .content-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .loading-skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .status-badge {
+            @apply px-2 py-1 text-xs font-semibold rounded-full;
+        }
+        .status-published { @apply bg-green-100 text-green-800; }
+        .status-draft { @apply bg-yellow-100 text-yellow-800; }
+        .status-scheduled { @apply bg-blue-100 text-blue-800; }
+        .status-archived { @apply bg-gray-100 text-gray-800; }
+        
+        .content-type-badge {
+            @apply px-2 py-1 text-xs font-medium rounded;
+        }
+        .type-notice { @apply bg-red-50 text-red-700 border border-red-200; }
+        .type-help { @apply bg-blue-50 text-blue-700 border border-blue-200; }
+        .type-banner { @apply bg-purple-50 text-purple-700 border border-purple-200; }
+        .type-announcement { @apply bg-green-50 text-green-700 border border-green-200; }
+        .type-tutorial { @apply bg-orange-50 text-orange-700 border border-orange-200; }
+
+        .quill-editor {
+            min-height: 200px;
+        }
+        .ql-editor {
+            min-height: 200px;
+        }
+        
+        .selected-content {
+            @apply ring-2 ring-blue-500 bg-blue-50;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <a href="../admin.html" class="text-gray-400 hover:text-gray-600 mr-4">
+                        <i class="fas fa-arrow-left text-xl"></i>
+                    </a>
+                    <i class="fas fa-edit text-2xl text-green-600 mr-3"></i>
+                    <h1 class="text-2xl font-bold text-gray-900">콘텐츠 관리</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="createNewContent()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200">
+                        <i class="fas fa-plus mr-2"></i>새 콘텐츠
+                    </button>
+                    <button onclick="refreshContent()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+                        <i class="fas fa-sync-alt mr-2"></i>새로고침
+                    </button>
+                    <span id="contentCount" class="text-gray-600">총 - 개</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- 검색 및 필터 -->
+        <div class="bg-white rounded-xl p-6 shadow-sm mb-6">
+            <div class="flex flex-col lg:flex-row gap-4">
+                <div class="flex-1">
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input 
+                            type="text" 
+                            id="searchInput"
+                            placeholder="제목 또는 내용으로 검색..." 
+                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                            onkeyup="handleSearch()"
+                        >
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <select id="typeFilter" onchange="applyFilters()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                        <option value="all">모든 타입</option>
+                        <option value="notice">공지사항</option>
+                        <option value="help">도움말</option>
+                        <option value="banner">배너</option>
+                        <option value="announcement">알림</option>
+                        <option value="tutorial">튜토리얼</option>
+                    </select>
+                    <select id="statusFilter" onchange="applyFilters()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                        <option value="all">모든 상태</option>
+                        <option value="published">게시됨</option>
+                        <option value="draft">초안</option>
+                        <option value="scheduled">예약됨</option>
+                        <option value="archived">보관됨</option>
+                    </select>
+                    <select id="sortBy" onchange="applyFilters()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                        <option value="newest">최신순</option>
+                        <option value="oldest">오래된순</option>
+                        <option value="title">제목순</option>
+                        <option value="type">타입순</option>
+                        <option value="status">상태순</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 대량 작업 -->
+            <div id="bulkActions" class="hidden mt-4 pt-4 border-t border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <span id="selectedCount" class="text-gray-600">0개 선택됨</span>
+                        <div class="flex space-x-2">
+                            <button onclick="bulkPublish()" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
+                                <i class="fas fa-eye mr-1"></i>게시
+                            </button>
+                            <button onclick="bulkUnpublish()" class="bg-yellow-600 text-white px-3 py-1 rounded text-sm hover:bg-yellow-700">
+                                <i class="fas fa-eye-slash mr-1"></i>비게시
+                            </button>
+                            <button onclick="bulkArchive()" class="bg-gray-600 text-white px-3 py-1 rounded text-sm hover:bg-gray-700">
+                                <i class="fas fa-archive mr-1"></i>보관
+                            </button>
+                            <button onclick="bulkDelete()" class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700">
+                                <i class="fas fa-trash mr-1"></i>삭제
+                            </button>
+                        </div>
+                    </div>
+                    <button onclick="clearSelection()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times mr-1"></i>선택 해제
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 통계 카드 -->
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+            <div class="bg-white rounded-xl p-6 shadow-sm border-l-4 border-l-green-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">전체 콘텐츠</p>
+                        <p id="totalContent" class="text-2xl font-bold text-green-600">-</p>
+                    </div>
+                    <i class="fas fa-file-alt text-2xl text-green-500"></i>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-6 shadow-sm border-l-4 border-l-blue-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">게시됨</p>
+                        <p id="publishedContent" class="text-2xl font-bold text-blue-600">-</p>
+                    </div>
+                    <i class="fas fa-eye text-2xl text-blue-500"></i>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-6 shadow-sm border-l-4 border-l-yellow-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">초안</p>
+                        <p id="draftContent" class="text-2xl font-bold text-yellow-600">-</p>
+                    </div>
+                    <i class="fas fa-edit text-2xl text-yellow-500"></i>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-6 shadow-sm border-l-4 border-l-purple-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">예약됨</p>
+                        <p id="scheduledContent" class="text-2xl font-bold text-purple-600">-</p>
+                    </div>
+                    <i class="fas fa-clock text-2xl text-purple-500"></i>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-6 shadow-sm border-l-4 border-l-gray-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">보관됨</p>
+                        <p id="archivedContent" class="text-2xl font-bold text-gray-600">-</p>
+                    </div>
+                    <i class="fas fa-archive text-2xl text-gray-500"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- 콘텐츠 목록 -->
+        <div class="bg-white rounded-xl shadow-sm">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-bold text-gray-900">
+                        <i class="fas fa-list text-green-600 mr-2"></i>콘텐츠 목록
+                    </h2>
+                    <div class="flex items-center space-x-2">
+                        <label class="flex items-center">
+                            <input 
+                                type="checkbox" 
+                                id="selectAll" 
+                                onchange="toggleSelectAll()"
+                                class="mr-2 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                            >
+                            <span class="text-sm text-gray-600">전체 선택</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 로딩 상태 -->
+            <div id="loadingContent" class="p-8 text-center">
+                <i class="fas fa-spinner fa-spin text-3xl text-gray-400 mb-4"></i>
+                <p class="text-gray-600">콘텐츠를 불러오는 중...</p>
+            </div>
+
+            <!-- 콘텐츠 그리드 -->
+            <div id="contentGrid" class="hidden p-6">
+                <div id="contentList" class="space-y-4">
+                    <!-- 콘텐츠 카드들이 여기에 동적으로 추가됩니다 -->
+                </div>
+
+                <!-- 페이지네이션 -->
+                <div id="pagination" class="mt-8 flex justify-center">
+                    <!-- 페이지네이션 버튼들이 여기에 동적으로 추가됩니다 -->
+                </div>
+            </div>
+
+            <!-- 빈 상태 -->
+            <div id="emptyState" class="hidden p-12 text-center">
+                <i class="fas fa-file-alt text-6xl text-gray-300 mb-4"></i>
+                <h3 class="text-xl font-semibold text-gray-600 mb-2">콘텐츠가 없습니다</h3>
+                <p class="text-gray-500 mb-6">첫 번째 콘텐츠를 만들어보세요.</p>
+                <button onclick="createNewContent()" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition duration-200">
+                    <i class="fas fa-plus mr-2"></i>새 콘텐츠 만들기
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- 콘텐츠 생성/편집 모달 -->
+    <div id="contentModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <h2 id="modalTitle" class="text-xl font-bold text-gray-900">새 콘텐츠</h2>
+                <button onclick="closeContentModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+                <form id="contentForm">
+                    <input type="hidden" id="contentId">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">콘텐츠 타입 *</label>
+                            <select id="contentType" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" required>
+                                <option value="">타입 선택</option>
+                                <option value="notice">공지사항</option>
+                                <option value="help">도움말</option>
+                                <option value="banner">배너</option>
+                                <option value="announcement">알림</option>
+                                <option value="tutorial">튜토리얼</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">상태</label>
+                            <select id="contentStatus" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                                <option value="draft">초안</option>
+                                <option value="published">게시</option>
+                                <option value="scheduled">예약 게시</option>
+                                <option value="archived">보관</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">제목 *</label>
+                        <input 
+                            type="text" 
+                            id="contentTitle" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" 
+                            required
+                            placeholder="콘텐츠 제목을 입력하세요"
+                        >
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">요약</label>
+                        <textarea 
+                            id="contentSummary" 
+                            rows="2"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                            placeholder="콘텐츠 요약을 입력하세요"
+                        ></textarea>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">내용 *</label>
+                        <div id="contentEditor" class="quill-editor border border-gray-300 rounded-lg"></div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div id="publishDateSection" class="hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">예약 게시 날짜</label>
+                            <input 
+                                type="datetime-local" 
+                                id="publishDate" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                            >
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">우선순위</label>
+                            <select id="contentPriority" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                                <option value="low">낮음</option>
+                                <option value="normal" selected>보통</option>
+                                <option value="high">높음</option>
+                                <option value="urgent">긴급</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">태그</label>
+                        <input 
+                            type="text" 
+                            id="contentTags" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                            placeholder="태그를 쉼표로 구분하여 입력하세요"
+                        >
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="contentFeatured" class="mr-2 rounded border-gray-300 text-green-600 focus:ring-green-500">
+                            <span class="text-sm font-medium text-gray-700">주요 콘텐츠로 표시</span>
+                        </label>
+                    </div>
+
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" onclick="closeContentModal()" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                            취소
+                        </button>
+                        <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                            <i class="fas fa-save mr-2"></i>저장
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 콘텐츠 상세보기 모달 -->
+    <div id="contentViewModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <h2 id="viewModalTitle" class="text-xl font-bold text-gray-900">콘텐츠 상세</h2>
+                <div class="flex items-center space-x-4">
+                    <button onclick="editContentFromView()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                        <i class="fas fa-edit mr-2"></i>편집
+                    </button>
+                    <button onclick="closeContentViewModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+                <div id="contentViewDetails">
+                    <!-- 콘텐츠 상세 정보가 여기에 표시됩니다 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Config -->
+    <script type="module" src="../js/firebase/firebase-init.js"></script>
+    <script type="module" src="js/admin-content.js"></script>
+</body>
+</html>
