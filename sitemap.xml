@@ -804,5 +804,61 @@
     <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/privacy"/>
     <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/privacy"/>
   </url>
+  
+  <!-- 커뮤니티 페이지들 -->
+  <url>
+    <loc>https://likevoca.com/ko/community</loc>
+    <lastmod>2024-09-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/community"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/community"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/community"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/community"/>
+  </url>
+  
+  <url>
+    <loc>https://likevoca.com/en/community</loc>
+    <lastmod>2024-09-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/community"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/community"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/community"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/community"/>
+  </url>
+  
+  <url>
+    <loc>https://likevoca.com/ja/community</loc>
+    <lastmod>2024-09-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/community"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/community"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/community"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/community"/>
+  </url>
+  
+  <url>
+    <loc>https://likevoca.com/zh/community</loc>
+    <lastmod>2024-09-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/community"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/community"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/community"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://likevoca.com/es/community"/>
+  </url>
+  
+  <url>
+    <loc>https://likevoca.com/es/community</loc>
+    <lastmod>2024-09-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/community"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://likevoca.com/en/community"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/community"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/community"/>
+  </url>
 
 </urlset> 

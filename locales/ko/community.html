@@ -3,13 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>커뮤니티 - LikeVoca</title>
+    <title>LikeVoca 커뮤니티 - 학습 가이드, FAQ, 매뉴얼</title>
     
-    <meta name="description" content="LikeVoca 커뮤니티 - 학습 가이드, FAQ, 매뉴얼 및 공지사항을 확인하세요." />
+    <meta name="description" content="LikeVoca 커뮤니티에서 언어 학습 가이드, 자주 묻는 질문(FAQ), 사용자 매뉴얼 및 공지사항을 확인하세요. 효과적인 언어 학습을 위한 다양한 정보를 제공합니다." />
+    <meta name="keywords" content="LikeVoca, 커뮤니티, 언어학습, 학습가이드, FAQ, 매뉴얼, 공지사항, 다국어, 영어, 일본어, 중국어" />
+    
+    <!-- Open Graph 태그 -->
+    <meta property="og:title" content="LikeVoca 커뮤니티 - 학습 가이드, FAQ, 매뉴얼" />
+    <meta property="og:description" content="LikeVoca 커뮤니티에서 언어 학습 가이드, FAQ, 매뉴얼을 확인하세요." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://likevoca.com/ko/community.html" />
+    <meta property="og:site_name" content="LikeVoca" />
+    <meta property="og:locale" content="ko_KR" />
+    
+    <!-- Twitter Card 태그 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="LikeVoca 커뮤니티 - 학습 가이드, FAQ, 매뉴얼" />
+    <meta name="twitter:description" content="LikeVoca 커뮤니티에서 언어 학습 가이드, FAQ, 매뉴얼을 확인하세요." />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://likevoca.com/ko/community.html" />
+    
+    <!-- Hreflang 태그 -->
+    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/community.html" />
+    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/community.html" />
+    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/community.html" />
+    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/community.html" />
+    <link rel="alternate" hreflang="es" href="https://likevoca.com/es/community.html" />
+    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/community.html" />
+    
+    <!-- JSON-LD 구조화 데이터 -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "LikeVoca Community",
+        "url": "https://likevoca.com/ko/community.html",
+        "description": "LikeVoca 커뮤니티에서 언어 학습 가이드, FAQ, 매뉴얼을 확인하세요.",
+        "inLanguage": "ko",
+        "publisher": {
+            "@type": "Organization",
+            "name": "LikeVoca",
+            "url": "https://likevoca.com"
+        },
+        "mainEntity": {
+            "@type": "FAQPage",
+            "mainEntity": []
+        }
+    }
+    </script>
     
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <link rel="stylesheet" href="../../css/style.css" />
+    
+    <!-- Firebase 초기화 -->
+    <script type="module" src="../../js/firebase/firebase-init.js"></script>
+    
+    <!-- Firebase 초기화 디버깅 -->
+    <script>
+        // Firebase 초기화 상태 모니터링
+        function monitorFirebaseInit() {
+            let checkCount = 0;
+            const maxChecks = 100; // 10초 (100ms * 100)
+            
+            const interval = setInterval(() => {
+                checkCount++;
+                console.log(`🔍 Firebase 상태 체크 #${checkCount}:`, {
+                    'window.db': !!window.db,
+                    'window.auth': !!window.auth,
+                    'window.firebaseInit': !!window.firebaseInit
+                });
+                
+                if (window.db && window.auth) {
+                    console.log('✅ Firebase 초기화 성공!');
+                    clearInterval(interval);
+                } else if (checkCount >= maxChecks) {
+                    console.error('❌ Firebase 초기화 타임아웃 - 10초 경과');
+                    console.log('최종 전역 객체 상태:', {
+                        'typeof window.db': typeof window.db,
+                        'typeof window.auth': typeof window.auth,
+                        'window 객체 키들': Object.keys(window).filter(key => key.includes('fire') || key.includes('db') || key.includes('auth'))
+                    });
+                    clearInterval(interval);
+                }
+            }, 100);
+        }
+        
+        // DOM 로드 후 모니터링 시작
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 DOM 로드 완료 - Firebase 초기화 모니터링 시작');
+            monitorFirebaseInit();
+        });
+    </script>
 </head>
 <body class="bg-gray-50">
     <div id="navbar-container"></div>
@@ -39,7 +125,7 @@
                 <div class="flex gap-2">
                     <select id="categoryFilter" class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B63AC]">
                         <option value="all">전체 카테고리</option>
-                        <option value="notices">공지사항</option>
+                        <option value="notice">공지사항</option>
                         <option value="guide">학습 가이드</option>
                         <option value="faq">자주 묻는 질문</option>
                         <option value="manual">사용자 매뉴얼</option>
@@ -57,7 +143,8 @@
         <!-- 로딩 상태 -->
         <div id="loading" class="text-center py-12">
             <i class="fas fa-spinner fa-spin text-3xl text-gray-400 mb-4"></i>
-            <p class="text-gray-600">콘텐츠를 불러오는 중...</p>
+            <p class="text-gray-600" id="loadingText">콘텐츠를 불러오는 중...</p>
+            <div id="loadingDebug" class="mt-2 text-sm text-gray-500"></div>
         </div>
         
         <!-- 콘텐츠 목록 -->
@@ -113,25 +200,113 @@
             }
         });
 
-        // 콘텐츠 데이터 로드
+        // 콘텐츠 데이터 로드 (Firestore 전용)
+        // 로딩 상태 업데이트 함수
+        function updateLoadingStatus(message, debug = '') {
+            const loadingText = document.getElementById('loadingText');
+            const loadingDebug = document.getElementById('loadingDebug');
+            if (loadingText) loadingText.textContent = message;
+            if (loadingDebug) loadingDebug.textContent = debug;
+            console.log('📱 Loading status:', message, debug);
+        }
+
         async function loadContentData() {
             try {
-                console.log('📊 콘텐츠 데이터 로드 시도...');
+                console.log('📊 콘텐츠 데이터 로드 시도... (Firestore)');
+                updateLoadingStatus('Firebase 초기화 확인 중...', '데이터베이스 연결을 설정하고 있습니다.');
                 
-                // localStorage에서 콘텐츠 로드
-                const localContent = localStorage.getItem('multilingual_content');
-                if (localContent) {
-                    contentData = JSON.parse(localContent);
-                    console.log(`✅ localStorage에서 ${contentData.length}개 콘텐츠 로드`);
+                // Firebase 초기화 확인 및 대기
+                console.log('🔥 현재 window.db 상태:', !!window.db);
+                console.log('🔥 현재 window.auth 상태:', !!window.auth);
+                
+                if (!window.db || !window.auth) {
+                    console.log('⏳ Firebase 초기화 대기 중...');
+                    updateLoadingStatus('Firebase 초기화 대기 중...', 'Firebase 서비스 연결을 기다리고 있습니다.');
+                    let attempts = 0;
+                    const maxAttempts = 100; // 10초 (100ms * 100)
+                    
+                    await new Promise((resolve, reject) => {
+                        const checkFirebase = setInterval(() => {
+                            attempts++;
+                            
+                            if (window.db && window.auth) {
+                                clearInterval(checkFirebase);
+                                console.log('✅ Firebase 초기화 완료! db와 auth 모두 준비됨');
+                                resolve();
+                            } else if (attempts >= maxAttempts) {
+                                clearInterval(checkFirebase);
+                                console.error('❌ Firebase 초기화 타임아웃 (10초 경과)');
+                                console.log('최종 상태 - window.db:', !!window.db, 'window.auth:', !!window.auth);
+                                console.log('Firebase 스크립트 로딩 상태:', {
+                                    'firebase script element': document.querySelector('script[src*="firebase-init"]'),
+                                    'window.firebaseInit': !!window.firebaseInit,
+                                    'window keys with firebase/db/auth': Object.keys(window).filter(key => 
+                                        key.toLowerCase().includes('firebase') || 
+                                        key.toLowerCase().includes('db') || 
+                                        key.toLowerCase().includes('auth')
+                                    )
+                                });
+                                
+                                // 타임아웃 시에도 계속 진행 (샘플 데이터 사용)
+                                console.log('🔄 Firebase 없이 샘플 데이터로 계속 진행...');
+                                resolve();
+                            } else if (attempts % 20 === 0) {
+                                console.log(`🔄 Firebase 대기 중... (${attempts}/${maxAttempts}) db:${!!window.db} auth:${!!window.auth}`);
+                                updateLoadingStatus('Firebase 초기화 대기 중...', `연결 시도 중... (${attempts}/100)`);
+                            }
+                        }, 100);
+                    });
                 } else {
-                    console.log('📝 localStorage가 비어있음, 샘플 데이터 생성...');
-                    contentData = generateSampleContent();
-                    localStorage.setItem('multilingual_content', JSON.stringify(contentData));
-                    console.log(`✅ 샘플 콘텐츠 ${contentData.length}개 생성`);
+                    console.log('✅ Firebase는 이미 초기화되어 있음');
                 }
+                
+                // Firestore에서 콘텐츠 로드 시도
+                if (window.db) {
+                    updateLoadingStatus('데이터베이스에서 콘텐츠 로드 중...', 'Firestore에서 최신 콘텐츠를 가져오고 있습니다.');
+                    try {
+                        const { collection, query, orderBy, getDocs } = await import("https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js");
+                        
+                        const contentRef = collection(window.db, 'admin_content');
+                        const contentQuery = query(contentRef, orderBy('createdAt', 'desc'));
+                        const snapshot = await getDocs(contentQuery);
+                        
+                        contentData = snapshot.docs
+                            .map(doc => ({
+                                id: doc.id,
+                                ...doc.data()
+                            }))
+                            .filter(item => {
+                                // 사용자가 작성한 다국어 콘텐츠만 표시
+                                const hasVersions = item.versions && typeof item.versions === 'object';
+                                const hasUserId = item.userId; // 사용자가 작성한 콘텐츠
+                                const isValidContentType = ['faq', 'guide', 'notice', 'manual'].includes(item.type);
+                                return hasVersions && hasUserId && isValidContentType;
+                            });
+                        
+                        console.log(`✅ Firestore에서 ${contentData.length}개 콘텐츠 로드`);
+                    } catch (firestoreError) {
+                        console.error('❌ Firestore 데이터 로드 실패:', firestoreError);
+                        console.log('📝 Firestore 오류로 인해 샘플 데이터 사용');
+                        contentData = [];
+                    }
+                } else {
+                    console.log('📝 Firebase가 없어 샘플 데이터로 직접 설정');
+                    updateLoadingStatus('샘플 콘텐츠 준비 중...', 'Firebase 연결 없이 기본 콘텐츠를 표시합니다.');
+                    contentData = [];
+                }
+                
+                // 콘텐츠가 없으면 샘플 생성
+                if (contentData.length === 0) {
+                    console.log('📝 콘텐츠가 없어 샘플 데이터 표시');
+                    updateLoadingStatus('샘플 콘텐츠 생성 중...', '기본 콘텐츠를 생성하고 있습니다.');
+                    contentData = generateSampleContent();
+                }
+                
+                updateLoadingStatus('콘텐츠 표시 준비 중...', '로드된 콘텐츠를 화면에 표시합니다.');
                 
             } catch (error) {
                 console.error('❌ 콘텐츠 데이터 로드 실패:', error);
+                console.log('📝 오류로 인해 샘플 데이터 사용');
                 contentData = generateSampleContent();
             }
         }
@@ -142,15 +317,22 @@
             
             return [
                 {
-                    id: 'welcome_001',
-                    type: 'notices',
+                    id: 'community_welcome_001',
+                    type: 'notice',
                     priority: 'high',
                     createdAt: currentTime,
                     updatedAt: currentTime,
                     versions: {
                         ko: {
                             title: 'LikeVoca 커뮤니티에 오신 것을 환영합니다!',
-                            content: '<div class="prose max-w-none"><h2>🎉 커뮤니티 오픈!</h2><p>언어학습에 도움이 되는 다양한 가이드와 팁을 공유하는 새로운 커뮤니티 공간이 오픈되었습니다.</p><ul><li>학습 가이드 및 전략</li><li>새로운 기능 안내</li><li>공지사항 및 업데이트</li></ul><p>여러분의 언어학습 여정에 도움이 되는 유용한 정보들을 찾아보세요!</p></div>',
+                            content: '<div class="prose max-w-none"><h2>🎉 LikeVoca 커뮤니티 오픈!</h2><p>언어학습에 도움이 되는 다양한 가이드와 팁을 공유하는 새로운 커뮤니티 공간이 오픈되었습니다.</p><ul><li>학습 가이드 및 전략</li><li>새로운 기능 안내</li><li>공지사항 및 업데이트</li></ul><p>여러분의 언어학습 여정에 도움이 되는 유용한 정보들을 찾아보세요!</p></div>',
+                            published: true,
+                            lastModified: currentTime,
+                            translationStatus: 'updated'
+                        },
+                        en: {
+                            title: 'Welcome to LikeVoca Community!',
+                            content: '<div class="prose max-w-none"><h2>🎉 LikeVoca Community Open!</h2><p>We\'re excited to announce the opening of our new community space where you can find helpful guides and tips for language learning.</p><ul><li>Learning guides and strategies</li><li>New feature announcements</li><li>Updates and notices</li></ul><p>Find useful information to help with your language learning journey!</p></div>',
                             published: true,
                             lastModified: currentTime,
                             translationStatus: 'updated'
@@ -228,16 +410,20 @@
                 
                 // 필터링
                 let filteredContent = contentData.filter(item => {
-                    const version = item.versions.ko;
-                    if (!version || !version.published) return false;
+                    // 상태가 'published'인 콘텐츠만 표시
+                    if (item.status !== 'published') return false;
+                    
+                    const versions = item.versions || {};
+                    const version = versions.ko;
+                    if (!version || !version.title || !version.content) return false;
                     
                     // 카테고리 필터
                     if (categoryFilter !== 'all' && item.type !== categoryFilter) return false;
                     
                     // 검색 필터
                     if (searchTerm) {
-                        const titleMatch = version.title.toLowerCase().includes(searchTerm);
-                        const contentMatch = version.content.toLowerCase().includes(searchTerm);
+                        const titleMatch = (version.title || '').toLowerCase().includes(searchTerm);
+                        const contentMatch = (version.content || '').toLowerCase().includes(searchTerm);
                         if (!titleMatch && !contentMatch) return false;
                     }
                     
@@ -265,22 +451,23 @@
             const contentList = document.getElementById('contentList');
             
             const categoryIcons = {
-                notices: 'fa-bullhorn',
+                notice: 'fa-bullhorn',
                 guide: 'fa-compass',
                 faq: 'fa-question-circle',
                 manual: 'fa-book'
             };
             
             const categoryNames = {
-                notices: '공지사항',
+                notice: '공지사항',
                 guide: '학습 가이드',
                 faq: '자주 묻는 질문',
                 manual: '사용자 매뉴얼'
             };
             
             const html = content.map(item => {
-                const version = item.versions.ko;
-                const excerpt = stripHtml(version.content).substring(0, 150) + '...';
+                const versions = item.versions || {};
+                const version = versions.ko || {};
+                const excerpt = stripHtml(version.content || '').substring(0, 150) + '...';
                 
                 return `
                     <article class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition duration-300">
@@ -291,7 +478,7 @@
                                 </div>
                                 <div>
                                     <h3 class="text-xl font-semibold text-gray-900 mb-1">
-                                        ${version.title}
+                                        ${version.title || '제목 없음'}
                                     </h3>
                                     <div class="flex items-center space-x-3">
                                         <span class="text-sm text-gray-500">${categoryNames[item.type]}</span>
@@ -330,6 +517,73 @@
             document.getElementById('categoryFilter').addEventListener('change', displayContent);
         }
 
+        // 동적 SEO 메타태그 업데이트
+        function updateSEOForContent(content, lang = 'ko') {
+            const version = content.versions[lang];
+            if (!version) return;
+            
+            // 제목과 설명 추출 (HTML 태그 제거)
+            const cleanTitle = version.title || 'LikeVoca 커뮤니티';
+            const cleanDescription = version.content 
+                ? version.content.replace(/<[^>]*>/g, '').substring(0, 160) + '...'
+                : 'LikeVoca 커뮤니티에서 언어 학습 정보를 확인하세요.';
+            
+            // 메타태그 업데이트
+            document.title = `${cleanTitle} - LikeVoca 커뮤니티`;
+            
+            // Description 업데이트
+            let metaDesc = document.querySelector('meta[name="description"]');
+            if (metaDesc) metaDesc.setAttribute('content', cleanDescription);
+            
+            // Open Graph 업데이트
+            let ogTitle = document.querySelector('meta[property="og:title"]');
+            if (ogTitle) ogTitle.setAttribute('content', cleanTitle);
+            
+            let ogDesc = document.querySelector('meta[property="og:description"]');
+            if (ogDesc) ogDesc.setAttribute('content', cleanDescription);
+            
+            // URL 업데이트 (히스토리 API 사용)
+            if (window.history && window.history.pushState) {
+                const newUrl = `${window.location.pathname}#${content.id}`;
+                window.history.pushState({contentId: content.id}, cleanTitle, newUrl);
+            }
+            
+            // JSON-LD 구조화 데이터 업데이트
+            updateStructuredData(content, lang);
+        }
+        
+        // 구조화 데이터 업데이트  
+        function updateStructuredData(content, lang) {
+            const version = content.versions[lang];
+            if (!version) return;
+            
+            const structuredData = {
+                "@context": "https://schema.org",
+                "@type": "Article",
+                "headline": version.title,
+                "description": version.content ? version.content.replace(/<[^>]*>/g, '').substring(0, 200) : '',
+                "author": {
+                    "@type": "Organization", 
+                    "name": "LikeVoca"
+                },
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "LikeVoca",
+                    "url": "https://likevoca.com"
+                },
+                "datePublished": content.createdAt,
+                "dateModified": content.updatedAt || content.createdAt,
+                "url": `https://likevoca.com/${lang}/community.html#${content.id}`,
+                "inLanguage": lang
+            };
+            
+            // 기존 JSON-LD 스크립트 찾기 및 업데이트
+            let jsonLdScript = document.querySelector('script[type="application/ld+json"]');
+            if (jsonLdScript) {
+                jsonLdScript.textContent = JSON.stringify(structuredData);
+            }
+        }
+
         // 상세보기
         window.openContentDetail = function(contentId) {
             const content = contentData.find(item => item.id === contentId);
@@ -337,6 +591,9 @@
             
             const version = content.versions.ko;
             if (!version) return;
+            
+            // SEO 메타태그 업데이트
+            updateSEOForContent(content, 'ko');
             
             // 간단한 모달 표시
             const modal = document.createElement('div');
@@ -369,9 +626,21 @@
             return tempDiv.textContent || tempDiv.innerText || '';
         }
 
-        function formatDate(dateString) {
-            if (!dateString) return '-';
-            const date = new Date(dateString);
+        function formatDate(dateValue) {
+            if (!dateValue) return '-';
+            
+            let date;
+            // Firestore Timestamp 객체인 경우
+            if (dateValue.toDate && typeof dateValue.toDate === 'function') {
+                date = dateValue.toDate();
+            }
+            // 이미 Date 객체인 경우 또는 문자열인 경우
+            else {
+                date = new Date(dateValue);
+            }
+            
+            if (isNaN(date.getTime())) return '-';
+            
             return date.toLocaleDateString('ko-KR', {
                 year: 'numeric',
                 month: 'long',

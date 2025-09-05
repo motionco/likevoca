@@ -1,4 +1,4 @@
-// admin-content.js - 콘텐츠 관리 시스템
+// admin-content.js - 다국어 콘텐츠 관리 시스템
 import { 
     collection, 
     doc, 
@@ -16,23 +16,35 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 
 // 전역 변수
-let allContent = [];
-let filteredContent = [];
-let selectedContent = new Set();
-let currentPage = 1;
-let contentPerPage = 10;
-let isEditMode = false;
-let currentEditingId = null;
-let quillEditor = null;
 let db;
 let auth;
+let contentData = [];
+let quillEditors = {};
+let currentEditingId = null;
+
+// 지원하는 언어 목록
+const SUPPORTED_LANGUAGES = {
+    ko: { name: '한국어', emoji: '🇰🇷', code: 'ko' },
+    en: { name: 'English', emoji: '🇺🇸', code: 'en' },
+    ja: { name: '日本語', emoji: '🇯🇵', code: 'ja' },
+    zh: { name: '中文', emoji: '🇨🇳', code: 'zh' },
+    es: { name: 'Español', emoji: '🇪🇸', code: 'es' }
+};
+
+// 콘텐츠 타입 정의
+const CONTENT_TYPES = {
+    faq: { name: 'FAQ', description: '자주 묻는 질문' },
+    manual: { name: '매뉴얼', description: '사용자 매뉴얼' },
+    guide: { name: '가이드', description: '학습 가이드' },
+    notice: { name: '공지사항', description: '공지사항' }
+};
 
 // Firebase 초기화 완료 확인
-function initializeContentManager() {
+function initializeMultilingualContentManager() {
     if (window.db && window.auth) {
         db = window.db;
         auth = window.auth;
-        console.log('📰 콘텐츠 관리 시스템 초기화 시작');
+        console.log('🌐 다국어 콘텐츠 관리 시스템 초기화 시작');
         
         // 인증 상태 확인
         auth.onAuthStateChanged((user) => {
@@ -46,22 +58,39 @@ function initializeContentManager() {
         });
     } else {
         console.log('⏳ Firebase 초기화 대기 중...');
-        setTimeout(initializeContentManager, 100);
+        setTimeout(initializeMultilingualContentManager, 100);
     }
 }
-
-// 페이지 로드 시 초기화
-document.addEventListener('DOMContentLoaded', initializeContentManager);
 
 // 관리자 권한 확인
 async function checkAdminPermission(userEmail) {
     try {
         console.log('🔐 관리자 권한 확인 중...');
         
-        const userRef = doc(db, 'users', userEmail);
+        // users 컬렉션에서 사용자 정보 확인
+        const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js");
+        const userRef = doc(window.db, 'users', userEmail);
         const userDoc = await getDoc(userRef);
         
-        // 간단한 관리자 이메일 체크 (admin-main.js와 동일한 방식)
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            const isAdmin = userData.role === 'admin';
+            
+            if (isAdmin) {
+                console.log('✅ 관리자 권한 확인됨 (DB에서 확인)');
+                await startMultilingualContentManager();
+            } else {
+                console.log('❌ 관리자 권한 없음 (role:', userData.role || 'undefined', ')');
+                showAccessDenied();
+            }
+        } else {
+            console.log('❌ 사용자 정보를 찾을 수 없음');
+            showAccessDenied();
+        }
+    } catch (error) {
+        console.error('❌ 관리자 권한 확인 중 오류:', error);
+        // Firestore 접근 실패 시 fallback으로 이메일 목록 확인
+        console.log('🔄 Fallback: 하드코딩된 관리자 목록으로 확인');
         const ADMIN_EMAILS = [
             'admin@likevoca.com',
             'manager@likevoca.com',
@@ -71,15 +100,12 @@ async function checkAdminPermission(userEmail) {
         const isAdmin = ADMIN_EMAILS.includes(userEmail);
         
         if (isAdmin) {
-            console.log('✅ 관리자 권한 확인됨');
-            await startContentManager();
+            console.log('✅ 관리자 권한 확인됨 (fallback)');
+            await startMultilingualContentManager();
         } else {
             console.log('❌ 관리자 권한 없음');
             showAccessDenied();
         }
-    } catch (error) {
-        console.error('❌ 관리자 권한 확인 중 오류:', error);
-        showAccessDenied();
     }
 }
 
@@ -99,126 +125,94 @@ function showAccessDenied() {
     `;
 }
 
-// 콘텐츠 관리자 시작
-async function startContentManager() {
-    console.log('🚀 콘텐츠 관리자 시작');
+// 다국어 콘텐츠 관리자 시작
+async function startMultilingualContentManager() {
+    console.log('🚀 다국어 콘텐츠 관리자 시작');
     
     try {
-        // Quill 에디터 초기화
-        initializeEditor();
-        
-        // 이벤트 리스너 설정
-        setupEventListeners();
-        
-        // 콘텐츠 데이터 로드
+        await initializeQuillEditors();
         await loadContentData();
+        updateStatistics();
         
-        console.log('✅ 콘텐츠 관리자 초기화 완료');
+        console.log('✅ 다국어 콘텐츠 관리자 초기화 완료');
     } catch (error) {
-        console.error('❌ 콘텐츠 관리자 초기화 실패:', error);
-        showError('콘텐츠 관리자 초기화에 실패했습니다.');
+        console.error('❌ 다국어 콘텐츠 관리자 초기화 실패:', error);
+        showError('다국어 콘텐츠 관리자 초기화에 실패했습니다.');
     }
 }
 
 // Quill 에디터 초기화
-function initializeEditor() {
-    console.log('📝 Quill 에디터 초기화');
+function initializeQuillEditors() {
+    const languages = Object.keys(SUPPORTED_LANGUAGES);
     
-    const editorElement = document.getElementById('contentEditor');
-    if (editorElement) {
-        quillEditor = new Quill('#contentEditor', {
-            theme: 'snow',
-            modules: {
-                toolbar: [
-                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-                    ['bold', 'italic', 'underline', 'strike'],
-                    ['blockquote', 'code-block'],
-                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                    [{ 'script': 'sub'}, { 'script': 'super' }],
-                    [{ 'indent': '-1'}, { 'indent': '+1' }],
-                    [{ 'color': [] }, { 'background': [] }],
-                    [{ 'align': [] }],
-                    ['link', 'image', 'video'],
-                    ['clean']
-                ]
-            },
-            placeholder: '콘텐츠 내용을 입력하세요...'
-        });
-        console.log('✅ Quill 에디터 초기화 완료');
-    }
+    languages.forEach(lang => {
+        const editorContainer = document.getElementById(`editor_${lang}`);
+        if (editorContainer) {
+            quillEditors[lang] = new Quill(`#editor_${lang}`, {
+                theme: 'snow',
+                placeholder: `콘텐츠를 ${SUPPORTED_LANGUAGES[lang].name}로 입력하세요...`,
+                modules: {
+                    toolbar: [
+                        [{ 'header': [1, 2, 3, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        [{ 'color': [] }, { 'background': [] }],
+                        ['link', 'image'],
+                        ['clean']
+                    ]
+                }
+            });
+        }
+    });
+    
+    console.log('✅ Quill 에디터 초기화 완료');
 }
 
-// 이벤트 리스너 설정
-function setupEventListeners() {
-    console.log('🔧 이벤트 리스너 설정');
-    
-    // 검색 입력
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        searchInput.addEventListener('input', debounce(handleSearch, 300));
-    }
-    
-    // 폼 제출
-    const contentForm = document.getElementById('contentForm');
-    if (contentForm) {
-        contentForm.addEventListener('submit', handleFormSubmit);
-    }
-    
-    // 상태 변경 시 예약 날짜 필드 표시/숨김
-    const statusSelect = document.getElementById('contentStatus');
-    if (statusSelect) {
-        statusSelect.addEventListener('change', togglePublishDateField);
-    }
-    
-    console.log('✅ 이벤트 리스너 설정 완료');
-}
-
-// 콘텐츠 데이터 로드
+// 콘텐츠 데이터 로드 (Firestore 전용)
 async function loadContentData() {
     try {
-        console.log('📊 콘텐츠 데이터 로드 시작');
+        console.log('📊 콘텐츠 데이터 로드 시작 (Firestore)');
         showLoading();
         
-        // 임시로 admin_content 컬렉션 사용 (권한 문제 회피)
-        const contentRef = collection(db, 'admin_content');
-        const contentSnapshot = await getDocs(contentRef);
+        // Firestore에서 콘텐츠 데이터 로드
+        const { collection, query, orderBy, getDocs } = await import("https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js");
+        const contentRef = collection(window.db, 'admin_content');
+        const contentQuery = query(contentRef, orderBy('createdAt', 'desc'));
+        const snapshot = await getDocs(contentQuery);
         
-        allContent = [];
-        let publishedCount = 0;
-        let draftCount = 0;
-        let scheduledCount = 0;
-        let archivedCount = 0;
+        contentData = snapshot.docs
+            .map(doc => {
+                const data = doc.data();
+                console.log(`📄 로드된 콘텐츠 ID: ${doc.id}`, data);
+                return {
+                    id: doc.id,
+                    ...data
+                };
+            })
+            .filter(item => {
+                // 사용자가 작성한 다국어 콘텐츠만 표시 (userId 필드가 있고, versions 필드가 있는 것)
+                const hasVersions = item.versions && typeof item.versions === 'object';
+                const hasUserId = item.userId; // 사용자가 작성한 콘텐츠
+                const isValidContentType = ['faq', 'guide', 'notice', 'manual'].includes(item.type);
+                
+                if (!hasVersions || !hasUserId || !isValidContentType) {
+                    console.log(`🚫 필터링된 콘텐츠: ${item.id} (type: ${item.type}, hasVersions: ${hasVersions}, hasUserId: ${!!hasUserId})`);
+                    return false;
+                }
+                console.log(`✅ 표시할 콘텐츠: ${item.id} (type: ${item.type}, 작성자: ${item.userId})`);
+                return true;
+            });
         
-        contentSnapshot.forEach((doc) => {
-            const data = doc.data();
-            const content = {
-                id: doc.id,
-                ...data,
-                created_at: data.created_at?.toDate ? data.created_at.toDate() : new Date(data.created_at),
-                updated_at: data.updated_at?.toDate ? data.updated_at.toDate() : new Date(data.updated_at),
-                publish_date: data.publish_date?.toDate ? data.publish_date.toDate() : (data.publish_date ? new Date(data.publish_date) : null)
-            };
-            
-            allContent.push(content);
-            
-            // 상태별 카운트
-            switch (content.status) {
-                case 'published': publishedCount++; break;
-                case 'draft': draftCount++; break;
-                case 'scheduled': scheduledCount++; break;
-                case 'archived': archivedCount++; break;
-            }
-        });
+        displayContentList(contentData);
+        console.log(`✅ Firestore에서 콘텐츠 데이터 로드 (${contentData.length}개)`);
         
-        console.log(`✅ 총 ${allContent.length}개의 콘텐츠 로드 완료`);
-        
-        // 통계 업데이트
-        updateStatistics(allContent.length, publishedCount, draftCount, scheduledCount, archivedCount);
-        
-        // 필터 적용 및 렌더링
-        applyFilters();
+        // 콘텐츠가 없어도 빈 상태로 표시 (사용자가 직접 작성하도록)
+        if (contentData.length === 0) {
+            console.log('📝 아직 작성된 콘텐츠가 없습니다. 새 콘텐츠를 작성해보세요.');
+        }
         
         hideLoading();
+        console.log('✅ 콘텐츠 데이터 로드 완료');
         
     } catch (error) {
         console.error('❌ 콘텐츠 데이터 로드 실패:', error);
@@ -227,265 +221,610 @@ async function loadContentData() {
     }
 }
 
+// 커뮤니티용 샘플 데이터 생성
+// 샘플 데이터 로직 제거됨 - 사용자가 직접 콘텐츠 작성
+
+// 콘텐츠 목록 표시
+function displayContentList(data) {
+    const container = document.getElementById('contentList');
+    
+    if (data.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-12">
+                <i class="fas fa-file-alt text-6xl text-gray-300 mb-4"></i>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">콘텐츠가 없습니다</h3>
+                <p class="text-gray-600 mb-4">새로운 콘텐츠를 작성해보세요.</p>
+                <button onclick="showCreateModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+                    <i class="fas fa-plus mr-2"></i>새 콘텐츠 작성
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = data.map(content => {
+        // 안전한 versions 접근
+        const versions = content.versions || {};
+        const koVersion = versions.ko || {};
+        const publishedCount = Object.values(versions).filter(v => v && v.published).length;
+        const totalVersions = Object.keys(versions).length;
+        const translationNeededCount = Object.values(versions).filter(v => v && (v.translationStatus === 'missing' || v.translationStatus === 'outdated')).length;
+        
+        return `
+            <div class="content-card bg-white border border-gray-200 rounded-lg p-6">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <span class="content-type-badge type-${content.type}">
+                                ${CONTENT_TYPES[content.type]?.name || content.type}
+                            </span>
+                            <span class="status-badge ${getStatusClass(content.status || 'draft')}">
+                                ${getStatusName(content.status || 'draft')}
+                            </span>
+                            <span class="status-badge ${content.priority === 'urgent' ? 'bg-red-100 text-red-800' : content.priority === 'high' ? 'bg-orange-100 text-orange-800' : 'bg-gray-100 text-gray-800'}">
+                                ${content.priority === 'urgent' ? '긴급' : content.priority === 'high' ? '높음' : '일반'}
+                            </span>
+                            ${content.featured ? '<span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded"><i class="fas fa-star mr-1"></i>주요</span>' : ''}
+                        </div>
+                        
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                            ${koVersion.title || '제목 없음'}
+                        </h3>
+                        
+                        <div class="flex items-center space-x-4 text-sm text-gray-600 mb-4">
+                            <span><i class="fas fa-calendar mr-1"></i>생성: ${formatDate(content.createdAt)}</span>
+                            <span><i class="fas fa-edit mr-1"></i>수정: ${formatDate(content.updatedAt)}</span>
+                        </div>
+                        
+                        <!-- 언어별 상태 -->
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-700">언어별 상태:</span>
+                                <span class="text-sm text-gray-600">${publishedCount}/${totalVersions} 게시중</span>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                ${Object.entries(versions).map(([lang, version]) => {
+                                    const langInfo = SUPPORTED_LANGUAGES[lang];
+                                    let statusClass = 'translation-missing';
+                                    let statusText = '번역 필요';
+                                    
+                                    if (version.content && version.published) {
+                                        statusClass = 'translation-updated';
+                                        statusText = '게시중';
+                                    } else if (version.content && !version.published) {
+                                        statusClass = 'translation-outdated';
+                                        statusText = '초안';
+                                    }
+                                    
+                                    return `
+                                        <div class="flex items-center space-x-1">
+                                            <span class="language-badge lang-${lang}">${langInfo.emoji} ${langInfo.code.toUpperCase()}</span>
+                                            <span class="translation-badge ${statusClass}">${statusText}</span>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                        
+                        ${translationNeededCount > 0 ? `
+                            <div class="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm">
+                                <i class="fas fa-exclamation-triangle text-yellow-600 mr-1"></i>
+                                <span class="text-yellow-800">${translationNeededCount}개 언어의 번역이 필요합니다.</span>
+                            </div>
+                        ` : ''}
+                        
+                        ${content.tags ? `
+                            <div class="mt-3">
+                                <div class="flex flex-wrap gap-1">
+                                    ${content.tags.split(',').slice(0, 5).map(tag => 
+                                        `<span class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">${tag.trim()}</span>`
+                                    ).join('')}
+                                    ${content.tags.split(',').length > 5 ? '<span class="px-2 py-1 bg-gray-200 text-gray-600 rounded text-xs">+더보기</span>' : ''}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="flex space-x-2 ml-4">
+                        <button onclick="editContent('${content.id}')" class="text-blue-600 hover:text-blue-800">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="duplicateContent('${content.id}')" class="text-green-600 hover:text-green-800">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <button onclick="deleteContent('${content.id}')" class="text-red-600 hover:text-red-800">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
 // 통계 업데이트
-function updateStatistics(total, published, draft, scheduled, archived) {
-    console.log('📈 통계 업데이트:', { total, published, draft, scheduled, archived });
+function updateStatistics() {
+    const total = contentData.length;
+    const published = contentData.reduce((count, content) => {
+        const versions = content.versions || {};
+        return count + Object.values(versions).filter(v => v && v.published).length;
+    }, 0);
+    const translationNeeded = contentData.reduce((count, content) => {
+        const versions = content.versions || {};
+        return count + Object.values(versions).filter(v => v && (v.translationStatus === 'missing' || v.translationStatus === 'outdated')).length;
+    }, 0);
     
     document.getElementById('totalContent').textContent = total;
     document.getElementById('publishedContent').textContent = published;
-    document.getElementById('draftContent').textContent = draft;
-    document.getElementById('scheduledContent').textContent = scheduled;
-    document.getElementById('archivedContent').textContent = archived;
-    document.getElementById('contentCount').textContent = `총 ${total}개`;
+    document.getElementById('translationNeeded').textContent = translationNeeded;
 }
 
-// 필터 적용
-function applyFilters() {
-    console.log('🔍 필터 적용');
+// 작성 방식 토글
+function toggleCreationMode() {
+    const mode = document.querySelector('input[name="creationMode"]:checked').value;
+    const autoTranslateSettings = document.getElementById('autoTranslateSettings');
+    const autoTranslateSection = document.getElementById('autoTranslateSection');
     
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
-    const typeFilter = document.getElementById('typeFilter').value;
+    if (mode === 'auto_translate') {
+        autoTranslateSettings.classList.remove('hidden');
+        autoTranslateSection.classList.remove('hidden');
+    } else {
+        autoTranslateSettings.classList.add('hidden');
+        autoTranslateSection.classList.add('hidden');
+    }
+}
+
+// 언어 탭 전환
+function switchLanguageTab(language) {
+    // 모든 탭 비활성화
+    document.querySelectorAll('.language-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // 모든 콘텐츠 숨김
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // 선택된 탭 활성화
+    document.querySelector(`[data-lang="${language}"]`).classList.add('active');
+    document.querySelector(`.tab-content[data-lang="${language}"]`).classList.add('active');
+}
+
+// 자동 번역 실행
+async function performAutoTranslation() {
+    try {
+        const sourceLanguage = document.getElementById('sourceLanguage').value;
+        const targetLanguages = Array.from(document.querySelectorAll('input[name="targetLanguages"]:checked')).map(input => input.value);
+        
+        const sourceTitle = document.getElementById(`title_${sourceLanguage}`).value;
+        const sourceContent = quillEditors[sourceLanguage].root.innerHTML;
+        
+        if (!sourceTitle || !sourceContent) {
+            showError('원본 언어의 제목과 내용을 먼저 입력해주세요.');
+            return;
+        }
+        
+        showSuccess('자동 번역을 시작합니다...');
+        
+        // 실제 환경에서는 Google Translate API 또는 다른 번역 서비스 사용
+        // 여기서는 시뮬레이션
+        for (const targetLang of targetLanguages) {
+            const translatedTitle = await simulateTranslation(sourceTitle, sourceLanguage, targetLang);
+            const translatedContent = await simulateTranslation(sourceContent, sourceLanguage, targetLang);
+            
+            document.getElementById(`title_${targetLang}`).value = translatedTitle;
+            quillEditors[targetLang].root.innerHTML = translatedContent;
+        }
+        
+        showSuccess('자동 번역이 완료되었습니다. 번역 결과를 검토하고 필요시 수정해주세요.');
+        
+    } catch (error) {
+        console.error('자동 번역 실패:', error);
+        showError('자동 번역에 실패했습니다.');
+    }
+}
+
+// 번역 시뮬레이션 (실제로는 Google Translate API 등 사용)
+async function simulateTranslation(text, fromLang, toLang) {
+    // 간단한 시뮬레이션 - 실제로는 번역 API 호출
+    const translations = {
+        ko: {
+            en: { '자주 묻는 질문': 'Frequently Asked Questions', '사용자 매뉴얼': 'User Manual' },
+            ja: { '자주 묻는 질문': 'よくある質問', '사용자 매뉴얼': 'ユーザーマニュアル' },
+            zh: { '자주 묻는 질문': '常见问题', '사용자 매뉴얼': '用户手册' },
+            es: { '자주 묻는 질문': 'Preguntas Frecuentes', '사용자 매뉴얼': 'Manual del Usuario' }
+        }
+    };
+    
+    await new Promise(resolve => setTimeout(resolve, 1000)); // 번역 지연 시뮬레이션
+    
+    const translationMap = translations[fromLang]?.[toLang];
+    if (translationMap && translationMap[text]) {
+        return translationMap[text];
+    }
+    
+    return `[${toLang.toUpperCase()}] ${text}`;
+}
+
+// 콘텐츠 저장
+async function saveContent() {
+    try {
+        const contentType = document.getElementById('contentType').value;
+        const priority = document.getElementById('priority').value;
+        const contentStatus = document.getElementById('contentStatus')?.value || 'draft';
+        const contentTags = document.getElementById('contentTags')?.value || '';
+        const contentFeatured = document.getElementById('contentFeatured')?.checked || false;
+        const currentTime = new Date().toISOString();
+        
+        const contentId = currentEditingId || `${contentType}_${Date.now()}`;
+        const isEditing = currentEditingId !== null;
+        
+        // 언어별 데이터 수집
+        const versions = {};
+        Object.keys(SUPPORTED_LANGUAGES).forEach(lang => {
+            const title = document.getElementById(`title_${lang}`).value.trim();
+            const content = quillEditors[lang].root.innerHTML;
+            const published = contentStatus === 'published'; // 상태 드롭다운에서 결정
+            
+            if (title || content !== '<p><br></p>') {
+                versions[lang] = {
+                    title: title || '',
+                    content: content,
+                    published: published,
+                    lastModified: currentTime,
+                    translationStatus: 'updated'
+                };
+            }
+        });
+        
+        if (Object.keys(versions).length === 0) {
+            showError('최소 하나의 언어로 콘텐츠를 작성해주세요.');
+            return;
+        }
+        
+        const contentItem = {
+            id: contentId,
+            type: contentType,
+            priority: priority,
+            status: contentStatus,
+            tags: contentTags,
+            featured: contentFeatured,
+            createdAt: isEditing ? (contentData.find(c => c.id === contentId)?.createdAt || currentTime) : currentTime,
+            updatedAt: currentTime,
+            versions: versions
+        };
+        
+        // 로컬 스토리지에 저장
+        if (isEditing) {
+            const index = contentData.findIndex(c => c.id === contentId);
+            if (index >= 0) {
+                contentData[index] = contentItem;
+            }
+        } else {
+            contentData.unshift(contentItem);
+        }
+        
+        // Firestore에 저장
+        if (!window.db) {
+            throw new Error('Firebase가 초기화되지 않았습니다.');
+        }
+        
+        // 현재 사용자 인증 정보 확인
+        const currentUser = window.auth.currentUser;
+        console.log('🔐 현재 사용자 정보:', {
+            email: currentUser?.email,
+            uid: currentUser?.uid,
+            token: currentUser ? '인증됨' : '인증 안됨'
+        });
+        
+        // 토큰 정보 확인
+        if (currentUser) {
+            try {
+                const token = await currentUser.getIdToken();
+                const tokenClaims = await currentUser.getIdTokenResult();
+                console.log('🎫 토큰 정보:', {
+                    email: tokenClaims.claims.email,
+                    admin: tokenClaims.claims.admin,
+                    customClaims: tokenClaims.claims
+                });
+            } catch (tokenError) {
+                console.error('❌ 토큰 정보 가져오기 실패:', tokenError);
+            }
+        }
+        
+        const { doc, setDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js");
+        const contentRef = doc(window.db, 'admin_content', contentId);
+        
+        console.log('📝 저장할 콘텐츠:', {
+            id: contentId,
+            type: contentItem.type,
+            versionsCount: Object.keys(contentItem.versions).length
+        });
+        
+        // 사용자 정보를 문서에 추가 (권한 우회용)
+        const contentWithUser = {
+            ...contentItem,
+            userId: currentUser.email,
+            userUid: currentUser.uid,
+            createdAt: contentItem.createdAt || serverTimestamp(),
+            updatedAt: serverTimestamp()
+        };
+        
+        console.log('💾 DB 저장 시도:', contentRef.path);
+        
+        try {
+            await setDoc(contentRef, contentWithUser);
+            console.log('✅ Firestore에 콘텐츠 저장 성공!');
+        } catch (firestoreError) {
+            console.error('❌ Firestore 저장 실패:', firestoreError);
+            console.log('🔍 권한 문제 디버깅:', {
+                userEmail: currentUser.email,
+                isLocalHost: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1',
+                collection: 'admin_content',
+                documentId: contentId
+            });
+            
+            // DB 저장에 실패하면 에러를 throw (로컬 저장하지 않음)
+            throw new Error(`DB 저장 실패: ${firestoreError.message}. 관리자 권한을 확인해주세요.`);
+        }
+        console.log('✅ Firestore에 콘텐츠 저장 완료');
+        
+        displayContentList(contentData);
+        updateStatistics();
+        closeModal();
+        showSuccess(isEditing ? '콘텐츠가 수정되었습니다.' : '새 콘텐츠가 생성되었습니다.');
+        
+    } catch (error) {
+        console.error('콘텐츠 저장 실패:', error);
+        showError('콘텐츠 저장에 실패했습니다.');
+    }
+}
+
+// 콘텐츠 편집
+function editContent(contentId) {
+    const content = contentData.find(c => c.id === contentId);
+    if (!content) {
+        showError('콘텐츠를 찾을 수 없습니다.');
+        return;
+    }
+    
+    currentEditingId = contentId;
+    
+    // 모달 제목 변경
+    document.getElementById('modalTitle').textContent = '콘텐츠 편집';
+    
+    // 기본 정보 설정
+    document.getElementById('contentType').value = content.type;
+    document.getElementById('priority').value = content.priority;
+    
+    // 새로 추가된 필드들
+    if (document.getElementById('contentStatus')) {
+        document.getElementById('contentStatus').value = content.status || 'draft';
+    }
+    if (document.getElementById('contentTags')) {
+        document.getElementById('contentTags').value = content.tags || '';
+    }
+    if (document.getElementById('contentFeatured')) {
+        document.getElementById('contentFeatured').checked = content.featured || false;
+    }
+    
+    // 언어별 데이터 설정
+    Object.keys(SUPPORTED_LANGUAGES).forEach(lang => {
+        const versions = content.versions || {};
+        const version = versions[lang];
+        if (version) {
+            document.getElementById(`title_${lang}`).value = version.title || '';
+            quillEditors[lang].root.innerHTML = version.content || '';
+            document.getElementById(`status_${lang}`).textContent = version.published ? '게시됨' : '초안';
+        } else {
+            document.getElementById(`title_${lang}`).value = '';
+            quillEditors[lang].root.innerHTML = '';
+            document.getElementById(`status_${lang}`).textContent = '초안';
+        }
+    });
+    
+    showModal();
+}
+
+// 콘텐츠 복제
+function duplicateContent(contentId) {
+    const content = contentData.find(c => c.id === contentId);
+    if (!content) {
+        showError('콘텐츠를 찾을 수 없습니다.');
+        return;
+    }
+    
+    currentEditingId = null;
+    
+    // 모달 제목 변경
+    document.getElementById('modalTitle').textContent = '콘텐츠 복제';
+    
+    // 기본 정보 설정
+    document.getElementById('contentType').value = content.type;
+    document.getElementById('priority').value = content.priority;
+    
+    // 복제된 콘텐츠의 새로운 필드 설정
+    if (document.getElementById('contentStatus')) {
+        document.getElementById('contentStatus').value = 'draft'; // 복제 시 초안으로 설정
+    }
+    if (document.getElementById('contentTags')) {
+        document.getElementById('contentTags').value = content.tags || ''; // 태그 복사
+    }
+    if (document.getElementById('contentFeatured')) {
+        document.getElementById('contentFeatured').checked = false; // 복제 시 주요 콘텐츠 설정 해제
+    }
+    
+    // 언어별 데이터 설정 (복제)
+    Object.keys(SUPPORTED_LANGUAGES).forEach(lang => {
+        const version = content.versions[lang];
+        if (version) {
+            document.getElementById(`title_${lang}`).value = `[복사] ${version.title || ''}`;
+            quillEditors[lang].root.innerHTML = version.content || '';
+            document.getElementById(`status_${lang}`).textContent = '초안';
+        }
+    });
+    
+    showModal();
+}
+
+// 콘텐츠 삭제
+async function deleteContent(contentId) {
+    const content = contentData.find(c => c.id === contentId);
+    if (!content) {
+        showError('콘텐츠를 찾을 수 없습니다.');
+        return;
+    }
+    
+    const versions = content.versions || {};
+    const koVersion = versions.ko || {};
+    if (confirm(`"${koVersion.title || '제목 없음'}" 콘텐츠를 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`)) {
+        try {
+            // Firestore에서 삭제
+            const { doc, deleteDoc } = await import("https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js");
+            const contentRef = doc(window.db, 'admin_content', contentId);
+            await deleteDoc(contentRef);
+            console.log('✅ Firestore에서 콘텐츠 삭제 완료');
+            
+            // 로컬 데이터에서 제거
+            contentData = contentData.filter(c => c.id !== contentId);
+            localStorage.setItem('admin_content', JSON.stringify(contentData));
+            
+            displayContentList(contentData);
+            updateStatistics();
+            showSuccess('콘텐츠가 삭제되었습니다.');
+            
+        } catch (error) {
+            console.error('콘텐츠 삭제 실패:', error);
+            showError('콘텐츠 삭제에 실패했습니다.');
+        }
+    }
+}
+
+// 필터링
+function filterContent() {
+    const typeFilter = document.getElementById('contentTypeFilter').value;
+    const langFilter = document.getElementById('languageFilter').value;
     const statusFilter = document.getElementById('statusFilter').value;
-    const sortBy = document.getElementById('sortBy').value;
+    const translationFilter = document.getElementById('translationFilter').value;
     
-    // 필터링
-    filteredContent = allContent.filter(content => {
-        let matches = true;
-        
-        // 검색어 필터
-        if (searchTerm) {
-            matches = matches && (
-                content.title?.toLowerCase().includes(searchTerm) ||
-                content.summary?.toLowerCase().includes(searchTerm) ||
-                content.content?.toLowerCase().includes(searchTerm)
-            );
-        }
-        
-        // 타입 필터
-        if (typeFilter && typeFilter !== 'all') {
-            matches = matches && content.type === typeFilter;
-        }
-        
-        // 상태 필터
-        if (statusFilter && statusFilter !== 'all') {
-            matches = matches && content.status === statusFilter;
-        }
-        
-        return matches;
+    let filteredData = [...contentData];
+    
+    // 타입 필터
+    if (typeFilter !== 'all') {
+        filteredData = filteredData.filter(content => content.type === typeFilter);
+    }
+    
+    // 언어 필터
+    if (langFilter !== 'all') {
+        filteredData = filteredData.filter(content => {
+            const version = content.versions[langFilter];
+            return version && version.content;
+        });
+    }
+    
+    // 상태 필터
+    if (statusFilter !== 'all') {
+        filteredData = filteredData.filter(content => {
+            const hasStatus = Object.values(content.versions).some(version => {
+                if (statusFilter === 'published') return version.published;
+                if (statusFilter === 'draft') return !version.published && version.content;
+                if (statusFilter === 'archived') return false; // 추후 구현
+                return true;
+            });
+            return hasStatus;
+        });
+    }
+    
+    // 번역 상태 필터
+    if (translationFilter !== 'all') {
+        filteredData = filteredData.filter(content => {
+            const hasTranslationStatus = Object.values(content.versions).some(version => {
+                return version.translationStatus === translationFilter;
+            });
+            return hasTranslationStatus;
+        });
+    }
+    
+    displayContentList(filteredData);
+}
+
+// 모달 관리
+function showCreateModal() {
+    currentEditingId = null;
+    document.getElementById('modalTitle').textContent = '새 콘텐츠 작성';
+    
+    // 폼 초기화
+    document.getElementById('contentType').value = 'faq';
+    document.getElementById('priority').value = 'normal';
+    
+    // 새로 추가된 필드 초기화
+    if (document.getElementById('contentStatus')) {
+        document.getElementById('contentStatus').value = 'draft';
+    }
+    if (document.getElementById('contentTags')) {
+        document.getElementById('contentTags').value = '';
+    }
+    if (document.getElementById('contentFeatured')) {
+        document.getElementById('contentFeatured').checked = false;
+    }
+    
+    // 작성 방식 초기화
+    document.querySelector('input[name="creationMode"][value="individual"]').checked = true;
+    toggleCreationMode();
+    
+    // 언어별 입력 필드 초기화
+    Object.keys(SUPPORTED_LANGUAGES).forEach(lang => {
+        document.getElementById(`title_${lang}`).value = '';
+        quillEditors[lang].root.innerHTML = '';
+        document.getElementById(`status_${lang}`).textContent = '초안';
     });
     
-    // 정렬
-    filteredContent.sort((a, b) => {
-        switch (sortBy) {
-            case 'newest':
-                return new Date(b.created_at) - new Date(a.created_at);
-            case 'oldest':
-                return new Date(a.created_at) - new Date(b.created_at);
-            case 'title':
-                return (a.title || '').localeCompare(b.title || '');
-            case 'type':
-                return (a.type || '').localeCompare(b.type || '');
-            case 'status':
-                return (a.status || '').localeCompare(b.status || '');
-            default:
-                return new Date(b.created_at) - new Date(a.created_at);
-        }
-    });
-    
-    console.log(`📋 필터링 결과: ${filteredContent.length}개 콘텐츠`);
-    
-    // 페이지 재설정 및 렌더링
-    currentPage = 1;
-    renderContent();
+    showModal();
 }
 
-// 콘텐츠 렌더링
-function renderContent() {
-    const contentList = document.getElementById('contentList');
-    const contentGrid = document.getElementById('contentGrid');
-    const emptyState = document.getElementById('emptyState');
-    
-    if (filteredContent.length === 0) {
-        contentGrid.classList.add('hidden');
-        emptyState.classList.remove('hidden');
-        return;
-    }
-    
-    emptyState.classList.add('hidden');
-    contentGrid.classList.remove('hidden');
-    
-    // 페이지네이션 계산
-    const startIndex = (currentPage - 1) * contentPerPage;
-    const endIndex = startIndex + contentPerPage;
-    const pageContent = filteredContent.slice(startIndex, endIndex);
-    
-    // 콘텐츠 카드 생성
-    contentList.innerHTML = pageContent.map(content => createContentCard(content)).join('');
-    
-    // 페이지네이션 렌더링
-    renderPagination();
-    
-    // 선택 상태 업데이트
-    updateSelectionUI();
+function showModal() {
+    document.getElementById('contentModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
 }
 
-// 콘텐츠 카드 생성
-function createContentCard(content) {
-    const isSelected = selectedContent.has(content.id);
-    const typeClass = `type-${content.type}`;
-    const statusClass = `status-${content.status}`;
-    
-    const typeName = {
-        notice: '공지사항',
-        help: '도움말',
-        banner: '배너',
-        announcement: '알림',
-        tutorial: '튜토리얼'
-    }[content.type] || content.type;
-    
-    const statusName = {
-        published: '게시됨',
-        draft: '초안',
-        scheduled: '예약됨',
-        archived: '보관됨'
-    }[content.status] || content.status;
-    
-    const publishDate = content.publish_date ? formatDate(content.publish_date) : '';
-    
-    return `
-        <div class="content-card bg-white border rounded-xl p-6 hover:shadow-lg transition-all duration-200 ${isSelected ? 'selected-content' : ''}">
-            <div class="flex items-start justify-between mb-4">
-                <div class="flex items-center space-x-3">
-                    <input 
-                        type="checkbox" 
-                        class="content-checkbox rounded border-gray-300 text-green-600 focus:ring-green-500" 
-                        ${isSelected ? 'checked' : ''}
-                        onchange="toggleContentSelection('${content.id}')"
-                    >
-                    <div class="flex space-x-2">
-                        <span class="content-type-badge ${typeClass}">${typeName}</span>
-                        <span class="status-badge ${statusClass}">${statusName}</span>
-                        ${content.featured ? '<span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded"><i class="fas fa-star mr-1"></i>주요</span>' : ''}
-                    </div>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <button onclick="viewContent('${content.id}')" class="text-blue-600 hover:text-blue-800" title="상세보기">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button onclick="editContent('${content.id}')" class="text-green-600 hover:text-green-800" title="편집">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button onclick="duplicateContent('${content.id}')" class="text-purple-600 hover:text-purple-800" title="복제">
-                        <i class="fas fa-copy"></i>
-                    </button>
-                    <div class="relative">
-                        <button onclick="toggleStatusMenu('${content.id}')" class="text-gray-600 hover:text-gray-800" title="상태 변경">
-                            <i class="fas fa-ellipsis-v"></i>
-                        </button>
-                        <div id="statusMenu-${content.id}" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border z-10">
-                            <button onclick="changeStatus('${content.id}', 'published')" class="w-full text-left px-4 py-2 hover:bg-gray-50 rounded-t-lg">
-                                <i class="fas fa-eye text-green-600 mr-2"></i>게시
-                            </button>
-                            <button onclick="changeStatus('${content.id}', 'draft')" class="w-full text-left px-4 py-2 hover:bg-gray-50">
-                                <i class="fas fa-edit text-yellow-600 mr-2"></i>초안으로
-                            </button>
-                            <button onclick="changeStatus('${content.id}', 'archived')" class="w-full text-left px-4 py-2 hover:bg-gray-50">
-                                <i class="fas fa-archive text-gray-600 mr-2"></i>보관
-                            </button>
-                            <hr class="my-1">
-                            <button onclick="deleteContent('${content.id}')" class="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 rounded-b-lg">
-                                <i class="fas fa-trash mr-2"></i>삭제
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <h3 class="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">${content.title || '제목 없음'}</h3>
-            
-            ${content.summary ? `<p class="text-gray-600 text-sm mb-3 line-clamp-2">${content.summary}</p>` : ''}
-            
-            <div class="flex items-center justify-between text-xs text-gray-500">
-                <div class="flex items-center space-x-4">
-                    <span><i class="fas fa-calendar-alt mr-1"></i>${formatDate(content.created_at)}</span>
-                    ${content.status === 'scheduled' && publishDate ? 
-                        `<span><i class="fas fa-clock mr-1"></i>예약: ${publishDate}</span>` : ''}
-                    ${content.priority && content.priority !== 'normal' ? 
-                        `<span class="px-2 py-1 rounded ${getPriorityClass(content.priority)}">${getPriorityName(content.priority)}</span>` : ''}
-                </div>
-                <div class="flex items-center space-x-2">
-                    ${content.tags ? content.tags.split(',').slice(0, 3).map(tag => 
-                        `<span class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">${tag.trim()}</span>`
-                    ).join('') : ''}
-                </div>
-            </div>
-        </div>
-    `;
+function closeModal() {
+    document.getElementById('contentModal').classList.add('hidden');
+    document.body.style.overflow = 'auto';
+    currentEditingId = null;
 }
 
-// 페이지네이션 렌더링
-function renderPagination() {
-    const totalPages = Math.ceil(filteredContent.length / contentPerPage);
-    const pagination = document.getElementById('pagination');
-    
-    if (totalPages <= 1) {
-        pagination.innerHTML = '';
-        return;
-    }
-    
-    let paginationHTML = '';
-    
-    // 이전 버튼
-    if (currentPage > 1) {
-        paginationHTML += `
-            <button onclick="changePage(${currentPage - 1})" class="px-4 py-2 border border-gray-300 rounded-l-lg hover:bg-gray-50">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-        `;
-    }
-    
-    // 페이지 번호
-    const startPage = Math.max(1, currentPage - 2);
-    const endPage = Math.min(totalPages, currentPage + 2);
-    
-    if (startPage > 1) {
-        paginationHTML += `<button onclick="changePage(1)" class="px-4 py-2 border-t border-b border-gray-300 hover:bg-gray-50">1</button>`;
-        if (startPage > 2) {
-            paginationHTML += `<span class="px-4 py-2 border-t border-b border-gray-300">...</span>`;
-        }
-    }
-    
-    for (let i = startPage; i <= endPage; i++) {
-        paginationHTML += `
-            <button onclick="changePage(${i})" class="px-4 py-2 border-t border-b border-gray-300 hover:bg-gray-50 ${i === currentPage ? 'bg-green-50 text-green-600 border-green-300' : ''}">
-                ${i}
-            </button>
-        `;
-    }
-    
-    if (endPage < totalPages) {
-        if (endPage < totalPages - 1) {
-            paginationHTML += `<span class="px-4 py-2 border-t border-b border-gray-300">...</span>`;
-        }
-        paginationHTML += `<button onclick="changePage(${totalPages})" class="px-4 py-2 border-t border-b border-gray-300 hover:bg-gray-50">${totalPages}</button>`;
-    }
-    
-    // 다음 버튼
-    if (currentPage < totalPages) {
-        paginationHTML += `
-            <button onclick="changePage(${currentPage + 1})" class="px-4 py-2 border border-gray-300 rounded-r-lg hover:bg-gray-50">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-        `;
-    }
-    
-    pagination.innerHTML = `<div class="flex items-center">${paginationHTML}</div>`;
+// 콘텐츠 새로고침
+async function refreshContent() {
+    await loadContentData();
+    updateStatistics();
+    showSuccess('콘텐츠 목록이 새로고침되었습니다.');
 }
 
 // 유틸리티 함수들
-function formatDate(date) {
-    if (!date) return '';
-    if (typeof date === 'string') date = new Date(date);
+function showLoading() {
+    document.getElementById('loadingSpinner').classList.remove('hidden');
+}
+
+function hideLoading() {
+    document.getElementById('loadingSpinner').classList.add('hidden');
+}
+
+function formatDate(dateValue) {
+    if (!dateValue) return '-';
+    
+    let date;
+    // Firestore Timestamp 객체인 경우
+    if (dateValue.toDate && typeof dateValue.toDate === 'function') {
+        date = dateValue.toDate();
+    }
+    // 이미 Date 객체인 경우 또는 문자열인 경우
+    else {
+        date = new Date(dateValue);
+    }
+    
+    if (isNaN(date.getTime())) return '-';
+    
     return date.toLocaleDateString('ko-KR', {
         year: 'numeric',
         month: 'short',
@@ -495,552 +834,7 @@ function formatDate(date) {
     });
 }
 
-function getPriorityClass(priority) {
-    const classes = {
-        low: 'bg-green-100 text-green-800',
-        normal: 'bg-blue-100 text-blue-800',
-        high: 'bg-orange-100 text-orange-800',
-        urgent: 'bg-red-100 text-red-800'
-    };
-    return classes[priority] || classes.normal;
-}
-
-function getPriorityName(priority) {
-    const names = {
-        low: '낮음',
-        normal: '보통',
-        high: '높음',
-        urgent: '긴급'
-    };
-    return names[priority] || priority;
-}
-
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-// 전역 함수들 (HTML에서 호출)
-window.handleSearch = function() {
-    applyFilters();
-};
-
-window.refreshContent = async function() {
-    await loadContentData();
-};
-
-window.createNewContent = function() {
-    openContentModal();
-};
-
-window.toggleSelectAll = function() {
-    const selectAll = document.getElementById('selectAll');
-    const pageContent = filteredContent.slice((currentPage - 1) * contentPerPage, currentPage * contentPerPage);
-    
-    if (selectAll.checked) {
-        pageContent.forEach(content => selectedContent.add(content.id));
-    } else {
-        pageContent.forEach(content => selectedContent.delete(content.id));
-    }
-    
-    renderContent();
-};
-
-window.toggleContentSelection = function(contentId) {
-    if (selectedContent.has(contentId)) {
-        selectedContent.delete(contentId);
-    } else {
-        selectedContent.add(contentId);
-    }
-    updateSelectionUI();
-};
-
-window.clearSelection = function() {
-    selectedContent.clear();
-    renderContent();
-};
-
-window.changePage = function(page) {
-    currentPage = page;
-    renderContent();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-};
-
-window.viewContent = function(contentId) {
-    const content = allContent.find(c => c.id === contentId);
-    if (content) {
-        openContentViewModal(content);
-    }
-};
-
-window.editContent = function(contentId) {
-    const content = allContent.find(c => c.id === contentId);
-    if (content) {
-        openContentModal(content);
-    }
-};
-
-window.editContentFromView = function() {
-    if (currentEditingId) {
-        closeContentViewModal();
-        editContent(currentEditingId);
-    }
-};
-
-window.duplicateContent = async function(contentId) {
-    const content = allContent.find(c => c.id === contentId);
-    if (content) {
-        try {
-            const duplicatedContent = {
-                ...content,
-                title: `${content.title} (복사본)`,
-                status: 'draft',
-                created_at: new Date(),
-                updated_at: new Date(),
-                publish_date: null
-            };
-            
-            delete duplicatedContent.id;
-            
-            const newRef = doc(collection(db, 'admin_content'));
-            await setDoc(newRef, duplicatedContent);
-            
-            showSuccess('콘텐츠가 복제되었습니다.');
-            await loadContentData();
-        } catch (error) {
-            console.error('콘텐츠 복제 실패:', error);
-            showError('콘텐츠 복제에 실패했습니다.');
-        }
-    }
-};
-
-window.toggleStatusMenu = function(contentId) {
-    // 모든 메뉴 숨기기
-    document.querySelectorAll('[id^="statusMenu-"]').forEach(menu => {
-        menu.classList.add('hidden');
-    });
-    
-    // 해당 메뉴 토글
-    const menu = document.getElementById(`statusMenu-${contentId}`);
-    if (menu) {
-        menu.classList.toggle('hidden');
-    }
-    
-    // 외부 클릭 시 메뉴 닫기
-    setTimeout(() => {
-        document.addEventListener('click', function closeMenu(e) {
-            if (!e.target.closest('[id^="statusMenu-"]') && !e.target.closest('button[onclick^="toggleStatusMenu"]')) {
-                document.querySelectorAll('[id^="statusMenu-"]').forEach(menu => {
-                    menu.classList.add('hidden');
-                });
-                document.removeEventListener('click', closeMenu);
-            }
-        });
-    }, 100);
-};
-
-window.changeStatus = async function(contentId, newStatus) {
-    try {
-        const contentRef = doc(db, 'admin_content', contentId);
-        await updateDoc(contentRef, {
-            status: newStatus,
-            updated_at: new Date()
-        });
-        
-        showSuccess('상태가 변경되었습니다.');
-        await loadContentData();
-    } catch (error) {
-        console.error('상태 변경 실패:', error);
-        showError('상태 변경에 실패했습니다.');
-    }
-};
-
-window.deleteContent = async function(contentId) {
-    if (!confirm('이 콘텐츠를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
-        return;
-    }
-    
-    try {
-        await deleteDoc(doc(db, 'admin_content', contentId));
-        showSuccess('콘텐츠가 삭제되었습니다.');
-        await loadContentData();
-    } catch (error) {
-        console.error('콘텐츠 삭제 실패:', error);
-        showError('콘텐츠 삭제에 실패했습니다.');
-    }
-};
-
-// 대량 작업 함수들
-window.bulkPublish = async function() {
-    if (selectedContent.size === 0) return;
-    
-    if (!confirm(`선택된 ${selectedContent.size}개의 콘텐츠를 게시하시겠습니까?`)) {
-        return;
-    }
-    
-    try {
-        const promises = Array.from(selectedContent).map(contentId => 
-            updateDoc(doc(db, 'admin_content', contentId), {
-                status: 'published',
-                updated_at: new Date()
-            })
-        );
-        
-        await Promise.all(promises);
-        selectedContent.clear();
-        showSuccess('선택된 콘텐츠가 게시되었습니다.');
-        await loadContentData();
-    } catch (error) {
-        console.error('대량 게시 실패:', error);
-        showError('일부 콘텐츠 게시에 실패했습니다.');
-    }
-};
-
-window.bulkUnpublish = async function() {
-    if (selectedContent.size === 0) return;
-    
-    if (!confirm(`선택된 ${selectedContent.size}개의 콘텐츠를 비게시하시겠습니까?`)) {
-        return;
-    }
-    
-    try {
-        const promises = Array.from(selectedContent).map(contentId => 
-            updateDoc(doc(db, 'admin_content', contentId), {
-                status: 'draft',
-                updated_at: new Date()
-            })
-        );
-        
-        await Promise.all(promises);
-        selectedContent.clear();
-        showSuccess('선택된 콘텐츠가 비게시되었습니다.');
-        await loadContentData();
-    } catch (error) {
-        console.error('대량 비게시 실패:', error);
-        showError('일부 콘텐츠 비게시에 실패했습니다.');
-    }
-};
-
-window.bulkArchive = async function() {
-    if (selectedContent.size === 0) return;
-    
-    if (!confirm(`선택된 ${selectedContent.size}개의 콘텐츠를 보관하시겠습니까?`)) {
-        return;
-    }
-    
-    try {
-        const promises = Array.from(selectedContent).map(contentId => 
-            updateDoc(doc(db, 'admin_content', contentId), {
-                status: 'archived',
-                updated_at: new Date()
-            })
-        );
-        
-        await Promise.all(promises);
-        selectedContent.clear();
-        showSuccess('선택된 콘텐츠가 보관되었습니다.');
-        await loadContentData();
-    } catch (error) {
-        console.error('대량 보관 실패:', error);
-        showError('일부 콘텐츠 보관에 실패했습니다.');
-    }
-};
-
-window.bulkDelete = async function() {
-    if (selectedContent.size === 0) return;
-    
-    if (!confirm(`선택된 ${selectedContent.size}개의 콘텐츠를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`)) {
-        return;
-    }
-    
-    try {
-        const promises = Array.from(selectedContent).map(contentId => 
-            deleteDoc(doc(db, 'admin_content', contentId))
-        );
-        
-        await Promise.all(promises);
-        selectedContent.clear();
-        showSuccess('선택된 콘텐츠가 삭제되었습니다.');
-        await loadContentData();
-    } catch (error) {
-        console.error('대량 삭제 실패:', error);
-        showError('일부 콘텐츠 삭제에 실패했습니다.');
-    }
-};
-
-// 모달 관리
-function openContentModal(content = null) {
-    const modal = document.getElementById('contentModal');
-    const title = document.getElementById('modalTitle');
-    
-    isEditMode = !!content;
-    currentEditingId = content?.id || null;
-    
-    title.textContent = isEditMode ? '콘텐츠 편집' : '새 콘텐츠';
-    
-    if (isEditMode) {
-        // 편집 모드: 기존 데이터 로드
-        document.getElementById('contentId').value = content.id;
-        document.getElementById('contentType').value = content.type || '';
-        document.getElementById('contentStatus').value = content.status || 'draft';
-        document.getElementById('contentTitle').value = content.title || '';
-        document.getElementById('contentSummary').value = content.summary || '';
-        document.getElementById('contentPriority').value = content.priority || 'normal';
-        document.getElementById('contentTags').value = content.tags || '';
-        document.getElementById('contentFeatured').checked = content.featured || false;
-        
-        if (content.publish_date) {
-            const publishDate = new Date(content.publish_date);
-            publishDate.setMinutes(publishDate.getMinutes() - publishDate.getTimezoneOffset());
-            document.getElementById('publishDate').value = publishDate.toISOString().slice(0, 16);
-        }
-        
-        if (quillEditor && content.content) {
-            quillEditor.root.innerHTML = content.content;
-        }
-    } else {
-        // 새 콘텐츠 모드: 폼 초기화
-        document.getElementById('contentForm').reset();
-        if (quillEditor) {
-            quillEditor.setContents([]);
-        }
-    }
-    
-    togglePublishDateField();
-    modal.classList.remove('hidden');
-}
-
-window.closeContentModal = function() {
-    document.getElementById('contentModal').classList.add('hidden');
-    isEditMode = false;
-    currentEditingId = null;
-};
-
-function openContentViewModal(content) {
-    const modal = document.getElementById('contentViewModal');
-    const title = document.getElementById('viewModalTitle');
-    const details = document.getElementById('contentViewDetails');
-    
-    currentEditingId = content.id;
-    title.textContent = content.title || '콘텐츠 상세';
-    
-    const typeName = {
-        notice: '공지사항',
-        help: '도움말',
-        banner: '배너',
-        announcement: '알림',
-        tutorial: '튜토리얼'
-    }[content.type] || content.type;
-    
-    const statusName = {
-        published: '게시됨',
-        draft: '초안',
-        scheduled: '예약됨',
-        archived: '보관됨'
-    }[content.status] || content.status;
-    
-    details.innerHTML = `
-        <div class="space-y-6">
-            <div class="flex flex-wrap gap-2 mb-4">
-                <span class="content-type-badge type-${content.type}">${typeName}</span>
-                <span class="status-badge status-${content.status}">${statusName}</span>
-                ${content.featured ? '<span class="px-3 py-1 bg-yellow-100 text-yellow-800 text-sm font-medium rounded-full"><i class="fas fa-star mr-1"></i>주요 콘텐츠</span>' : ''}
-                ${content.priority && content.priority !== 'normal' ? 
-                    `<span class="px-3 py-1 rounded-full text-sm font-medium ${getPriorityClass(content.priority)}">${getPriorityName(content.priority)}</span>` : ''}
-            </div>
-            
-            ${content.summary ? `
-                <div class="bg-gray-50 rounded-lg p-4">
-                    <h4 class="font-medium text-gray-900 mb-2">요약</h4>
-                    <p class="text-gray-700">${content.summary}</p>
-                </div>
-            ` : ''}
-            
-            <div>
-                <h4 class="font-medium text-gray-900 mb-3">내용</h4>
-                <div class="prose max-w-none">
-                    ${content.content || '내용이 없습니다.'}
-                </div>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200">
-                <div>
-                    <h4 class="font-medium text-gray-700 mb-2">생성 정보</h4>
-                    <p class="text-sm text-gray-600">생성일: ${formatDate(content.created_at)}</p>
-                    <p class="text-sm text-gray-600">수정일: ${formatDate(content.updated_at)}</p>
-                    ${content.status === 'scheduled' && content.publish_date ? 
-                        `<p class="text-sm text-gray-600">예약일: ${formatDate(content.publish_date)}</p>` : ''}
-                </div>
-                
-                ${content.tags ? `
-                    <div>
-                        <h4 class="font-medium text-gray-700 mb-2">태그</h4>
-                        <div class="flex flex-wrap gap-1">
-                            ${content.tags.split(',').map(tag => 
-                                `<span class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm">${tag.trim()}</span>`
-                            ).join('')}
-                        </div>
-                    </div>
-                ` : ''}
-            </div>
-        </div>
-    `;
-    
-    modal.classList.remove('hidden');
-}
-
-window.closeContentViewModal = function() {
-    document.getElementById('contentViewModal').classList.add('hidden');
-    currentEditingId = null;
-};
-
-// 폼 처리
-function togglePublishDateField() {
-    const status = document.getElementById('contentStatus').value;
-    const publishDateSection = document.getElementById('publishDateSection');
-    
-    if (status === 'scheduled') {
-        publishDateSection.classList.remove('hidden');
-    } else {
-        publishDateSection.classList.add('hidden');
-    }
-}
-
-function handleFormSubmit(e) {
-    e.preventDefault();
-    saveContent();
-}
-
-async function saveContent() {
-    try {
-        console.log('💾 콘텐츠 저장 시작');
-        
-        const formData = {
-            type: document.getElementById('contentType').value,
-            status: document.getElementById('contentStatus').value,
-            title: document.getElementById('contentTitle').value,
-            summary: document.getElementById('contentSummary').value,
-            content: quillEditor ? quillEditor.root.innerHTML : '',
-            priority: document.getElementById('contentPriority').value,
-            tags: document.getElementById('contentTags').value,
-            featured: document.getElementById('contentFeatured').checked
-        };
-        
-        console.log('📝 폼 데이터:', formData);
-        
-        // 유효성 검사
-        if (!formData.type || !formData.title) {
-            showError('타입과 제목은 필수 입력 항목입니다.');
-            return;
-        }
-        
-        // 예약 게시 날짜
-        if (formData.status === 'scheduled') {
-            const publishDate = document.getElementById('publishDate').value;
-            if (publishDate) {
-                formData.publish_date = new Date(publishDate);
-            }
-        }
-        
-        // 현재 시간을 직접 설정 (serverTimestamp 대신)
-        const currentTime = new Date();
-        
-        if (isEditMode && currentEditingId) {
-            console.log('✏️ 콘텐츠 수정 모드');
-            // 수정
-            const contentRef = doc(db, 'admin_content', currentEditingId);
-            const updateData = {
-                ...formData,
-                updated_at: currentTime
-            };
-            console.log('📤 업데이트 데이터:', updateData);
-            
-            await updateDoc(contentRef, updateData);
-            showSuccess('콘텐츠가 수정되었습니다.');
-        } else {
-            console.log('➕ 새 콘텐츠 생성 모드');
-            // 새 콘텐츠 생성 - addDoc을 사용해서 자동 ID 생성
-            const newData = {
-                ...formData,
-                created_at: currentTime,
-                updated_at: currentTime,
-                author: auth.currentUser?.email || 'anonymous'
-            };
-            console.log('📤 새 데이터:', newData);
-            
-            const contentRef = await addDoc(collection(db, 'admin_content'), newData);
-            console.log('🆔 생성된 문서 ID:', contentRef.id);
-            console.log('✅ 콘텐츠 저장 완료');
-            showSuccess('콘텐츠가 생성되었습니다.');
-        }
-        
-        closeContentModal();
-        await loadContentData();
-        
-    } catch (error) {
-        console.error('❌ 콘텐츠 저장 실패:', error);
-        console.error('에러 코드:', error.code);
-        console.error('에러 메시지:', error.message);
-        
-        // 더 구체적인 에러 메시지
-        if (error.code === 'permission-denied') {
-            showError('권한이 부족합니다. 관리자에게 문의하세요.');
-        } else if (error.code === 'unauthenticated') {
-            showError('인증이 필요합니다. 다시 로그인해주세요.');
-        } else {
-            showError(`콘텐츠 저장에 실패했습니다: ${error.message}`);
-        }
-    }
-}
-
-// UI 상태 관리
-function updateSelectionUI() {
-    const selectedCount = selectedContent.size;
-    const bulkActions = document.getElementById('bulkActions');
-    const selectedCountElement = document.getElementById('selectedCount');
-    const selectAllCheckbox = document.getElementById('selectAll');
-    
-    if (selectedCount > 0) {
-        bulkActions.classList.remove('hidden');
-        selectedCountElement.textContent = `${selectedCount}개 선택됨`;
-    } else {
-        bulkActions.classList.add('hidden');
-    }
-    
-    // 전체 선택 체크박스 상태 업데이트
-    const pageContent = filteredContent.slice((currentPage - 1) * contentPerPage, currentPage * contentPerPage);
-    const selectedOnPage = pageContent.filter(content => selectedContent.has(content.id)).length;
-    
-    if (selectedOnPage === 0) {
-        selectAllCheckbox.indeterminate = false;
-        selectAllCheckbox.checked = false;
-    } else if (selectedOnPage === pageContent.length) {
-        selectAllCheckbox.indeterminate = false;
-        selectAllCheckbox.checked = true;
-    } else {
-        selectAllCheckbox.indeterminate = true;
-    }
-}
-
-function showLoading() {
-    document.getElementById('loadingContent').classList.remove('hidden');
-    document.getElementById('contentGrid').classList.add('hidden');
-    document.getElementById('emptyState').classList.add('hidden');
-}
-
-function hideLoading() {
-    document.getElementById('loadingContent').classList.add('hidden');
-}
-
 function showSuccess(message) {
-    // 간단한 토스트 알림 (실제 구현에서는 더 정교한 알림 시스템 사용)
     const toast = document.createElement('div');
     toast.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50';
     toast.innerHTML = `<i class="fas fa-check mr-2"></i>${message}`;
@@ -1062,4 +856,42 @@ function showError(message) {
     }, 5000);
 }
 
-console.log('📰 admin-content.js 로드 완료');
+// 상태 별 CSS 클래스 반환
+function getStatusClass(status) {
+    const classes = {
+        'published': 'bg-green-100 text-green-800',
+        'draft': 'bg-yellow-100 text-yellow-800',
+        'scheduled': 'bg-blue-100 text-blue-800',
+        'archived': 'bg-gray-100 text-gray-800'
+    };
+    return classes[status] || classes.draft;
+}
+
+// 상태명 반환
+function getStatusName(status) {
+    const names = {
+        'published': '게시됨',
+        'draft': '초안',
+        'scheduled': '예약됨',
+        'archived': '보관됨'
+    };
+    return names[status] || '초안';
+}
+
+// 전역 함수 노출
+window.showCreateModal = showCreateModal;
+window.closeModal = closeModal;
+window.refreshContent = refreshContent;
+window.filterContent = filterContent;
+window.editContent = editContent;
+window.duplicateContent = duplicateContent;
+window.deleteContent = deleteContent;
+window.switchLanguageTab = switchLanguageTab;
+window.toggleCreationMode = toggleCreationMode;
+window.performAutoTranslation = performAutoTranslation;
+window.saveContent = saveContent;
+
+// 페이지 로드 시 초기화
+document.addEventListener('DOMContentLoaded', initializeMultilingualContentManager);
+
+console.log('🌐 admin-content.js 로드 완료');

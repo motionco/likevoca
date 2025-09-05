@@ -46,7 +46,7 @@ http://localhost:8080/dev-tools-test-integration.html
 3. **콘텐츠가 없으면 content-migrator.js 자동 실행**
 4. **기존 HTML 콘텐츠를 JSON 형식으로 변환하여 저장**
 5. **변환된 콘텐츠를 페이지에 표시**
-6. **관리자는 이제 admin/multilingual-content.html에서 편집 가능**
+6. **관리자는 이제 admin/content.html에서 편집 가능**
 
 ### 실시간 동기화 과정:
 1. **관리자가 콘텐츠 수정**
@@ -66,7 +66,7 @@ http://localhost:8080/dev-tools-test-integration.html
 - [x] `js/content-migrator.js` - 콘텐츠 이전 도구 (첫 실행 시 필요)
 - [x] `js/content-integration.js` - 페이지 통합 시스템
 - [x] `js/real-time-content-sync.js` - 실시간 동기화
-- [x] `admin/multilingual-content.html` - 관리자 인터페이스
+- [x] `admin/content.html` - 관리자 인터페이스
 - [x] `admin/js/admin-multilingual-content.js` - 관리자 기능
 
 ## 🐛 디버깅 가이드

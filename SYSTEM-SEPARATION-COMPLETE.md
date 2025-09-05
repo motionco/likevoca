@@ -45,7 +45,7 @@
 📁 새로운 동적 시스템 (관리자 콘텐츠 관리)
 ├── 📄 community.html    ← 블로그/게시판 (FAQ, Manual, Guide, Notices 통합)
 └── 📁 admin/
-    └── 📄 multilingual-content.html ← 관리자 인터페이스
+    └── 📄 content.html ← 관리자 인터페이스
 ```
 
 ## 💡 사용 시나리오
@@ -57,7 +57,7 @@
 
 ### 👨‍💼 관리자
 1. **정적 페이지**: 기존 FAQ, Manual, Guide는 HTML 직접 수정
-2. **동적 콘텐츠**: `admin/multilingual-content.html`에서 커뮤니티용 콘텐츠 관리
+2. **동적 콘텐츠**: `admin/content.html`에서 커뮤니티용 콘텐츠 관리
    - 새로운 학습 가이드 작성
    - 공지사항 및 업데이트 정보 발행
    - FAQ 추가 및 보완
