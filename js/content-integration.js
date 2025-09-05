@@ -24,9 +24,21 @@ export class ContentIntegration {
                 return this.contentData;
             }
 
-            // 데이터가 없으면 빈 배열 반환
-            console.log('⚠️ 콘텐츠 데이터가 없습니다. 관리자에서 콘텐츠를 먼저 생성해주세요.');
-            return [];
+            // 데이터가 없으면 기존 콘텐츠를 자동 이전
+            console.log('📦 콘텐츠 데이터가 없습니다. 기존 콘텐츠를 자동으로 이전합니다...');
+            
+            // 기존 콘텐츠 이전 모듈 동적 로드
+            const { initializeContentMigration } = await import('./content-migrator.js');
+            const migrationResult = await initializeContentMigration();
+            
+            if (migrationResult && migrationResult.content) {
+                this.contentData = migrationResult.content;
+                console.log(`✅ 기존 콘텐츠 ${migrationResult.migrated}개를 성공적으로 이전했습니다!`);
+                return this.contentData;
+            } else {
+                console.log('⚠️ 콘텐츠 이전에 실패했습니다. 관리자에서 콘텐츠를 생성해주세요.');
+                return [];
+            }
 
         } catch (error) {
             console.error('❌ 콘텐츠 데이터 로드 실패:', error);
@@ -232,17 +244,25 @@ export class ContentIntegration {
         container.innerHTML = guideHTML;
     }
 
-    // 빈 상태 렌더링
+    // 빈 상태 렌더링 - 정적 콘텐츠로 폴백
     renderEmptyState(container, contentType) {
+        console.log(`⚠️ 동적 ${contentType} 콘텐츠가 비어있어 정적 콘텐츠로 폴백합니다.`);
+        
+        // 정적 폴백 콘텐츠를 표시
+        this.showStaticFallback();
+        
+        // 버튼 추가로 관리자에게 콘텐츠 생성 안내
         container.innerHTML = `
-            <div class="text-center py-12">
-                <i class="fas fa-file-alt text-6xl text-gray-300 mb-6"></i>
-                <h3 class="text-xl font-semibold text-gray-700 mb-2">아직 ${contentType} 콘텐츠가 없습니다</h3>
-                <p class="text-gray-500 mb-6">관리자가 콘텐츠를 준비 중입니다. 잠시 후 다시 확인해주세요.</p>
-                <div class="flex justify-center space-x-4">
-                    <a href="../faq.html" class="text-blue-600 hover:text-blue-800 underline">FAQ 보기</a>
-                    <a href="../manual.html" class="text-blue-600 hover:text-blue-800 underline">매뉴얼 보기</a>
-                    <a href="../guide.html" class="text-blue-600 hover:text-blue-800 underline">가이드 보기</a>
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-8">
+                <div class="text-center">
+                    <i class="fas fa-info-circle text-yellow-600 text-2xl mb-3"></i>
+                    <h3 class="text-lg font-semibold text-yellow-800 mb-2">관리자 생성 ${contentType} 콘텐츠가 없습니다</h3>
+                    <p class="text-yellow-700 mb-4">기존 ${contentType} 콘텐츠를 표시합니다. 관리자에서 콘텐츠를 추가하여 더 풍부한 정보를 제공할 수 있습니다.</p>
+                    <a href="../../admin/multilingual-content.html" 
+                       class="inline-flex items-center px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition duration-200">
+                        <i class="fas fa-plus mr-2"></i>
+                        관리자에서 ${contentType} 콘텐츠 추가
+                    </a>
                 </div>
             </div>
         `;
@@ -257,6 +277,49 @@ export class ContentIntegration {
             month: 'long',
             day: 'numeric'
         });
+    }
+
+    // 정적 폴백 콘텐츠 표시
+    showStaticFallback() {
+        const dynamicContainer = document.getElementById('dynamic-content-container');
+        const staticFallback = document.getElementById('static-faq-fallback') || 
+                               document.getElementById('static-manual-fallback') ||
+                               document.getElementById('static-guide-fallback');
+        
+        if (dynamicContainer && staticFallback) {
+            console.log('📄 정적 폴백 콘텐츠로 전환합니다.');
+            
+            // 동적 컨테이너 숨기고 정적 폴백 표시
+            dynamicContainer.style.display = 'none';
+            staticFallback.classList.remove('hidden');
+            staticFallback.style.display = 'block';
+            
+            return true;
+        } else {
+            console.warn('⚠️ 정적 폴백 콘텐츠를 찾을 수 없습니다.');
+            return false;
+        }
+    }
+
+    // 정적 폴백에서 동적 콘텐츠로 복귀
+    showDynamicContent() {
+        const dynamicContainer = document.getElementById('dynamic-content-container');
+        const staticFallback = document.getElementById('static-faq-fallback') || 
+                               document.getElementById('static-manual-fallback') ||
+                               document.getElementById('static-guide-fallback');
+        
+        if (dynamicContainer && staticFallback) {
+            console.log('🔄 동적 콘텐츠로 복귀합니다.');
+            
+            // 정적 폴백 숨기고 동적 컨테이너 표시
+            staticFallback.classList.add('hidden');
+            staticFallback.style.display = 'none';
+            dynamicContainer.style.display = 'block';
+            
+            return true;
+        }
+        
+        return false;
     }
 
     // 페이지별 콘텐츠 초기화

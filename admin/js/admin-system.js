@@ -148,7 +148,7 @@ async function loadSystemSettings() {
                 adminEmail: 'admin@likevoca.com',
                 databaseRegion: 'asia-northeast1',
                 offlineSupport: true,
-                cacheEnabled: true,
+                cacheEnabled: false,
                 cacheExpiry: 30,
                 rateLimit: 100,
                 maxConnections: 50,
@@ -186,8 +186,10 @@ async function loadSystemSettings() {
             adminEmail: 'admin@likevoca.com',
             databaseRegion: 'asia-northeast1',
             offlineSupport: true,
-            cacheEnabled: true,
+            cacheEnabled: false,
             cacheExpiry: 30,
+            realTimeSync: false,
+            syncInterval: 30,
             rateLimit: 100,
             maxConnections: 50,
             requestTimeout: 30,
@@ -261,6 +263,7 @@ function updateSettingsUI() {
     document.getElementById('adminEmail').value = systemSettings.adminEmail || 'admin@likevoca.com';
     document.getElementById('databaseRegion').value = systemSettings.databaseRegion || 'asia-northeast1';
     document.getElementById('cacheExpiry').value = systemSettings.cacheExpiry || 30;
+    document.getElementById('syncInterval').value = systemSettings.syncInterval || 30;
     document.getElementById('rateLimit').value = systemSettings.rateLimit || 100;
     document.getElementById('maxConnections').value = systemSettings.maxConnections || 50;
     document.getElementById('requestTimeout').value = systemSettings.requestTimeout || 30;
@@ -275,7 +278,8 @@ function updateSettingsUI() {
     updateToggle('emailNotifications', systemSettings.emailNotifications !== false);
     updateToggle('pushNotifications', systemSettings.pushNotifications !== false);
     updateToggle('offlineSupport', systemSettings.offlineSupport !== false);
-    updateToggle('cacheEnabled', systemSettings.cacheEnabled !== false);
+    updateToggle('cacheEnabled', systemSettings.cacheEnabled === true);
+    updateToggle('realTimeSync', systemSettings.realTimeSync === true);
     updateToggle('autoBackup', systemSettings.autoBackup !== false);
 }
 
@@ -319,12 +323,75 @@ function switchTab(tabName) {
     currentTab = tabName;
 }
 
-// 토글 설정 변경
-function toggleSetting(settingId) {
+// 토글 설정 변경 (즉시 저장)
+async function toggleSetting(settingId) {
     const toggle = document.getElementById(settingId);
     if (toggle) {
+        const wasActive = toggle.classList.contains('active');
         toggle.classList.toggle('active');
+        const isActive = toggle.classList.contains('active');
+        
+        console.log(`✅ ${settingId} 토글됨: ${wasActive} → ${isActive}`);
+        
+        // 즉시 저장
+        try {
+            await saveSpecificSetting(settingId, isActive);
+            
+            // 성공 알림 (짧게)
+            showSuccess(`${getSettingDisplayName(settingId)} ${isActive ? '활성화' : '비활성화'}됨`, 2000);
+            
+        } catch (error) {
+            // 실패시 원래 상태로 되돌리기
+            toggle.classList.toggle('active');
+            console.error(`❌ ${settingId} 저장 실패:`, error);
+            showError(`설정 저장에 실패했습니다: ${error.message}`);
+        }
     }
+}
+
+// 특정 설정만 저장하는 함수
+async function saveSpecificSetting(settingId, value) {
+    // 현재 설정 읽기
+    const currentSettings = JSON.parse(localStorage.getItem('system_settings') || '{}');
+    
+    // 특정 설정 업데이트
+    currentSettings[settingId] = value;
+    currentSettings.updatedAt = new Date().toISOString();
+    
+    // localStorage에 저장
+    localStorage.setItem('system_settings', JSON.stringify(currentSettings));
+    systemSettings = currentSettings;
+    
+    // Firestore에도 백업 저장 (선택적)
+    try {
+        if (db) {
+            const settingsRef = doc(db, 'admin_content', `system_settings_${Date.now()}`);
+            await setDoc(settingsRef, {
+                type: 'system_settings',
+                data: currentSettings,
+                createdAt: new Date()
+            });
+        }
+    } catch (firestoreError) {
+        console.warn('⚠️ Firestore 백업 저장 실패 (로컬 저장은 성공):', firestoreError.message);
+    }
+}
+
+// 설정 표시명 반환
+function getSettingDisplayName(settingId) {
+    const displayNames = {
+        maintenanceMode: '점검 모드',
+        allowSignup: '회원가입 허용',
+        allowGuest: '게스트 모드',
+        require2FA: '2단계 인증',
+        emailNotifications: '이메일 알림',
+        pushNotifications: '푸시 알림',
+        offlineSupport: '오프라인 지원',
+        cacheEnabled: '캐시',
+        realTimeSync: '실시간 동기화',
+        autoBackup: '자동 백업'
+    };
+    return displayNames[settingId] || settingId;
 }
 
 // 모든 설정 저장
@@ -361,6 +428,8 @@ async function saveAllSettings() {
             pushNotifications: document.getElementById('pushNotifications').classList.contains('active'),
             offlineSupport: document.getElementById('offlineSupport').classList.contains('active'),
             cacheEnabled: document.getElementById('cacheEnabled').classList.contains('active'),
+            realTimeSync: document.getElementById('realTimeSync').classList.contains('active'),
+            syncInterval: parseInt(document.getElementById('syncInterval').value) || 30,
             autoBackup: document.getElementById('autoBackup').classList.contains('active'),
             
             updatedAt: new Date().toISOString()
@@ -509,26 +578,50 @@ async function validateData() {
 }
 
 // UI 유틸리티 함수들
-function showSuccess(message) {
+function showSuccess(message, duration = 3000) {
     const toast = document.createElement('div');
-    toast.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+    toast.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300';
     toast.innerHTML = `<i class="fas fa-check mr-2"></i>${message}`;
     document.body.appendChild(toast);
     
+    // 애니메이션으로 나타나기
     setTimeout(() => {
-        toast.remove();
-    }, 3000);
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateX(0)';
+    }, 10);
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => toast.remove(), 300);
+    }, duration);
 }
 
-function showError(message) {
+function showError(message, duration = 5000) {
     const toast = document.createElement('div');
-    toast.className = 'fixed top-4 right-4 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+    toast.className = 'fixed top-4 right-4 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300';
     toast.innerHTML = `<i class="fas fa-exclamation-triangle mr-2"></i>${message}`;
     document.body.appendChild(toast);
     
+    // 애니메이션으로 나타나기
     setTimeout(() => {
-        toast.remove();
-    }, 5000);
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateX(0)';
+    }, 10);
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => toast.remove(), 300);
+    }, duration);
+}
+
+// 설정 초기화 함수
+function resetToDefaults() {
+    if (confirm('모든 설정을 기본값으로 초기화하시겠습니까?\n저장된 설정이 모두 삭제됩니다.')) {
+        localStorage.removeItem('system_settings');
+        location.reload();
+    }
 }
 
 // 전역 함수 노출
@@ -536,6 +629,7 @@ window.switchTab = switchTab;
 window.toggleSetting = toggleSetting;
 window.saveAllSettings = saveAllSettings;
 window.refreshSettings = refreshSettings;
+window.resetToDefaults = resetToDefaults;
 window.optimizeDatabase = optimizeDatabase;
 window.clearCache = clearCache;
 window.createBackup = createBackup;

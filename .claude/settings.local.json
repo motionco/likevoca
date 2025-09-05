@@ -45,7 +45,8 @@
       "Read(/C:\\practice\\likevoca\\locales\\ko/**)",
       "Read(/C:\\practice\\likevoca\\locales\\ko/**)",
       "Read(/C:\\practice\\likevoca\\locales\\ko/**)",
-      "Read(/C:\\practice\\likevoca\\locales\\ko/**)"
+      "Read(/C:\\practice\\likevoca\\locales\\ko/**)",
+      "Read(//c/c/practice/likevoca/**)"
     ],
     "deny": [],
     "ask": []

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>커뮤니티 - LikeVoca</title>
+    
+    <meta name="description" content="LikeVoca 커뮤니티 - 학습 가이드, FAQ, 매뉴얼 및 공지사항을 확인하세요." />
+    
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="stylesheet" href="../../css/style.css" />
+</head>
+<body class="bg-gray-50">
+    <div id="navbar-container"></div>
+
+    <main class="container mx-auto max-w-6xl px-4 md:px-6 lg:px-8 py-8 md:py-12">
+        <!-- 헤더 섹션 -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
+                LikeVoca <span class="text-[#4B63AC]">커뮤니티</span>
+            </h1>
+            <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
+                언어학습에 도움이 되는 가이드, 팁, 공지사항을 확인하세요
+            </p>
+        </header>
+
+        <!-- 검색 및 필터 -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <div class="flex flex-col md:flex-row gap-4 items-center">
+                <div class="flex-1">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="궁금한 내용을 검색해보세요..." 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B63AC]"
+                    />
+                </div>
+                <div class="flex gap-2">
+                    <select id="categoryFilter" class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B63AC]">
+                        <option value="all">전체 카테고리</option>
+                        <option value="notices">공지사항</option>
+                        <option value="guide">학습 가이드</option>
+                        <option value="faq">자주 묻는 질문</option>
+                        <option value="manual">사용자 매뉴얼</option>
+                    </select>
+                    <button id="searchBtn" class="bg-[#4B63AC] text-white px-6 py-3 rounded-lg hover:bg-[#3A4F8B] transition duration-200">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <button id="refreshBtn" class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition duration-200" title="콘텐츠 새로고침">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 로딩 상태 -->
+        <div id="loading" class="text-center py-12">
+            <i class="fas fa-spinner fa-spin text-3xl text-gray-400 mb-4"></i>
+            <p class="text-gray-600">콘텐츠를 불러오는 중...</p>
+        </div>
+        
+        <!-- 콘텐츠 목록 -->
+        <div id="contentList" class="space-y-6">
+        </div>
+
+        <!-- 빈 상태 -->
+        <div id="emptyState" class="text-center py-12 hidden">
+            <i class="fas fa-search text-6xl text-gray-300 mb-6"></i>
+            <h3 class="text-xl font-semibold text-gray-700 mb-2">검색 결과가 없습니다</h3>
+            <p class="text-gray-500">다른 검색어를 사용해보세요.</p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <!-- Scripts -->
+    <script src="../../components/js/navbar.js"></script>
+    <script src="../../components/js/footer.js"></script>
+    
+    <script type="module">
+        import { applyLanguage, updateMetadata } from '../../utils/language-utils.js';
+        
+        let contentData = [];
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // 네비게이션바 로드
+                if (typeof window.loadNavbar === 'function') {
+                    await window.loadNavbar();
+                }
+                
+                // Footer 로드
+                if (typeof window.loadFooter === 'function') {
+                    await window.loadFooter();
+                }
+                
+                // 언어 적용
+                await applyLanguage();
+                await updateMetadata('community');
+                
+                // 콘텐츠 로드
+                await loadContentData();
+                await displayContent();
+                
+                // 이벤트 리스너 설정
+                setupEventListeners();
+                
+            } catch (error) {
+                console.error('커뮤니티 페이지 초기화 중 오류:', error);
+                showError('페이지를 불러오는 중 오류가 발생했습니다.');
+            }
+        });
+
+        // 콘텐츠 데이터 로드
+        async function loadContentData() {
+            try {
+                console.log('📊 콘텐츠 데이터 로드 시도...');
+                
+                // localStorage에서 콘텐츠 로드
+                const localContent = localStorage.getItem('multilingual_content');
+                if (localContent) {
+                    contentData = JSON.parse(localContent);
+                    console.log(`✅ localStorage에서 ${contentData.length}개 콘텐츠 로드`);
+                } else {
+                    console.log('📝 localStorage가 비어있음, 샘플 데이터 생성...');
+                    contentData = generateSampleContent();
+                    localStorage.setItem('multilingual_content', JSON.stringify(contentData));
+                    console.log(`✅ 샘플 콘텐츠 ${contentData.length}개 생성`);
+                }
+                
+            } catch (error) {
+                console.error('❌ 콘텐츠 데이터 로드 실패:', error);
+                contentData = generateSampleContent();
+            }
+        }
+
+        // 샘플 콘텐츠 생성
+        function generateSampleContent() {
+            const currentTime = new Date().toISOString();
+            
+            return [
+                {
+                    id: 'welcome_001',
+                    type: 'notices',
+                    priority: 'high',
+                    createdAt: currentTime,
+                    updatedAt: currentTime,
+                    versions: {
+                        ko: {
+                            title: 'LikeVoca 커뮤니티에 오신 것을 환영합니다!',
+                            content: '<div class="prose max-w-none"><h2>🎉 커뮤니티 오픈!</h2><p>언어학습에 도움이 되는 다양한 가이드와 팁을 공유하는 새로운 커뮤니티 공간이 오픈되었습니다.</p><ul><li>학습 가이드 및 전략</li><li>새로운 기능 안내</li><li>공지사항 및 업데이트</li></ul><p>여러분의 언어학습 여정에 도움이 되는 유용한 정보들을 찾아보세요!</p></div>',
+                            published: true,
+                            lastModified: currentTime,
+                            translationStatus: 'updated'
+                        }
+                    }
+                },
+                {
+                    id: 'guide_001',
+                    type: 'guide',
+                    priority: 'high',
+                    createdAt: currentTime,
+                    updatedAt: currentTime,
+                    versions: {
+                        ko: {
+                            title: '효과적인 단어 학습 전략',
+                            content: '<div class="prose max-w-none"><h2>📚 단어 학습의 과학적 접근법</h2><p>언어학습에서 가장 중요한 것 중 하나는 어휘 학습입니다. 여기 효과적인 단어 학습 전략을 소개합니다.</p><h3>🔄 간격 반복 학습법</h3><ul><li>1일 후: 첫 번째 복습</li><li>3일 후: 두 번째 복습</li><li>1주일 후: 세 번째 복습</li><li>2주일 후: 네 번째 복습</li></ul><h3>🎯 능동적 회상법</h3><p>단순히 읽기보다는 직접 생각해내는 것이 효과적입니다.</p></div>',
+                            published: true,
+                            lastModified: currentTime,
+                            translationStatus: 'updated'
+                        }
+                    }
+                },
+                {
+                    id: 'faq_001',
+                    type: 'faq',
+                    priority: 'normal',
+                    createdAt: currentTime,
+                    updatedAt: currentTime,
+                    versions: {
+                        ko: {
+                            title: 'LikeVoca를 처음 시작하는 방법은?',
+                            content: '<div class="prose max-w-none"><p>LikeVoca를 처음 사용하시는 분들을 위한 간단한 가이드입니다:</p><ol><li><strong>계정 생성</strong>: 이메일로 가입하거나 Google/Facebook 소셜 로그인을 이용하세요.</li><li><strong>레벨 테스트</strong>: 간단한 어휘 테스트로 내 수준을 확인해보세요.</li><li><strong>AI 단어 추천</strong>: 내 수준에 맞는 다양한 단어들을 만나보세요.</li><li><strong>게임으로 학습</strong>: 재미있는 게임으로 단어를 익혀보세요!</li></ol></div>',
+                            published: true,
+                            lastModified: currentTime,
+                            translationStatus: 'updated'
+                        }
+                    }
+                }
+            ];
+        }
+
+        // 콘텐츠 표시
+        async function displayContent() {
+            const loading = document.getElementById('loading');
+            const contentList = document.getElementById('contentList');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (!loading || !contentList || !emptyState) {
+                console.error('필수 DOM 요소를 찾을 수 없습니다:', {
+                    loading: !!loading,
+                    contentList: !!contentList,
+                    emptyState: !!emptyState
+                });
+                return;
+            }
+            
+            loading.style.display = 'block';
+            emptyState.classList.add('hidden');
+            
+            try {
+                const searchInput = document.getElementById('searchInput');
+                const categoryFilterElement = document.getElementById('categoryFilter');
+                
+                if (!searchInput || !categoryFilterElement) {
+                    console.error('검색/필터 DOM 요소를 찾을 수 없습니다:', {
+                        searchInput: !!searchInput,
+                        categoryFilter: !!categoryFilterElement
+                    });
+                    showError('페이지 요소를 찾을 수 없습니다.');
+                    return;
+                }
+                
+                const searchTerm = searchInput.value.toLowerCase();
+                const categoryFilter = categoryFilterElement.value;
+                
+                // 필터링
+                let filteredContent = contentData.filter(item => {
+                    const version = item.versions.ko;
+                    if (!version || !version.published) return false;
+                    
+                    // 카테고리 필터
+                    if (categoryFilter !== 'all' && item.type !== categoryFilter) return false;
+                    
+                    // 검색 필터
+                    if (searchTerm) {
+                        const titleMatch = version.title.toLowerCase().includes(searchTerm);
+                        const contentMatch = version.content.toLowerCase().includes(searchTerm);
+                        if (!titleMatch && !contentMatch) return false;
+                    }
+                    
+                    return true;
+                });
+                
+                if (filteredContent.length === 0) {
+                    contentList.innerHTML = '';
+                    emptyState.classList.remove('hidden');
+                } else {
+                    renderContent(filteredContent);
+                    emptyState.classList.add('hidden');
+                }
+                
+            } catch (error) {
+                console.error('콘텐츠 표시 실패:', error);
+                showError('콘텐츠를 표시하는데 실패했습니다.');
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        // 콘텐츠 렌더링
+        function renderContent(content) {
+            const contentList = document.getElementById('contentList');
+            
+            const categoryIcons = {
+                notices: 'fa-bullhorn',
+                guide: 'fa-compass',
+                faq: 'fa-question-circle',
+                manual: 'fa-book'
+            };
+            
+            const categoryNames = {
+                notices: '공지사항',
+                guide: '학습 가이드',
+                faq: '자주 묻는 질문',
+                manual: '사용자 매뉴얼'
+            };
+            
+            const html = content.map(item => {
+                const version = item.versions.ko;
+                const excerpt = stripHtml(version.content).substring(0, 150) + '...';
+                
+                return `
+                    <article class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition duration-300">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 rounded-lg bg-[#4B63AC] bg-opacity-10 flex items-center justify-center">
+                                    <i class="fas ${categoryIcons[item.type]} text-[#4B63AC] text-lg"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold text-gray-900 mb-1">
+                                        ${version.title}
+                                    </h3>
+                                    <div class="flex items-center space-x-3">
+                                        <span class="text-sm text-gray-500">${categoryNames[item.type]}</span>
+                                        <span class="text-sm text-gray-400">${formatDate(item.updatedAt)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-gray-600 mb-4">
+                            ${excerpt}
+                        </div>
+                        
+                        <button onclick="openContentDetail('${item.id}')" class="text-[#4B63AC] hover:text-[#3A4F8B] font-medium">
+                            <i class="fas fa-arrow-right mr-2"></i>
+                            자세히 보기
+                        </button>
+                    </article>
+                `;
+            }).join('');
+            
+            contentList.innerHTML = html;
+        }
+
+        // 이벤트 리스너 설정
+        function setupEventListeners() {
+            document.getElementById('searchBtn').addEventListener('click', displayContent);
+            document.getElementById('refreshBtn').addEventListener('click', async () => {
+                console.log('🔄 수동 새로고침 실행...');
+                await loadContentData();
+                await displayContent();
+            });
+            document.getElementById('searchInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') displayContent();
+            });
+            document.getElementById('categoryFilter').addEventListener('change', displayContent);
+        }
+
+        // 상세보기
+        window.openContentDetail = function(contentId) {
+            const content = contentData.find(item => item.id === contentId);
+            if (!content) return;
+            
+            const version = content.versions.ko;
+            if (!version) return;
+            
+            // 간단한 모달 표시
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+            modal.innerHTML = `
+                <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                    <div class="p-6 border-b">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-2xl font-bold text-gray-900">${version.title}</h2>
+                            <button onclick="this.closest('.fixed').remove()" class="text-gray-500 hover:text-gray-700">
+                                <i class="fas fa-times text-xl"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="prose max-w-none">
+                            ${version.content}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        };
+
+        // 유틸리티 함수들
+        function stripHtml(html) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+            return tempDiv.textContent || tempDiv.innerText || '';
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        function showError(message) {
+            const contentList = document.getElementById('contentList');
+            contentList.innerHTML = `
+                <div class="text-center py-12">
+                    <i class="fas fa-exclamation-triangle text-4xl text-red-400 mb-4"></i>
+                    <p class="text-red-600">${message}</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

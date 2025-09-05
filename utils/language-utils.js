@@ -197,6 +197,39 @@ const seoMetadata = {
       canonical: "https://likevoca.com/zh/pages/games.html",
     },
   },
+  // 커뮤니티 페이지 메타데이터
+  community: {
+    ko: {
+      title: "LikeVoca - 커뮤니티",
+      description: "LikeVoca 커뮤니티 - 학습 가이드, FAQ, 매뉴얼 및 공지사항을 확인하세요.",
+      keywords: "커뮤니티, 학습 가이드, FAQ, 매뉴얼, 공지사항, 언어학습 팁",
+      canonical: "https://likevoca.com/ko/community.html",
+    },
+    en: {
+      title: "LikeVoca - Community", 
+      description: "LikeVoca Community - Check out learning guides, FAQ, manuals and announcements.",
+      keywords: "community, learning guide, FAQ, manual, announcements, language learning tips",
+      canonical: "https://likevoca.com/en/community.html",
+    },
+    ja: {
+      title: "LikeVoca - コミュニティ",
+      description: "LikeVocaコミュニティ - 学習ガイド、FAQ、マニュアル、お知らせをご確認ください。",
+      keywords: "コミュニティ, 学習ガイド, FAQ, マニュアル, お知らせ, 言語学習のヒント", 
+      canonical: "https://likevoca.com/ja/community.html",
+    },
+    zh: {
+      title: "LikeVoca - 社区",
+      description: "LikeVoca社区 - 查看学习指南、FAQ、手册和公告。",
+      keywords: "社区, 学习指南, FAQ, 手册, 公告, 语言学习技巧",
+      canonical: "https://likevoca.com/zh/community.html",
+    },
+    es: {
+      title: "LikeVoca - Comunidad",
+      description: "Comunidad LikeVoca - Consulta guías de aprendizaje, FAQ, manuales y anuncios.",
+      keywords: "comunidad, guía de aprendizaje, FAQ, manual, anuncios, consejos de aprendizaje de idiomas",
+      canonical: "https://likevoca.com/es/community.html",
+    },
+  },
   // AI 단어장 페이지 메타데이터
   "ai-vocabulary": {
     ko: {
@@ -804,15 +837,17 @@ function getCurrentLanguage() {
 
 // 현재 활성화된 언어 코드 가져오기 (캐싱 및 중복 호출 방지)
 async function getActiveLanguage() {
-  // 이미 감지 중이면 대기
+  // 이미 감지 중이면 대기 (polling 대신 Promise 체인 사용)
   if (languageDetectionInProgress) {
     return new Promise((resolve) => {
-      const checkInterval = setInterval(() => {
+      const checkCompletion = () => {
         if (!languageDetectionInProgress && cachedLanguage) {
-          clearInterval(checkInterval);
           resolve(cachedLanguage);
+        } else {
+          setTimeout(checkCompletion, 100);
         }
-      }, 100);
+      };
+      checkCompletion();
     });
   }
 

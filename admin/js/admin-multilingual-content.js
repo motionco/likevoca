@@ -178,12 +178,34 @@ async function loadContentData() {
         if (localContent) {
             contentData = JSON.parse(localContent);
             displayContentList(contentData);
-            console.log('✅ 로컬 스토리지에서 콘텐츠 데이터 로드');
+            console.log(`✅ 로컬 스토리지에서 콘텐츠 데이터 로드 (${contentData.length}개)`);
         } else {
-            // 기본 데이터 생성
-            contentData = generateSampleData();
-            displayContentList(contentData);
-            console.log('✅ 샘플 콘텐츠 데이터 생성');
+            // 기존 콘텐츠 자동 이전
+            console.log('📦 로컬 스토리지에 콘텐츠가 없습니다. 기존 콘텐츠를 자동으로 가져옵니다...');
+            
+            try {
+                // 기존 콘텐츠 이전 시도
+                const migrationModule = await import('../js/content-migrator.js');
+                const migrationResult = await migrationModule.initializeContentMigration();
+                
+                if (migrationResult && migrationResult.content && migrationResult.content.length > 0) {
+                    contentData = migrationResult.content;
+                    displayContentList(contentData);
+                    console.log(`✅ 기존 콘텐츠 ${migrationResult.migrated}개를 성공적으로 가져왔습니다!`);
+                    showSuccess(`기존 FAQ, Manual, Guide 콘텐츠 ${migrationResult.migrated}개를 성공적으로 가져왔습니다. 이제 관리자에서 편집할 수 있습니다.`);
+                } else {
+                    // 기존 콘텐츠도 없으면 샘플 데이터 생성
+                    contentData = generateSampleData();
+                    displayContentList(contentData);
+                    console.log('✅ 샘플 콘텐츠 데이터 생성');
+                }
+            } catch (migrationError) {
+                console.warn('⚠️ 기존 콘텐츠 이전 실패:', migrationError);
+                // 이전 실패 시 샘플 데이터 사용
+                contentData = generateSampleData();
+                displayContentList(contentData);
+                console.log('✅ 샘플 콘텐츠 데이터 생성 (이전 실패로 인한 폴백)');
+            }
         }
         
         hideLoading();
@@ -196,28 +218,28 @@ async function loadContentData() {
     }
 }
 
-// 샘플 데이터 생성
+// 커뮤니티용 샘플 데이터 생성
 function generateSampleData() {
     const currentTime = new Date().toISOString();
     
     return [
         {
-            id: 'faq_001',
-            type: 'faq',
-            priority: 'normal',
+            id: 'community_welcome_001',
+            type: 'notices',
+            priority: 'high',
             createdAt: currentTime,
             updatedAt: currentTime,
             versions: {
                 ko: {
-                    title: '자주 묻는 질문',
-                    content: '<h2>LikeVoca 자주 묻는 질문</h2><p>LikeVoca 사용에 대한 궁금한 점들을 모았습니다.</p>',
+                    title: 'LikeVoca 커뮤니티에 오신 것을 환영합니다!',
+                    content: '<div class="prose max-w-none"><h2>🎉 LikeVoca 커뮤니티 오픈!</h2><p>언어학습에 도움이 되는 다양한 가이드와 팁을 공유하는 새로운 커뮤니티 공간이 오픈되었습니다.</p><ul><li>학습 가이드 및 전략</li><li>새로운 기능 안내</li><li>공지사항 및 업데이트</li></ul><p>여러분의 언어학습 여정에 도움이 되는 유용한 정보들을 찾아보세요!</p></div>',
                     published: true,
                     lastModified: currentTime,
                     translationStatus: 'updated'
                 },
                 en: {
-                    title: 'Frequently Asked Questions',
-                    content: '<h2>LikeVoca FAQ</h2><p>Common questions about using LikeVoca.</p>',
+                    title: 'Welcome to LikeVoca Community!',
+                    content: '<div class="prose max-w-none"><h2>🎉 LikeVoca Community Open!</h2><p>We\'re excited to announce the opening of our new community space where you can find helpful guides and tips for language learning.</p><ul><li>Learning guides and strategies</li><li>New feature announcements</li><li>Updates and notices</li></ul><p>Find useful information to help with your language learning journey!</p></div>',
                     published: true,
                     lastModified: currentTime,
                     translationStatus: 'updated'
@@ -246,15 +268,15 @@ function generateSampleData() {
             }
         },
         {
-            id: 'manual_001',
-            type: 'manual',
+            id: 'guide_effective_learning',
+            type: 'guide',
             priority: 'high',
             createdAt: currentTime,
             updatedAt: currentTime,
             versions: {
                 ko: {
-                    title: '사용자 매뉴얼',
-                    content: '<h2>LikeVoca 사용자 매뉴얼</h2><p>LikeVoca의 모든 기능을 상세히 설명합니다.</p>',
+                    title: '효과적인 단어 학습 전략',
+                    content: '<div class="prose max-w-none"><h2>📚 단어 학습의 과학적 접근법</h2><p>언어학습에서 가장 중요한 것 중 하나는 어휘 학습입니다. 여기 몰라둔던 효과적인 단어 학습 전략을 소개합니다.</p><h3>🔄 간격 반복 학습법</h3><ul><li>1일 후: 첫 번째 복습</li><li>3일 후: 두 번째 복습</li><li>1주일 후: 세 번째 복습</li><li>2주일 후: 네 번째 복습</li></ul><h3>🎯 능동적 회상법</h3><p>단순히 읽기보다는 직접 생각해내는 것이 효과적입니다.</p></div>',
                     published: true,
                     lastModified: currentTime,
                     translationStatus: 'updated'
@@ -282,6 +304,50 @@ function generateSampleData() {
                 },
                 es: {
                     title: 'Manual del Usuario',
+                    content: null,
+                    published: false,
+                    lastModified: null,
+                    translationStatus: 'missing'
+                }
+            }
+        },
+        {
+            id: 'faq_getting_started',
+            type: 'faq',
+            priority: 'normal',
+            createdAt: currentTime,
+            updatedAt: currentTime,
+            versions: {
+                ko: {
+                    title: 'LikeVoca를 처음 시작하는 방법은?',
+                    content: '<div class="prose max-w-none"><p>LikeVoca를 처음 사용하시는 분들을 위한 간단한 가이드입니다:</p><ol><li><strong>계정 생성</strong>: 이메일로 가입하거나 Google/Facebook 소셜 로그인을 이용하세요.</li><li><strong>레벨 테스트</strong>: 간단한 어휘 테스트로 내 수준을 확인해보세요.</li><li><strong>AI 단어 추천</strong>: 내 수준에 맞는 다양한 단어들을 만나보세요.</li><li><strong>게임으로 학습</strong>: 재미있는 게임으로 단어를 익혀보세요!</li></ol></div>',
+                    published: true,
+                    lastModified: currentTime,
+                    translationStatus: 'updated'
+                },
+                en: {
+                    title: 'How do I get started with LikeVoca?',
+                    content: '<div class="prose max-w-none"><p>Here\'s a simple guide for first-time LikeVoca users:</p><ol><li><strong>Create Account</strong>: Sign up with email or use Google/Facebook social login.</li><li><strong>Level Test</strong>: Take a simple vocabulary test to check your level.</li><li><strong>AI Word Recommendations</strong>: Discover various words matched to your level.</li><li><strong>Learn with Games</strong>: Master vocabulary through fun games!</li></ol></div>',
+                    published: true,
+                    lastModified: currentTime,
+                    translationStatus: 'updated'
+                },
+                ja: {
+                    title: null,
+                    content: null,
+                    published: false,
+                    lastModified: null,
+                    translationStatus: 'missing'
+                },
+                zh: {
+                    title: null,
+                    content: null,
+                    published: false,
+                    lastModified: null,
+                    translationStatus: 'missing'
+                },
+                es: {
+                    title: null,
                     content: null,
                     published: false,
                     lastModified: null,
