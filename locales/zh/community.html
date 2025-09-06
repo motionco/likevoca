@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LikeVoca社区 - 学习指南、FAQ、手册</title>
+    
+    <meta name="description" content="在LikeVoca社区查看语言学习指南、常见问题(FAQ)、用户手册和公告。获取有效语言学习的全面信息。" />
+    <meta name="keywords" content="LikeVoca, 社区, 语言学习, 学习指南, FAQ, 手册, 公告, 多语言, 英语, 日语, 中文" />
+    
+    <!-- Open Graph 标签 -->
+    <meta property="og:title" content="LikeVoca社区 - 学习指南、FAQ、手册" />
+    <meta property="og:description" content="在LikeVoca社区查看学习指南、FAQ和手册。" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://likevoca.com/zh/community.html" />
+    <meta property="og:site_name" content="LikeVoca" />
+    <meta property="og:locale" content="zh_CN" />
+    
+    <!-- Twitter Card 标签 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="LikeVoca社区 - 学习指南、FAQ、手册" />
+    <meta name="twitter:description" content="在LikeVoca社区查看学习指南、FAQ和手册。" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://likevoca.com/zh/community.html" />
+    
+    <!-- Hreflang 标签 -->
+    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/community.html" />
+    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/community.html" />
+    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/community.html" />
+    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/community.html" />
+    <link rel="alternate" hreflang="es" href="https://likevoca.com/es/community.html" />
+    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/community.html" />
+    
+    <!-- JSON-LD 结构化数据 -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "LikeVoca Community",
+        "url": "https://likevoca.com/zh/community.html",
+        "description": "在LikeVoca社区查看学习指南、FAQ和手册。",
+        "inLanguage": "zh",
+        "publisher": {
+            "@type": "Organization",
+            "name": "LikeVoca",
+            "url": "https://likevoca.com"
+        },
+        "mainEntity": {
+            "@type": "FAQPage",
+            "name": "LikeVoca Community",
+            "mainEntity": []
+        }
+    }
+    </script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .content-card {
+            transition: all 0.2s ease;
+        }
+        .content-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .loading-skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="navbar-container"></div>
+
+    <main class="container mx-auto max-w-6xl px-4 md:px-6 lg:px-8 py-8 md:py-12">
+        <!-- 标题部分 -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
+                LikeVoca <span class="text-[#4B63AC]">社区</span>
+            </h1>
+            <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
+                查找有助于语言学习的指南、技巧和公告
+            </p>
+        </header>
+
+        <!-- 搜索和筛选 -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <div class="flex flex-col md:flex-row gap-4 items-center">
+                <div class="flex-1">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="搜索信息..." 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B63AC]"
+                    />
+                </div>
+                <div class="flex gap-2">
+                    <select id="categoryFilter" class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B63AC]">
+                        <option value="all">所有分类</option>
+                        <option value="notice">公告</option>
+                        <option value="guide">学习指南</option>
+                        <option value="faq">常见问题</option>
+                        <option value="manual">用户手册</option>
+                    </select>
+                    <button id="searchBtn" class="bg-[#4B63AC] text-white px-6 py-3 rounded-lg hover:bg-[#3A4F8B] transition duration-200">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <button id="refreshBtn" class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition duration-200" title="刷新内容">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 加载状态 -->
+        <div id="loading" class="text-center py-12">
+            <i class="fas fa-spinner fa-spin text-3xl text-gray-400 mb-4"></i>
+            <p class="text-gray-600" id="loadingText">正在加载内容...</p>
+            <div id="loadingDebug" class="mt-2 text-sm text-gray-500"></div>
+        </div>
+        
+        <!-- 内容列表 -->
+        <div id="contentList" class="space-y-6">
+        </div>
+
+        <!-- 空状态 -->
+        <div id="emptyState" class="text-center py-12 hidden">
+            <i class="fas fa-search text-6xl text-gray-300 mb-6"></i>
+            <h3 class="text-xl font-semibold text-gray-700 mb-2">没有搜索结果</h3>
+            <p class="text-gray-500">请尝试使用不同的搜索词。</p>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <div id="footer-container"></div>
+
+    <!-- 脚本 -->
+    <script src="../../components/js/navbar.js"></script>
+    <script src="../../components/js/footer.js"></script>
+    
+    <script type="module">
+        import { applyLanguage, updateMetadata } from '../../utils/language-utils.js';
+        
+        let contentData = [];
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // 加载导航栏
+                if (typeof window.loadNavbar === 'function') {
+                    await window.loadNavbar();
+                }
+                
+                // 加载页脚
+                if (typeof window.loadFooter === 'function') {
+                    await window.loadFooter();
+                }
+                
+                // 应用语言
+                await applyLanguage();
+                await updateMetadata('community');
+                
+                // 加载内容
+                await loadContentData();
+                await displayContent();
+                
+                // 设置事件监听器
+                setupEventListeners();
+                
+            } catch (error) {
+                console.error('社区页面初始化错误:', error);
+                showError('页面加载时发生错误。');
+            }
+        });
+
+        // 初始化Firebase并加载内容数据
+        async function loadContentData() {
+            try {
+                console.log('🔄 从Firestore加载内容数据');
+                
+                // 等待Firebase初始化
+                await waitForFirebase();
+                
+                showLoading();
+                
+                // 导入Firebase函数
+                const { collection, query, orderBy, getDocs } = await import("https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js");
+                
+                if (!window.db) {
+                    throw new Error('Firebase未初始化');
+                }
+                
+                // 从Firestore加载内容
+                const contentRef = collection(window.db, 'admin_content');
+                const contentQuery = query(contentRef, orderBy('createdAt', 'desc'));
+                const snapshot = await getDocs(contentQuery);
+                
+                contentData = snapshot.docs
+                    .map(doc => {
+                        const data = doc.data();
+                        console.log(`📄 已加载内容ID: ${doc.id}`, data);
+                        return {
+                            id: doc.id,
+                            ...data
+                        };
+                    })
+                    .filter(item => {
+                        // 筛选具有版本的多语言内容
+                        const hasVersions = item.versions && typeof item.versions === 'object';
+                        const hasUserId = item.userId;
+                        const isValidContentType = ['faq', 'guide', 'notice', 'manual'].includes(item.type);
+                        
+                        if (!hasVersions || !hasUserId || !isValidContentType) {
+                            console.log(`🚫 已筛选内容: ${item.id} (type: ${item.type}, hasVersions: ${hasVersions}, hasUserId: ${!!hasUserId})`);
+                            return false;
+                        }
+                        console.log(`✅ 显示内容: ${item.id} (type: ${item.type}, 作者: ${item.userId})`);
+                        return true;
+                    });
+
+                // 如果没有内容则添加示例数据
+                if (contentData.length === 0) {
+                    console.log('📝 没有找到内容，添加示例数据');
+                    
+                    const currentTime = new Date().toISOString();
+                    
+                    contentData = [
+                        {
+                            id: 'sample_announcement_zh',
+                            type: 'notice',
+                            createdAt: currentTime,
+                            updatedAt: currentTime,
+                            versions: {
+                                zh: {
+                                    title: '欢迎来到LikeVoca社区！',
+                                    content: '<div class="prose max-w-none"><h2>🎉 LikeVoca社区开放！</h2><p>我们很兴奋地宣布新社区空间的开放，您可以在这里找到有助于语言学习的指南和技巧。</p><ul><li>学习指南和策略</li><li>新功能公告</li><li>更新和通知</li></ul><p>找到对您的语言学习之旅有用的信息！</p></div>',
+                                    published: true,
+                                    lastModified: currentTime,
+                                    translationStatus: 'updated'
+                                }
+                            }
+                        }
+                    ];
+                }
+                
+                console.log(`✅ 内容数据加载完成 (${contentData.length}项)`);
+                hideLoading();
+                
+            } catch (error) {
+                console.error('❌ 内容数据加载失败:', error);
+                hideLoading();
+                showError('内容数据加载失败。');
+            }
+        }
+
+        // 等待Firebase初始化
+        async function waitForFirebase() {
+            let attempts = 0;
+            const maxAttempts = 50;
+            
+            while (!window.db && attempts < maxAttempts) {
+                console.log(`⏳ 等待Firebase初始化... (${attempts + 1}/${maxAttempts})`);
+                await new Promise(resolve => setTimeout(resolve, 200));
+                attempts++;
+            }
+            
+            if (!window.db) {
+                throw new Error('Firebase初始化超时');
+            }
+            
+            console.log('✅ Firebase初始化成功');
+        }
+
+        // 使用筛选显示内容
+        async function displayContent() {
+            console.log('🎨 显示内容');
+            
+            const contentList = document.getElementById('contentList');
+            const emptyState = document.getElementById('emptyState');
+            const searchInput = document.getElementById('searchInput');
+            const categoryFilterElement = document.getElementById('categoryFilter');
+            
+            if (!searchInput || !categoryFilterElement) {
+                console.error('❌ 找不到所需的筛选元素');
+                return;
+            }
+            
+            const searchTerm = searchInput.value.toLowerCase();
+            const categoryFilter = categoryFilterElement.value;
+            
+            // 筛选
+            let filteredContent = contentData.filter(item => {
+                // 仅显示"已发布"状态的内容
+                if (item.status !== 'published') return false;
+                
+                const versions = item.versions || {};
+                const version = versions.zh;
+                if (!version || !version.title || !version.content) return false;
+                
+                // 分类筛选
+                if (categoryFilter !== 'all' && item.type !== categoryFilter) return false;
+                
+                // 搜索筛选
+                if (searchTerm) {
+                    const titleMatch = (version.title || '').toLowerCase().includes(searchTerm);
+                    const contentMatch = (version.content || '').toLowerCase().includes(searchTerm);
+                    if (!titleMatch && !contentMatch) return false;
+                }
+                
+                return true;
+            });
+            
+            if (filteredContent.length === 0) {
+                contentList.innerHTML = '';
+                emptyState.classList.remove('hidden');
+            } else {
+                renderContent(filteredContent);
+                emptyState.classList.add('hidden');
+            }
+        }
+
+        // 渲染内容卡片
+        function renderContent(content) {
+            const contentList = document.getElementById('contentList');
+            
+            const typeIcons = {
+                faq: 'fa-question-circle',
+                manual: 'fa-book',
+                guide: 'fa-lightbulb',
+                notice: 'fa-bullhorn'
+            };
+            
+            const typeNames = {
+                faq: '常见问题',
+                manual: '手册',
+                guide: '学习指南',
+                notice: '公告'
+            };
+
+            contentList.innerHTML = content.map(item => {
+                const version = item.versions.zh || {};
+                const typeIcon = typeIcons[item.type] || 'fa-file-alt';
+                const typeName = typeNames[item.type] || item.type;
+                
+                return `
+                    <div class="content-card bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-all duration-200">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-[#4B63AC] rounded-lg flex items-center justify-center text-white">
+                                    <i class="fas ${typeIcon}"></i>
+                                </div>
+                                <div>
+                                    <span class="inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
+                                        ${typeName}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="text-right text-sm text-gray-500">
+                                <div>${formatDate(item.createdAt)}</div>
+                                <span class="text-sm text-gray-400">${formatDate(item.updatedAt)}</span>
+                            </div>
+                        </div>
+                        
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">
+                            ${version.title || '无标题'}
+                        </h3>
+                        
+                        <div class="text-gray-700 mb-4 line-clamp-3">
+                            ${stripHtml(version.content || '')}
+                        </div>
+                        
+                        <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                            <div class="flex items-center space-x-2 text-sm text-gray-500">
+                                <i class="fas fa-eye"></i>
+                                <span>查看详情</span>
+                            </div>
+                            <button 
+                                onclick="toggleContent('content_${item.id}')" 
+                                class="text-[#4B63AC] hover:text-[#3A4F8B] text-sm font-medium"
+                            >
+                                阅读更多 <i class="fas fa-chevron-down ml-1"></i>
+                            </button>
+                        </div>
+                        
+                        <div id="content_${item.id}" class="hidden mt-4 pt-4 border-t border-gray-100">
+                            <div class="prose max-w-none">
+                                ${version.content || ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 切换内容展开
+        window.toggleContent = function(contentId) {
+            const element = document.getElementById(contentId);
+            const button = element.previousElementSibling.querySelector('button');
+            const icon = button.querySelector('i.fa-chevron-down, i.fa-chevron-up');
+            
+            if (element.classList.contains('hidden')) {
+                element.classList.remove('hidden');
+                button.innerHTML = '收起 <i class="fas fa-chevron-up ml-1"></i>';
+            } else {
+                element.classList.add('hidden');
+                button.innerHTML = '阅读更多 <i class="fas fa-chevron-down ml-1"></i>';
+            }
+        };
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            const searchBtn = document.getElementById('searchBtn');
+            const searchInput = document.getElementById('searchInput');
+            const categoryFilter = document.getElementById('categoryFilter');
+            const refreshBtn = document.getElementById('refreshBtn');
+            
+            if (searchBtn) searchBtn.addEventListener('click', displayContent);
+            if (searchInput) searchInput.addEventListener('keyup', (e) => {
+                if (e.key === 'Enter') displayContent();
+            });
+            if (categoryFilter) categoryFilter.addEventListener('change', displayContent);
+            if (refreshBtn) refreshBtn.addEventListener('click', async () => {
+                await loadContentData();
+                await displayContent();
+                showSuccess('内容已成功刷新！');
+            });
+        }
+
+        // 工具函数
+        function showLoading() {
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('contentList').innerHTML = '';
+            document.getElementById('emptyState').classList.add('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').classList.add('hidden');
+        }
+
+        function stripHtml(html) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+            return tempDiv.textContent || tempDiv.innerText || '';
+        }
+
+        function formatDate(dateValue) {
+            if (!dateValue) return '-';
+            
+            let date;
+            // Firestore Timestamp对象
+            if (dateValue.toDate && typeof dateValue.toDate === 'function') {
+                date = dateValue.toDate();
+            }
+            // 已经是Date对象或字符串
+            else {
+                date = new Date(dateValue);
+            }
+            
+            if (isNaN(date.getTime())) return '-';
+            
+            return date.toLocaleDateString('zh-CN', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        function showError(message) {
+            const contentList = document.getElementById('contentList');
+            contentList.innerHTML = `
+                <div class="text-center py-12">
+                    <i class="fas fa-exclamation-triangle text-4xl text-red-400 mb-4"></i>
+                    <p class="text-red-600">${message}</p>
+                </div>
+            `;
+        }
+
+        function showSuccess(message) {
+            // 简单的提示通知
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+            toast.innerHTML = `<i class="fas fa-check mr-2"></i>${message}`;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

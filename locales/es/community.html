@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comunidad LikeVoca - Guías de Aprendizaje, FAQ, Manual</title>
+    
+    <meta name="description" content="Encuentra guías de aprendizaje de idiomas, preguntas frecuentes (FAQ), manuales de usuario y anuncios en la comunidad LikeVoca. Obtén información completa para un aprendizaje de idiomas efectivo." />
+    <meta name="keywords" content="LikeVoca, comunidad, aprendizaje de idiomas, guías de aprendizaje, FAQ, manual, anuncios, multilingüe, inglés, japonés, chino" />
+    
+    <!-- Etiquetas Open Graph -->
+    <meta property="og:title" content="Comunidad LikeVoca - Guías de Aprendizaje, FAQ, Manual" />
+    <meta property="og:description" content="Encuentra guías de aprendizaje, FAQ y manuales en la comunidad LikeVoca." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://likevoca.com/es/community.html" />
+    <meta property="og:site_name" content="LikeVoca" />
+    <meta property="og:locale" content="es_ES" />
+    
+    <!-- Etiquetas Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Comunidad LikeVoca - Guías de Aprendizaje, FAQ, Manual" />
+    <meta name="twitter:description" content="Encuentra guías de aprendizaje, FAQ y manuales en la comunidad LikeVoca." />
+    
+    <!-- URL canónica -->
+    <link rel="canonical" href="https://likevoca.com/es/community.html" />
+    
+    <!-- Etiquetas Hreflang -->
+    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/community.html" />
+    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/community.html" />
+    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/community.html" />
+    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/community.html" />
+    <link rel="alternate" hreflang="es" href="https://likevoca.com/es/community.html" />
+    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/community.html" />
+    
+    <!-- Datos estructurados JSON-LD -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "LikeVoca Community",
+        "url": "https://likevoca.com/es/community.html",
+        "description": "Encuentra guías de aprendizaje, FAQ y manuales en la comunidad LikeVoca.",
+        "inLanguage": "es",
+        "publisher": {
+            "@type": "Organization",
+            "name": "LikeVoca",
+            "url": "https://likevoca.com"
+        },
+        "mainEntity": {
+            "@type": "FAQPage",
+            "name": "LikeVoca Community",
+            "mainEntity": []
+        }
+    }
+    </script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .content-card {
+            transition: all 0.2s ease;
+        }
+        .content-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .loading-skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="navbar-container"></div>
+
+    <main class="container mx-auto max-w-6xl px-4 md:px-6 lg:px-8 py-8 md:py-12">
+        <!-- Sección de encabezado -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
+                <span class="text-[#4B63AC]">Comunidad</span> LikeVoca
+            </h1>
+            <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
+                Encuentra guías útiles, consejos y anuncios para el aprendizaje de idiomas
+            </p>
+        </header>
+
+        <!-- Búsqueda y filtros -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <div class="flex flex-col md:flex-row gap-4 items-center">
+                <div class="flex-1">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Buscar información..." 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B63AC]"
+                    />
+                </div>
+                <div class="flex gap-2">
+                    <select id="categoryFilter" class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B63AC]">
+                        <option value="all">Todas las Categorías</option>
+                        <option value="notice">Anuncios</option>
+                        <option value="guide">Guías de Aprendizaje</option>
+                        <option value="faq">Preguntas Frecuentes</option>
+                        <option value="manual">Manual de Usuario</option>
+                    </select>
+                    <button id="searchBtn" class="bg-[#4B63AC] text-white px-6 py-3 rounded-lg hover:bg-[#3A4F8B] transition duration-200">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <button id="refreshBtn" class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition duration-200" title="Actualizar contenido">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estado de carga -->
+        <div id="loading" class="text-center py-12">
+            <i class="fas fa-spinner fa-spin text-3xl text-gray-400 mb-4"></i>
+            <p class="text-gray-600" id="loadingText">Cargando contenido...</p>
+            <div id="loadingDebug" class="mt-2 text-sm text-gray-500"></div>
+        </div>
+        
+        <!-- Lista de contenido -->
+        <div id="contentList" class="space-y-6">
+        </div>
+
+        <!-- Estado vacío -->
+        <div id="emptyState" class="text-center py-12 hidden">
+            <i class="fas fa-search text-6xl text-gray-300 mb-6"></i>
+            <h3 class="text-xl font-semibold text-gray-700 mb-2">No hay resultados de búsqueda</h3>
+            <p class="text-gray-500">Intenta usar diferentes términos de búsqueda.</p>
+        </div>
+    </main>
+
+    <!-- Pie de página -->
+    <div id="footer-container"></div>
+
+    <!-- Scripts -->
+    <script src="../../components/js/navbar.js"></script>
+    <script src="../../components/js/footer.js"></script>
+    
+    <script type="module">
+        import { applyLanguage, updateMetadata } from '../../utils/language-utils.js';
+        
+        let contentData = [];
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Cargar barra de navegación
+                if (typeof window.loadNavbar === 'function') {
+                    await window.loadNavbar();
+                }
+                
+                // Cargar pie de página
+                if (typeof window.loadFooter === 'function') {
+                    await window.loadFooter();
+                }
+                
+                // Aplicar idioma
+                await applyLanguage();
+                await updateMetadata('community');
+                
+                // Cargar contenido
+                await loadContentData();
+                await displayContent();
+                
+                // Configurar event listeners
+                setupEventListeners();
+                
+            } catch (error) {
+                console.error('Error al inicializar la página de comunidad:', error);
+                showError('Ocurrió un error al cargar la página.');
+            }
+        });
+
+        // Inicializar Firebase y cargar datos de contenido
+        async function loadContentData() {
+            try {
+                console.log('🔄 Cargando datos de contenido desde Firestore');
+                
+                // Esperar inicialización de Firebase
+                await waitForFirebase();
+                
+                showLoading();
+                
+                // Importar funciones de Firebase
+                const { collection, query, orderBy, getDocs } = await import("https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js");
+                
+                if (!window.db) {
+                    throw new Error('Firebase no inicializado');
+                }
+                
+                // Cargar contenido desde Firestore
+                const contentRef = collection(window.db, 'admin_content');
+                const contentQuery = query(contentRef, orderBy('createdAt', 'desc'));
+                const snapshot = await getDocs(contentQuery);
+                
+                contentData = snapshot.docs
+                    .map(doc => {
+                        const data = doc.data();
+                        console.log(`📄 Contenido cargado ID: ${doc.id}`, data);
+                        return {
+                            id: doc.id,
+                            ...data
+                        };
+                    })
+                    .filter(item => {
+                        // Filtrar contenido multilingüe con versiones
+                        const hasVersions = item.versions && typeof item.versions === 'object';
+                        const hasUserId = item.userId;
+                        const isValidContentType = ['faq', 'guide', 'notice', 'manual'].includes(item.type);
+                        
+                        if (!hasVersions || !hasUserId || !isValidContentType) {
+                            console.log(`🚫 Contenido filtrado: ${item.id} (type: ${item.type}, hasVersions: ${hasVersions}, hasUserId: ${!!hasUserId})`);
+                            return false;
+                        }
+                        console.log(`✅ Mostrar contenido: ${item.id} (type: ${item.type}, autor: ${item.userId})`);
+                        return true;
+                    });
+
+                // Agregar datos de muestra si no existe contenido
+                if (contentData.length === 0) {
+                    console.log('📝 No se encontró contenido, agregando datos de muestra');
+                    
+                    const currentTime = new Date().toISOString();
+                    
+                    contentData = [
+                        {
+                            id: 'sample_announcement_es',
+                            type: 'notice',
+                            createdAt: currentTime,
+                            updatedAt: currentTime,
+                            versions: {
+                                es: {
+                                    title: '¡Bienvenido a la Comunidad LikeVoca!',
+                                    content: '<div class="prose max-w-none"><h2>🎉 ¡Comunidad LikeVoca Abierta!</h2><p>Nos complace anunciar la apertura de nuestro nuevo espacio comunitario donde puedes encontrar guías útiles y consejos para el aprendizaje de idiomas.</p><ul><li>Guías y estrategias de aprendizaje</li><li>Anuncios de nuevas funciones</li><li>Actualizaciones y avisos</li></ul><p>¡Encuentra información útil para ayudar en tu viaje de aprendizaje de idiomas!</p></div>',
+                                    published: true,
+                                    lastModified: currentTime,
+                                    translationStatus: 'updated'
+                                }
+                            }
+                        }
+                    ];
+                }
+                
+                console.log(`✅ Datos de contenido cargados (${contentData.length} elementos)`);
+                hideLoading();
+                
+            } catch (error) {
+                console.error('❌ Error al cargar datos de contenido:', error);
+                hideLoading();
+                showError('Error al cargar los datos de contenido.');
+            }
+        }
+
+        // Esperar inicialización de Firebase
+        async function waitForFirebase() {
+            let attempts = 0;
+            const maxAttempts = 50;
+            
+            while (!window.db && attempts < maxAttempts) {
+                console.log(`⏳ Esperando inicialización de Firebase... (${attempts + 1}/${maxAttempts})`);
+                await new Promise(resolve => setTimeout(resolve, 200));
+                attempts++;
+            }
+            
+            if (!window.db) {
+                throw new Error('Tiempo de espera de inicialización de Firebase agotado');
+            }
+            
+            console.log('✅ Firebase inicializado correctamente');
+        }
+
+        // Mostrar contenido con filtrado
+        async function displayContent() {
+            console.log('🎨 Mostrando contenido');
+            
+            const contentList = document.getElementById('contentList');
+            const emptyState = document.getElementById('emptyState');
+            const searchInput = document.getElementById('searchInput');
+            const categoryFilterElement = document.getElementById('categoryFilter');
+            
+            if (!searchInput || !categoryFilterElement) {
+                console.error('❌ No se encontraron elementos de filtro requeridos');
+                return;
+            }
+            
+            const searchTerm = searchInput.value.toLowerCase();
+            const categoryFilter = categoryFilterElement.value;
+            
+            // Filtrado
+            let filteredContent = contentData.filter(item => {
+                // Mostrar solo contenido con estado 'publicado'
+                if (item.status !== 'published') return false;
+                
+                const versions = item.versions || {};
+                const version = versions.es;
+                if (!version || !version.title || !version.content) return false;
+                
+                // Filtro de categoría
+                if (categoryFilter !== 'all' && item.type !== categoryFilter) return false;
+                
+                // Filtro de búsqueda
+                if (searchTerm) {
+                    const titleMatch = (version.title || '').toLowerCase().includes(searchTerm);
+                    const contentMatch = (version.content || '').toLowerCase().includes(searchTerm);
+                    if (!titleMatch && !contentMatch) return false;
+                }
+                
+                return true;
+            });
+            
+            if (filteredContent.length === 0) {
+                contentList.innerHTML = '';
+                emptyState.classList.remove('hidden');
+            } else {
+                renderContent(filteredContent);
+                emptyState.classList.add('hidden');
+            }
+        }
+
+        // Renderizar tarjetas de contenido
+        function renderContent(content) {
+            const contentList = document.getElementById('contentList');
+            
+            const typeIcons = {
+                faq: 'fa-question-circle',
+                manual: 'fa-book',
+                guide: 'fa-lightbulb',
+                notice: 'fa-bullhorn'
+            };
+            
+            const typeNames = {
+                faq: 'Preguntas Frecuentes',
+                manual: 'Manual',
+                guide: 'Guía de Aprendizaje',
+                notice: 'Anuncio'
+            };
+
+            contentList.innerHTML = content.map(item => {
+                const version = item.versions.es || {};
+                const typeIcon = typeIcons[item.type] || 'fa-file-alt';
+                const typeName = typeNames[item.type] || item.type;
+                
+                return `
+                    <div class="content-card bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-all duration-200">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-[#4B63AC] rounded-lg flex items-center justify-center text-white">
+                                    <i class="fas ${typeIcon}"></i>
+                                </div>
+                                <div>
+                                    <span class="inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
+                                        ${typeName}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="text-right text-sm text-gray-500">
+                                <div>${formatDate(item.createdAt)}</div>
+                                <span class="text-sm text-gray-400">${formatDate(item.updatedAt)}</span>
+                            </div>
+                        </div>
+                        
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">
+                            ${version.title || 'Sin título'}
+                        </h3>
+                        
+                        <div class="text-gray-700 mb-4 line-clamp-3">
+                            ${stripHtml(version.content || '')}
+                        </div>
+                        
+                        <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                            <div class="flex items-center space-x-2 text-sm text-gray-500">
+                                <i class="fas fa-eye"></i>
+                                <span>Ver detalles</span>
+                            </div>
+                            <button 
+                                onclick="toggleContent('content_${item.id}')" 
+                                class="text-[#4B63AC] hover:text-[#3A4F8B] text-sm font-medium"
+                            >
+                                Leer más <i class="fas fa-chevron-down ml-1"></i>
+                            </button>
+                        </div>
+                        
+                        <div id="content_${item.id}" class="hidden mt-4 pt-4 border-t border-gray-100">
+                            <div class="prose max-w-none">
+                                ${version.content || ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Alternar expansión de contenido
+        window.toggleContent = function(contentId) {
+            const element = document.getElementById(contentId);
+            const button = element.previousElementSibling.querySelector('button');
+            const icon = button.querySelector('i.fa-chevron-down, i.fa-chevron-up');
+            
+            if (element.classList.contains('hidden')) {
+                element.classList.remove('hidden');
+                button.innerHTML = 'Mostrar menos <i class="fas fa-chevron-up ml-1"></i>';
+            } else {
+                element.classList.add('hidden');
+                button.innerHTML = 'Leer más <i class="fas fa-chevron-down ml-1"></i>';
+            }
+        };
+
+        // Configurar event listeners
+        function setupEventListeners() {
+            const searchBtn = document.getElementById('searchBtn');
+            const searchInput = document.getElementById('searchInput');
+            const categoryFilter = document.getElementById('categoryFilter');
+            const refreshBtn = document.getElementById('refreshBtn');
+            
+            if (searchBtn) searchBtn.addEventListener('click', displayContent);
+            if (searchInput) searchInput.addEventListener('keyup', (e) => {
+                if (e.key === 'Enter') displayContent();
+            });
+            if (categoryFilter) categoryFilter.addEventListener('change', displayContent);
+            if (refreshBtn) refreshBtn.addEventListener('click', async () => {
+                await loadContentData();
+                await displayContent();
+                showSuccess('¡Contenido actualizado exitosamente!');
+            });
+        }
+
+        // Funciones de utilidad
+        function showLoading() {
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('contentList').innerHTML = '';
+            document.getElementById('emptyState').classList.add('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').classList.add('hidden');
+        }
+
+        function stripHtml(html) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+            return tempDiv.textContent || tempDiv.innerText || '';
+        }
+
+        function formatDate(dateValue) {
+            if (!dateValue) return '-';
+            
+            let date;
+            // Objeto Firestore Timestamp
+            if (dateValue.toDate && typeof dateValue.toDate === 'function') {
+                date = dateValue.toDate();
+            }
+            // Ya es objeto Date o cadena
+            else {
+                date = new Date(dateValue);
+            }
+            
+            if (isNaN(date.getTime())) return '-';
+            
+            return date.toLocaleDateString('es-ES', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        function showError(message) {
+            const contentList = document.getElementById('contentList');
+            contentList.innerHTML = `
+                <div class="text-center py-12">
+                    <i class="fas fa-exclamation-triangle text-4xl text-red-400 mb-4"></i>
+                    <p class="text-red-600">${message}</p>
+                </div>
+            `;
+        }
+
+        function showSuccess(message) {
+            // Notificación toast simple
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+            toast.innerHTML = `<i class="fas fa-check mr-2"></i>${message}`;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
