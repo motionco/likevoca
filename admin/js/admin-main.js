@@ -22,37 +22,79 @@ const ADMIN_EMAILS = [
     // 필요시 추가
 ];
 
-// Firebase 초기화 완료 확인
+// Firebase 초기화 완료 확인 (향상된 타임아웃 처리)
 function initializeAdminDashboard() {
-    if (window.db && window.auth) {
-        db = window.db;
-        console.log('🔐 관리자 대시보드 초기화 시작');
+    let initializationAttempts = 0;
+    const maxAttempts = 100; // 10초 대기
+    
+    const updateLoadingProgress = (progress, status) => {
+        const progressElement = document.getElementById('loadingProgress');
+        const statusElement = document.getElementById('loadingStatus');
         
-        // 사용자 인증 상태 확인
-        window.auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                currentUser = user;
-                await checkAdminPermission(user.email);
-            } else {
+        if (progressElement) progressElement.style.width = `${progress}%`;
+        if (statusElement) statusElement.textContent = status;
+    };
+    
+    const checkInitialization = () => {
+        const progress = (initializationAttempts / maxAttempts) * 50; // 50% for Firebase init
+        updateLoadingProgress(progress, 'Firebase 연결 중...');
+        
+        if (window.db && window.auth) {
+            db = window.db;
+            updateLoadingProgress(50, '사용자 인증 확인 중...');
+            
+            // 사용자 인증 상태 확인 (타임아웃 적용)
+            const authTimeout = setTimeout(() => {
+                console.error('⏰ 인증 확인 시간 초과 - 로그인 페이지로 이동');
                 redirectToLogin();
+            }, 10000);
+            
+            window.auth.onAuthStateChanged(async (user) => {
+                clearTimeout(authTimeout);
+                updateLoadingProgress(75, '관리자 권한 확인 중...');
+                
+                if (user) {
+                    currentUser = user;
+                    await checkAdminPermission(user.email);
+                } else {
+                    redirectToLogin();
+                }
+            });
+        } else {
+            initializationAttempts++;
+            
+            if (initializationAttempts >= maxAttempts) {
+                console.error('🚨 Firebase 초기화 시간 초과 - 페이지를 새로고침하세요');
+                showInitializationError();
+                return;
             }
-        });
-    } else {
-        console.log('⏳ Firebase 초기화 대기 중...');
-        setTimeout(initializeAdminDashboard, 100);
-    }
+            
+            setTimeout(checkInitialization, 100);
+        }
+    };
+    
+    checkInitialization();
 }
 
 // 관리자 권한 확인 (개인정보보호 준수)
 async function checkAdminPermission(userEmail) {
     try {
+        const updateLoadingProgress = (progress, status) => {
+            const progressElement = document.getElementById('loadingProgress');
+            const statusElement = document.getElementById('loadingStatus');
+            
+            if (progressElement) progressElement.style.width = `${progress}%`;
+            if (statusElement) statusElement.textContent = status;
+        };
+        
         // 하드코딩된 관리자 목록 확인 (Firestore 읽기 비용 절약)
         const isAdmin = ADMIN_EMAILS.includes(userEmail);
         
         if (isAdmin) {
-            console.log('✅ 관리자 권한 확인됨');
+            updateLoadingProgress(90, '대시보드 데이터 로드 중...');
             await loadDashboardData();
-            showDashboard();
+            updateLoadingProgress(100, '로드 완료');
+            setTimeout(showDashboard, 300); // 사용자가 진행 상황을 볼 수 있도록 잠깐 대기
         } else {
             console.log('❌ 관리자 권한 없음');
             showAccessDenied();
@@ -234,6 +276,19 @@ function showAccessDenied() {
     document.getElementById('loadingScreen').classList.add('hidden');
     document.getElementById('mainDashboard').classList.add('hidden');
     document.getElementById('accessDenied').classList.remove('hidden');
+}
+
+function showInitializationError() {
+    document.getElementById('loadingScreen').innerHTML = `
+        <div class="text-center">
+            <i class="fas fa-exclamation-triangle text-4xl text-red-600 mb-4"></i>
+            <p class="text-red-600 font-medium mb-4">Firebase 초기화에 실패했습니다</p>
+            <p class="text-gray-600 mb-6">페이지를 새로고침하거나 잠시 후 다시 시도해주세요</p>
+            <button onclick="location.reload()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-200">
+                페이지 새로고침
+            </button>
+        </div>
+    `;
 }
 
 // 네비게이션 함수들

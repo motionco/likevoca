@@ -10,7 +10,8 @@
     { "src": "pages/**", "use": "@vercel/static" },
     { "src": "utils/**", "use": "@vercel/static" },
     { "src": "samples/**", "use": "@vercel/static" },
-    { "src": "locales/**", "use": "@vercel/static" }
+    { "src": "locales/**", "use": "@vercel/static" },
+    { "src": "admin/**", "use": "@vercel/static" }
   ],
   "routes": [
     { "src": "/api/config", "dest": "/api/config.js" },
@@ -18,7 +19,8 @@
     { "src": "/api/test-env", "dest": "/api/test-env.js" },
     { "src": "/api/log-auth-error", "dest": "/api/log-auth-error.js" },
     { "handle": "filesystem" },
-    { "src": "^/(?!ko|en|ja|zh|es).*", "dest": "/index.html" },
+    { "src": "/admin/(.*)", "dest": "/admin/$1" },
+    { "src": "^/(?!ko|en|ja|zh|es|admin).*", "dest": "/index.html" },
     { "src": "/ko", "dest": "/locales/ko/index.html" },
     { "src": "/en", "dest": "/locales/en/index.html" },
     { "src": "/ja", "dest": "/locales/ja/index.html" },

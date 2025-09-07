@@ -69,9 +69,13 @@
 
     <!-- Loading Screen -->
     <div id="loadingScreen" class="flex items-center justify-center py-12">
-        <div class="text-center">
+        <div class="text-center max-w-md mx-auto">
             <i class="fas fa-spinner fa-spin text-4xl text-indigo-600 mb-4"></i>
-            <p class="text-gray-600">관리자 권한을 확인하는 중...</p>
+            <p class="text-gray-600 mb-4">관리자 권한을 확인하는 중...</p>
+            <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
+                <div id="loadingProgress" class="bg-indigo-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <p id="loadingStatus" class="text-sm text-gray-500">Firebase 연결 중...</p>
         </div>
     </div>
 
