@@ -42,73 +42,118 @@ const CONTENT_TYPES = {
     notice: { name: '공지사항', description: '공지사항' }
 };
 
+// 로딩 상태 업데이트 함수
+function updateLoadingStatus(message, progress = null) {
+    const statusElement = document.getElementById('loading-status');
+    const progressElement = document.getElementById('loading-progress');
+    
+    if (statusElement) {
+        statusElement.textContent = message;
+    }
+    
+    if (progress !== null && progressElement) {
+        progressElement.style.width = `${progress}%`;
+    }
+}
+
+// 로딩 화면 숨기기
+function hideLoadingScreen() {
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen) {
+        loadingScreen.style.opacity = '0';
+        loadingScreen.style.transition = 'opacity 0.5s ease-out';
+        setTimeout(() => {
+            loadingScreen.style.display = 'none';
+        }, 500);
+    }
+}
+
 // Firebase 초기화 완료 확인
 function initializeMultilingualContentManager() {
     if (window.db && window.auth) {
         db = window.db;
         auth = window.auth;
         console.log('🌐 다국어 콘텐츠 관리 시스템 초기화 시작');
+        updateLoadingStatus('사용자 인증 확인 중...', 30);
         
         // 인증 상태 확인
         auth.onAuthStateChanged((user) => {
             if (user) {
                 console.log('✅ 사용자 인증됨:', user.email);
+                updateLoadingStatus('관리자 권한 확인 중...', 60);
                 checkAdminPermission(user.email);
             } else {
                 console.log('❌ 사용자 인증되지 않음');
-                window.location.href = '../pages/vocabulary.html';
+                updateLoadingStatus('로그인이 필요합니다. 로그인 페이지로 이동 중...', 100);
+                setTimeout(() => {
+                    window.location.href = '../pages/vocabulary.html';
+                }, 2000);
             }
         });
     } else {
         console.log('⏳ Firebase 초기화 대기 중...');
+        updateLoadingStatus('Firebase 초기화 대기 중...', 10);
         setTimeout(initializeMultilingualContentManager, 100);
     }
 }
 
-// 관리자 권한 확인
+// 관리자 권한 확인 (배포 환경 최적화)
 async function checkAdminPermission(userEmail) {
+    // 관리자 이메일 목록 (배포 환경에서 빠른 확인을 위해)
+    const ADMIN_EMAILS = [
+        'admin@likevoca.com',
+        'manager@likevoca.com',
+        'motioncomc@gmail.com',
+    ];
+    
+    console.log('🔐 관리자 권한 확인 중...', userEmail);
+    
+    // 먼저 하드코딩된 목록으로 빠른 확인
+    const isAdminByEmail = ADMIN_EMAILS.includes(userEmail);
+    
+    if (isAdminByEmail) {
+        console.log('✅ 관리자 권한 확인됨 (이메일 목록)');
+        updateLoadingStatus('시스템 초기화 중...', 90);
+        await startMultilingualContentManager();
+        return;
+    }
+    
+    // Firestore에서 추가 확인 (타임아웃 적용)
     try {
-        console.log('🔐 관리자 권한 확인 중...');
+        console.log('🔍 Firestore에서 사용자 권한 추가 확인 중...');
         
-        // users 컬렉션에서 사용자 정보 확인
         const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js");
         const userRef = doc(window.db, 'users', userEmail);
-        const userDoc = await getDoc(userRef);
+        
+        // 3초 타임아웃 적용
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Firestore 접근 타임아웃')), 3000)
+        );
+        
+        const userDoc = await Promise.race([
+            getDoc(userRef),
+            timeoutPromise
+        ]);
         
         if (userDoc.exists()) {
             const userData = userDoc.data();
             const isAdmin = userData.role === 'admin';
             
             if (isAdmin) {
-                console.log('✅ 관리자 권한 확인됨 (DB에서 확인)');
+                console.log('✅ 관리자 권한 확인됨 (Firestore DB)');
+                updateLoadingStatus('시스템 초기화 중...', 90);
                 await startMultilingualContentManager();
-            } else {
-                console.log('❌ 관리자 권한 없음 (role:', userData.role || 'undefined', ')');
-                showAccessDenied();
+                return;
             }
-        } else {
-            console.log('❌ 사용자 정보를 찾을 수 없음');
-            showAccessDenied();
         }
+        
+        console.log('❌ 관리자 권한 없음 - 이메일:', userEmail);
+        showAccessDenied();
+        
     } catch (error) {
-        console.error('❌ 관리자 권한 확인 중 오류:', error);
-        // Firestore 접근 실패 시 fallback으로 이메일 목록 확인
-        console.log('🔄 Fallback: 하드코딩된 관리자 목록으로 확인');
-        const ADMIN_EMAILS = [
-            'admin@likevoca.com',
-            'manager@likevoca.com',
-            'motioncomc@gmail.com',
-        ];
-        
-        const isAdmin = ADMIN_EMAILS.includes(userEmail);
-        
-        if (isAdmin) {
-            console.log('✅ 관리자 권한 확인됨 (fallback)');
-            await startMultilingualContentManager();
-        } else {
-            console.log('❌ 관리자 권한 없음');
-            showAccessDenied();
-        }
+        console.error('❌ Firestore 권한 확인 실패:', error);
+        console.log('❌ 관리자 권한 없음 - 인증된 관리자 목록에 없음');
+        showAccessDenied();
     }
 }
 
@@ -133,14 +178,26 @@ async function startMultilingualContentManager() {
     console.log('🚀 다국어 콘텐츠 관리자 시작');
     
     try {
+        updateLoadingStatus('에디터 초기화 중...', 95);
         await initializeQuillEditors();
+        
+        updateLoadingStatus('콘텐츠 데이터 로딩 중...', 98);
         await loadContentData();
         updateStatistics();
         
+        updateLoadingStatus('초기화 완료!', 100);
         console.log('✅ 다국어 콘텐츠 관리자 초기화 완료');
+        
+        // 로딩 화면 숨기기
+        setTimeout(hideLoadingScreen, 500);
+        
     } catch (error) {
         console.error('❌ 다국어 콘텐츠 관리자 초기화 실패:', error);
-        showError('다국어 콘텐츠 관리자 초기화에 실패했습니다.');
+        updateLoadingStatus('초기화 실패: ' + error.message, 100);
+        setTimeout(() => {
+            showError('다국어 콘텐츠 관리자 초기화에 실패했습니다.');
+            hideLoadingScreen();
+        }, 2000);
     }
 }
 
@@ -408,18 +465,48 @@ async function performAutoTranslation() {
             return;
         }
         
-        showSuccess('자동 번역을 시작합니다...');
+        // 번역 환경 정보 표시
+        const environment = window.location.hostname === "localhost" || 
+                          window.location.hostname === "127.0.0.1" ? "로컬" : "배포";
+        
+        showSuccess(`자동 번역을 시작합니다... (${environment} 환경, ${targetLanguages.length}개 언어)`);
+        
+        let successCount = 0;
+        let failCount = 0;
         
         // Gemini API를 사용한 실제 번역
-        for (const targetLang of targetLanguages) {
-            const translatedTitle = await translateContentWithGemini(sourceTitle, sourceLanguage, targetLang);
-            const translatedContent = await translateContentWithGemini(sourceContent, sourceLanguage, targetLang);
+        for (let i = 0; i < targetLanguages.length; i++) {
+            const targetLang = targetLanguages[i];
+            const langName = SUPPORTED_LANGUAGES[targetLang].name;
             
-            document.getElementById(`title_${targetLang}`).value = translatedTitle;
-            quillEditors[targetLang].root.innerHTML = translatedContent;
+            try {
+                // 진행 상태 표시
+                showSuccess(`${langName} 번역 중... (${i + 1}/${targetLanguages.length})`);
+                
+                const translatedTitle = await translateContentWithGemini(sourceTitle, sourceLanguage, targetLang);
+                const translatedContent = await translateContentWithGemini(sourceContent, sourceLanguage, targetLang);
+                
+                document.getElementById(`title_${targetLang}`).value = translatedTitle;
+                quillEditors[targetLang].root.innerHTML = translatedContent;
+                
+                successCount++;
+                console.log(`✅ ${langName} 번역 완료`);
+                
+            } catch (error) {
+                failCount++;
+                console.error(`❌ ${langName} 번역 실패:`, error);
+                showError(`${langName} 번역 중 오류가 발생했습니다.`);
+            }
         }
         
-        showSuccess('자동 번역이 완료되었습니다. 번역 결과를 검토하고 필요시 수정해주세요.');
+        // 최종 결과 표시
+        if (successCount === targetLanguages.length) {
+            showSuccess(`🎉 모든 언어 번역 완료! (${successCount}/${targetLanguages.length}) 번역 결과를 검토하고 필요시 수정해주세요.`);
+        } else if (successCount > 0) {
+            showSuccess(`⚠️ 일부 언어 번역 완료 (성공: ${successCount}, 실패: ${failCount}) 번역 결과를 검토해주세요.`);
+        } else {
+            showError(`❌ 모든 번역이 실패했습니다. 네트워크 연결이나 권한을 확인해주세요.`);
+        }
         
     } catch (error) {
         console.error('자동 번역 실패:', error);
@@ -429,6 +516,38 @@ async function performAutoTranslation() {
 
 // 번역 기능은 별도 모듈(admin-content-translation.js)로 분리됨
 // translateContentWithGemini 함수를 사용하여 Gemini API로 실제 번역 수행
+
+// 환경별 번역 테스트 함수 (개발/디버깅 용도)
+async function testTranslationEnvironment() {
+    const environment = {
+        hostname: window.location.hostname,
+        protocol: window.location.protocol,
+        isLocal: window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1",
+        hasGeminiAccess: typeof fetch !== 'undefined'
+    };
+    
+    console.log('🔍 번역 환경 테스트:', environment);
+    
+    try {
+        const testText = "안녕하세요";
+        const result = await translateContentWithGemini(testText, 'ko', 'en');
+        
+        console.log('✅ 번역 테스트 성공:', {
+            input: testText,
+            output: result,
+            environment: environment.isLocal ? 'LOCAL' : 'PRODUCTION'
+        });
+        
+        return { success: true, result, environment };
+        
+    } catch (error) {
+        console.error('❌ 번역 테스트 실패:', error);
+        return { success: false, error: error.message, environment };
+    }
+}
+
+// 전역 함수로 등록 (개발자 콘솔에서 테스트 가능)
+window.testTranslationEnvironment = testTranslationEnvironment;
 
 // 콘텐츠 저장
 async function saveContent() {

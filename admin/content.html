@@ -66,6 +66,21 @@
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
+    <!-- 초기 로딩 화면 -->
+    <div id="loading-screen" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
+        <div class="text-center">
+            <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <h2 class="text-xl font-semibold text-gray-900 mb-2">콘텐츠 관리 시스템 로딩 중...</h2>
+            <p id="loading-status" class="text-gray-600">Firebase 초기화 중...</p>
+            <div class="mt-6 max-w-md mx-auto">
+                <div class="bg-gray-200 rounded-full h-2">
+                    <div id="loading-progress" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+                <p class="text-sm text-gray-500 mt-2">잠시만 기다려주세요...</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Header -->
     <header class="bg-white shadow-sm border-b sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -1,10 +1,18 @@
 // Gemini API를 사용한 콘텐츠 번역 전용 모듈
 // AI 단어장과 구분되는 별도 번역 기능
 
-// 로컬 환경 감지
+// 환경 감지 (더 정교한 감지)
 const isLocalEnvironment = 
     window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1";
+    window.location.hostname === "127.0.0.1" ||
+    window.location.hostname.includes('localhost') ||
+    window.location.protocol === 'file:';
+
+const isProductionEnvironment = 
+    !isLocalEnvironment && 
+    (window.location.hostname.includes('vercel.app') || 
+     window.location.hostname.includes('likevoca.com') ||
+     window.location.protocol === 'https:');
 
 // Gemini API를 사용한 실제 번역 기능
 export async function translateContentWithGemini(text, fromLang, toLang) {
@@ -13,13 +21,24 @@ export async function translateContentWithGemini(text, fromLang, toLang) {
         return text;
     }
     
-    console.log('콘텐츠 번역 시작:', { fromLang, toLang, textLength: text.length });
+    console.log('🌍 콘텐츠 번역 시작:', { 
+        fromLang, 
+        toLang, 
+        textLength: text.length,
+        environment: isLocalEnvironment ? 'LOCAL' : 'PRODUCTION',
+        hostname: window.location.hostname
+    });
     
     // 로컬 환경에서는 fallback 번역 사용
     if (isLocalEnvironment) {
-        console.log('로컬 환경에서 fallback 번역 사용');
+        console.log('🏠 로컬 환경 감지 - fallback 번역 사용');
         await new Promise(resolve => setTimeout(resolve, 800)); // 번역 지연 시뮬레이션
         return fallbackTranslation(text, fromLang, toLang);
+    }
+    
+    // 배포 환경에서 Gemini API 사용
+    if (isProductionEnvironment) {
+        console.log('🚀 배포 환경 감지 - Gemini API 사용 시도');
     }
     
     try {
@@ -65,7 +84,12 @@ export async function translateContentWithGemini(text, fromLang, toLang) {
         }
         
         const translatedText = data.candidates[0].content.parts[0].text.trim();
-        console.log('콘텐츠 번역 완료:', { translatedLength: translatedText.length });
+        console.log('✅ Gemini API 번역 성공:', { 
+            originalLength: text.length,
+            translatedLength: translatedText.length,
+            fromLang, 
+            toLang 
+        });
         
         // HTML 태그가 포함된 경우 원본 HTML 구조 유지하면서 텍스트만 번역
         if (text.includes('<') && text.includes('>')) {
