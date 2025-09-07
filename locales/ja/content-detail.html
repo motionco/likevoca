@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 動的メタタグ - JavaScriptで更新 -->
+    <title>コンテンツを読み込み中... - LikeVoca</title>
+    <meta name="description" content="LikeVocaコミュニティのコンテンツをご確認ください。" />
+    <meta name="keywords" content="LikeVoca, コミュニティ, 言語学習" />
+    
+    <!-- Open Graph タグ -->
+    <meta property="og:title" content="コンテンツを読み込み中... - LikeVoca" />
+    <meta property="og:description" content="LikeVocaコミュニティのコンテンツをご確認ください。" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="" />
+    <meta property="og:site_name" content="LikeVoca" />
+    <meta property="og:locale" content="ja_JP" />
+    
+    <!-- Twitter Card タグ -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="コンテンツを読み込み中... - LikeVoca" />
+    <meta name="twitter:description" content="LikeVocaコミュニティのコンテンツをご確認ください。" />
+    
+    <!-- Canonical URL - 動的更新 -->
+    <link rel="canonical" href="" />
+    
+    <!-- Hreflang タグ -->
+    <link rel="alternate" hreflang="ko" href="" />
+    <link rel="alternate" hreflang="en" href="" />
+    <link rel="alternate" hreflang="ja" href="" />
+    <link rel="alternate" hreflang="zh" href="" />
+    <link rel="alternate" hreflang="es" href="" />
+    <link rel="alternate" hreflang="x-default" href="" />
+    
+    <!-- JSON-LD 構造化データ - 動的更新 -->
+    <script type="application/ld+json" id="structuredData">
+    {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "コンテンツを読み込み中...",
+        "description": "LikeVocaコミュニティのコンテンツをご確認ください。",
+        "author": {
+            "@type": "Organization",
+            "name": "LikeVoca"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "LikeVoca",
+            "url": "https://likevoca.com"
+        },
+        "url": "",
+        "datePublished": "",
+        "dateModified": "",
+        "inLanguage": "ja",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": ""
+        }
+    }
+    </script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        .content-detail {
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .content-detail h1, .content-detail h2, .content-detail h3 {
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .content-detail p {
+            margin-bottom: 1rem;
+        }
+        
+        .content-detail ul, .content-detail ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+        
+        .content-detail li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .breadcrumb {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .share-buttons {
+            position: fixed;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 10;
+        }
+        
+        @media (max-width: 768px) {
+            .share-buttons {
+                position: relative;
+                right: auto;
+                top: auto;
+                transform: none;
+                flex-direction: row;
+                justify-content: center;
+                margin: 2rem 0;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header Component -->
+    <div id="header-placeholder"></div>
+    
+    <main class="container mx-auto px-4 py-8">
+        <!-- ローディングスクリーン -->
+        <div id="loadingScreen" class="text-center py-12">
+            <i class="fas fa-spinner fa-spin text-4xl text-blue-600 mb-4"></i>
+            <p class="text-gray-600">コンテンツを読み込んでいます...</p>
+        </div>
+        
+        <!-- エラースクリーン -->
+        <div id="errorScreen" class="hidden text-center py-12">
+            <i class="fas fa-exclamation-triangle text-4xl text-red-600 mb-4"></i>
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">コンテンツが見つかりません</h2>
+            <p class="text-gray-600 mb-6">お探しのコンテンツは存在しないか、削除されました。</p>
+            <a href="/locales/ja/community.html" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-200">
+                コミュニティに戻る
+            </a>
+        </div>
+        
+        <!-- コンテンツ詳細 -->
+        <article id="contentDetail" class="hidden">
+            <!-- パンくずナビゲーション -->
+            <nav class="breadcrumb">
+                <div class="flex items-center space-x-2 text-sm">
+                    <a href="/locales/ja/index.html" class="text-blue-600 hover:text-blue-800">ホーム</a>
+                    <i class="fas fa-chevron-right text-gray-400"></i>
+                    <a href="/locales/ja/community.html" class="text-blue-600 hover:text-blue-800">コミュニティ</a>
+                    <i class="fas fa-chevron-right text-gray-400"></i>
+                    <span id="breadcrumbTitle" class="text-gray-700">コンテンツ</span>
+                </div>
+            </nav>
+            
+            <!-- コンテンツヘッダー -->
+            <header class="mb-8">
+                <div class="flex items-center mb-4">
+                    <span id="contentCategory" class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">カテゴリー</span>
+                    <span id="contentDate" class="text-gray-500 text-sm ml-4"></span>
+                </div>
+                <h1 id="contentTitle" class="text-4xl font-bold text-gray-900 mb-4">タイトル</h1>
+                <p id="contentSummary" class="text-xl text-gray-600">概要</p>
+            </header>
+            
+            <!-- コンテンツ本文 -->
+            <div class="content-detail bg-white rounded-lg shadow-sm p-8">
+                <div id="contentBody" class="prose max-w-none">
+                    <!-- コンテンツがここに読み込まれます -->
+                </div>
+            </div>
+            
+            <!-- タグ -->
+            <div id="contentTags" class="mt-6 flex flex-wrap gap-2">
+                <!-- 動的タグ -->
+            </div>
+            
+            <!-- シェアボタン（デスクトップ） -->
+            <div class="share-buttons hidden md:flex">
+                <button onclick="shareContent('facebook')" class="bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 transition duration-200" title="Facebookでシェア">
+                    <i class="fab fa-facebook-f"></i>
+                </button>
+                <button onclick="shareContent('twitter')" class="bg-blue-400 text-white p-3 rounded-full hover:bg-blue-500 transition duration-200" title="Twitterでシェア">
+                    <i class="fab fa-twitter"></i>
+                </button>
+                <button onclick="copyURL()" class="bg-gray-600 text-white p-3 rounded-full hover:bg-gray-700 transition duration-200" title="リンクをコピー">
+                    <i class="fas fa-link"></i>
+                </button>
+            </div>
+            
+            <!-- シェアボタン（モバイル） -->
+            <div class="share-buttons md:hidden">
+                <button onclick="shareContent('facebook')" class="bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition duration-200">
+                    <i class="fab fa-facebook-f mr-2"></i>Facebook
+                </button>
+                <button onclick="shareContent('twitter')" class="bg-blue-400 text-white p-3 rounded-lg hover:bg-blue-500 transition duration-200">
+                    <i class="fab fa-twitter mr-2"></i>Twitter
+                </button>
+                <button onclick="copyURL()" class="bg-gray-600 text-white p-3 rounded-lg hover:bg-gray-700 transition duration-200">
+                    <i class="fas fa-link mr-2"></i>リンクをコピー
+                </button>
+            </div>
+            
+            <!-- 関連コンテンツ -->
+            <section id="relatedContent" class="mt-12">
+                <h3 class="text-2xl font-bold text-gray-900 mb-6">関連コンテンツ</h3>
+                <div id="relatedContentList" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- 動的関連コンテンツ -->
+                </div>
+            </section>
+        </article>
+    </main>
+    
+    <!-- Footer Component -->
+    <div id="footer-placeholder"></div>
+    
+    <!-- Firebase Config -->
+    <script type="module" src="../../js/firebase/firebase-init.js"></script>
+    <script type="module" src="../../js/content-detail.js"></script>
+</body>
+</html>

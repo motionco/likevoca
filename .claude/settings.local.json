@@ -48,7 +48,8 @@
       "Read(/C:\\practice\\likevoca\\locales\\ko/**)",
       "Read(//c/c/practice/likevoca/**)",
       "Bash(npm run dev:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(dir:*)"
     ],
     "deny": [],
     "ask": []

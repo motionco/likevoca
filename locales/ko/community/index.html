@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 동적 메타태그 - JavaScript로 업데이트 -->
+    <title>콘텐츠 로딩 중... - LikeVoca</title>
+    <meta name="description" content="LikeVoca 커뮤니티 콘텐츠를 확인하세요." />
+    <meta name="keywords" content="LikeVoca, 커뮤니티, 언어학습" />
+    
+    <!-- Open Graph 태그 -->
+    <meta property="og:title" content="콘텐츠 로딩 중... - LikeVoca" />
+    <meta property="og:description" content="LikeVoca 커뮤니티 콘텐츠를 확인하세요." />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="" />
+    <meta property="og:site_name" content="LikeVoca" />
+    <meta property="og:locale" content="ko_KR" />
+    
+    <!-- Twitter Card 태그 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="콘텐츠 로딩 중... - LikeVoca" />
+    <meta name="twitter:description" content="LikeVoca 커뮤니티 콘텐츠를 확인하세요." />
+    
+    <!-- Canonical URL - 동적 업데이트 -->
+    <link rel="canonical" href="" />
+    
+    <!-- Hreflang 태그 -->
+    <link rel="alternate" hreflang="ko" href="" />
+    <link rel="alternate" hreflang="en" href="" />
+    <link rel="alternate" hreflang="ja" href="" />
+    <link rel="alternate" hreflang="zh" href="" />
+    <link rel="alternate" hreflang="es" href="" />
+    <link rel="alternate" hreflang="x-default" href="" />
+    
+    <!-- JSON-LD 구조화 데이터 - 동적 업데이트 -->
+    <script type="application/ld+json" id="structuredData">
+    {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "콘텐츠 로딩 중...",
+        "description": "LikeVoca 커뮤니티 콘텐츠를 확인하세요.",
+        "author": {
+            "@type": "Organization",
+            "name": "LikeVoca"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "LikeVoca",
+            "url": "https://likevoca.com"
+        },
+        "url": "",
+        "datePublished": "",
+        "dateModified": "",
+        "inLanguage": "ko",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": ""
+        }
+    }
+    </script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        .content-detail {
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .content-detail h1, .content-detail h2, .content-detail h3 {
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .content-detail p {
+            margin-bottom: 1rem;
+        }
+        
+        .content-detail ul, .content-detail ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+        
+        .content-detail li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .breadcrumb {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .share-buttons {
+            position: fixed;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 10;
+        }
+        
+        @media (max-width: 768px) {
+            .share-buttons {
+                position: relative;
+                right: auto;
+                top: auto;
+                transform: none;
+                flex-direction: row;
+                justify-content: center;
+                margin: 2rem 0;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header Component -->
+    <div id="header-placeholder"></div>
+    
+    <main class="container mx-auto px-4 py-8">
+        <!-- 로딩 스크린 -->
+        <div id="loadingScreen" class="text-center py-12">
+            <i class="fas fa-spinner fa-spin text-4xl text-blue-600 mb-4"></i>
+            <p class="text-gray-600">콘텐츠를 불러오는 중...</p>
+        </div>
+        
+        <!-- 에러 스크린 -->
+        <div id="errorScreen" class="hidden text-center py-12">
+            <i class="fas fa-exclamation-triangle text-4xl text-red-600 mb-4"></i>
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">콘텐츠를 찾을 수 없습니다</h2>
+            <p class="text-gray-600 mb-6">요청하신 콘텐츠가 존재하지 않거나 삭제되었습니다.</p>
+            <a href="/locales/ko/community.html" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-200">
+                커뮤니티로 돌아가기
+            </a>
+        </div>
+        
+        <!-- 콘텐츠 상세 -->
+        <article id="contentDetail" class="hidden">
+            <!-- 브레드크럼 네비게이션 -->
+            <nav class="breadcrumb">
+                <div class="flex items-center space-x-2 text-sm">
+                    <a href="/locales/ko/index.html" class="text-blue-600 hover:text-blue-800">홈</a>
+                    <i class="fas fa-chevron-right text-gray-400"></i>
+                    <a href="/locales/ko/community.html" class="text-blue-600 hover:text-blue-800">커뮤니티</a>
+                    <i class="fas fa-chevron-right text-gray-400"></i>
+                    <span id="breadcrumbTitle" class="text-gray-700">콘텐츠</span>
+                </div>
+            </nav>
+            
+            <!-- 콘텐츠 헤더 -->
+            <header class="mb-8">
+                <div class="flex items-center mb-4">
+                    <span id="contentCategory" class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">카테고리</span>
+                    <span id="contentDate" class="text-gray-500 text-sm ml-4"></span>
+                </div>
+                <h1 id="contentTitle" class="text-4xl font-bold text-gray-900 mb-4">제목</h1>
+                <p id="contentSummary" class="text-xl text-gray-600">요약</p>
+            </header>
+            
+            <!-- 콘텐츠 본문 -->
+            <div class="content-detail bg-white rounded-lg shadow-sm p-8">
+                <div id="contentBody" class="prose max-w-none">
+                    <!-- 본문 내용 -->
+                </div>
+            </div>
+            
+            <!-- 태그 -->
+            <div id="contentTags" class="mt-6 flex flex-wrap gap-2">
+                <!-- 동적 태그 -->
+            </div>
+            
+            <!-- 공유 버튼 (데스크톱) -->
+            <div class="share-buttons hidden md:flex">
+                <button onclick="shareContent('facebook')" class="bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 transition duration-200" title="Facebook 공유">
+                    <i class="fab fa-facebook-f"></i>
+                </button>
+                <button onclick="shareContent('twitter')" class="bg-blue-400 text-white p-3 rounded-full hover:bg-blue-500 transition duration-200" title="Twitter 공유">
+                    <i class="fab fa-twitter"></i>
+                </button>
+                <button onclick="shareContent('kakao')" class="bg-yellow-400 text-white p-3 rounded-full hover:bg-yellow-500 transition duration-200" title="카카오톡 공유">
+                    <i class="fas fa-comment"></i>
+                </button>
+                <button onclick="copyURL()" class="bg-gray-600 text-white p-3 rounded-full hover:bg-gray-700 transition duration-200" title="링크 복사">
+                    <i class="fas fa-link"></i>
+                </button>
+            </div>
+            
+            <!-- 공유 버튼 (모바일) -->
+            <div class="share-buttons md:hidden">
+                <button onclick="shareContent('facebook')" class="bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition duration-200">
+                    <i class="fab fa-facebook-f mr-2"></i>Facebook
+                </button>
+                <button onclick="shareContent('twitter')" class="bg-blue-400 text-white p-3 rounded-lg hover:bg-blue-500 transition duration-200">
+                    <i class="fab fa-twitter mr-2"></i>Twitter
+                </button>
+                <button onclick="shareContent('kakao')" class="bg-yellow-400 text-white p-3 rounded-lg hover:bg-yellow-500 transition duration-200">
+                    <i class="fas fa-comment mr-2"></i>카카오톡
+                </button>
+                <button onclick="copyURL()" class="bg-gray-600 text-white p-3 rounded-lg hover:bg-gray-700 transition duration-200">
+                    <i class="fas fa-link mr-2"></i>링크 복사
+                </button>
+            </div>
+            
+            <!-- 관련 콘텐츠 -->
+            <section id="relatedContent" class="mt-12">
+                <h3 class="text-2xl font-bold text-gray-900 mb-6">관련 콘텐츠</h3>
+                <div id="relatedContentList" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- 동적 관련 콘텐츠 -->
+                </div>
+            </section>
+        </article>
+    </main>
+    
+    <!-- Footer Component -->
+    <div id="footer-placeholder"></div>
+    
+    <!-- Firebase Config -->
+    <script type="module" src="../../../js/firebase/firebase-init.js"></script>
+    <script type="module" src="../../../js/community-detail.js"></script>
+</body>
+</html>

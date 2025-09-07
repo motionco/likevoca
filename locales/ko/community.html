@@ -207,21 +207,14 @@
             const loadingDebug = document.getElementById('loadingDebug');
             if (loadingText) loadingText.textContent = message;
             if (loadingDebug) loadingDebug.textContent = debug;
-            console.log('📱 Loading status:', message, debug);
+            // 로그 제거됨
         }
 
         async function loadContentData() {
             try {
                 console.log('📊 콘텐츠 데이터 로드 시도... (Firestore)');
-                updateLoadingStatus('Firebase 초기화 확인 중...', '데이터베이스 연결을 설정하고 있습니다.');
-                
                 // Firebase 초기화 확인 및 대기
-                console.log('🔥 현재 window.db 상태:', !!window.db);
-                console.log('🔥 현재 window.auth 상태:', !!window.auth);
-                
                 if (!window.db || !window.auth) {
-                    console.log('⏳ Firebase 초기화 대기 중...');
-                    updateLoadingStatus('Firebase 초기화 대기 중...', 'Firebase 서비스 연결을 기다리고 있습니다.');
                     let attempts = 0;
                     const maxAttempts = 100; // 10초 (100ms * 100)
                     
@@ -252,7 +245,7 @@
                                 resolve();
                             } else if (attempts % 20 === 0) {
                                 console.log(`🔄 Firebase 대기 중... (${attempts}/${maxAttempts}) db:${!!window.db} auth:${!!window.auth}`);
-                                updateLoadingStatus('Firebase 초기화 대기 중...', `연결 시도 중... (${attempts}/100)`);
+                                // Firebase 연결 대기 중
                             }
                         }, 100);
                     });
@@ -262,7 +255,7 @@
                 
                 // Firestore에서 콘텐츠 로드 시도
                 if (window.db) {
-                    updateLoadingStatus('데이터베이스에서 콘텐츠 로드 중...', 'Firestore에서 최신 콘텐츠를 가져오고 있습니다.');
+                    // 데이터베이스에서 콘텐츠 로드 중
                     try {
                         const { collection, query, orderBy, getDocs } = await import("https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js");
                         
@@ -291,18 +284,18 @@
                     }
                 } else {
                     console.log('📝 Firebase가 없어 샘플 데이터로 직접 설정');
-                    updateLoadingStatus('샘플 콘텐츠 준비 중...', 'Firebase 연결 없이 기본 콘텐츠를 표시합니다.');
+                    // Firebase 연결 없이 샘플 콘텐츠 사용
                     contentData = [];
                 }
                 
                 // 콘텐츠가 없으면 샘플 생성
                 if (contentData.length === 0) {
                     console.log('📝 콘텐츠가 없어 샘플 데이터 표시');
-                    updateLoadingStatus('샘플 콘텐츠 생성 중...', '기본 콘텐츠를 생성하고 있습니다.');
+                    // 샘플 콘텐츠 생성
                     contentData = generateSampleContent();
                 }
                 
-                updateLoadingStatus('콘텐츠 표시 준비 중...', '로드된 콘텐츠를 화면에 표시합니다.');
+                // 콘텐츠 표시 준비 완료
                 
             } catch (error) {
                 console.error('❌ 콘텐츠 데이터 로드 실패:', error);
@@ -492,10 +485,10 @@
                             ${excerpt}
                         </div>
                         
-                        <button onclick="openContentDetail('${item.id}')" class="text-[#4B63AC] hover:text-[#3A4F8B] font-medium">
+                        <a href="content-detail.html?id=${item.id}" class="inline-flex items-center text-[#4B63AC] hover:text-[#3A4F8B] font-medium transition duration-200">
                             <i class="fas fa-arrow-right mr-2"></i>
                             자세히 보기
-                        </button>
+                        </a>
                     </article>
                 `;
             }).join('');
@@ -585,39 +578,7 @@
         }
 
         // 상세보기
-        window.openContentDetail = function(contentId) {
-            const content = contentData.find(item => item.id === contentId);
-            if (!content) return;
-            
-            const version = content.versions.ko;
-            if (!version) return;
-            
-            // SEO 메타태그 업데이트
-            updateSEOForContent(content, 'ko');
-            
-            // 간단한 모달 표시
-            const modal = document.createElement('div');
-            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
-            modal.innerHTML = `
-                <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-                    <div class="p-6 border-b">
-                        <div class="flex items-center justify-between">
-                            <h2 class="text-2xl font-bold text-gray-900">${version.title}</h2>
-                            <button onclick="this.closest('.fixed').remove()" class="text-gray-500 hover:text-gray-700">
-                                <i class="fas fa-times text-xl"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <div class="prose max-w-none">
-                            ${version.content}
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-        };
+        // 모달 기반 콘텐츠 표시 제거 - 개별 페이지로 대체됨
 
         // 유틸리티 함수들
         function stripHtml(html) {
