@@ -140,6 +140,9 @@
     <!-- Footer -->
     <div id="footer-container"></div>
 
+    <!-- Firebase Config -->
+    <script type="module" src="../../js/firebase/firebase-init.js"></script>
+    
     <!-- Scripts -->
     <script src="../../components/js/navbar.js"></script>
     <script src="../../components/js/footer.js"></script>
@@ -181,7 +184,7 @@
         // Initialize Firebase and load content data
         async function loadContentData() {
             try {
-                console.log('🔄 Loading content data from Firestore');
+                // Loading content data from Firestore
                 
                 // Wait for Firebase initialization
                 await waitForFirebase();
@@ -203,7 +206,6 @@
                 contentData = snapshot.docs
                     .map(doc => {
                         const data = doc.data();
-                        console.log(`📄 Loaded content ID: ${doc.id}`, data);
                         return {
                             id: doc.id,
                             ...data
@@ -216,16 +218,14 @@
                         const isValidContentType = ['faq', 'guide', 'notice', 'manual'].includes(item.type);
                         
                         if (!hasVersions || !hasUserId || !isValidContentType) {
-                            console.log(`🚫 Filtered content: ${item.id} (type: ${item.type}, hasVersions: ${hasVersions}, hasUserId: ${!!hasUserId})`);
                             return false;
                         }
-                        console.log(`✅ Display content: ${item.id} (type: ${item.type}, author: ${item.userId})`);
                         return true;
                     });
 
                 // Add sample data if no content exists
                 if (contentData.length === 0) {
-                    console.log('📝 No content found, adding sample data');
+                    // No content found, adding sample data
                     
                     const currentTime = new Date().toISOString();
                     
@@ -248,7 +248,7 @@
                     ];
                 }
                 
-                console.log(`✅ Content data loaded (${contentData.length} items)`);
+                // Content data loaded
                 hideLoading();
                 
             } catch (error) {
@@ -264,7 +264,6 @@
             const maxAttempts = 50;
             
             while (!window.db && attempts < maxAttempts) {
-                console.log(`⏳ Waiting for Firebase initialization... (${attempts + 1}/${maxAttempts})`);
                 await new Promise(resolve => setTimeout(resolve, 200));
                 attempts++;
             }
@@ -273,12 +272,12 @@
                 throw new Error('Firebase initialization timeout');
             }
             
-            console.log('✅ Firebase initialized successfully');
+            // Firebase initialized successfully
         }
 
         // Display content with filtering
         async function displayContent() {
-            console.log('🎨 Displaying content');
+            // Displaying content
             
             const contentList = document.getElementById('contentList');
             const emptyState = document.getElementById('emptyState');

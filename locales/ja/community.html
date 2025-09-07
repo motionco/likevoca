@@ -140,6 +140,9 @@
     <!-- フッター -->
     <div id="footer-container"></div>
 
+    <!-- Firebase Config -->
+    <script type="module" src="../../js/firebase/firebase-init.js"></script>
+    
     <!-- スクリプト -->
     <script src="../../components/js/navbar.js"></script>
     <script src="../../components/js/footer.js"></script>
@@ -181,7 +184,7 @@
         // Firebaseを初期化してコンテンツデータを読み込み
         async function loadContentData() {
             try {
-                console.log('🔄 Firestoreからコンテンツデータを読み込み中');
+                // Loading content data from Firestore
                 
                 // Firebase初期化を待機
                 await waitForFirebase();
@@ -203,7 +206,7 @@
                 contentData = snapshot.docs
                     .map(doc => {
                         const data = doc.data();
-                        console.log(`📄 読み込まれたコンテンツID: ${doc.id}`, data);
+                        // Content loaded
                         return {
                             id: doc.id,
                             ...data
@@ -216,10 +219,8 @@
                         const isValidContentType = ['faq', 'guide', 'notice', 'manual'].includes(item.type);
                         
                         if (!hasVersions || !hasUserId || !isValidContentType) {
-                            console.log(`🚫 フィルターされたコンテンツ: ${item.id} (type: ${item.type}, hasVersions: ${hasVersions}, hasUserId: ${!!hasUserId})`);
                             return false;
                         }
-                        console.log(`✅ 表示コンテンツ: ${item.id} (type: ${item.type}, 作成者: ${item.userId})`);
                         return true;
                     });
 
@@ -248,7 +249,7 @@
                     ];
                 }
                 
-                console.log(`✅ コンテンツデータ読み込み完了 (${contentData.length}項目)`);
+                // Content data loaded
                 hideLoading();
                 
             } catch (error) {
@@ -278,7 +279,7 @@
 
         // フィルターを使用してコンテンツを表示
         async function displayContent() {
-            console.log('🎨 コンテンツを表示中');
+            // Displaying content
             
             const contentList = document.getElementById('contentList');
             const emptyState = document.getElementById('emptyState');

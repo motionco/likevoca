@@ -15,6 +15,9 @@ import {
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 
+// 콘텐츠 번역 전용 모듈 import
+import { translateContentWithGemini } from './admin-content-translation.js';
+
 // 전역 변수
 let db;
 let auth;
@@ -407,11 +410,10 @@ async function performAutoTranslation() {
         
         showSuccess('자동 번역을 시작합니다...');
         
-        // 실제 환경에서는 Google Translate API 또는 다른 번역 서비스 사용
-        // 여기서는 시뮬레이션
+        // Gemini API를 사용한 실제 번역
         for (const targetLang of targetLanguages) {
-            const translatedTitle = await simulateTranslation(sourceTitle, sourceLanguage, targetLang);
-            const translatedContent = await simulateTranslation(sourceContent, sourceLanguage, targetLang);
+            const translatedTitle = await translateContentWithGemini(sourceTitle, sourceLanguage, targetLang);
+            const translatedContent = await translateContentWithGemini(sourceContent, sourceLanguage, targetLang);
             
             document.getElementById(`title_${targetLang}`).value = translatedTitle;
             quillEditors[targetLang].root.innerHTML = translatedContent;
@@ -425,27 +427,8 @@ async function performAutoTranslation() {
     }
 }
 
-// 번역 시뮬레이션 (실제로는 Google Translate API 등 사용)
-async function simulateTranslation(text, fromLang, toLang) {
-    // 간단한 시뮬레이션 - 실제로는 번역 API 호출
-    const translations = {
-        ko: {
-            en: { '자주 묻는 질문': 'Frequently Asked Questions', '사용자 매뉴얼': 'User Manual' },
-            ja: { '자주 묻는 질문': 'よくある質問', '사용자 매뉴얼': 'ユーザーマニュアル' },
-            zh: { '자주 묻는 질문': '常见问题', '사용자 매뉴얼': '用户手册' },
-            es: { '자주 묻는 질문': 'Preguntas Frecuentes', '사용자 매뉴얼': 'Manual del Usuario' }
-        }
-    };
-    
-    await new Promise(resolve => setTimeout(resolve, 1000)); // 번역 지연 시뮬레이션
-    
-    const translationMap = translations[fromLang]?.[toLang];
-    if (translationMap && translationMap[text]) {
-        return translationMap[text];
-    }
-    
-    return `[${toLang.toUpperCase()}] ${text}`;
-}
+// 번역 기능은 별도 모듈(admin-content-translation.js)로 분리됨
+// translateContentWithGemini 함수를 사용하여 Gemini API로 실제 번역 수행
 
 // 콘텐츠 저장
 async function saveContent() {

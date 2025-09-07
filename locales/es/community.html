@@ -140,6 +140,9 @@
     <!-- Pie de página -->
     <div id="footer-container"></div>
 
+    <!-- Firebase Config -->
+    <script type="module" src="../../js/firebase/firebase-init.js"></script>
+    
     <!-- Scripts -->
     <script src="../../components/js/navbar.js"></script>
     <script src="../../components/js/footer.js"></script>
@@ -181,7 +184,7 @@
         // Inicializar Firebase y cargar datos de contenido
         async function loadContentData() {
             try {
-                console.log('🔄 Cargando datos de contenido desde Firestore');
+                // Loading content data from Firestore
                 
                 // Esperar inicialización de Firebase
                 await waitForFirebase();
@@ -203,7 +206,7 @@
                 contentData = snapshot.docs
                     .map(doc => {
                         const data = doc.data();
-                        console.log(`📄 Contenido cargado ID: ${doc.id}`, data);
+                        // Content loaded
                         return {
                             id: doc.id,
                             ...data
@@ -216,16 +219,16 @@
                         const isValidContentType = ['faq', 'guide', 'notice', 'manual'].includes(item.type);
                         
                         if (!hasVersions || !hasUserId || !isValidContentType) {
-                            console.log(`🚫 Contenido filtrado: ${item.id} (type: ${item.type}, hasVersions: ${hasVersions}, hasUserId: ${!!hasUserId})`);
+                            // Content filtered
                             return false;
                         }
-                        console.log(`✅ Mostrar contenido: ${item.id} (type: ${item.type}, autor: ${item.userId})`);
+                        // Content displayed
                         return true;
                     });
 
                 // Agregar datos de muestra si no existe contenido
                 if (contentData.length === 0) {
-                    console.log('📝 No se encontró contenido, agregando datos de muestra');
+                    // No content found, adding sample data
                     
                     const currentTime = new Date().toISOString();
                     
@@ -248,7 +251,7 @@
                     ];
                 }
                 
-                console.log(`✅ Datos de contenido cargados (${contentData.length} elementos)`);
+                // Content data loaded
                 hideLoading();
                 
             } catch (error) {
@@ -278,7 +281,7 @@
 
         // Mostrar contenido con filtrado
         async function displayContent() {
-            console.log('🎨 Mostrando contenido');
+            // Displaying content
             
             const contentList = document.getElementById('contentList');
             const emptyState = document.getElementById('emptyState');
