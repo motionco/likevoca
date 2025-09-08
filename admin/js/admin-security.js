@@ -563,7 +563,7 @@ async function saveSecurityData() {
         
         // Firestore 저장 시도 (선택적 - 실패해도 무시)
         try {
-            const securityRef = doc(db, 'admin_content', `security_data_${Date.now()}`);
+            const securityRef = doc(db, 'content', `security_data_${Date.now()}`);
             await setDoc(securityRef, {
                 type: 'security_data',
                 data: updatedData,

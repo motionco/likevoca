@@ -8,6 +8,9 @@ import {
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 import {
+  getStorage
+} from "https://www.gstatic.com/firebasejs/11.2.0/firebase-storage.js";
+import {
   doc,
   collection,
   setDoc,
@@ -39,6 +42,7 @@ const defaultConfig = {
 let app = initializeApp(defaultConfig);
 let auth = getAuth(app);
 let db = getFirestore(app);
+let storage = getStorage(app);
 
 // Firebase 초기화 함수
 async function initializeFirebase() {
@@ -78,6 +82,7 @@ async function initializeFirebase() {
       app = initializeApp(firebaseConfig);
       auth = getAuth(app);
       db = getFirestore(app);
+      storage = getStorage(app);
     }
 
     console.log("Firebase가 성공적으로 초기화되었습니다.");
@@ -96,6 +101,7 @@ initializeFirebase();
 // 전역 접근을 위해 window 객체에 추가
 window.auth = auth;
 window.db = db;
+window.storage = storage;
 window.onAuthStateChanged = onAuthStateChanged;
 
 // 다국어 지원 언어 목록

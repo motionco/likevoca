@@ -222,10 +222,75 @@ function initializeQuillEditors() {
                     ]
                 }
             });
+            
+            // 이미지 업로드 핸들러 설정
+            setupImageHandler(quillEditors[lang], lang);
         }
     });
     
     console.log('✅ Quill 에디터 초기화 완료');
+}
+
+// Firebase Storage 이미지 업로드 핸들러
+function setupImageHandler(quill, language) {
+    const toolbar = quill.getModule('toolbar');
+    toolbar.addHandler('image', () => {
+        selectLocalImage(quill, language);
+    });
+}
+
+function selectLocalImage(quill, language) {
+    const input = document.createElement('input');
+    input.setAttribute('type', 'file');
+    input.setAttribute('accept', 'image/*');
+    input.click();
+
+    input.onchange = () => {
+        const file = input.files[0];
+        if (file) {
+            uploadImageToFirebaseStorage(file, quill, language);
+        }
+    };
+}
+
+async function uploadImageToFirebaseStorage(file, quill, language) {
+    try {
+        // 로딩 표시
+        const range = quill.getSelection();
+        quill.insertText(range.index, '이미지 업로드 중...', { color: '#999' });
+        
+        // Firebase Storage import
+        const { ref, uploadBytes, getDownloadURL } = await import("https://www.gstatic.com/firebasejs/11.2.0/firebase-storage.js");
+        
+        // 파일명 생성 (타임스탬프 + 원본 파일명)
+        const fileName = `content/${Date.now()}_${file.name}`;
+        const storageRef = ref(window.storage, fileName);
+        
+        console.log('📤 Firebase Storage에 이미지 업로드 시작:', fileName);
+        
+        // 파일 업로드
+        const snapshot = await uploadBytes(storageRef, file);
+        const downloadURL = await getDownloadURL(snapshot.ref);
+        
+        console.log('✅ 이미지 업로드 완료:', downloadURL);
+        
+        // 로딩 텍스트 제거
+        quill.deleteText(range.index, '이미지 업로드 중...'.length);
+        
+        // 이미지 삽입
+        quill.insertEmbed(range.index, 'image', downloadURL);
+        quill.setSelection(range.index + 1);
+        
+    } catch (error) {
+        console.error('❌ 이미지 업로드 실패:', error);
+        alert('이미지 업로드에 실패했습니다: ' + error.message);
+        
+        // 로딩 텍스트 제거
+        const range = quill.getSelection();
+        if (range) {
+            quill.deleteText(range.index, '이미지 업로드 중...'.length);
+        }
+    }
 }
 
 // 콘텐츠 데이터 로드 (Firestore 전용)
@@ -236,7 +301,7 @@ async function loadContentData() {
         
         // Firestore에서 콘텐츠 데이터 로드
         const { collection, query, orderBy, getDocs } = await import("https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js");
-        const contentRef = collection(window.db, 'admin_content');
+        const contentRef = collection(window.db, 'content');
         const contentQuery = query(contentRef, orderBy('createdAt', 'desc'));
         const snapshot = await getDocs(contentQuery);
         
@@ -636,7 +701,7 @@ async function saveContent() {
         }
         
         const { doc, setDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js");
-        const contentRef = doc(window.db, 'admin_content', contentId);
+        const contentRef = doc(window.db, 'content', contentId);
         
         console.log('📝 저장할 콘텐츠:', {
             id: contentId,
@@ -663,7 +728,7 @@ async function saveContent() {
             console.log('🔍 권한 문제 디버깅:', {
                 userEmail: currentUser.email,
                 isLocalHost: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1',
-                collection: 'admin_content',
+                collection: 'content',
                 documentId: contentId
             });
             
@@ -784,13 +849,13 @@ async function deleteContent(contentId) {
         try {
             // Firestore에서 삭제
             const { doc, deleteDoc } = await import("https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js");
-            const contentRef = doc(window.db, 'admin_content', contentId);
+            const contentRef = doc(window.db, 'content', contentId);
             await deleteDoc(contentRef);
             console.log('✅ Firestore에서 콘텐츠 삭제 완료');
             
             // 로컬 데이터에서 제거
             contentData = contentData.filter(c => c.id !== contentId);
-            localStorage.setItem('admin_content', JSON.stringify(contentData));
+            localStorage.setItem('content', JSON.stringify(contentData));
             
             displayContentList(contentData);
             updateStatistics();

@@ -224,7 +224,7 @@ async function loadSystemStatus() {
 async function loadDatabaseStats() {
     try {
         // 각 컬렉션의 문서 수 조회
-        const collections = ['users', 'concepts', 'admin_content', 'stats'];
+        const collections = ['users', 'concepts', 'content', 'stats'];
         const stats = {};
         
         for (const collectionName of collections) {
@@ -241,7 +241,7 @@ async function loadDatabaseStats() {
         // UI 업데이트
         document.getElementById('usersCount').textContent = stats.users || 0;
         document.getElementById('conceptsCount').textContent = stats.concepts || 0;
-        document.getElementById('adminContentCount').textContent = stats.admin_content || 0;
+        document.getElementById('adminContentCount').textContent = stats.content || 0;
         document.getElementById('statsCount').textContent = stats.stats || 0;
         
     } catch (error) {
@@ -365,7 +365,7 @@ async function saveSpecificSetting(settingId, value) {
     // Firestore에도 백업 저장 (선택적)
     try {
         if (db) {
-            const settingsRef = doc(db, 'admin_content', `system_settings_${Date.now()}`);
+            const settingsRef = doc(db, 'content', `system_settings_${Date.now()}`);
             await setDoc(settingsRef, {
                 type: 'system_settings',
                 data: currentSettings,
@@ -441,7 +441,7 @@ async function saveAllSettings() {
         
         // Firestore 저장 시도 (선택적)
         try {
-            const settingsRef = doc(db, 'admin_content', `system_settings_${Date.now()}`);
+            const settingsRef = doc(db, 'content', `system_settings_${Date.now()}`);
             await setDoc(settingsRef, {
                 type: 'system_settings',
                 data: updatedSettings,

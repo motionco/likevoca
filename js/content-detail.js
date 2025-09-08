@@ -203,7 +203,7 @@ async function loadContentDetail(contentId, language) {
         showLoading();
         
         // Firestore에서 콘텐츠 조회
-        const contentRef = doc(db, 'admin_content', contentId);
+        const contentRef = doc(db, 'content', contentId);
         const contentSnap = await getDoc(contentRef);
         
         if (!contentSnap.exists()) {
@@ -255,6 +255,7 @@ function renderContentDetail(version, contentData, language) {
     // 본문 렌더링 (Markdown 지원)
     const contentBody = document.getElementById('contentBody');
     contentBody.innerHTML = renderMarkdown(version.content);
+    
     
     // 태그 렌더링
     renderTags(version.tags || [], language);
@@ -408,7 +409,7 @@ async function loadRelatedContent(category, excludeId, language) {
             return;
         }
 
-        const contentRef = collection(db, 'admin_content');
+        const contentRef = collection(db, 'content');
         const relatedQuery = query(
             contentRef,
             where('category', '==', category),

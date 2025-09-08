@@ -115,10 +115,6 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin(); // 관리자만 생성, 수정, 삭제 가능
     }
 
-    // 관리자 콘텐츠 컬렉션 - 관리자만 접근 가능
-    match /admin_content/{contentId} {
-      allow read, write: if isAdmin(); // 관리자만 모든 권한
-    }
 
     // 기본 규칙: 다른 모든 문서는 관리자만 접근 가능
     match /{document=**} {

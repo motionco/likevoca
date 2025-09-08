@@ -251,7 +251,7 @@ async function loadContentDetail(contentId, language) {
         showLoading();
         
         // Firestore에서 콘텐츠 조회
-        const contentRef = doc(db, 'admin_content', contentId);
+        const contentRef = doc(db, 'content', contentId);
         const contentSnap = await getDoc(contentRef);
         
         if (!contentSnap.exists()) {
@@ -448,7 +448,7 @@ function renderTags(tags, language) {
 // 관련 콘텐츠 로드
 async function loadRelatedContent(category, excludeId, language) {
     try {
-        const contentRef = collection(db, 'admin_content');
+        const contentRef = collection(db, 'content');
         const relatedQuery = query(
             contentRef,
             where('category', '==', category),
