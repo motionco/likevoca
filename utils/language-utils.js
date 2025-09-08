@@ -1048,10 +1048,15 @@ function redirectToLanguagePage(langCode, forceRedirect = false) {
       : `/${langCode}/index.html`;
   }
 
-  console.log(`🚀 언어 변경 리디렉션: ${currentPath} → ${targetPath}`);
+  // 현재 URL의 쿼리 파라미터와 해시 보존
+  const currentSearch = window.location.search;
+  const currentHash = window.location.hash;
+  const finalTargetPath = targetPath + currentSearch + currentHash;
+
+  console.log(`🚀 언어 변경 리디렉션: ${currentPath}${currentSearch}${currentHash} → ${finalTargetPath}`);
 
   // 즉시 리디렉션 실행
-  window.location.href = targetPath;
+  window.location.href = finalTargetPath;
 
   // 500ms 후 세션 스토리지 정리 (더 빠르게)
   setTimeout(() => {
