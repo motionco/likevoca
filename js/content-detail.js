@@ -214,6 +214,7 @@ async function loadContentDetail(contentId, language) {
         const contentData = contentSnap.data();
         currentContent = contentData;
         
+        
         // 언어별 버전 확인
         const version = contentData.versions?.[language];
         if (!version) {
@@ -245,7 +246,8 @@ function renderContentDetail(version, contentData, language) {
     
     // 콘텐츠 표시
     document.getElementById('contentCategory').textContent = getCategoryName(contentData.category, language);
-    document.getElementById('contentDate').textContent = formatDate(contentData.created_at, language);
+    
+    document.getElementById('contentDate').textContent = formatDate(contentData.createdAt, language);
     document.getElementById('contentTitle').textContent = version.title;
     document.getElementById('contentSummary').textContent = version.summary || '';
     document.getElementById('breadcrumbTitle').textContent = version.title;
@@ -452,7 +454,7 @@ function renderRelatedContent(contents, language) {
                     <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
                         ${getCategoryName(content.category, language)}
                     </span>
-                    <span class="text-gray-500 text-xs ml-2">${formatDate(content.created_at, language)}</span>
+                    <span class="text-gray-500 text-xs ml-2">${formatDate(content.createdAt, language)}</span>
                 </div>
                 <h4 class="font-semibold text-gray-900 mb-2 hover:text-blue-600">
                     <a href="/locales/${language}/content-detail.html?id=${content.id}">${version.title}</a>
@@ -488,8 +490,27 @@ function getCategoryName(category, language) {
     return categories[language]?.[category] || category;
 }
 
-function formatDate(dateStr, language) {
-    const date = new Date(dateStr);
+function formatDate(dateValue, language) {
+    let date;
+    
+    // Firebase Timestamp 객체인지 확인
+    if (dateValue && typeof dateValue.toDate === 'function') {
+        date = dateValue.toDate();
+    } else if (dateValue && typeof dateValue.seconds === 'number') {
+        // Timestamp의 seconds 속성을 직접 사용
+        date = new Date(dateValue.seconds * 1000);
+    } else if (dateValue) {
+        // 일반 문자열이나 Date 객체
+        date = new Date(dateValue);
+    } else {
+        return 'Unknown Date';
+    }
+    
+    // Invalid Date 체크
+    if (isNaN(date.getTime())) {
+        return 'Unknown Date';
+    }
+    
     const options = { 
         year: 'numeric', 
         month: 'long', 
