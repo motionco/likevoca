@@ -10,6 +10,8 @@ import {
     orderBy
 } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 
+import { applyLanguage, updateMetadata } from '../utils/language-utils.js';
+
 // 전역 변수
 let db;
 let currentContentId = null;
@@ -400,7 +402,6 @@ async function loadRelatedContent(category, excludeId, language) {
     try {
         // category가 없으면 관련 콘텐츠 섹션 숨기기
         if (!category) {
-            console.log('카테고리가 없어서 관련 콘텐츠를 숨깁니다.');
             document.getElementById('relatedContent').classList.add('hidden');
             return;
         }

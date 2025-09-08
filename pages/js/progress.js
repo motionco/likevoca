@@ -2635,35 +2635,25 @@ async function showTotalWordsModal(conceptsList) {
             <div class="flex items-center">
               <span class="text-purple-400">🎯</span>
               <span class="ml-1 text-white">${concept.quizCount || 0}</span>
-              ${
-                concept.quizCount > 0
-                  ? `<button class="ml-1 text-xs text-gray-400 hover:text-white" onclick="toggleQuizDetails(${index})" id="quiz-toggle-${index}">+</button>`
-                  : ""
-              }
+              <button class="ml-1 text-xs text-gray-400 hover:text-white" onclick="toggleQuizDetails(${index})" id="quiz-toggle-${index}">+</button>
             </div>
 
           </div>
           
           <!-- 퀴즈 상세 정보 (아래쪽으로 이동, 한 줄로 표시) -->
-          ${
-            concept.quizCount > 0
-              ? `
           <div id="quiz-details-${index}" class="hidden mt-2 pt-2 border-t border-gray-600">
             <div class="flex items-center justify-center space-x-4 text-xs text-gray-300">
               <span>✅ ${getTranslatedText("correct_short")}: ${
-                  concept.quizCorrect || 0
-                }${getTranslatedText("unit_times")}</span>
+                concept.quizCorrect || 0
+              }${getTranslatedText("unit_times")}</span>
               <span>❌ ${getTranslatedText("incorrect_short")}: ${
-                  (concept.quizTotal || 0) - (concept.quizCorrect || 0)
-                }${getTranslatedText("unit_times")}</span>
+                (concept.quizTotal || 0) - (concept.quizCorrect || 0)
+              }${getTranslatedText("unit_times")}</span>
               <span>📊 ${getTranslatedText("accuracy_label")}: ${
-                  concept.quizAccuracy ? concept.quizAccuracy.toFixed(1) : 0
-                }${getTranslatedText("unit_percent")}</span>
+                concept.quizAccuracy ? concept.quizAccuracy.toFixed(1) : 0
+              }${getTranslatedText("unit_percent")}</span>
             </div>
           </div>
-          `
-              : ""
-          }
         </div>
       `;
     });
@@ -2781,33 +2771,25 @@ async function showMasteredWordsModal(conceptsList) {
               <div class="flex items-center">
                 <span class="text-purple-400">🎯</span>
                 <span class="ml-1 text-white">${concept.quizCount || 0}</span>
-                ${
-                  concept.quizCount > 0
-                    ? `<button class="ml-1 text-xs text-gray-400 hover:text-white" onclick="toggleQuizDetails(${index})" id="quiz-toggle-${index}">+</button>`
-                    : ""
-                }
+                <button class="ml-1 text-xs text-gray-400 hover:text-white" onclick="toggleQuizDetails(${index})" id="quiz-toggle-${index}">+</button>
               </div>
 
           </div>
           
           <!-- 퀴즈 상세 정보 (아래쪽으로 이동, 한 줄로 표시) -->
-          ${
-            concept.quizCount > 0
-              ? `
           <div id="quiz-details-${index}" class="hidden mt-2 pt-2 border-t border-gray-600">
             <div class="flex items-center justify-center space-x-4 text-xs text-gray-300">
               <span>✅ ${getTranslatedText("correct_short")}: ${
-                  concept.quizCorrect || 0
-                }${getTranslatedText("unit_times")}</span>
+                concept.quizCorrect || 0
+              }${getTranslatedText("unit_times")}</span>
               <span>❌ ${getTranslatedText("incorrect_short")}: ${
-                  (concept.quizTotal || 0) - (concept.quizCorrect || 0)
-                }${getTranslatedText("unit_times")}</span>
+                (concept.quizTotal || 0) - (concept.quizCorrect || 0)
+              }${getTranslatedText("unit_times")}</span>
               <span>📊 ${getTranslatedText("accuracy_label")}: ${
-                  concept.quizAccuracy ? concept.quizAccuracy.toFixed(1) : 0
-                }${getTranslatedText("unit_percent")}</span>
+                concept.quizAccuracy ? concept.quizAccuracy.toFixed(1) : 0
+              }${getTranslatedText("unit_percent")}</span>
             </div>
           </div>
-          `
               : ""
           }
         </div>
