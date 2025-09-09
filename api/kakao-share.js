@@ -20,7 +20,7 @@ export default async (req, res) => {
   }
 
   try {
-    const kakaoJsKey = process.env.KAKAO_APP_KEY;
+    const kakaoJsKey = cae5858f71d624bf839cc0bba539a619;
 
     // API 키가 설정되어 있는지 확인
     if (!kakaoJsKey) {
@@ -37,7 +37,6 @@ export default async (req, res) => {
       'localhost',
       '127.0.0.1',
       'likevoca.com',
-      'www.likevoca.com',
       'vercel.app'
     ];
 
