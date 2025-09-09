@@ -157,6 +157,144 @@ class FooterManager {
       console.error('Footer 번역 적용 실패:', error);
     }
   }
+
+  // 소셜 공유 기능 초기화
+  initializeSocialSharing() {
+    this.initializeKakaoSDK();
+  }
+
+  async initializeKakaoSDK() {
+    try {
+      if (typeof Kakao === 'undefined') {
+        console.warn('⚠️ 카카오 SDK가 로드되지 않았습니다.');
+        return;
+      }
+
+      if (Kakao.isInitialized()) {
+        return;
+      }
+
+      // KakaoConfig 사용하여 앱 키 가져오기
+      if (typeof window.KakaoConfig !== 'undefined') {
+        const kakaoAppKey = window.KakaoConfig.getAppKey();
+        
+        if (!kakaoAppKey) {
+          console.log('🔧 카카오톡 공유 기능이 현재 환경에서 비활성화되었습니다.');
+          return;
+        }
+
+        Kakao.init(kakaoAppKey);
+        console.log('✅ Footer 카카오 SDK 초기화 완료');
+      } else {
+        console.warn('⚠️ KakaoConfig가 로드되지 않았습니다.');
+      }
+    } catch (error) {
+      console.warn('⚠️ Footer 카카오 SDK 초기화 실패:', error);
+    }
+  }
+}
+
+// 전역 소셜 공유 함수들
+window.shareCurrentPage = function(platform) {
+  const currentUrl = window.location.href;
+  const pageTitle = document.title || 'LikeVoca';
+  const pageDescription = document.querySelector('meta[name="description"]')?.content || 'AI 기반 맞춤형 언어학습 플랫폼';
+
+  switch (platform) {
+    case 'kakao':
+      shareToKakao(pageTitle, pageDescription, currentUrl);
+      break;
+    case 'facebook':
+      const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`;
+      window.open(facebookUrl, '_blank', 'width=600,height=400');
+      break;
+    case 'twitter':
+      const twitterUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(pageTitle)}`;
+      window.open(twitterUrl, '_blank', 'width=600,height=400');
+      break;
+    case 'linkedin':
+      const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentUrl)}`;
+      window.open(linkedinUrl, '_blank', 'width=600,height=400');
+      break;
+    case 'threads':
+      const threadsUrl = `https://www.threads.net/intent/post?text=${encodeURIComponent(pageTitle + ' ' + currentUrl)}`;
+      window.open(threadsUrl, '_blank', 'width=600,height=400');
+      break;
+    default:
+      console.warn('지원하지 않는 플랫폼:', platform);
+  }
+};
+
+window.shareToKakao = function(title, description, url) {
+  try {
+    if (typeof Kakao === 'undefined' || !Kakao.isInitialized()) {
+      // SDK가 로드되지 않은 경우 fallback
+      copyCurrentURL();
+      alert('카카오톡 공유 설정이 필요합니다. 링크가 복사되었습니다.');
+      return;
+    }
+
+    Kakao.Share.sendDefault({
+      objectType: 'feed',
+      content: {
+        title: title,
+        description: description,
+        imageUrl: window.location.origin + '/images/logo.png',
+        link: {
+          mobileWebUrl: url,
+          webUrl: url
+        }
+      },
+      buttons: [
+        {
+          title: '웹으로 이동',
+          link: {
+            mobileWebUrl: url,
+            webUrl: url
+          }
+        }
+      ]
+    });
+  } catch (error) {
+    console.warn('카카오톡 공유 실패:', error);
+    copyCurrentURL();
+    alert('카카오톡 공유 설정이 필요합니다. 링크가 복사되었습니다.');
+  }
+};
+
+window.copyCurrentURL = function() {
+  const currentUrl = window.location.href;
+  
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(currentUrl).then(() => {
+      console.log('링크가 클립보드에 복사되었습니다.');
+    }).catch(err => {
+      console.error('클립보드 복사 실패:', err);
+      fallbackCopyURL(currentUrl);
+    });
+  } else {
+    fallbackCopyURL(currentUrl);
+  }
+};
+
+function fallbackCopyURL(url) {
+  const textArea = document.createElement('textarea');
+  textArea.value = url;
+  textArea.style.position = 'fixed';
+  textArea.style.left = '-999999px';
+  textArea.style.top = '-999999px';
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  
+  try {
+    document.execCommand('copy');
+    console.log('링크가 클립보드에 복사되었습니다.');
+  } catch (err) {
+    console.error('클립보드 복사 실패:', err);
+  }
+  
+  document.body.removeChild(textArea);
 }
 
 // Footer 로드 함수 (전역으로 노출)
@@ -164,6 +302,13 @@ window.loadFooter = async function() {
   if (window.footerManager) return;
   
   window.footerManager = new FooterManager();
+  
+  // 소셜 공유 기능 초기화
+  setTimeout(() => {
+    if (window.footerManager) {
+      window.footerManager.initializeSocialSharing();
+    }
+  }, 500);
   
   // 번역 적용 (language-utils.js와 연동)
   if (typeof window.applyLanguage === 'function') {
