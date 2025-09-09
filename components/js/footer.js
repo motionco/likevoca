@@ -54,39 +54,66 @@ class FooterManager {
 
   async loadKakaoScripts() {
     try {
-      // 이미 로드되어 있다면 스킵
-      if (typeof Kakao !== 'undefined' && typeof window.KakaoConfig !== 'undefined') {
-        return;
-      }
-
       // 카카오 SDK 로드
       if (typeof Kakao === 'undefined') {
         await this.loadScript('https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js');
         console.log('✅ 카카오 SDK 스크립트 로드 완료');
       }
 
-      // KakaoConfig 로드 (경로 자동 감지)
+      // KakaoConfig 로드 시도 (실패해도 계속 진행)
       if (typeof window.KakaoConfig === 'undefined') {
-        const configPath = this.getConfigPath();
-        await this.loadScript(configPath);
-        console.log('✅ KakaoConfig 스크립트 로드 완료');
+        try {
+          const configPath = this.getConfigPath();
+          await this.loadScript(configPath);
+          console.log('✅ KakaoConfig 스크립트 로드 완료');
+        } catch (configError) {
+          console.warn('⚠️ KakaoConfig 로드 실패, 기본 설정 사용:', configError);
+          // KakaoConfig 로드 실패 시 기본 구현 생성
+          this.createFallbackKakaoConfig();
+        }
       }
     } catch (error) {
       console.warn('⚠️ 카카오 스크립트 로드 실패:', error);
     }
   }
 
+  createFallbackKakaoConfig() {
+    // KakaoConfig 로드 실패 시 기본 구현
+    window.KakaoConfig = {
+      isProduction: () => {
+        return window.location.hostname === 'likevoca.com' || 
+               window.location.hostname.includes('vercel.app');
+      },
+      async getAppKey() {
+        if (!this.isProduction()) {
+          console.log('🔧 개발 환경: 카카오톡 공유 기능이 비활성화되었습니다.');
+          return null;
+        }
+        
+        try {
+          const response = await fetch('/api/kakao-share', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'getKey' })
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            return data.success ? data.kakaoJsKey : null;
+          }
+          return null;
+        } catch (error) {
+          console.warn('카카오 키 요청 실패:', error);
+          return null;
+        }
+      }
+    };
+    console.log('✅ Fallback KakaoConfig 생성 완료');
+  }
+
   getConfigPath() {
-    // 현재 페이지 경로에 따라 config 파일 경로 결정
-    const currentPath = window.location.pathname;
-    
-    if (currentPath.includes('/locales/')) {
-      // locales 하위 페이지에서는 ../../config/kakao-config.js
-      return '../../config/kakao-config.js';
-    } else {
-      // 루트 레벨 페이지에서는 config/kakao-config.js
-      return 'config/kakao-config.js';
-    }
+    // 절대 경로 사용으로 경로 문제 해결
+    return '/config/kakao-config.js';
   }
 
   loadScript(src) {
