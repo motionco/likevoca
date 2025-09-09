@@ -699,12 +699,6 @@ function shareCurrentPage(platform) {
             window.open(linkedinUrl, '_blank', 'width=600,height=400');
             break;
             
-        case 'instagram':
-            // Instagram doesn't support direct URL sharing from web, so copy URL
-            copyCurrentURL();
-            alert('Instagram은 웹에서 직접 공유가 지원되지 않습니다. 링크가 복사되었습니다.');
-            break;
-            
         case 'reddit':
             const redditUrl = `https://www.reddit.com/submit?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`;
             window.open(redditUrl, '_blank', 'width=800,height=600');
@@ -713,12 +707,6 @@ function shareCurrentPage(platform) {
         case 'line':
             const lineUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(url)}`;
             window.open(lineUrl, '_blank', 'width=600,height=400');
-            break;
-            
-        case 'wechat':
-            // WeChat sharing requires QR code generation, fallback to copy
-            copyCurrentURL();
-            alert('WeChat 공유를 위해 링크가 복사되었습니다. WeChat에서 공유해주세요.');
             break;
             
         case 'weibo':
@@ -739,17 +727,6 @@ function shareCurrentPage(platform) {
         case 'telegram':
             const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`;
             window.open(telegramUrl, '_blank');
-            break;
-            
-        case 'naver':
-            const naverUrl = `https://share.naver.com/web/shareView?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`;
-            window.open(naverUrl, '_blank', 'width=600,height=400');
-            break;
-            
-        case 'mixi':
-            // Mixi sharing fallback to copy
-            copyCurrentURL();
-            alert('Mixi 공유를 위해 링크가 복사되었습니다.');
             break;
             
         case 'kakao':
