@@ -160,7 +160,39 @@ class FooterManager {
 
   // 소셜 공유 기능 초기화
   initializeSocialSharing() {
+    this.initializeKakaoSDK();
     console.log('✅ 소셜 공유 기능이 초기화되었습니다.');
+  }
+
+  async initializeKakaoSDK() {
+    try {
+      // 카카오 SDK 로드 확인
+      if (typeof Kakao === 'undefined') {
+        console.warn('⚠️ 카카오 SDK가 로드되지 않았습니다.');
+        return;
+      }
+
+      if (Kakao.isInitialized()) {
+        return; // 이미 초기화됨
+      }
+
+      // KakaoConfig를 통해 키 가져오기
+      if (typeof window.KakaoConfig !== 'undefined') {
+        const kakaoAppKey = await window.KakaoConfig.getAppKey();
+        
+        if (!kakaoAppKey) {
+          console.log('🔧 카카오톡 공유 기능이 현재 환경에서 비활성화되었습니다.');
+          return;
+        }
+
+        Kakao.init(kakaoAppKey);
+        console.log('✅ Footer 카카오 SDK 초기화 완료');
+      } else {
+        console.warn('⚠️ KakaoConfig가 로드되지 않았습니다.');
+      }
+    } catch (error) {
+      console.warn('⚠️ Footer 카카오 SDK 초기화 실패:', error);
+    }
   }
 }
 
@@ -170,27 +202,9 @@ window.shareCurrentPage = function(platform) {
   const pageTitle = document.title || 'LikeVoca';
   const pageDescription = document.querySelector('meta[name="description"]')?.content || 'AI 기반 맞춤형 언어학습 플랫폼';
 
-  // 먼저 Native Web Share API 사용 시도 (모바일에서 지원)
-  if (platform === 'kakao' && navigator.share && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-    navigator.share({
-      title: pageTitle,
-      text: pageDescription,
-      url: currentUrl
-    }).then(() => {
-      console.log('공유 성공');
-    }).catch((error) => {
-      console.log('공유 실패, 링크 복사로 대체:', error);
-      copyCurrentURL();
-      showShareMessage('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
-    });
-    return;
-  }
-
   switch (platform) {
     case 'kakao':
-      // 카카오톡의 경우 링크 복사 사용 (보안상 안전)
-      copyCurrentURL();
-      showShareMessage('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
+      shareToKakao(pageTitle, pageDescription, currentUrl);
       break;
     case 'facebook':
       const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`;
@@ -213,6 +227,74 @@ window.shareCurrentPage = function(platform) {
   }
 };
 
+window.shareToKakao = async function(title, description, url) {
+  try {
+    // 카카오 SDK 및 초기화 상태 확인
+    if (typeof Kakao === 'undefined') {
+      console.warn('카카오 SDK가 로드되지 않았습니다.');
+      copyCurrentURL();
+      showShareMessage('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
+      return;
+    }
+
+    // 카카오 SDK가 초기화되지 않았다면 초기화 시도
+    if (!Kakao.isInitialized()) {
+      if (typeof window.KakaoConfig !== 'undefined') {
+        const kakaoAppKey = await window.KakaoConfig.getAppKey();
+        if (kakaoAppKey) {
+          Kakao.init(kakaoAppKey);
+          console.log('✅ 카카오 SDK 늦은 초기화 완료');
+        } else {
+          console.warn('카카오 앱 키를 가져올 수 없습니다.');
+          copyCurrentURL();
+          showShareMessage('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
+          return;
+        }
+      } else {
+        console.warn('KakaoConfig가 로드되지 않았습니다.');
+        copyCurrentURL();
+        showShareMessage('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
+        return;
+      }
+    }
+
+    console.log('카카오톡 공유 시도:', { title, description, url });
+
+    Kakao.Share.sendDefault({
+      objectType: 'feed',
+      content: {
+        title: title,
+        description: description,
+        imageUrl: window.location.origin + '/images/logo.png',
+        link: {
+          mobileWebUrl: url,
+          webUrl: url
+        }
+      },
+      buttons: [
+        {
+          title: '웹으로 이동',
+          link: {
+            mobileWebUrl: url,
+            webUrl: url
+          }
+        }
+      ],
+      success: function(response) {
+        console.log('✅ 카카오톡 공유 성공:', response);
+      },
+      fail: function(error) {
+        console.error('❌ 카카오톡 공유 실패:', error);
+        copyCurrentURL();
+        showShareMessage('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
+      }
+    });
+  } catch (error) {
+    console.error('카카오톡 공유 중 오류:', error);
+    copyCurrentURL();
+    showShareMessage('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
+  }
+};
 
 window.copyCurrentURL = function() {
   const currentUrl = window.location.href;

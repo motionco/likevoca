@@ -588,7 +588,7 @@ async function initializeKakaoSDK() {
 
         // KakaoConfig 사용하여 앱 키 가져오기
         if (typeof window.KakaoConfig !== 'undefined') {
-            const kakaoAppKey = window.KakaoConfig.getAppKey();
+            const kakaoAppKey = await window.KakaoConfig.getAppKey();
             
             if (!kakaoAppKey) {
                 console.log('🔧 카카오톡 공유 기능이 현재 환경에서 비활성화되었습니다.');
@@ -606,7 +606,7 @@ async function initializeKakaoSDK() {
     }
 }
 
-function shareToKakao(title, description, url) {
+async function shareToKakao(title, description, url) {
     try {
         // 카카오 SDK 및 초기화 상태 확인
         if (typeof Kakao === 'undefined') {
@@ -616,19 +616,25 @@ function shareToKakao(title, description, url) {
             return;
         }
 
+        // 카카오 SDK가 초기화되지 않았다면 초기화 시도
         if (!Kakao.isInitialized()) {
-            console.warn('카카오 SDK가 초기화되지 않았습니다.');
-            copyURL();
-            alert('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
-            return;
-        }
-
-        // KakaoConfig 확인
-        if (typeof window.KakaoConfig === 'undefined' || !window.KakaoConfig.isAvailable()) {
-            console.warn('카카오 설정이 사용 불가능합니다.');
-            copyURL();
-            alert('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
-            return;
+            if (typeof window.KakaoConfig !== 'undefined') {
+                const kakaoAppKey = await window.KakaoConfig.getAppKey();
+                if (kakaoAppKey) {
+                    Kakao.init(kakaoAppKey);
+                    console.log('✅ 카카오 SDK 늦은 초기화 완료');
+                } else {
+                    console.warn('카카오 앱 키를 가져올 수 없습니다.');
+                    copyURL();
+                    alert('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
+                    return;
+                }
+            } else {
+                console.warn('KakaoConfig가 로드되지 않았습니다.');
+                copyURL();
+                alert('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
+                return;
+            }
         }
 
         console.log('카카오톡 공유 시도:', { title, description, url });
@@ -658,10 +664,10 @@ function shareToKakao(title, description, url) {
                 },
             ],
             success: function(response) {
-                console.log('카카오톡 공유 성공:', response);
+                console.log('✅ 카카오톡 공유 성공:', response);
             },
             fail: function(error) {
-                console.error('카카오톡 공유 실패:', error);
+                console.error('❌ 카카오톡 공유 실패:', error);
                 copyURL();
                 alert('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
             }
