@@ -9,19 +9,25 @@
             Plataforma de aprendizaje de idiomas personalizada basada en IA que ayuda a usuarios de todo el mundo a dominar idiomas.
             Ofrecemos un aprendizaje de idiomas más rápido y eficiente a través de experiencias de aprendizaje personalizadas y gestión sistemática del progreso.
           </p>
-          <div class="flex space-x-4">
-            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="Facebook">
+          <div class="flex space-x-4 flex-wrap">
+            <button onclick="shareCurrentPage('facebook')" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="Share on Facebook" title="Share on Facebook">
               <i class="fab fa-facebook-f text-lg"></i>
-            </a>
-            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="Twitter">
+            </button>
+            <button onclick="shareCurrentPage('whatsapp')" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="Share on WhatsApp" title="Share on WhatsApp">
+              <i class="fab fa-whatsapp text-lg"></i>
+            </button>
+            <button onclick="shareCurrentPage('twitter')" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="Share on Twitter" title="Share on Twitter">
               <i class="fab fa-twitter text-lg"></i>
-            </a>
-            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="Instagram">
+            </button>
+            <button onclick="shareCurrentPage('instagram')" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="Share on Instagram" title="Share on Instagram">
               <i class="fab fa-instagram text-lg"></i>
-            </a>
-            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="LinkedIn">
-              <i class="fab fa-linkedin text-lg"></i>
-            </a>
+            </button>
+            <button onclick="shareCurrentPage('telegram')" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="Share on Telegram" title="Share on Telegram">
+              <i class="fab fa-telegram text-lg"></i>
+            </button>
+            <button onclick="copyCurrentURL()" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="Copy Link" title="Copy Link">
+              <i class="fas fa-link text-lg"></i>
+            </button>
           </div>
         </div>
       </div>

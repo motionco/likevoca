@@ -9,19 +9,25 @@
             AI搭載のパーソナライズされた言語学習プラットフォームで、世界中のユーザーの言語マスターをサポートしています。
             個人化された学習体験と体系的な進捗管理により、より速く効率的な言語学習を提供します。
           </p>
-          <div class="flex space-x-4">
-            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="Facebook">
-              <i class="fab fa-facebook-f text-lg"></i>
-            </a>
-            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="Twitter">
+          <div class="flex space-x-4 flex-wrap">
+            <button onclick="shareCurrentPage('twitter')" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="Share on Twitter" title="Share on Twitter">
               <i class="fab fa-twitter text-lg"></i>
-            </a>
-            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="Instagram">
+            </button>
+            <button onclick="shareCurrentPage('line')" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="Share on Line" title="Share on Line">
+              <i class="fab fa-line text-lg"></i>
+            </button>
+            <button onclick="shareCurrentPage('facebook')" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="Share on Facebook" title="Share on Facebook">
+              <i class="fab fa-facebook-f text-lg"></i>
+            </button>
+            <button onclick="shareCurrentPage('instagram')" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="Share on Instagram" title="Share on Instagram">
               <i class="fab fa-instagram text-lg"></i>
-            </a>
-            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="LinkedIn">
-              <i class="fab fa-linkedin text-lg"></i>
-            </a>
+            </button>
+            <button onclick="shareCurrentPage('mixi')" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="Share on Mixi" title="Share on Mixi">
+              <i class="fas fa-users text-lg"></i>
+            </button>
+            <button onclick="copyCurrentURL()" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="Copy Link" title="Copy Link">
+              <i class="fas fa-link text-lg"></i>
+            </button>
           </div>
         </div>
       </div>

@@ -80,6 +80,9 @@ async function initializeContentDetail() {
     // 헤더/푸터 로드
     await loadComponents();
     
+    // 카카오 SDK 초기화
+    initializeKakaoSDK();
+    
     // 콘텐츠 로드
     await loadContentDetail(contentId, language);
 }
@@ -566,10 +569,95 @@ function shareContent(platform) {
             break;
             
         case 'kakao':
-            // 카카오톡 공유 (웹에서는 클립보드 복사로 대체)
+            shareToKakao(title, text, url);
+            break;
+    }
+}
+
+// 카카오톡 SDK 초기화 및 공유 함수
+async function initializeKakaoSDK() {
+    try {
+        if (typeof Kakao === 'undefined') {
+            console.warn('⚠️ 카카오 SDK가 로드되지 않았습니다.');
+            return;
+        }
+
+        if (Kakao.isInitialized()) {
+            return; // 이미 초기화됨
+        }
+
+        // 환경변수에서 카카오 앱 키 가져오기
+        let kakaoAppKey = null;
+
+        try {
+            const response = await fetch('/api/env-config');
+            const config = await response.json();
+            kakaoAppKey = config.kakaoAppKey;
+        } catch (error) {
+            console.warn('⚠️ 환경설정을 가져올 수 없습니다. 로컬 환경변수를 시도합니다.');
+        }
+
+        // 로컬 개발 환경에서는 .env 파일이나 하드코딩된 키 사용
+        if (!kakaoAppKey) {
+            // 개발 환경에서는 여기에 테스트 키를 넣을 수 있습니다
+            // kakaoAppKey = 'your_development_kakao_key';
+            console.warn('⚠️ 카카오 앱 키가 설정되지 않았습니다. 카카오톡 공유 기능을 사용할 수 없습니다.');
+            return;
+        }
+
+        Kakao.init(kakaoAppKey);
+        console.log('✅ 카카오 SDK 초기화 완료');
+    } catch (error) {
+        console.warn('⚠️ 카카오 SDK 초기화 실패:', error);
+    }
+}
+
+function shareToKakao(title, description, url) {
+    try {
+        if (typeof Kakao === 'undefined') {
+            // SDK가 로드되지 않은 경우 fallback
             copyURL();
             alert('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
-            break;
+            return;
+        }
+
+        // 카카오 앱 키가 설정되지 않은 경우 fallback
+        if (!Kakao.isInitialized()) {
+            copyURL();
+            alert('카카오톡 공유 설정이 필요합니다. 링크가 복사되었습니다.');
+            return;
+        }
+
+        // 이미지 URL 가져오기 (OG 이미지 또는 기본 이미지)
+        const imageUrl = document.querySelector('meta[property="og:image"]')?.content || 
+                        'https://likevoca.com/assets/og-image.jpg';
+
+        Kakao.Share.sendDefault({
+            objectType: 'feed',
+            content: {
+                title: title,
+                description: description,
+                imageUrl: imageUrl,
+                link: {
+                    mobileWebUrl: url,
+                    webUrl: url,
+                },
+            },
+            buttons: [
+                {
+                    title: '자세히 보기',
+                    link: {
+                        mobileWebUrl: url,
+                        webUrl: url,
+                    },
+                },
+            ],
+        });
+    } catch (error) {
+        console.error('❌ 카카오톡 공유 실패:', error);
+        // 실패 시 fallback
+        copyURL();
+        alert('카카오톡 공유에 실패했습니다. 링크가 복사되었습니다.');
     }
 }
 
@@ -588,9 +676,112 @@ function copyURL() {
     });
 }
 
+// Footer 공유 버튼용 전역 함수
+function shareCurrentPage(platform) {
+    const title = document.title || 'LikeVoca';
+    const url = window.location.href;
+    const description = document.querySelector('meta[name="description"]')?.content || 
+                      'LikeVoca - AI 기반 맞춤형 언어학습 플랫폼';
+    
+    switch (platform) {
+        case 'facebook':
+            const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+            window.open(facebookUrl, '_blank', 'width=600,height=400');
+            break;
+            
+        case 'twitter':
+            const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`;
+            window.open(twitterUrl, '_blank', 'width=600,height=400');
+            break;
+            
+        case 'linkedin':
+            const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+            window.open(linkedinUrl, '_blank', 'width=600,height=400');
+            break;
+            
+        case 'instagram':
+            // Instagram doesn't support direct URL sharing from web, so copy URL
+            copyCurrentURL();
+            alert('Instagram은 웹에서 직접 공유가 지원되지 않습니다. 링크가 복사되었습니다.');
+            break;
+            
+        case 'reddit':
+            const redditUrl = `https://www.reddit.com/submit?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`;
+            window.open(redditUrl, '_blank', 'width=800,height=600');
+            break;
+            
+        case 'line':
+            const lineUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(url)}`;
+            window.open(lineUrl, '_blank', 'width=600,height=400');
+            break;
+            
+        case 'wechat':
+            // WeChat sharing requires QR code generation, fallback to copy
+            copyCurrentURL();
+            alert('WeChat 공유를 위해 링크가 복사되었습니다. WeChat에서 공유해주세요.');
+            break;
+            
+        case 'weibo':
+            const weiboUrl = `https://service.weibo.com/share/share.php?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`;
+            window.open(weiboUrl, '_blank', 'width=600,height=400');
+            break;
+            
+        case 'qq':
+            const qqUrl = `https://connect.qq.com/widget/shareqq/index.html?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}&desc=${encodeURIComponent(description)}`;
+            window.open(qqUrl, '_blank', 'width=600,height=400');
+            break;
+            
+        case 'whatsapp':
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(title + ' ' + url)}`;
+            window.open(whatsappUrl, '_blank');
+            break;
+            
+        case 'telegram':
+            const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`;
+            window.open(telegramUrl, '_blank');
+            break;
+            
+        case 'naver':
+            const naverUrl = `https://share.naver.com/web/shareView?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`;
+            window.open(naverUrl, '_blank', 'width=600,height=400');
+            break;
+            
+        case 'mixi':
+            // Mixi sharing fallback to copy
+            copyCurrentURL();
+            alert('Mixi 공유를 위해 링크가 복사되었습니다.');
+            break;
+            
+        case 'kakao':
+            shareToKakao(title, description, url);
+            break;
+            
+        default:
+            copyCurrentURL();
+            break;
+    }
+}
+
+function copyCurrentURL() {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+        alert('링크가 복사되었습니다!');
+    }).catch(() => {
+        // 백업 방법
+        const textArea = document.createElement('textarea');
+        textArea.value = window.location.href;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        alert('링크가 복사되었습니다!');
+    });
+}
+
 // 전역 함수 노출
 window.shareContent = shareContent;
 window.copyURL = copyURL;
+window.shareCurrentPage = shareCurrentPage;
+window.copyCurrentURL = copyCurrentURL;
 
 // 페이지 로드 시 초기화
 window.addEventListener('DOMContentLoaded', initializeContentDetail);

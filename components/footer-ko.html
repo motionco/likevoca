@@ -9,19 +9,25 @@
             AI 기반 맞춤형 언어학습 플랫폼으로 전 세계 사용자들의 언어 마스터를 돕고 있습니다. 
             개인화된 학습 경험과 체계적인 진도 관리로 더 빠르고 효율적인 언어 학습을 제공합니다.
           </p>
-          <div class="flex space-x-4">
-            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="Facebook">
+          <div class="flex space-x-4 flex-wrap">
+            <button onclick="shareCurrentPage('kakao')" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="카카오톡 공유" title="카카오톡 공유">
+              <i class="fas fa-comment text-lg"></i>
+            </button>
+            <button onclick="shareCurrentPage('facebook')" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="Facebook 공유" title="Facebook 공유">
               <i class="fab fa-facebook-f text-lg"></i>
-            </a>
-            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="Twitter">
+            </button>
+            <button onclick="shareCurrentPage('twitter')" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="Twitter 공유" title="Twitter 공유">
               <i class="fab fa-twitter text-lg"></i>
-            </a>
-            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="Instagram">
+            </button>
+            <button onclick="shareCurrentPage('instagram')" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="Instagram 공유" title="Instagram 공유">
               <i class="fab fa-instagram text-lg"></i>
-            </a>
-            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="LinkedIn">
-              <i class="fab fa-linkedin text-lg"></i>
-            </a>
+            </button>
+            <button onclick="shareCurrentPage('naver')" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="네이버 블로그 공유" title="네이버 블로그">
+              <i class="fas fa-blog text-lg"></i>
+            </button>
+            <button onclick="copyCurrentURL()" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="링크 복사" title="링크 복사">
+              <i class="fas fa-link text-lg"></i>
+            </button>
           </div>
         </div>
       </div>
