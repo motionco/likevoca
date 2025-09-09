@@ -19,7 +19,7 @@ const KakaoConfig = {
     getAppKey: () => {
         if (KakaoConfig.isProduction()) {
             // 프로덕션: 실제 카카오 JavaScript 키
-            return 'your_production_kakao_javascript_key_here';
+            return process.env.KAKAO_APP_KEY;
         } else if (KakaoConfig.isDevelopment()) {
             // 개발: 테스트 키 또는 null (비활성화)
             return null; // 'your_development_kakao_key_here';
