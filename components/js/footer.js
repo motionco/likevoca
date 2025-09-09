@@ -74,6 +74,7 @@ class FooterManager {
     window.KakaoConfig = {
       isProduction: () => {
         return window.location.hostname === 'likevoca.com' || 
+               window.location.hostname === 'www.likevoca.com' ||
                window.location.hostname.includes('vercel.app');
       },
       async getAppKey() {
