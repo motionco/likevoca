@@ -586,21 +586,49 @@ async function initializeKakaoSDK() {
             return; // 이미 초기화됨
         }
 
-        // KakaoConfig 사용하여 앱 키 가져오기
-        if (typeof window.KakaoConfig !== 'undefined') {
-            const kakaoAppKey = await window.KakaoConfig.getAppKey();
-            
-            if (!kakaoAppKey) {
-                console.log('🔧 카카오톡 공유 기능이 현재 환경에서 비활성화되었습니다.');
-                return;
-            }
+        // KakaoConfig가 없다면 생성
+        if (typeof window.KakaoConfig === 'undefined') {
+            window.KakaoConfig = {
+                isProduction: () => {
+                    return window.location.hostname === 'likevoca.com' || 
+                           window.location.hostname.includes('vercel.app');
+                },
+                async getAppKey() {
+                    if (!this.isProduction()) {
+                        console.log('🔧 개발 환경: 카카오톡 공유 기능이 비활성화되었습니다.');
+                        return null;
+                    }
+                    
+                    try {
+                        const response = await fetch('/api/kakao-share', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ action: 'getKey' })
+                        });
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            return data.success ? data.kakaoJsKey : null;
+                        }
+                        return null;
+                    } catch (error) {
+                        console.warn('카카오 키 요청 실패:', error);
+                        return null;
+                    }
+                }
+            };
+        }
 
-            Kakao.init(kakaoAppKey);
-            console.log('✅ 카카오 SDK 초기화 완료');
-        } else {
-            console.warn('⚠️ KakaoConfig가 로드되지 않았습니다.');
+        // KakaoConfig 사용하여 앱 키 가져오기
+        const kakaoAppKey = await window.KakaoConfig.getAppKey();
+        
+        if (!kakaoAppKey) {
+            console.log('🔧 카카오톡 공유 기능이 현재 환경에서 비활성화되었습니다.');
             return;
         }
+
+        Kakao.init(kakaoAppKey);
+        console.log('✅ 카카오 SDK 초기화 완료');
     } catch (error) {
         console.warn('⚠️ 카카오 SDK 초기화 실패:', error);
     }

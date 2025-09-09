@@ -60,25 +60,17 @@ class FooterManager {
         console.log('✅ 카카오 SDK 스크립트 로드 완료');
       }
 
-      // KakaoConfig 로드 시도 (실패해도 계속 진행)
+      // KakaoConfig 직접 생성 (외부 파일 로드 문제 해결)
       if (typeof window.KakaoConfig === 'undefined') {
-        try {
-          const configPath = this.getConfigPath();
-          await this.loadScript(configPath);
-          console.log('✅ KakaoConfig 스크립트 로드 완료');
-        } catch (configError) {
-          console.warn('⚠️ KakaoConfig 로드 실패, 기본 설정 사용:', configError);
-          // KakaoConfig 로드 실패 시 기본 구현 생성
-          this.createFallbackKakaoConfig();
-        }
+        this.createKakaoConfig();
       }
     } catch (error) {
       console.warn('⚠️ 카카오 스크립트 로드 실패:', error);
     }
   }
 
-  createFallbackKakaoConfig() {
-    // KakaoConfig 로드 실패 시 기본 구현
+  createKakaoConfig() {
+    // KakaoConfig를 직접 생성하여 로드 문제 해결
     window.KakaoConfig = {
       isProduction: () => {
         return window.location.hostname === 'likevoca.com' || 
@@ -108,7 +100,7 @@ class FooterManager {
         }
       }
     };
-    console.log('✅ Fallback KakaoConfig 생성 완료');
+    console.log('✅ KakaoConfig 생성 완료');
   }
 
   getConfigPath() {
