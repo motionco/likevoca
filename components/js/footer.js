@@ -83,22 +83,8 @@ class FooterManager {
           return null;
         }
         
-        try {
-          const response = await fetch('/api/kakao-share', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'getKey' })
-          });
-          
-          if (response.ok) {
-            const data = await response.json();
-            return data.success ? data.kakaoJsKey : null;
-          }
-          return null;
-        } catch (error) {
-          console.warn('카카오 키 요청 실패:', error);
-          return null;
-        }
+        // 프로덕션 환경에서는 카카오 JavaScript 키를 직접 반환
+        return 'cae5858f71d624bf839cc0bba539a619';
       }
     };
     console.log('✅ KakaoConfig 생성 완료');

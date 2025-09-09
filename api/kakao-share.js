@@ -37,6 +37,7 @@ export default async (req, res) => {
       'localhost',
       '127.0.0.1',
       'likevoca.com',
+      'www.likevoca.com',
       'vercel.app'
     ];
 
