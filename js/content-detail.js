@@ -586,27 +586,21 @@ async function initializeKakaoSDK() {
             return; // 이미 초기화됨
         }
 
-        // 환경변수에서 카카오 앱 키 가져오기
-        let kakaoAppKey = null;
+        // KakaoConfig 사용하여 앱 키 가져오기
+        if (typeof window.KakaoConfig !== 'undefined') {
+            const kakaoAppKey = window.KakaoConfig.getAppKey();
+            
+            if (!kakaoAppKey) {
+                console.log('🔧 카카오톡 공유 기능이 현재 환경에서 비활성화되었습니다.');
+                return;
+            }
 
-        try {
-            const response = await fetch('/api/env-config');
-            const config = await response.json();
-            kakaoAppKey = config.kakaoAppKey;
-        } catch (error) {
-            console.warn('⚠️ 환경설정을 가져올 수 없습니다. 로컬 환경변수를 시도합니다.');
-        }
-
-        // 로컬 개발 환경에서는 .env 파일이나 하드코딩된 키 사용
-        if (!kakaoAppKey) {
-            // 개발 환경에서는 여기에 테스트 키를 넣을 수 있습니다
-            // kakaoAppKey = 'your_development_kakao_key';
-            console.warn('⚠️ 카카오 앱 키가 설정되지 않았습니다. 카카오톡 공유 기능을 사용할 수 없습니다.');
+            Kakao.init(kakaoAppKey);
+            console.log('✅ 카카오 SDK 초기화 완료');
+        } else {
+            console.warn('⚠️ KakaoConfig가 로드되지 않았습니다.');
             return;
         }
-
-        Kakao.init(kakaoAppKey);
-        console.log('✅ 카카오 SDK 초기화 완료');
     } catch (error) {
         console.warn('⚠️ 카카오 SDK 초기화 실패:', error);
     }
