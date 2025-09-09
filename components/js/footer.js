@@ -83,8 +83,22 @@ class FooterManager {
           return null;
         }
         
-        // 프로덕션 환경에서는 카카오 JavaScript 키를 직접 반환
-        return 'cae5858f71d624bf839cc0bba539a619';
+        try {
+          const response = await fetch('/api/kakao-share', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'getKey' })
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            return data.success ? data.kakaoJsKey : null;
+          }
+          return null;
+        } catch (error) {
+          console.warn('카카오 키 요청 실패:', error);
+          return null;
+        }
       }
     };
     console.log('✅ KakaoConfig 생성 완료');
@@ -323,35 +337,34 @@ window.shareToKakao = async function(title, description, url) {
 
     console.log('카카오톡 공유 시도:', { title, description, url });
 
-    Kakao.Share.sendDefault({
-      objectType: 'feed',
-      content: {
-        title: title,
-        description: description,
-        imageUrl: window.location.origin + '/images/logo.png',
-        link: {
-          mobileWebUrl: url,
-          webUrl: url
-        }
-      },
-      buttons: [
-        {
-          title: '웹으로 이동',
+    try {
+      await Kakao.Share.sendDefault({
+        objectType: 'feed',
+        content: {
+          title: title,
+          description: description,
+          imageUrl: window.location.origin + '/images/logo.png',
           link: {
             mobileWebUrl: url,
             webUrl: url
           }
-        }
-      ],
-      success: function(response) {
-        console.log('✅ 카카오톡 공유 성공:', response);
-      },
-      fail: function(error) {
-        console.error('❌ 카카오톡 공유 실패:', error);
-        copyCurrentURL();
-        showShareMessage('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
-      }
-    });
+        },
+        buttons: [
+          {
+            title: '웹으로 이동',
+            link: {
+              mobileWebUrl: url,
+              webUrl: url
+            }
+          }
+        ]
+      });
+      console.log('✅ 카카오톡 공유 성공');
+    } catch (shareError) {
+      console.error('❌ 카카오톡 공유 실패:', shareError);
+      copyCurrentURL();
+      showShareMessage('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
+    }
   } catch (error) {
     console.error('카카오톡 공유 중 오류:', error);
     copyCurrentURL();
