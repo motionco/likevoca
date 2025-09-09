@@ -227,12 +227,30 @@ window.shareCurrentPage = function(platform) {
 
 window.shareToKakao = function(title, description, url) {
   try {
-    if (typeof Kakao === 'undefined' || !Kakao.isInitialized()) {
-      // SDK가 로드되지 않은 경우 fallback
+    // 카카오 SDK 및 초기화 상태 확인
+    if (typeof Kakao === 'undefined') {
+      console.warn('카카오 SDK가 로드되지 않았습니다.');
       copyCurrentURL();
-      alert('카카오톡 공유 설정이 필요합니다. 링크가 복사되었습니다.');
+      alert('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
       return;
     }
+
+    if (!Kakao.isInitialized()) {
+      console.warn('카카오 SDK가 초기화되지 않았습니다.');
+      copyCurrentURL();
+      alert('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
+      return;
+    }
+
+    // KakaoConfig 확인
+    if (typeof window.KakaoConfig === 'undefined' || !window.KakaoConfig.isAvailable()) {
+      console.warn('카카오 설정이 사용 불가능합니다.');
+      copyCurrentURL();
+      alert('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
+      return;
+    }
+
+    console.log('카카오톡 공유 시도:', { title, description, url });
 
     Kakao.Share.sendDefault({
       objectType: 'feed',
@@ -253,12 +271,20 @@ window.shareToKakao = function(title, description, url) {
             webUrl: url
           }
         }
-      ]
+      ],
+      success: function(response) {
+        console.log('카카오톡 공유 성공:', response);
+      },
+      fail: function(error) {
+        console.error('카카오톡 공유 실패:', error);
+        copyCurrentURL();
+        alert('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
+      }
     });
   } catch (error) {
-    console.warn('카카오톡 공유 실패:', error);
+    console.error('카카오톡 공유 중 오류:', error);
     copyCurrentURL();
-    alert('카카오톡 공유 설정이 필요합니다. 링크가 복사되었습니다.');
+    alert('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
   }
 };
 

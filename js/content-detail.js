@@ -608,23 +608,34 @@ async function initializeKakaoSDK() {
 
 function shareToKakao(title, description, url) {
     try {
+        // 카카오 SDK 및 초기화 상태 확인
         if (typeof Kakao === 'undefined') {
-            // SDK가 로드되지 않은 경우 fallback
+            console.warn('카카오 SDK가 로드되지 않았습니다.');
             copyURL();
             alert('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
             return;
         }
 
-        // 카카오 앱 키가 설정되지 않은 경우 fallback
         if (!Kakao.isInitialized()) {
+            console.warn('카카오 SDK가 초기화되지 않았습니다.');
             copyURL();
-            alert('카카오톡 공유 설정이 필요합니다. 링크가 복사되었습니다.');
+            alert('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
             return;
         }
 
+        // KakaoConfig 확인
+        if (typeof window.KakaoConfig === 'undefined' || !window.KakaoConfig.isAvailable()) {
+            console.warn('카카오 설정이 사용 불가능합니다.');
+            copyURL();
+            alert('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
+            return;
+        }
+
+        console.log('카카오톡 공유 시도:', { title, description, url });
+
         // 이미지 URL 가져오기 (OG 이미지 또는 기본 이미지)
         const imageUrl = document.querySelector('meta[property="og:image"]')?.content || 
-                        'https://likevoca.com/assets/og-image.jpg';
+                        window.location.origin + '/images/logo.png';
 
         Kakao.Share.sendDefault({
             objectType: 'feed',
@@ -646,12 +657,19 @@ function shareToKakao(title, description, url) {
                     },
                 },
             ],
+            success: function(response) {
+                console.log('카카오톡 공유 성공:', response);
+            },
+            fail: function(error) {
+                console.error('카카오톡 공유 실패:', error);
+                copyURL();
+                alert('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
+            }
         });
     } catch (error) {
-        console.error('❌ 카카오톡 공유 실패:', error);
-        // 실패 시 fallback
+        console.error('카카오톡 공유 중 오류:', error);
         copyURL();
-        alert('카카오톡 공유에 실패했습니다. 링크가 복사되었습니다.');
+        alert('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
     }
 }
 
