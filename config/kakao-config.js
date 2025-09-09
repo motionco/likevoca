@@ -15,6 +15,7 @@ const KakaoConfig = {
     // 프로덕션 환경 감지
     isProduction: () => {
         return window.location.hostname === 'likevoca.com' || 
+               window.location.hostname === 'www.likevoca.com' ||
                window.location.hostname.includes('vercel.app');
     },
 
