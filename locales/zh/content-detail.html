@@ -179,11 +179,20 @@
             
             <!-- 分享按钮（桌面版） -->
             <div class="share-buttons hidden md:flex">
+                <button onclick="shareContent('weibo')" class="bg-red-500 text-white p-3 rounded-full hover:bg-red-600 transition duration-200" title="在微博上分享">
+                    <i class="fab fa-weibo"></i>
+                </button>
+                <button onclick="shareContent('qq')" class="bg-blue-500 text-white p-3 rounded-full hover:bg-blue-600 transition duration-200" title="在QQ上分享">
+                    <i class="fab fa-qq"></i>
+                </button>
                 <button onclick="shareContent('facebook')" class="bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 transition duration-200" title="在Facebook上分享">
                     <i class="fab fa-facebook-f"></i>
                 </button>
                 <button onclick="shareContent('twitter')" class="bg-blue-400 text-white p-3 rounded-full hover:bg-blue-500 transition duration-200" title="在Twitter上分享">
                     <i class="fab fa-twitter"></i>
+                </button>
+                <button onclick="shareContent('telegram')" class="bg-blue-500 text-white p-3 rounded-full hover:bg-blue-600 transition duration-200" title="在Telegram上分享">
+                    <i class="fab fa-telegram"></i>
                 </button>
                 <button onclick="copyURL()" class="bg-gray-600 text-white p-3 rounded-full hover:bg-gray-700 transition duration-200" title="复制链接">
                     <i class="fas fa-link"></i>
@@ -192,11 +201,20 @@
             
             <!-- 分享按钮（移动版） -->
             <div class="share-buttons md:hidden">
+                <button onclick="shareContent('weibo')" class="bg-red-500 text-white p-3 rounded-lg hover:bg-red-600 transition duration-200">
+                    <i class="fab fa-weibo mr-2"></i>微博
+                </button>
+                <button onclick="shareContent('qq')" class="bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition duration-200">
+                    <i class="fab fa-qq mr-2"></i>QQ
+                </button>
                 <button onclick="shareContent('facebook')" class="bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition duration-200">
                     <i class="fab fa-facebook-f mr-2"></i>Facebook
                 </button>
                 <button onclick="shareContent('twitter')" class="bg-blue-400 text-white p-3 rounded-lg hover:bg-blue-500 transition duration-200">
                     <i class="fab fa-twitter mr-2"></i>Twitter
+                </button>
+                <button onclick="shareContent('telegram')" class="bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition duration-200">
+                    <i class="fab fa-telegram mr-2"></i>Telegram
                 </button>
                 <button onclick="copyURL()" class="bg-gray-600 text-white p-3 rounded-lg hover:bg-gray-700 transition duration-200">
                     <i class="fas fa-link mr-2"></i>复制链接

@@ -729,6 +729,12 @@ function shareCurrentPage(platform) {
             window.open(telegramUrl, '_blank');
             break;
             
+        case 'threads':
+            // Threads (Instagram's text-based app) sharing
+            const threadsUrl = `https://www.threads.net/intent/post?text=${encodeURIComponent(title + ' ' + url)}`;
+            window.open(threadsUrl, '_blank', 'width=600,height=400');
+            break;
+            
         case 'kakao':
             shareToKakao(title, description, url);
             break;
