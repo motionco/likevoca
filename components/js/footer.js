@@ -20,6 +20,9 @@ class FooterManager {
         return;
       }
 
+      // 먼저 카카오 SDK와 Config 로드
+      await this.loadKakaoScripts();
+
       // 현재 언어 감지
       const currentLang = this.getCurrentLanguage();
       const footerFile = `footer-${currentLang}.html`;
@@ -47,6 +50,60 @@ class FooterManager {
     } catch (error) {
       console.error('Footer 로드 실패:', error);
     }
+  }
+
+  async loadKakaoScripts() {
+    try {
+      // 이미 로드되어 있다면 스킵
+      if (typeof Kakao !== 'undefined' && typeof window.KakaoConfig !== 'undefined') {
+        return;
+      }
+
+      // 카카오 SDK 로드
+      if (typeof Kakao === 'undefined') {
+        await this.loadScript('https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js');
+        console.log('✅ 카카오 SDK 스크립트 로드 완료');
+      }
+
+      // KakaoConfig 로드 (경로 자동 감지)
+      if (typeof window.KakaoConfig === 'undefined') {
+        const configPath = this.getConfigPath();
+        await this.loadScript(configPath);
+        console.log('✅ KakaoConfig 스크립트 로드 완료');
+      }
+    } catch (error) {
+      console.warn('⚠️ 카카오 스크립트 로드 실패:', error);
+    }
+  }
+
+  getConfigPath() {
+    // 현재 페이지 경로에 따라 config 파일 경로 결정
+    const currentPath = window.location.pathname;
+    
+    if (currentPath.includes('/locales/')) {
+      // locales 하위 페이지에서는 ../../config/kakao-config.js
+      return '../../config/kakao-config.js';
+    } else {
+      // 루트 레벨 페이지에서는 config/kakao-config.js
+      return 'config/kakao-config.js';
+    }
+  }
+
+  loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error(`Script load failed: ${src}`));
+      
+      // 카카오 SDK의 경우 integrity 추가
+      if (src.includes('kakao_js_sdk')) {
+        script.integrity = 'sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4';
+        script.crossOrigin = 'anonymous';
+      }
+      
+      document.head.appendChild(script);
+    });
   }
 
   getCurrentLanguage() {
@@ -367,12 +424,12 @@ window.loadFooter = async function() {
   
   window.footerManager = new FooterManager();
   
-  // 소셜 공유 기능 초기화
+  // Footer 로드 완료 후 소셜 공유 기능 초기화
   setTimeout(() => {
     if (window.footerManager) {
       window.footerManager.initializeSocialSharing();
     }
-  }, 500);
+  }, 1000); // 카카오 SDK 로딩을 위해 시간 증가
   
   // 번역 적용 (language-utils.js와 연동)
   if (typeof window.applyLanguage === 'function') {
