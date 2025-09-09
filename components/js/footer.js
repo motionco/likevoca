@@ -160,37 +160,7 @@ class FooterManager {
 
   // 소셜 공유 기능 초기화
   initializeSocialSharing() {
-    this.initializeKakaoSDK();
-  }
-
-  async initializeKakaoSDK() {
-    try {
-      if (typeof Kakao === 'undefined') {
-        console.warn('⚠️ 카카오 SDK가 로드되지 않았습니다.');
-        return;
-      }
-
-      if (Kakao.isInitialized()) {
-        return;
-      }
-
-      // KakaoConfig 사용하여 앱 키 가져오기
-      if (typeof window.KakaoConfig !== 'undefined') {
-        const kakaoAppKey = window.KakaoConfig.getAppKey();
-        
-        if (!kakaoAppKey) {
-          console.log('🔧 카카오톡 공유 기능이 현재 환경에서 비활성화되었습니다.');
-          return;
-        }
-
-        Kakao.init(kakaoAppKey);
-        console.log('✅ Footer 카카오 SDK 초기화 완료');
-      } else {
-        console.warn('⚠️ KakaoConfig가 로드되지 않았습니다.');
-      }
-    } catch (error) {
-      console.warn('⚠️ Footer 카카오 SDK 초기화 실패:', error);
-    }
+    console.log('✅ 소셜 공유 기능이 초기화되었습니다.');
   }
 }
 
@@ -200,9 +170,27 @@ window.shareCurrentPage = function(platform) {
   const pageTitle = document.title || 'LikeVoca';
   const pageDescription = document.querySelector('meta[name="description"]')?.content || 'AI 기반 맞춤형 언어학습 플랫폼';
 
+  // 먼저 Native Web Share API 사용 시도 (모바일에서 지원)
+  if (platform === 'kakao' && navigator.share && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+    navigator.share({
+      title: pageTitle,
+      text: pageDescription,
+      url: currentUrl
+    }).then(() => {
+      console.log('공유 성공');
+    }).catch((error) => {
+      console.log('공유 실패, 링크 복사로 대체:', error);
+      copyCurrentURL();
+      showShareMessage('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
+    });
+    return;
+  }
+
   switch (platform) {
     case 'kakao':
-      shareToKakao(pageTitle, pageDescription, currentUrl);
+      // 카카오톡의 경우 링크 복사 사용 (보안상 안전)
+      copyCurrentURL();
+      showShareMessage('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
       break;
     case 'facebook':
       const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`;
@@ -225,68 +213,6 @@ window.shareCurrentPage = function(platform) {
   }
 };
 
-window.shareToKakao = function(title, description, url) {
-  try {
-    // 카카오 SDK 및 초기화 상태 확인
-    if (typeof Kakao === 'undefined') {
-      console.warn('카카오 SDK가 로드되지 않았습니다.');
-      copyCurrentURL();
-      alert('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
-      return;
-    }
-
-    if (!Kakao.isInitialized()) {
-      console.warn('카카오 SDK가 초기화되지 않았습니다.');
-      copyCurrentURL();
-      alert('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
-      return;
-    }
-
-    // KakaoConfig 확인
-    if (typeof window.KakaoConfig === 'undefined' || !window.KakaoConfig.isAvailable()) {
-      console.warn('카카오 설정이 사용 불가능합니다.');
-      copyCurrentURL();
-      alert('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
-      return;
-    }
-
-    console.log('카카오톡 공유 시도:', { title, description, url });
-
-    Kakao.Share.sendDefault({
-      objectType: 'feed',
-      content: {
-        title: title,
-        description: description,
-        imageUrl: window.location.origin + '/images/logo.png',
-        link: {
-          mobileWebUrl: url,
-          webUrl: url
-        }
-      },
-      buttons: [
-        {
-          title: '웹으로 이동',
-          link: {
-            mobileWebUrl: url,
-            webUrl: url
-          }
-        }
-      ],
-      success: function(response) {
-        console.log('카카오톡 공유 성공:', response);
-      },
-      fail: function(error) {
-        console.error('카카오톡 공유 실패:', error);
-        copyCurrentURL();
-        alert('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
-      }
-    });
-  } catch (error) {
-    console.error('카카오톡 공유 중 오류:', error);
-    copyCurrentURL();
-    alert('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
-  }
-};
 
 window.copyCurrentURL = function() {
   const currentUrl = window.location.href;
@@ -301,6 +227,36 @@ window.copyCurrentURL = function() {
   } else {
     fallbackCopyURL(currentUrl);
   }
+};
+
+window.showShareMessage = function(message) {
+  // 간단한 토스트 메시지 표시
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #333;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    max-width: 300px;
+  `;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  
+  // 애니메이션
+  setTimeout(() => toast.style.opacity = '1', 10);
+  
+  // 3초 후 제거
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    setTimeout(() => document.body.removeChild(toast), 300);
+  }, 3000);
 };
 
 function fallbackCopyURL(url) {

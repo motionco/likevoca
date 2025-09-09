@@ -17,14 +17,8 @@ const KakaoConfig = {
 
     // 카카오 앱 키 반환
     getAppKey: () => {
-        if (KakaoConfig.isProduction()) {
-            // 프로덕션: 실제 카카오 JavaScript 키
-            // 카카오 개발자 콘솔에서 발급받은 JavaScript 키를 여기에 입력
-            return 'cae5858f71d624bf839cc0bba539a619'; // 실제 JavaScript 키로 교체
-        } else if (KakaoConfig.isDevelopment()) {
-            // 개발: 테스트 키 또는 null (비활성화)
-            return null; // 개발 환경에서는 비활성화
-        }
+        // 보안상 이유로 카카오 공유 기능을 비활성화
+        // 대신 링크 복사 기능을 사용
         return null;
     },
 
