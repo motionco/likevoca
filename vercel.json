@@ -1,40 +1,129 @@
 {
   "version": 2,
-  "env": {
-    "KAKAO_APP_KEY": "@kakao-app-key"
-  },
+  // "env": {
+  //   "KAKAO_APP_KEY": "@kakao-app-key"
+  // },
   "builds": [
-    { "src": "api/*.js", "use": "@vercel/node" },
-    { "src": "*.html", "use": "@vercel/static" },
-    { "src": "js/**", "use": "@vercel/static" },
-    { "src": "css/**", "use": "@vercel/static" },
-    { "src": "assets/**", "use": "@vercel/static" },
-    { "src": "components/**", "use": "@vercel/static" },
-    { "src": "pages/**", "use": "@vercel/static" },
-    { "src": "utils/**", "use": "@vercel/static" },
-    { "src": "samples/**", "use": "@vercel/static" },
-    { "src": "locales/**", "use": "@vercel/static" },
-    { "src": "admin/**", "use": "@vercel/static" }
+    {
+      "src": "api/*.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "*.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "js/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "css/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "assets/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "components/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "pages/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "utils/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "samples/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "locales/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "admin/**",
+      "use": "@vercel/static"
+    }
   ],
   "routes": [
-    { "src": "/api/config", "dest": "/api/config.js" },
-    { "src": "/api/gemini", "dest": "/api/gemini.js" },
-    { "src": "/api/test-env", "dest": "/api/test-env.js" },
-    { "src": "/api/log-auth-error", "dest": "/api/log-auth-error.js" },
-    { "handle": "filesystem" },
-    { "src": "/admin/(.*)", "dest": "/admin/$1" },
-    { "src": "/(ko|en|ja|zh|es)/community/?$", "dest": "/locales/$1/community.html" },
-    { "src": "^/(?!ko|en|ja|zh|es|admin|community).*", "dest": "/index.html" },
-    { "src": "/ko", "dest": "/locales/ko/index.html" },
-    { "src": "/en", "dest": "/locales/en/index.html" },
-    { "src": "/ja", "dest": "/locales/ja/index.html" },
-    { "src": "/zh", "dest": "/locales/zh/index.html" },
-    { "src": "/es", "dest": "/locales/es/index.html" },
-    { "src": "/ko/(.*)", "dest": "/locales/ko/$1" },
-    { "src": "/en/(.*)", "dest": "/locales/en/$1" },
-    { "src": "/ja/(.*)", "dest": "/locales/ja/$1" },
-    { "src": "/zh/(.*)", "dest": "/locales/zh/$1" },
-    { "src": "/es/(.*)", "dest": "/locales/es/$1" },
-    { "src": "/(.*)", "dest": "/$1" }
+    {
+      "src": "/api/config",
+      "dest": "/api/config.js"
+    },
+    {
+      "src": "/api/gemini",
+      "dest": "/api/gemini.js"
+    },
+    {
+      "src": "/api/test-env",
+      "dest": "/api/test-env.js"
+    },
+    {
+      "src": "/api/log-auth-error",
+      "dest": "/api/log-auth-error.js"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/admin/(.*)",
+      "dest": "/admin/$1"
+    },
+    {
+      "src": "/(ko|en|ja|zh|es)/community/?$",
+      "dest": "/locales/$1/community.html"
+    },
+    {
+      "src": "^/(?!ko|en|ja|zh|es|admin|community).*",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/ko",
+      "dest": "/locales/ko/index.html"
+    },
+    {
+      "src": "/en",
+      "dest": "/locales/en/index.html"
+    },
+    {
+      "src": "/ja",
+      "dest": "/locales/ja/index.html"
+    },
+    {
+      "src": "/zh",
+      "dest": "/locales/zh/index.html"
+    },
+    {
+      "src": "/es",
+      "dest": "/locales/es/index.html"
+    },
+    {
+      "src": "/ko/(.*)",
+      "dest": "/locales/ko/$1"
+    },
+    {
+      "src": "/en/(.*)",
+      "dest": "/locales/en/$1"
+    },
+    {
+      "src": "/ja/(.*)",
+      "dest": "/locales/ja/$1"
+    },
+    {
+      "src": "/zh/(.*)",
+      "dest": "/locales/zh/$1"
+    },
+    {
+      "src": "/es/(.*)",
+      "dest": "/locales/es/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
   ]
-} 
+}
