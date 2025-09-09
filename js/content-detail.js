@@ -549,28 +549,34 @@ function showError() {
     document.getElementById('errorScreen').classList.remove('hidden');
 }
 
-// 소셜 공유 함수들
+// 소셜 공유 함수들 - footer.js의 함수를 활용
 function shareContent(platform) {
-    if (!currentContent) return;
-    
-    const title = document.getElementById('contentTitle').textContent;
-    const url = window.location.href;
-    const text = document.getElementById('contentSummary').textContent;
-    
-    switch (platform) {
-        case 'facebook':
-            const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
-            window.open(facebookUrl, '_blank', 'width=600,height=400');
-            break;
-            
-        case 'twitter':
-            const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`;
-            window.open(twitterUrl, '_blank', 'width=600,height=400');
-            break;
-            
-        case 'kakao':
-            shareToKakao(title, text, url);
-            break;
+    // footer.js의 shareCurrentPage 함수를 사용
+    if (typeof window.shareCurrentPage === 'function') {
+        window.shareCurrentPage(platform);
+    } else {
+        // 백업 방식
+        if (!currentContent) return;
+        
+        const title = document.getElementById('contentTitle').textContent;
+        const url = window.location.href;
+        const text = document.getElementById('contentSummary').textContent;
+        
+        switch (platform) {
+            case 'facebook':
+                const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+                window.open(facebookUrl, '_blank', 'width=600,height=400');
+                break;
+                
+            case 'twitter':
+                const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`;
+                window.open(twitterUrl, '_blank', 'width=600,height=400');
+                break;
+                
+            case 'kakao':
+                shareToKakao(title, text, url);
+                break;
+        }
     }
 }
 
@@ -600,22 +606,9 @@ async function initializeKakaoSDK() {
                         return null;
                     }
                     
-                    try {
-                        const response = await fetch('/api/kakao-share', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ action: 'getKey' })
-                        });
-                        
-                        if (response.ok) {
-                            const data = await response.json();
-                            return data.success ? data.kakaoJsKey : null;
-                        }
-                        return null;
-                    } catch (error) {
-                        console.warn('카카오 키 요청 실패:', error);
-                        return null;
-                    }
+                    // 프로덕션 환경에서는 카카오 JavaScript 키를 직접 반환
+                    // API 호출이 불안정할 때를 위한 백업 방식
+                    return 'cae5858f71d624bf839cc0bba539a619';
                 }
             };
         }
@@ -672,35 +665,34 @@ async function shareToKakao(title, description, url) {
         const imageUrl = document.querySelector('meta[property="og:image"]')?.content || 
                         window.location.origin + '/images/logo.png';
 
-        Kakao.Share.sendDefault({
-            objectType: 'feed',
-            content: {
-                title: title,
-                description: description,
-                imageUrl: imageUrl,
-                link: {
-                    mobileWebUrl: url,
-                    webUrl: url,
-                },
-            },
-            buttons: [
-                {
-                    title: '자세히 보기',
+        try {
+            await Kakao.Share.sendDefault({
+                objectType: 'feed',
+                content: {
+                    title: title,
+                    description: description,
+                    imageUrl: imageUrl,
                     link: {
                         mobileWebUrl: url,
                         webUrl: url,
                     },
                 },
-            ],
-            success: function(response) {
-                console.log('✅ 카카오톡 공유 성공:', response);
-            },
-            fail: function(error) {
-                console.error('❌ 카카오톡 공유 실패:', error);
-                copyURL();
-                alert('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
-            }
-        });
+                buttons: [
+                    {
+                        title: '자세히 보기',
+                        link: {
+                            mobileWebUrl: url,
+                            webUrl: url,
+                        },
+                    },
+                ]
+            });
+            console.log('✅ 카카오톡 공유 성공');
+        } catch (shareError) {
+            console.error('❌ 카카오톡 공유 실패:', shareError);
+            copyURL();
+            alert('링크가 복사되었습니다. 카카오톡에서 공유해보세요!');
+        }
     } catch (error) {
         console.error('카카오톡 공유 중 오류:', error);
         copyURL();
@@ -709,109 +701,34 @@ async function shareToKakao(title, description, url) {
 }
 
 function copyURL() {
-    navigator.clipboard.writeText(window.location.href).then(() => {
-        alert('링크가 복사되었습니다!');
-    }).catch(() => {
-        // 백업 방법
-        const textArea = document.createElement('textarea');
-        textArea.value = window.location.href;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        alert('링크가 복사되었습니다!');
-    });
-}
-
-// Footer 공유 버튼용 전역 함수
-function shareCurrentPage(platform) {
-    const title = document.title || 'LikeVoca';
-    const url = window.location.href;
-    const description = document.querySelector('meta[name="description"]')?.content || 
-                      'LikeVoca - AI 기반 맞춤형 언어학습 플랫폼';
-    
-    switch (platform) {
-        case 'facebook':
-            const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
-            window.open(facebookUrl, '_blank', 'width=600,height=400');
-            break;
-            
-        case 'twitter':
-            const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`;
-            window.open(twitterUrl, '_blank', 'width=600,height=400');
-            break;
-            
-        case 'linkedin':
-            const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
-            window.open(linkedinUrl, '_blank', 'width=600,height=400');
-            break;
-            
-        case 'reddit':
-            const redditUrl = `https://www.reddit.com/submit?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`;
-            window.open(redditUrl, '_blank', 'width=800,height=600');
-            break;
-            
-        case 'line':
-            const lineUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(url)}`;
-            window.open(lineUrl, '_blank', 'width=600,height=400');
-            break;
-            
-        case 'weibo':
-            const weiboUrl = `https://service.weibo.com/share/share.php?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`;
-            window.open(weiboUrl, '_blank', 'width=600,height=400');
-            break;
-            
-        case 'qq':
-            const qqUrl = `https://connect.qq.com/widget/shareqq/index.html?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}&desc=${encodeURIComponent(description)}`;
-            window.open(qqUrl, '_blank', 'width=600,height=400');
-            break;
-            
-        case 'whatsapp':
-            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(title + ' ' + url)}`;
-            window.open(whatsappUrl, '_blank');
-            break;
-            
-        case 'telegram':
-            const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`;
-            window.open(telegramUrl, '_blank');
-            break;
-            
-        case 'threads':
-            // Threads (Instagram's text-based app) sharing
-            const threadsUrl = `https://www.threads.net/intent/post?text=${encodeURIComponent(title + ' ' + url)}`;
-            window.open(threadsUrl, '_blank', 'width=600,height=400');
-            break;
-            
-        case 'kakao':
-            shareToKakao(title, description, url);
-            break;
-            
-        default:
-            copyCurrentURL();
-            break;
+    // footer.js의 copyCurrentURL 함수를 사용
+    if (typeof window.copyCurrentURL === 'function') {
+        window.copyCurrentURL();
+    } else {
+        // 백업 방식
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            alert('링크가 복사되었습니다!');
+        }).catch(() => {
+            const textArea = document.createElement('textarea');
+            textArea.value = window.location.href;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert('링크가 복사되었습니다!');
+        });
     }
 }
 
-function copyCurrentURL() {
-    navigator.clipboard.writeText(window.location.href).then(() => {
-        alert('링크가 복사되었습니다!');
-    }).catch(() => {
-        // 백업 방법
-        const textArea = document.createElement('textarea');
-        textArea.value = window.location.href;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        alert('링크가 복사되었습니다!');
-    });
-}
+// Footer 공유 기능과 동일한 방식으로 통합
+// footer.js에서 이미 정의된 함수들을 사용하도록 함
 
-// 전역 함수 노출
-window.shareContent = shareContent;
-window.copyURL = copyURL;
-window.shareCurrentPage = shareCurrentPage;
-window.copyCurrentURL = copyCurrentURL;
+// copyCurrentURL은 footer.js에서 제공하므로 제거
+
+// 전역 함수 노출 (footer.js와 충돌하지 않도록 조건부 노출)
+if (!window.shareContent) window.shareContent = shareContent;
+if (!window.copyURL) window.copyURL = copyURL;
+// shareCurrentPage와 copyCurrentURL은 footer.js에서 제공하므로 제거
 
 // 페이지 로드 시 초기화
 window.addEventListener('DOMContentLoaded', initializeContentDetail);
