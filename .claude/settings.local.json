@@ -50,7 +50,8 @@
       "Bash(npm run dev:*)",
       "Bash(mkdir:*)",
       "Bash(dir:*)",
-      "Bash(git config:*)"
+      "Bash(git config:*)",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []
