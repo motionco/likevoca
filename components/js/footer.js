@@ -450,7 +450,7 @@ window.shareToKakao = async function(title, description, url) {
       console.log('✅ 메타데이터에서 이미지 사용:', imageUrl);
     } else {
       const ogImage = document.querySelector('meta[property="og:image"]')?.content;
-      imageUrl = ogImage || 'https://likevoca.com/assets/og-image.jpg';
+      imageUrl = ogImage || 'https://likevoca.com/assets/hero.jpeg';
       console.log('📷 OG 또는 기본 이미지 사용:', imageUrl);
     }
     

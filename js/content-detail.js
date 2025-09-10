@@ -328,7 +328,7 @@ function renderContentDetail(version, contentData, language) {
         window.shareMetadata = {
             title: version.title,
             description: cleanDescription || 'LikeVoca 콘텐츠를 확인하세요.',
-            image: version.image || 'https://likevoca.com/assets/og-image.jpg',
+            image: version.image || 'https://likevoca.com/assets/hero.jpeg',
             url: window.location.href
         };
         
@@ -361,7 +361,7 @@ function updateMetaTags(version, contentData, language) {
     }
     
     const url = `https://likevoca.com/${language}/content-detail.html?id=${currentContentId}`;
-    const imageUrl = version.image || 'https://likevoca.com/assets/og-image.jpg';
+    const imageUrl = version.image || 'https://likevoca.com/assets/hero.jpeg';
     
     console.log('🏷️ 메타태그 업데이트:', {
         title: title.substring(0, 50),

@@ -1,43 +1,47 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- 동적 메타태그 - JavaScript로 업데이트 -->
-    <title>콘텐츠 로딩 중... - LikeVoca</title>
-    <meta name="description" content="LikeVoca 커뮤니티 콘텐츠를 확인하세요." />
-    <meta name="keywords" content="LikeVoca, 커뮤니티, 언어학습" />
-    
+    <title>LikeVoca - 개인화된 언어 학습 콘텐츠</title>
+    <meta name="description"
+        content="LikeVoca의 체계적인 언어학습 콘텐츠를 확인하세요. AI 기반 맞춤형 학습과 커뮤니티 기반 지식 공유로 효과적인 언어 습득을 지원합니다." />
+    <meta name="keywords" content="LikeVoca, 언어학습, AI학습, 커뮤니티, 개인화" />
+
     <!-- Open Graph 태그 (Facebook/LinkedIn 최적화) -->
-    <meta property="og:title" content="콘텐츠 로딩 중... - LikeVoca" />
-    <meta property="og:description" content="LikeVoca 커뮤니티 콘텐츠를 확인하세요." />
+    <meta property="og:title" content="LikeVoca - 개인화된 언어 학습 콘텐츠" />
+    <meta property="og:description"
+        content="LikeVoca의 체계적인 언어학습 콘텐츠를 확인하세요. AI 기반 맞춤형 학습과 커뮤니티 기반 지식 공유로 효과적인 언어 습득을 지원합니다." />
     <meta property="og:type" content="article" />
-    <meta property="og:url" content="" />
+    <meta property="og:url" content="https://likevoca.com/ko/content-detail.html" />
     <meta property="og:site_name" content="LikeVoca" />
     <meta property="og:locale" content="ko_KR" />
-    <meta property="og:image" content="https://www.likevoca.com/assets/images/logo-social.png" />
+    <meta property="og:image" content="https://likevoca.com/assets/hero.jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="LikeVoca - AI 기반 맞춤형 언어학습 플랫폼" />
     <meta property="og:updated_time" content="" />
-    
+
     <!-- Facebook 특화 태그 -->
     <meta property="fb:app_id" content="1234567890" />
-    
+
     <!-- Article 메타태그 -->
     <meta property="article:author" content="LikeVoca" />
     <meta property="article:publisher" content="https://likevoca.com" />
     <meta property="article:published_time" content="" />
-    
+
     <!-- Twitter Card 태그 -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="콘텐츠 로딩 중... - LikeVoca" />
-    <meta name="twitter:description" content="LikeVoca 커뮤니티 콘텐츠를 확인하세요." />
-    <meta name="twitter:image" content="https://www.likevoca.com/assets/images/logo-social.png" />
-    
+    <meta name="twitter:title" content="LikeVoca - 개인화된 언어 학습 콘텐츠" />
+    <meta name="twitter:description"
+        content="LikeVoca의 체계적인 언어학습 콘텐츠를 확인하세요. AI 기반 맞춤형 학습과 커뮤니티 기반 지식 공유로 효과적인 언어 습득을 지원합니다." />
+    <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
+
     <!-- Canonical URL - 동적 업데이트 -->
     <link rel="canonical" href="" />
-    
+
     <!-- Hreflang 태그 -->
     <link rel="alternate" hreflang="ko" href="" />
     <link rel="alternate" hreflang="en" href="" />
@@ -45,7 +49,7 @@
     <link rel="alternate" hreflang="zh" href="" />
     <link rel="alternate" hreflang="es" href="" />
     <link rel="alternate" hreflang="x-default" href="" />
-    
+
     <!-- JSON-LD 구조화 데이터 - 동적 업데이트 -->
     <script type="application/ld+json" id="structuredData">
     {
@@ -72,46 +76,49 @@
         }
     }
     </script>
-    
-    
+
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" 
-            integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" 
-            crossorigin="anonymous"></script>
-    
+    <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"
+        integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4"
+        crossorigin="anonymous"></script>
+
     <style>
         .content-detail {
             max-width: 800px;
             margin: 0 auto;
             line-height: 1.6;
         }
-        
-        .content-detail h1, .content-detail h2, .content-detail h3 {
+
+        .content-detail h1,
+        .content-detail h2,
+        .content-detail h3 {
             margin-top: 2rem;
             margin-bottom: 1rem;
         }
-        
+
         .content-detail p {
             margin-bottom: 1rem;
         }
-        
-        .content-detail ul, .content-detail ol {
+
+        .content-detail ul,
+        .content-detail ol {
             margin-bottom: 1rem;
             padding-left: 2rem;
         }
-        
+
         .content-detail li {
             margin-bottom: 0.5rem;
         }
-        
+
         .breadcrumb {
             background: #f8f9fa;
             padding: 1rem;
             border-radius: 0.5rem;
             margin-bottom: 2rem;
         }
-        
+
         .share-buttons {
             position: fixed;
             right: 2rem;
@@ -122,7 +129,7 @@
             gap: 0.5rem;
             z-index: 10;
         }
-        
+
         @media (max-width: 768px) {
             .share-buttons {
                 position: relative;
@@ -136,27 +143,29 @@
         }
     </style>
 </head>
+
 <body class="bg-gray-50">
     <!-- Header Component (기존 방식과 동일) -->
     <div id="navbar-container"></div>
-    
+
     <main class="container mx-auto px-4 py-8">
         <!-- 로딩 스크린 -->
         <div id="loadingScreen" class="text-center py-12">
             <i class="fas fa-spinner fa-spin text-4xl text-blue-600 mb-4"></i>
             <p class="text-gray-600">콘텐츠를 불러오는 중...</p>
         </div>
-        
+
         <!-- 에러 스크린 -->
         <div id="errorScreen" class="hidden text-center py-12">
             <i class="fas fa-exclamation-triangle text-4xl text-red-600 mb-4"></i>
             <h2 class="text-2xl font-bold text-gray-900 mb-4">콘텐츠를 찾을 수 없습니다</h2>
             <p class="text-gray-600 mb-6">요청하신 콘텐츠가 존재하지 않거나 삭제되었습니다.</p>
-            <a href="/locales/ko/community.html" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-200">
+            <a href="/locales/ko/community.html"
+                class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-200">
                 커뮤니티로 돌아가기
             </a>
         </div>
-        
+
         <!-- 콘텐츠 상세 -->
         <article id="contentDetail" class="hidden">
             <!-- 브레드크럼 네비게이션 -->
@@ -169,77 +178,98 @@
                     <span id="breadcrumbTitle" class="text-gray-700">콘텐츠</span>
                 </div>
             </nav>
-            
+
             <!-- 콘텐츠 헤더 -->
             <header class="mb-8">
                 <div class="flex items-center mb-4">
-                    <span id="contentCategory" class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">카테고리</span>
+                    <span id="contentCategory"
+                        class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">카테고리</span>
                     <span id="contentDate" class="text-gray-500 text-sm ml-4"></span>
                 </div>
                 <h1 id="contentTitle" class="text-4xl font-bold text-gray-900 mb-4">제목</h1>
                 <p id="contentSummary" class="text-xl text-gray-600">요약</p>
             </header>
-            
+
             <!-- 콘텐츠 본문 -->
             <div class="content-detail bg-white rounded-lg shadow-sm p-8">
                 <div id="contentBody" class="prose max-w-none">
                     <!-- 본문 내용 -->
                 </div>
             </div>
-            
+
             <!-- 태그 -->
             <div id="contentTags" class="mt-6 flex flex-wrap gap-2">
                 <!-- 동적 태그 -->
             </div>
-            
+
             <!-- 공유 버튼 (데스크톱) -->
             <div class="share-buttons hidden md:flex">
-                <button onclick="shareContent('kakao')" class="bg-yellow-400 text-white p-3 rounded-full hover:bg-yellow-500 transition duration-200" title="카카오톡 공유">
+                <button onclick="shareContent('kakao')"
+                    class="bg-yellow-400 text-white p-3 rounded-full hover:bg-yellow-500 transition duration-200"
+                    title="카카오톡 공유">
                     <i class="fas fa-comment"></i>
                 </button>
-                <button onclick="shareContent('facebook')" class="bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 transition duration-200" title="Facebook 공유">
+                <button onclick="shareContent('facebook')"
+                    class="bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 transition duration-200"
+                    title="Facebook 공유">
                     <i class="fab fa-facebook-f"></i>
                 </button>
-                <button onclick="shareContent('twitter')" class="bg-black text-white p-3 rounded-full hover:bg-gray-800 transition duration-200" title="X(트위터) 공유">
+                <button onclick="shareContent('twitter')"
+                    class="bg-black text-white p-3 rounded-full hover:bg-gray-800 transition duration-200"
+                    title="X(트위터) 공유">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        <path
+                            d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                     </svg>
                 </button>
-                <button onclick="shareContent('threads')" class="bg-black text-white p-3 rounded-full hover:bg-gray-800 transition duration-200" title="Threads 공유">
+                <button onclick="shareContent('threads')"
+                    class="bg-black text-white p-3 rounded-full hover:bg-gray-800 transition duration-200"
+                    title="Threads 공유">
                     <i class="fas fa-at"></i>
                 </button>
-                <button onclick="shareContent('linkedin')" class="bg-blue-700 text-white p-3 rounded-full hover:bg-blue-800 transition duration-200" title="LinkedIn 공유">
+                <button onclick="shareContent('linkedin')"
+                    class="bg-blue-700 text-white p-3 rounded-full hover:bg-blue-800 transition duration-200"
+                    title="LinkedIn 공유">
                     <i class="fab fa-linkedin"></i>
                 </button>
-                <button onclick="copyURL()" class="bg-gray-600 text-white p-3 rounded-full hover:bg-gray-700 transition duration-200" title="링크 복사">
+                <button onclick="copyURL()"
+                    class="bg-gray-600 text-white p-3 rounded-full hover:bg-gray-700 transition duration-200"
+                    title="링크 복사">
                     <i class="fas fa-link"></i>
                 </button>
             </div>
-            
+
             <!-- 공유 버튼 (모바일) -->
             <div class="share-buttons md:hidden">
-                <button onclick="shareContent('kakao')" class="bg-yellow-400 text-white p-3 rounded-lg hover:bg-yellow-500 transition duration-200">
+                <button onclick="shareContent('kakao')"
+                    class="bg-yellow-400 text-white p-3 rounded-lg hover:bg-yellow-500 transition duration-200">
                     <i class="fas fa-comment mr-2"></i>카카오톡
                 </button>
-                <button onclick="shareContent('facebook')" class="bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition duration-200">
+                <button onclick="shareContent('facebook')"
+                    class="bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition duration-200">
                     <i class="fab fa-facebook-f mr-2"></i>Facebook
                 </button>
-                <button onclick="shareContent('twitter')" class="bg-black text-white p-3 rounded-lg hover:bg-gray-800 transition duration-200">
+                <button onclick="shareContent('twitter')"
+                    class="bg-black text-white p-3 rounded-lg hover:bg-gray-800 transition duration-200">
                     <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        <path
+                            d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                     </svg>X(트위터)
                 </button>
-                <button onclick="shareContent('threads')" class="bg-black text-white p-3 rounded-lg hover:bg-gray-800 transition duration-200">
+                <button onclick="shareContent('threads')"
+                    class="bg-black text-white p-3 rounded-lg hover:bg-gray-800 transition duration-200">
                     <i class="fas fa-at mr-2"></i>Threads
                 </button>
-                <button onclick="shareContent('linkedin')" class="bg-blue-700 text-white p-3 rounded-lg hover:bg-blue-800 transition duration-200">
+                <button onclick="shareContent('linkedin')"
+                    class="bg-blue-700 text-white p-3 rounded-lg hover:bg-blue-800 transition duration-200">
                     <i class="fab fa-linkedin mr-2"></i>LinkedIn
                 </button>
-                <button onclick="copyURL()" class="bg-gray-600 text-white p-3 rounded-lg hover:bg-gray-700 transition duration-200">
+                <button onclick="copyURL()"
+                    class="bg-gray-600 text-white p-3 rounded-lg hover:bg-gray-700 transition duration-200">
                     <i class="fas fa-link mr-2"></i>링크 복사
                 </button>
             </div>
-            
+
             <!-- 관련 콘텐츠 -->
             <section id="relatedContent" class="mt-12">
                 <h3 class="text-2xl font-bold text-gray-900 mb-6">관련 콘텐츠</h3>
@@ -249,17 +279,18 @@
             </section>
         </article>
     </main>
-    
+
     <!-- Footer Component (기존 방식과 동일) -->
     <div id="footer-container"></div>
-    
+
     <!-- Scripts (기존 커뮤니티 페이지와 동일) -->
     <script type="module" src="../../utils/language-utils.js"></script>
     <script src="../../components/js/navbar.js"></script>
     <script src="../../components/js/footer.js"></script>
-    
+
     <!-- Firebase Config -->
     <script type="module" src="../../js/firebase/firebase-init.js"></script>
     <script type="module" src="../../js/content-detail.js"></script>
 </body>
+
 </html>
