@@ -1,4 +1,4 @@
-import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
 import {
   getAuth,
   onAuthStateChanged,
@@ -26,36 +26,23 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 import { collectionManager } from "./firebase-collection-manager.js";
 
-// 통일된 Firebase 설정 (LikeVoca 프로젝트)
+// 기본 Firebase 설정 (서버 요청 실패 시 폴백)
 const defaultConfig = {
-  apiKey: "AIzaSyDSM1m4UhrPiXpJINsaU1sN9GGT-Gz6-Bs",
-  authDomain: "likevoca-8a8a7.firebaseapp.com",
-  projectId: "likevoca-8a8a7",
-  storageBucket: "likevoca-8a8a7.appspot.com",
-  messagingSenderId: "398693466745",
-  appId: "1:398693466745:web:bb71ba8fc0e2f4e4ad72c6"
+  apiKey: "AIzaSyCPQVYE7h7odTDCkoH6mrsEtT1giWk8yDM",
+  authDomain: "uploadfile-e6f81.firebaseapp.com",
+  databaseURL:
+    "https://uploadfile-e6f81-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "uploadfile-e6f81",
+  storageBucket: "uploadfile-e6f81.appspot.com",
+  messagingSenderId: "663760434128",
+  appId: "1:663760434128:web:1ccbc92ab3e34670783fd5",
 };
 
-// 전역으로 선언 (초기화는 initializeFirebase에서 수행)
-let app;
-let auth;
-let db;
-let storage;
-
-// Firebase가 이미 초기화되었는지 확인하는 함수
-function getOrCreateFirebaseApp(config) {
-  try {
-    // 기존 앱이 있는지 확인
-    app = getApp('[DEFAULT]');
-    console.log('✅ 기존 Firebase 앱 사용');
-    return app;
-  } catch (error) {
-    // 앱이 없으면 새로 생성
-    console.log('🆕 새 Firebase 앱 생성');
-    app = initializeApp(config);
-    return app;
-  }
-}
+// 전역으로 선언하여 초기화
+let app = initializeApp(defaultConfig);
+let auth = getAuth(app);
+let db = getFirestore(app);
+let storage = getStorage(app);
 
 // Firebase 초기화 함수
 async function initializeFirebase() {
@@ -69,79 +56,52 @@ async function initializeFirebase() {
 
     if (isLocalEnvironment) {
       console.log(
-        "로컬 환경에서 실행 중입니다. LikeVoca Firebase 설정을 사용합니다."
+        "로컬 환경에서 실행 중입니다. 기본 Firebase 설정을 사용합니다."
       );
-      // 로컬과 프로덕션 모두 동일한 LikeVoca 프로젝트 사용
-      firebaseConfig = defaultConfig;
+      // 로컬 개발 환경에서 사용할 기본 설정
+      firebaseConfig = {
+        apiKey: "AIzaSyCPQVYE7h7odTDCkoH6mrsEtT1giWk8yDM",
+        authDomain: "uploadfile-e6f81.firebaseapp.com",
+        projectId: "uploadfile-e6f81",
+        storageBucket: "uploadfile-e6f81.appspot.com",
+        messagingSenderId: "663760434128",
+        appId: "1:663760434128:web:1ccbc92ab3e34670783fd5",
+        databaseURL:
+          "https://uploadfile-e6f81-default-rtdb.asia-southeast1.firebasedatabase.app",
+      };
     } else {
       // 배포 환경에서는 API에서 설정 가져오기
-      try {
-        const response = await fetch("/api/config");
-        if (!response.ok) {
-          throw new Error("서버 응답 실패");
-        }
-        const data = await response.json();
-        firebaseConfig = data.firebase;
-      } catch (error) {
-        console.warn("API에서 설정을 가져오는데 실패했습니다. LikeVoca 기본 설정을 사용합니다.");
-        firebaseConfig = defaultConfig;
+      const response = await fetch("/api/config");
+      if (!response.ok) {
+        throw new Error("서버 응답 실패");
       }
-    }
+      const data = await response.json();
+      firebaseConfig = data.firebase;
 
-    // Firebase 앱 초기화 (중복 방지)
-    app = getOrCreateFirebaseApp(firebaseConfig);
-    auth = getAuth(app);
-    db = getFirestore(app);
-    storage = getStorage(app);
-
-    // Firestore 오프라인 지원 활성화 (선택적)
-    try {
-      // Firestore 오프라인 데이터 지속성 활성화
-      // enableNetwork는 이미 기본적으로 활성화되어 있음
-      console.log("✅ Firestore 연결 설정 완료");
-    } catch (offlineError) {
-      console.warn("⚠️ Firestore 오프라인 설정 실패:", offlineError);
-    }
-
-    console.log("Firebase가 성공적으로 초기화되었습니다.");
-    
-    // 전역 객체 업데이트
-    updateGlobalObjects();
-  } catch (error) {
-    console.error("Firebase 초기화 중 오류:", error);
-    
-    // 최소한의 기본 설정으로 초기화
-    try {
-      firebaseConfig = defaultConfig;
-      app = getOrCreateFirebaseApp(firebaseConfig);
+      // 기존 앱 초기화 취소 후 새로운 설정으로 초기화
+      app = initializeApp(firebaseConfig);
       auth = getAuth(app);
       db = getFirestore(app);
       storage = getStorage(app);
-      console.log("기본 설정으로 Firebase 초기화 완료");
-      updateGlobalObjects();
-    } catch (fallbackError) {
-      console.error("Firebase 기본 초기화도 실패:", fallbackError);
     }
-  }
-}
 
-// 전역 객체 업데이트 함수
-function updateGlobalObjects() {
-  console.log('🔄 전역 객체 업데이트 중...', { app: !!app, auth: !!auth, db: !!db, storage: !!storage });
-  window.auth = auth;
-  window.db = db;
-  window.storage = storage;
-  window.onAuthStateChanged = onAuthStateChanged;
-  console.log('✅ 전역 객체 설정 완료:', { 'window.auth': !!window.auth, 'window.db': !!window.db });
+    console.log("Firebase가 성공적으로 초기화되었습니다.");
+  } catch (error) {
+    console.error(
+      "서버에서 Firebase 설정을 가져오지 못했습니다. 기본 설정을 사용합니다.",
+      error
+    );
+    // 오류가 발생해도 이미 defaultConfig로 초기화가 되어 있으므로 추가 작업 필요없음
+  }
 }
 
 // 페이지 로드 시 Firebase 초기화
 initializeFirebase();
 
-// 초기 전역 객체 설정 (firebase-init.js 로드 직후)
-window.auth = auth || null;
-window.db = db || null;  
-window.storage = storage || null;
+// 전역 접근을 위해 window 객체에 추가
+window.auth = auth;
+window.db = db;
+window.storage = storage;
 window.onAuthStateChanged = onAuthStateChanged;
 
 // 다국어 지원 언어 목록

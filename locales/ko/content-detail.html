@@ -15,7 +15,7 @@
     <meta property="og:url" content="" />
     <meta property="og:site_name" content="LikeVoca" />
     <meta property="og:locale" content="ko_KR" />
-    <meta property="og:image" content="https://likevoca.com/images/logo.png" />
+    <meta property="og:image" content="https://www.likevoca.com/assets/images/logo-social.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="LikeVoca - AI 기반 맞춤형 언어학습 플랫폼" />
@@ -33,7 +33,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="콘텐츠 로딩 중... - LikeVoca" />
     <meta name="twitter:description" content="LikeVoca 커뮤니티 콘텐츠를 확인하세요." />
-    <meta name="twitter:image" content="https://likevoca.com/images/logo.png" />
+    <meta name="twitter:image" content="https://www.likevoca.com/assets/images/logo-social.png" />
     
     <!-- Canonical URL - 동적 업데이트 -->
     <link rel="canonical" href="" />
@@ -73,77 +73,6 @@
     }
     </script>
     
-    <!-- 서버사이드 메타태그 프리렌더링 스크립트 -->
-    <script>
-        // URL 파라미터에서 콘텐츠 ID 추출하여 즉시 메타태그 업데이트
-        (function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const contentId = urlParams.get('id');
-            
-            if (contentId) {
-                // Firebase 콘텐츠 데이터를 즉시 로드하여 메타태그 업데이트
-                const script = document.createElement('script');
-                script.type = 'module';
-                script.textContent = `
-                    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
-                    import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
-                    import { getFirestore } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
-                    
-                    const firebaseConfig = {
-                        apiKey: "AIzaSyDSM1m4UhrPiXpJINsaU1sN9GGT-Gz6-Bs",
-                        authDomain: "likevoca-8a8a7.firebaseapp.com",
-                        projectId: "likevoca-8a8a7",
-                        storageBucket: "likevoca-8a8a7.appspot.com",
-                        messagingSenderId: "398693466745",
-                        appId: "1:398693466745:web:bb71ba8fc0e2f4e4ad72c6"
-                    };
-                    
-                    try {
-                        // Firebase 앱 중복 초기화 방지
-                        let app;
-                        try {
-                            app = getApp('[DEFAULT]');
-                            console.log('✅ 기존 Firebase 앱 사용 (프리렌더링)');
-                        } catch (error) {
-                            app = initializeApp(firebaseConfig);
-                            console.log('🆕 새 Firebase 앱 생성 (프리렌더링)');
-                        }
-                        const db = getFirestore(app);
-                        
-                        const contentRef = doc(db, 'content', '${contentId}');
-                        getDoc(contentRef).then(contentSnap => {
-                            if (contentSnap.exists()) {
-                                const contentData = contentSnap.data();
-                                const version = contentData.versions?.ko;
-                                
-                                if (version) {
-                                    const title = version.title + ' - LikeVoca';
-                                    const description = version.summary || version.content?.substring(0, 160) || 'LikeVoca 커뮤니티의 유용한 학습 콘텐츠';
-                                    const url = window.location.href;
-                                    
-                                    // 메타태그 즉시 업데이트
-                                    document.title = title;
-                                    document.querySelector('meta[name="description"]').content = description;
-                                    document.querySelector('meta[property="og:title"]').content = title;
-                                    document.querySelector('meta[property="og:description"]').content = description;
-                                    document.querySelector('meta[property="og:url"]').content = url;
-                                    document.querySelector('meta[name="twitter:title"]').content = title;
-                                    document.querySelector('meta[name="twitter:description"]').content = description;
-                                    
-                                    console.log('✅ 프리렌더링 메타태그 업데이트 완료');
-                                }
-                            }
-                        }).catch(err => {
-                            console.warn('프리렌더링 실패:', err);
-                        });
-                    } catch (error) {
-                        console.warn('Firebase 초기화 실패:', error);
-                    }
-                `;
-                document.head.appendChild(script);
-            }
-        })();
-    </script>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
