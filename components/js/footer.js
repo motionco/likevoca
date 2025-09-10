@@ -347,9 +347,9 @@ window.shareCurrentPage = function(platform) {
     const urlParams = new URLSearchParams(window.location.search);
     const contentId = urlParams.get('id');
     if (contentId) {
-      // 언어별 올바른 URL 생성 (메타태그와 일치)
-      currentUrl = `https://likevoca.com/${currentLanguage}/content-detail.html?id=${contentId.replace(/^(faq_|tip_|guide_)/, '')}`;
-      console.log('📝 언어별 URL 생성:', currentUrl);
+      // 언어별 올바른 URL 생성 (전체 콘텐츠 ID 유지, 추적 파라미터 제거)
+      currentUrl = `https://www.likevoca.com/${currentLanguage}/content-detail.html?id=${contentId}`;
+      console.log('📝 언어별 URL 생성 (깨끗한 URL):', currentUrl);
     }
     
     // 전역 공유 메타데이터가 있으면 우선 사용 (가장 신뢰할 수 있는 데이터)
