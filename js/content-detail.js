@@ -479,6 +479,15 @@ function updateMetaTags(version, contentData, language) {
     
     console.log('🌐 소셜 미디어 최적화 메타태그 설정 완료');
     
+    // 소셜 미디어 디버거 도구 안내 (개발 환경에서만)
+    if (window.location.hostname === 'localhost' || window.location.hostname.includes('127.0.0.1')) {
+        console.log('🔧 소셜 미디어 디버깅 도구:');
+        console.log('📘 Facebook: https://developers.facebook.com/tools/debug/');
+        console.log('💼 LinkedIn: https://www.linkedin.com/post-inspector/');
+        console.log('🐦 X(Twitter): https://cards-dev.twitter.com/validator');
+        console.log('📱 카카오톡: 실시간 업데이트됨');
+    }
+    
     // Hreflang 업데이트
     const languages = ['ko', 'en', 'ja', 'zh', 'es'];
     languages.forEach(lang => {
