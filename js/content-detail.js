@@ -200,16 +200,36 @@ function addBackupNavigation() {
     }
 }
 
-// 콘텐츠 상세 정보 로드
-async function loadContentDetail(contentId, language) {
+// 콘텐츠 상세 정보 로드 (재시도 로직 포함)
+async function loadContentDetail(contentId, language, retryCount = 0) {
+    const maxRetries = 3;
+    const retryDelay = 1000; // 1초
+    
     try {
         showLoading();
         
-        // Firestore에서 콘텐츠 조회
+        console.log(`📥 콘텐츠 로드 시도 ${retryCount + 1}/${maxRetries + 1}: ${contentId}`);
+        
+        // Firestore 연결 상태 확인
+        if (!db) {
+            throw new Error('Firestore가 초기화되지 않았습니다.');
+        }
+        
+        // Firestore에서 콘텐츠 조회 (타임아웃 포함)
         const contentRef = doc(db, 'content', contentId);
-        const contentSnap = await getDoc(contentRef);
+        
+        // 타임아웃 설정 (10초)
+        const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('요청 시간 초과')), 10000);
+        });
+        
+        const contentSnap = await Promise.race([
+            getDoc(contentRef),
+            timeoutPromise
+        ]);
         
         if (!contentSnap.exists()) {
+            console.warn(`❌ 콘텐츠를 찾을 수 없음: ${contentId}`);
             showError();
             return;
         }
@@ -217,10 +237,12 @@ async function loadContentDetail(contentId, language) {
         const contentData = contentSnap.data();
         currentContent = contentData;
         
+        console.log('✅ 콘텐츠 데이터 로드 성공:', contentData);
         
         // 언어별 버전 확인
         const version = contentData.versions?.[language];
         if (!version) {
+            console.warn(`❌ ${language} 언어 버전을 찾을 수 없음`);
             showError();
             return;
         }
@@ -228,14 +250,31 @@ async function loadContentDetail(contentId, language) {
         // 페이지 렌더링
         renderContentDetail(version, contentData, language);
         
-        // 관련 콘텐츠 로드
-        await loadRelatedContent(contentData.category, contentId, language);
+        // 관련 콘텐츠 로드 (비동기로 처리)
+        loadRelatedContent(contentData.category, contentId, language).catch(err => {
+            console.warn('관련 콘텐츠 로드 실패:', err);
+        });
         
         hideLoading();
         
     } catch (error) {
-        console.error('콘텐츠 로드 실패:', error);
-        showError();
+        console.error(`콘텐츠 로드 실패 (시도 ${retryCount + 1}/${maxRetries + 1}):`, error);
+        
+        // 재시도 로직
+        if (retryCount < maxRetries && (
+            error.message.includes('offline') ||
+            error.message.includes('network') ||
+            error.message.includes('timeout') ||
+            error.message.includes('시간 초과')
+        )) {
+            console.log(`🔄 ${retryDelay}ms 후 재시도...`);
+            setTimeout(() => {
+                loadContentDetail(contentId, language, retryCount + 1);
+            }, retryDelay);
+        } else {
+            console.error('❌ 모든 재시도 실패, 에러 페이지 표시');
+            showError();
+        }
     }
 }
 

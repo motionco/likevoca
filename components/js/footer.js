@@ -341,9 +341,13 @@ window.shareCurrentPage = function(platform) {
       shareToKakao(shortTitle, shortDescription, currentUrl);
       break;
     case 'facebook':
-      // Facebook은 OG 태그를 읽지만, 때로는 quote 파라미터를 추가하면 더 잘 작동함
-      console.log('📘 Facebook 공유:', { title: shortTitle, description: shortDescription });
-      const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}&quote=${encodeURIComponent(shortTitle + '\n\n' + shortDescription)}`;
+      // Facebook 공유 전 메타태그 검증
+      validateSocialMetaTags('Facebook');
+      
+      console.log('📘 Facebook 공유:', { title: shortTitle, description: shortDescription, url: currentUrl });
+      
+      // Facebook은 기본적으로 OG 태그를 읽으며, quote는 선택적 텍스트 추가
+      const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`;
       window.open(facebookUrl, '_blank', 'width=600,height=500,scrollbars=yes,resizable=yes');
       break;
     case 'twitter':
@@ -353,14 +357,14 @@ window.shareCurrentPage = function(platform) {
       window.open(twitterUrl, '_blank', 'width=600,height=400');
       break;
     case 'linkedin':
-      // LinkedIn은 새로운 API를 사용해야 함. 구형 URL은 deprecated됨
+      // LinkedIn 공유 전 메타태그 검증
+      validateSocialMetaTags('LinkedIn');
+      
       console.log('💼 LinkedIn 공유:', { title: shortTitle, description: shortDescription, url: currentUrl });
-      // LinkedIn의 새로운 공유 URL (text 포함)
-      const linkedinText = shortDescription ? `${shortTitle}\n\n${shortDescription}` : shortTitle;
-      const linkedinUrl = `https://www.linkedin.com/feed/update/urn:li:share:${Date.now()}/?text=${encodeURIComponent(linkedinText)}&url=${encodeURIComponent(currentUrl)}`;
-      // 혹은 간단한 버전
-      const linkedinSimpleUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentUrl)}`;
-      window.open(linkedinSimpleUrl, '_blank', 'width=600,height=500,scrollbars=yes,resizable=yes');
+      
+      // LinkedIn은 주로 OG 태그를 읽지만, URL 파라미터도 지원
+      const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentUrl)}&title=${encodeURIComponent(shortTitle)}&summary=${encodeURIComponent(shortDescription)}`;
+      window.open(linkedinUrl, '_blank', 'width=600,height=500,scrollbars=yes,resizable=yes');
       break;
     case 'threads':
       // Threads는 제목과 설명 포함
@@ -525,6 +529,52 @@ function fallbackCopyURL(url) {
   }
   
   document.body.removeChild(textArea);
+}
+
+// 소셜 미디어 메타태그 검증 함수
+function validateSocialMetaTags(platform) {
+  console.log(`🔍 ${platform} 메타태그 검증 시작`);
+  
+  const metaTags = {
+    'og:title': document.querySelector('meta[property="og:title"]')?.content,
+    'og:description': document.querySelector('meta[property="og:description"]')?.content,
+    'og:url': document.querySelector('meta[property="og:url"]')?.content,
+    'og:image': document.querySelector('meta[property="og:image"]')?.content,
+    'og:site_name': document.querySelector('meta[property="og:site_name"]')?.content,
+    'og:type': document.querySelector('meta[property="og:type"]')?.content,
+  };
+  
+  // Facebook 특화 검증
+  if (platform === 'Facebook') {
+    metaTags['fb:app_id'] = document.querySelector('meta[property="fb:app_id"]')?.content;
+    metaTags['article:author'] = document.querySelector('meta[property="article:author"]')?.content;
+  }
+  
+  // LinkedIn 특화 검증
+  if (platform === 'LinkedIn') {
+    metaTags['og:image:width'] = document.querySelector('meta[property="og:image:width"]')?.content;
+    metaTags['og:image:height'] = document.querySelector('meta[property="og:image:height"]')?.content;
+  }
+  
+  console.table(metaTags);
+  
+  // 누락된 중요 태그 확인
+  const missingTags = [];
+  const criticalTags = ['og:title', 'og:description', 'og:url', 'og:image'];
+  
+  criticalTags.forEach(tag => {
+    if (!metaTags[tag] || metaTags[tag].includes('로딩 중')) {
+      missingTags.push(tag);
+    }
+  });
+  
+  if (missingTags.length > 0) {
+    console.warn(`⚠️ ${platform} 공유에 필요한 메타태그 누락:`, missingTags);
+  } else {
+    console.log(`✅ ${platform} 메타태그 검증 통과`);
+  }
+  
+  return missingTags.length === 0;
 }
 
 // Footer 로드 함수 (전역으로 노출)

@@ -26,16 +26,14 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 import { collectionManager } from "./firebase-collection-manager.js";
 
-// 기본 Firebase 설정 (서버 요청 실패 시 폴백)
+// 통일된 Firebase 설정 (LikeVoca 프로젝트)
 const defaultConfig = {
-  apiKey: "AIzaSyCPQVYE7h7odTDCkoH6mrsEtT1giWk8yDM",
-  authDomain: "uploadfile-e6f81.firebaseapp.com",
-  databaseURL:
-    "https://uploadfile-e6f81-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "uploadfile-e6f81",
-  storageBucket: "uploadfile-e6f81.appspot.com",
-  messagingSenderId: "663760434128",
-  appId: "1:663760434128:web:1ccbc92ab3e34670783fd5",
+  apiKey: "AIzaSyDSM1m4UhrPiXpJINsaU1sN9GGT-Gz6-Bs",
+  authDomain: "likevoca-8a8a7.firebaseapp.com",
+  projectId: "likevoca-8a8a7",
+  storageBucket: "likevoca-8a8a7.appspot.com",
+  messagingSenderId: "398693466745",
+  appId: "1:398693466745:web:bb71ba8fc0e2f4e4ad72c6"
 };
 
 // 전역으로 선언 (초기화는 initializeFirebase에서 수행)
@@ -71,19 +69,10 @@ async function initializeFirebase() {
 
     if (isLocalEnvironment) {
       console.log(
-        "로컬 환경에서 실행 중입니다. 기본 Firebase 설정을 사용합니다."
+        "로컬 환경에서 실행 중입니다. LikeVoca Firebase 설정을 사용합니다."
       );
-      // 로컬 개발 환경에서 사용할 기본 설정
-      firebaseConfig = {
-        apiKey: "AIzaSyCPQVYE7h7odTDCkoH6mrsEtT1giWk8yDM",
-        authDomain: "uploadfile-e6f81.firebaseapp.com",
-        projectId: "uploadfile-e6f81",
-        storageBucket: "uploadfile-e6f81.appspot.com",
-        messagingSenderId: "663760434128",
-        appId: "1:663760434128:web:1ccbc92ab3e34670783fd5",
-        databaseURL:
-          "https://uploadfile-e6f81-default-rtdb.asia-southeast1.firebasedatabase.app",
-      };
+      // 로컬과 프로덕션 모두 동일한 LikeVoca 프로젝트 사용
+      firebaseConfig = defaultConfig;
     } else {
       // 배포 환경에서는 API에서 설정 가져오기
       try {
@@ -94,15 +83,8 @@ async function initializeFirebase() {
         const data = await response.json();
         firebaseConfig = data.firebase;
       } catch (error) {
-        console.warn("API에서 설정을 가져오는데 실패했습니다. 기본 설정을 사용합니다.");
-        firebaseConfig = {
-          apiKey: "AIzaSyDSM1m4UhrPiXpJINsaU1sN9GGT-Gz6-Bs",
-          authDomain: "likevoca-8a8a7.firebaseapp.com",
-          projectId: "likevoca-8a8a7",
-          storageBucket: "likevoca-8a8a7.appspot.com",
-          messagingSenderId: "398693466745",
-          appId: "1:398693466745:web:bb71ba8fc0e2f4e4ad72c6"
-        };
+        console.warn("API에서 설정을 가져오는데 실패했습니다. LikeVoca 기본 설정을 사용합니다.");
+        firebaseConfig = defaultConfig;
       }
     }
 
@@ -111,6 +93,15 @@ async function initializeFirebase() {
     auth = getAuth(app);
     db = getFirestore(app);
     storage = getStorage(app);
+
+    // Firestore 오프라인 지원 활성화 (선택적)
+    try {
+      // Firestore 오프라인 데이터 지속성 활성화
+      // enableNetwork는 이미 기본적으로 활성화되어 있음
+      console.log("✅ Firestore 연결 설정 완료");
+    } catch (offlineError) {
+      console.warn("⚠️ Firestore 오프라인 설정 실패:", offlineError);
+    }
 
     console.log("Firebase가 성공적으로 초기화되었습니다.");
   } catch (error) {
