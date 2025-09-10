@@ -463,8 +463,10 @@ function updateMetaTags(version, contentData, language) {
     updateMetaTag('og:image:width', '1200');
     updateMetaTag('og:image:height', '630');  
     updateMetaTag('og:image:alt', title);
-    updateMetaTag('twitter:image', finalImageUrl);
-    updateMetaTag('twitter:image:alt', title);
+    
+    // Twitter는 정적 HTML만 읽으므로 동적 업데이트 하지 않음 (정적 hero.jpeg 유지)
+    // updateMetaTag('twitter:image', finalImageUrl);
+    // updateMetaTag('twitter:image:alt', title);
     
     // Facebook/LinkedIn을 위한 추가 메타태그
     updateMetaTag('article:author', 'LikeVoca');
