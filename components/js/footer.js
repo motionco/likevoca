@@ -262,16 +262,8 @@ class FooterManager {
 
 // 전역 소셜 공유 함수들
 window.shareCurrentPage = function(platform) {
-  // 캐시 버스팅을 위한 URL 처리
+  // 현재 페이지 URL 가져오기
   let currentUrl = window.location.href;
-  
-  // 소셜 미디어 플랫폼별 캐시 우회
-  if (platform === 'facebook' || platform === 'linkedin' || platform === 'twitter') {
-    const separator = currentUrl.includes('?') ? '&' : '?';
-    const timestamp = Date.now();
-    currentUrl = `${currentUrl}${separator}_t=${timestamp}`;
-    console.log('🔄 캐시 버스팅 URL:', currentUrl);
-  }
   
   // HTML 태그 제거 함수 (강화된 버전)
   function stripHtml(html) {
@@ -380,9 +372,7 @@ window.shareCurrentPage = function(platform) {
       // Facebook 공유 전 메타태그 검증
       validateSocialMetaTags('Facebook');
       
-      console.log('📘 Facebook 공유:', { title: shortTitle, description: shortDescription, url: currentUrl });
-      
-      console.log('📘 Facebook 공유:', { title: shortTitle, description: shortDescription, url: currentUrl });
+      console.log('📘 Facebook 공유:', { title: shortTitle, description: shortDescription });
       
       const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}&quote=${encodeURIComponent(shortDescription)}`;
       window.open(facebookUrl, '_blank', 'width=600,height=500,scrollbars=yes,resizable=yes');
@@ -456,18 +446,22 @@ window.shareToKakao = async function(title, description, url) {
 
     console.log('카카오톡 공유 시도:', { title, description, url });
 
-    // 더 나은 이미지 URL 가져오기 (우선순위: 전역 메타데이터 > OG 태그 > 기본 이미지)
+    // 이미지 URL 선택 (우선순위: 전역 메타데이터 > OG 태그 > 기본 이미지)
     let imageUrl;
     if (window.shareMetadata?.image) {
       imageUrl = window.shareMetadata.image;
-      console.log('✅ 메타데이터에서 이미지 사용:', imageUrl);
+      console.log('✅ 메타데이터에서 이미지 사용');
     } else {
       const ogImage = document.querySelector('meta[property="og:image"]')?.content;
       imageUrl = ogImage || 'https://likevoca.com/assets/hero.jpeg';
-      console.log('📷 OG 또는 기본 이미지 사용:', imageUrl);
+      console.log('📷 기본 이미지 사용');
     }
     
-    console.log('🖼️ 이미지 URL:', imageUrl);
+    // 이미지 URL 유효성 검증
+    if (!imageUrl || !imageUrl.startsWith('http')) {
+      imageUrl = 'https://likevoca.com/assets/hero.jpeg';
+      console.warn('⚠️ 유효하지 않은 이미지 URL, 기본 이미지로 대체');
+    }
 
     // HTML 태그가 있는지 다시 한번 확인
     if (title.includes('<') || description.includes('<')) {
@@ -580,7 +574,7 @@ function fallbackCopyURL(url) {
 
 // 소셜 미디어 메타태그 검증 함수
 function validateSocialMetaTags(platform) {
-  console.log(`🔍 ${platform} 메타태그 검증 시작`);
+  console.log(`🔍 ${platform} 메타태그 검증`);
   
   const metaTags = {
     'og:title': document.querySelector('meta[property="og:title"]')?.content,
