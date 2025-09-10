@@ -382,27 +382,17 @@ window.shareCurrentPage = function(platform) {
       
       console.log('📘 Facebook 공유:', { title: shortTitle, description: shortDescription, url: currentUrl });
       
-      // Facebook 캐시 무효화를 위한 추가 파라미터
-      const fbTimestamp = Date.now();
-      const fbCacheUrl = `${currentUrl}&fb_cache=${fbTimestamp}`;
+      console.log('📘 Facebook 공유:', { title: shortTitle, description: shortDescription, url: currentUrl });
       
-      // Facebook Debugger에서 캐시 갱신 권장 알림
-      console.log('💡 Facebook 미리보기가 업데이트되지 않으면 Facebook Debugger에서 캐시를 갱신하세요: https://developers.facebook.com/tools/debug/');
-      
-      const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(fbCacheUrl)}&quote=${encodeURIComponent(shortDescription)}`;
+      const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}&quote=${encodeURIComponent(shortDescription)}`;
       window.open(facebookUrl, '_blank', 'width=600,height=500,scrollbars=yes,resizable=yes');
       break;
     case 'twitter':
-      // X(Twitter) 캐시 무효화를 위한 추가 파라미터
-      const twTimestamp = Date.now();
-      const twCacheUrl = `${currentUrl}&tw_cache=${twTimestamp}`;
-      
       // X(Twitter)는 제목과 설명 모두 포함
       const twitterText = shortDescription ? `${shortTitle}\n\n${shortDescription}` : shortTitle;
-      const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(twitterText)}&url=${encodeURIComponent(twCacheUrl)}`;
+      const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(twitterText)}&url=${encodeURIComponent(currentUrl)}`;
       
-      console.log('🐦 X(Twitter) 공유:', { text: twitterText, url: twCacheUrl });
-      console.log('💡 X(Twitter) 카드 미리보기가 업데이트되지 않으면 Twitter Card Validator에서 확인하세요: https://cards-dev.twitter.com/validator');
+      console.log('🐦 X(Twitter) 공유:', { text: twitterText, url: currentUrl });
       
       window.open(twitterUrl, '_blank', 'width=600,height=400');
       break;
@@ -412,15 +402,8 @@ window.shareCurrentPage = function(platform) {
       
       console.log('💼 LinkedIn 공유:', { title: shortTitle, description: shortDescription, url: currentUrl });
       
-      // LinkedIn 캐시 무효화를 위한 추가 파라미터
-      const liTimestamp = Date.now();
-      const liCacheUrl = `${currentUrl}&li_cache=${liTimestamp}`;
-      
-      // LinkedIn Post Inspector에서 캐시 갱신 권장 알림
-      console.log('💡 LinkedIn 미리보기가 업데이트되지 않으면 LinkedIn Post Inspector에서 캐시를 갱신하세요: https://www.linkedin.com/post-inspector/');
-      
       // LinkedIn은 주로 OG 태그를 읽지만, URL 파라미터도 지원
-      const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(liCacheUrl)}&title=${encodeURIComponent(shortTitle)}&summary=${encodeURIComponent(shortDescription)}`;
+      const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentUrl)}&title=${encodeURIComponent(shortTitle)}&summary=${encodeURIComponent(shortDescription)}`;
       window.open(linkedinUrl, '_blank', 'width=600,height=500,scrollbars=yes,resizable=yes');
       break;
     case 'threads':
