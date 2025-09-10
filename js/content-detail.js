@@ -304,25 +304,52 @@ function updateMetaTags(version, contentData, language) {
         hasHtmlTags: description.includes('<')
     });
     
-    // Title
+    // Title (다양한 플랫폼별 최적화)
     document.title = title;
     updateMetaTag('og:title', title);
     updateMetaTag('twitter:title', title);
+    updateMetaTag('og:site_name', 'LikeVoca');
     
-    // Description
+    // Description (더 견고한 설명 설정)
     updateMetaTag('description', description);
     updateMetaTag('og:description', description);
     updateMetaTag('twitter:description', description);
     
-    // URL
+    // URL (정규화된 URL 사용)
     updateMetaTag('og:url', url);
-    document.querySelector('link[rel="canonical"]').href = url;
-    
-    // Image
-    if (imageUrl) {
-        updateMetaTag('og:image', imageUrl);
-        updateMetaTag('twitter:image', imageUrl);
+    const canonicalLink = document.querySelector('link[rel="canonical"]');
+    if (canonicalLink) {
+        canonicalLink.href = url;
     }
+    
+    // Open Graph 타입 및 추가 메타태그
+    updateMetaTag('og:type', 'article');
+    updateMetaTag('og:locale', language === 'ko' ? 'ko_KR' : `${language}_${language.toUpperCase()}`);
+    
+    // Twitter Card 타입 설정
+    updateMetaTag('twitter:card', 'summary_large_image');
+    
+    // Image (더 견고한 이미지 처리)
+    const finalImageUrl = imageUrl || 'https://likevoca.com/images/logo.png';
+    updateMetaTag('og:image', finalImageUrl);
+    updateMetaTag('og:image:width', '1200');
+    updateMetaTag('og:image:height', '630');
+    updateMetaTag('og:image:alt', title);
+    updateMetaTag('twitter:image', finalImageUrl);
+    
+    // Facebook/LinkedIn을 위한 추가 메타태그
+    updateMetaTag('article:author', 'LikeVoca');
+    updateMetaTag('article:publisher', 'https://likevoca.com');
+    updateMetaTag('article:published_time', contentData.created_at ? new Date(contentData.created_at.toDate()).toISOString() : new Date().toISOString());
+    
+    // 소셜 미디어 캐시 새로고침을 위한 추가 설정
+    updateMetaTag('fb:app_id', '1234567890'); // 실제 Facebook App ID로 교체 필요
+    updateMetaTag('og:updated_time', new Date().toISOString());
+    
+    // LinkedIn 특화 메타태그
+    updateMetaTag('og:see_also', url);
+    
+    console.log('🌐 소셜 미디어 최적화 메타태그 설정 완료');
     
     // Hreflang 업데이트
     const languages = ['ko', 'en', 'ja', 'zh', 'es'];
@@ -341,19 +368,33 @@ function updateMetaTags(version, contentData, language) {
     }
 }
 
-// 메타 태그 헬퍼 함수
+// 메타 태그 헬퍼 함수 (동적 생성 포함)
 function updateMetaTag(property, content) {
     let selector;
+    let attributeName;
+    
+    // 메타태그 종류별 selector 및 attribute 결정
     if (property === 'description' || property === 'keywords') {
         selector = `meta[name="${property}"]`;
+        attributeName = 'name';
     } else {
         selector = `meta[property="${property}"]`;
+        attributeName = 'property';
     }
     
-    const element = document.querySelector(selector);
-    if (element) {
-        element.content = content;
+    let element = document.querySelector(selector);
+    
+    // 메타태그가 없으면 동적으로 생성
+    if (!element) {
+        element = document.createElement('meta');
+        element.setAttribute(attributeName, property);
+        document.head.appendChild(element);
+        console.log(`📋 메타태그 생성: ${property}`);
     }
+    
+    // 내용 업데이트
+    element.content = content;
+    console.log(`🏷️ 메타태그 업데이트: ${property} = ${content.substring(0, 50)}`);
 }
 
 // 구조화 데이터 업데이트

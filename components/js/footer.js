@@ -341,9 +341,10 @@ window.shareCurrentPage = function(platform) {
       shareToKakao(shortTitle, shortDescription, currentUrl);
       break;
     case 'facebook':
-      // Facebook은 자동으로 OG 태그를 읽어오므로 URL만 필요
-      const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`;
-      window.open(facebookUrl, '_blank', 'width=600,height=400');
+      // Facebook은 OG 태그를 읽지만, 때로는 quote 파라미터를 추가하면 더 잘 작동함
+      console.log('📘 Facebook 공유:', { title: shortTitle, description: shortDescription });
+      const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}&quote=${encodeURIComponent(shortTitle + '\n\n' + shortDescription)}`;
+      window.open(facebookUrl, '_blank', 'width=600,height=500,scrollbars=yes,resizable=yes');
       break;
     case 'twitter':
       // X(Twitter)는 제목과 설명 모두 포함
@@ -352,9 +353,14 @@ window.shareCurrentPage = function(platform) {
       window.open(twitterUrl, '_blank', 'width=600,height=400');
       break;
     case 'linkedin':
-      // LinkedIn은 제목, 요약, URL 모두 전달
-      const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentUrl)}&title=${encodeURIComponent(shortTitle)}&summary=${encodeURIComponent(shortDescription)}`;
-      window.open(linkedinUrl, '_blank', 'width=600,height=400');
+      // LinkedIn은 새로운 API를 사용해야 함. 구형 URL은 deprecated됨
+      console.log('💼 LinkedIn 공유:', { title: shortTitle, description: shortDescription, url: currentUrl });
+      // LinkedIn의 새로운 공유 URL (text 포함)
+      const linkedinText = shortDescription ? `${shortTitle}\n\n${shortDescription}` : shortTitle;
+      const linkedinUrl = `https://www.linkedin.com/feed/update/urn:li:share:${Date.now()}/?text=${encodeURIComponent(linkedinText)}&url=${encodeURIComponent(currentUrl)}`;
+      // 혹은 간단한 버전
+      const linkedinSimpleUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentUrl)}`;
+      window.open(linkedinSimpleUrl, '_blank', 'width=600,height=500,scrollbars=yes,resizable=yes');
       break;
     case 'threads':
       // Threads는 제목과 설명 포함

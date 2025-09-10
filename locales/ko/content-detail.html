@@ -74,7 +74,7 @@
                 script.type = 'module';
                 script.textContent = `
                     import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
-                    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+                    import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
                     import { getFirestore } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
                     
                     const firebaseConfig = {
@@ -87,7 +87,15 @@
                     };
                     
                     try {
-                        const app = initializeApp(firebaseConfig);
+                        // Firebase 앱 중복 초기화 방지
+                        let app;
+                        try {
+                            app = getApp('[DEFAULT]');
+                            console.log('✅ 기존 Firebase 앱 사용 (프리렌더링)');
+                        } catch (error) {
+                            app = initializeApp(firebaseConfig);
+                            console.log('🆕 새 Firebase 앱 생성 (프리렌더링)');
+                        }
                         const db = getFirestore(app);
                         
                         const contentRef = doc(db, 'content', '${contentId}');

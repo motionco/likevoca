@@ -1,4 +1,4 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
 import {
   getAuth,
   onAuthStateChanged,
@@ -38,11 +38,26 @@ const defaultConfig = {
   appId: "1:663760434128:web:1ccbc92ab3e34670783fd5",
 };
 
-// 전역으로 선언하여 초기화
-let app = initializeApp(defaultConfig);
-let auth = getAuth(app);
-let db = getFirestore(app);
-let storage = getStorage(app);
+// 전역으로 선언 (초기화는 initializeFirebase에서 수행)
+let app;
+let auth;
+let db;
+let storage;
+
+// Firebase가 이미 초기화되었는지 확인하는 함수
+function getOrCreateFirebaseApp(config) {
+  try {
+    // 기존 앱이 있는지 확인
+    app = getApp('[DEFAULT]');
+    console.log('✅ 기존 Firebase 앱 사용');
+    return app;
+  } catch (error) {
+    // 앱이 없으면 새로 생성
+    console.log('🆕 새 Firebase 앱 생성');
+    app = initializeApp(config);
+    return app;
+  }
+}
 
 // Firebase 초기화 함수
 async function initializeFirebase() {
@@ -71,27 +86,47 @@ async function initializeFirebase() {
       };
     } else {
       // 배포 환경에서는 API에서 설정 가져오기
-      const response = await fetch("/api/config");
-      if (!response.ok) {
-        throw new Error("서버 응답 실패");
+      try {
+        const response = await fetch("/api/config");
+        if (!response.ok) {
+          throw new Error("서버 응답 실패");
+        }
+        const data = await response.json();
+        firebaseConfig = data.firebase;
+      } catch (error) {
+        console.warn("API에서 설정을 가져오는데 실패했습니다. 기본 설정을 사용합니다.");
+        firebaseConfig = {
+          apiKey: "AIzaSyDSM1m4UhrPiXpJINsaU1sN9GGT-Gz6-Bs",
+          authDomain: "likevoca-8a8a7.firebaseapp.com",
+          projectId: "likevoca-8a8a7",
+          storageBucket: "likevoca-8a8a7.appspot.com",
+          messagingSenderId: "398693466745",
+          appId: "1:398693466745:web:bb71ba8fc0e2f4e4ad72c6"
+        };
       }
-      const data = await response.json();
-      firebaseConfig = data.firebase;
-
-      // 기존 앱 초기화 취소 후 새로운 설정으로 초기화
-      app = initializeApp(firebaseConfig);
-      auth = getAuth(app);
-      db = getFirestore(app);
-      storage = getStorage(app);
     }
+
+    // Firebase 앱 초기화 (중복 방지)
+    app = getOrCreateFirebaseApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getFirestore(app);
+    storage = getStorage(app);
 
     console.log("Firebase가 성공적으로 초기화되었습니다.");
   } catch (error) {
-    console.error(
-      "서버에서 Firebase 설정을 가져오지 못했습니다. 기본 설정을 사용합니다.",
-      error
-    );
-    // 오류가 발생해도 이미 defaultConfig로 초기화가 되어 있으므로 추가 작업 필요없음
+    console.error("Firebase 초기화 중 오류:", error);
+    
+    // 최소한의 기본 설정으로 초기화
+    try {
+      firebaseConfig = defaultConfig;
+      app = getOrCreateFirebaseApp(firebaseConfig);
+      auth = getAuth(app);
+      db = getFirestore(app);
+      storage = getStorage(app);
+      console.log("기본 설정으로 Firebase 초기화 완료");
+    } catch (fallbackError) {
+      console.error("Firebase 기본 초기화도 실패:", fallbackError);
+    }
   }
 }
 

@@ -59,69 +59,75 @@
     }
     </script>
     
-    <!-- 프리렌더링을 위한 SEO 최적화 스크립트 -->
+    <!-- 서버사이드 메타태그 프리렌더링 스크립트 -->
     <script>
+        // URL 파라미터에서 콘텐츠 ID 추출하여 즉시 메타태그 업데이트
         (function() {
-            const contentId = new URLSearchParams(window.location.search).get('id');
-            if (!contentId) return;
+            const urlParams = new URLSearchParams(window.location.search);
+            const contentId = urlParams.get('id');
             
-            // Firebase를 직접 사용하지 않고 캐시된 데이터 또는 API를 통해 기본 메타데이터만 설정
-            fetch(`https://likevoca-default-rtdb.firebaseio.com/community-content/${contentId}.json`)
-                .then(response => response.json())
-                .then(contentData => {
-                    if (contentData && contentData.versions?.es) {
-                        const esContent = contentData.versions.es;
+            if (contentId) {
+                // Firebase 콘텐츠 데이터를 즉시 로드하여 메타태그 업데이트
+                const script = document.createElement('script');
+                script.type = 'module';
+                script.textContent = `
+                    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
+                    import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+                    import { getFirestore } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
+                    
+                    const firebaseConfig = {
+                        apiKey: "AIzaSyDSM1m4UhrPiXpJINsaU1sN9GGT-Gz6-Bs",
+                        authDomain: "likevoca-8a8a7.firebaseapp.com",
+                        projectId: "likevoca-8a8a7",
+                        storageBucket: "likevoca-8a8a7.appspot.com",
+                        messagingSenderId: "398693466745",
+                        appId: "1:398693466745:web:bb71ba8fc0e2f4e4ad72c6"
+                    };
+                    
+                    try {
+                        // Firebase 앱 중복 초기화 방지
+                        let app;
+                        try {
+                            app = getApp('[DEFAULT]');
+                            console.log('✅ 기존 Firebase 앱 사용 (프리렌더링)');
+                        } catch (error) {
+                            app = initializeApp(firebaseConfig);
+                            console.log('🆕 새 Firebase 앱 생성 (프리렌더링)');
+                        }
+                        const db = getFirestore(app);
                         
-                        // 기본 메타 태그 업데이트
-                        document.title = (esContent.title || 'Contenido') + ' - LikeVoca';
-                        
-                        const description = esContent.summary || 'Contenido de aprendizaje útil de la comunidad LikeVoca';
-                        document.querySelector('meta[name="description"]').setAttribute('content', description);
-                        
-                        // Open Graph 태그 업데이트
-                        document.querySelector('meta[property="og:title"]').setAttribute('content', document.title);
-                        document.querySelector('meta[property="og:description"]').setAttribute('content', description);
-                        document.querySelector('meta[property="og:url"]').setAttribute('content', window.location.href);
-                        
-                        // Twitter Card 업데이트
-                        document.querySelector('meta[name="twitter:title"]').setAttribute('content', document.title);
-                        document.querySelector('meta[name="twitter:description"]').setAttribute('content', description);
-                        
-                        // Canonical URL 설정
-                        document.querySelector('link[rel="canonical"]').setAttribute('href', window.location.href);
-                        
-                        // 구조화된 데이터 업데이트
-                        const structuredData = {
-                            "@context": "https://schema.org",
-                            "@type": "Article",
-                            "headline": esContent.title || 'Contenido',
-                            "description": description,
-                            "author": {
-                                "@type": "Organization",
-                                "name": "LikeVoca"
-                            },
-                            "publisher": {
-                                "@type": "Organization", 
-                                "name": "LikeVoca",
-                                "url": "https://likevoca.com"
-                            },
-                            "url": window.location.href,
-                            "datePublished": contentData.createdAt || new Date().toISOString(),
-                            "dateModified": contentData.updatedAt || contentData.createdAt || new Date().toISOString(),
-                            "inLanguage": "es",
-                            "mainEntityOfPage": {
-                                "@type": "WebPage",
-                                "@id": window.location.href
+                        const contentRef = doc(db, 'content', '${contentId}');
+                        getDoc(contentRef).then(contentSnap => {
+                            if (contentSnap.exists()) {
+                                const contentData = contentSnap.data();
+                                const version = contentData.versions?.es;
+                                
+                                if (version) {
+                                    const title = version.title + ' - LikeVoca';
+                                    const description = version.summary || version.content?.substring(0, 160) || 'Contenido de aprendizaje útil de la comunidad LikeVoca';
+                                    const url = window.location.href;
+                                    
+                                    // 메타태그 즉시 업데이트
+                                    document.title = title;
+                                    document.querySelector('meta[name="description"]').content = description;
+                                    document.querySelector('meta[property="og:title"]').content = title;
+                                    document.querySelector('meta[property="og:description"]').content = description;
+                                    document.querySelector('meta[property="og:url"]').content = url;
+                                    document.querySelector('meta[name="twitter:title"]').content = title;
+                                    document.querySelector('meta[name="twitter:description"]').content = description;
+                                    
+                                    console.log('✅ Actualización de metaetiquetas de prerenderizado completada');
+                                }
                             }
-                        };
-                        
-                        document.getElementById('structuredData').textContent = JSON.stringify(structuredData, null, 2);
+                        }).catch(err => {
+                            console.warn('Prerenderizado falló:', err);
+                        });
+                    } catch (error) {
+                        console.warn('Firebase 초기화 실패:', error);
                     }
-                })
-                .catch(error => {
-                    // 오류 발생 시 기본값 유지
-                    console.warn('메타데이터를 로드할 수 없습니다:', error);
-                });
+                `;
+                document.head.appendChild(script);
+            }
         })();
     </script>
     
