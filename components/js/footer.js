@@ -266,67 +266,83 @@ window.shareCurrentPage = function(platform) {
   
   // HTML 태그 제거 함수 (강화된 버전)
   function stripHtml(html) {
-    if (!html) return '';
+    if (!html || typeof html !== 'string') return '';
     
-    // 임시 DOM 요소 생성하여 HTML 파싱
-    const tmp = document.createElement('div');
-    tmp.innerHTML = html;
-    
-    // 텍스트 추출
-    let text = tmp.textContent || tmp.innerText || '';
-    
-    // 추가 정리: 연속된 공백 및 개행 제거
-    text = text.replace(/\s+/g, ' ').trim();
-    
-    return text;
+    try {
+      // 임시 DOM 요소 생성하여 HTML 파싱
+      const tmp = document.createElement('div');
+      tmp.innerHTML = html;
+      
+      // 텍스트 추출
+      let text = tmp.textContent || tmp.innerText || '';
+      
+      // 추가 정리: 연속된 공백 및 개행 제거
+      text = text.replace(/\s+/g, ' ').trim();
+      
+      // 최대 길이 제한 (공유 시 너무 긴 텍스트 방지)
+      if (text.length > 300) {
+        text = text.substring(0, 297) + '...';
+      }
+      
+      return text;
+    } catch (error) {
+      console.warn('HTML 태그 제거 중 오류:', error);
+      // 폴백: 정규식으로 HTML 태그 제거
+      return html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+    }
   }
 
   // content-detail 페이지인 경우 실제 콘텐츠 정보 사용
   let pageTitle, pageDescription;
   
-  if (window.location.pathname.includes('content-detail.html')) {
-    console.log('🔍 Content Detail 페이지 공유 시도');
+  if (window.location.pathname.includes('content-detail.html') || window.location.pathname.includes('community')) {
+    console.log('🔍 콘텐츠/커뮤니티 상세 페이지 공유 시도');
     
-    // 콘텐츠가 아직 로드되지 않았다면 잠시 대기
-    if (!window.contentLoaded) {
+    // 전역 공유 메타데이터가 있으면 우선 사용 (가장 신뢰할 수 있는 데이터)
+    if (window.shareMetadata) {
+      console.log('✅ 전역 공유 메타데이터 사용');
+      pageTitle = window.shareMetadata.title + ' - LikeVoca';
+      pageDescription = stripHtml(window.shareMetadata.description);
+      console.log('🎯 메타데이터 기반 공유:', { 
+        title: pageTitle.substring(0, 50), 
+        description: pageDescription.substring(0, 100) 
+      });
+    } else if (!window.contentLoaded) {
+      // 콘텐츠가 아직 로드되지 않았다면 잠시 대기
       console.log('⏳ 콘텐츠 로딩 대기 중...');
       setTimeout(() => shareCurrentPage(platform), 500);
       return;
-    }
-    
-    const contentTitle = document.getElementById('contentTitle')?.textContent;
-    const contentSummary = document.getElementById('contentSummary')?.textContent;
-    const contentBody = document.getElementById('contentBody');
-    
-    console.log('📝 콘텐츠 요소들:', {
-      contentTitle,
-      contentSummary,
-      contentBodyHTML: contentBody?.innerHTML?.substring(0, 200),
-      contentBodyText: contentBody?.textContent?.substring(0, 200)
-    });
-    
-    pageTitle = contentTitle || document.title || 'LikeVoca';
-    
-    // 메타 태그에서 업데이트된 설명 우선 확인
-    const metaDescription = document.querySelector('meta[name="description"]')?.content;
-    
-    let rawDescription = '';
-    if (contentSummary && contentSummary.trim() && !contentSummary.includes('콘텐츠 로딩 중')) {
-      rawDescription = contentSummary;
-      console.log('✅ Summary 사용:', rawDescription.substring(0, 100));
-    } else if (metaDescription && !metaDescription.includes('콘텐츠 로딩 중') && !metaDescription.includes('LikeVoca 커뮤니티 콘텐츠')) {
-      rawDescription = metaDescription;
-      console.log('✅ Meta Description 사용:', rawDescription.substring(0, 100));
-    } else if (contentBody && contentBody.textContent && contentBody.textContent.trim()) {
-      rawDescription = contentBody.textContent.substring(0, 300);
-      console.log('✅ Body Text 사용:', rawDescription.substring(0, 100));
     } else {
-      rawDescription = 'AI 기반 맞춤형 언어학습 플랫폼';
-      console.log('⚠️ 기본 설명 사용');
+      // 폴백: DOM에서 직접 가져오기
+      const contentTitle = document.getElementById('contentTitle')?.textContent;
+      const contentSummary = document.getElementById('contentSummary')?.textContent;
+      const contentBody = document.getElementById('contentBody');
+      
+      console.log('📝 DOM에서 콘텐츠 추출');
+      
+      pageTitle = contentTitle || document.title || 'LikeVoca';
+      
+      // 메타 태그에서 업데이트된 설명 우선 확인
+      const metaDescription = document.querySelector('meta[name="description"]')?.content;
+      
+      let rawDescription = '';
+      if (contentSummary && contentSummary.trim() && !contentSummary.includes('콘텐츠 로딩 중')) {
+        rawDescription = contentSummary;
+        console.log('✅ Summary 사용:', rawDescription.substring(0, 100));
+      } else if (metaDescription && !metaDescription.includes('콘텐츠 로딩 중') && !metaDescription.includes('LikeVoca 커뮤니티 콘텐츠')) {
+        rawDescription = metaDescription;
+        console.log('✅ Meta Description 사용:', rawDescription.substring(0, 100));
+      } else if (contentBody && contentBody.textContent && contentBody.textContent.trim()) {
+        rawDescription = contentBody.textContent.substring(0, 300);
+        console.log('✅ Body Text 사용:', rawDescription.substring(0, 100));
+      } else {
+        rawDescription = 'AI 기반 맞춤형 언어학습 플랫폼';
+        console.log('⚠️ 기본 설명 사용');
+      }
+      
+      pageDescription = stripHtml(rawDescription);
+      console.log('🎯 최종 Description:', pageDescription.substring(0, 100));
     }
-    
-    pageDescription = stripHtml(rawDescription);
-    console.log('🎯 최종 Description:', pageDescription.substring(0, 100));
   } else {
     pageTitle = document.title || 'LikeVoca';
     pageDescription = document.querySelector('meta[name="description"]')?.content || 'AI 기반 맞춤형 언어학습 플랫폼';
@@ -416,9 +432,16 @@ window.shareToKakao = async function(title, description, url) {
 
     console.log('카카오톡 공유 시도:', { title, description, url });
 
-    // 더 나은 이미지 URL 가져오기
-    const ogImage = document.querySelector('meta[property="og:image"]')?.content;
-    const imageUrl = ogImage || window.location.origin + '/images/logo.png';
+    // 더 나은 이미지 URL 가져오기 (우선순위: 전역 메타데이터 > OG 태그 > 기본 이미지)
+    let imageUrl;
+    if (window.shareMetadata?.image) {
+      imageUrl = window.shareMetadata.image;
+      console.log('✅ 메타데이터에서 이미지 사용:', imageUrl);
+    } else {
+      const ogImage = document.querySelector('meta[property="og:image"]')?.content;
+      imageUrl = ogImage || 'https://likevoca.com/assets/og-image.jpg';
+      console.log('📷 OG 또는 기본 이미지 사용:', imageUrl);
+    }
     
     console.log('🖼️ 이미지 URL:', imageUrl);
 

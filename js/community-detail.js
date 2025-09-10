@@ -307,6 +307,20 @@ function renderContentDetail(version, contentData, language) {
     
     // 콘텐츠 표시
     document.getElementById('contentDetail').classList.remove('hidden');
+    
+    // 공유용 메타데이터를 전역 변수로 설정 (소셜 미디어 공유용)
+    window.shareMetadata = {
+        title: version.title,
+        description: version.summary || (version.content ? version.content.substring(0, 160) + '...' : ''),
+        image: version.image || 'https://likevoca.com/assets/og-image.jpg',
+        url: window.location.href
+    };
+    
+    // 공유 기능 활성화
+    window.contentLoaded = true;
+    
+    console.log('✅ 커뮤니티 콘텐츠 렌더링 완료, 공유 기능 활성화');
+    console.log('📤 공유 메타데이터 설정:', window.shareMetadata);
 }
 
 // 메타 태그 동적 업데이트
