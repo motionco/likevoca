@@ -458,12 +458,15 @@ function updateMetaTags(version, contentData, language) {
     updateMetaTag('twitter:card', 'summary_large_image');
     
     // Image (더 견고한 이미지 처리)
-    const finalImageUrl = imageUrl || 'https://likevoca.com/images/logo.png';
+    const finalImageUrl = imageUrl || 'https://likevoca.com/assets/hero.jpeg';
     updateMetaTag('og:image', finalImageUrl);
     updateMetaTag('og:image:width', '1200');
-    updateMetaTag('og:image:height', '630');
+    updateMetaTag('og:image:height', '630');  
     updateMetaTag('og:image:alt', title);
     updateMetaTag('twitter:image', finalImageUrl);
+    updateMetaTag('twitter:image:src', finalImageUrl);
+    updateMetaTag('twitter:image:width', '1200');
+    updateMetaTag('twitter:image:height', '630');
     
     // Facebook/LinkedIn을 위한 추가 메타태그
     updateMetaTag('article:author', 'LikeVoca');
