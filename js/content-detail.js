@@ -247,6 +247,22 @@ async function loadContentDetail(contentId, language, retryCount = 0) {
             return;
         }
         
+        console.log('📝 버전 데이터 확인:', {
+            title: version.title,
+            hasImage: !!version.image,
+            imageUrl: version.image,
+            hasImageUrl: !!version.image_url,
+            imageUrlField: version.image_url,
+            hasSummary: !!version.summary,
+            summary: version.summary?.substring(0, 100),
+            allImageFields: {
+                image: version.image,
+                image_url: version.image_url,
+                imageUrl: version.imageUrl,
+                images: version.images
+            }
+        });
+        
         // 페이지 렌더링
         renderContentDetail(version, contentData, language);
         
@@ -325,14 +341,25 @@ function renderContentDetail(version, contentData, language) {
             cleanDescription = stripHtmlForShare(version.content.substring(0, 160)) + '...';
         }
         
+        // 다양한 이미지 필드명 확인
+        const contentImage = version.image || version.image_url || version.imageUrl || 
+                            (version.images && version.images[0]) ||
+                            (contentData.image || contentData.image_url || contentData.imageUrl);
+        const finalImage = contentImage || 'https://likevoca.com/assets/hero.jpeg';
+        
         window.shareMetadata = {
             title: version.title,
             description: cleanDescription || 'LikeVoca 콘텐츠를 확인하세요.',
-            image: version.image || 'https://likevoca.com/assets/hero.jpeg',
+            image: finalImage,
             url: window.location.href
         };
         
         console.log('✅ 콘텐츠 렌더링 완료, 공유 기능 활성화');
+        console.log('🖼️ 콘텐츠 이미지 정보:', { 
+            hasContentImage: !!contentImage, 
+            contentImageUrl: contentImage,
+            finalImageUrl: finalImage 
+        });
         console.log('📤 공유 메타데이터 설정:', window.shareMetadata);
     }, 100);
 }
@@ -361,7 +388,11 @@ function updateMetaTags(version, contentData, language) {
     }
     
     const url = `https://likevoca.com/${language}/content-detail.html?id=${currentContentId}`;
-    const imageUrl = version.image || 'https://likevoca.com/assets/hero.jpeg';
+    // 다양한 이미지 필드명 확인 (메타태그용)
+    const imageUrl = version.image || version.image_url || version.imageUrl || 
+                    (version.images && version.images[0]) ||
+                    (contentData.image || contentData.image_url || contentData.imageUrl) ||
+                    'https://likevoca.com/assets/hero.jpeg';
     
     console.log('🏷️ 메타태그 업데이트:', {
         title: title.substring(0, 50),
