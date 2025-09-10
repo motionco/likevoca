@@ -259,20 +259,50 @@ function renderContentDetail(version, contentData, language) {
     const contentBody = document.getElementById('contentBody');
     contentBody.innerHTML = renderMarkdown(version.content);
     
-    
     // 태그 렌더링
     renderTags(version.tags || [], language);
     
     // 콘텐츠 표시
     document.getElementById('contentDetail').classList.remove('hidden');
+    
+    // 공유 버튼 활성화 (콘텐츠가 완전히 로드된 후)
+    setTimeout(() => {
+        enableSharingButtons();
+        console.log('✅ 콘텐츠 렌더링 완료, 공유 기능 활성화');
+    }, 100);
 }
 
 // 메타 태그 동적 업데이트
 function updateMetaTags(version, contentData, language) {
     const title = `${version.title} - LikeVoca`;
-    const description = version.summary || version.content.substring(0, 160) + '...';
+    
+    // HTML 태그 제거 함수
+    function stripHtml(html) {
+        if (!html) return '';
+        const tmp = document.createElement('div');
+        tmp.innerHTML = html;
+        let text = tmp.textContent || tmp.innerText || '';
+        return text.replace(/\s+/g, ' ').trim();
+    }
+    
+    // 설명 생성 - HTML 태그 제거하여 깔끔한 텍스트만 추출
+    let description = '';
+    if (version.summary && version.summary.trim()) {
+        description = stripHtml(version.summary);
+    } else if (version.content) {
+        description = stripHtml(version.content.substring(0, 160)) + '...';
+    } else {
+        description = 'LikeVoca 커뮤니티의 유용한 학습 콘텐츠를 확인하세요.';
+    }
+    
     const url = `https://likevoca.com/${language}/content-detail.html?id=${currentContentId}`;
     const imageUrl = version.image || 'https://likevoca.com/assets/og-image.jpg';
+    
+    console.log('🏷️ 메타태그 업데이트:', {
+        title: title.substring(0, 50),
+        description: description.substring(0, 100),
+        hasHtmlTags: description.includes('<')
+    });
     
     // Title
     document.title = title;
@@ -751,6 +781,21 @@ function copyURL() {
 if (!window.shareContent) window.shareContent = shareContent;
 if (!window.copyURL) window.copyURL = copyURL;
 // shareCurrentPage와 copyCurrentURL은 footer.js에서 제공하므로 제거
+
+// 공유 버튼 활성화
+function enableSharingButtons() {
+    // 공유 버튼들이 활성화되었음을 표시
+    const shareButtons = document.querySelectorAll('.share-buttons button');
+    shareButtons.forEach(button => {
+        button.disabled = false;
+        button.style.opacity = '1';
+    });
+    
+    // 전역 플래그 설정
+    window.contentLoaded = true;
+    
+    console.log('📢 공유 버튼 활성화 완료');
+}
 
 // 페이지 로드 시 초기화
 window.addEventListener('DOMContentLoaded', initializeContentDetail);

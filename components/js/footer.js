@@ -264,22 +264,69 @@ class FooterManager {
 window.shareCurrentPage = function(platform) {
   const currentUrl = window.location.href;
   
-  // HTML 태그 제거 함수
+  // HTML 태그 제거 함수 (강화된 버전)
   function stripHtml(html) {
+    if (!html) return '';
+    
+    // 임시 DOM 요소 생성하여 HTML 파싱
     const tmp = document.createElement('div');
     tmp.innerHTML = html;
-    return tmp.textContent || tmp.innerText || '';
+    
+    // 텍스트 추출
+    let text = tmp.textContent || tmp.innerText || '';
+    
+    // 추가 정리: 연속된 공백 및 개행 제거
+    text = text.replace(/\s+/g, ' ').trim();
+    
+    return text;
   }
 
   // content-detail 페이지인 경우 실제 콘텐츠 정보 사용
   let pageTitle, pageDescription;
   
   if (window.location.pathname.includes('content-detail.html')) {
+    console.log('🔍 Content Detail 페이지 공유 시도');
+    
+    // 콘텐츠가 아직 로드되지 않았다면 잠시 대기
+    if (!window.contentLoaded) {
+      console.log('⏳ 콘텐츠 로딩 대기 중...');
+      setTimeout(() => shareCurrentPage(platform), 500);
+      return;
+    }
+    
     const contentTitle = document.getElementById('contentTitle')?.textContent;
     const contentSummary = document.getElementById('contentSummary')?.textContent;
+    const contentBody = document.getElementById('contentBody');
+    
+    console.log('📝 콘텐츠 요소들:', {
+      contentTitle,
+      contentSummary,
+      contentBodyHTML: contentBody?.innerHTML?.substring(0, 200),
+      contentBodyText: contentBody?.textContent?.substring(0, 200)
+    });
     
     pageTitle = contentTitle || document.title || 'LikeVoca';
-    pageDescription = contentSummary ? stripHtml(contentSummary) : document.querySelector('meta[name="description"]')?.content || 'AI 기반 맞춤형 언어학습 플랫폼';
+    
+    // 메타 태그에서 업데이트된 설명 우선 확인
+    const metaDescription = document.querySelector('meta[name="description"]')?.content;
+    
+    let rawDescription = '';
+    if (contentSummary && contentSummary.trim() && !contentSummary.includes('콘텐츠 로딩 중')) {
+      rawDescription = contentSummary;
+      console.log('✅ Summary 사용:', rawDescription.substring(0, 100));
+    } else if (metaDescription && !metaDescription.includes('콘텐츠 로딩 중') && !metaDescription.includes('LikeVoca 커뮤니티 콘텐츠')) {
+      rawDescription = metaDescription;
+      console.log('✅ Meta Description 사용:', rawDescription.substring(0, 100));
+    } else if (contentBody && contentBody.textContent && contentBody.textContent.trim()) {
+      rawDescription = contentBody.textContent.substring(0, 300);
+      console.log('✅ Body Text 사용:', rawDescription.substring(0, 100));
+    } else {
+      rawDescription = 'AI 기반 맞춤형 언어학습 플랫폼';
+      console.log('⚠️ 기본 설명 사용');
+    }
+    
+    pageDescription = stripHtml(rawDescription);
+    console.log('🎯 최종 Description:', pageDescription.substring(0, 100));
   } else {
     pageTitle = document.title || 'LikeVoca';
     pageDescription = document.querySelector('meta[name="description"]')?.content || 'AI 기반 맞춤형 언어학습 플랫폼';
@@ -322,6 +369,12 @@ window.shareCurrentPage = function(platform) {
 
 window.shareToKakao = async function(title, description, url) {
   try {
+    console.log('🔥 카카오톡 공유 함수 호출됨:', { 
+      title: title.substring(0, 50), 
+      description: description.substring(0, 100),
+      url 
+    });
+    
     // 카카오 SDK 및 초기화 상태 확인
     if (typeof Kakao === 'undefined') {
       console.warn('카카오 SDK가 로드되지 않았습니다.');
@@ -356,9 +409,16 @@ window.shareToKakao = async function(title, description, url) {
     // 더 나은 이미지 URL 가져오기
     const ogImage = document.querySelector('meta[property="og:image"]')?.content;
     const imageUrl = ogImage || window.location.origin + '/images/logo.png';
+    
+    console.log('🖼️ 이미지 URL:', imageUrl);
+
+    // HTML 태그가 있는지 다시 한번 확인
+    if (title.includes('<') || description.includes('<')) {
+      console.warn('⚠️ HTML 태그가 여전히 포함됨:', { title, description });
+    }
 
     try {
-      await Kakao.Share.sendDefault({
+      const shareData = {
         objectType: 'feed',
         content: {
           title: title,
@@ -378,7 +438,11 @@ window.shareToKakao = async function(title, description, url) {
             }
           }
         ]
-      });
+      };
+      
+      console.log('📤 카카오 공유 데이터:', shareData);
+      
+      await Kakao.Share.sendDefault(shareData);
       console.log('✅ 카카오톡 공유 성공');
     } catch (shareError) {
       console.error('❌ 카카오톡 공유 실패:', shareError);
