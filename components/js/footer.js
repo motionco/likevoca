@@ -301,10 +301,12 @@ window.shareCurrentPage = function(platform) {
   // 현재 페이지의 메타데이터 추출
   let pageTitle, pageDescription, pageImage;
   
-  // 페이지 타입 감지
-  const isDetailPage = window.location.pathname.includes('content-detail.html') || 
-                       (window.location.pathname.includes('community') && window.location.search.includes('id='));
-  const isCommunityPage = window.location.pathname.includes('community');
+  // 페이지 타입 감지 (더 정확하게)
+  const isContentDetailPage = window.location.pathname.includes('content-detail.html');
+  const isCommunityListPage = window.location.pathname.includes('community') && !window.location.search.includes('id=');
+  const isCommunityDetailPage = window.location.pathname.includes('community') && window.location.search.includes('id=');
+  const isDetailPage = isContentDetailPage; // 콘텐츠 상세페이지만 상세페이지로 처리
+  const isCommunityPage = isCommunityListPage || isCommunityDetailPage;
   const isHomePage = window.location.pathname === '/' || window.location.pathname.includes('index.html');
   
   console.log('📄 페이지 타입:', { isDetailPage, isCommunityPage, isHomePage });
@@ -312,7 +314,7 @@ window.shareCurrentPage = function(platform) {
   // 기본적으로 현재 페이지의 메타태그에서 정보 추출
   const currentTitle = document.title;
   const currentDescription = document.querySelector('meta[name="description"]')?.content || '';
-  let currentImage = document.querySelector('meta[property="og:image"]')?.content || 'https://likevoca.vercel.app/assets/hero.webp';
+  let currentImage = document.querySelector('meta[property="og:image"]')?.content || 'https://www.likevoca.com/assets/hero.webp';
   
   // Firebase 이미지 우선 검색 (모든 페이지에서)
   const firebaseImageSources = [
@@ -407,6 +409,31 @@ window.shareCurrentPage = function(platform) {
       pageDescription = stripHtml(rawDescription);
       console.log('🎯 최종 Description:', pageDescription.substring(0, 100));
     }
+  } else if (isCommunityDetailPage) {
+    // 커뮤니티 상세페이지 - 콘텐츠 상세페이지와 다르게 처리
+    console.log('👥 커뮤니티 상세 페이지 공유 시도');
+    
+    // 커뮤니티 상세페이지는 실제 현재 URL 유지 (content-detail.html로 변경하지 않음)
+    // currentUrl은 그대로 유지
+    
+    // 전역 공유 메타데이터가 있으면 사용, 없으면 페이지 메타태그 사용
+    if (window.shareMetadata) {
+      console.log('✅ 커뮤니티 전역 공유 메타데이터 사용');
+      pageTitle = window.shareMetadata.title + ' - LikeVoca';
+      pageDescription = stripHtml(window.shareMetadata.description);
+      pageImage = window.shareMetadata.image || currentImage;
+    } else {
+      // 페이지 메타태그 사용
+      pageTitle = currentTitle;
+      pageDescription = stripHtml(currentDescription) || 'LikeVoca 커뮤니티 콘텐츠';
+      pageImage = currentImage;
+    }
+    
+    console.log('👥 커뮤니티 상세페이지 메타데이터:', { 
+      title: pageTitle.substring(0, 50), 
+      description: pageDescription.substring(0, 100),
+      image: pageImage 
+    });
   } else {
     // 일반 페이지 (홈페이지, 커뮤니티 목록 등)
     console.log('🏠 일반 페이지 공유 시도');
@@ -423,10 +450,44 @@ window.shareCurrentPage = function(platform) {
     });
   }
   
+  // 언어별 기본값 설정
+  function getLanguageDefaults(lang) {
+    const defaults = {
+      ko: {
+        platformName: 'AI 기반 맞춤형 언어학습 플랫폼',
+        communityContent: 'LikeVoca 커뮤니티 콘텐츠'
+      },
+      en: {
+        platformName: 'AI-powered personalized language learning platform',
+        communityContent: 'LikeVoca Community Content'
+      },
+      ja: {
+        platformName: 'AI駆動のカスタマイズ言語学習プラットフォーム',
+        communityContent: 'LikeVocaコミュニティコンテンツ'
+      },
+      zh: {
+        platformName: 'AI驱动的个性化语言学习平台',
+        communityContent: 'LikeVoca社区内容'
+      },
+      es: {
+        platformName: 'Plataforma de aprendizaje de idiomas personalizada con IA',
+        communityContent: 'Contenido de la comunidad LikeVoca'
+      }
+    };
+    return defaults[lang] || defaults.ko;
+  }
+
   // 최종 메타데이터가 설정되지 않은 경우 폴백
   if (!pageTitle || pageTitle === 'LikeVoca') {
     pageTitle = document.title || 'LikeVoca';
-    pageDescription = document.querySelector('meta[name="description"]')?.content || 'AI 기반 맞춤형 언어학습 플랫폼';
+    const langDefaults = getLanguageDefaults(currentLanguage);
+    pageDescription = document.querySelector('meta[name="description"]')?.content || langDefaults.platformName;
+  }
+  
+  // 기본 설명이 여전히 한국어인 경우 언어에 맞게 교체
+  if (pageDescription === 'AI 기반 맞춤형 언어학습 플랫폼' || pageDescription === 'LikeVoca 커뮤니티 콘텐츠') {
+    const langDefaults = getLanguageDefaults(currentLanguage);
+    pageDescription = isCommunityDetailPage ? langDefaults.communityContent : langDefaults.platformName;
   }
   
   // 길이 제한 (소셜 미디어 플랫폼별 권장 길이)
@@ -448,11 +509,15 @@ window.shareCurrentPage = function(platform) {
       window.open(facebookUrl, '_blank', 'width=600,height=500,scrollbars=yes,resizable=yes');
       break;
     case 'twitter':
+      // X(Twitter) 공유 전 메타태그 실시간 업데이트
+      updateSocialMetaTags(shortTitle, shortDescription, currentUrl, pageImage);
+      validateSocialMetaTags('X(Twitter)');
+      
       // X(Twitter)는 제목과 설명 모두 포함
       const twitterText = shortDescription ? `${shortTitle}\n\n${shortDescription}` : shortTitle;
       const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(twitterText)}&url=${encodeURIComponent(currentUrl)}`;
       
-      console.log('🐦 X(Twitter) 공유:', { text: twitterText, url: currentUrl });
+      console.log('🐦 X(Twitter) 공유:', { text: twitterText, url: currentUrl, image: pageImage });
       
       window.open(twitterUrl, '_blank', 'width=600,height=400');
       break;
@@ -468,9 +533,16 @@ window.shareCurrentPage = function(platform) {
       window.open(linkedinUrl, '_blank', 'width=600,height=500,scrollbars=yes,resizable=yes');
       break;
     case 'threads':
+      // Threads 공유 전 메타태그 실시간 업데이트
+      updateSocialMetaTags(shortTitle, shortDescription, currentUrl, pageImage);
+      validateSocialMetaTags('Threads');
+      
       // Threads는 제목과 설명 포함
       const threadsText = shortDescription ? `${shortTitle}\n\n${shortDescription}` : shortTitle;
       const threadsUrl = `https://www.threads.net/intent/post?text=${encodeURIComponent(threadsText + '\n\n' + currentUrl)}`;
+      
+      console.log('🧵 Threads 공유:', { text: threadsText, url: currentUrl, image: pageImage });
+      
       window.open(threadsUrl, '_blank', 'width=600,height=400');
       break;
     case 'reddit':
@@ -707,8 +779,10 @@ function updateSocialMetaTags(title, description, url, image) {
     
     if (!meta) {
       meta = document.createElement('meta');
-      if (property.startsWith('og:') || property.startsWith('twitter:')) {
+      if (property.startsWith('og:')) {
         meta.setAttribute('property', property);
+      } else if (property.startsWith('twitter:')) {
+        meta.setAttribute('name', property);
       } else {
         meta.setAttribute('name', property);
       }
@@ -728,9 +802,18 @@ function updateSocialMetaTags(title, description, url, image) {
   updateOrCreateMeta('og:image', image);
   
   // Twitter Card 메타태그 업데이트
+  updateOrCreateMeta('twitter:card', 'summary_large_image');
   updateOrCreateMeta('twitter:title', title);
   updateOrCreateMeta('twitter:description', description);
   updateOrCreateMeta('twitter:image', image);
+  updateOrCreateMeta('twitter:image:alt', title);
+  
+  // Open Graph 추가 메타태그
+  updateOrCreateMeta('og:type', 'website');
+  updateOrCreateMeta('og:site_name', 'LikeVoca');
+  updateOrCreateMeta('og:image:width', '1200');
+  updateOrCreateMeta('og:image:height', '630');
+  updateOrCreateMeta('og:image:alt', title);
   
   console.log('✅ 메타태그 업데이트 완료:', { title: title.substring(0, 30), description: description.substring(0, 50), url, image });
 }
