@@ -262,7 +262,16 @@ class FooterManager {
 
 // 전역 소셜 공유 함수들
 window.shareCurrentPage = function(platform) {
-  const currentUrl = window.location.href;
+  // 캐시 버스팅을 위한 URL 처리
+  let currentUrl = window.location.href;
+  
+  // 소셜 미디어 플랫폼별 캐시 우회
+  if (platform === 'facebook' || platform === 'linkedin' || platform === 'twitter') {
+    const separator = currentUrl.includes('?') ? '&' : '?';
+    const timestamp = Date.now();
+    currentUrl = `${currentUrl}${separator}_t=${timestamp}`;
+    console.log('🔄 캐시 버스팅 URL:', currentUrl);
+  }
   
   // HTML 태그 제거 함수 (강화된 버전)
   function stripHtml(html) {

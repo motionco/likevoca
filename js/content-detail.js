@@ -263,6 +263,14 @@ async function loadContentDetail(contentId, language, retryCount = 0) {
             }
         });
         
+        // 전체 버전 데이터와 콘텐츠 데이터에서 이미지 관련 필드 모두 확인
+        console.log('🔍 전체 데이터 이미지 필드 확인:', {
+            versionKeys: Object.keys(version),
+            contentDataKeys: Object.keys(contentData),
+            versionData: version,
+            contentData: contentData
+        });
+        
         // 페이지 렌더링
         renderContentDetail(version, contentData, language);
         
@@ -341,10 +349,21 @@ function renderContentDetail(version, contentData, language) {
             cleanDescription = stripHtmlForShare(version.content.substring(0, 160)) + '...';
         }
         
-        // 다양한 이미지 필드명 확인
-        const contentImage = version.image || version.image_url || version.imageUrl || 
-                            (version.images && version.images[0]) ||
-                            (contentData.image || contentData.image_url || contentData.imageUrl);
+        // 다양한 이미지 필드명 확인 및 HTML에서 이미지 추출
+        let contentImage = version.image || version.image_url || version.imageUrl || 
+                          (version.images && version.images[0]) ||
+                          (contentData.image || contentData.image_url || contentData.imageUrl);
+        
+        // HTML 콘텐츠에서 Firebase Storage 이미지 추출 시도
+        if (!contentImage && version.content) {
+            const imgRegex = /<img[^>]+src="([^"]*firebasestorage[^"]*)"[^>]*>/i;
+            const match = version.content.match(imgRegex);
+            if (match) {
+                contentImage = match[1];
+                console.log('📷 HTML에서 Firebase 이미지 추출:', contentImage);
+            }
+        }
+        
         const finalImage = contentImage || 'https://likevoca.com/assets/hero.jpeg';
         
         window.shareMetadata = {
@@ -388,11 +407,24 @@ function updateMetaTags(version, contentData, language) {
     }
     
     const url = `https://likevoca.com/${language}/content-detail.html?id=${currentContentId}`;
-    // 다양한 이미지 필드명 확인 (메타태그용)
-    const imageUrl = version.image || version.image_url || version.imageUrl || 
-                    (version.images && version.images[0]) ||
-                    (contentData.image || contentData.image_url || contentData.imageUrl) ||
-                    'https://likevoca.com/assets/hero.jpeg';
+    // 다양한 이미지 필드명 확인 및 HTML에서 이미지 추출 (메타태그용)
+    let imageUrl = version.image || version.image_url || version.imageUrl || 
+                  (version.images && version.images[0]) ||
+                  (contentData.image || contentData.image_url || contentData.imageUrl);
+    
+    // HTML 콘텐츠에서 Firebase Storage 이미지 추출 시도
+    if (!imageUrl && version.content) {
+        const imgRegex = /<img[^>]+src="([^"]*firebasestorage[^"]*)"[^>]*>/i;
+        const match = version.content.match(imgRegex);
+        if (match) {
+            imageUrl = match[1];
+            console.log('📷 메타태그용 HTML에서 Firebase 이미지 추출:', imageUrl);
+        }
+    }
+    
+    if (!imageUrl) {
+        imageUrl = 'https://likevoca.com/assets/hero.jpeg';
+    }
     
     console.log('🏷️ 메타태그 업데이트:', {
         title: title.substring(0, 50),
