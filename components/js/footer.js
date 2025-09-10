@@ -263,27 +263,56 @@ class FooterManager {
 // 전역 소셜 공유 함수들
 window.shareCurrentPage = function(platform) {
   const currentUrl = window.location.href;
-  const pageTitle = document.title || 'LikeVoca';
-  const pageDescription = document.querySelector('meta[name="description"]')?.content || 'AI 기반 맞춤형 언어학습 플랫폼';
+  
+  // HTML 태그 제거 함수
+  function stripHtml(html) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || '';
+  }
+
+  // content-detail 페이지인 경우 실제 콘텐츠 정보 사용
+  let pageTitle, pageDescription;
+  
+  if (window.location.pathname.includes('content-detail.html')) {
+    const contentTitle = document.getElementById('contentTitle')?.textContent;
+    const contentSummary = document.getElementById('contentSummary')?.textContent;
+    
+    pageTitle = contentTitle || document.title || 'LikeVoca';
+    pageDescription = contentSummary ? stripHtml(contentSummary) : document.querySelector('meta[name="description"]')?.content || 'AI 기반 맞춤형 언어학습 플랫폼';
+  } else {
+    pageTitle = document.title || 'LikeVoca';
+    pageDescription = document.querySelector('meta[name="description"]')?.content || 'AI 기반 맞춤형 언어학습 플랫폼';
+  }
+  
+  // 길이 제한 (소셜 미디어 플랫폼별 권장 길이)
+  const shortTitle = pageTitle.length > 60 ? pageTitle.substring(0, 57) + '...' : pageTitle;
+  const shortDescription = pageDescription.length > 160 ? pageDescription.substring(0, 157) + '...' : pageDescription;
 
   switch (platform) {
     case 'kakao':
-      shareToKakao(pageTitle, pageDescription, currentUrl);
+      shareToKakao(shortTitle, shortDescription, currentUrl);
       break;
     case 'facebook':
+      // Facebook은 자동으로 OG 태그를 읽어오므로 URL만 필요
       const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`;
       window.open(facebookUrl, '_blank', 'width=600,height=400');
       break;
     case 'twitter':
-      const twitterUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(pageTitle)}`;
+      // X(Twitter)는 제목과 설명 모두 포함
+      const twitterText = shortDescription ? `${shortTitle}\n\n${shortDescription}` : shortTitle;
+      const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(twitterText)}&url=${encodeURIComponent(currentUrl)}`;
       window.open(twitterUrl, '_blank', 'width=600,height=400');
       break;
     case 'linkedin':
-      const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentUrl)}`;
+      // LinkedIn은 제목, 요약, URL 모두 전달
+      const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentUrl)}&title=${encodeURIComponent(shortTitle)}&summary=${encodeURIComponent(shortDescription)}`;
       window.open(linkedinUrl, '_blank', 'width=600,height=400');
       break;
     case 'threads':
-      const threadsUrl = `https://www.threads.net/intent/post?text=${encodeURIComponent(pageTitle + ' ' + currentUrl)}`;
+      // Threads는 제목과 설명 포함
+      const threadsText = shortDescription ? `${shortTitle}\n\n${shortDescription}` : shortTitle;
+      const threadsUrl = `https://www.threads.net/intent/post?text=${encodeURIComponent(threadsText + '\n\n' + currentUrl)}`;
       window.open(threadsUrl, '_blank', 'width=600,height=400');
       break;
     default:
@@ -324,13 +353,17 @@ window.shareToKakao = async function(title, description, url) {
 
     console.log('카카오톡 공유 시도:', { title, description, url });
 
+    // 더 나은 이미지 URL 가져오기
+    const ogImage = document.querySelector('meta[property="og:image"]')?.content;
+    const imageUrl = ogImage || window.location.origin + '/images/logo.png';
+
     try {
       await Kakao.Share.sendDefault({
         objectType: 'feed',
         content: {
           title: title,
           description: description,
-          imageUrl: window.location.origin + '/images/logo.png',
+          imageUrl: imageUrl,
           link: {
             mobileWebUrl: url,
             webUrl: url

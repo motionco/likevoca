@@ -555,12 +555,22 @@ function shareContent(platform) {
     if (typeof window.shareCurrentPage === 'function') {
         window.shareCurrentPage(platform);
     } else {
-        // 백업 방식
+        // 백업 방식 - HTML 태그 제거 포함
         if (!currentContent) return;
         
-        const title = document.getElementById('contentTitle').textContent;
+        function stripHtml(html) {
+            const tmp = document.createElement('div');
+            tmp.innerHTML = html;
+            return tmp.textContent || tmp.innerText || '';
+        }
+        
+        const title = document.getElementById('contentTitle')?.textContent || 'LikeVoca';
         const url = window.location.href;
-        const text = document.getElementById('contentSummary').textContent;
+        const summaryText = document.getElementById('contentSummary')?.textContent;
+        const text = summaryText ? stripHtml(summaryText) : '';
+        
+        const shortTitle = title.length > 60 ? title.substring(0, 57) + '...' : title;
+        const shortText = text.length > 160 ? text.substring(0, 157) + '...' : text;
         
         switch (platform) {
             case 'facebook':
@@ -569,12 +579,24 @@ function shareContent(platform) {
                 break;
                 
             case 'twitter':
-                const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`;
+                const twitterTextContent = shortText ? `${shortTitle}\n\n${shortText}` : shortTitle;
+                const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(twitterTextContent)}&url=${encodeURIComponent(url)}`;
                 window.open(twitterUrl, '_blank', 'width=600,height=400');
                 break;
                 
+            case 'linkedin':
+                const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}&title=${encodeURIComponent(shortTitle)}&summary=${encodeURIComponent(shortText)}`;
+                window.open(linkedinUrl, '_blank', 'width=600,height=400');
+                break;
+                
+            case 'threads':
+                const threadsTextContent = shortText ? `${shortTitle}\n\n${shortText}` : shortTitle;
+                const threadsUrl = `https://www.threads.net/intent/post?text=${encodeURIComponent(threadsTextContent + '\n\n' + url)}`;
+                window.open(threadsUrl, '_blank', 'width=600,height=400');
+                break;
+                
             case 'kakao':
-                shareToKakao(title, text, url);
+                shareToKakao(shortTitle, shortText, url);
                 break;
         }
     }
