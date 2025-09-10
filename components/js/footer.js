@@ -262,8 +262,13 @@ class FooterManager {
 
 // 전역 소셜 공유 함수들
 window.shareCurrentPage = function(platform) {
-  // 현재 페이지 URL 가져오기
+  // 현재 페이지 URL 가져오기 및 언어 감지
   let currentUrl = window.location.href;
+  
+  // 현재 언어 감지 (URL 경로에서)
+  const pathMatch = window.location.pathname.match(/\/([a-z]{2})\//);
+  const currentLanguage = pathMatch ? pathMatch[1] : 'ko';
+  console.log('🌐 현재 감지된 언어:', currentLanguage);
   
   // HTML 태그 제거 함수 (강화된 버전)
   function stripHtml(html) {
@@ -302,6 +307,15 @@ window.shareCurrentPage = function(platform) {
   
   if (isDetailPage) {
     console.log('🔍 콘텐츠/커뮤니티 상세 페이지 공유 시도');
+    
+    // URL을 올바른 언어별 형태로 정규화
+    const urlParams = new URLSearchParams(window.location.search);
+    const contentId = urlParams.get('id');
+    if (contentId) {
+      // 언어별 올바른 URL 생성 (메타태그와 일치)
+      currentUrl = `https://likevoca.com/${currentLanguage}/content-detail.html?id=${contentId.replace(/^(faq_|tip_|guide_)/, '')}`;
+      console.log('📝 언어별 URL 생성:', currentUrl);
+    }
     
     // 전역 공유 메타데이터가 있으면 우선 사용 (가장 신뢰할 수 있는 데이터)
     if (window.shareMetadata) {
@@ -369,7 +383,8 @@ window.shareCurrentPage = function(platform) {
       shareToKakao(shortTitle, shortDescription, currentUrl);
       break;
     case 'facebook':
-      // Facebook 공유 전 메타태그 검증
+      // Facebook 공유 전 메타태그 실시간 업데이트
+      updateSocialMetaTags(shortTitle, shortDescription, currentUrl);
       validateSocialMetaTags('Facebook');
       
       console.log('📘 Facebook 공유:', { title: shortTitle, description: shortDescription });
@@ -387,7 +402,8 @@ window.shareCurrentPage = function(platform) {
       window.open(twitterUrl, '_blank', 'width=600,height=400');
       break;
     case 'linkedin':
-      // LinkedIn 공유 전 메타태그 검증
+      // LinkedIn 공유 전 메타태그 실시간 업데이트
+      updateSocialMetaTags(shortTitle, shortDescription, currentUrl);
       validateSocialMetaTags('LinkedIn');
       
       console.log('💼 LinkedIn 공유:', { title: shortTitle, description: shortDescription, url: currentUrl });
@@ -570,6 +586,36 @@ function fallbackCopyURL(url) {
   }
   
   document.body.removeChild(textArea);
+}
+
+// 소셜 미디어 메타태그 실시간 업데이트 함수
+function updateSocialMetaTags(title, description, url) {
+  console.log('🔄 소셜 미디어 메타태그 실시간 업데이트');
+  
+  // 기본 메타태그 업데이트
+  const titleMeta = document.querySelector('meta[name="description"]');
+  if (titleMeta) titleMeta.content = description;
+  
+  // Open Graph 메타태그 업데이트
+  const ogTitleMeta = document.querySelector('meta[property="og:title"]');
+  if (ogTitleMeta) ogTitleMeta.content = title;
+  
+  const ogDescMeta = document.querySelector('meta[property="og:description"]');
+  if (ogDescMeta) ogDescMeta.content = description;
+  
+  const ogUrlMeta = document.querySelector('meta[property="og:url"]');
+  if (ogUrlMeta) ogUrlMeta.content = url;
+  
+  // 이미지 메타태그 업데이트 (전역 메타데이터에서 가져오기)
+  if (window.shareMetadata?.image) {
+    const ogImageMeta = document.querySelector('meta[property="og:image"]');
+    if (ogImageMeta) {
+      ogImageMeta.content = window.shareMetadata.image;
+      console.log('🖼️ OG 이미지 메타태그 업데이트:', window.shareMetadata.image);
+    }
+  }
+  
+  console.log('✅ 메타태그 업데이트 완료');
 }
 
 // 소셜 미디어 메타태그 검증 함수
