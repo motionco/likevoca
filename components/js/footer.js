@@ -298,12 +298,47 @@ window.shareCurrentPage = function(platform) {
     }
   }
 
-  // content-detail 페이지인 경우 실제 콘텐츠 정보 사용
-  let pageTitle, pageDescription;
+  // 현재 페이지의 메타데이터 추출
+  let pageTitle, pageDescription, pageImage;
   
-  // 상세 페이지 여부 확인 (content-detail.html 또는 URL에 id 파라미터가 있는 경우)
+  // 페이지 타입 감지
   const isDetailPage = window.location.pathname.includes('content-detail.html') || 
                        (window.location.pathname.includes('community') && window.location.search.includes('id='));
+  const isCommunityPage = window.location.pathname.includes('community');
+  const isHomePage = window.location.pathname === '/' || window.location.pathname.includes('index.html');
+  
+  console.log('📄 페이지 타입:', { isDetailPage, isCommunityPage, isHomePage });
+  
+  // 기본적으로 현재 페이지의 메타태그에서 정보 추출
+  const currentTitle = document.title;
+  const currentDescription = document.querySelector('meta[name="description"]')?.content || '';
+  let currentImage = document.querySelector('meta[property="og:image"]')?.content || 'https://likevoca.vercel.app/assets/hero.webp';
+  
+  // Firebase 이미지 우선 검색 (모든 페이지에서)
+  const firebaseImageSources = [
+    () => window.shareMetadata?.image,
+    () => window.imageUrl,
+    () => window.coverImage,
+    () => window.thumbnailUrl,
+    () => window.featuredImage,
+    () => document.querySelector('meta[property="og:image"]')?.content
+  ];
+  
+  for (const source of firebaseImageSources) {
+    const image = source();
+    if (image && typeof image === 'string' && image.trim() && 
+        !image.includes('/assets/') && !image.includes('hero.')) {
+      currentImage = image;
+      console.log('🔥 Firebase 이미지 발견:', currentImage);
+      break;
+    }
+  }
+  
+  console.log('📋 페이지 기본 메타데이터:', { 
+    title: currentTitle, 
+    description: currentDescription.substring(0, 100),
+    image: currentImage 
+  });
   
   if (isDetailPage) {
     console.log('🔍 콘텐츠/커뮤니티 상세 페이지 공유 시도');
@@ -322,9 +357,11 @@ window.shareCurrentPage = function(platform) {
       console.log('✅ 전역 공유 메타데이터 사용');
       pageTitle = window.shareMetadata.title + ' - LikeVoca';
       pageDescription = stripHtml(window.shareMetadata.description);
+      pageImage = window.shareMetadata.image || currentImage; // Firebase 이미지 이미 currentImage에 반영됨
       console.log('🎯 메타데이터 기반 공유:', { 
         title: pageTitle.substring(0, 50), 
-        description: pageDescription.substring(0, 100) 
+        description: pageDescription.substring(0, 100),
+        image: pageImage 
       });
     } else if (!window.contentLoaded) {
       // 콘텐츠가 아직 로드되지 않았다면 잠시 대기 (최대 5초)
@@ -339,14 +376,15 @@ window.shareCurrentPage = function(platform) {
         window.shareWaitCount = 0; // 리셋
       }
     } else {
-      // 폴백: DOM에서 직접 가져오기
+      // 상세 페이지 - 폴백: DOM에서 직접 가져오기
       const contentTitle = document.getElementById('contentTitle')?.textContent;
       const contentSummary = document.getElementById('contentSummary')?.textContent;
       const contentBody = document.getElementById('contentBody');
       
       console.log('📝 DOM에서 콘텐츠 추출');
       
-      pageTitle = contentTitle || document.title || 'LikeVoca';
+      pageTitle = contentTitle || currentTitle || 'LikeVoca';
+      pageImage = currentImage; // 기본 OG 이미지 사용
       
       // 메타 태그에서 업데이트된 설명 우선 확인
       const metaDescription = document.querySelector('meta[name="description"]')?.content;
@@ -370,6 +408,23 @@ window.shareCurrentPage = function(platform) {
       console.log('🎯 최종 Description:', pageDescription.substring(0, 100));
     }
   } else {
+    // 일반 페이지 (홈페이지, 커뮤니티 목록 등)
+    console.log('🏠 일반 페이지 공유 시도');
+    
+    // 현재 페이지의 메타태그 정보 사용
+    pageTitle = currentTitle;
+    pageDescription = stripHtml(currentDescription) || 'LikeVoca - AI 기반 맞춤형 언어학습 플랫폼';
+    pageImage = currentImage;
+    
+    console.log('📄 일반 페이지 메타데이터:', { 
+      title: pageTitle, 
+      description: pageDescription.substring(0, 100),
+      image: pageImage 
+    });
+  }
+  
+  // 최종 메타데이터가 설정되지 않은 경우 폴백
+  if (!pageTitle || pageTitle === 'LikeVoca') {
     pageTitle = document.title || 'LikeVoca';
     pageDescription = document.querySelector('meta[name="description"]')?.content || 'AI 기반 맞춤형 언어학습 플랫폼';
   }
@@ -384,10 +439,10 @@ window.shareCurrentPage = function(platform) {
       break;
     case 'facebook':
       // Facebook 공유 전 메타태그 실시간 업데이트
-      updateSocialMetaTags(shortTitle, shortDescription, currentUrl);
+      updateSocialMetaTags(shortTitle, shortDescription, currentUrl, pageImage);
       validateSocialMetaTags('Facebook');
       
-      console.log('📘 Facebook 공유:', { title: shortTitle, description: shortDescription });
+      console.log('📘 Facebook 공유:', { title: shortTitle, description: shortDescription, image: pageImage });
       
       const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}&quote=${encodeURIComponent(shortDescription)}`;
       window.open(facebookUrl, '_blank', 'width=600,height=500,scrollbars=yes,resizable=yes');
@@ -403,10 +458,10 @@ window.shareCurrentPage = function(platform) {
       break;
     case 'linkedin':
       // LinkedIn 공유 전 메타태그 실시간 업데이트
-      updateSocialMetaTags(shortTitle, shortDescription, currentUrl);
+      updateSocialMetaTags(shortTitle, shortDescription, currentUrl, pageImage);
       validateSocialMetaTags('LinkedIn');
       
-      console.log('💼 LinkedIn 공유:', { title: shortTitle, description: shortDescription, url: currentUrl });
+      console.log('💼 LinkedIn 공유:', { title: shortTitle, description: shortDescription, url: currentUrl, image: pageImage });
       
       // LinkedIn은 주로 OG 태그를 읽지만, URL 파라미터도 지원
       const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentUrl)}&title=${encodeURIComponent(shortTitle)}&summary=${encodeURIComponent(shortDescription)}`;
@@ -589,33 +644,42 @@ function fallbackCopyURL(url) {
 }
 
 // 소셜 미디어 메타태그 실시간 업데이트 함수
-function updateSocialMetaTags(title, description, url) {
+function updateSocialMetaTags(title, description, url, image) {
   console.log('🔄 소셜 미디어 메타태그 실시간 업데이트');
   
+  // 메타태그를 업데이트하거나 생성하는 헬퍼 함수
+  const updateOrCreateMeta = (property, content) => {
+    let meta = document.querySelector(`meta[property="${property}"]`) || 
+              document.querySelector(`meta[name="${property}"]`);
+    
+    if (!meta) {
+      meta = document.createElement('meta');
+      if (property.startsWith('og:') || property.startsWith('twitter:')) {
+        meta.setAttribute('property', property);
+      } else {
+        meta.setAttribute('name', property);
+      }
+      document.head.appendChild(meta);
+    }
+    
+    meta.setAttribute('content', content);
+  };
+  
   // 기본 메타태그 업데이트
-  const titleMeta = document.querySelector('meta[name="description"]');
-  if (titleMeta) titleMeta.content = description;
+  updateOrCreateMeta('description', description);
   
   // Open Graph 메타태그 업데이트
-  const ogTitleMeta = document.querySelector('meta[property="og:title"]');
-  if (ogTitleMeta) ogTitleMeta.content = title;
+  updateOrCreateMeta('og:title', title);
+  updateOrCreateMeta('og:description', description);
+  updateOrCreateMeta('og:url', url);
+  updateOrCreateMeta('og:image', image);
   
-  const ogDescMeta = document.querySelector('meta[property="og:description"]');
-  if (ogDescMeta) ogDescMeta.content = description;
+  // Twitter Card 메타태그 업데이트
+  updateOrCreateMeta('twitter:title', title);
+  updateOrCreateMeta('twitter:description', description);
+  updateOrCreateMeta('twitter:image', image);
   
-  const ogUrlMeta = document.querySelector('meta[property="og:url"]');
-  if (ogUrlMeta) ogUrlMeta.content = url;
-  
-  // 이미지 메타태그 업데이트 (전역 메타데이터에서 가져오기)
-  if (window.shareMetadata?.image) {
-    const ogImageMeta = document.querySelector('meta[property="og:image"]');
-    if (ogImageMeta) {
-      ogImageMeta.content = window.shareMetadata.image;
-      console.log('🖼️ OG 이미지 메타태그 업데이트:', window.shareMetadata.image);
-    }
-  }
-  
-  console.log('✅ 메타태그 업데이트 완료');
+  console.log('✅ 메타태그 업데이트 완료:', { title: title.substring(0, 30), description: description.substring(0, 50), url, image });
 }
 
 // 소셜 미디어 메타태그 검증 함수
