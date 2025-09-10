@@ -464,9 +464,7 @@ function updateMetaTags(version, contentData, language) {
     updateMetaTag('og:image:height', '630');  
     updateMetaTag('og:image:alt', title);
     updateMetaTag('twitter:image', finalImageUrl);
-    updateMetaTag('twitter:image:src', finalImageUrl);
-    updateMetaTag('twitter:image:width', '1200');
-    updateMetaTag('twitter:image:height', '630');
+    updateMetaTag('twitter:image:alt', title);
     
     // Facebook/LinkedIn을 위한 추가 메타태그
     updateMetaTag('article:author', 'LikeVoca');
