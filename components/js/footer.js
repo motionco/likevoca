@@ -473,6 +473,59 @@ window.shareCurrentPage = function(platform) {
       const threadsUrl = `https://www.threads.net/intent/post?text=${encodeURIComponent(threadsText + '\n\n' + currentUrl)}`;
       window.open(threadsUrl, '_blank', 'width=600,height=400');
       break;
+    case 'reddit':
+      // Reddit 공유
+      const redditUrl = `https://www.reddit.com/submit?url=${encodeURIComponent(currentUrl)}&title=${encodeURIComponent(shortTitle)}`;
+      
+      console.log('🟠 Reddit 공유:', { title: shortTitle, url: currentUrl });
+      
+      window.open(redditUrl, '_blank', 'width=600,height=500,scrollbars=yes,resizable=yes');
+      break;
+    case 'telegram':
+      // Telegram 공유
+      const telegramText = shortDescription ? `${shortTitle}\n\n${shortDescription}\n\n${currentUrl}` : `${shortTitle}\n\n${currentUrl}`;
+      const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(telegramText)}`;
+      
+      console.log('✈️ Telegram 공유:', { text: telegramText, url: currentUrl });
+      
+      window.open(telegramUrl, '_blank', 'width=600,height=400');
+      break;
+    case 'line':
+      // LINE 공유
+      const lineText = shortDescription ? `${shortTitle}\n${shortDescription}` : shortTitle;
+      const lineUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(lineText)}`;
+      
+      console.log('💚 LINE 공유:', { text: lineText, url: currentUrl });
+      
+      window.open(lineUrl, '_blank', 'width=600,height=500,scrollbars=yes,resizable=yes');
+      break;
+    case 'weibo':
+      // 웨이보 공유
+      const weiboText = shortDescription ? `${shortTitle} - ${shortDescription}` : shortTitle;
+      const weiboUrl = `https://service.weibo.com/share/share.php?url=${encodeURIComponent(currentUrl)}&title=${encodeURIComponent(weiboText)}`;
+      
+      console.log('🔴 웨이보 공유:', { title: weiboText, url: currentUrl });
+      
+      window.open(weiboUrl, '_blank', 'width=600,height=500,scrollbars=yes,resizable=yes');
+      break;
+    case 'qq':
+      // QQ 공유
+      const qqText = shortDescription ? `${shortTitle} - ${shortDescription}` : shortTitle;
+      const qqUrl = `https://connect.qq.com/widget/shareqq/index.html?url=${encodeURIComponent(currentUrl)}&title=${encodeURIComponent(qqText)}`;
+      
+      console.log('🔵 QQ 공유:', { title: qqText, url: currentUrl });
+      
+      window.open(qqUrl, '_blank', 'width=600,height=500,scrollbars=yes,resizable=yes');
+      break;
+    case 'whatsapp':
+      // WhatsApp 공유
+      const whatsappText = shortDescription ? `${shortTitle}\n\n${shortDescription}\n\n${currentUrl}` : `${shortTitle}\n\n${currentUrl}`;
+      const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(whatsappText)}`;
+      
+      console.log('💬 WhatsApp 공유:', { text: whatsappText });
+      
+      window.open(whatsappUrl, '_blank', 'width=600,height=500,scrollbars=yes,resizable=yes');
+      break;
     default:
       console.warn('지원하지 않는 플랫폼:', platform);
   }
