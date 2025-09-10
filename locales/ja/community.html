@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LikeVocaコミュニティ - 学習ガイド、FAQ、マニュアル</title>
-    
-    <meta name="description" content="LikeVocaコミュニティで言語学習ガイド、よくある質問（FAQ）、ユーザーマニュアル、お知らせをご確認ください。効果的な言語学習のための包括的な情報を提供します。" />
+
+    <meta name="description"
+        content="LikeVocaコミュニティで言語学習ガイド、よくある質問（FAQ）、ユーザーマニュアル、お知らせをご確認ください。効果的な言語学習のための包括的な情報を提供します。" />
     <meta name="keywords" content="LikeVoca, コミュニティ, 言語学習, 学習ガイド, FAQ, マニュアル, お知らせ, 多言語, 英語, 日本語, 中国語" />
-    
+
     <!-- Open Graph タグ -->
     <meta property="og:title" content="LikeVocaコミュニティ - 学習ガイド、FAQ、マニュアル" />
     <meta property="og:description" content="LikeVocaコミュニティで学習ガイド、FAQ、マニュアルをご確認ください。" />
@@ -15,15 +17,15 @@
     <meta property="og:url" content="https://likevoca.com/ja/community.html" />
     <meta property="og:site_name" content="LikeVoca" />
     <meta property="og:locale" content="ja_JP" />
-    
+
     <!-- Twitter Card タグ -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="LikeVocaコミュニティ - 学習ガイド、FAQ、マニュアル" />
     <meta name="twitter:description" content="LikeVocaコミュニティで学習ガイド、FAQ、マニュアルをご確認ください。" />
-    
+
     <!-- Canonical URL -->
     <link rel="canonical" href="https://likevoca.com/ja/community.html" />
-    
+
     <!-- Hreflang タグ -->
     <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/community.html" />
     <link rel="alternate" hreflang="en" href="https://likevoca.com/en/community.html" />
@@ -31,7 +33,7 @@
     <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/community.html" />
     <link rel="alternate" hreflang="es" href="https://likevoca.com/es/community.html" />
     <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/community.html" />
-    
+
     <!-- JSON-LD 構造化データ -->
     <script type="application/ld+json">
     {
@@ -53,28 +55,37 @@
         }
     }
     </script>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .content-card {
             transition: all 0.2s ease;
         }
+
         .content-card:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
+
         .loading-skeleton {
             background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
             background-size: 200% 100%;
             animation: loading 1.5s infinite;
         }
+
         @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
         }
     </style>
 </head>
+
 <body class="bg-gray-50">
     <div id="navbar-container"></div>
 
@@ -93,25 +104,25 @@
         <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
             <div class="flex flex-col md:flex-row gap-4 items-center">
                 <div class="flex-1">
-                    <input 
-                        type="text" 
-                        id="searchInput" 
-                        placeholder="情報を検索..." 
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B63AC]"
-                    />
+                    <input type="text" id="searchInput" placeholder="情報を検索..."
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B63AC]" />
                 </div>
                 <div class="flex gap-2">
-                    <select id="categoryFilter" class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B63AC]">
+                    <select id="categoryFilter"
+                        class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B63AC]">
                         <option value="all">すべてのカテゴリ</option>
                         <option value="notice">お知らせ</option>
                         <option value="guide">学習ガイド</option>
                         <option value="faq">よくある質問</option>
                         <option value="manual">ユーザーマニュアル</option>
                     </select>
-                    <button id="searchBtn" class="bg-[#4B63AC] text-white px-6 py-3 rounded-lg hover:bg-[#3A4F8B] transition duration-200">
+                    <button id="searchBtn"
+                        class="bg-[#4B63AC] text-white px-6 py-3 rounded-lg hover:bg-[#3A4F8B] transition duration-200">
                         <i class="fas fa-search"></i>
                     </button>
-                    <button id="refreshBtn" class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition duration-200" title="コンテンツ更新">
+                    <button id="refreshBtn"
+                        class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition duration-200"
+                        title="コンテンツ更新">
                         <i class="fas fa-sync-alt"></i>
                     </button>
                 </div>
@@ -124,7 +135,7 @@
             <p class="text-gray-600" id="loadingText">コンテンツを読み込み中...</p>
             <div id="loadingDebug" class="mt-2 text-sm text-gray-500"></div>
         </div>
-        
+
         <!-- コンテンツ一覧 -->
         <div id="contentList" class="space-y-6">
         </div>
@@ -142,39 +153,39 @@
 
     <!-- Firebase Config -->
     <script type="module" src="../../js/firebase/firebase-init.js"></script>
-    
+
     <!-- スクリプト -->
     <script src="../../components/js/navbar.js"></script>
     <script src="../../components/js/footer.js"></script>
-    
+
     <script type="module">
         import { applyLanguage, updateMetadata } from '../../utils/language-utils.js';
-        
+
         let contentData = [];
-        
+
         document.addEventListener('DOMContentLoaded', async () => {
             try {
                 // ナビゲーションバーを読み込み
                 if (typeof window.loadNavbar === 'function') {
                     await window.loadNavbar();
                 }
-                
+
                 // フッターを読み込み
                 if (typeof window.loadFooter === 'function') {
                     await window.loadFooter();
                 }
-                
+
                 // 言語を適用
                 await applyLanguage();
                 await updateMetadata('community');
-                
+
                 // コンテンツを読み込み
                 await loadContentData();
                 await displayContent();
-                
+
                 // イベントリスナーを設定
                 setupEventListeners();
-                
+
             } catch (error) {
                 console.error('コミュニティページの初期化エラー:', error);
                 showError('ページの読み込み中にエラーが発生しました。');
@@ -185,24 +196,24 @@
         async function loadContentData() {
             try {
                 // Loading content data from Firestore
-                
+
                 // Firebase初期化を待機
                 await waitForFirebase();
-                
+
                 showLoading();
-                
+
                 // Firebase関数をインポート
                 const { collection, query, orderBy, getDocs } = await import("https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js");
-                
+
                 if (!window.db) {
                     throw new Error('Firebase初期化されていません');
                 }
-                
+
                 // Firestoreからコンテンツを読み込み
                 const contentRef = collection(window.db, 'content');
                 const contentQuery = query(contentRef, orderBy('createdAt', 'desc'));
                 const snapshot = await getDocs(contentQuery);
-                
+
                 contentData = snapshot.docs
                     .map(doc => {
                         const data = doc.data();
@@ -217,7 +228,7 @@
                         const hasVersions = item.versions && typeof item.versions === 'object';
                         const hasUserId = item.userId;
                         const isValidContentType = ['faq', 'guide', 'notice', 'manual'].includes(item.type);
-                        
+
                         if (!hasVersions || !hasUserId || !isValidContentType) {
                             return false;
                         }
@@ -227,9 +238,9 @@
                 // コンテンツがない場合はサンプルデータを追加
                 if (contentData.length === 0) {
                     console.log('📝 コンテンツがありません、サンプルデータを追加');
-                    
+
                     const currentTime = new Date().toISOString();
-                    
+
                     contentData = [
                         {
                             id: 'sample_announcement_ja',
@@ -248,10 +259,10 @@
                         }
                     ];
                 }
-                
+
                 // Content data loaded
                 hideLoading();
-                
+
             } catch (error) {
                 console.error('❌ コンテンツデータの読み込み失敗:', error);
                 hideLoading();
@@ -263,59 +274,59 @@
         async function waitForFirebase() {
             let attempts = 0;
             const maxAttempts = 50;
-            
+
             while (!window.db && attempts < maxAttempts) {
                 console.log(`⏳ Firebase初期化を待機中... (${attempts + 1}/${maxAttempts})`);
                 await new Promise(resolve => setTimeout(resolve, 200));
                 attempts++;
             }
-            
+
             if (!window.db) {
                 throw new Error('Firebase初期化タイムアウト');
             }
-            
+
             console.log('✅ Firebase初期化成功');
         }
 
         // フィルターを使用してコンテンツを表示
         async function displayContent() {
             // Displaying content
-            
+
             const contentList = document.getElementById('contentList');
             const emptyState = document.getElementById('emptyState');
             const searchInput = document.getElementById('searchInput');
             const categoryFilterElement = document.getElementById('categoryFilter');
-            
+
             if (!searchInput || !categoryFilterElement) {
                 console.error('❌ 必要なフィルター要素が見つかりません');
                 return;
             }
-            
+
             const searchTerm = searchInput.value.toLowerCase();
             const categoryFilter = categoryFilterElement.value;
-            
+
             // フィルタリング
             let filteredContent = contentData.filter(item => {
                 // 「公開」ステータスのコンテンツのみ表示
                 if (item.status !== 'published') return false;
-                
+
                 const versions = item.versions || {};
                 const version = versions.ja;
                 if (!version || !version.title || !version.content) return false;
-                
+
                 // カテゴリフィルター
                 if (categoryFilter !== 'all' && item.type !== categoryFilter) return false;
-                
+
                 // 検索フィルター
                 if (searchTerm) {
                     const titleMatch = (version.title || '').toLowerCase().includes(searchTerm);
                     const contentMatch = (version.content || '').toLowerCase().includes(searchTerm);
                     if (!titleMatch && !contentMatch) return false;
                 }
-                
+
                 return true;
             });
-            
+
             if (filteredContent.length === 0) {
                 contentList.innerHTML = '';
                 emptyState.classList.remove('hidden');
@@ -328,14 +339,14 @@
         // コンテンツカードをレンダリング
         function renderContent(content) {
             const contentList = document.getElementById('contentList');
-            
+
             const typeIcons = {
                 faq: 'fa-question-circle',
                 manual: 'fa-book',
                 guide: 'fa-lightbulb',
                 notice: 'fa-bullhorn'
             };
-            
+
             const typeNames = {
                 faq: 'よくある質問',
                 manual: 'マニュアル',
@@ -347,7 +358,7 @@
                 const version = item.versions.ja || {};
                 const typeIcon = typeIcons[item.type] || 'fa-file-alt';
                 const typeName = typeNames[item.type] || item.type;
-                
+
                 return `
                     <article class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition duration-300">
                         <div class="flex items-start justify-between mb-4">
@@ -382,11 +393,11 @@
         }
 
         // コンテンツ展開をトグル
-        window.toggleContent = function(contentId) {
+        window.toggleContent = function (contentId) {
             const element = document.getElementById(contentId);
             const button = element.previousElementSibling.querySelector('button');
             const icon = button.querySelector('i.fa-chevron-down, i.fa-chevron-up');
-            
+
             if (element.classList.contains('hidden')) {
                 element.classList.remove('hidden');
                 button.innerHTML = '閉じる <i class="fas fa-chevron-up ml-1"></i>';
@@ -402,7 +413,7 @@
             const searchInput = document.getElementById('searchInput');
             const categoryFilter = document.getElementById('categoryFilter');
             const refreshBtn = document.getElementById('refreshBtn');
-            
+
             if (searchBtn) searchBtn.addEventListener('click', displayContent);
             if (searchInput) searchInput.addEventListener('keyup', (e) => {
                 if (e.key === 'Enter') displayContent();
@@ -434,7 +445,7 @@
 
         function formatDate(dateValue) {
             if (!dateValue) return '-';
-            
+
             let date;
             // Firestore Timestampオブジェクト
             if (dateValue.toDate && typeof dateValue.toDate === 'function') {
@@ -444,9 +455,9 @@
             else {
                 date = new Date(dateValue);
             }
-            
+
             if (isNaN(date.getTime())) return '-';
-            
+
             return date.toLocaleDateString('ja-JP', {
                 year: 'numeric',
                 month: 'long',
@@ -470,11 +481,21 @@
             toast.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50';
             toast.innerHTML = `<i class="fas fa-check mr-2"></i>${message}`;
             document.body.appendChild(toast);
-            
+
             setTimeout(() => {
                 toast.remove();
             }, 3000);
         }
+
+        // 커뮤니티 메인 페이지의 경우 즉시 공유 기능 활성화
+        document.addEventListener('DOMContentLoaded', () => {
+            // URL에 id 파라미터가 없으면 메인 페이지로 간주
+            if (!window.location.search.includes('id=')) {
+                window.contentLoaded = true;
+                console.log('✅ 커뮤니티 메인 페이지 공유 기능 활성화');
+            }
+        });
     </script>
 </body>
+
 </html>

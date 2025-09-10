@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="zh">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LikeVoca社区 - 学习指南、FAQ、手册</title>
-    
+
     <meta name="description" content="在LikeVoca社区查看语言学习指南、常见问题(FAQ)、用户手册和公告。获取有效语言学习的全面信息。" />
     <meta name="keywords" content="LikeVoca, 社区, 语言学习, 学习指南, FAQ, 手册, 公告, 多语言, 英语, 日语, 中文" />
-    
+
     <!-- Open Graph 标签 -->
     <meta property="og:title" content="LikeVoca社区 - 学习指南、FAQ、手册" />
     <meta property="og:description" content="在LikeVoca社区查看学习指南、FAQ和手册。" />
@@ -15,15 +16,15 @@
     <meta property="og:url" content="https://likevoca.com/zh/community.html" />
     <meta property="og:site_name" content="LikeVoca" />
     <meta property="og:locale" content="zh_CN" />
-    
+
     <!-- Twitter Card 标签 -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="LikeVoca社区 - 学习指南、FAQ、手册" />
     <meta name="twitter:description" content="在LikeVoca社区查看学习指南、FAQ和手册。" />
-    
+
     <!-- Canonical URL -->
     <link rel="canonical" href="https://likevoca.com/zh/community.html" />
-    
+
     <!-- Hreflang 标签 -->
     <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/community.html" />
     <link rel="alternate" hreflang="en" href="https://likevoca.com/en/community.html" />
@@ -31,7 +32,7 @@
     <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/community.html" />
     <link rel="alternate" hreflang="es" href="https://likevoca.com/es/community.html" />
     <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/community.html" />
-    
+
     <!-- JSON-LD 结构化数据 -->
     <script type="application/ld+json">
     {
@@ -53,28 +54,37 @@
         }
     }
     </script>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .content-card {
             transition: all 0.2s ease;
         }
+
         .content-card:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
+
         .loading-skeleton {
             background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
             background-size: 200% 100%;
             animation: loading 1.5s infinite;
         }
+
         @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
         }
     </style>
 </head>
+
 <body class="bg-gray-50">
     <div id="navbar-container"></div>
 
@@ -93,25 +103,25 @@
         <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
             <div class="flex flex-col md:flex-row gap-4 items-center">
                 <div class="flex-1">
-                    <input 
-                        type="text" 
-                        id="searchInput" 
-                        placeholder="搜索信息..." 
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B63AC]"
-                    />
+                    <input type="text" id="searchInput" placeholder="搜索信息..."
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B63AC]" />
                 </div>
                 <div class="flex gap-2">
-                    <select id="categoryFilter" class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B63AC]">
+                    <select id="categoryFilter"
+                        class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B63AC]">
                         <option value="all">所有分类</option>
                         <option value="notice">公告</option>
                         <option value="guide">学习指南</option>
                         <option value="faq">常见问题</option>
                         <option value="manual">用户手册</option>
                     </select>
-                    <button id="searchBtn" class="bg-[#4B63AC] text-white px-6 py-3 rounded-lg hover:bg-[#3A4F8B] transition duration-200">
+                    <button id="searchBtn"
+                        class="bg-[#4B63AC] text-white px-6 py-3 rounded-lg hover:bg-[#3A4F8B] transition duration-200">
                         <i class="fas fa-search"></i>
                     </button>
-                    <button id="refreshBtn" class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition duration-200" title="刷新内容">
+                    <button id="refreshBtn"
+                        class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition duration-200"
+                        title="刷新内容">
                         <i class="fas fa-sync-alt"></i>
                     </button>
                 </div>
@@ -124,7 +134,7 @@
             <p class="text-gray-600" id="loadingText">正在加载内容...</p>
             <div id="loadingDebug" class="mt-2 text-sm text-gray-500"></div>
         </div>
-        
+
         <!-- 内容列表 -->
         <div id="contentList" class="space-y-6">
         </div>
@@ -142,39 +152,39 @@
 
     <!-- Firebase Config -->
     <script type="module" src="../../js/firebase/firebase-init.js"></script>
-    
+
     <!-- 脚本 -->
     <script src="../../components/js/navbar.js"></script>
     <script src="../../components/js/footer.js"></script>
-    
+
     <script type="module">
         import { applyLanguage, updateMetadata } from '../../utils/language-utils.js';
-        
+
         let contentData = [];
-        
+
         document.addEventListener('DOMContentLoaded', async () => {
             try {
                 // 加载导航栏
                 if (typeof window.loadNavbar === 'function') {
                     await window.loadNavbar();
                 }
-                
+
                 // 加载页脚
                 if (typeof window.loadFooter === 'function') {
                     await window.loadFooter();
                 }
-                
+
                 // 应用语言
                 await applyLanguage();
                 await updateMetadata('community');
-                
+
                 // 加载内容
                 await loadContentData();
                 await displayContent();
-                
+
                 // 设置事件监听器
                 setupEventListeners();
-                
+
             } catch (error) {
                 console.error('社区页面初始化错误:', error);
                 showError('页面加载时发生错误。');
@@ -185,24 +195,24 @@
         async function loadContentData() {
             try {
                 // Loading content data from Firestore
-                
+
                 // 等待Firebase初始化
                 await waitForFirebase();
-                
+
                 showLoading();
-                
+
                 // 导入Firebase函数
                 const { collection, query, orderBy, getDocs } = await import("https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js");
-                
+
                 if (!window.db) {
                     throw new Error('Firebase未初始化');
                 }
-                
+
                 // 从Firestore加载内容
                 const contentRef = collection(window.db, 'content');
                 const contentQuery = query(contentRef, orderBy('createdAt', 'desc'));
                 const snapshot = await getDocs(contentQuery);
-                
+
                 contentData = snapshot.docs
                     .map(doc => {
                         const data = doc.data();
@@ -217,7 +227,7 @@
                         const hasVersions = item.versions && typeof item.versions === 'object';
                         const hasUserId = item.userId;
                         const isValidContentType = ['faq', 'guide', 'notice', 'manual'].includes(item.type);
-                        
+
                         if (!hasVersions || !hasUserId || !isValidContentType) {
                             // Content filtered
                             return false;
@@ -229,9 +239,9 @@
                 // 如果没有内容则添加示例数据
                 if (contentData.length === 0) {
                     // No content found, adding sample data
-                    
+
                     const currentTime = new Date().toISOString();
-                    
+
                     contentData = [
                         {
                             id: 'sample_announcement_zh',
@@ -250,10 +260,10 @@
                         }
                     ];
                 }
-                
+
                 // Content data loaded
                 hideLoading();
-                
+
             } catch (error) {
                 console.error('❌ 内容数据加载失败:', error);
                 hideLoading();
@@ -265,59 +275,59 @@
         async function waitForFirebase() {
             let attempts = 0;
             const maxAttempts = 50;
-            
+
             while (!window.db && attempts < maxAttempts) {
                 console.log(`⏳ 等待Firebase初始化... (${attempts + 1}/${maxAttempts})`);
                 await new Promise(resolve => setTimeout(resolve, 200));
                 attempts++;
             }
-            
+
             if (!window.db) {
                 throw new Error('Firebase初始化超时');
             }
-            
+
             console.log('✅ Firebase初始化成功');
         }
 
         // 使用筛选显示内容
         async function displayContent() {
             // Displaying content
-            
+
             const contentList = document.getElementById('contentList');
             const emptyState = document.getElementById('emptyState');
             const searchInput = document.getElementById('searchInput');
             const categoryFilterElement = document.getElementById('categoryFilter');
-            
+
             if (!searchInput || !categoryFilterElement) {
                 console.error('❌ 找不到所需的筛选元素');
                 return;
             }
-            
+
             const searchTerm = searchInput.value.toLowerCase();
             const categoryFilter = categoryFilterElement.value;
-            
+
             // 筛选
             let filteredContent = contentData.filter(item => {
                 // 仅显示"已发布"状态的内容
                 if (item.status !== 'published') return false;
-                
+
                 const versions = item.versions || {};
                 const version = versions.zh;
                 if (!version || !version.title || !version.content) return false;
-                
+
                 // 分类筛选
                 if (categoryFilter !== 'all' && item.type !== categoryFilter) return false;
-                
+
                 // 搜索筛选
                 if (searchTerm) {
                     const titleMatch = (version.title || '').toLowerCase().includes(searchTerm);
                     const contentMatch = (version.content || '').toLowerCase().includes(searchTerm);
                     if (!titleMatch && !contentMatch) return false;
                 }
-                
+
                 return true;
             });
-            
+
             if (filteredContent.length === 0) {
                 contentList.innerHTML = '';
                 emptyState.classList.remove('hidden');
@@ -330,14 +340,14 @@
         // 渲染内容卡片
         function renderContent(content) {
             const contentList = document.getElementById('contentList');
-            
+
             const typeIcons = {
                 faq: 'fa-question-circle',
                 manual: 'fa-book',
                 guide: 'fa-lightbulb',
                 notice: 'fa-bullhorn'
             };
-            
+
             const typeNames = {
                 faq: '常见问题',
                 manual: '手册',
@@ -349,7 +359,7 @@
                 const version = item.versions.zh || {};
                 const typeIcon = typeIcons[item.type] || 'fa-file-alt';
                 const typeName = typeNames[item.type] || item.type;
-                
+
                 return `
                     <article class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition duration-300">
                         <div class="flex items-start justify-between mb-4">
@@ -384,11 +394,11 @@
         }
 
         // 切换内容展开
-        window.toggleContent = function(contentId) {
+        window.toggleContent = function (contentId) {
             const element = document.getElementById(contentId);
             const button = element.previousElementSibling.querySelector('button');
             const icon = button.querySelector('i.fa-chevron-down, i.fa-chevron-up');
-            
+
             if (element.classList.contains('hidden')) {
                 element.classList.remove('hidden');
                 button.innerHTML = '收起 <i class="fas fa-chevron-up ml-1"></i>';
@@ -404,7 +414,7 @@
             const searchInput = document.getElementById('searchInput');
             const categoryFilter = document.getElementById('categoryFilter');
             const refreshBtn = document.getElementById('refreshBtn');
-            
+
             if (searchBtn) searchBtn.addEventListener('click', displayContent);
             if (searchInput) searchInput.addEventListener('keyup', (e) => {
                 if (e.key === 'Enter') displayContent();
@@ -436,7 +446,7 @@
 
         function formatDate(dateValue) {
             if (!dateValue) return '-';
-            
+
             let date;
             // Firestore Timestamp对象
             if (dateValue.toDate && typeof dateValue.toDate === 'function') {
@@ -446,9 +456,9 @@
             else {
                 date = new Date(dateValue);
             }
-            
+
             if (isNaN(date.getTime())) return '-';
-            
+
             return date.toLocaleDateString('zh-CN', {
                 year: 'numeric',
                 month: 'long',
@@ -472,11 +482,21 @@
             toast.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50';
             toast.innerHTML = `<i class="fas fa-check mr-2"></i>${message}`;
             document.body.appendChild(toast);
-            
+
             setTimeout(() => {
                 toast.remove();
             }, 3000);
         }
+
+        // 커뮤니티 메인 페이지의 경우 즉시 공유 기능 활성화
+        document.addEventListener('DOMContentLoaded', () => {
+            // URL에 id 파라미터가 없으면 메인 페이지로 간주
+            if (!window.location.search.includes('id=')) {
+                window.contentLoaded = true;
+                console.log('✅ 커뮤니티 메인 페이지 공유 기능 활성화');
+            }
+        });
     </script>
 </body>
+
 </html>

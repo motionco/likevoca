@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LikeVoca Community - Learning Guides, FAQ, Manual</title>
-    
-    <meta name="description" content="Find learning guides, frequently asked questions (FAQ), user manuals, and announcements in the LikeVoca community. Get comprehensive information for effective language learning." />
-    <meta name="keywords" content="LikeVoca, community, language learning, learning guides, FAQ, manual, announcements, multilingual, English, Japanese, Chinese" />
-    
+
+    <meta name="description"
+        content="Find learning guides, frequently asked questions (FAQ), user manuals, and announcements in the LikeVoca community. Get comprehensive information for effective language learning." />
+    <meta name="keywords"
+        content="LikeVoca, community, language learning, learning guides, FAQ, manual, announcements, multilingual, English, Japanese, Chinese" />
+
     <!-- Open Graph tags -->
     <meta property="og:title" content="LikeVoca Community - Learning Guides, FAQ, Manual" />
     <meta property="og:description" content="Find learning guides, FAQ, and manuals in the LikeVoca community." />
@@ -15,15 +18,15 @@
     <meta property="og:url" content="https://likevoca.com/en/community.html" />
     <meta property="og:site_name" content="LikeVoca" />
     <meta property="og:locale" content="en_US" />
-    
+
     <!-- Twitter Card tags -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="LikeVoca Community - Learning Guides, FAQ, Manual" />
     <meta name="twitter:description" content="Find learning guides, FAQ, and manuals in the LikeVoca community." />
-    
+
     <!-- Canonical URL -->
     <link rel="canonical" href="https://likevoca.com/en/community.html" />
-    
+
     <!-- Hreflang tags -->
     <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/community.html" />
     <link rel="alternate" hreflang="en" href="https://likevoca.com/en/community.html" />
@@ -31,7 +34,7 @@
     <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/community.html" />
     <link rel="alternate" hreflang="es" href="https://likevoca.com/es/community.html" />
     <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/community.html" />
-    
+
     <!-- JSON-LD structured data -->
     <script type="application/ld+json">
     {
@@ -53,28 +56,37 @@
         }
     }
     </script>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .content-card {
             transition: all 0.2s ease;
         }
+
         .content-card:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
+
         .loading-skeleton {
             background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
             background-size: 200% 100%;
             animation: loading 1.5s infinite;
         }
+
         @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
         }
     </style>
 </head>
+
 <body class="bg-gray-50">
     <div id="navbar-container"></div>
 
@@ -93,25 +105,25 @@
         <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
             <div class="flex flex-col md:flex-row gap-4 items-center">
                 <div class="flex-1">
-                    <input 
-                        type="text" 
-                        id="searchInput" 
-                        placeholder="Search for information..." 
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B63AC]"
-                    />
+                    <input type="text" id="searchInput" placeholder="Search for information..."
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B63AC]" />
                 </div>
                 <div class="flex gap-2">
-                    <select id="categoryFilter" class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B63AC]">
+                    <select id="categoryFilter"
+                        class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B63AC]">
                         <option value="all">All Categories</option>
                         <option value="notice">Announcements</option>
                         <option value="guide">Learning Guides</option>
                         <option value="faq">FAQ</option>
                         <option value="manual">User Manual</option>
                     </select>
-                    <button id="searchBtn" class="bg-[#4B63AC] text-white px-6 py-3 rounded-lg hover:bg-[#3A4F8B] transition duration-200">
+                    <button id="searchBtn"
+                        class="bg-[#4B63AC] text-white px-6 py-3 rounded-lg hover:bg-[#3A4F8B] transition duration-200">
                         <i class="fas fa-search"></i>
                     </button>
-                    <button id="refreshBtn" class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition duration-200" title="Refresh content">
+                    <button id="refreshBtn"
+                        class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition duration-200"
+                        title="Refresh content">
                         <i class="fas fa-sync-alt"></i>
                     </button>
                 </div>
@@ -124,7 +136,7 @@
             <p class="text-gray-600" id="loadingText">Loading content...</p>
             <div id="loadingDebug" class="mt-2 text-sm text-gray-500"></div>
         </div>
-        
+
         <!-- Content List -->
         <div id="contentList" class="space-y-6">
         </div>
@@ -142,39 +154,39 @@
 
     <!-- Firebase Config -->
     <script type="module" src="../../js/firebase/firebase-init.js"></script>
-    
+
     <!-- Scripts -->
     <script src="../../components/js/navbar.js"></script>
     <script src="../../components/js/footer.js"></script>
-    
+
     <script type="module">
         import { applyLanguage, updateMetadata } from '../../utils/language-utils.js';
-        
+
         let contentData = [];
-        
+
         document.addEventListener('DOMContentLoaded', async () => {
             try {
                 // Load navbar
                 if (typeof window.loadNavbar === 'function') {
                     await window.loadNavbar();
                 }
-                
+
                 // Load footer
                 if (typeof window.loadFooter === 'function') {
                     await window.loadFooter();
                 }
-                
+
                 // Apply language
                 await applyLanguage();
                 await updateMetadata('community');
-                
+
                 // Load content
                 await loadContentData();
                 await displayContent();
-                
+
                 // Setup event listeners
                 setupEventListeners();
-                
+
             } catch (error) {
                 console.error('Error initializing community page:', error);
                 showError('An error occurred while loading the page.');
@@ -185,24 +197,24 @@
         async function loadContentData() {
             try {
                 // Loading content data from Firestore
-                
+
                 // Wait for Firebase initialization
                 await waitForFirebase();
-                
+
                 showLoading();
-                
+
                 // Import Firebase functions
                 const { collection, query, orderBy, getDocs } = await import("https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js");
-                
+
                 if (!window.db) {
                     throw new Error('Firebase not initialized');
                 }
-                
+
                 // Load content from Firestore
                 const contentRef = collection(window.db, 'content');
                 const contentQuery = query(contentRef, orderBy('createdAt', 'desc'));
                 const snapshot = await getDocs(contentQuery);
-                
+
                 contentData = snapshot.docs
                     .map(doc => {
                         const data = doc.data();
@@ -216,7 +228,7 @@
                         const hasVersions = item.versions && typeof item.versions === 'object';
                         const hasUserId = item.userId;
                         const isValidContentType = ['faq', 'guide', 'notice', 'manual'].includes(item.type);
-                        
+
                         if (!hasVersions || !hasUserId || !isValidContentType) {
                             return false;
                         }
@@ -226,9 +238,9 @@
                 // Add sample data if no content exists
                 if (contentData.length === 0) {
                     // No content found, adding sample data
-                    
+
                     const currentTime = new Date().toISOString();
-                    
+
                     contentData = [
                         {
                             id: 'sample_announcement_en',
@@ -247,10 +259,10 @@
                         }
                     ];
                 }
-                
+
                 // Content data loaded
                 hideLoading();
-                
+
             } catch (error) {
                 console.error('❌ Failed to load content data:', error);
                 hideLoading();
@@ -262,58 +274,58 @@
         async function waitForFirebase() {
             let attempts = 0;
             const maxAttempts = 50;
-            
+
             while (!window.db && attempts < maxAttempts) {
                 await new Promise(resolve => setTimeout(resolve, 200));
                 attempts++;
             }
-            
+
             if (!window.db) {
                 throw new Error('Firebase initialization timeout');
             }
-            
+
             // Firebase initialized successfully
         }
 
         // Display content with filtering
         async function displayContent() {
             // Displaying content
-            
+
             const contentList = document.getElementById('contentList');
             const emptyState = document.getElementById('emptyState');
             const searchInput = document.getElementById('searchInput');
             const categoryFilterElement = document.getElementById('categoryFilter');
-            
+
             if (!searchInput || !categoryFilterElement) {
                 console.error('❌ Required filter elements not found');
                 return;
             }
-            
+
             const searchTerm = searchInput.value.toLowerCase();
             const categoryFilter = categoryFilterElement.value;
-            
+
             // Filtering
             let filteredContent = contentData.filter(item => {
                 // Show only content with 'published' status
                 if (item.status !== 'published') return false;
-                
+
                 const versions = item.versions || {};
                 const version = versions.en;
                 if (!version || !version.title || !version.content) return false;
-                
+
                 // Category filter
                 if (categoryFilter !== 'all' && item.type !== categoryFilter) return false;
-                
+
                 // Search filter
                 if (searchTerm) {
                     const titleMatch = (version.title || '').toLowerCase().includes(searchTerm);
                     const contentMatch = (version.content || '').toLowerCase().includes(searchTerm);
                     if (!titleMatch && !contentMatch) return false;
                 }
-                
+
                 return true;
             });
-            
+
             if (filteredContent.length === 0) {
                 contentList.innerHTML = '';
                 emptyState.classList.remove('hidden');
@@ -326,14 +338,14 @@
         // Render content cards
         function renderContent(content) {
             const contentList = document.getElementById('contentList');
-            
+
             const typeIcons = {
                 faq: 'fa-question-circle',
                 manual: 'fa-book',
                 guide: 'fa-lightbulb',
                 notice: 'fa-bullhorn'
             };
-            
+
             const typeNames = {
                 faq: 'FAQ',
                 manual: 'Manual',
@@ -376,7 +388,7 @@
                 const version = item.versions.en || {};
                 const typeIcon = typeIcons[item.type] || 'fa-file-alt';
                 const typeName = typeNames[item.type] || item.type;
-                
+
                 return `
                     <article class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition duration-300">
                         <div class="flex items-start justify-between mb-4">
@@ -410,11 +422,11 @@
         }
 
         // Toggle content expansion
-        window.toggleContent = function(contentId) {
+        window.toggleContent = function (contentId) {
             const element = document.getElementById(contentId);
             const button = element.previousElementSibling.querySelector('button');
             const icon = button.querySelector('i.fa-chevron-down, i.fa-chevron-up');
-            
+
             if (element.classList.contains('hidden')) {
                 element.classList.remove('hidden');
                 button.innerHTML = 'Show less <i class="fas fa-chevron-up ml-1"></i>';
@@ -430,7 +442,7 @@
             const searchInput = document.getElementById('searchInput');
             const categoryFilter = document.getElementById('categoryFilter');
             const refreshBtn = document.getElementById('refreshBtn');
-            
+
             if (searchBtn) searchBtn.addEventListener('click', displayContent);
             if (searchInput) searchInput.addEventListener('keyup', (e) => {
                 if (e.key === 'Enter') displayContent();
@@ -462,7 +474,7 @@
 
         function formatDate(dateValue) {
             if (!dateValue) return '-';
-            
+
             let date;
             // Firestore Timestamp object
             if (dateValue.toDate && typeof dateValue.toDate === 'function') {
@@ -472,9 +484,9 @@
             else {
                 date = new Date(dateValue);
             }
-            
+
             if (isNaN(date.getTime())) return '-';
-            
+
             return date.toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'long',
@@ -498,11 +510,21 @@
             toast.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50';
             toast.innerHTML = `<i class="fas fa-check mr-2"></i>${message}`;
             document.body.appendChild(toast);
-            
+
             setTimeout(() => {
                 toast.remove();
             }, 3000);
         }
+
+        // 커뮤니티 메인 페이지의 경우 즉시 공유 기능 활성화
+        document.addEventListener('DOMContentLoaded', () => {
+            // URL에 id 파라미터가 없으면 메인 페이지로 간주
+            if (!window.location.search.includes('id=')) {
+                window.contentLoaded = true;
+                console.log('✅ 커뮤니티 메인 페이지 공유 기능 활성화');
+            }
+        });
     </script>
 </body>
+
 </html>

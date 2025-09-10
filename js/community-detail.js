@@ -308,10 +308,26 @@ function renderContentDetail(version, contentData, language) {
     // 콘텐츠 표시
     document.getElementById('contentDetail').classList.remove('hidden');
     
+    // HTML 태그 제거 함수 (공유용)
+    function stripHtmlForShare(html) {
+        if (!html) return '';
+        const tmp = document.createElement('div');
+        tmp.innerHTML = html;
+        let text = tmp.textContent || tmp.innerText || '';
+        return text.replace(/\s+/g, ' ').trim();
+    }
+    
     // 공유용 메타데이터를 전역 변수로 설정 (소셜 미디어 공유용)
+    let cleanDescription = '';
+    if (version.summary) {
+        cleanDescription = stripHtmlForShare(version.summary);
+    } else if (version.content) {
+        cleanDescription = stripHtmlForShare(version.content.substring(0, 160)) + '...';
+    }
+    
     window.shareMetadata = {
         title: version.title,
-        description: version.summary || (version.content ? version.content.substring(0, 160) + '...' : ''),
+        description: cleanDescription || 'LikeVoca 커뮤니티 콘텐츠를 확인하세요.',
         image: version.image || 'https://likevoca.com/assets/og-image.jpg',
         url: window.location.href
     };

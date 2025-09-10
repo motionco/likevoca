@@ -295,7 +295,11 @@ window.shareCurrentPage = function(platform) {
   // content-detail 페이지인 경우 실제 콘텐츠 정보 사용
   let pageTitle, pageDescription;
   
-  if (window.location.pathname.includes('content-detail.html') || window.location.pathname.includes('community')) {
+  // 상세 페이지 여부 확인 (content-detail.html 또는 URL에 id 파라미터가 있는 경우)
+  const isDetailPage = window.location.pathname.includes('content-detail.html') || 
+                       (window.location.pathname.includes('community') && window.location.search.includes('id='));
+  
+  if (isDetailPage) {
     console.log('🔍 콘텐츠/커뮤니티 상세 페이지 공유 시도');
     
     // 전역 공유 메타데이터가 있으면 우선 사용 (가장 신뢰할 수 있는 데이터)
@@ -308,10 +312,17 @@ window.shareCurrentPage = function(platform) {
         description: pageDescription.substring(0, 100) 
       });
     } else if (!window.contentLoaded) {
-      // 콘텐츠가 아직 로드되지 않았다면 잠시 대기
-      console.log('⏳ 콘텐츠 로딩 대기 중...');
-      setTimeout(() => shareCurrentPage(platform), 500);
-      return;
+      // 콘텐츠가 아직 로드되지 않았다면 잠시 대기 (최대 5초)
+      const waitCount = window.shareWaitCount || 0;
+      if (waitCount < 10) {
+        console.log(`⏳ 콘텐츠 로딩 대기 중... (${waitCount + 1}/10)`);
+        window.shareWaitCount = waitCount + 1;
+        setTimeout(() => shareCurrentPage(platform), 500);
+        return;
+      } else {
+        console.warn('⚠️ 콘텐츠 로딩 타임아웃, 기본 공유 진행');
+        window.shareWaitCount = 0; // 리셋
+      }
     } else {
       // 폴백: DOM에서 직접 가져오기
       const contentTitle = document.getElementById('contentTitle')?.textContent;
