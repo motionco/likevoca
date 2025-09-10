@@ -59,6 +59,70 @@
     }
     </script>
     
+    <!-- Server-side meta tag prerendering script -->
+    <script>
+        // Extract content ID from URL parameters and immediately update meta tags
+        (function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const contentId = urlParams.get('id');
+            
+            if (contentId) {
+                // Load Firebase content data immediately and update meta tags
+                const script = document.createElement('script');
+                script.type = 'module';
+                script.textContent = `
+                    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
+                    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+                    import { getFirestore } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
+                    
+                    const firebaseConfig = {
+                        apiKey: "AIzaSyDSM1m4UhrPiXpJINsaU1sN9GGT-Gz6-Bs",
+                        authDomain: "likevoca-8a8a7.firebaseapp.com",
+                        projectId: "likevoca-8a8a7",
+                        storageBucket: "likevoca-8a8a7.appspot.com",
+                        messagingSenderId: "398693466745",
+                        appId: "1:398693466745:web:bb71ba8fc0e2f4e4ad72c6"
+                    };
+                    
+                    try {
+                        const app = initializeApp(firebaseConfig);
+                        const db = getFirestore(app);
+                        
+                        const contentRef = doc(db, 'content', '${contentId}');
+                        getDoc(contentRef).then(contentSnap => {
+                            if (contentSnap.exists()) {
+                                const contentData = contentSnap.data();
+                                const version = contentData.versions?.en;
+                                
+                                if (version) {
+                                    const title = version.title + ' - LikeVoca';
+                                    const description = version.summary || version.content?.substring(0, 160) || 'Useful learning content from LikeVoca community';
+                                    const url = window.location.href;
+                                    
+                                    // Update meta tags immediately
+                                    document.title = title;
+                                    document.querySelector('meta[name="description"]').content = description;
+                                    document.querySelector('meta[property="og:title"]').content = title;
+                                    document.querySelector('meta[property="og:description"]').content = description;
+                                    document.querySelector('meta[property="og:url"]').content = url;
+                                    document.querySelector('meta[name="twitter:title"]').content = title;
+                                    document.querySelector('meta[name="twitter:description"]').content = description;
+                                    
+                                    console.log('✅ Prerendering meta tag update complete');
+                                }
+                            }
+                        }).catch(err => {
+                            console.warn('Prerendering failed:', err);
+                        });
+                    } catch (error) {
+                        console.warn('Firebase initialization failed:', error);
+                    }
+                `;
+                document.head.appendChild(script);
+            }
+        })();
+    </script>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" 

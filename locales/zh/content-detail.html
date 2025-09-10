@@ -59,6 +59,72 @@
     }
     </script>
     
+    <!-- 프리렌더링을 위한 SEO 최적화 스크립트 -->
+    <script>
+        (function() {
+            const contentId = new URLSearchParams(window.location.search).get('id');
+            if (!contentId) return;
+            
+            // Firebase를 직접 사용하지 않고 캐시된 데이터 또는 API를 통해 기본 메타데이터만 설정
+            fetch(`https://likevoca-default-rtdb.firebaseio.com/community-content/${contentId}.json`)
+                .then(response => response.json())
+                .then(contentData => {
+                    if (contentData && contentData.versions?.zh) {
+                        const zhContent = contentData.versions.zh;
+                        
+                        // 기본 메타 태그 업데이트
+                        document.title = (zhContent.title || '内容') + ' - LikeVoca';
+                        
+                        const description = zhContent.summary || 'LikeVoca社区的有用学习内容';
+                        document.querySelector('meta[name="description"]').setAttribute('content', description);
+                        
+                        // Open Graph 태그 업데이트
+                        document.querySelector('meta[property="og:title"]').setAttribute('content', document.title);
+                        document.querySelector('meta[property="og:description"]').setAttribute('content', description);
+                        document.querySelector('meta[property="og:url"]').setAttribute('content', window.location.href);
+                        
+                        // Twitter Card 업데이트
+                        document.querySelector('meta[name="twitter:title"]').setAttribute('content', document.title);
+                        document.querySelector('meta[name="twitter:description"]').setAttribute('content', description);
+                        
+                        // Canonical URL 설정
+                        document.querySelector('link[rel="canonical"]').setAttribute('href', window.location.href);
+                        
+                        // 구조화된 데이터 업데이트
+                        const structuredData = {
+                            "@context": "https://schema.org",
+                            "@type": "Article",
+                            "headline": zhContent.title || '内容',
+                            "description": description,
+                            "author": {
+                                "@type": "Organization",
+                                "name": "LikeVoca"
+                            },
+                            "publisher": {
+                                "@type": "Organization", 
+                                "name": "LikeVoca",
+                                "url": "https://likevoca.com"
+                            },
+                            "url": window.location.href,
+                            "datePublished": contentData.createdAt || new Date().toISOString(),
+                            "dateModified": contentData.updatedAt || contentData.createdAt || new Date().toISOString(),
+                            "inLanguage": "zh",
+                            "mainEntityOfPage": {
+                                "@type": "WebPage",
+                                "@id": window.location.href
+                            }
+                        };
+                        
+                        document.getElementById('structuredData').textContent = JSON.stringify(structuredData, null, 2);
+                    }
+                })
+                .catch(error => {
+                    // 오류 발생 시 기본값 유지
+                    console.warn('메타데이터를 로드할 수 없습니다:', error);
+                });
+        })();
+    </script>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" 
