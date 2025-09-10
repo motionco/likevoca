@@ -104,6 +104,9 @@ async function initializeFirebase() {
     }
 
     console.log("Firebase가 성공적으로 초기화되었습니다.");
+    
+    // 전역 객체 업데이트
+    updateGlobalObjects();
   } catch (error) {
     console.error("Firebase 초기화 중 오류:", error);
     
@@ -115,19 +118,30 @@ async function initializeFirebase() {
       db = getFirestore(app);
       storage = getStorage(app);
       console.log("기본 설정으로 Firebase 초기화 완료");
+      updateGlobalObjects();
     } catch (fallbackError) {
       console.error("Firebase 기본 초기화도 실패:", fallbackError);
     }
   }
 }
 
+// 전역 객체 업데이트 함수
+function updateGlobalObjects() {
+  console.log('🔄 전역 객체 업데이트 중...', { app: !!app, auth: !!auth, db: !!db, storage: !!storage });
+  window.auth = auth;
+  window.db = db;
+  window.storage = storage;
+  window.onAuthStateChanged = onAuthStateChanged;
+  console.log('✅ 전역 객체 설정 완료:', { 'window.auth': !!window.auth, 'window.db': !!window.db });
+}
+
 // 페이지 로드 시 Firebase 초기화
 initializeFirebase();
 
-// 전역 접근을 위해 window 객체에 추가
-window.auth = auth;
-window.db = db;
-window.storage = storage;
+// 초기 전역 객체 설정 (firebase-init.js 로드 직후)
+window.auth = auth || null;
+window.db = db || null;  
+window.storage = storage || null;
 window.onAuthStateChanged = onAuthStateChanged;
 
 // 다국어 지원 언어 목록
