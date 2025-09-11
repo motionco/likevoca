@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Iniciar Sesión - LikeVoca</title>
+
     <meta
       name="description"
       content="Inicia sesión en LikeVoca para acceder a tu experiencia de aprendizaje multilingüe personalizada con vocabulario, cuestionarios y seguimiento de progreso"
@@ -13,7 +14,21 @@
       property="og:description"
       content="Inicia sesión en LikeVoca para acceder a tu experiencia de aprendizaje multilingüe personalizada con vocabulario, cuestionarios y seguimiento de progreso"
     />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.likevoca.com/es/login.html" />
     <meta property="og:locale" content="es" />
+    <meta property="og:site_name" content="LikeVoca" />
+    <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Iniciar Sesión - LikeVoca" />
+
+    <!-- Twitter Card 섹션 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Iniciar Sesión - LikeVoca" />
+    <meta name="twitter:description" content="Inicia sesión en LikeVoca para acceder a tu experiencia de aprendizaje multilingüe personalizada con vocabulario, cuestionarios y seguimiento de progreso" />
+    <meta name="twitter:image" content="https://www.likevoca.com/assets/hero.webp" />
+    <meta name="twitter:image:alt" content="Iniciar Sesión - LikeVoca" />
     <link rel="canonical" href="https://likevoca.com/es/login" />
     <link rel="alternate" hreflang="en" href="https://likevoca.com/en/login" />
     <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/login" />

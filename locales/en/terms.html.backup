@@ -10,12 +10,32 @@
   <meta name="description" content="Review LikeVoca's terms of service. Important information about membership registration, service usage, account management, and more." />
   <meta name="keywords" content="LikeVoca terms of service, service terms, membership terms, language learning service terms" />
 
-  <!-- Open Graph / Social Media Meta Tags -->
+  <!-- 첫 번째 Open Graph 섹션 -->
   <meta property="og:title" content="Terms of Service - LikeVoca" />
   <meta property="og:description" content="Review LikeVoca's terms of service. Important information about membership registration, service usage, account management, and more." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://likevoca.com/en/terms" />
+  <meta property="og:url" content="https://www.likevoca.com/en/terms.html" />
   <meta property="og:locale" content="en" />
+  <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
+
+  <!-- Twitter Card 섹션 -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Terms of Service - LikeVoca" />
+  <meta name="twitter:description" content="Review LikeVoca's terms of service. Important information about membership registration, service usage, account management, and more." />
+  <meta name="twitter:image" content="https://www.likevoca.com/assets/hero.webp" />
+  <meta name="twitter:image:alt" content="Terms of Service - LikeVoca" />
+
+  <!-- 두 번째 Open Graph 섹션 (상세) -->
+  <meta property="og:title" content="Terms of Service - LikeVoca" />
+  <meta property="og:description" content="Review LikeVoca's terms of service. Important information about membership registration, service usage, account management, and more." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.likevoca.com/en/terms.html" />
+  <meta property="og:site_name" content="LikeVoca" />
+  <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Terms of Service - LikeVoca" />
+
 
   <!-- Canonical Link -->
   <link rel="canonical" href="https://likevoca.com/en/terms" />

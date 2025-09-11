@@ -8,18 +8,34 @@
     <!-- 기본 메타 태그 -->
     <meta name="description" content="LikeVocaはAI駆動のパーソナライズされた言語学習プラットフォームです。Firebaseクラウドストレージ、リアルタイム進捗追跡、多言語サポートで効率的な単語学習を提供します。" />
     <meta name="keywords" content="LikeVocaについて, AI言語学習, Firebaseストレージ, パーソナライズ単語帳, リアルタイム進捗管理, 多言語サポート, レスポンシブウェブデザイン, お問い合わせシステム" />
+
+  <!-- 첫 번째 Open Graph 섹션 -->
+  <meta property="og:title" content="LikeVocaについて - パーソナライズされた言語学習プラットフォーム" />
+  <meta property="og:description" content="LikeVocaはAI駆動のパーソナライズされた言語学習プラットフォームです。Firebaseクラウドストレージ、リアルタイム進捗追跡、多言語サポートで効率的な単語学習を提供します。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.likevoca.com/ja/about.html" />
+  <meta property="og:locale" content="ja" />
+  <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
+
+  <!-- Twitter Card 섹션 -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="LikeVocaについて - パーソナライズされた言語学習プラットフォーム" />
+  <meta name="twitter:description" content="LikeVocaはAI駆動のパーソナライズされた言語学習プラットフォームです。Firebaseクラウドストレージ、リアルタイム進捗追跡、多言語サポートで効率的な単語学習を提供します。" />
+  <meta name="twitter:image" content="https://www.likevoca.com/assets/hero.webp" />
+  <meta name="twitter:image:alt" content="LikeVocaについて - パーソナライズされた言語学習プラットフォーム" />
+
+  <!-- 두 번째 Open Graph 섹션 (상세) -->
+  <meta property="og:title" content="LikeVocaについて - パーソナライズされた言語学習プラットフォーム" />
+  <meta property="og:description" content="LikeVocaはAI駆動のパーソナライズされた言語学習プラットフォームです。Firebaseクラウドストレージ、リアルタイム進捗追跡、多言語サポートで効率的な単語学習を提供します。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.likevoca.com/ja/about.html" />
+  <meta property="og:site_name" content="LikeVoca" />
+  <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="LikeVocaについて - パーソナライズされた言語学習プラットフォーム" />
     
-    <!-- Open Graph / 소셜 미디어 메타 태그 -->
-    <meta property="og:title" content="LikeVocaについて - AI駆動パーソナライズ言語学習プラットフォーム" />
-    <meta property="og:description" content="Firebaseクラウドストレージで安全なデータ管理、AIカスタム単語推薦、リアルタイム進捗追跡で効率的な言語学習を体験してください。" />
-    <meta property="og:type" content="article" />
-    <meta property="og:url" content="https://likevoca.com/ja/about" />
-    <meta property="og:locale" content="ja" />
     
-    <!-- Twitter Card 태그 -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="LikeVocaについて - AI駆動パーソナライズ言語学習プラットフォーム" />
-    <meta name="twitter:description" content="Firebaseクラウドストレージで安全なデータ管理、AIカスタム単語推薦、リアルタイム進捗追跡で効率的な言語学習を体験してください。" />
     
     <!-- 표준 링크 -->
     <link rel="canonical" href="https://likevoca.com/ja/about" />

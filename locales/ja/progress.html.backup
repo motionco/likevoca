@@ -9,19 +9,34 @@
   <!-- 기본 메타 태그 -->
   <meta name="description" content="個人カスタマイズされた学習進捗を視覚的に確認し、分析しましょう。単語学習量、クイズ成果、ゲームスコアなどをチャートとグラフで一目で把握できます。データ駆動学習で言語スキルを効果的に向上させることができます。" />
   <meta name="keywords" content="学習進捗, 成果分析, 学習統計, 進捗管理, 学習データ, 成果追跡, 言語学習分析, 個人カスタマイズ進捗, 学習達成度" />
-  
-  <!-- Open Graph / 소셜 미디어 메타 태그 -->
+
+  <!-- 첫 번째 Open Graph 섹션 -->
   <meta property="og:title" content="LikeVoca - 学習進捗と成果分析" />
   <meta property="og:description" content="個人カスタマイズされた学習進捗を視覚的に確認し、分析しましょう。単語学習量、クイズ成果、ゲームスコアなどをチャートとグラフで一目で把握できます。データ駆動学習で言語スキルを効果的に向上させることができます。" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://likevoca.com/ja/progress" />
+  <meta property="og:url" content="https://www.likevoca.com/ja/progress.html" />
   <meta property="og:locale" content="ja" />
-  
-  <!-- Twitter Card 태그 -->
+  <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
+
+  <!-- Twitter Card 섹션 -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="LikeVoca - 学習進捗と成果分析" />
   <meta name="twitter:description" content="個人カスタマイズされた学習進捗を視覚的に確認し、分析しましょう。単語学習量、クイズ成果、ゲームスコアなどをチャートとグラフで一目で把握できます。データ駆動学習で言語スキルを効果的に向上させることができます。" />
-  <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
+  <meta name="twitter:image" content="https://www.likevoca.com/assets/hero.webp" />
+  <meta name="twitter:image:alt" content="LikeVoca - 学習進捗と成果分析" />
+
+  <!-- 두 번째 Open Graph 섹션 (상세) -->
+  <meta property="og:title" content="LikeVoca - 学習進捗と成果分析" />
+  <meta property="og:description" content="個人カスタマイズされた学習進捗を視覚的に確認し、分析しましょう。単語学習量、クイズ成果、ゲームスコアなどをチャートとグラフで一目で把握できます。データ駆動学習で言語スキルを効果的に向上させることができます。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.likevoca.com/ja/progress.html" />
+  <meta property="og:site_name" content="LikeVoca" />
+  <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="LikeVoca - 学習進捗と成果分析" />
+  
+  
   
   <!-- 표준 링크 -->
   <link rel="canonical" href="https://likevoca.com/ja/progress" />

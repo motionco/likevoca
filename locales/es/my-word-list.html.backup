@@ -9,23 +9,38 @@
   <!-- 기본 메타 태그 -->
   <meta name="description"
     content="Crea tu propio vocabulario personalizado con generación de palabras IA y funciones de marcadores de palabras. Mejora efectivamente tu vocabulario a través de gestión de progreso de aprendizaje personalizado y sistemas de revisión." />
-  <meta name="keywords"
-    content="mi vocabulario, vocabulario personalizado, generación de palabras IA, marcadores de palabras, vocabulario personal, gestión de vocabulario, progreso de aprendizaje, sistema de revisión, vocabulario multilingüe" />
+  <meta name="keywords" content="vocabulario, lista de palabras, aprendizaje de idiomas, IA, aprendizaje personalizado, multilingüe" />
 
-  <!-- Open Graph / 소셜 미디어 메타 태그 -->
+  <!-- 첫 번째 Open Graph 섹션 -->
   <meta property="og:title" content="LikeVoca - Mi Vocabulario Personalizado" />
-  <meta property="og:description"
-    content="Crea tu propio vocabulario personalizado con generación de palabras IA y funciones de marcadores de palabras. Mejora efectivamente tu vocabulario a través de gestión de progreso de aprendizaje personalizado y sistemas de revisión." />
+  <meta property="og:description" content="LikeVoca - Plataforma de Aprendizaje Multilingüe" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://likevoca.com/es/my-word-list" />
+  <meta property="og:url" content="https://www.likevoca.com/es/my-word-list.html" />
   <meta property="og:locale" content="es" />
+  <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
 
-  <!-- Twitter Card 태그 -->
+  <!-- Twitter Card 섹션 -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="LikeVoca - Mi Vocabulario Personalizado" />
-  <meta name="twitter:description"
+  <meta name="twitter:description" content="LikeVoca - Plataforma de Aprendizaje Multilingüe" />
+  <meta name="twitter:image" content="https://www.likevoca.com/assets/hero.webp" />
+  <meta name="twitter:image:alt" content="LikeVoca - Mi Vocabulario Personalizado" />
+
+  <!-- 두 번째 Open Graph 섹션 (상세) -->
+  <meta property="og:title" content="LikeVoca - Mi Vocabulario Personalizado" />
+  <meta property="og:description" content="LikeVoca - Plataforma de Aprendizaje Multilingüe" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.likevoca.com/es/my-word-list.html" />
+  <meta property="og:site_name" content="LikeVoca" />
+  <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="LikeVoca - Mi Vocabulario Personalizado" />
+    content="mi vocabulario, vocabulario personalizado, generación de palabras IA, marcadores de palabras, vocabulario personal, gestión de vocabulario, progreso de aprendizaje, sistema de revisión, vocabulario multilingüe" />
+
     content="Crea tu propio vocabulario personalizado con generación de palabras IA y funciones de marcadores de palabras. Mejora efectivamente tu vocabulario a través de gestión de progreso de aprendizaje personalizado y sistemas de revisión." />
-  <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
+
+    content="Crea tu propio vocabulario personalizado con generación de palabras IA y funciones de marcadores de palabras. Mejora efectivamente tu vocabulario a través de gestión de progreso de aprendizaje personalizado y sistemas de revisión." />
 
   <!-- 표준 링크 -->
   <link rel="canonical" href="https://likevoca.com/es/my-word-list" />

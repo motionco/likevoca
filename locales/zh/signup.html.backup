@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>注册 - LikeVoca</title>
+
     <meta
       name="description"
       content="创建LikeVoca账户，开始您的多语言学习之旅。使用个性化单词本、测验和进度跟踪功能"
@@ -13,7 +14,21 @@
       property="og:description"
       content="创建LikeVoca账户，开始您的多语言学习之旅。使用个性化单词本、测验和进度跟踪功能"
     />
-    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.likevoca.com/zh/signup.html" />
+    <meta property="og:locale" content="zh" />
+    <meta property="og:site_name" content="LikeVoca" />
+    <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="注册 - LikeVoca" />
+
+    <!-- Twitter Card 섹션 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="注册 - LikeVoca" />
+    <meta name="twitter:description" content="创建LikeVoca账户，开始您的多语言学习之旅。使用个性化单词本、测验和进度跟踪功能" />
+    <meta name="twitter:image" content="https://www.likevoca.com/assets/hero.webp" />
+    <meta name="twitter:image:alt" content="注册 - LikeVoca" />
     <link rel="canonical" href="https://likevoca.com/zh/signup" />
     <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/signup" />
     <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/signup" />

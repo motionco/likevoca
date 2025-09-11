@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>サインアップ - LikeVoca</title>
+
     <meta
       name="description"
       content="LikeVocaアカウントを作成して、多言語学習の旅を始めましょう。パーソナライズされた単語帳、クイズ、進捗追跡機能をご利用いただけます"
@@ -13,7 +14,21 @@
       property="og:description"
       content="LikeVocaアカウントを作成して、多言語学習の旅を始めましょう。パーソナライズされた単語帳、クイズ、進捗追跡機能をご利用いただけます"
     />
-    <meta property="og:locale" content="ja_JP" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.likevoca.com/ja/signup.html" />
+    <meta property="og:locale" content="ja" />
+    <meta property="og:site_name" content="LikeVoca" />
+    <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="サインアップ - LikeVoca" />
+
+    <!-- Twitter Card 섹션 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="サインアップ - LikeVoca" />
+    <meta name="twitter:description" content="LikeVocaアカウントを作成して、多言語学習の旅を始めましょう。パーソナライズされた単語帳、クイズ、進捗追跡機能をご利用いただけます" />
+    <meta name="twitter:image" content="https://www.likevoca.com/assets/hero.webp" />
+    <meta name="twitter:image:alt" content="サインアップ - LikeVoca" />
     <link rel="canonical" href="https://likevoca.com/ja/signup" />
     <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/signup" />
     <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/signup" />

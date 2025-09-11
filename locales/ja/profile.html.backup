@@ -5,10 +5,33 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>プロフィール管理 - LikeVoca</title>
-  <meta name="description" content="LikeVocaのプロフィール設定、アカウント接続、個人情報を管理して言語学習をカスタマイズしましょう" />
+
+  <!-- 첫 번째 Open Graph 섹션 -->
   <meta property="og:title" content="プロフィール管理 - LikeVoca" />
   <meta property="og:description" content="LikeVocaのプロフィール設定、アカウント接続、個人情報を管理して言語学習をカスタマイズしましょう" />
-  <meta property="og:locale" content="ja_JP" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.likevoca.com/ja/profile.html" />
+  <meta property="og:locale" content="ja" />
+  <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
+
+  <!-- Twitter Card 섹션 -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="プロフィール管理 - LikeVoca" />
+  <meta name="twitter:description" content="LikeVocaのプロフィール設定、アカウント接続、個人情報を管理して言語学習をカスタマイズしましょう" />
+  <meta name="twitter:image" content="https://www.likevoca.com/assets/hero.webp" />
+  <meta name="twitter:image:alt" content="プロフィール管理 - LikeVoca" />
+
+  <!-- 두 번째 Open Graph 섹션 (상세) -->
+  <meta property="og:title" content="プロフィール管理 - LikeVoca" />
+  <meta property="og:description" content="LikeVocaのプロフィール設定、アカウント接続、個人情報を管理して言語学習をカスタマイズしましょう" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.likevoca.com/ja/profile.html" />
+  <meta property="og:site_name" content="LikeVoca" />
+  <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="プロフィール管理 - LikeVoca" />
+  <meta name="description" content="LikeVocaのプロフィール設定、アカウント接続、個人情報を管理して言語学習をカスタマイズしましょう" />
   <link rel="canonical" href="https://likevoca.com/ja/profile" />
   <link rel="alternate" hreflang="en" href="https://likevoca.com/en/profile" />
   <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/profile" />

@@ -8,13 +8,33 @@
     <!-- 基本メタタグ -->
     <meta name="description" content="LikeVocaユーザーマニュアル。アカウント作成から高度な機能まで、LikeVocaのすべての機能を詳しく説明いたします。効果的な言語学習のための完全ガイド。" />
     <meta name="keywords" content="LikeVocaマニュアル, 使い方, 言語学習ガイド, AI単語学習, ユーザーガイド, 始め方" />
+
+  <!-- 첫 번째 Open Graph 섹션 -->
+  <meta property="og:title" content="ユーザーマニュアル - LikeVoca" />
+  <meta property="og:description" content="LikeVocaユーザーマニュアル。アカウント作成から高度な機能まで、LikeVocaのすべての機能を詳しく説明いたします。効果的な言語学習のための完全ガイド。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.likevoca.com/ja/manual.html" />
+  <meta property="og:locale" content="ja" />
+  <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
+
+  <!-- Twitter Card 섹션 -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="ユーザーマニュアル - LikeVoca" />
+  <meta name="twitter:description" content="LikeVocaユーザーマニュアル。アカウント作成から高度な機能まで、LikeVocaのすべての機能を詳しく説明いたします。効果的な言語学習のための完全ガイド。" />
+  <meta name="twitter:image" content="https://www.likevoca.com/assets/hero.webp" />
+  <meta name="twitter:image:alt" content="ユーザーマニュアル - LikeVoca" />
+
+  <!-- 두 번째 Open Graph 섹션 (상세) -->
+  <meta property="og:title" content="ユーザーマニュアル - LikeVoca" />
+  <meta property="og:description" content="LikeVocaユーザーマニュアル。アカウント作成から高度な機能まで、LikeVocaのすべての機能を詳しく説明いたします。効果的な言語学習のための完全ガイド。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.likevoca.com/ja/manual.html" />
+  <meta property="og:site_name" content="LikeVoca" />
+  <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="ユーザーマニュアル - LikeVoca" />
     
-    <!-- Open Graph / ソーシャルメディアメタタグ -->
-    <meta property="og:title" content="ユーザーマニュアル - LikeVoca" />
-    <meta property="og:description" content="LikeVocaのすべての機能を詳しく説明する完全なユーザーマニュアル。アカウント作成から高度な機能まで段階的にご案内いたします。" />
-    <meta property="og:type" content="article" />
-    <meta property="og:url" content="https://likevoca.com/ja/manual" />
-    <meta property="og:locale" content="ja" />
     
     <!-- 標準リンク -->
     <link rel="canonical" href="https://likevoca.com/ja/manual" />

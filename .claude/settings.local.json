@@ -59,7 +59,8 @@
       "Bash(./update_meta_en.sh:*)",
       "Bash(./update_meta_ja.sh:*)",
       "Bash(./update_meta_zh.sh:*)",
-      "Bash(./update_meta_es.sh:*)"
+      "Bash(./update_meta_es.sh:*)",
+      "Bash(/c/Users/motio/AppData/Local/Microsoft/WindowsApps/python update_twitter_optimization.py)"
     ],
     "deny": [],
     "ask": []

@@ -10,18 +10,33 @@
   <meta name="description" content="需要LikeVoca服务相关帮助或技术支持吗？随时方便地联系我们。我们提供快速友好的客户支持，为您提供最佳的语言学习体验。" />
   <meta name="keywords" content="客户支持, 联系我们, 技术支持, 客户服务, LikeVoca联系, 语言学习支持, 用户支持, 反馈" />
 
-  <!-- Open Graph / 소셜 미디어 메타 태그 -->
+  <!-- 첫 번째 Open Graph 섹션 -->
   <meta property="og:title" content="LikeVoca - 客户支持与联系我们" />
   <meta property="og:description" content="需要LikeVoca服务相关帮助或技术支持吗？随时方便地联系我们。我们提供快速友好的客户支持，为您提供最佳的语言学习体验。" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://likevoca.com/zh/inquiry" />
+  <meta property="og:url" content="https://www.likevoca.com/zh/inquiry.html" />
   <meta property="og:locale" content="zh" />
+  <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
 
-  <!-- Twitter Card 태그 -->
+  <!-- Twitter Card 섹션 -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="LikeVoca - 客户支持与联系我们" />
   <meta name="twitter:description" content="需要LikeVoca服务相关帮助或技术支持吗？随时方便地联系我们。我们提供快速友好的客户支持，为您提供最佳的语言学习体验。" />
-  <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
+  <meta name="twitter:image" content="https://www.likevoca.com/assets/hero.webp" />
+  <meta name="twitter:image:alt" content="LikeVoca - 客户支持与联系我们" />
+
+  <!-- 두 번째 Open Graph 섹션 (상세) -->
+  <meta property="og:title" content="LikeVoca - 客户支持与联系我们" />
+  <meta property="og:description" content="需要LikeVoca服务相关帮助或技术支持吗？随时方便地联系我们。我们提供快速友好的客户支持，为您提供最佳的语言学习体验。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.likevoca.com/zh/inquiry.html" />
+  <meta property="og:site_name" content="LikeVoca" />
+  <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="LikeVoca - 客户支持与联系我们" />
+
+
 
   <!-- 표준 링크 -->
   <link rel="canonical" href="https://likevoca.com/zh/inquiry" />

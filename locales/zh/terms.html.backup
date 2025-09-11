@@ -10,12 +10,32 @@
   <meta name="description" content="请查看LikeVoca服务条款。包含关于会员注册、服务使用、账户管理等的重要内容。" />
   <meta name="keywords" content="LikeVoca 服务条款, 服务协议, 会员使用条款, 语言学习服务条款" />
 
-  <!-- Open Graph / 社交媒体元标签 -->
+  <!-- 첫 번째 Open Graph 섹션 -->
   <meta property="og:title" content="服务条款 - LikeVoca" />
   <meta property="og:description" content="请查看LikeVoca服务条款。包含关于会员注册、服务使用、账户管理等的重要内容。" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://likevoca.com/zh/terms" />
+  <meta property="og:url" content="https://www.likevoca.com/zh/terms.html" />
   <meta property="og:locale" content="zh" />
+  <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
+
+  <!-- Twitter Card 섹션 -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="服务条款 - LikeVoca" />
+  <meta name="twitter:description" content="请查看LikeVoca服务条款。包含关于会员注册、服务使用、账户管理等的重要内容。" />
+  <meta name="twitter:image" content="https://www.likevoca.com/assets/hero.webp" />
+  <meta name="twitter:image:alt" content="服务条款 - LikeVoca" />
+
+  <!-- 두 번째 Open Graph 섹션 (상세) -->
+  <meta property="og:title" content="服务条款 - LikeVoca" />
+  <meta property="og:description" content="请查看LikeVoca服务条款。包含关于会员注册、服务使用、账户管理等的重要内容。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.likevoca.com/zh/terms.html" />
+  <meta property="og:site_name" content="LikeVoca" />
+  <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="服务条款 - LikeVoca" />
+
 
   <!-- 规范链接 -->
   <link rel="canonical" href="https://likevoca.com/zh/terms" />

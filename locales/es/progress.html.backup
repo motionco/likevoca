@@ -8,19 +8,34 @@
   <!-- 기본 메타 태그 -->
   <meta name="description" content="Revisa y analiza visualmente tu progreso de aprendizaje personalizado. Ve el volumen de aprendizaje de palabras, rendimiento en cuestionarios, puntuaciones de juegos y más de un vistazo a través de gráficos y estadísticas. Mejora efectivamente tus habilidades lingüísticas a través del aprendizaje basado en datos." />
   <meta name="keywords" content="progreso de aprendizaje, análisis de rendimiento, estadísticas de aprendizaje, gestión de progreso, datos de aprendizaje, seguimiento de rendimiento, análisis de aprendizaje de idiomas, progreso personalizado, logros de aprendizaje" />
-  
-  <!-- Open Graph / 소셜 미디어 메타 태그 -->
+
+  <!-- 첫 번째 Open Graph 섹션 -->
   <meta property="og:title" content="LikeVoca - Análisis de Progreso y Rendimiento de Aprendizaje" />
   <meta property="og:description" content="Revisa y analiza visualmente tu progreso de aprendizaje personalizado. Ve el volumen de aprendizaje de palabras, rendimiento en cuestionarios, puntuaciones de juegos y más de un vistazo a través de gráficos y estadísticas. Mejora efectivamente tus habilidades lingüísticas a través del aprendizaje basado en datos." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://likevoca.com/es/progress" />
+  <meta property="og:url" content="https://www.likevoca.com/es/progress.html" />
   <meta property="og:locale" content="es" />
-  
-  <!-- Twitter Card 태그 -->
+  <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
+
+  <!-- Twitter Card 섹션 -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="LikeVoca - Análisis de Progreso y Rendimiento de Aprendizaje" />
   <meta name="twitter:description" content="Revisa y analiza visualmente tu progreso de aprendizaje personalizado. Ve el volumen de aprendizaje de palabras, rendimiento en cuestionarios, puntuaciones de juegos y más de un vistazo a través de gráficos y estadísticas. Mejora efectivamente tus habilidades lingüísticas a través del aprendizaje basado en datos." />
-  <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
+  <meta name="twitter:image" content="https://www.likevoca.com/assets/hero.webp" />
+  <meta name="twitter:image:alt" content="LikeVoca - Análisis de Progreso y Rendimiento de Aprendizaje" />
+
+  <!-- 두 번째 Open Graph 섹션 (상세) -->
+  <meta property="og:title" content="LikeVoca - Análisis de Progreso y Rendimiento de Aprendizaje" />
+  <meta property="og:description" content="Revisa y analiza visualmente tu progreso de aprendizaje personalizado. Ve el volumen de aprendizaje de palabras, rendimiento en cuestionarios, puntuaciones de juegos y más de un vistazo a través de gráficos y estadísticas. Mejora efectivamente tus habilidades lingüísticas a través del aprendizaje basado en datos." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.likevoca.com/es/progress.html" />
+  <meta property="og:site_name" content="LikeVoca" />
+  <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="LikeVoca - Análisis de Progreso y Rendimiento de Aprendizaje" />
+  
+  
   
   <!-- 표준 링크 -->
   <link rel="canonical" href="https://likevoca.com/es/progress" />

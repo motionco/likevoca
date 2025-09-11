@@ -8,18 +8,34 @@
     <!-- 기본 메타 태그 -->
     <meta name="description" content="Discover LikeVoca's systematic learning methods. Learn efficient vocabulary mastery through Firebase storage-based AI vocabulary, quiz modes, and real-time progress tracking." />
     <meta name="keywords" content="language learning methods, LikeVoca learning guide, AI vocabulary, Firebase storage, quiz modes, real-time progress tracking, multilingual support, responsive learning" />
+
+  <!-- 첫 번째 Open Graph 섹션 -->
+  <meta property="og:title" content="How to Learn - LikeVoca Effective Language Learning Guide" />
+  <meta property="og:description" content="Discover LikeVoca's systematic learning methods. Learn efficient vocabulary mastery through Firebase storage-based AI vocabulary, quiz modes, and real-time progress tracking." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.likevoca.com/en/guide.html" />
+  <meta property="og:locale" content="en" />
+  <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
+
+  <!-- Twitter Card 섹션 -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="How to Learn - LikeVoca Effective Language Learning Guide" />
+  <meta name="twitter:description" content="Discover LikeVoca's systematic learning methods. Learn efficient vocabulary mastery through Firebase storage-based AI vocabulary, quiz modes, and real-time progress tracking." />
+  <meta name="twitter:image" content="https://www.likevoca.com/assets/hero.webp" />
+  <meta name="twitter:image:alt" content="How to Learn - LikeVoca Effective Language Learning Guide" />
+
+  <!-- 두 번째 Open Graph 섹션 (상세) -->
+  <meta property="og:title" content="How to Learn - LikeVoca Effective Language Learning Guide" />
+  <meta property="og:description" content="Discover LikeVoca's systematic learning methods. Learn efficient vocabulary mastery through Firebase storage-based AI vocabulary, quiz modes, and real-time progress tracking." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.likevoca.com/en/guide.html" />
+  <meta property="og:site_name" content="LikeVoca" />
+  <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="How to Learn - LikeVoca Effective Language Learning Guide" />
     
-    <!-- Open Graph / 소셜 미디어 메타 태그 -->
-    <meta property="og:title" content="How to Learn - LikeVoca Effective Language Learning Guide" />
-    <meta property="og:description" content="Experience systematic vocabulary learning with Firebase cloud storage-based AI vocabulary, quiz modes, and real-time progress tracking. LikeVoca's complete learning guide." />
-    <meta property="og:type" content="article" />
-    <meta property="og:url" content="https://likevoca.com/en/guide" />
-    <meta property="og:locale" content="en" />
     
-    <!-- Twitter Card 태그 -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="How to Learn - LikeVoca Effective Language Learning Guide" />
-    <meta name="twitter:description" content="Experience systematic vocabulary learning with Firebase cloud storage-based AI vocabulary, quiz modes, and real-time progress tracking." />
     
     <!-- 표준 링크 -->
     <link rel="canonical" href="https://likevoca.com/en/guide" />

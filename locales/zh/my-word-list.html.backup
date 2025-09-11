@@ -10,12 +10,32 @@
   <meta name="description" content="通过AI单词生成和单词书签功能创建您自己的定制化词汇本。通过个性化学习进度管理和复习系统有效提高词汇水平。" />
   <meta name="keywords" content="我的词汇本, 定制化词汇本, AI单词生成, 单词书签, 个人词汇本, 词汇管理, 学习进度, 复习系统, 多语言词汇本" />
 
-  <!-- Open Graph / 소셜 미디어 메타 태그 -->
-  <meta property="og:title" content="LikeVoca - 我的定制化词汇本" />
+  <!-- 첫 번째 Open Graph 섹션 -->
+  <meta property="og:title" content="我的词汇本 - LikeVoca" />
   <meta property="og:description" content="通过AI单词生成和单词书签功能创建您自己的定制化词汇本。通过个性化学习进度管理和复习系统有效提高词汇水平。" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://likevoca.com/zh/my-word-list.html" />
+  <meta property="og:url" content="https://www.likevoca.com/zh/my-word-list.html" />
   <meta property="og:locale" content="zh" />
+  <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
+
+  <!-- Twitter Card 섹션 -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="我的词汇本 - LikeVoca" />
+  <meta name="twitter:description" content="通过AI单词生成和单词书签功能创建您自己的定制化词汇本。通过个性化学习进度管理和复习系统有效提高词汇水平。" />
+  <meta name="twitter:image" content="https://www.likevoca.com/assets/hero.webp" />
+  <meta name="twitter:image:alt" content="我的词汇本 - LikeVoca" />
+
+  <!-- 두 번째 Open Graph 섹션 (상세) -->
+  <meta property="og:title" content="我的词汇本 - LikeVoca" />
+  <meta property="og:description" content="通过AI单词生成和单词书签功能创建您自己的定制化词汇本。通过个性化学习进度管理和复习系统有效提高词汇水平。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.likevoca.com/zh/my-word-list.html" />
+  <meta property="og:site_name" content="LikeVoca" />
+  <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="我的词汇本 - LikeVoca" />
+
 
   <!-- 표준 링크 -->
   <link rel="canonical" href="https://likevoca.com/zh/my-word-list.html" />

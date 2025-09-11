@@ -11,20 +11,35 @@
     content="다양한 퀴즈 형식으로 학습한 단어들을 복습하고 완벽하게 마스터하세요. 객관식, 단답형, 듣기 퀴즈 등 재미있는 방식으로 언어 실력을 향상시킬 수 있습니다." />
   <meta name="keywords" content="언어 퀴즈, 단어 퀴즈, 어휘 테스트, 언어 학습 퀴즈, 맞춤형 퀴즈, AI 퀴즈, 다국어 퀴즈, 영어 퀴즈, 일본어 퀴즈, 중국어 퀴즈" />
 
-  <!-- Open Graph / 소셜 미디어 메타 태그 -->
+  <!-- 첫 번째 Open Graph 섹션 -->
   <meta property="og:title" content="LikeVoca - 퀴즈로 단어 마스터하기" />
-  <meta property="og:description"
-    content="다양한 퀴즈 형식으로 학습한 단어들을 복습하고 완벽하게 마스터하세요. 객관식, 단답형, 듣기 퀴즈 등 재미있는 방식으로 언어 실력을 향상시킬 수 있습니다." />
+  <meta property="og:description" content="LikeVoca - 多语言学习平台" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://likevoca.com/ko/quiz" />
-  <meta property="og:locale" content="ko" />
+  <meta property="og:url" content="https://www.likevoca.com/zh/quiz_backup.html" />
+  <meta property="og:locale" content="zh" />
+  <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
 
-  <!-- Twitter Card 태그 -->
+  <!-- Twitter Card 섹션 -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="LikeVoca - 퀴즈로 단어 마스터하기" />
-  <meta name="twitter:description"
+  <meta name="twitter:description" content="LikeVoca - 多语言学习平台" />
+  <meta name="twitter:image" content="https://www.likevoca.com/assets/hero.webp" />
+  <meta name="twitter:image:alt" content="LikeVoca - 퀴즈로 단어 마스터하기" />
+
+  <!-- 두 번째 Open Graph 섹션 (상세) -->
+  <meta property="og:title" content="LikeVoca - 퀴즈로 단어 마스터하기" />
+  <meta property="og:description" content="LikeVoca - 多语言学习平台" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.likevoca.com/zh/quiz_backup.html" />
+  <meta property="og:site_name" content="LikeVoca" />
+  <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="LikeVoca - 퀴즈로 단어 마스터하기" />
+
     content="다양한 퀴즈 형식으로 학습한 단어들을 복습하고 완벽하게 마스터하세요. 객관식, 단답형, 듣기 퀴즈 등 재미있는 방식으로 언어 실력을 향상시킬 수 있습니다." />
-  <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
+
+    content="다양한 퀴즈 형식으로 학습한 단어들을 복습하고 완벽하게 마스터하세요. 객관식, 단답형, 듣기 퀴즈 등 재미있는 방식으로 언어 실력을 향상시킬 수 있습니다." />
 
   <!-- 표준 링크 -->
   <link rel="canonical" href="https://likevoca.com/ko/quiz" />
