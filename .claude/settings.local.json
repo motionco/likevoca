@@ -60,7 +60,8 @@
       "Bash(./update_meta_ja.sh:*)",
       "Bash(./update_meta_zh.sh:*)",
       "Bash(./update_meta_es.sh:*)",
-      "Bash(/c/Users/motio/AppData/Local/Microsoft/WindowsApps/python update_twitter_optimization.py)"
+      "Bash(/c/Users/motio/AppData/Local/Microsoft/WindowsApps/python update_twitter_optimization.py)",
+      "Bash(/c/Users/motio/AppData/Local/Microsoft/WindowsApps/python add_resource_hints.py)"
     ],
     "deny": [],
     "ask": []
