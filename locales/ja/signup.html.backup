@@ -1,0 +1,386 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>サインアップ - LikeVoca</title>
+    <meta
+      name="description"
+      content="LikeVocaアカウントを作成して、多言語学習の旅を始めましょう。パーソナライズされた単語帳、クイズ、進捗追跡機能をご利用いただけます"
+    />
+    <meta property="og:title" content="サインアップ - LikeVoca" />
+    <meta
+      property="og:description"
+      content="LikeVocaアカウントを作成して、多言語学習の旅を始めましょう。パーソナライズされた単語帳、クイズ、進捗追跡機能をご利用いただけます"
+    />
+    <meta property="og:locale" content="ja_JP" />
+    <link rel="canonical" href="https://likevoca.com/ja/signup" />
+    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/signup" />
+    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/signup" />
+    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/signup" />
+    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/signup" />
+    <link href="../../css/style.css" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="../../js/auth/signup.js"></script>
+    <script type="module" src="../../js/language-init.js"></script>
+    <script type="module" src="../../components/js/navbar.js"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-100 min-h-screen">
+    <!-- 네비게이션바 컨테이너 -->
+    <div id="navbar-container"></div>
+
+    <div class="flex items-center justify-center min-h-screen py-12">
+      <div class="bg-white shadow-lg rounded-lg w-11/12 sm:w-96 p-6">
+        <h1 class="text-3xl font-bold text-gray-800 text-center mb-6">
+          アカウント作成
+        </h1>
+
+        <div class="space-y-4 mb-6">
+          <button
+            id="google-signup-btn"
+            class="w-full flex items-center justify-center bg-red-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-red-600"
+          >
+            <i class="fa-brands fa-google mr-2"></i><span>Googleで登録</span>
+          </button>
+          <button
+            id="github-signup-btn"
+            class="w-full flex items-center justify-center bg-gray-800 text-white py-2 px-4 rounded-lg shadow-md hover:bg-gray-900"
+          >
+            <i class="fa-brands fa-github mr-2"></i>
+            <span>GitHubで登録</span>
+          </button>
+          <button
+            id="facebook-signup-btn"
+            class="w-full flex items-center justify-center bg-blue-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-700"
+          >
+            <i class="fa-brands fa-facebook mr-2"></i>
+            <span>Facebookで登録</span>
+          </button>
+        </div>
+
+        <div class="relative my-6">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-gray-300"></div>
+          </div>
+          <div class="relative flex justify-center text-sm">
+            <span class="px-2 bg-white text-gray-500">または</span>
+          </div>
+        </div>
+
+        <form
+          id="signup-form"
+          class="space-y-4"
+          autocomplete="off"
+          onsubmit="return false;"
+        >
+          <div>
+            <label for="name" class="block text-sm font-medium text-gray-700"
+              >お名前</label
+            >
+            <input
+              type="text"
+              id="name"
+              name="name"
+              required
+              placeholder="お名前を入力してください"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#4B63AC] focus:border-[#4B63AC] sm:text-sm"
+            />
+          </div>
+          <div>
+            <label for="email" class="block text-sm font-medium text-gray-700"
+              >メールアドレス</label
+            >
+            <input
+              type="email"
+              id="email"
+              name="email"
+              required
+              placeholder="メールアドレスを入力してください"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#4B63AC] focus:border-[#4B63AC] sm:text-sm"
+            />
+          </div>
+          <div>
+            <label
+              for="password"
+              class="block text-sm font-medium text-gray-700"
+              >パスワード</label
+            >
+            <input
+              type="password"
+              id="password"
+              name="password"
+              required
+              placeholder="パスワードを入力してください"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#4B63AC] focus:border-[#4B63AC] sm:text-sm"
+            />
+          </div>
+          <div>
+            <label
+              for="confirm-password"
+              class="block text-sm font-medium text-gray-700"
+              >パスワード確認</label
+            >
+            <input
+              type="password"
+              id="confirm-password"
+              name="confirm-password"
+              required
+              placeholder="パスワードを再入力してください"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#4B63AC] focus:border-[#4B63AC] sm:text-sm"
+            />
+          </div>
+
+          <!-- 約款同意チェックボックス -->
+          <div class="space-y-3 py-4 border-t border-gray-200">
+            <div class="flex items-start space-x-3">
+              <input
+                type="checkbox"
+                id="terms-checkbox"
+                name="terms"
+                class="mt-1 h-4 w-4 text-[#4B63AC] focus:ring-[#4B63AC] border-gray-300 rounded"
+              />
+              <label for="terms-checkbox" class="text-sm text-gray-700">
+                <a href="#" class="text-[#4B63AC] hover:underline" onclick="showTermsModal(); return false;">利用規約</a>に同意します <span class="text-red-500">(必須)</span>
+              </label>
+            </div>
+            
+            <div class="flex items-start space-x-3">
+              <input
+                type="checkbox"
+                id="privacy-checkbox"
+                name="privacy"
+                class="mt-1 h-4 w-4 text-[#4B63AC] focus:ring-[#4B63AC] border-gray-300 rounded"
+              />
+              <label for="privacy-checkbox" class="text-sm text-gray-700">
+                <a href="#" class="text-[#4B63AC] hover:underline" onclick="showPrivacyModal(); return false;">個人情報収集及び利用</a>に同意します <span class="text-red-500">(必須)</span>
+              </label>
+            </div>
+            
+            <div class="flex items-start space-x-3">
+              <input
+                type="checkbox"
+                id="marketing-checkbox"
+                name="marketing"
+                class="mt-1 h-4 w-4 text-[#4B63AC] focus:ring-[#4B63AC] border-gray-300 rounded"
+              />
+              <label for="marketing-checkbox" class="text-sm text-gray-700">
+                マーケティング情報の受信に同意します (選択)
+              </label>
+            </div>
+            
+            <div class="flex items-start space-x-3 pt-2">
+              <input
+                type="checkbox"
+                id="all-checkbox"
+                class="mt-1 h-4 w-4 text-[#4B63AC] focus:ring-[#4B63AC] border-gray-300 rounded"
+              />
+              <label for="all-checkbox" class="text-sm font-medium text-gray-700">
+                全て同意
+              </label>
+            </div>
+          </div>
+
+          <div
+            id="error-message"
+            class="hidden text-red-500 text-sm text-center"
+          ></div>
+
+          <button
+            id="signup-button"
+            type="submit"
+            class="w-full bg-[#4B63AC] text-white px-4 py-2 rounded-lg shadow-md hover:bg-[#3A4F8B] focus:outline-none focus:ring-2 focus:ring-[#4B63AC] focus:ring-offset-2"
+          >
+            サインアップ
+          </button>
+        </form>
+        <p class="mt-6 text-sm text-center text-gray-600">
+          <span>すでにアカウントをお持ちですか？</span>
+          <a
+            href="#"
+            onclick="goToLanguageSpecificPage('login.html'); return false;"
+            class="text-[#4B63AC] hover:underline"
+            >ログイン</a
+          >
+        </p>
+      </div>
+    </div>
+
+    <!-- 利用規約モーダル -->
+    <div id="terms-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+      <div class="bg-white rounded-lg p-6 max-w-2xl w-11/12 max-h-96 overflow-y-auto">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-bold text-gray-800">利用規約</h3>
+          <button onclick="closeTermsModal()" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="text-sm text-gray-600 space-y-3">
+          <h4 class="font-semibold">サービス概要</h4>
+          <p>LikeVocaはAIベースの個人化言語学習プラットフォームで、多様な学習コンテンツとツールを提供します。</p>
+          
+          <h4 class="font-semibold">会員登録と義務</h4>
+          <p><strong>登録制限：</strong>虚偽情報登録、他人の情報盗用時は登録拒否</p>
+          <p><strong>禁止行為：</strong>サービス悪用、著作権侵害、わいせつコンテンツ投稿など</p>
+          
+          <h4 class="font-semibold">サービス提供</h4>
+          <p><strong>提供サービス：</strong>言語学習コンテンツ、AIベース個人化学習、進捗管理、コミュニティ機能</p>
+          <p><strong>サービス変更：</strong>技術的・運営上の理由によりサービスの修正・中断の可能性</p>
+          
+          <h4 class="font-semibold">知的財産権とユーザー義務</h4>
+          <p><strong>著作権：</strong>すべてのサービスコンテンツは当社に帰属</p>
+          <p><strong>ユーザー責任：</strong>無断使用の禁止、アカウントセキュリティ維持、使用ポリシーの遵守</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 個人情報取扱方針モーダル -->
+    <div id="privacy-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+      <div class="bg-white rounded-lg p-6 max-w-2xl w-11/12 max-h-96 overflow-y-auto">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-bold text-gray-800">個人情報収集及び利用</h3>
+          <button onclick="closePrivacyModal()" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="text-sm text-gray-600 space-y-3">
+          <h4 class="font-semibold">1. 個人情報処理目的</h4>
+          <p><strong>主要目的：</strong>会員登録及び管理、サービス提供、学習進度管理、顧客サポート</p>
+          <p><strong>マーケティング：</strong>マーケティング活動（同意時のみ）</p>
+          
+          <h4 class="font-semibold">2. 処理する個人情報項目</h4>
+          <p><strong>メール/パスワード登録時：</strong>メールアドレス、パスワード（暗号化保存）</p>
+          <p><strong>OAuth登録時：</strong>メールアドレス、外部認証提供者識別子</p>
+          <p><strong>選択項目：</strong>名前/ニックネーム、学習目標言語、学習進度及び成果データ、マーケティング受信同意状況</p>
+          
+          <h4 class="font-semibold">3. 個人情報保有期間</h4>
+          <p><strong>会員情報：</strong>会員退会まで</p>
+          <p><strong>学習記録：</strong>退会後1年間（サービス改善目的）</p>
+          <p><strong>サービス使用記録：</strong>3ヶ月（統計及びサービス改善目的）</p>
+          
+          <h4 class="font-semibold">4. 第三者提供及び処理委託</h4>
+          <p><strong>第三者提供：</strong>ユーザー同意または法的要件時のみ</p>
+          <p><strong>委託：</strong>クラウドサービス提供者（システム運営・データ保存）、メールサービス提供者（サービス関連メール配信）</p>
+          
+          <h4 class="font-semibold">5. 情報主体の権利</h4>
+          <p>個人情報のアクセス、訂正、削除、処理停止権。お問い合わせはprivacy@likevoca.comまで。</p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // 언어별 페이지로 이동하는 함수
+      function goToLanguageSpecificPage(filename) {
+        const userLanguage = localStorage.getItem("userLanguage") || "ja";
+        const isDev =
+          window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1" ||
+          window.location.port === "5595";
+
+        if (isDev) {
+          window.location.href = `/locales/${userLanguage}/${filename}`;
+        } else {
+          window.location.href = `/${userLanguage}/${filename}`;
+        }
+      }
+
+      // モーダル管理関数
+      function showTermsModal() {
+        document.getElementById('terms-modal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeTermsModal() {
+        document.getElementById('terms-modal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+      }
+
+      function showPrivacyModal() {
+        document.getElementById('privacy-modal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closePrivacyModal() {
+        document.getElementById('privacy-modal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+      }
+
+      // モーダル外クリック時閉じる
+      document.getElementById('terms-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+          closeTermsModal();
+        }
+      });
+
+      document.getElementById('privacy-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+          closePrivacyModal();
+        }
+      });
+
+      // ESCキーでモーダル閉じる
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          closeTermsModal();
+          closePrivacyModal();
+        }
+      });
+
+      // 全て同意チェックボックス機能
+      document.addEventListener('DOMContentLoaded', function() {
+        const allCheckbox = document.getElementById('all-checkbox');
+        const termsCheckbox = document.getElementById('terms-checkbox');
+        const privacyCheckbox = document.getElementById('privacy-checkbox');
+        const marketingCheckbox = document.getElementById('marketing-checkbox');
+
+        // 全て同意クリック時
+        allCheckbox.addEventListener('change', function() {
+          const isChecked = this.checked;
+          termsCheckbox.checked = isChecked;
+          privacyCheckbox.checked = isChecked;
+          marketingCheckbox.checked = isChecked;
+        });
+
+        // 個別チェックボックス状態変更時全体同意状態更新
+        function updateAllCheckbox() {
+          const allRequired = termsCheckbox.checked && privacyCheckbox.checked;
+          const allOptional = marketingCheckbox.checked;
+          
+          if (allRequired && allOptional) {
+            allCheckbox.checked = true;
+            allCheckbox.indeterminate = false;
+          } else if (allRequired) {
+            allCheckbox.checked = false;
+            allCheckbox.indeterminate = true;
+          } else {
+            allCheckbox.checked = false;
+            allCheckbox.indeterminate = false;
+          }
+        }
+
+        [termsCheckbox, privacyCheckbox, marketingCheckbox].forEach(checkbox => {
+          checkbox.addEventListener('change', updateAllCheckbox);
+        });
+      });
+    </script>
+  </body>
+</html>
+n  <!-- Footer 컨테이너 -->
+  <div id="footer-container"></div>
+
+  <!-- Footer 스크립트 -->
+  <script src="../../components/js/footer.js"></script>
+  <script>
+    // Footer 로드
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (typeof window.loadFooter === 'function') {
+        await window.loadFooter();
+      }
+    });
+  </script>
+</body>
+</html>

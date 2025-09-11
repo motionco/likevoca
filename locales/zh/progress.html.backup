@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LikeVoca - 学习进度和成果分析</title>
+  
+  <!-- 기본 메타 태그 -->
+  <meta name="description" content="可视化查看和分析个性化学习进度。通过图表和图形一目了然地掌握单词学习量、测验成果、游戏分数等。通过数据驱动学习有效提高语言技能。" />
+  <meta name="keywords" content="学习进度, 成果分析, 学习统计, 进度管理, 学习数据, 成果追踪, 语言学习分析, 个性化进度, 学习成就" />
+  
+  <!-- Open Graph / 소셜 미디어 메타 태그 -->
+  <meta property="og:title" content="LikeVoca - 学习进度和成果分析" />
+  <meta property="og:description" content="可视化查看和分析个性化学习进度。通过图表和图形一目了然地掌握单词学习量、测验成果、游戏分数等。通过数据驱动学习有效提高语言技能。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://likevoca.com/zh/progress" />
+  <meta property="og:locale" content="zh" />
+  
+  <!-- Twitter Card 태그 -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="LikeVoca - 学习进度和成果分析" />
+  <meta name="twitter:description" content="可视化查看和分析个性化学习进度。通过图表和图形一目了然地掌握单词学习量、测验成果、游戏分数等。通过数据驱动学习有效提高语言技能。" />
+  <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
+  
+  <!-- 표준 링크 -->
+  <link rel="canonical" href="https://likevoca.com/zh/progress" />
+  
+  <!-- 대체 언어 링크 -->
+  <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/progress" />
+  <link rel="alternate" hreflang="en" href="https://likevoca.com/en/progress" />
+  <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/progress" />
+  <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/progress" />
+  <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/progress" />
+
+  <!-- 성능 최적화 - Resource Hints -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+
+  <link rel="icon" href="../../assets/favicon.ico" type="image/x-icon" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="../../css/style.css" />
+  
+  <!-- 구조화된 데이터 (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "LikeVoca 学习进度",
+    "description": "可视化查看和分析个性化学习进度。通过图表和图形一目了然地掌握单词学习量、测验成果、游戏分数等。",
+    "url": "https://likevoca.com/zh/progress",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "LikeVoca",
+      "url": "https://likevoca.com"
+    },
+    "inLanguage": "zh",
+    "potentialAction": {
+      "@type": "ViewAction",
+      "name": "查看进度",
+      "description": "可视化分析并查看个人学习进度和成果"
+    }
+  }
+  </script>
+
+  <script type="module" src="../../js/firebase/firebase-init.js"></script>
+  <script type="module" src="../../utils/language-utils.js"></script>
+  <script type="module" src="../../js/language-init.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <div id="navbar-container"></div>
+  <main class="container mx-auto px-6 py-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-800 mb-2" data-i18n="progress_title">
+          📊 进度
+      </h1>
+        <p class="text-gray-600">
+          通过图表和图形一目了然地查看学习进度和成果。
+        </p>
+      </div>
+      <div class="flex items-center gap-2">
+        <label class="text-sm text-gray-600" data-i18n="target_language">目标语言</label>
+        <select id="target-language-filter" class="text-sm border border-gray-300 rounded px-3 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          <option value="english" data-i18n="english">英语</option>
+          <option value="korean" data-i18n="korean">韩语</option>
+          <option value="japanese" data-i18n="japanese">日语</option>
+          <option value="chinese" data-i18n="chinese">中文</option>
+          <option value="spanish" data-i18n="spanish">西班牙语</option>
+        </select>
+      </div>
+    </div>
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-8 border border-blue-100">
+      <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+        <i class="fas fa-chart-line text-blue-600 mr-2"></i>
+        <span data-i18n="activity_progress_summary">活动情况摘要</span>
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div id="total-words-card" class="bg-white rounded-lg shadow-sm p-5 border-l-4 border-blue-500 cursor-pointer hover:bg-blue-50 hover:shadow-md transition-all duration-200">
+        <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-600" data-i18n="total_words">总单词数</p>
+            <p id="total-words-count" class="text-2xl font-bold text-blue-600">0</p>
+              <p class="text-xs text-blue-500 mt-1" data-i18n="see_details">查看详情 →</p>
+          </div>
+          <div class="bg-blue-100 p-3 rounded-full">
+              <span class="text-2xl">📚</span>
+            </div>
+          </div>
+        </div>
+        <div id="mastered-words-card" class="bg-white rounded-lg shadow-sm p-5 border-l-4 border-green-500 cursor-pointer hover:bg-green-50 hover:shadow-md transition-all duration-200">
+        <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-600" data-i18n="mastered_words">已掌握单词</p>
+            <p id="mastered-words-count" class="text-2xl font-bold text-green-600">0</p>
+              <p class="text-xs text-green-500 mt-1" data-i18n="see_details">查看详情 →</p>
+          </div>
+          <div class="bg-green-100 p-3 rounded-full">
+              <span class="text-2xl">✅</span>
+            </div>
+          </div>
+        </div>
+        <div id="study-streak-card" class="bg-white rounded-lg shadow-sm p-5 border-l-4 border-orange-500 cursor-pointer hover:bg-orange-50 hover:shadow-md transition-all duration-200">
+        <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-600" data-i18n="study_streak">连续学习</p>
+              <p id="study-streak-count" class="text-2xl font-bold text-orange-600">0天</p>
+              <p class="text-xs text-orange-500 mt-1" data-i18n="see_details">查看详情 →</p>
+          </div>
+          <div class="bg-orange-100 p-3 rounded-full">
+              <span class="text-2xl">🔥</span>
+            </div>
+          </div>
+        </div>
+      <div id="quiz-accuracy-card"
+          class="bg-white rounded-lg shadow-sm p-5 border-l-4 border-purple-500 cursor-pointer hover:bg-purple-50 hover:shadow-md transition-all duration-200"
+        >
+        <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-600" data-i18n="quiz_accuracy">测验准确率</p>
+            <p id="quiz-accuracy-rate" class="text-2xl font-bold text-purple-600">0%</p>
+              <p class="text-xs text-purple-500 mt-1" data-i18n="see_details">查看详情 →</p>
+          </div>
+          <div class="bg-purple-100 p-3 rounded-full">
+              <span class="text-2xl">🎯</span>
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 学习活动分析 -->
+    <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 mb-8 border border-green-100">
+      <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+        <i class="fas fa-chart-bar text-green-600 mr-2"></i>
+        学习活动分析
+      </h2>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- 周间学习活动 -->
+        <div class="bg-white rounded-lg shadow-sm p-6 border border-green-100">
+          <h3 class="text-lg font-semibold mb-4 flex items-center text-green-700" data-i18n="weekly_activity">
+            <i class="fas fa-calendar-week text-sm mr-2"></i>
+            周间学习活动
+          </h3>
+        <div class="relative h-64">
+          <canvas id="weekly-activity-chart" class="w-full h-full"></canvas>
+        </div>
+      </div>
+        <!-- 按领域进度 -->
+        <div class="bg-white rounded-lg shadow-sm p-6 border border-green-100 relative">
+          <h3 class="text-lg font-semibold mb-4 flex items-center text-green-700" data-i18n="domain_progress">
+            <i class="fas fa-layer-group text-sm mr-2"></i>
+            按领域进度
+          </h3>
+          <div class="relative h-64 overflow-visible">
+          <canvas id="category-progress-chart" class="w-full h-full"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 成就 -->
+    <div class="bg-gradient-to-r from-pink-50 to-rose-50 rounded-xl p-6 mb-8 border border-pink-100">
+      <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+        <i class="fas fa-trophy text-pink-600 mr-2"></i>
+        <span data-i18n="achievements">成就</span>
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <!-- 测验成就 -->
+        <div class="bg-white rounded-lg shadow-sm p-5 border border-pink-100">
+          <div class="flex items-center mb-3">
+            <span class="text-lg mr-2">❓</span>
+            <h3 class="font-semibold text-gray-800" data-i18n="quiz_achievements">测验成就</h3>
+          </div>
+          <div class="space-y-2">
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600" data-i18n="total_quizzes">总测验数:</span>
+              <span id="total-quizzes-count" class="text-sm font-medium">0次</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600" data-i18n="avg_quiz_accuracy">平均准确率:</span>
+              <span id="avg-quiz-accuracy" class="text-sm font-medium">0%</span>
+          </div>
+          </div>
+        </div>
+        <!-- 游戏成就 -->
+        <div id="total-games-card" class="bg-white rounded-lg shadow-sm p-5 border border-pink-100 cursor-pointer hover:shadow-md transition-shadow">
+          <div class="flex items-center mb-3">
+            <span class="text-lg mr-2">🎮</span>
+            <h3 class="font-semibold text-gray-800" data-i18n="game_achievements">游戏成就</h3>
+          </div>
+          <div class="space-y-2">
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600" data-i18n="total_games">总游戏数:</span>
+              <span id="total-games-count" class="text-sm font-medium">0次</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600" data-i18n="avg_game_score">平均分数:</span>
+              <span id="avg-game-score" class="text-sm font-medium">0</span>
+          </div>
+          </div>
+        </div>
+        <!-- 学习会话成就 -->
+        <div class="bg-white rounded-lg shadow-sm p-5 border border-pink-100">
+          <div class="flex items-center mb-3">
+            <span class="text-lg mr-2">📖</span>
+            <h3 class="font-semibold text-gray-800" data-i18n="learning_achievements">学习会话成就</h3>
+          </div>
+          <div class="space-y-2">
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600" data-i18n="total_sessions">总会话数:</span>
+              <span id="total-learning-sessions" class="text-sm font-medium">0次</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600" data-i18n="avg_session_quality">平均质量:</span>
+              <span id="avg-session-quality" class="text-sm font-medium">-</span>
+          </div>
+          </div>
+        </div>
+        <!-- 综合成就 -->
+        <div class="bg-white rounded-lg shadow-sm p-5 border border-pink-100">
+          <div class="flex items-center mb-3">
+            <span class="text-lg mr-2">⭐</span>
+            <h3 class="font-semibold text-gray-800" data-i18n="overall_achievements">综合成就</h3>
+          </div>
+          <div class="space-y-2">
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600" data-i18n="total_study_time">总学习时间:</span>
+              <span id="total-study-time" class="text-sm font-medium">0分钟</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600" data-i18n="completion_rate">完成率:</span>
+              <span id="completion-rate" class="text-sm font-medium">0%</span>
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 最近活动 -->
+    <div class="bg-gradient-to-r from-yellow-50 to-amber-50 rounded-xl p-6 mb-8 border border-yellow-100">
+      <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+        <i class="fas fa-history text-yellow-600 mr-2"></i>
+        <span data-i18n="recent_activities">最近活动</span>
+      </h2>
+      <div id="recent-activities-list" class="space-y-3">
+        <div class="text-center py-8 text-gray-500">
+          <i class="fas fa-clock text-3xl mb-2"></i>
+          <p data-i18n="no_recent_activities">暂无最近活动。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 学习目标设置 -->
+    <div class="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl p-6 border border-teal-100">
+      <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+        <i class="fas fa-bullseye text-teal-600 mr-2"></i>
+        <span data-i18n="learning_goals">学习目标</span>
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- 每日目标 -->
+        <div>
+          <h3 class="text-lg font-medium mb-3" data-i18n="daily_goal">每日目标</h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="daily_new_words">新单词学习</label>
+              <div class="flex items-center space-x-3">
+                <input type="number" id="daily-words-goal" class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" min="1" max="100" value="10" />
+                <span class="text-sm text-gray-600" data-i18n="words_per_day">个/天</span>
+              </div>
+              <div class="mt-2">
+                <div class="flex justify-between text-xs text-gray-500 mb-1">
+                  <span data-i18n="today_progress">今日进度</span>
+                  <span id="daily-words-progress">0/10个</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-1">
+                  <div id="daily-words-bar" class="bg-blue-600 h-1 rounded-full transition-all duration-300 w-0"></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="daily_quiz_time">测验时间</label>
+              <div class="flex items-center space-x-3">
+                <input type="number" id="daily-quiz-goal" class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" min="5" max="120" value="20" />
+                <span class="text-sm text-gray-600" data-i18n="minutes_per_day">分钟/天</span>
+              </div>
+              <div class="mt-2">
+                <div class="flex justify-between text-xs text-gray-500 mb-1">
+                  <span data-i18n="today_progress">今日进度</span>
+                  <span id="daily-quiz-progress">0/20分钟</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-1">
+                  <div id="daily-quiz-bar" class="bg-green-600 h-1 rounded-full transition-all duration-300 w-0"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- 每周目标 -->
+        <div>
+          <h3 class="text-lg font-medium mb-3" data-i18n="weekly_goal">每周目标</h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="weekly_study_days">学习天数</label>
+              <div class="flex items-center space-x-3">
+                <input type="number" id="weekly-days-goal" class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" min="1" max="7" value="5" />
+                <span class="text-sm text-gray-600" data-i18n="days_per_week">天/周</span>
+              </div>
+              <div class="mt-2">
+                <div class="flex justify-between text-xs text-gray-500 mb-1">
+                  <span data-i18n="this_week_progress">本周进度</span>
+                  <span id="weekly-days-progress">0/5天</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-1">
+                  <div id="weekly-days-bar" class="bg-purple-600 h-1 rounded-full transition-all duration-300 w-0"></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="weekly_mastery_goal">单词掌握目标</label>
+              <div class="flex items-center space-x-3">
+                <input type="number" id="weekly-mastery-goal" class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" min="1" max="100" value="30" />
+                <span class="text-sm text-gray-600" data-i18n="words_per_week">个/周</span>
+              </div>
+              <div class="mt-2">
+                <div class="flex justify-between text-xs text-gray-500 mb-1">
+                  <span data-i18n="this_week_progress">本周进度</span>
+                  <span id="weekly-mastery-progress">0/30个</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-1">
+                  <div id="weekly-mastery-bar" class="bg-orange-600 h-1 rounded-full transition-all duration-300 w-0"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mt-6 text-center">
+        <button id="save-goals-btn" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors" data-i18n="save_goals">保存目标</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <div id="footer-container"></div>
+
+  <div id="totalWordsModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+    <div class="bg-white rounded-lg shadow-xl max-w-5xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between p-6 border-b sticky top-0 bg-white z-10">
+        <h2 class="text-xl font-bold text-gray-900" data-i18n="modal_title">单词详情</h2>
+        <button onclick="closeTotalWordsModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+      </div>
+      <div id="totalWordsModalBody" class="p-6">
+        <!-- 模态框内容将在这里动态添加 -->
+      </div>
+
+    </div>
+  </div>
+  <script type="module" src="../../components/js/navbar.js"></script>
+  <script type="module" src="../../pages/js/progress.js"></script>
+
+  <!-- Scripts -->
+  <script src="../../components/js/footer.js"></script>
+</body>
+</html>

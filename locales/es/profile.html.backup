@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Perfil - LikeVoca</title>
+  <meta name="description"
+    content="Gestiona la configuración de tu perfil de LikeVoca, conexiones de cuenta e información personal para el aprendizaje de idiomas" />
+  <meta property="og:title" content="Gestión de Perfil - LikeVoca" />
+  <meta property="og:description"
+    content="Gestiona la configuración de tu perfil de LikeVoca, conexiones de cuenta e información personal para el aprendizaje de idiomas" />
+  <meta property="og:locale" content="es" />
+  <link rel="canonical" href="https://likevoca.com/es/profile" />
+  <link rel="alternate" hreflang="en" href="https://likevoca.com/en/profile" />
+  <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/profile" />
+  <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/profile" />
+  <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/profile" />
+  <link rel="alternate" hreflang="es" href="https://likevoca.com/es/profile" />
+  <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/profile" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/profile.css">
+</head>
+
+<body class="bg-gray-100">
+  <!-- 네비게이션바 컨테이너 -->
+  <div id="navbar-container"></div>
+
+  <main class="container mx-auto px-4 py-8">
+    <div id="profile-container" class="bg-white rounded-lg shadow-md p-6">
+      <h1 class="text-2xl font-bold mb-6">Gestión de Perfil</h1>
+
+      <div id="auth-required" class="p-6 bg-yellow-100 rounded-lg border border-yellow-300 mb-4">
+        <p class="text-lg">Necesitas iniciar sesión para ver esta página.</p>
+        <a href="#" onclick="window.redirectToLogin()" class="btn btn-primary mt-3 inline-block">Iniciar Sesión</a>
+      </div>
+
+      <div id="profile-content">
+        <div class="profile-section">
+          <h2>Información Personal</h2>
+          <form id="profile-form">
+            <div class="form-group">
+              <label for="displayName">Nombre</label>
+              <input type="text" id="displayName" name="displayName" class="form-control">
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" class="form-control" disabled>
+            </div>
+            <button type="submit" id="update-profile" class="btn btn-primary">Actualizar Información</button>
+          </form>
+        </div>
+
+        <div class="profile-section">
+          <h2>Conexiones de Cuenta</h2>
+          <div class="account-connections">
+            <div class="connection-item">
+              <div class="connection-info">
+                <i class="fab fa-google provider-icon" style="color: #DB4437;"></i>
+                <span>Cuenta de Google</span>
+              </div>
+              <div class="connection-status">
+                <span id="google-status" class="status-badge">No Conectado</span>
+                <button id="google-connect" class="btn btn-outline">Conectar</button>
+                <button id="google-disconnect" class="btn btn-outline btn-danger hidden">Desconectar</button>
+              </div>
+            </div>
+
+            <div class="connection-item">
+              <div class="connection-info">
+                <i class="fab fa-github provider-icon"></i>
+                <span>Cuenta de GitHub</span>
+              </div>
+              <div class="connection-status">
+                <span id="github-status" class="status-badge">No Conectado</span>
+                <button id="github-connect" class="btn btn-outline">Conectar</button>
+                <button id="github-disconnect" class="btn btn-outline btn-danger hidden">Desconectar</button>
+              </div>
+            </div>
+
+            <div class="connection-item">
+              <div class="connection-info">
+                <i class="fab fa-facebook provider-icon" style="color: #1877F2;"></i>
+                <span>Cuenta de Facebook</span>
+              </div>
+              <div class="connection-status">
+                <span id="facebook-status" class="status-badge">No Conectado</span>
+                <button id="facebook-connect" class="btn btn-outline">Conectar</button>
+                <button id="facebook-disconnect" class="btn btn-outline btn-danger hidden">Desconectar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-section danger-zone">
+          <h2>Zona de Peligro</h2>
+          <div class="danger-actions">
+            <button id="logout-btn" class="btn btn-outline">Cerrar Sesión</button>
+            <button id="delete-account" class="btn btn-danger">Eliminar Cuenta</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <div id="footer-container"></div>
+
+  <!-- Firebase -->
+  <script type="module" src="../../js/firebase/firebase-init.js"></script>
+  <script type="module" src="../../utils/language-utils.js"></script>
+  <script type="module" src="../../js/language-init.js"></script>
+  <script type="module" src="../../js/profile.js"></script>
+  <script type="module" src="../../components/js/navbar.js"></script>
+
+  <!-- Scripts -->
+  <script src="../../components/js/footer.js"></script>
+</body>
+
+</html>

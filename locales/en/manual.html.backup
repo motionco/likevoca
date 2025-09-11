@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Manual - LikeVoca</title>
+    
+    <!-- Basic meta tags -->
+    <meta name="description" content="LikeVoca user manual. Comprehensive guide covering Firebase storage-based AI vocabulary learning, quiz modes, and real-time progress tracking features. Complete step-by-step user guide." />
+    <meta name="keywords" content="LikeVoca manual, Firebase storage, AI vocabulary learning, quiz modes, real-time progress tracking, responsive web design, multilingual support" />
+    
+    <!-- Open Graph / Social media meta tags -->
+    <meta property="og:title" content="User Manual - LikeVoca" />
+    <meta property="og:description" content="Complete user manual covering Firebase storage-based AI vocabulary learning, quiz modes, real-time data synchronization features. Step-by-step instructions for all LikeVoca functions." />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://likevoca.com/en/manual" />
+    <meta property="og:locale" content="en" />
+    
+    <!-- Canonical link -->
+    <link rel="canonical" href="https://likevoca.com/en/manual" />
+    
+    <!-- Alternate language links -->
+    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/manual" />
+    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/manual" />
+    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/manual" />
+    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/manual" />
+    <link rel="alternate" hreflang="es" href="https://likevoca.com/es/manual" />
+    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/manual" />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="stylesheet" href="../../css/style.css" />
+    
+    <style>
+      .manual-toc {
+        position: sticky;
+        top: 100px;
+      }
+      .manual-section {
+        scroll-margin-top: 100px;
+      }
+    </style>
+  </head>
+  
+  <body class="bg-gray-50">
+    <div id="navbar-container"></div>
+
+    <main class="container mx-auto max-w-7xl px-4 md:px-6 lg:px-8 py-8 md:py-12">
+      <!-- Header -->
+      <header class="text-center mb-12">
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">User Manual</h1>
+        <p class="text-lg text-gray-600">Step-by-step guide to master LikeVoca completely</p>
+      </header>
+
+      <div class="lg:flex lg:gap-8">
+        <!-- Table of Contents (Sidebar) -->
+        <aside class="lg:w-1/4 mb-8 lg:mb-0">
+          <div class="manual-toc bg-white rounded-xl p-6 shadow-lg">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Table of Contents</h2>
+            <ul class="space-y-2 text-sm">
+              <li><a href="#getting-started" class="text-[#4B63AC] hover:underline">Getting Started</a></li>
+              <li><a href="#learning-features" class="text-[#4B63AC] hover:underline">Learning Features</a></li>
+              <li><a href="#account-management" class="text-[#4B63AC] hover:underline">Account Management</a></li>
+              <li><a href="#advanced-features" class="text-[#4B63AC] hover:underline">Advanced Features</a></li>
+              <li><a href="#troubleshooting" class="text-[#4B63AC] hover:underline">Troubleshooting</a></li>
+              <li><a href="#tips" class="text-[#4B63AC] hover:underline">Tips & Best Practices</a></li>
+            </ul>
+          </div>
+        </aside>
+
+        <!-- Manual Content -->
+        <div class="lg:w-3/4">
+          <!-- Getting Started -->
+          <section id="getting-started" class="manual-section bg-white rounded-xl p-8 shadow-lg mb-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+              <i class="fas fa-rocket text-[#4B63AC] mr-3"></i>
+              Getting Started
+            </h2>
+            
+            <div class="space-y-6">
+              <div class="manual-subsection">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">1. Account Creation</h3>
+                <div class="bg-gray-50 rounded-lg p-4">
+                  <ol class="list-decimal list-inside space-y-2">
+                    <li>Visit the LikeVoca homepage</li>
+                    <li>Click the "Sign Up" button</li>
+                    <li>Choose email registration or social login</li>
+                    <li>Fill in required information and agree to terms</li>
+                    <li>Complete email verification</li>
+                  </ol>
+                </div>
+              </div>
+
+              <div class="manual-subsection">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">2. First Login & Setup</h3>
+                <div class="bg-blue-50 rounded-lg p-4">
+                  <p class="mb-3">Complete these settings on your first login:</p>
+                  <ul class="list-disc list-inside space-y-1">
+                    <li>Select target learning language</li>
+                    <li>Set current language level</li>
+                    <li>Set learning goals</li>
+                    <li>Complete basic settings</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="manual-subsection">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">3. Dashboard Overview</h3>
+                <div class="grid md:grid-cols-2 gap-4">
+                  <div class="bg-green-50 rounded-lg p-4">
+                    <h4 class="font-semibold mb-2">Main Menu</h4>
+                    <ul class="text-sm space-y-1">
+                      <li>• Vocabulary - Manage words to learn</li>
+                      <li>• Quiz - Learning assessment</li>
+                      <li>• Games - Fun learning activities</li>
+                      <li>• Progress - Check learning status</li>
+                    </ul>
+                  </div>
+                  <div class="bg-orange-50 rounded-lg p-4">
+                    <h4 class="font-semibold mb-2">Dashboard Widgets</h4>
+                    <ul class="text-sm space-y-1">
+                      <li>• Learning progress status</li>
+                      <li>• Recent learning activities</li>
+                      <li>• Vocabulary and quiz management</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Learning Features -->
+          <section id="learning-features" class="manual-section bg-white rounded-xl p-8 shadow-lg mb-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+              <i class="fas fa-graduation-cap text-[#4B63AC] mr-3"></i>
+              Learning Features
+            </h2>
+            
+            <div class="space-y-6">
+              <div class="manual-subsection">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">1. Using AI Vocabulary</h3>
+                <div class="bg-purple-50 rounded-lg p-4">
+                  <p class="mb-3">Learn personalized vocabulary recommended by AI:</p>
+                  <div class="grid md:grid-cols-3 gap-4 mt-4">
+                    <div class="text-center">
+                      <i class="fas fa-brain text-2xl text-[#9C27B0] mb-2"></i>
+                      <p class="text-sm font-semibold">Analyze</p>
+                      <p class="text-xs">Learning pattern analysis</p>
+                    </div>
+                    <div class="text-center">
+                      <i class="fas fa-magic text-2xl text-[#9C27B0] mb-2"></i>
+                      <p class="text-sm font-semibold">Recommend</p>
+                      <p class="text-xs">Optimal word selection</p>
+                    </div>
+                    <div class="text-center">
+                      <i class="fas fa-chart-line text-2xl text-[#9C27B0] mb-2"></i>
+                      <p class="text-sm font-semibold">Adapt</p>
+                      <p class="text-xs">Learning difficulty adjustment</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="manual-subsection">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">2. Creating Your Own Vocabulary</h3>
+                <div class="bg-green-50 rounded-lg p-4">
+                  <ol class="list-decimal list-inside space-y-2">
+                    <li>Click "My Vocabulary" on the dashboard</li>
+                    <li>Select "Create New Vocabulary"</li>
+                    <li>Enter vocabulary name and description</li>
+                    <li>Set category (optional)</li>
+                    <li>Start adding words</li>
+                  </ol>
+                  <div class="mt-4 p-3 bg-green-100 rounded">
+                    <p class="text-sm"><i class="fas fa-lightbulb mr-2"></i>
+                    <strong>Tip:</strong> Dividing vocabulary by topics can help you learn more effectively.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="manual-subsection">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">3. Using Quiz Mode</h3>
+                <div class="grid md:grid-cols-2 gap-4">
+                  <div class="bg-blue-50 rounded-lg p-4">
+                    <h4 class="font-semibold mb-2">Quiz Types</h4>
+                    <ul class="text-sm space-y-1">
+                      <li>• Multiple choice questions</li>
+                      <li>• Word matching</li>
+                      <li>• Learning assessment tests</li>
+                    </ul>
+                  </div>
+                  <div class="bg-yellow-50 rounded-lg p-4">
+                    <h4 class="font-semibold mb-2">Setting Options</h4>
+                    <ul class="text-sm space-y-1">
+                      <li>• Use default settings</li>
+                      <li>• Review mode</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Account Management -->
+          <section id="account-management" class="manual-section bg-white rounded-xl p-8 shadow-lg mb-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+              <i class="fas fa-user-cog text-[#4B63AC] mr-3"></i>
+              Account Management
+            </h2>
+            
+            <div class="space-y-6">
+              <div class="manual-subsection">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Profile Settings</h3>
+                <div class="bg-gray-50 rounded-lg p-4">
+                  <p class="mb-3">Personal information management:</p>
+                  <ul class="list-disc list-inside space-y-1">
+                    <li>Change profile picture</li>
+                    <li>Edit nickname</li>
+                    <li>Change target language</li>
+                    <li>Reset learning level</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="manual-subsection">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Security Settings</h3>
+                <div class="bg-red-50 rounded-lg p-4">
+                  <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <h4 class="font-semibold mb-2">Password Management</h4>
+                      <ul class="text-sm space-y-1">
+                        <li>• Change password</li>
+                        <li>• Use strong passwords</li>
+                        <li>• Regular updates</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 class="font-semibold mb-2">Account Security</h4>
+                      <ul class="text-sm space-y-1">
+                        <li>• Password reset</li>
+                        <li>• Social login integration</li>
+                        <li>• Account security management</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Advanced Features -->
+          <section id="advanced-features" class="manual-section bg-white rounded-xl p-8 shadow-lg mb-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+              <i class="fas fa-cogs text-[#4B63AC] mr-3"></i>
+              Advanced Features
+            </h2>
+            
+            <div class="space-y-6">
+              <div class="manual-subsection">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Learning Data Management</h3>
+                <div class="bg-indigo-50 rounded-lg p-4">
+                  <p class="mb-3">Learning data and progress management:</p>
+                  <div class="grid md:grid-cols-2 gap-4">
+                    <div class="text-center">
+                      <i class="fas fa-chart-bar text-2xl text-[#3F51B5] mb-2"></i>
+                      <p class="text-sm font-semibold">Check Progress</p>
+                    </div>
+                    <div class="text-center">
+                      <i class="fas fa-download text-2xl text-[#3F51B5] mb-2"></i>
+                      <p class="text-sm font-semibold">Export Data</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </section>
+
+          <!-- Troubleshooting -->
+          <section id="troubleshooting" class="manual-section bg-white rounded-xl p-8 shadow-lg mb-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+              <i class="fas fa-wrench text-[#4B63AC] mr-3"></i>
+              Troubleshooting
+            </h2>
+            
+            <div class="space-y-6">
+              <div class="manual-subsection">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Common Issues</h3>
+                <div class="space-y-4">
+                  <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="font-semibold mb-2">Login Issues</h4>
+                    <ul class="text-sm space-y-1">
+                      <li>• Use password reset</li>
+                      <li>• Clear browser cache</li>
+                      <li>• Try a different browser</li>
+                    </ul>
+                  </div>
+                  <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="font-semibold mb-2">Performance Issues</h4>
+                    <ul class="text-sm space-y-1">
+                      <li>• Check internet connection</li>
+                      <li>• Update browser</li>
+                      <li>• Close other tabs</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Tips & Best Practices -->
+          <section id="tips" class="manual-section bg-white rounded-xl p-8 shadow-lg">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+              <i class="fas fa-lightbulb text-[#4B63AC] mr-3"></i>
+              Tips & Best Practices
+            </h2>
+            
+            <div class="space-y-6">
+              <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-green-50 rounded-lg p-4">
+                  <h4 class="font-semibold mb-3">Effective Learning Strategies</h4>
+                  <ul class="text-sm space-y-2">
+                    <li>• Study at consistent daily times</li>
+                    <li>• Regular review sessions</li>
+                    <li>• Use various learning modes</li>
+                    <li>• Set target word count goals</li>
+                  </ul>
+                </div>
+                <div class="bg-blue-50 rounded-lg p-4">
+                  <h4 class="font-semibold mb-3">Maintaining Motivation</h4>
+                  <ul class="text-sm space-y-2">
+                    <li>• Achieve small goals first</li>
+                    <li>• Collect achievement badges</li>
+                    <li>• Check learning records</li>
+                    <li>• Compete with friends</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- Help Contact -->
+      <div class="bg-gradient-to-r from-[#4B63AC] to-[#3A4F8B] text-white rounded-xl p-8 text-center mt-12">
+        <h2 class="text-2xl font-bold mb-4">Need Additional Help?</h2>
+        <p class="text-lg mb-6">If your issue isn't resolved, please feel free to contact us anytime</p>
+        <div class="flex justify-center gap-4">
+          <a href="faq.html" class="bg-white text-[#4B63AC] px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-300">
+            View FAQ
+          </a>
+          <a href="inquiry.html" class="bg-transparent border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-[#4B63AC] transition duration-300">
+            Contact Us
+          </a>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer Container -->
+    <div id="footer-container"></div>
+
+    <!-- Scripts -->
+    <script src="../../components/js/navbar.js"></script>
+    <script src="../../components/js/footer.js"></script>
+    
+    <script type="module">
+      import { applyLanguage, updateMetadata, getActiveLanguage } from '../../utils/language-utils.js';
+      
+      document.addEventListener('DOMContentLoaded', async () => {
+        try {
+          if (typeof window.loadNavbar === 'function') {
+            await window.loadNavbar();
+          }
+          
+          if (typeof window.loadFooter === 'function') {
+            await window.loadFooter();
+          }
+          
+          await applyLanguage();
+          await updateMetadata('manual');
+          
+        } catch (error) {
+          console.error('Error applying language settings:', error);
+        }
+      });
+
+      // Smooth scroll for table of contents links
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            target.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

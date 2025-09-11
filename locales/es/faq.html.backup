@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Preguntas Frecuentes (FAQ) - Ayuda de Aprendizaje de Idiomas LikeVoca</title>
+    
+    <!-- Etiquetas meta básicas -->
+    <meta name="description" content="Preguntas frecuentes y respuestas sobre la plataforma de aprendizaje de idiomas LikeVoca. Resuelva todas sus dudas sobre creación de cuenta, funciones de aprendizaje, soporte técnico, privacidad y seguridad." />
+    <meta name="keywords" content="LikeVoca FAQ, preguntas frecuentes, ayuda de aprendizaje de idiomas, creación de cuenta, aprendizaje de vocabulario AI, soporte técnico, protección de privacidad" />
+    
+    <!-- Etiquetas meta de Open Graph / redes sociales -->
+    <meta property="og:title" content="Preguntas Frecuentes (FAQ) - Ayuda de Aprendizaje de Idiomas LikeVoca" />
+    <meta property="og:description" content="Obtenga ayuda con el uso de LikeVoca, gestión de cuenta, funciones de aprendizaje y soporte técnico. Encuentre respuestas rápidas y precisas a todas sus preguntas." />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://likevoca.com/es/faq" />
+    <meta property="og:locale" content="es" />
+    
+    <!-- Etiquetas de Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Preguntas Frecuentes (FAQ) - Ayuda de Aprendizaje de Idiomas LikeVoca" />
+    <meta name="twitter:description" content="Obtenga ayuda con el uso de LikeVoca, gestión de cuenta y funciones de aprendizaje." />
+    
+    <!-- Enlace canónico -->
+    <link rel="canonical" href="https://likevoca.com/es/faq" />
+    
+    <!-- Enlaces de idiomas alternativos -->
+    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/faq" />
+    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/faq" />
+    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/faq" />
+    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/faq" />
+    <link rel="alternate" hreflang="es" href="https://likevoca.com/es/faq" />
+    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/faq" />
+
+    <!-- Optimización de rendimiento - Resource Hints -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+
+    <link rel="stylesheet" href="../../css/style.css" />
+    
+    <!-- Datos estructurados (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "name": "LikeVoca Preguntas Frecuentes",
+      "description": "Preguntas frecuentes y respuestas sobre la plataforma de aprendizaje de idiomas LikeVoca",
+      "url": "https://likevoca.com/es/faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "¿Cómo creo una cuenta?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Puede registrarse directamente con correo electrónico o registrarse fácilmente usando su cuenta de Google, Facebook o Apple."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Cómo funciona la función de vocabulario AI?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "La IA analiza su nivel de aprendizaje, objetivos e intereses para recomendar vocabulario optimizado y proporcionar una experiencia de aprendizaje personalizada."
+          }
+        }
+      ],
+      "inLanguage": "es"
+    }
+    </script>
+  </head>
+  <body class="bg-gray-50">
+    <div id="navbar-container"></div>
+
+    <main class="container mx-auto max-w-4xl px-4 md:px-6 lg:px-8 py-8 md:py-12">
+      <!-- Sección de encabezado -->
+      <header class="text-center mb-12">
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
+          Preguntas <span class="text-[#4B63AC]">Frecuentes</span>
+        </h1>
+        <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
+          Resuelva rápidamente sus preguntas sobre el uso de LikeVoca
+        </p>
+      </header>
+
+      <!-- Búsqueda rápida -->
+      <section class="mb-12">
+        <div class="bg-white rounded-xl p-6 shadow-lg">
+          <div class="relative">
+            <input 
+              type="text" 
+              id="faq-search" 
+              placeholder="Busque lo que le interesa saber..." 
+              class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B63AC] focus:border-transparent"
+            />
+            <i class="fas fa-search absolute left-4 top-4 text-gray-400"></i>
+          </div>
+        </div>
+      </section>
+
+      <!-- Categorías de FAQ -->
+      <section class="mb-8">
+        <div class="flex flex-wrap gap-4 justify-center">
+          <button onclick="filterFAQ('all')" class="faq-filter-btn bg-[#4B63AC] text-white px-6 py-2 rounded-full font-medium transition duration-300">
+            Todo
+          </button>
+          <button onclick="filterFAQ('account')" class="faq-filter-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full font-medium hover:bg-[#4B63AC] hover:text-white transition duration-300">
+            Cuenta y Registro
+          </button>
+          <button onclick="filterFAQ('learning')" class="faq-filter-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full font-medium hover:bg-[#4B63AC] hover:text-white transition duration-300">
+            Funciones de Aprendizaje
+          </button>
+          <button onclick="filterFAQ('technical')" class="faq-filter-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full font-medium hover:bg-[#4B63AC] hover:text-white transition duration-300">
+            Soporte Técnico
+          </button>
+          <button onclick="filterFAQ('privacy')" class="faq-filter-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full font-medium hover:bg-[#4B63AC] hover:text-white transition duration-300">
+            Privacidad y Seguridad
+          </button>
+        </div>
+      </section>
+
+      <!-- Lista de FAQ -->
+      <section class="space-y-4">
+        <!-- Cuenta y Registro -->
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="account">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('account-1')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">¿Cómo creo una cuenta?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-account-1"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-account-1">
+            <p class="mb-4">Hay dos formas de registrarse en LikeVoca:</p>
+            <ul class="list-disc pl-6 space-y-2">
+              <li><strong>Registro por correo:</strong> Puede crear una cuenta directamente ingresando su dirección de correo y contraseña.</li>
+              <li><strong>Inicio de sesión social:</strong> Puede registrarse fácilmente usando su cuenta de Google, Facebook o Apple.</li>
+            </ul>
+            <p class="mt-4">Después del registro, complete la verificación por correo para acceder a todas las funciones.</p>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="account">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('account-2')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">¿Cuál es la diferencia entre registro OAuth y registro por correo?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-account-2"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-account-2">
+            <div class="overflow-x-auto">
+              <table class="w-full border-collapse border border-gray-300 mt-4">
+                <thead>
+                  <tr class="bg-gray-50">
+                    <th class="border border-gray-300 px-4 py-2 text-left">Categoría</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Registro OAuth</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Registro por Correo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="border border-gray-300 px-4 py-2 font-semibold">Conveniencia</td>
+                    <td class="border border-gray-300 px-4 py-2">Inicio inmediato con cuenta existente</td>
+                    <td class="border border-gray-300 px-4 py-2">Requiere configuración de contraseña separada</td>
+                  </tr>
+                  <tr>
+                    <td class="border border-gray-300 px-4 py-2 font-semibold">Seguridad</td>
+                    <td class="border border-gray-300 px-4 py-2">Se aplican políticas de seguridad de cada plataforma</td>
+                    <td class="border border-gray-300 px-4 py-2">Gestión directa de seguridad personal</td>
+                  </tr>
+                  <tr>
+                    <td class="border border-gray-300 px-4 py-2 font-semibold">Privacidad</td>
+                    <td class="border border-gray-300 px-4 py-2">Intercambio mínimo de información</td>
+                    <td class="border border-gray-300 px-4 py-2">Control completo de información personal</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="account">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('account-3')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">¿Qué hacer si olvido mi contraseña?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-account-3"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-account-3">
+            <p class="mb-4">Procedimiento para restablecer contraseña:</p>
+            <ol class="list-decimal pl-6 space-y-2">
+              <li>Haga clic en el enlace "¿Olvidó su contraseña?" en la página de inicio de sesión.</li>
+              <li>Ingrese la dirección de correo con la que se registró.</li>
+              <li>Haga clic en el enlace de restablecimiento enviado a su correo.</li>
+              <li>Establezca una nueva contraseña.</li>
+            </ol>
+            <div class="mt-4 p-4 bg-blue-50 rounded-lg">
+              <p class="text-sm"><i class="fas fa-info-circle text-blue-500 mr-2"></i>
+              El enlace de restablecimiento es válido solo por 24 horas. Si no recibe el correo, revise su carpeta de spam.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="account">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('account-4')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">¿Cómo puedo eliminar mi cuenta?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-account-4"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-account-4">
+            <p class="mb-4">La eliminación de cuenta es irreversible, así que considérelo cuidadosamente:</p>
+            <ol class="list-decimal pl-6 space-y-2">
+              <li>Vaya a la página de Configuración.</li>
+              <li>Encuentre la sección "Gestión de Cuenta".</li>
+              <li>Haga clic en el botón "Eliminar Cuenta".</li>
+              <li>Seleccione una razón para la eliminación e ingrese su contraseña.</li>
+              <li>Después de la confirmación final, su cuenta será eliminada permanentemente.</li>
+            </ol>
+            <div class="mt-4 p-4 bg-red-50 rounded-lg">
+              <p class="text-sm"><i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>
+              Al eliminar su cuenta, todos los datos de aprendizaje y progreso serán eliminados permanentemente y no se podrán recuperar.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Funciones de Aprendizaje -->
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="learning">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('learning-1')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">¿Cómo funciona la función de vocabulario AI?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-learning-1"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-learning-1">
+            <p class="mb-4">La función de vocabulario AI funciona de la siguiente manera:</p>
+            <div class="grid md:grid-cols-2 gap-6">
+              <div class="bg-blue-50 rounded-lg p-4">
+                <h4 class="font-semibold text-gray-800 mb-3">
+                  <i class="fas fa-brain text-[#4B63AC] mr-2"></i>Análisis Personalizado
+                </h4>
+                <ul class="text-sm space-y-1">
+                  <li>• Análisis del nivel de vocabulario actual</li>
+                  <li>• Identificación de objetivos de aprendizaje</li>
+                  <li>• Consideración de áreas de interés</li>
+                  <li>• Análisis de patrones de aprendizaje</li>
+                </ul>
+              </div>
+              <div class="bg-green-50 rounded-lg p-4">
+                <h4 class="font-semibold text-gray-800 mb-3">
+                  <i class="fas fa-magic text-[#2E7D32] mr-2"></i>Recomendaciones Inteligentes
+                </h4>
+                <ul class="text-sm space-y-1">
+                  <li>• Selección de palabras de dificultad óptima</li>
+                  <li>• Prioridad de utilidad práctica</li>
+                  <li>• Aumento gradual de dificultad</li>
+                  <li>• Ajuste automático del ciclo de repaso</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="learning">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('learning-2')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">¿Cómo creo mi propia lista de vocabulario?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-learning-2"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-learning-2">
+            <p class="mb-4">Método de creación de lista de vocabulario personal:</p>
+            <ol class="list-decimal pl-6 space-y-2">
+              <li>Haga clic en el botón "Mi Lista de Vocabulario" en el panel principal.</li>
+              <li>Ingrese el nombre y descripción de la lista de vocabulario.</li>
+              <li>Agregue directamente palabras que desea aprender u obtenga recomendaciones de AI.</li>
+              <li>Puede verificar y modificar el significado, oraciones de ejemplo y pronunciación de cada palabra.</li>
+              <li>Puede organizar por categorías para una gestión sistemática.</li>
+            </ol>
+            <div class="mt-4 p-4 bg-green-50 rounded-lg">
+              <p class="text-sm"><i class="fas fa-lightbulb text-green-500 mr-2"></i>
+              Puede crear múltiples listas de vocabulario personalizadas según sus necesidades.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="learning">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('learning-3')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">¿Qué modos de cuestionario y juegos están disponibles?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-learning-3"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-learning-3">
+            <div class="grid md:grid-cols-2 gap-6">
+              <div>
+                <h4 class="font-semibold text-gray-800 mb-3">
+                  <i class="fas fa-question-circle text-[#F57C00] mr-2"></i>Modos de Cuestionario
+                </h4>
+                <ul class="space-y-2">
+                  <li>• Preguntas de opción múltiple</li>
+                  <li>• Llenar espacios en blanco</li>
+                  <li>• Emparejamiento de palabras</li>
+                  <li>• Completar oraciones</li>
+                  <li>• Escuchar y emparejar pronunciación</li>
+                </ul>
+              </div>
+              <div>
+                <h4 class="font-semibold text-gray-800 mb-3">
+                  <i class="fas fa-gamepad text-[#9C27B0] mr-2"></i>Modos de Juego
+                </h4>
+                <ul class="space-y-2">
+                  <li>• Juego de emparejamiento de palabras</li>
+                  <li>• Cuestionario de velocidad</li>
+                  <li>• Juego de búsqueda de palabras</li>
+                  <li>• Crucigrama</li>
+                  <li>• Modo batalla (competir con otros usuarios)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="learning">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('learning-4')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">¿Cómo puedo verificar mi progreso de aprendizaje?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-learning-4"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-learning-4">
+            <p class="mb-4">Funciones de seguimiento del progreso de aprendizaje:</p>
+            <div class="grid md:grid-cols-3 gap-4">
+              <div class="bg-blue-50 rounded-lg p-4 text-center">
+                <i class="fas fa-chart-line text-2xl text-[#4B63AC] mb-2"></i>
+                <h4 class="font-semibold">Estadísticas Diarias</h4>
+                <p class="text-sm mt-2">Número de palabras estudiadas diariamente, tasa de aciertos, tiempo de estudio</p>
+              </div>
+              <div class="bg-green-50 rounded-lg p-4 text-center">
+                <i class="fas fa-calendar-week text-2xl text-[#2E7D32] mb-2"></i>
+                <h4 class="font-semibold">Reporte Semanal</h4>
+                <p class="text-sm mt-2">Patrones de aprendizaje semanal y análisis de rendimiento</p>
+              </div>
+              <div class="bg-orange-50 rounded-lg p-4 text-center">
+                <i class="fas fa-trophy text-2xl text-[#E65100] mb-2"></i>
+                <h4 class="font-semibold">Logros</h4>
+                <p class="text-sm mt-2">Tasa de cumplimiento de objetivos y medallas obtenidas</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Soporte Técnico -->
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="technical">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('technical-1')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">¿Qué navegadores están soportados?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-technical-1"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-technical-1">
+            <p class="mb-4">LikeVoca funciona de manera óptima en los siguientes navegadores:</p>
+            <div class="grid md:grid-cols-2 gap-6">
+              <div>
+                <h4 class="font-semibold text-gray-800 mb-3">
+                  <i class="fas fa-check-circle text-green-500 mr-2"></i>Navegadores Recomendados
+                </h4>
+                <ul class="space-y-2">
+                  <li>• Chrome 90 o superior</li>
+                  <li>• Firefox 88 o superior</li>
+                  <li>• Safari 14 o superior</li>
+                  <li>• Edge 90 o superior</li>
+                </ul>
+              </div>
+              <div>
+                <h4 class="font-semibold text-gray-800 mb-3">
+                  <i class="fas fa-mobile-alt text-[#4B63AC] mr-2"></i>Soporte Móvil
+                </h4>
+                <ul class="space-y-2">
+                  <li>• iOS Safari</li>
+                  <li>• Android Chrome</li>
+                  <li>• Samsung Internet</li>
+                  <li>• Diseño web responsivo</li>
+                </ul>
+              </div>
+            </div>
+            <div class="mt-4 p-4 bg-yellow-50 rounded-lg">
+              <p class="text-sm"><i class="fas fa-exclamation-triangle text-yellow-500 mr-2"></i>
+              Internet Explorer no está soportado. Recomendamos usar navegadores actualizados.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="technical">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('technical-2')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">¿Hay una aplicación móvil?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-technical-2"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-technical-2">
+            <p class="mb-4">Soporte de dispositivos móviles de LikeVoca:</p>
+            <div class="bg-blue-50 rounded-lg p-6">
+              <h4 class="font-semibold text-gray-800 mb-3">
+                <i class="fas fa-mobile-alt text-[#4B63AC] mr-2"></i>Web Responsivo
+              </h4>
+              <p class="mb-4">LikeVoca está optimizado para funcionar perfectamente en dispositivos móviles a través del navegador web:</p>
+              <ul class="space-y-2">
+                <li>• Diseño completamente responsivo</li>
+                <li>• Interfaz optimizada para pantallas táctiles</li>
+                <li>• Funcionalidad completa en dispositivos móviles</li>
+                <li>• Velocidad de carga optimizada</li>
+              </ul>
+            </div>
+            <div class="mt-4 p-4 bg-green-50 rounded-lg">
+              <p class="text-sm"><i class="fas fa-info-circle text-green-500 mr-2"></i>
+              Simplemente acceda a LikeVoca desde el navegador de su dispositivo móvil para una experiencia de aprendizaje óptima.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="technical">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('technical-3')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">¿Cómo funciona el almacenamiento de datos?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-technical-3"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-technical-3">
+            <p class="mb-4">LikeVoca utiliza almacenamiento seguro en la nube basado en Firebase:</p>
+            <div class="grid md:grid-cols-2 gap-6">
+              <div class="bg-blue-50 rounded-lg p-4">
+                <h4 class="font-semibold text-gray-800 mb-3">
+                  <i class="fas fa-cloud text-[#4B63AC] mr-2"></i>Base de Datos en la Nube
+                </h4>
+                <ul class="text-sm space-y-1">
+                  <li>• Almacenamiento seguro con Firebase Cloud Database</li>
+                  <li>• Guardado automático del progreso de aprendizaje</li>
+                  <li>• Respaldo seguro de listas de vocabulario</li>
+                  <li>• Acceso desde múltiples dispositivos</li>
+                </ul>
+              </div>
+              <div class="bg-green-50 rounded-lg p-4">
+                <h4 class="font-semibold text-gray-800 mb-3">
+                  <i class="fas fa-shield-alt text-[#2E7D32] mr-2"></i>Seguridad de Datos
+                </h4>
+                <ul class="text-sm space-y-1">
+                  <li>• Transmisión de datos encriptada</li>
+                  <li>• Infraestructura segura de Google Firebase</li>
+                  <li>• Protección contra pérdida de datos</li>
+                  <li>• Cumplimiento de estándares de seguridad</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="technical">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('technical-4')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">¿Qué debo hacer cuando ocurren problemas?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-technical-4"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-technical-4">
+            <p class="mb-4">Pasos para resolver problemas:</p>
+            <ol class="list-decimal pl-6 space-y-2 mb-4">
+              <li>Actualizar el navegador (Ctrl+F5 o Cmd+Shift+R)</li>
+              <li>Borrar caché y cookies del navegador</li>
+              <li>Intentar acceder desde un navegador diferente</li>
+              <li>Verificar el estado de la conexión a internet</li>
+            </ol>
+            <div class="bg-orange-50 rounded-lg p-4">
+              <h4 class="font-semibold text-gray-800 mb-3">
+                <i class="fas fa-envelope text-[#E65100] mr-2"></i>Contacto de Atención al Cliente
+              </h4>
+              <ul class="space-y-2">
+                <li>• Formulario de consulta: Disponible en la página de contacto</li>
+                <li>• Tiempo de respuesta: Días laborables dentro de 48 horas</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Privacidad y Seguridad -->
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="privacy">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('privacy-1')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">¿Qué datos recopilan?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-privacy-1"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-privacy-1">
+            <p class="mb-4">Tipos de datos recopilados por LikeVoca:</p>
+            <div class="grid md:grid-cols-2 gap-6">
+              <div class="bg-blue-50 rounded-lg p-4">
+                <h4 class="font-semibold text-gray-800 mb-3">
+                  <i class="fas fa-user text-[#4B63AC] mr-2"></i>Información Esencial
+                </h4>
+                <ul class="text-sm space-y-1">
+                  <li>• Dirección de correo electrónico</li>
+                  <li>• Nombre de usuario</li>
+                  <li>• Contraseña (encriptada)</li>
+                  <li>• Configuración de idioma de aprendizaje</li>
+                </ul>
+              </div>
+              <div class="bg-green-50 rounded-lg p-4">
+                <h4 class="font-semibold text-gray-800 mb-3">
+                  <i class="fas fa-chart-bar text-[#2E7D32] mr-2"></i>Datos de Aprendizaje
+                </h4>
+                <ul class="text-sm space-y-1">
+                  <li>• Progreso y rendimiento de aprendizaje</li>
+                  <li>• Listas de vocabulario y marcadores</li>
+                  <li>• Resultados de cuestionarios</li>
+                  <li>• Patrones de uso (anonimizados)</li>
+                </ul>
+              </div>
+            </div>
+            <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+              <p class="text-sm"><i class="fas fa-shield-alt text-gray-600 mr-2"></i>
+              Toda la información personal se procesa de forma segura de acuerdo con GDPR y las leyes de protección de datos personales.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-lg shadow-md" data-category="privacy">
+          <button class="w-full text-left p-6 focus:outline-none" onclick="toggleFAQ('privacy-2')">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-lg text-gray-800">¿Cómo se protege la seguridad de la cuenta?</h3>
+              <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="arrow-privacy-2"></i>
+            </div>
+          </button>
+          <div class="hidden px-6 pb-6 text-gray-600" id="answer-privacy-2">
+            <p class="mb-4">Funciones de seguridad disponibles para proteger su cuenta:</p>
+            <div class="grid md:grid-cols-2 gap-6">
+              <div class="bg-red-50 rounded-lg p-4">
+                <h4 class="font-semibold text-gray-800 mb-3">
+                  <i class="fas fa-lock text-[#D32F2F] mr-2"></i>Seguridad Técnica
+                </h4>
+                <ul class="text-sm space-y-1">
+                  <li>• Comunicación encriptada SSL/TLS</li>
+                  <li>• Procesamiento hash de contraseñas</li>
+                  <li>• Actualizaciones de seguridad regulares</li>
+                  <li>• Gestión segura de sesiones</li>
+                </ul>
+              </div>
+              <div class="bg-orange-50 rounded-lg p-4">
+                <h4 class="font-semibold text-gray-800 mb-3">
+                  <i class="fas fa-user-shield text-[#E65100] mr-2"></i>Funciones de Cuenta
+                </h4>
+                <ul class="text-sm space-y-1">
+                  <li>• Restablecimiento de contraseña</li>
+                  <li>• Inicio de sesión social (Google, Facebook, Apple)</li>
+                  <li>• Gestión segura de sesiones</li>
+                  <li>• Recomendación de contraseñas fuertes</li>
+                </ul>
+              </div>
+            </div>
+            <div class="mt-4 p-4 bg-blue-50 rounded-lg">
+              <h4 class="font-semibold text-gray-800 mb-2">
+                <i class="fas fa-lightbulb text-[#1976D2] mr-2"></i>Consejos de Seguridad
+              </h4>
+              <ul class="text-sm space-y-1">
+                <li>• Cambie su contraseña regularmente</li>
+                <li>• Use una contraseña diferente a otros sitios</li>
+                <li>• Reporte actividades sospechosas inmediatamente</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+
+      </section>
+
+      <!-- Ayuda adicional -->
+      <section class="mt-12 bg-gradient-to-r from-[#4B63AC] to-[#3A4F8B] rounded-xl p-8 md:p-12 text-white text-center">
+        <h2 class="text-3xl md:text-4xl font-bold mb-6">
+          ¿Necesita más ayuda?
+        </h2>
+        <p class="text-lg md:text-xl mb-8 opacity-90">
+          Si no puede encontrar la respuesta que busca, no dude en contactarnos a través de nuestro formulario de consulta
+        </p>
+        <div class="flex justify-center">
+          <a href="/contact" class="inline-flex items-center justify-center bg-white text-[#4B63AC] px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition duration-300">
+            <i class="fas fa-envelope mr-2"></i>
+            Formulario de Consulta
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <!-- Contenedor de footer -->
+    <div id="footer-container"></div>
+
+    <!-- Scripts de funcionalidad FAQ -->
+    <script>
+      // Función de alternar FAQ
+      function toggleFAQ(id) {
+        const answer = document.getElementById(`answer-${id}`);
+        const arrow = document.getElementById(`arrow-${id}`);
+        
+        if (answer.classList.contains('hidden')) {
+          answer.classList.remove('hidden');
+          arrow.classList.add('rotate-180');
+        } else {
+          answer.classList.add('hidden');
+          arrow.classList.remove('rotate-180');
+        }
+      }
+
+      // Función de filtro FAQ
+      function filterFAQ(category) {
+        const faqItems = document.querySelectorAll('.faq-item');
+        const filterBtns = document.querySelectorAll('.faq-filter-btn');
+        
+        // Actualizar estados de botón
+        filterBtns.forEach(btn => {
+          btn.classList.remove('bg-[#4B63AC]', 'text-white');
+          btn.classList.add('bg-gray-200', 'text-gray-700');
+        });
+        
+        event.target.classList.remove('bg-gray-200', 'text-gray-700');
+        event.target.classList.add('bg-[#4B63AC]', 'text-white');
+        
+        // Filtrar elementos FAQ
+        faqItems.forEach(item => {
+          if (category === 'all' || item.dataset.category === category) {
+            item.style.display = 'block';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+      }
+
+      // Función de búsqueda FAQ
+      function initFAQSearch() {
+        const searchInput = document.getElementById('faq-search');
+        const faqItems = document.querySelectorAll('.faq-item');
+        
+        searchInput.addEventListener('input', function(e) {
+          const searchTerm = e.target.value.toLowerCase();
+          
+          faqItems.forEach(item => {
+            const question = item.querySelector('h3').textContent.toLowerCase();
+            const answer = item.querySelector('.text-gray-600').textContent.toLowerCase();
+            
+            if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+              item.style.display = 'block';
+            } else {
+              item.style.display = 'none';
+            }
+          });
+        });
+      }
+
+
+      // Inicializar
+      document.addEventListener('DOMContentLoaded', function() {
+        initFAQSearch();
+      });
+    </script>
+
+    <!-- Script de barra de navegación -->
+    <script src="../../components/js/navbar.js"></script>
+    <!-- Script de footer -->
+    <script src="../../components/js/footer.js"></script>
+    
+    <!-- Utilidades de idioma -->
+    <script type="module">
+      import { applyLanguage, updateMetadata, getActiveLanguage } from '../../utils/language-utils.js';
+      
+      document.addEventListener('DOMContentLoaded', async () => {
+        try {
+          // Cargar barra de navegación
+          if (typeof window.loadNavbar === 'function') {
+            await window.loadNavbar();
+          }
+          
+          // Cargar footer
+          if (typeof window.loadFooter === 'function') {
+            await window.loadFooter();
+          }
+          
+          // Aplicar idioma
+          await applyLanguage();
+          await updateMetadata('faq');
+          
+        } catch (error) {
+          console.error('Error al aplicar configuración de idioma:', error);
+        }
+      });
+    </script>
+  </body>
+</html>

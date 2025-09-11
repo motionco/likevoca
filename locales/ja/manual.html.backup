@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ユーザーマニュアル - LikeVoca</title>
+    
+    <!-- 基本メタタグ -->
+    <meta name="description" content="LikeVocaユーザーマニュアル。アカウント作成から高度な機能まで、LikeVocaのすべての機能を詳しく説明いたします。効果的な言語学習のための完全ガイド。" />
+    <meta name="keywords" content="LikeVocaマニュアル, 使い方, 言語学習ガイド, AI単語学習, ユーザーガイド, 始め方" />
+    
+    <!-- Open Graph / ソーシャルメディアメタタグ -->
+    <meta property="og:title" content="ユーザーマニュアル - LikeVoca" />
+    <meta property="og:description" content="LikeVocaのすべての機能を詳しく説明する完全なユーザーマニュアル。アカウント作成から高度な機能まで段階的にご案内いたします。" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://likevoca.com/ja/manual" />
+    <meta property="og:locale" content="ja" />
+    
+    <!-- 標準リンク -->
+    <link rel="canonical" href="https://likevoca.com/ja/manual" />
+    
+    <!-- 代替言語リンク -->
+    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/manual" />
+    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/manual" />
+    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/manual" />
+    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/manual" />
+    <link rel="alternate" hreflang="es" href="https://likevoca.com/es/manual" />
+    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/manual" />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="stylesheet" href="../../css/style.css" />
+    
+    <style>
+      .manual-toc {
+        position: sticky;
+        top: 100px;
+      }
+      .manual-section {
+        scroll-margin-top: 100px;
+      }
+    </style>
+  </head>
+  
+  <body class="bg-gray-50">
+    <div id="navbar-container"></div>
+
+    <main class="container mx-auto max-w-7xl px-4 md:px-6 lg:px-8 py-8 md:py-12">
+      <!-- ヘッダー -->
+      <header class="text-center mb-12">
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">ユーザーマニュアル</h1>
+        <p class="text-lg text-gray-600">LikeVocaを完璧に活用する方法を段階的にご案内いたします</p>
+      </header>
+
+      <div class="lg:flex lg:gap-8">
+        <!-- 目次（サイドバー） -->
+        <aside class="lg:w-1/4 mb-8 lg:mb-0">
+          <div class="manual-toc bg-white rounded-xl p-6 shadow-lg">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">目次</h2>
+            <ul class="space-y-2 text-sm">
+              <li><a href="#getting-started" class="text-[#4B63AC] hover:underline">始め方</a></li>
+              <li><a href="#learning-features" class="text-[#4B63AC] hover:underline">学習機能</a></li>
+              <li><a href="#account-management" class="text-[#4B63AC] hover:underline">アカウント管理</a></li>
+              <li><a href="#advanced-features" class="text-[#4B63AC] hover:underline">高度な機能</a></li>
+              <li><a href="#troubleshooting" class="text-[#4B63AC] hover:underline">問題解決</a></li>
+              <li><a href="#tips" class="text-[#4B63AC] hover:underline">ヒントとベストプラクティス</a></li>
+            </ul>
+          </div>
+        </aside>
+
+        <!-- マニュアル内容 -->
+        <div class="lg:w-3/4">
+          <!-- 始め方 -->
+          <section id="getting-started" class="manual-section bg-white rounded-xl p-8 shadow-lg mb-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+              <i class="fas fa-rocket text-[#4B63AC] mr-3"></i>
+              始め方
+            </h2>
+            
+            <div class="space-y-6">
+              <div class="manual-subsection">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">1. アカウント作成</h3>
+                <div class="bg-gray-50 rounded-lg p-4">
+                  <ol class="list-decimal list-inside space-y-2">
+                    <li>LikeVocaホームページにアクセスします</li>
+                    <li>「新規登録」ボタンをクリックします</li>
+                    <li>メールアドレス登録またはソーシャルログインを選択します</li>
+                    <li>必須情報を入力し、利用規約に同意します</li>
+                    <li>メール認証を完了します</li>
+                  </ol>
+                </div>
+              </div>
+
+              <div class="manual-subsection">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">2. 初回ログインと設定</h3>
+                <div class="bg-blue-50 rounded-lg p-4">
+                  <p class="mb-3">初回ログイン時に以下の設定を完了してください：</p>
+                  <ul class="list-disc list-inside space-y-1">
+                    <li>目標学習言語の選択</li>
+                    <li>現在の言語レベル設定</li>
+                    <li>学習目標の設定</li>
+                    <li>基本設定の完了</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="manual-subsection">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">3. ダッシュボード概要</h3>
+                <div class="grid md:grid-cols-2 gap-4">
+                  <div class="bg-green-50 rounded-lg p-4">
+                    <h4 class="font-semibold mb-2">主要メニュー</h4>
+                    <ul class="text-sm space-y-1">
+                      <li>• 単語帳 - 学習する単語を管理</li>
+                      <li>• クイズ - 学習評価</li>
+                      <li>• ゲーム - 楽しい学習</li>
+                      <li>• 進捗 - 学習状況の確認</li>
+                    </ul>
+                  </div>
+                  <div class="bg-orange-50 rounded-lg p-4">
+                    <h4 class="font-semibold mb-2">ダッシュボードウィジェット</h4>
+                    <ul class="text-sm space-y-1">
+                      <li>• 学習進捗状況</li>
+                      <li>• 最近の学習活動</li>
+                      <li>• 単語帳及びクイズ管理</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 学習機能 -->
+          <section id="learning-features" class="manual-section bg-white rounded-xl p-8 shadow-lg mb-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+              <i class="fas fa-graduation-cap text-[#4B63AC] mr-3"></i>
+              学習機能
+            </h2>
+            
+            <div class="space-y-6">
+              <div class="manual-subsection">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">1. AI単語帳の使用</h3>
+                <div class="bg-purple-50 rounded-lg p-4">
+                  <p class="mb-3">AIが推奨するカスタマイズされた単語を学習しましょう：</p>
+                  <div class="grid md:grid-cols-3 gap-4 mt-4">
+                    <div class="text-center">
+                      <i class="fas fa-brain text-2xl text-[#9C27B0] mb-2"></i>
+                      <p class="text-sm font-semibold">分析</p>
+                      <p class="text-xs">学習パターンの分析</p>
+                    </div>
+                    <div class="text-center">
+                      <i class="fas fa-magic text-2xl text-[#9C27B0] mb-2"></i>
+                      <p class="text-sm font-semibold">推奨</p>
+                      <p class="text-xs">最適な単語の選択</p>
+                    </div>
+                    <div class="text-center">
+                      <i class="fas fa-chart-line text-2xl text-[#9C27B0] mb-2"></i>
+                      <p class="text-sm font-semibold">適応</p>
+                      <p class="text-xs">学習難易度の調整</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="manual-subsection">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">2. オリジナル単語帳の作成</h3>
+                <div class="bg-green-50 rounded-lg p-4">
+                  <ol class="list-decimal list-inside space-y-2">
+                    <li>ダッシュボードで「マイ単語帳」をクリック</li>
+                    <li>「新しい単語帳を作成」を選択</li>
+                    <li>単語帳名と説明を入力</li>
+                    <li>カテゴリ設定（任意）</li>
+                    <li>単語の追加を開始</li>
+                  </ol>
+                  <div class="mt-4 p-3 bg-green-100 rounded">
+                    <p class="text-sm"><i class="fas fa-lightbulb mr-2"></i>
+                    <strong>ヒント：</strong> テーマ別に単語帳を分けると、より効果的に学習できます。</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="manual-subsection">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">3. クイズモードの活用</h3>
+                <div class="grid md:grid-cols-2 gap-4">
+                  <div class="bg-blue-50 rounded-lg p-4">
+                    <h4 class="font-semibold mb-2">クイズ形式</h4>
+                    <ul class="text-sm space-y-1">
+                      <li>• 選択式問題</li>
+                      <li>• 単語入力問題</li>
+                      <li>• 学習確認テスト</li>
+                    </ul>
+                  </div>
+                  <div class="bg-yellow-50 rounded-lg p-4">
+                    <h4 class="font-semibold mb-2">設定オプション</h4>
+                    <ul class="text-sm space-y-1">
+                      <li>• 基本設定の使用</li>
+                      <li>• 復習モード</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- アカウント管理 -->
+          <section id="account-management" class="manual-section bg-white rounded-xl p-8 shadow-lg mb-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+              <i class="fas fa-user-cog text-[#4B63AC] mr-3"></i>
+              アカウント管理
+            </h2>
+            
+            <div class="space-y-6">
+              <div class="manual-subsection">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">プロフィール設定</h3>
+                <div class="bg-gray-50 rounded-lg p-4">
+                  <p class="mb-3">個人情報の管理：</p>
+                  <ul class="list-disc list-inside space-y-1">
+                    <li>プロフィール写真の変更</li>
+                    <li>ニックネームの修正</li>
+                    <li>目標言語の変更</li>
+                    <li>学習レベルの再設定</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="manual-subsection">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">セキュリティ設定</h3>
+                <div class="bg-red-50 rounded-lg p-4">
+                  <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <h4 class="font-semibold mb-2">パスワード管理</h4>
+                      <ul class="text-sm space-y-1">
+                        <li>• パスワード変更</li>
+                        <li>• 強力なパスワードの使用</li>
+                        <li>• 定期的な更新</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 class="font-semibold mb-2">アカウントセキュリティ</h4>
+                      <ul class="text-sm space-y-1">
+                        <li>• パスワード再設定</li>
+                        <li>• ソーシャルログイン連携</li>
+                        <li>• アカウントセキュリティ管理</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 高度な機能 -->
+          <section id="advanced-features" class="manual-section bg-white rounded-xl p-8 shadow-lg mb-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+              <i class="fas fa-cogs text-[#4B63AC] mr-3"></i>
+              高度な機能
+            </h2>
+            
+            <div class="space-y-6">
+              <div class="manual-subsection">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">学習データ管理</h3>
+                <div class="bg-indigo-50 rounded-lg p-4">
+                  <p class="mb-3">学習データと進捗の管理：</p>
+                  <div class="grid md:grid-cols-2 gap-4">
+                    <div class="text-center">
+                      <i class="fas fa-chart-bar text-2xl text-[#3F51B5] mb-2"></i>
+                      <p class="text-sm font-semibold">進捗確認</p>
+                    </div>
+                    <div class="text-center">
+                      <i class="fas fa-download text-2xl text-[#3F51B5] mb-2"></i>
+                      <p class="text-sm font-semibold">データエクスポート</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </section>
+
+          <!-- 問題解決 -->
+          <section id="troubleshooting" class="manual-section bg-white rounded-xl p-8 shadow-lg mb-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+              <i class="fas fa-wrench text-[#4B63AC] mr-3"></i>
+              問題解決
+            </h2>
+            
+            <div class="space-y-6">
+              <div class="manual-subsection">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">一般的な問題</h3>
+                <div class="space-y-4">
+                  <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="font-semibold mb-2">ログインの問題</h4>
+                    <ul class="text-sm space-y-1">
+                      <li>• パスワード再設定を使用</li>
+                      <li>• ブラウザキャッシュの削除</li>
+                      <li>• 他のブラウザで試す</li>
+                    </ul>
+                  </div>
+                  <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="font-semibold mb-2">パフォーマンスの問題</h4>
+                    <ul class="text-sm space-y-1">
+                      <li>• インターネット接続の確認</li>
+                      <li>• ブラウザの更新</li>
+                      <li>• 他のタブを閉じる</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ヒントとベストプラクティス -->
+          <section id="tips" class="manual-section bg-white rounded-xl p-8 shadow-lg">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+              <i class="fas fa-lightbulb text-[#4B63AC] mr-3"></i>
+              ヒントとベストプラクティス
+            </h2>
+            
+            <div class="space-y-6">
+              <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-green-50 rounded-lg p-4">
+                  <h4 class="font-semibold mb-3">効果的な学習戦略</h4>
+                  <ul class="text-sm space-y-2">
+                    <li>• 毎日決まった時間に学習</li>
+                    <li>• 定期的な復習</li>
+                    <li>• 多様な学習モードの活用</li>
+                    <li>• 目標単語数の設定</li>
+                  </ul>
+                </div>
+                <div class="bg-blue-50 rounded-lg p-4">
+                  <h4 class="font-semibold mb-3">モチベーション維持の方法</h4>
+                  <ul class="text-sm space-y-2">
+                    <li>• 小さな目標から達成</li>
+                    <li>• 達成度バッジの収集</li>
+                    <li>• 学習記録の確認</li>
+                    <li>• 友達との競争</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- ヘルプ連絡先 -->
+      <div class="bg-gradient-to-r from-[#4B63AC] to-[#3A4F8B] text-white rounded-xl p-8 text-center mt-12">
+        <h2 class="text-2xl font-bold mb-4">さらなるサポートが必要ですか？</h2>
+        <p class="text-lg mb-6">問題が解決されない場合は、いつでもお気軽にお問い合わせください</p>
+        <div class="flex justify-center gap-4">
+          <a href="faq.html" class="bg-white text-[#4B63AC] px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-300">
+            よくある質問を見る
+          </a>
+          <a href="inquiry.html" class="bg-transparent border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-[#4B63AC] transition duration-300">
+            お問い合わせ
+          </a>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footerコンテナ -->
+    <div id="footer-container"></div>
+
+    <!-- Scripts -->
+    <script src="../../components/js/navbar.js"></script>
+    <script src="../../components/js/footer.js"></script>
+    
+    <script type="module">
+      import { applyLanguage, updateMetadata, getActiveLanguage } from '../../utils/language-utils.js';
+      
+      document.addEventListener('DOMContentLoaded', async () => {
+        try {
+          if (typeof window.loadNavbar === 'function') {
+            await window.loadNavbar();
+          }
+          
+          if (typeof window.loadFooter === 'function') {
+            await window.loadFooter();
+          }
+          
+          await applyLanguage();
+          await updateMetadata('manual');
+          
+        } catch (error) {
+          console.error('言語設定の適用中にエラーが発生しました:', error);
+        }
+      });
+
+      // 目次リンクスムーススクロール
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            target.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

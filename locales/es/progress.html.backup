@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LikeVoca - Análisis de Progreso y Rendimiento de Aprendizaje</title>
+  
+  <!-- 기본 메타 태그 -->
+  <meta name="description" content="Revisa y analiza visualmente tu progreso de aprendizaje personalizado. Ve el volumen de aprendizaje de palabras, rendimiento en cuestionarios, puntuaciones de juegos y más de un vistazo a través de gráficos y estadísticas. Mejora efectivamente tus habilidades lingüísticas a través del aprendizaje basado en datos." />
+  <meta name="keywords" content="progreso de aprendizaje, análisis de rendimiento, estadísticas de aprendizaje, gestión de progreso, datos de aprendizaje, seguimiento de rendimiento, análisis de aprendizaje de idiomas, progreso personalizado, logros de aprendizaje" />
+  
+  <!-- Open Graph / 소셜 미디어 메타 태그 -->
+  <meta property="og:title" content="LikeVoca - Análisis de Progreso y Rendimiento de Aprendizaje" />
+  <meta property="og:description" content="Revisa y analiza visualmente tu progreso de aprendizaje personalizado. Ve el volumen de aprendizaje de palabras, rendimiento en cuestionarios, puntuaciones de juegos y más de un vistazo a través de gráficos y estadísticas. Mejora efectivamente tus habilidades lingüísticas a través del aprendizaje basado en datos." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://likevoca.com/es/progress" />
+  <meta property="og:locale" content="es" />
+  
+  <!-- Twitter Card 태그 -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="LikeVoca - Análisis de Progreso y Rendimiento de Aprendizaje" />
+  <meta name="twitter:description" content="Revisa y analiza visualmente tu progreso de aprendizaje personalizado. Ve el volumen de aprendizaje de palabras, rendimiento en cuestionarios, puntuaciones de juegos y más de un vistazo a través de gráficos y estadísticas. Mejora efectivamente tus habilidades lingüísticas a través del aprendizaje basado en datos." />
+  <meta name="twitter:image" content="https://likevoca.com/assets/hero.jpeg" />
+  
+  <!-- 표준 링크 -->
+  <link rel="canonical" href="https://likevoca.com/es/progress" />
+  
+  <!-- 대체 언어 링크 -->
+  <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/progress" />
+  <link rel="alternate" hreflang="en" href="https://likevoca.com/en/progress" />
+  <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/progress" />
+  <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/progress" />
+  <link rel="alternate" hreflang="es" href="https://likevoca.com/es/progress" />
+  <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/progress" />
+
+  <!-- 성능 최적화 - Resource Hints -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+
+  <link rel="icon" href="../../assets/favicon.ico" type="image/x-icon" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="../../css/style.css" />
+  
+  <!-- 구조화된 데이터 (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "LikeVoca Progreso de Aprendizaje",
+    "description": "Revisa y analiza visualmente tu progreso de aprendizaje personalizado. Ve el volumen de aprendizaje de palabras, rendimiento en cuestionarios, puntuaciones de juegos y más de un vistazo a través de gráficos y estadísticas.",
+    "url": "https://likevoca.com/es/progress",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "LikeVoca",
+      "url": "https://likevoca.com"
+    },
+    "inLanguage": "es",
+    "potentialAction": {
+      "@type": "ViewAction",
+      "name": "Revisar Progreso",
+      "description": "Analiza y revisa visualmente tu progreso de aprendizaje personalizado y rendimiento"
+    }
+  }
+  </script>
+
+  <script type="module" src="../../js/firebase/firebase-init.js"></script>
+  <script type="module" src="../../utils/language-utils.js"></script>
+  <script type="module" src="../../js/language-init.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <div id="navbar-container"></div>
+  <main class="container mx-auto px-6 py-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-800 mb-2" data-i18n="progress_title">
+          📊 Progreso
+        </h1>
+        <p class="text-gray-600">
+          Revisa tu progreso de aprendizaje y logros con gráficos y estadísticas.
+        </p>
+      </div>
+      <div class="flex items-center gap-2">
+        <label class="text-sm text-gray-600" data-i18n="target_language">Idioma Objetivo</label>
+        <select id="target-language-filter" class="text-sm border border-gray-300 rounded px-3 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          <option value="english" data-i18n="english">Inglés</option>
+          <option value="korean" data-i18n="korean">Coreano</option>
+          <option value="japanese" data-i18n="japanese">Japonés</option>
+          <option value="chinese" data-i18n="chinese">Chino</option>
+          <option value="spanish" data-i18n="spanish">Español</option>
+        </select>
+      </div>
+    </div>
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-8 border border-blue-100">
+      <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+        <i class="fas fa-chart-line text-blue-600 mr-2"></i>
+        <span data-i18n="activity_progress_summary">Resumen de Progreso de Actividad</span>
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div id="total-words-card" class="bg-white rounded-lg shadow-sm p-5 border-l-4 border-blue-500 cursor-pointer hover:bg-blue-50 hover:shadow-md transition-all duration-200">
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-600" data-i18n="total_words">Total de Palabras</p>
+              <p id="total-words-count" class="text-2xl font-bold text-blue-600">0</p>
+              <p class="text-xs text-blue-500 mt-1" data-i18n="see_details">Ver Detalles →</p>
+            </div>
+            <div class="bg-blue-100 p-3 rounded-full">
+              <span class="text-2xl">📚</span>
+            </div>
+          </div>
+        </div>
+        <div id="mastered-words-card" class="bg-white rounded-lg shadow-sm p-5 border-l-4 border-green-500 cursor-pointer hover:bg-green-50 hover:shadow-md transition-all duration-200">
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-600" data-i18n="mastered_words">Palabras Dominadas</p>
+              <p id="mastered-words-count" class="text-2xl font-bold text-green-600">0</p>
+              <p class="text-xs text-green-500 mt-1" data-i18n="see_details">Ver Detalles →</p>
+            </div>
+            <div class="bg-green-100 p-3 rounded-full">
+              <span class="text-2xl">✅</span>
+            </div>
+          </div>
+        </div>
+        <div id="study-streak-card" class="bg-white rounded-lg shadow-sm p-5 border-l-4 border-orange-500 cursor-pointer hover:bg-orange-50 hover:shadow-md transition-all duration-200">
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-600" data-i18n="study_streak">Racha de Estudio</p>
+              <p id="study-streak-count" class="text-2xl font-bold text-orange-600">0 días</p>
+              <p class="text-xs text-orange-500 mt-1" data-i18n="see_details">Ver Detalles →</p>
+            </div>
+            <div class="bg-orange-100 p-3 rounded-full">
+              <span class="text-2xl">🔥</span>
+            </div>
+          </div>
+        </div>
+        <div id="quiz-accuracy-card" class="bg-white rounded-lg shadow-sm p-5 border-l-4 border-purple-500 cursor-pointer hover:bg-purple-50 hover:shadow-md transition-all duration-200" >
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-600" data-i18n="quiz_accuracy">Precisión en Cuestionarios</p>
+              <p id="quiz-accuracy-rate" class="text-2xl font-bold text-purple-600">0%</p>
+              <p class="text-xs text-purple-500 mt-1" data-i18n="see_details">Ver Detalles →</p>
+            </div>
+            <div class="bg-purple-100 p-3 rounded-full">
+              <span class="text-2xl">🎯</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 학습활동 분석(Analysis) 섹션 -->
+    <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 mb-8 border border-green-100">
+      <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+        <i class="fas fa-chart-bar text-green-600 mr-2"></i>
+        <span data-i18n="learning_activity_analysis">Análisis de Actividad de Aprendizaje</span>
+      </h2>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- 주간 학습 활동 -->
+        <div class="bg-white rounded-lg shadow-sm p-6 border border-green-100">
+          <h3 class="text-lg font-semibold mb-4 flex items-center text-green-700">
+            <i class="fas fa-calendar-week text-sm mr-2"></i>
+            <span data-i18n="weekly_activity">Actividad Semanal</span>
+          </h3>
+          <div class="relative h-64">
+            <canvas id="weekly-activity-chart" class="w-full h-full"></canvas>
+          </div>
+        </div>
+
+        <!-- 카테고리별 진도 -->
+        <div class="bg-white rounded-lg shadow-sm p-6 border border-green-100 relative">
+          <h3 class="text-lg font-semibold mb-4 flex items-center text-green-700">
+            <i class="fas fa-tags text-sm mr-2"></i>
+            <span data-i18n="domain_progress">Progreso por Dominio</span>
+          </h3>
+          <div class="relative h-64 overflow-visible">
+            <canvas id="category-progress-chart" class="w-full h-full"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Achievements Section -->
+    <div class="bg-gradient-to-r from-pink-50 to-rose-50 rounded-xl p-6 mb-8 border border-pink-100">
+      <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+        <i class="fas fa-trophy text-pink-600 mr-2"></i>
+        <span data-i18n="achievements">Logros</span>
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <!-- Quiz Achievements -->
+        <div class="bg-white rounded-lg shadow-sm p-5 border border-pink-100">
+          <div class="flex items-center mb-3">
+            <span class="text-lg mr-2">❓</span>
+            <h3 class="font-semibold text-gray-800" data-i18n="quiz_achievements">Logros en Cuestionarios</h3>
+          </div>
+          <div class="space-y-2">
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600" data-i18n="total_quizzes">Total de Cuestionarios:</span>
+              <span id="total-quizzes-count" class="text-sm font-medium">0</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600" data-i18n="average_accuracy">Precisión Promedio:</span>
+              <span id="avg-quiz-accuracy" class="text-sm font-medium">0%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Game Achievements -->
+        <div id="total-games-card"
+          class="bg-white rounded-lg shadow-sm p-5 border border-pink-100 cursor-pointer hover:shadow-md transition-shadow">
+          <div class="flex items-center mb-3">
+            <span class="text-lg mr-2">🎮</span>
+            <h3 class="font-semibold text-gray-800" data-i18n="game_achievements">Logros en Juegos</h3>
+          </div>
+          <div class="space-y-2">
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600" data-i18n="total_games">Total de Juegos:</span>
+              <span id="total-games-count" class="text-sm font-medium">0</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600" data-i18n="average_score">Puntuación Promedio:</span>
+              <span id="avg-game-score" class="text-sm font-medium">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Learning Session Achievements -->
+        <div class="bg-white rounded-lg shadow-sm p-5 border border-pink-100">
+          <div class="flex items-center mb-3">
+            <span class="text-lg mr-2">📖</span>
+            <h3 class="font-semibold text-gray-800" data-i18n="learning_achievements">Logros de Aprendizaje</h3>
+          </div>
+          <div class="space-y-2">
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600" data-i18n="total_sessions">Total de Sesiones:</span>
+              <span id="total-learning-sessions" class="text-sm font-medium">0</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600" data-i18n="average_quality">Calidad Promedio:</span>
+              <span id="avg-session-quality" class="text-sm font-medium">0%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Overall Achievements -->
+        <div class="bg-white rounded-lg shadow-sm p-5 border border-pink-100">
+          <div class="flex items-center mb-3">
+            <span class="text-lg mr-2">🏆</span>
+            <h3 class="font-semibold text-gray-800" data-i18n="overall_achievements">Logros Generales</h3>
+          </div>
+          <div class="space-y-2">
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600" data-i18n="total_study_time">Tiempo Total de Estudio:</span>
+              <span id="total-study-time" class="text-sm font-medium">0 min</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600" data-i18n="completion_rate">Tasa de Finalización:</span>
+              <span id="completion-rate" class="text-sm font-medium">0%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--  퀴즈 & 활동 현황 -->
+    <div class="bg-gradient-to-r from-yellow-50 to-amber-50 rounded-xl p-6 mb-8 border border-yellow-100">
+      <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+        <i class="fas fa-history text-yellow-600 mr-2"></i>
+        <span data-i18n="recent_activities">Actividades Recientes</span>
+      </h2>
+
+      <div id="recent-activities-list" class="space-y-3">
+        <div class="text-center py-8 text-gray-500">
+          <i class="fas fa-clock text-3xl mb-2"></i>
+          <p data-i18n="no_recent_activities">No se encontraron actividades recientes.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🎯 학습 목표 설정 -->
+    <div class="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl p-6 border border-teal-100">
+      <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+        <i class="fas fa-bullseye text-teal-600 mr-2"></i>
+        <span data-i18n="learning_goals">Objetivos de Aprendizaje</span>
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- 일일 목표 -->
+        <div>
+          <h3 class="text-lg font-medium mb-3">Objetivo Diario</h3>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                <span data-i18n="new_word_learning">Aprendizaje de Nuevas Palabras</span>
+              </label>
+              <div class="flex items-center space-x-3">
+                <input type="number" id="daily-words-goal"
+                  class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  min="1" max="100" value="10" />
+                <span class="text-sm text-gray-600">palabras/día</span>
+              </div>
+              <div class="mt-2">
+                <div class="flex justify-between text-xs text-gray-500 mb-1">
+                  <span data-i18n="today_progress">Progreso de Hoy</span>
+                  <span id="daily-words-progress">0/10</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-1">
+                  <div id="daily-words-bar" class="bg-blue-600 h-1 rounded-full transition-all duration-300 w-0"></div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                <span data-i18n="quiz_time">Tiempo de Cuestionarios</span>
+              </label>
+              <div class="flex items-center space-x-3">
+                <input type="number" id="daily-quiz-goal"
+                  class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  min="5" max="120" value="20" />
+                <span class="text-sm text-gray-600">minutos/día</span>
+              </div>
+              <div class="mt-2">
+                <div class="flex justify-between text-xs text-gray-500 mb-1">
+                  <span data-i18n="today_progress">Progreso de Hoy</span>
+                  <span id="daily-quiz-progress">0/20 minutos</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-1">
+                  <div id="daily-quiz-bar" class="bg-green-600 h-1 rounded-full transition-all duration-300 w-0"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 주간 목표 -->
+        <div>
+          <h3 class="text-lg font-medium mb-3">Objetivo Semanal</h3>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                <span data-i18n="study_days">Días de Estudio</span>
+              </label>
+              <div class="flex items-center space-x-3">
+                <input type="number" id="weekly-days-goal"
+                  class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  min="1" max="7" value="5" />
+                <span class="text-sm text-gray-600">días/semana</span>
+              </div>
+              <div class="mt-2">
+                <div class="flex justify-between text-xs text-gray-500 mb-1">
+                  <span data-i18n="this_week_progress">Progreso de Esta Semana</span>
+                  <span id="weekly-days-progress">0/5 días</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-1">
+                  <div id="weekly-days-bar" class="bg-purple-600 h-1 rounded-full transition-all duration-300 w-0"></div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                <span data-i18n="mastery_goal">Objetivo de Dominio</span>
+              </label>
+              <div class="flex items-center space-x-3">
+                <input type="number" id="weekly-mastery-goal"
+                  class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  min="1" max="100" value="30" />
+                <span class="text-sm text-gray-600">palabras/semana</span>
+              </div>
+              <div class="mt-2">
+                <div class="flex justify-between text-xs text-gray-500 mb-1">
+                  <span data-i18n="this_week_progress">Progreso de Esta Semana</span>
+                  <span id="weekly-mastery-progress">0/30 palabras</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-1">
+                  <div id="weekly-mastery-bar" class="bg-orange-600 h-1 rounded-full transition-all duration-300 w-0"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 text-center">
+        <button id="save-goals-btn"
+          class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+          <span data-i18n="save_goals">Guardar Objetivos</span>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <div id="footer-container"></div>
+
+  <div id="totalWordsModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+    <div class="bg-white rounded-lg shadow-xl max-w-5xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between p-6 border-b sticky top-0 bg-white z-10">
+        <h2 class="text-xl font-bold text-gray-900" data-i18n="modal_title">Detalles de Palabras</h2>
+        <button onclick="closeTotalWordsModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+      </div>
+      <div id="totalWordsModalBody" class="p-6">
+        <!-- Modal content will be dynamically inserted here -->
+      </div>
+
+    </div>
+  </div>
+  <script type="module" src="../../components/js/navbar.js"></script>
+  <script type="module" src="../../pages/js/progress.js"></script>
+
+  <!-- Scripts -->
+  <script src="../../components/js/footer.js"></script>
+</body>
+</html> 

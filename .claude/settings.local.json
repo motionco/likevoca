@@ -51,7 +51,15 @@
       "Bash(mkdir:*)",
       "Bash(dir:*)",
       "Bash(git config:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(cat:*)",
+      "Bash(cp:*)",
+      "Bash(chmod:*)",
+      "Bash(./update_meta_single.sh:*)",
+      "Bash(./update_meta_en.sh:*)",
+      "Bash(./update_meta_ja.sh:*)",
+      "Bash(./update_meta_zh.sh:*)",
+      "Bash(./update_meta_es.sh:*)"
     ],
     "deny": [],
     "ask": []

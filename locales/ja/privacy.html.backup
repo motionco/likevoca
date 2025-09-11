@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>プライバシーポリシー - LikeVoca</title>
+    
+    <!-- 基本メタタグ -->
+    <meta name="description" content="LikeVocaのプライバシーポリシーをご確認ください。個人情報の収集、利用、保管、削除に関する詳細な内容を提供します。" />
+    <meta name="keywords" content="LikeVoca プライバシーポリシー, 個人情報保護, 個人情報収集, 個人情報利用" />
+    
+    <!-- Open Graph / ソーシャルメディアメタタグ -->
+    <meta property="og:title" content="プライバシーポリシー - LikeVoca" />
+    <meta property="og:description" content="LikeVocaのプライバシーポリシーをご確認ください。個人情報の収集、利用、保管、削除に関する詳細な内容を提供します。" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://likevoca.com/ja/privacy" />
+    <meta property="og:locale" content="ja" />
+    
+    <!-- カノニカルリンク -->
+    <link rel="canonical" href="https://likevoca.com/ja/privacy" />
+    
+    <!-- 代替言語リンク -->
+    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/privacy" />
+    <link rel="alternate" hreflang="en" href="https://likevoca.com/en/privacy" />
+    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/privacy" />
+    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/privacy" />
+    <link rel="alternate" hreflang="es" href="https://likevoca.com/es/privacy" />
+    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/privacy" />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+    <link rel="stylesheet" href="../../css/style.css" />
+  </head>
+  <body class="bg-gray-50">
+    <div id="navbar-container"></div>
+
+    <main class="container mx-auto max-w-4xl px-4 md:px-6 lg:px-8 py-8 md:py-12">
+      <header class="text-center mb-12">
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">プライバシーポリシー</h1>
+        <p class="text-lg text-gray-600">LikeVoca プライバシーポリシー</p>
+        <p class="text-sm text-gray-500 mt-2">最終更新日: 2025年8月29日</p>
+      </header>
+
+      <div class="bg-white rounded-xl p-8 md:p-12 shadow-lg prose prose-lg max-w-none">
+        <h2>1. 個人情報処理の目的</h2>
+        <p>
+          LikeVoca（以下「会社」）は、以下の目的のために個人情報を処理します。処理中の個人情報は以下の目的以外には使用されず、利用目的が変更される場合には、個人情報保護法第18条に従って別途同意を得るなど必要な措置を実施予定です。
+        </p>
+        <ul>
+          <li>会員登録および管理</li>
+          <li>サービス提供および運営</li>
+          <li>学習進度管理および個人向けサービス提供</li>
+          <li>顧客相談および苦情処理</li>
+          <li>サービス改善および新規サービス開発</li>
+          <li>マーケティングおよび広告活動（同意した場合のみ）</li>
+        </ul>
+
+        <h2>2. 個人情報の処理および保有期間</h2>
+        <p>
+          会社は、情報主体から個人情報を収集する際に同意を受けた個人情報保有・利用期間または法令による個人情報保有・利用期間内で個人情報を処理・保有します。
+        </p>
+        <ul>
+          <li><strong>会員情報</strong>: 会員退会まで</li>
+          <li><strong>学習記録</strong>: 会員退会後1年間（サービス改善目的）</li>
+          <li><strong>サービス利用記録</strong>: 3ヶ月（統計およびサービス改善目的）</li>
+        </ul>
+
+        <h2>3. 第三者への個人情報提供</h2>
+        <p>
+          会社は、情報主体の同意、法律の特別な規定など個人情報保護法第17条および第18条に該当する場合のみ個人情報を第三者に提供します。
+        </p>
+        <p>
+          会社は以下の場合に個人情報を第三者に提供することがあります：
+        </p>
+        <ul>
+          <li>情報主体が事前に同意した場合</li>
+          <li>法令の規定によるか、捜査目的で法令に定められた手続きと方法に従って捜査機関の要求がある場合</li>
+          <li>統計作成、学術研究などの目的で、特定個人を識別できない形で個人情報を提供する場合</li>
+        </ul>
+
+        <h2>4. 個人情報処理委託</h2>
+        <p>
+          会社は、円滑な個人情報業務処理のため、以下のように個人情報処理業務を委託しています：
+        </p>
+        <ul>
+          <li><strong>クラウドサービス提供会社</strong>: システム運営およびデータ保存</li>
+          <li><strong>メールサービス提供会社</strong>: サービス関連メール送信</li>
+        </ul>
+        
+        <p>
+          会社は委託契約締結時、個人情報保護法第26条に従って委託業務遂行目的外の個人情報処理禁止、技術的・管理的保護措置、再委託制限、受託者に対する管理・監督、損害賠償などの責任に関する事項を契約書等の文書に明示し、受託者が個人情報を安全に処理しているかを監督しています。
+        </p>
+
+        <h2>5. 情報主体の権利・義務およびその行使方法</h2>
+        <p>利用者は個人情報主体として以下の権利を行使できます：</p>
+        <ul>
+          <li>個人情報処理現況通知要求</li>
+          <li>個人情報閲覧要求</li>
+          <li>個人情報訂正・削除要求</li>
+          <li>個人情報処理停止要求</li>
+        </ul>
+        
+        <p>
+          上記権利の行使は、個人情報保護法施行令第41条第1項に従って書面、電子メール、FAXなどを通じて行うことができ、会社はこれに対して遅滞なく措置いたします。
+        </p>
+
+        <h2>6. 処理する個人情報の項目</h2>
+        <p>会社は以下の個人情報項目を処理しています：</p>
+        
+        <h3>必須項目</h3>
+        <ul>
+          <li><strong>メール/パスワード登録時：</strong> メールアドレス、パスワード（暗号化保存）</li>
+          <li><strong>OAuth登録時：</strong> メールアドレス、外部認証提供者識別子</li>
+          <li><strong>共通：</strong> サービス利用記録</li>
+        </ul>
+        
+        <h3>選択項目</h3>
+        <ul>
+          <li>名前またはニックネーム</li>
+          <li>学習目標言語</li>
+          <li>学習進度および成果データ</li>
+          <li>マーケティング受信同意状況</li>
+        </ul>
+        
+        <h3>非個人情報収集項目</h3>
+        <p class="text-sm text-gray-600 mb-4">
+          以下の情報は個人を識別できない非個人情報として分類され、ブラウザにローカル保存されます：
+        </p>
+        <ul class="mb-6">
+          <li>言語設定（localStorage: userLanguage）</li>
+          <li>ユーザーインターフェース設定</li>
+          <li>ブラウザ環境設定</li>
+        </ul>
+        <p class="text-sm text-gray-600 mb-6">
+          このような非個人情報は、ユーザーがブラウザ設定を通じて直接管理および削除できます。
+        </p>
+
+        <h2>7. 個人情報の破棄</h2>
+        <p>
+          会社は、個人情報保有期間の経過、処理目的達成など個人情報が不要となった時は、遅滞なく当該個人情報を破棄します。
+        </p>
+        <p>破棄の手続きおよび方法は以下のとおりです：</p>
+        <ul>
+          <li><strong>破棄手続き</strong>: 会社は破棄事由が発生した個人情報を選定し、個人情報保護責任者の承認を受けて個人情報を破棄します。</li>
+          <li><strong>破棄方法</strong>: 電子ファイル形式の情報は記録を再生できない技術的方法を使用します。紙に印刷された個人情報はシュレッダーで粉砕または焼却により破棄します。</li>
+        </ul>
+
+        <h2>8. 個人情報の安全性確保措置</h2>
+        <p>会社は個人情報保護法第29条に従って安全性確保に必要な技術的/管理的および物理的措置を行っています：</p>
+        <ul>
+          <li>個人情報の暗号化（パスワード暗号化保存）</li>
+          <li>HTTPS通信暗号化</li>
+          <li>個人情報へのアクセス制限（認証システム）</li>
+          <li>定期的なセキュリティ更新および監視</li>
+        </ul>
+
+        <h2>9. 個人情報保護責任者</h2>
+        <p>
+          会社は、個人情報処理に関する業務を総括して責任を負い、個人情報処理に関する情報主体の苦情処理および被害救済等のため、以下のように個人情報保護責任者を指定しています：
+        </p>
+        
+        <div class="bg-gray-50 p-6 rounded-lg">
+          <h4 class="font-semibold mb-2">個人情報保護責任者</h4>
+          <ul class="text-sm">
+            <li>担当部署: 開発チーム</li>
+            <li>メール: privacy@likevoca.com</li>
+            <li>連絡先: お問い合わせページを通じてご連絡</li>
+          </ul>
+        </div>
+
+        <h2>10. プライバシーポリシーの変更</h2>
+        <p>
+          このプライバシーポリシーは施行日から適用され、法令および方針による変更内容の追加、削除および訂正がある場合には、変更事項の施行7日前からお知らせを通じて告知いたします。
+        </p>
+
+        <h2>11. サービスホスティングおよびデータ保存場所</h2>
+        <p>
+          現在LikeVocaサービスは韓国内でホスティングされ、個人情報は国内に保存されます。今後のサービス拡張により海外サーバー利用が必要な場合は、事前告知および同意を得ます。
+        </p>
+
+        <div class="mt-12 pt-8 border-t">
+          <p class="text-sm text-gray-500">
+            本プライバシーポリシーは2025年8月29日から施行されます。
+          </p>
+        </div>
+      </div>
+    </main>
+
+    <div id="footer-container"></div>
+
+    <script src="../../components/js/navbar.js"></script>
+    <script type="module">
+      import { applyLanguage, updateMetadata, getActiveLanguage } from '../../utils/language-utils.js';
+      
+      document.addEventListener('DOMContentLoaded', async () => {
+        try {
+          const currentLanguage = getActiveLanguage();
+          await applyLanguage(currentLanguage);
+          updateMetadata();
+        } catch (error) {
+          console.error('Language initialization failed:', error);
+        }
+      });
+    </script>
+
+    <!-- Footer スクリプト -->
+    <script src="../../components/js/footer.js"></script>
+  </body>
+</html>

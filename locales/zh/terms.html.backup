@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>服务条款 - LikeVoca</title>
+
+  <!-- 基本元标签 -->
+  <meta name="description" content="请查看LikeVoca服务条款。包含关于会员注册、服务使用、账户管理等的重要内容。" />
+  <meta name="keywords" content="LikeVoca 服务条款, 服务协议, 会员使用条款, 语言学习服务条款" />
+
+  <!-- Open Graph / 社交媒体元标签 -->
+  <meta property="og:title" content="服务条款 - LikeVoca" />
+  <meta property="og:description" content="请查看LikeVoca服务条款。包含关于会员注册、服务使用、账户管理等的重要内容。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://likevoca.com/zh/terms" />
+  <meta property="og:locale" content="zh" />
+
+  <!-- 规范链接 -->
+  <link rel="canonical" href="https://likevoca.com/zh/terms" />
+
+  <!-- 替代语言链接 -->
+  <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko/terms" />
+  <link rel="alternate" hreflang="en" href="https://likevoca.com/en/terms" />
+  <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja/terms" />
+  <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh/terms" />
+  <link rel="alternate" hreflang="es" href="https://likevoca.com/es/terms" />
+  <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en/terms" />
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+  <link rel="stylesheet" href="../../css/style.css" />
+</head>
+
+<body class="bg-gray-50">
+  <div id="navbar-container"></div>
+
+  <main class="container mx-auto max-w-4xl px-4 md:px-6 lg:px-8 py-8 md:py-12">
+    <header class="text-center mb-12">
+      <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">服务条款</h1>
+      <p class="text-lg text-gray-600">LikeVoca 服务条款</p>
+      <p class="text-sm text-gray-500 mt-2">最后更新：2025年8月29日</p>
+    </header>
+
+    <div class="bg-white rounded-xl p-8 md:p-12 shadow-lg prose prose-lg max-w-none">
+      <h2>第1条（目的）</h2>
+      <p>
+        本条款旨在规定LikeVoca（以下简称"公司"）提供的语言学习服务（以下简称"服务"）的使用相关的公司与用户之间的权利、义务及责任事项、其他必要事项。
+      </p>
+
+      <h2>第2条（定义）</h2>
+      <p>本条款中使用术语的定义如下：</p>
+      <ul>
+        <li><strong>服务</strong>：公司提供的LikeVoca语言学习平台及相关服务</li>
+        <li><strong>用户</strong>：访问服务并根据本条款接受公司提供服务的会员和非会员</li>
+        <li><strong>会员</strong>：向公司提供个人信息并进行会员注册的人，可持续接受公司信息并持续使用公司提供服务的人</li>
+        <li><strong>账户</strong>：为会员识别和服务使用而由会员设置的字符和数字组合</li>
+      </ul>
+
+      <h2>第3条（条款的效力及变更）</h2>
+      <ol>
+        <li>本条款通过在服务界面发布或以其他方式向会员公告而生效。</li>
+        <li>公司在出现合理事由的情况下，可在不违反相关法律的范围内变更本条款。</li>
+        <li>条款变更时，公司将从其施行日7天前通过服务内公告告知变更事项。</li>
+      </ol>
+
+      <h2>第4条（会员注册）</h2>
+      <ol>
+        <li>用户按照公司规定的注册格式填写会员信息后，通过表示同意本条款的意思表示申请会员注册。</li>
+        <li>公司将按第1款申请成为会员的用户注册为会员，但以下各项情况除外：
+          <ul>
+            <li>申请人根据本条款曾经失去会员资格的情况</li>
+            <li>注册内容有虚假、遗漏、错误的情况</li>
+            <li>其他认为注册为会员在公司技术上有显著障碍的情况</li>
+          </ul>
+        </li>
+      </ol>
+
+      <h2>第5条（服务的提供及变更）</h2>
+      <ol>
+        <li>公司向会员提供以下服务：
+          <ul>
+            <li>语言学习内容提供</li>
+            <li>基于AI的个性化学习服务</li>
+            <li>学习进度管理和统计</li>
+            <li>社区和沟通服务</li>
+            <li>其他公司额外开发或通过与其他公司的合作协议等向会员提供的一切服务</li>
+          </ul>
+        </li>
+        <li>公司可根据运营上、技术上的需要变更所提供的全部或部分服务。</li>
+      </ol>
+
+      <h2>第6条（服务中断）</h2>
+      <ol>
+        <li>公司在计算机等信息通信设备的维护检修、更换及故障、通信中断等事由发生时，可暂时中断服务提供。</li>
+        <li>公司不对因第1款事由导致服务提供暂时中断而使用户或第三方遭受的损害进行赔偿。但公司有故意或重大过失的情况除外。</li>
+      </ol>
+
+      <h2>第7条（会员义务）</h2>
+      <ol>
+        <li>用户不得从事以下行为：
+          <ul>
+            <li>申请或变更时注册虚假内容</li>
+            <li>盗用他人信息</li>
+            <li>变更公司发布的信息</li>
+            <li>发送或发布公司规定信息以外的信息（计算机程序等）</li>
+            <li>侵犯公司或第三方的著作权等知识产权</li>
+            <li>损害公司或第三方名誉或妨碍业务的行为</li>
+            <li>在服务上公开或发布淫秽或暴力信息、图像、声音、其他违反公序良俗信息的行为</li>
+          </ul>
+        </li>
+      </ol>
+
+      <h2>第8条（著作权的归属及使用限制）</h2>
+      <ol>
+        <li>公司创作的作品的著作权等知识产权归公司所有。</li>
+        <li>用户不得未经公司事先同意，将通过使用服务获得的信息中知识产权归属于公司的信息用于营利目的或通过复制、传输、出版、分发、广播等其他方法让第三方使用。</li>
+      </ol>
+
+      <h2>第9条（个人信息保护）</h2>
+      <p>
+        公司为保护用户个人信息制定并实施个人信息处理方针，并根据相关法律努力保护用户个人信息。个人信息的保护和使用适用相关法律及公司个人信息处理方针。
+      </p>
+
+      <h2>第10条（公司义务）</h2>
+      <ol>
+        <li>公司不从事法律和本条款禁止或违反公序良俗的行为，将尽最大努力根据本条款规定持续稳定地提供服务。</li>
+        <li>公司建立用户个人信息保护安全系统，使用户能够安全使用互联网服务。</li>
+      </ol>
+
+      <h2>第11条（争议解决）</h2>
+      <ol>
+        <li>公司设立并运营损害赔偿处理机构，以反映用户提出的正当意见或投诉并进行损害赔偿处理。</li>
+        <li>公司与用户之间发生的电子商务争议相关诉讼以起诉时用户住所为准，无住所时以居住地管辖地方法院为专属管辖。</li>
+      </ol>
+
+      <h2>第12条（准据法及管辖法院）</h2>
+      <ol>
+        <li>本条款的解释和适用、用户与公司之间发生的争议以韩国法律为准据法。</li>
+        <li>但用户居住地国家有消费者保护法等强制性法规时，相关法规可优先适用。</li>
+        <li>争议解决优先以韩国法院为管辖法院，但根据相关法律可以认定其他管辖法院。</li>
+        <li>对于国际用户，尽可能优先通过公平解决和仲裁进行争议解决。</li>
+      </ol>
+
+      <div class="mt-12 pt-8 border-t">
+        <p class="text-sm text-gray-500">
+          本条款自2025年8月29日起施行。
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+
+  <script src="../../components/js/navbar.js"></script>
+  <script type="module">
+    import { applyLanguage, updateMetadata, getActiveLanguage } from '../../utils/language-utils.js';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        if (typeof window.loadNavbar === 'function') {
+          await window.loadNavbar();
+        }
+
+        await applyLanguage();
+        await updateMetadata('terms');
+
+      } catch (error) {
+        console.error('语言设置应用错误:', error);
+      }
+    });
+  </script>
+
+  <!-- Footer 脚本 -->
+  <script src="../../components/js/footer.js"></script>
+</body>
+
+</html>
