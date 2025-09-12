@@ -33,7 +33,7 @@ async function checkUserAuth() {
       const unsubscribe = onAuthStateChanged(auth, (user) => {
         if (user) {
           currentUser = user;
-          console.log("User authenticated:", user.email);
+          console.log("User authenticated");
           resolve(user);
         } else {
           console.log("No user authenticated");

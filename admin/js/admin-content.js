@@ -79,7 +79,7 @@ function initializeMultilingualContentManager() {
         // 인증 상태 확인
         auth.onAuthStateChanged((user) => {
             if (user) {
-                console.log('✅ 사용자 인증됨:', user.email);
+                console.log('✅ 사용자 인증됨');
                 updateLoadingStatus('관리자 권한 확인 중...', 60);
                 checkAdminPermission(user.email);
             } else {
@@ -324,7 +324,7 @@ async function loadContentData() {
                     console.log(`🚫 필터링된 콘텐츠: ${item.id} (type: ${item.type}, hasVersions: ${hasVersions}, hasUserId: ${!!hasUserId})`);
                     return false;
                 }
-                console.log(`✅ 표시할 콘텐츠: ${item.id} (type: ${item.type}, 작성자: ${item.userId})`);
+                console.log(`✅ 콘텐츠 표시: ${item.type}`);
                 return true;
             });
         
@@ -696,7 +696,7 @@ async function saveContent() {
                     customClaims: tokenClaims.claims
                 });
             } catch (tokenError) {
-                console.error('❌ 토큰 정보 가져오기 실패:', tokenError);
+                console.error('❌ 토큰 정보 가져오기 실패');
             }
         }
         

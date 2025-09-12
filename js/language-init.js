@@ -43,7 +43,6 @@ async function loadNavbar() {
       if (response.ok) {
         const navbarHTML = await response.text();
         navbarContainer.innerHTML = navbarHTML;
-        console.log("✅ 네비게이션바 로드 완료");
       } else {
         throw new Error(`네비게이션바 로드 실패: ${response.status}`);
       }
@@ -76,7 +75,6 @@ async function loadNavbar() {
           // 네비게이션바 초기화
           if (typeof window.initializeNavbar === "function") {
             await window.initializeNavbar(currentLanguage);
-            console.log("✅ 네비게이션바 초기화 완료");
           }
 
           // 번역 적용

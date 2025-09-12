@@ -2752,11 +2752,10 @@ export class CollectionManager {
   async updateLearningActivity(userId, activityData) {
     try {
       console.log("📚 학습 활동 추적 시작:", activityData);
-      console.log("📧 userId 확인:", userId);
 
       // userId 유효성 검사
       if (!userId || typeof userId !== "string") {
-        console.error("❌ 유효하지 않은 userId:", userId);
+        console.error("❌ 유효하지 않은 userId 형식");
         throw new Error("유효하지 않은 사용자 ID");
       }
 

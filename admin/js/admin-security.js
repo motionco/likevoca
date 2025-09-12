@@ -30,7 +30,7 @@ function initializeSecurityManager() {
         // 인증 상태 확인
         auth.onAuthStateChanged((user) => {
             if (user) {
-                console.log('✅ 사용자 인증됨:', user.email);
+                console.log('✅ 사용자 인증됨');
                 checkAdminPermission(user.email);
             } else {
                 console.log('❌ 사용자 인증되지 않음');
