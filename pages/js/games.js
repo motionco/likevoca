@@ -53,9 +53,6 @@ let firebaseReadCount = 0;
 // Firebase 읽기 추적 함수
 function trackFirebaseRead(queryName, docCount) {
   firebaseReadCount += docCount;
-  console.log(
-    `📊 Firebase 읽기: ${queryName} (+${docCount}), 총 ${firebaseReadCount}회`
-  );
 
   // 임계값을 50으로 증가 (게임용 랜덤 조회는 여러 시도가 필요할 수 있음)
   if (firebaseReadCount > 50) {
@@ -304,7 +301,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   // 네비게이션바 이벤트 설정 (햄버거 메뉴 등)
   if (typeof window.setupBasicNavbarEvents === "function") {
     window.setupBasicNavbarEvents();
-    console.log("✅ 게임: 네비게이션바 이벤트 설정 완료");
   } else {
     console.warn("⚠️ setupBasicNavbarEvents 함수를 찾을 수 없습니다.");
   }
@@ -328,7 +324,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // 언어 변경 이벤트 리스너 추가
   window.addEventListener("languageChanged", (event) => {
-    console.log("🌐 언어 변경 이벤트 수신 - 게임 페이지 업데이트");
 
     // 변경된 언어 가져오기
     const newUILanguage =
@@ -348,11 +343,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       sourceLanguage = newSettings.sourceLanguage;
       targetLanguage = newSettings.targetLanguage;
 
-      console.log("🔄 환경 언어 변경에 따른 게임 페이지 언어 필터 초기화:", {
-        newUILanguage: currentUILanguage,
-        sourceLanguage,
-        targetLanguage,
-      });
     });
 
     // 번역 다시 적용
@@ -375,10 +365,6 @@ function loadLanguageSettings() {
       sourceLanguage = filterSettings.sourceLanguage;
       targetLanguage = filterSettings.targetLanguage;
 
-      console.log("🌐 게임 페이지 언어 설정 로드:", {
-        sourceLanguage,
-        targetLanguage,
-      });
 
       // UI 업데이트
       const sourceElement = document.getElementById("source-language");
@@ -408,7 +394,6 @@ function saveLanguageSettings() {
         targetLanguage,
         "gameLanguageFilter"
       );
-      console.log("언어 설정 저장됨:", settings);
     });
   } catch (error) {
     console.error("언어 설정 저장 오류:", error);
@@ -436,7 +421,6 @@ function setupLanguageSelectors() {
         targetSelect.value = targetLanguage;
       }
       saveLanguageSettings();
-      console.log("원본 언어 변경:", sourceLanguage);
     });
   }
 
@@ -456,7 +440,6 @@ function setupLanguageSelectors() {
         sourceSelect.value = sourceLanguage;
       }
       saveLanguageSettings();
-      console.log("대상 언어 변경:", targetLanguage);
     });
   }
 }
@@ -476,7 +459,6 @@ function setupGameCards() {
 // 게임 시작 (페이지 내에서)
 async function navigateToGame(gameType) {
   try {
-    console.log("게임 시작:", gameType);
 
     // 현재 게임 타입 설정
     currentGameType = gameType;
@@ -631,11 +613,6 @@ async function loadGameStats() {
       averageScoreElement.textContent = averageScore;
     }
 
-    console.log("🎯 게임 통계 UI 업데이트 완료:", {
-      totalGames,
-      bestScore,
-      averageScore,
-    });
 
     // 최근 게임 활동 표시
     await updateRecentGameActivity(gameResults);

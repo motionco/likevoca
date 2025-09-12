@@ -73,17 +73,14 @@ function initializeMultilingualContentManager() {
     if (window.db && window.auth) {
         db = window.db;
         auth = window.auth;
-        console.log('🌐 다국어 콘텐츠 관리 시스템 초기화 시작');
         updateLoadingStatus('사용자 인증 확인 중...', 30);
         
         // 인증 상태 확인
         auth.onAuthStateChanged((user) => {
             if (user) {
-                console.log('✅ 사용자 인증됨');
                 updateLoadingStatus('관리자 권한 확인 중...', 60);
                 checkAdminPermission(user.email);
             } else {
-                console.log('❌ 사용자 인증되지 않음');
                 updateLoadingStatus('로그인이 필요합니다. 로그인 페이지로 이동 중...', 100);
                 setTimeout(() => {
                     window.location.href = '../pages/vocabulary.html';
@@ -91,7 +88,6 @@ function initializeMultilingualContentManager() {
             }
         });
     } else {
-        console.log('⏳ Firebase 초기화 대기 중...');
         updateLoadingStatus('Firebase 초기화 대기 중...', 10);
         setTimeout(initializeMultilingualContentManager, 100);
     }
@@ -106,13 +102,11 @@ async function checkAdminPermission(userEmail) {
         'motioncomc@gmail.com',
     ];
     
-    console.log('🔐 관리자 권한 확인 중...', userEmail);
     
     // 먼저 하드코딩된 목록으로 빠른 확인
     const isAdminByEmail = ADMIN_EMAILS.includes(userEmail);
     
     if (isAdminByEmail) {
-        console.log('✅ 관리자 권한 확인됨 (이메일 목록)');
         updateLoadingStatus('시스템 초기화 중...', 90);
         await startMultilingualContentManager();
         return;
@@ -120,7 +114,6 @@ async function checkAdminPermission(userEmail) {
     
     // Firestore에서 추가 확인 (타임아웃 적용)
     try {
-        console.log('🔍 Firestore에서 사용자 권한 추가 확인 중...');
         
         const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js");
         const userRef = doc(window.db, 'users', userEmail);
@@ -140,19 +133,16 @@ async function checkAdminPermission(userEmail) {
             const isAdmin = userData.role === 'admin';
             
             if (isAdmin) {
-                console.log('✅ 관리자 권한 확인됨 (Firestore DB)');
                 updateLoadingStatus('시스템 초기화 중...', 90);
                 await startMultilingualContentManager();
                 return;
             }
         }
         
-        console.log('❌ 관리자 권한 없음 - 이메일:', userEmail);
         showAccessDenied();
         
     } catch (error) {
         console.error('❌ Firestore 권한 확인 실패:', error);
-        console.log('❌ 관리자 권한 없음 - 인증된 관리자 목록에 없음');
         showAccessDenied();
     }
 }
@@ -175,7 +165,6 @@ function showAccessDenied() {
 
 // 다국어 콘텐츠 관리자 시작
 async function startMultilingualContentManager() {
-    console.log('🚀 다국어 콘텐츠 관리자 시작');
     
     try {
         updateLoadingStatus('에디터 초기화 중...', 95);
@@ -186,7 +175,6 @@ async function startMultilingualContentManager() {
         updateStatistics();
         
         updateLoadingStatus('초기화 완료!', 100);
-        console.log('✅ 다국어 콘텐츠 관리자 초기화 완료');
         
         // 로딩 화면 숨기기
         setTimeout(hideLoadingScreen, 500);
@@ -228,7 +216,6 @@ function initializeQuillEditors() {
         }
     });
     
-    console.log('✅ Quill 에디터 초기화 완료');
 }
 
 // Firebase Storage 이미지 업로드 핸들러
@@ -266,13 +253,11 @@ async function uploadImageToFirebaseStorage(file, quill, language) {
         const fileName = `content/${Date.now()}_${file.name}`;
         const storageRef = ref(window.storage, fileName);
         
-        console.log('📤 Firebase Storage에 이미지 업로드 시작:', fileName);
         
         // 파일 업로드
         const snapshot = await uploadBytes(storageRef, file);
         const downloadURL = await getDownloadURL(snapshot.ref);
         
-        console.log('✅ 이미지 업로드 완료:', downloadURL);
         
         // 로딩 텍스트 제거
         quill.deleteText(range.index, '이미지 업로드 중...'.length);
@@ -296,7 +281,6 @@ async function uploadImageToFirebaseStorage(file, quill, language) {
 // 콘텐츠 데이터 로드 (Firestore 전용)
 async function loadContentData() {
     try {
-        console.log('📊 콘텐츠 데이터 로드 시작 (Firestore)');
         showLoading();
         
         // Firestore에서 콘텐츠 데이터 로드
@@ -308,7 +292,6 @@ async function loadContentData() {
         contentData = snapshot.docs
             .map(doc => {
                 const data = doc.data();
-                console.log(`📄 로드된 콘텐츠 ID: ${doc.id}`, data);
                 return {
                     id: doc.id,
                     ...data
@@ -321,23 +304,18 @@ async function loadContentData() {
                 const isValidContentType = ['faq', 'guide', 'notice', 'manual'].includes(item.type);
                 
                 if (!hasVersions || !hasUserId || !isValidContentType) {
-                    console.log(`🚫 필터링된 콘텐츠: ${item.id} (type: ${item.type}, hasVersions: ${hasVersions}, hasUserId: ${!!hasUserId})`);
                     return false;
                 }
-                console.log(`✅ 콘텐츠 표시: ${item.type}`);
                 return true;
             });
         
         displayContentList(contentData);
-        console.log(`✅ Firestore에서 콘텐츠 데이터 로드 (${contentData.length}개)`);
         
         // 콘텐츠가 없어도 빈 상태로 표시 (사용자가 직접 작성하도록)
         if (contentData.length === 0) {
-            console.log('📝 아직 작성된 콘텐츠가 없습니다. 새 콘텐츠를 작성해보세요.');
         }
         
         hideLoading();
-        console.log('✅ 콘텐츠 데이터 로드 완료');
         
     } catch (error) {
         console.error('❌ 콘텐츠 데이터 로드 실패:', error);
@@ -555,7 +533,6 @@ async function performAutoTranslation() {
                 quillEditors[targetLang].root.innerHTML = translatedContent;
                 
                 successCount++;
-                console.log(`✅ ${langName} 번역 완료`);
                 
             } catch (error) {
                 failCount++;
@@ -591,7 +568,6 @@ async function testTranslationEnvironment() {
         hasGeminiAccess: typeof fetch !== 'undefined'
     };
     
-    console.log('🔍 번역 환경 테스트:', environment);
     
     try {
         const testText = "안녕하세요";

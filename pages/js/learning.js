@@ -80,21 +80,14 @@ let areaData = {
 
 // 현재 데이터 getter 함수 (세션별 10개씩 반환)
 function getCurrentData() {
-  console.log(
-    `🔍 getCurrentData 호출 - currentLearningArea: ${currentLearningArea}, sessionOffset: ${sessionOffset}`
-  );
 
   const allData = areaData[currentLearningArea] || [];
   
   // 현재 세션의 10개만 반환 (sessionOffset부터 sessionOffset+10까지)
   const sessionData = allData.slice(sessionOffset, sessionOffset + 10);
   
-  console.log(
-    `🔍 getCurrentData: 전체=${allData.length}개, 세션=${sessionData.length}개 (${sessionOffset}~${sessionOffset + 10})`
-  );
 
   if (sessionData.length > 0) {
-    console.log(`🔍 세션 데이터 샘플:`, sessionData[0]);
   }
 
   return sessionData;
@@ -143,7 +136,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (user) {
       currentUser = user;
     } else {
-      console.log("❌ 사용자 로그인되지 않음");
     }
   });
 
@@ -183,10 +175,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         window.languageSettings.targetLanguage = targetLanguage;
       }
 
-      console.log("🔄 언어 필터 강제 초기화 완료:", {
-        sourceLanguage,
-        targetLanguage,
-      });
     });
 
     showAreaSelection();
@@ -370,7 +358,6 @@ function handleFilterChange() {
 
   // 현재 학습 중인 경우 기존 데이터에 필터만 적용 (DB 재조회 없음)
   if (currentLearningArea && currentLearningMode) {
-    console.log("🔄 필터 변경 - 기존 데이터 활용");
 
     // ✅ DB 재조회 없이 기존 데이터에 필터만 적용
     if (
@@ -381,13 +368,11 @@ function handleFilterChange() {
       areaData[currentLearningArea] = filteredData;
       currentIndex = 0; // 인덱스 초기화
 
-      console.log(`✅ 클라이언트 필터링 완료: ${filteredData.length}개`);
 
       // UI만 업데이트
       updateCurrentView();
     } else {
       // 프리로드된 데이터가 없는 경우에만 DB 조회
-      console.log("⚠️ 프리로드 데이터 없음 - DB 재조회");
       currentIndex = 0;
       startLearningMode(currentLearningArea, currentLearningMode);
     }
@@ -435,8 +420,6 @@ function getCurrentFilters() {
 // 데이터에 필터 적용
 function applyFilters(data) {
   const filters = getCurrentFilters();
-  console.log("🔍 필터 적용:", filters);
-  console.log("🔍 원본 데이터 샘플:", data.slice(0, 3));
 
   // 정의된 도메인 목록
   const definedDomains = [
@@ -454,13 +437,6 @@ function applyFilters(data) {
   ];
 
   const filteredData = data.filter((item) => {
-    console.log("🔍 아이템 검사:", {
-      id: item.id,
-      domain: item.domain,
-      difficulty: item.difficulty,
-      pattern_type: item.pattern_type,
-      concept_info: item.concept_info,
-    });
 
     // 도메인 필터 - 여러 가능한 필드 확인
     if (filters.domain !== "all") {
@@ -469,13 +445,9 @@ function applyFilters(data) {
       // general 도메인이나 정의되지 않은 도메인을 other로 매핑
       if (itemDomain === "general" || !definedDomains.includes(itemDomain)) {
         itemDomain = "other";
-        console.log(`🔍 도메인 매핑: ${item.domain || "undefined"} → other`);
       }
 
       if (itemDomain !== filters.domain) {
-        console.log(
-          `🔍 도메인 필터로 제외: ${itemDomain} !== ${filters.domain}`
-        );
         return false;
       }
     }
@@ -519,11 +491,9 @@ function applyFilters(data) {
       }
     }
 
-    console.log("🔍 필터 통과:", item.id);
     return true;
   });
 
-  console.log(`🔍 필터링 결과: ${data.length}개 → ${filteredData.length}개`);
   return filteredData;
 }
 
@@ -544,7 +514,6 @@ function applyTranslations() {
 // 추가 번역 키들을 직접 처리하는 함수
 function applyAdditionalTranslations() {
   const currentLang = getCurrentLanguage();
-  console.log("🌐 학습 페이지 추가 번역 적용:", currentLang);
 
   // 추가 번역 키들 정의
   const additionalTranslations = {
@@ -786,17 +755,14 @@ function applyAdditionalTranslations() {
   // 현재 언어의 번역 적용
   if (additionalTranslations[currentLang]) {
     const translations = additionalTranslations[currentLang];
-    console.log("🔍 번역 키 개수:", Object.keys(translations).length);
 
     // 일반 텍스트 요소 번역
     const i18nElements = document.querySelectorAll("[data-i18n]");
-    console.log("🔍 data-i18n 요소 개수:", i18nElements.length);
 
     i18nElements.forEach((element) => {
       const key = element.getAttribute("data-i18n");
       if (translations[key]) {
         element.textContent = translations[key];
-        console.log("✅ 번역 적용:", key, "->", translations[key]);
       }
     });
 
@@ -813,7 +779,6 @@ function applyAdditionalTranslations() {
       const key = element.getAttribute("data-i18n-placeholder");
       if (translations[key]) {
         element.placeholder = translations[key];
-        console.log("✅ placeholder 번역 적용:", key, "->", translations[key]);
       }
     });
   } else {
@@ -831,7 +796,6 @@ function getCurrentLanguage() {
     if (langIndex < pathParts.length) {
       const detectedLang = pathParts[langIndex];
       if (["ko", "en", "ja", "zh", "es"].includes(detectedLang)) {
-        console.log("🔍 URL 경로에서 언어 감지:", detectedLang);
         return detectedLang;
       }
     }
@@ -840,17 +804,14 @@ function getCurrentLanguage() {
   // utils/language-utils.js와 동일한 방식으로 언어 감지
   const savedLanguage = localStorage.getItem("preferredLanguage");
   if (savedLanguage) {
-    console.log("🔍 localStorage에서 언어 감지:", savedLanguage);
     return savedLanguage;
   }
 
   const sessionLanguage = sessionStorage.getItem("currentUILanguage");
   if (sessionLanguage) {
-    console.log("🔍 sessionStorage에서 언어 감지:", sessionLanguage);
     return sessionLanguage;
   }
 
-  console.log("🔍 기본 언어 사용: ko");
   return "ko";
 }
 
@@ -890,7 +851,6 @@ function setupEventListeners() {
   // 네비게이션바 이벤트 설정 (햄버거 메뉴 등)
   if (typeof window.setupBasicNavbarEvents === "function") {
     window.setupBasicNavbarEvents();
-    console.log("✅ 학습: 네비게이션바 이벤트 설정 완료");
   } else {
     console.warn("⚠️ setupBasicNavbarEvents 함수를 찾을 수 없습니다.");
   }
@@ -1074,7 +1034,6 @@ function setupEventListeners() {
     if (targetLanguageDesktopSelect)
       targetLanguageDesktopSelect.value = targetLanguage;
 
-    console.log("🔄 언어 전환:", { sourceLanguage, targetLanguage });
 
     // 언어 설정 저장
     import("../../utils/language-utils.js").then((module) => {
@@ -1533,7 +1492,6 @@ function backToAreasHandler(e) {
   e.stopPropagation();
 
   // 🔄 학습 데이터 초기화 (새로운 데이터 로드를 위해)
-  console.log("🔄 학습 데이터 초기화: 돌아가기 후 새로운 데이터 로드 준비");
   areaData = {
     vocabulary: [],
     grammar: [],
@@ -1559,7 +1517,6 @@ function backToAreasHandler(e) {
     };
   }
 
-  console.log("🔧 플래시카드에서 돌아가기 - 모든 학습 상태 초기화 완료");
 
   showAreaSelection();
 }
@@ -1569,7 +1526,6 @@ async function finishLearningHandler(e) {
   e.preventDefault();
   e.stopPropagation();
 
-  console.log("🏁 학습 종료 버튼 클릭 - 현재 진도 저장 후 종료");
 
   // 현재 학습 세션 상태 확인
   console.log("🔍 현재 학습 세션 상태:", {
@@ -1584,7 +1540,6 @@ async function finishLearningHandler(e) {
 
   // 현재 학습 세션 완료 처리
   if (typeof learningSessionData !== "undefined" && learningSessionData.area) {
-    console.log("💾 학습 세션 완료 처리 중:", learningSessionData);
 
     // 세션 종료 시간 기록
     learningSessionData.endTime = new Date();
@@ -1593,7 +1548,6 @@ async function finishLearningHandler(e) {
 
     // 🎯 중간 종료 시에는 최소 조건 무시하고 강제 저장
     const conceptsCount = learningSessionData.conceptsStudied.size;
-    console.log(`💾 강제 세션 완료 처리: ${conceptsCount}개 개념 학습됨`);
 
     // learningSessionData 최소값 보장 - 실제 상호작용 수 사용
     if (learningSessionData.totalInteractions === 0 && conceptsCount > 0) {
@@ -1605,7 +1559,6 @@ async function finishLearningHandler(e) {
     // 학습 세션 완료 처리 (기존 함수 활용)
     try {
       const savedSessionData = await completeLearningSession(true); // forceComplete = true
-      console.log("✅ 학습 세션 완료 처리 성공");
 
       // 모달에 표시할 데이터 (저장된 세션 데이터 사용)
       const sessionStats = {
@@ -1617,9 +1570,7 @@ async function finishLearningHandler(e) {
         efficiency: savedSessionData?.session_quality || 0, // 저장된 효율 값 사용
       };
 
-      console.log("📋 학습 완료 팝업 데이터:", sessionStats);
       await showLearningCompleteWithStats(sessionStats);
-      console.log("✅ 학습 완료 팝업 표시 완료 - 함수 종료");
     } catch (error) {
       console.error("❌ 학습 세션 완료 처리 실패:", error);
 
@@ -1666,7 +1617,6 @@ async function finishLearningHandler(e) {
               currentUser.email,
               activityData
             );
-            console.log("✅ 직접 학습 기록 저장 성공");
           }
         } catch (directSaveError) {
           console.error("❌ 직접 학습 기록 저장도 실패:", directSaveError);
@@ -1680,7 +1630,6 @@ async function finishLearningHandler(e) {
 
   // 학습 완료 팝업 표시 (세션 완료 후)
   if (conceptsCount > 0) {
-    console.log("🎉 학습 종료 - 완료 팝업 표시");
     console.log("📊 학습 완료 통계:", {
       conceptsCount,
       duration:
@@ -1726,9 +1675,7 @@ async function finishLearningHandler(e) {
       baseScore = Math.min(60, conceptsCount * 6);
     }
   } else {
-    console.log("🏁 학습 종료 - 학습한 개념이 없어 바로 영역 선택으로 이동");
     // 🔄 학습 데이터 초기화
-    console.log("🔄 학습 데이터 초기화: 학습 종료 후 초기화");
     areaData = {
       vocabulary: [],
       grammar: [],
@@ -1768,7 +1715,6 @@ function globalClickHandler(e) {
   ) {
     e.preventDefault();
     e.stopPropagation();
-    console.log("🔙 back-from-flashcard 버튼 클릭 (globalClickHandler)");
     backToAreasHandler(e);
     return;
   }
@@ -1789,7 +1735,6 @@ function globalClickHandler(e) {
     if (e.target.id === buttonId || e.target.closest(`#${buttonId}`)) {
       e.preventDefault();
       e.stopPropagation();
-      console.log(`🔙 ${buttonId} 버튼 클릭 (globalClickHandler)`);
       backToAreasHandler(e);
       return;
     }
@@ -1799,7 +1744,6 @@ function globalClickHandler(e) {
   if (e.target.id === "home-btn" || e.target.matches(".home-btn")) {
     e.preventDefault();
     e.stopPropagation();
-    console.log("🏠 홈 버튼 클릭");
     showAreaSelection();
     return;
   }
@@ -1808,14 +1752,10 @@ function globalClickHandler(e) {
   if (e.target.closest("#flashcard-mode-card")) {
     e.preventDefault();
     e.stopPropagation();
-    console.log("🔄 단어 학습 플래시카드 클릭");
-    console.log("🔍 현재 학습 모드:", currentLearningMode);
     // 플래시카드 모드일 때만 뒤집기 기능 작동
     if (currentLearningMode === "flashcard") {
-      console.log("✅ 플래시카드 모드 확인됨, 뒤집기 실행");
       flipCard();
     } else {
-      console.log("❌ 플래시카드 모드가 아님, 뒤집기 실행 안함");
     }
     return;
   }
@@ -1824,7 +1764,6 @@ function globalClickHandler(e) {
   if (e.target.matches("#grammar-card, #grammar-card *")) {
     e.preventDefault();
     e.stopPropagation();
-    console.log("🔄 문법 카드 뒤집기");
     flipGrammarCard();
     return;
   }
@@ -1834,14 +1773,10 @@ function globalClickHandler(e) {
     // 카드 뒤집기
     e.preventDefault();
     e.stopPropagation();
-    console.log("🔄 독해 플래시 카드 클릭");
-    console.log("🔍 현재 학습 모드:", currentLearningMode);
     // 플래시 모드일 때만 뒤집기 기능 작동
     if (currentLearningMode === "flash") {
-      console.log("✅ 플래시 모드 확인됨, 뒤집기 실행");
       flipReadingCard();
     } else {
-      console.log("❌ 플래시 모드가 아님, 뒤집기 실행 안함");
     }
     return;
   }
@@ -1852,14 +1787,12 @@ function globalClickHandler(e) {
     e.stopPropagation();
     const itemId = e.target.getAttribute("data-item-id");
     const itemType = e.target.getAttribute("data-item-type");
-    console.log(`🗑️ 삭제 버튼 클릭: ${itemType} - ${itemId}`);
     deleteItem(itemId, itemType);
     return;
   }
 }
 
 async function showAreaSelection() {
-  console.log("🏠 통합 학습 대시보드 표시");
   hideAllSections();
 
   // 학습 모드 비활성화 시 body에서 클래스 제거 (통계 카드 표시용)
@@ -1878,7 +1811,6 @@ async function showAreaSelection() {
 
   // 통합 학습 모드 카드들에 이벤트 리스너 추가
   const modeCards = document.querySelectorAll(".learning-mode-card");
-  console.log(`🎯 통합 학습 모드 카드 ${modeCards.length}개 발견`);
 
   if (modeCards.length === 0) {
     console.warn(
@@ -1889,7 +1821,6 @@ async function showAreaSelection() {
   modeCards.forEach((card, index) => {
     const area = card.getAttribute("data-area");
     const mode = card.getAttribute("data-mode");
-    console.log(`🔍 카드 ${index + 1}: ${area} - ${mode}`);
 
     // 이미 이벤트 리스너가 있는지 확인
     if (!card.hasAttribute("data-listener-added")) {
@@ -1898,7 +1829,6 @@ async function showAreaSelection() {
         e.stopPropagation();
         const cardArea = this.getAttribute("data-area");
         const cardMode = this.getAttribute("data-mode");
-        console.log(`🎯 통합 학습 모드 카드 클릭됨: ${cardArea} - ${cardMode}`);
 
         if (cardArea && cardMode) {
           // 로딩 표시
@@ -1910,9 +1840,7 @@ async function showAreaSelection() {
         }
       });
       card.setAttribute("data-listener-added", "true");
-      console.log(`✅ 카드 ${index + 1}에 이벤트 리스너 추가됨`);
     } else {
-      console.log(`⚠️ 카드 ${index + 1}에 이미 이벤트 리스너가 있습니다.`);
     }
   });
 
@@ -1927,7 +1855,6 @@ async function showAreaSelection() {
       const lastArea = sessionStorage.getItem("lastLearningArea");
       const lastMode = sessionStorage.getItem("lastLearningMode");
       if (lastArea && lastMode) {
-        console.log(`🔄 학습 이어하기: ${lastArea} - ${lastMode}`);
         startLearningMode(lastArea, lastMode);
       }
     });
@@ -2315,8 +2242,6 @@ let preloadedData = {
 
 // 페이지 로드 시 데이터 프리로딩 시작
 function startDataPreloading() {
-  console.log("🔄 데이터 프리로딩 시작 (백그라운드)");
-  console.log("📌 프리로딩은 화면 표시와 무관하게 진행됩니다");
 
   // 각 영역별로 순차적으로 프리로드 (동시에 하면 부하가 클 수 있음)
   setTimeout(() => preloadAreaData("vocabulary"), 1000);
@@ -2332,7 +2257,6 @@ async function preloadAreaData(area) {
   if (preloadedData[area]) return; // 이미 로드됨
 
   try {
-    console.log(`📦 ${area} 데이터 프리로딩 중...`);
 
     let data = [];
     switch (area) {
@@ -2349,7 +2273,6 @@ async function preloadAreaData(area) {
 
     if (data && data.length > 0) {
       preloadedData[area] = data;
-      console.log(`✅ ${area} 데이터 프리로딩 완료: ${data.length}개`);
     }
   } catch (error) {
     console.warn(`⚠️ ${area} 데이터 프리로딩 실패:`, error);
@@ -2358,11 +2281,9 @@ async function preloadAreaData(area) {
 
 // 프리로드된 데이터 사용하도록 loadLearningData 수정
 async function loadLearningDataOptimized(area) {
-  console.log(`📚 ${area} 학습 데이터 로드 시작`);
 
   // 프리로드된 데이터가 있으면 사용
   if (preloadedData[area]) {
-    console.log(`⚡ ${area} 프리로드된 데이터 사용`);
     currentData = applyFilters(preloadedData[area]);
     return;
   }
@@ -2519,7 +2440,6 @@ window.updateFilterOptionsLanguage = updateFilterOptionsLanguage;
 // 상황 및 목적 필터 옵션 동적 로드
 async function loadSituationAndPurposeFilterOptions() {
   try {
-    console.log("🏷️ 상황 및 목적 필터 옵션 로드 중...");
 
     // 상황 태그 목록 정의
     const situationTags = [
@@ -2581,7 +2501,6 @@ async function loadSituationAndPurposeFilterOptions() {
       }
     });
 
-    console.log(`✅ 상황 필터 옵션 로드 완료: ${situationTags.length}개 태그`);
 
     // 목적 필터 옵션 생성 (데스크톱과 모바일)
     const purposeFilters = [
@@ -2610,14 +2529,12 @@ async function loadSituationAndPurposeFilterOptions() {
       }
     });
 
-    console.log(`✅ 목적 필터 옵션 로드 완료: ${purposeTags.length}개 태그`);
   } catch (error) {
     console.error("❌ 상황 및 목적 필터 옵션 로드 실패:", error);
   }
 }
 
 function showLearningModes(area) {
-  console.log(`📖 학습 모드 선택 화면 표시: ${area}`);
 
   const modeSection = document.getElementById("mode-selection");
   const modeTitle = document.getElementById("mode-title");
@@ -2744,8 +2661,6 @@ function showLearningModes(area) {
     )
     .join("");
 
-  console.log("🔧 모드 선택 HTML 생성 완료:", modes.length, "개 모드");
-  console.log("🖥️ 모드 선택 섹션 표시...");
 
   modeSection.classList.remove("hidden");
 
@@ -2757,12 +2672,10 @@ function showLearningModes(area) {
 
   // 학습 모드 카드들에 이벤트 리스너 추가
   const modeCards = modeContainer.querySelectorAll(".learning-mode-card");
-  console.log(`🎯 학습 모드 카드 ${modeCards.length}개에 이벤트 리스너 추가`);
 
   modeCards.forEach((card, index) => {
     const cardArea = card.getAttribute("data-area");
     const cardMode = card.getAttribute("data-mode");
-    console.log(`🔍 모드 카드 ${index + 1}: ${cardArea} - ${cardMode}`);
 
     card.addEventListener(
       "click",
@@ -2771,10 +2684,8 @@ function showLearningModes(area) {
         e.stopPropagation();
         e.stopImmediatePropagation();
 
-        console.log(`🎯 학습 모드 카드 직접 클릭: ${cardArea} - ${cardMode}`);
 
         if (cardArea && cardMode) {
-          console.log(`✅ startLearningMode 호출: ${cardArea} - ${cardMode}`);
           startLearningMode(cardArea, cardMode);
         } else {
           console.error("❌ data-area 또는 data-mode 속성이 없습니다.");
@@ -2783,7 +2694,6 @@ function showLearningModes(area) {
       { capture: true }
     );
 
-    console.log(`✅ 모드 카드 ${index + 1}에 새 이벤트 리스너 추가됨`);
   });
 
   console.log(
@@ -2793,7 +2703,6 @@ function showLearningModes(area) {
 }
 
 window.startLearningMode = async function startLearningMode(area, mode) {
-  console.log(`🎯 학습 모드 시작: ${area} - ${mode}`);
 
   // 이전 세션이 있다면 완료 처리
   if (learningSessionData.sessionActive) {
@@ -2813,7 +2722,6 @@ window.startLearningMode = async function startLearningMode(area, mode) {
   isFlipped = false;
   isNavigating = false;
 
-  console.log("🔧 새로운 학습 모드 시작 - 모든 상태 초기화 완료");
 
   // 학습 기록 저장
   try {
@@ -2848,7 +2756,6 @@ window.startLearningMode = async function startLearningMode(area, mode) {
     // Firebase 사용자별 학습 기록 저장 (로그인된 경우)
     await saveLearningRecordToFirebase(learningRecord);
 
-    console.log("📊 학습 기록 저장:", learningRecord);
   } catch (error) {
     console.warn("학습 기록 저장 실패:", error);
   }
@@ -2860,15 +2767,12 @@ window.startLearningMode = async function startLearningMode(area, mode) {
   const allAreaData = areaData[area] || [];
   const currentData = getCurrentData();
   
-  console.log(`🔍 데이터 검증: areaData[${area}]=${allAreaData.length}개, currentData=${currentData?.length || 0}개`);
   
   if (!currentData || currentData.length === 0) {
-    console.log(`❌ ${area} 영역에 학습할 데이터가 없습니다.`);
     showNoDataMessage(area);
     return;
   }
 
-  console.log(`📚 ${currentData.length}개의 데이터로 학습 시작`);
 
   // 모드별 화면 표시
   hideAllSections();
@@ -2927,7 +2831,6 @@ window.startLearningMode = async function startLearningMode(area, mode) {
 };
 
 async function loadLearningData(area) {
-  console.log(`📚 ${area} 학습 데이터 로드 시작`);
 
   try {
     // ✅ 프리로드된 데이터가 있으면 우선 사용
@@ -2953,7 +2856,6 @@ async function loadLearningData(area) {
     }
 
     // ✅ 캐시가 없거나 만료된 경우에만 DB 조회
-    console.log(`🔄 ${area} DB에서 새로운 데이터 로드`);
     switch (area) {
       case "vocabulary":
         areaData[area] = await loadVocabularyData(); // 일반 학습 시 10개
@@ -2977,14 +2879,12 @@ async function loadLearningData(area) {
         data: [...areaData[area]], // 깊은 복사
         timestamp: now,
       };
-      console.log(`💾 ${area} 데이터 캐시 저장: ${areaData[area].length}개`);
     }
 
     const currentData = getCurrentData();
     if (currentData.length === 0) {
       showNoDataMessage(area);
     } else {
-      console.log(`✅ ${area} 데이터 로딩 완료: ${currentData.length}개`);
     }
   } catch (error) {
     console.error("데이터 로딩 중 오류:", error);
@@ -2993,7 +2893,6 @@ async function loadLearningData(area) {
 }
 
 async function loadVocabularyData(limitCount = 10) {
-  console.log(`🔍 학습용 단어 데이터 로드 시작 (${limitCount}개 제한)...`);
 
   let data = [];
 
@@ -3003,7 +2902,6 @@ async function loadVocabularyData(limitCount = 10) {
       throw new Error("Firebase가 초기화되지 않았습니다.");
     }
 
-    console.log("🎲 DB에서 진짜 랜덤 단어 10개 로드...");
 
     // 🎯 효율적인 랜덤 조회 방식 (randomField 활용)
     try {
@@ -3012,7 +2910,6 @@ async function loadVocabularyData(limitCount = 10) {
         "concepts"
       );
 
-      console.log("🚀 randomField를 활용한 효율적인 조회 시작...");
 
       // 효율적인 랜덤 쿼리 (매개변수로 전달받은 개수만큼 읽음)
       const randomValue = Math.random();
@@ -3030,7 +2927,6 @@ async function loadVocabularyData(limitCount = 10) {
           id: doc.id,
           ...doc.data(),
         }));
-        console.log(`💰 효율적인 조회 성공: ${data.length}개 단어 (1개 쿼리)`);
         trackFirebaseRead("단어 랜덤 조회", randomSnapshot.size); // ✅ 읽기 추적
       } else {
         // 충분하지 않은 경우 추가 조회
@@ -3055,7 +2951,6 @@ async function loadVocabularyData(limitCount = 10) {
         }));
 
         data = [...firstBatch, ...secondBatch];
-        console.log(`💰 효율적인 조회 성공: ${data.length}개 단어 (2개 쿼리)`);
         trackFirebaseRead(
           "단어 추가 조회",
           randomSnapshot.size + additionalSnapshot.size
@@ -3080,7 +2975,6 @@ async function loadVocabularyData(limitCount = 10) {
     console.error("❌ DB 단어 데이터 로드 실패:", error);
 
     // 실패 시 sessionStorage에서 폴백 시도
-    console.log("🔄 sessionStorage 폴백 시도...");
     const sessionData = sessionStorage.getItem("conceptsData");
     if (sessionData) {
       try {
@@ -3093,7 +2987,6 @@ async function loadVocabularyData(limitCount = 10) {
             [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
           }
           data = shuffled.slice(0, limitCount);
-          console.log(`📦 sessionStorage에서 랜덤 ${data.length}개 단어 선택`);
         }
       } catch (parseError) {
         console.error("❌ sessionStorage 데이터 파싱 실패:", parseError);
@@ -3114,7 +3007,6 @@ async function loadVocabularyData(limitCount = 10) {
 }
 
 async function loadGrammarData(limitCount = 10) {
-  console.log("📝 문법 패턴 데이터 로딩 시작...");
 
   try {
     // Firebase가 초기화되었는지 확인
@@ -3122,7 +3014,6 @@ async function loadGrammarData(limitCount = 10) {
       throw new Error("Firebase가 초기화되지 않았습니다.");
     }
 
-    console.log("🎲 DB에서 진짜 랜덤 문법 패턴 로드...");
 
     const grammarRef = window.firebaseInit.collection(
       window.firebaseInit.db,
@@ -3133,7 +3024,6 @@ async function loadGrammarData(limitCount = 10) {
     let grammarData = [];
 
     try {
-      console.log("🚀 문법 패턴 - randomField를 활용한 효율적인 조회...");
 
       // 효율적인 랜덤 쿼리 (최대 20개만 읽음)
       const randomValue = Math.random();
@@ -3239,12 +3129,10 @@ async function loadGrammarData(limitCount = 10) {
     console.error("📝 문법 패턴 데이터 로딩 실패:", error);
   }
 
-  console.log("📝 문법 패턴 DB 데이터 없음");
   return [];
 }
 
 async function loadReadingData(limitCount = 10) {
-  console.log("📖 독해 예문 데이터 로딩 시작...");
 
   // 현재 언어 설정 가져오기
   const currentSourceLanguage =
@@ -3266,12 +3154,10 @@ async function loadReadingData(limitCount = 10) {
       "examples"
     );
 
-    console.log("🎲 DB에서 진짜 랜덤 독해 예문 로드...");
 
     let exampleData = [];
 
     try {
-      console.log("🚀 독해 예문 - randomField를 활용한 효율적인 조회...");
 
       // 효율적인 랜덤 쿼리 (최대 10개만 읽음)
       const randomValue = Math.random();
@@ -3288,14 +3174,12 @@ async function loadReadingData(limitCount = 10) {
         exampleData = randomSnapshot.docs
           .map((doc) => {
             const docData = doc.data();
-            console.log("📖 원본 예문 데이터:", docData);
 
             // 지역화된 예문 생성
             const localizedExample = getLocalizedReadingExample({
               id: doc.id,
               ...docData,
             });
-            console.log("📖 지역화된 예문:", localizedExample);
 
             if (localizedExample) {
               const processedData = {
@@ -3304,7 +3188,6 @@ async function loadReadingData(limitCount = 10) {
                 ...localizedExample,
                 tags: [], // 빈 태그 배열로 초기화
               };
-              console.log("📖 처리된 예문 데이터:", processedData);
               return processedData;
             }
             return null;
@@ -3410,7 +3293,6 @@ async function loadReadingData(limitCount = 10) {
   }
 
   // DB에 데이터가 없으면 빈 배열 반환
-  console.log("📖 독해 예문 DB 데이터 없음");
   return [];
 }
 
@@ -3552,7 +3434,6 @@ function updateFlashcard() {
     const sourceExpression = concept.expressions[currentSourceLanguage];
     const targetExpression = concept.expressions[currentTargetLanguage];
 
-    console.log("✅ concepts 데이터 구조 사용");
 
     if (sourceExpression && targetExpression) {
       // 단어 학습: 앞면은 대상언어 단어, 뒤면은 원본언어 단어
@@ -3786,7 +3667,6 @@ function updateTyping() {
       sourcePronunciation = sourceExpr.pronunciation || "";
       targetMeaning = targetExpr.word || "";
       correctAnswer = targetExpr.word.toLowerCase();
-      console.log("✅ 타이핑 모드: concepts 데이터 구조 사용");
     } else {
       console.warn(
         "⚠️ 타이핑 모드: concepts 데이터에서 언어별 표현을 찾을 수 없음"
@@ -3800,7 +3680,6 @@ function updateTyping() {
     sourcePronunciation = concept.pronunciation || "";
     targetMeaning = concept[currentTargetLanguage];
     correctAnswer = concept[currentTargetLanguage].toLowerCase();
-    console.log("✅ 타이핑 모드: examples 데이터 구조 사용");
   }
   // 3. 지원되지 않는 구조
   else {
@@ -4017,7 +3896,6 @@ function updateListeningMode() {
   if (!currentData || currentData.length === 0) return;
 
   const concept = currentData[currentIndex];
-  console.log("🎧 듣기 연습 데이터:", concept);
 
   // 듣기 모드 요소들
   const listeningWord = document.getElementById("listening-word");
@@ -4142,7 +4020,6 @@ function updateGrammarPatterns() {
   if (!currentData || currentData.length === 0) return;
 
   const pattern = currentData[currentIndex];
-  console.log("📝 문법 패턴 데이터:", pattern);
 
   const patternTitle = document.getElementById("pattern-title");
   const patternStructure = document.getElementById("pattern-structure");
@@ -4232,7 +4109,6 @@ function updateGrammarPractice() {
   if (!currentData || currentData.length === 0) return;
 
   const pattern = currentData[currentIndex];
-  console.log("📚 문법 실습 데이터:", pattern);
 
   // 실제 DB 구조에 맞게 데이터 추출
   const title = getLocalizedPatternTitle(pattern);
@@ -4311,7 +4187,6 @@ function flipGrammarCard() {
 }
 
 function showReadingExampleMode() {
-  console.log("📖 예문 독해 모드 시작");
   const readingContainer = document.getElementById("reading-example-mode");
   if (readingContainer) {
     readingContainer.classList.remove("hidden");
@@ -4360,7 +4235,6 @@ function updateReadingExample() {
   if (!container) return;
 
   // 디버깅 로그 추가
-  console.log("🔍 updateReadingExample - example 데이터:", example);
   console.log("🔍 example.situation:", example.situation);
   console.log(
     "🔍 Array.isArray(example.situation):",
@@ -4440,7 +4314,6 @@ function updateReadingFlash() {
   const backContext = document.getElementById("reading-flash-back-context");
 
   // 디버깅 로그 추가
-  console.log("🔍 updateReadingFlash - example 데이터:", example);
   console.log("🔍 example.situation:", example.situation);
 
   if (frontText) {
@@ -4492,7 +4365,6 @@ async function navigateContent(direction) {
 
   const currentData = getCurrentData();
   if (!currentData || currentData.length === 0) {
-    console.log("❌ 네비게이션: 데이터가 없음");
     return;
   }
 
@@ -5706,7 +5578,6 @@ async function deleteItem(itemId, itemType) {
           (item) => item.id !== itemId
         );
         sessionStorage.setItem("vocabularyData", JSON.stringify(filteredData));
-        console.log("✅ sessionStorage에서 단어 데이터 제거 완료");
       } catch (error) {
         console.warn("⚠️ sessionStorage 처리 중 오류:", error);
       }
@@ -5891,7 +5762,6 @@ async function syncUserLearningData() {
         );
       }
 
-      console.log("🔄 사용자 학습 데이터 동기화 완료");
     }
   } catch (error) {
     console.warn("🔄 사용자 학습 데이터 동기화 실패:", error);
@@ -6457,7 +6327,6 @@ async function showLearningCompleteWithStats(sessionStats) {
           [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
         }
         preloadedData[area] = shuffled;
-        console.log(`🎲 ${area} 프리로드 데이터 랜덤화 완료`);
       }
     });
 
@@ -6582,7 +6451,6 @@ async function showLearningComplete() {
           [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
         }
         preloadedData[area] = shuffled;
-        console.log(`🎲 ${area} 프리로드 데이터 랜덤화 완료`);
       }
     });
 

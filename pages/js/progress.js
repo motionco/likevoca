@@ -1,5 +1,4 @@
 ﻿// Progress page JavaScript
-console.log("Progress page initializing...");
 
 // 전역 변수
 let currentUser = null;
@@ -14,7 +13,6 @@ async function waitForFirebase() {
   return new Promise((resolve) => {
     const checkFirebase = () => {
       if (window.firebaseInit) {
-        console.log("✅ Firebase functions are ready");
         resolve();
       } else {
         setTimeout(checkFirebase, 100);
@@ -33,10 +31,8 @@ async function checkUserAuth() {
       const unsubscribe = onAuthStateChanged(auth, (user) => {
         if (user) {
           currentUser = user;
-          console.log("User authenticated");
           resolve(user);
         } else {
-          console.log("No user authenticated");
           resolve(null);
         }
         unsubscribe();
@@ -113,24 +109,10 @@ async function loadActivityRecords() {
 
     // 디버깅: 각 기록의 샘플 출력
     if (allGameRecords.length > 0) {
-      console.log("🎮 게임 기록 샘플:", allGameRecords[0]);
     }
     if (allQuizRecords.length > 0) {
-      console.log("🎯 퀴즈 기록 샘플:", allQuizRecords[0]);
-      console.log("🎯 퀴즈 기록 전체 구조:", {
-        type: allQuizRecords[0].type,
-        activity_type: allQuizRecords[0].activity_type,
-        concept_ids: allQuizRecords[0].concept_ids,
-        answers: allQuizRecords[0].answers,
-      });
     }
     if (allLearningRecords.length > 0) {
-      console.log("📚 학습 기록 샘플:", allLearningRecords[0]);
-      console.log("📚 학습 기록 전체 구조:", {
-        type: allLearningRecords[0].type,
-        activity_type: allLearningRecords[0].activity_type,
-        concept_id: allLearningRecords[0].concept_id,
-        concept_ids: allLearningRecords[0].concept_ids,
       });
     }
   } catch (error) {
@@ -141,7 +123,6 @@ async function loadActivityRecords() {
 // concept_snapshots 기반 총 단어수 목록 생성
 async function generateDetailedConceptsListFromSnapshots() {
   try {
-    console.log("📋 concept_snapshots 기반 총 단어수 목록 생성 시작");
 
     // 1. user_records에서 concept_snapshots 조회
     const { doc, getDoc, db } = window.firebaseInit;
@@ -227,20 +208,6 @@ async function generateDetailedConceptsListFromSnapshots() {
         conceptRecords.push(...learningRecords);
       }
 
-      // 디버깅: 개념별 활동 기록 출력
-      console.log(`🔍 개념 ${conceptId} 활동 기록:`, {
-        originalConceptIds,
-        conceptRecordsCount: conceptRecords.length,
-        learningCount: conceptRecords.filter(
-          (r) => r.type === "learning" || r.activity_type === "learning"
-        ).length,
-        gameCount: conceptRecords.filter(
-          (r) => r.type === "game" || r.activity_type === "game"
-        ).length,
-        quizCount: conceptRecords.filter(
-          (r) => r.type === "quiz" || r.activity_type === "quiz"
-        ).length,
-      });
 
       // 마스터리 계산
       const masteryResult = calculateConceptMastery(
@@ -248,7 +215,6 @@ async function generateDetailedConceptsListFromSnapshots() {
         conceptRecords
       );
 
-      console.log(`📊 개념 ${conceptId} 마스터리 결과:`, masteryResult);
 
       // 상세 개념 정보 생성
       const detailedConcept = {
@@ -352,17 +318,6 @@ function extractConceptIds(record) {
     }
   }
 
-  // 디버깅: 추출된 concept_ids 출력
-  if (conceptIds.length > 0) {
-    console.log(`🔍 extractConceptIds 결과:`, {
-      recordType: record.type || record.activity_type,
-      extractedIds: conceptIds,
-      originalRecord: {
-        concept_id: record.concept_id,
-        concept_ids: record.concept_ids,
-      },
-    });
-  }
 
   return [...new Set(conceptIds)]; // 중복 제거
 }
