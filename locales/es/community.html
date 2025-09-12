@@ -503,6 +503,81 @@
             }, 3000);
         }
 
+        // Dynamic SEO metadata update for individual content
+        function updateSEOForContent(content, lang = 'es') {
+            const version = content.versions[lang];
+            if (!version) return;
+
+            // Extract title and description (remove HTML tags)
+            const cleanTitle = version.title || 'Comunidad LikeVoca';
+            const cleanDescription = version.content
+                ? version.content.replace(/<[^>]*>/g, '').substring(0, 160) + '...'
+                : 'Encuentra guías de aprendizaje, preguntas frecuentes y manuales en la comunidad LikeVoca.';
+
+            // Update meta tags
+            document.title = `${cleanTitle} - Comunidad LikeVoca`;
+
+            // Update Description
+            let metaDesc = document.querySelector('meta[name="description"]');
+            if (metaDesc) metaDesc.setAttribute('content', cleanDescription);
+
+            // Update Open Graph
+            let ogTitle = document.querySelector('meta[property="og:title"]');
+            if (ogTitle) ogTitle.setAttribute('content', cleanTitle);
+
+            let ogDesc = document.querySelector('meta[property="og:description"]');
+            if (ogDesc) ogDesc.setAttribute('content', cleanDescription);
+
+            // Update URL (using History API)
+            if (window.history && window.history.pushState) {
+                const newUrl = `${window.location.pathname}#${content.id}`;
+                window.history.pushState({ contentId: content.id }, cleanTitle, newUrl);
+            }
+
+            // Update JSON-LD structured data
+            updateStructuredData(content, lang);
+        }
+
+        // Update structured data
+        function updateStructuredData(content, lang) {
+            const version = content.versions[lang];
+            if (!version) return;
+
+            const cleanTitle = version.title || 'Comunidad LikeVoca';
+            const cleanDescription = version.content
+                ? version.content.replace(/<[^>]*>/g, '').substring(0, 300)
+                : 'Encuentra guías de aprendizaje, preguntas frecuentes y manuales en la comunidad LikeVoca.';
+
+            const structuredData = {
+                "@context": "https://schema.org",
+                "@type": "Article",
+                "headline": cleanTitle,
+                "description": cleanDescription,
+                "author": {
+                    "@type": "Organization",
+                    "name": "LikeVoca"
+                },
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "LikeVoca",
+                    "url": "https://likevoca.com"
+                },
+                "url": `https://www.likevoca.com/es/community.html#${content.id}`,
+                "datePublished": content.created_at || new Date().toISOString(),
+                "dateModified": content.updated_at || new Date().toISOString(),
+                "mainEntityOfPage": {
+                    "@type": "WebPage",
+                    "@id": `https://www.likevoca.com/es/community.html#${content.id}`
+                }
+            };
+
+            // Update existing JSON-LD or create new one
+            let jsonLdScript = document.querySelector('script[type="application/ld+json"]');
+            if (jsonLdScript) {
+                jsonLdScript.textContent = JSON.stringify(structuredData);
+            }
+        }
+
         // 커뮤니티 메인 페이지의 경우 즉시 공유 기능 활성화
         document.addEventListener('DOMContentLoaded', () => {
             // URL에 id 파라미터가 없으면 메인 페이지로 간주
