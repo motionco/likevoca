@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <!-- Chinese sitemap -->
+  
+  <!-- Chinese homepage -->
+  <url>
+    <loc>https://www.likevoca.com/zh/</loc>
+    <lastmod>2025-09-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://www.likevoca.com/ko/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.likevoca.com/en/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.likevoca.com/ja/"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://www.likevoca.com/zh/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.likevoca.com/es/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.likevoca.com/en/"/>
+  </url>
+  
+  <!-- Chinese main pages -->
+  <url>
+    <loc>https://www.likevoca.com/zh/vocabulary.html</loc>
+    <lastmod>2025-09-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.likevoca.com/zh/learning.html</loc>
+    <lastmod>2025-09-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.likevoca.com/zh/community.html</loc>
+    <lastmod>2025-09-12</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.likevoca.com/zh/games.html</loc>
+    <lastmod>2025-09-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.likevoca.com/zh/quiz.html</loc>
+    <lastmod>2025-09-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.likevoca.com/zh/ai-vocabulary.html</loc>
+    <lastmod>2025-09-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.likevoca.com/zh/faq.html</loc>
+    <lastmod>2025-09-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.likevoca.com/zh/about.html</loc>
+    <lastmod>2025-09-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+</urlset>

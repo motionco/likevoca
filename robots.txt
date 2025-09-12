@@ -2,7 +2,13 @@ User-agent: *
 Allow: /
 
 # 사이트맵 위치
-Sitemap: https://likevoca.com/sitemap.xml
+Sitemap: https://www.likevoca.com/sitemap-index.xml
+Sitemap: https://www.likevoca.com/sitemap.xml
+Sitemap: https://www.likevoca.com/ko/sitemap.xml
+Sitemap: https://www.likevoca.com/en/sitemap.xml
+Sitemap: https://www.likevoca.com/ja/sitemap.xml
+Sitemap: https://www.likevoca.com/zh/sitemap.xml
+Sitemap: https://www.likevoca.com/es/sitemap.xml
 
 # 크롤링 지연 (선택사항)
 Crawl-delay: 1

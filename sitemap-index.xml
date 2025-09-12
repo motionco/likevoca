@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  <!-- 통합 사이트맵 (모든 언어 포함) -->
+  <sitemap>
+    <loc>https://www.likevoca.com/sitemap.xml</loc>
+    <lastmod>2025-09-12</lastmod>
+  </sitemap>
+  
+  <!-- 한국어 전용 사이트맵 -->
+  <sitemap>
+    <loc>https://www.likevoca.com/ko/sitemap.xml</loc>
+    <lastmod>2025-09-12</lastmod>
+  </sitemap>
+  
+  <!-- 영어 전용 사이트맵 -->
+  <sitemap>
+    <loc>https://www.likevoca.com/en/sitemap.xml</loc>
+    <lastmod>2025-09-12</lastmod>
+  </sitemap>
+  
+  <!-- 일본어 전용 사이트맵 -->
+  <sitemap>
+    <loc>https://www.likevoca.com/ja/sitemap.xml</loc>
+    <lastmod>2025-09-12</lastmod>
+  </sitemap>
+  
+  <!-- 중국어 전용 사이트맵 -->
+  <sitemap>
+    <loc>https://www.likevoca.com/zh/sitemap.xml</loc>
+    <lastmod>2025-09-12</lastmod>
+  </sitemap>
+  
+  <!-- 스페인어 전용 사이트맵 -->
+  <sitemap>
+    <loc>https://www.likevoca.com/es/sitemap.xml</loc>
+    <lastmod>2025-09-12</lastmod>
+  </sitemap>
+  
+</sitemapindex>
