@@ -17,3 +17,7 @@ docs/
 backup/
 result/
 batch/
+
+# Node.js (if reinstalled in future)
+node_modules/
+package-lock.json
