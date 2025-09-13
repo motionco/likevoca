@@ -1,70 +1,79 @@
 ﻿<!DOCTYPE html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LikeVoca - 다국어 학습 플랫폼</title>
-    
-    <!-- 기본 메타 태그 -->
-    <meta name="description" content="원하는 언어를 쉽고 빠르게 학습할 수 있는 맞춤형 언어학습 플랫폼입니다. AI 단어 생성과 단어 북마크 기능으로 나만의 단어장을 체계적으로 관리하고, 학습과 퀴즈, 게임을 통해 단어를 완벽하게 마스터할 수 있습니다." />
-    <meta name="keywords" content="맞춤형 언어학습, AI 단어 생성, 단어 북마크, 나만의 단어장, 다국어, 언어 학습, 퀴즈, 게임, 영어, 일본어, 중국어, 한국어" />
-    
-    <!-- Open Graph / 소셜 미디어 메타 태그 -->
-    <meta property="og:title" content="LikeVoca - 맞춤형 언어학습 플랫폼" />
-    <meta property="og:description" content="원하는 언어를 쉽고 빠르게 학습할 수 있는 맞춤형 언어학습 플랫폼입니다. AI 단어 생성과 단어 북마크 기능으로 나만의 단어장을 체계적으로 관리하고, 학습과 퀴즈, 게임을 통해 단어를 완벽하게 마스터할 수 있습니다." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://www.likevoca.com/ko" />
-    <meta property="og:locale" content="ko" />
-    <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
-    
-    <!-- Twitter Card 태그 -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="LikeVoca - 맞춤형 언어학습 플랫폼" />
-    <meta name="twitter:description" content="원하는 언어를 쉽고 빠르게 학습할 수 있는 맞춤형 언어학습 플랫폼입니다. AI 단어 생성과 단어 북마크 기능으로 나만의 단어장을 체계적으로 관리하고, 학습과 퀴즈, 게임을 통해 단어를 완벽하게 마스터할 수 있습니다." />
-    <meta name="twitter:image" content="https://www.likevoca.com/assets/hero.webp" />
-    <meta name="twitter:image:alt" content="LikeVoca - AI 기반 맞춤형 언어학습 플랫폼" />
-    
-    <!-- Open Graph 태그 -->
-    <meta property="og:title" content="LikeVoca - 맞춤형 언어학습 플랫폼" />
-    <meta property="og:description" content="원하는 언어를 쉽고 빠르게 학습할 수 있는 맞춤형 언어학습 플랫폼입니다. AI 단어 생성과 단어 북마크 기능으로 나만의 단어장을 체계적으로 관리하고, 학습과 퀴즈, 게임을 통해 단어를 완벽하게 마스터할 수 있습니다." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://www.likevoca.com/ko/" />
-    <meta property="og:site_name" content="LikeVoca" />
-    <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="LikeVoca - AI 기반 맞춤형 언어학습 플랫폼" />
-    
-    <!-- 표준 링크 -->
-    <link rel="canonical" href="https://likevoca.com" />
-    
-    <!-- 대체 언어 링크 (초기값) -->
-    <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko" />
-    <link rel="alternate" hreflang="en" href="https://likevoca.com/en" />
-    <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja" />
-    <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh" />
-    <link rel="alternate" hreflang="es" href="https://likevoca.com/es" />
-    <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en" />
 
-    <!-- 성능 최적화 - Resource Hints -->
-    <link rel="preconnect" href="https://cdn.tailwindcss.com">
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
-    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LikeVoca - 다국어 학습 플랫폼</title>
 
-    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-    />
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="../../assets/favicon.ico" />
+  <link rel="shortcut icon" type="image/x-icon" href="../../assets/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="152x152" href="../../assets/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../../assets/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="16x16" href="../../assets/favicon.ico" />
 
-    <link rel="stylesheet" href="../../css/style.css" />
-    
-    <!-- 네비게이션바 JavaScript -->
-    <script src="../../components/js/navbar.js"></script>
-    
-    <!-- 구조화된 데이터 (JSON-LD) -->
-    <script type="application/ld+json">
+  <!-- 기본 메타 태그 -->
+  <meta name="description"
+    content="원하는 언어를 쉽고 빠르게 학습할 수 있는 맞춤형 언어학습 플랫폼입니다. AI 단어 생성과 단어 북마크 기능으로 나만의 단어장을 체계적으로 관리하고, 학습과 퀴즈, 게임을 통해 단어를 완벽하게 마스터할 수 있습니다." />
+  <meta name="keywords" content="맞춤형 언어학습, AI 단어 생성, 단어 북마크, 나만의 단어장, 다국어, 언어 학습, 퀴즈, 게임, 영어, 일본어, 중국어, 한국어" />
+
+  <!-- Open Graph / 소셜 미디어 메타 태그 -->
+  <meta property="og:title" content="LikeVoca - 맞춤형 언어학습 플랫폼" />
+  <meta property="og:description"
+    content="원하는 언어를 쉽고 빠르게 학습할 수 있는 맞춤형 언어학습 플랫폼입니다. AI 단어 생성과 단어 북마크 기능으로 나만의 단어장을 체계적으로 관리하고, 학습과 퀴즈, 게임을 통해 단어를 완벽하게 마스터할 수 있습니다." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.likevoca.com/ko" />
+  <meta property="og:locale" content="ko" />
+  <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
+
+  <!-- Twitter Card 태그 -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="LikeVoca - 맞춤형 언어학습 플랫폼" />
+  <meta name="twitter:description"
+    content="원하는 언어를 쉽고 빠르게 학습할 수 있는 맞춤형 언어학습 플랫폼입니다. AI 단어 생성과 단어 북마크 기능으로 나만의 단어장을 체계적으로 관리하고, 학습과 퀴즈, 게임을 통해 단어를 완벽하게 마스터할 수 있습니다." />
+  <meta name="twitter:image" content="https://www.likevoca.com/assets/hero.webp" />
+  <meta name="twitter:image:alt" content="LikeVoca - AI 기반 맞춤형 언어학습 플랫폼" />
+
+  <!-- Open Graph 태그 -->
+  <meta property="og:title" content="LikeVoca - 맞춤형 언어학습 플랫폼" />
+  <meta property="og:description"
+    content="원하는 언어를 쉽고 빠르게 학습할 수 있는 맞춤형 언어학습 플랫폼입니다. AI 단어 생성과 단어 북마크 기능으로 나만의 단어장을 체계적으로 관리하고, 학습과 퀴즈, 게임을 통해 단어를 완벽하게 마스터할 수 있습니다." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.likevoca.com/ko/" />
+  <meta property="og:site_name" content="LikeVoca" />
+  <meta property="og:image" content="https://www.likevoca.com/assets/hero.webp" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="LikeVoca - AI 기반 맞춤형 언어학습 플랫폼" />
+
+  <!-- 표준 링크 -->
+  <link rel="canonical" href="https://likevoca.com" />
+
+  <!-- 대체 언어 링크 (초기값) -->
+  <link rel="alternate" hreflang="ko" href="https://likevoca.com/ko" />
+  <link rel="alternate" hreflang="en" href="https://likevoca.com/en" />
+  <link rel="alternate" hreflang="ja" href="https://likevoca.com/ja" />
+  <link rel="alternate" hreflang="zh" href="https://likevoca.com/zh" />
+  <link rel="alternate" hreflang="es" href="https://likevoca.com/es" />
+  <link rel="alternate" hreflang="x-default" href="https://likevoca.com/en" />
+
+  <!-- 성능 최적화 - Resource Hints -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+  <link rel="stylesheet" href="../../css/style.css" />
+
+  <!-- 네비게이션바 JavaScript -->
+  <script src="../../components/js/navbar.js"></script>
+
+  <!-- 구조화된 데이터 (JSON-LD) -->
+  <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
@@ -92,382 +101,355 @@
       "availableLanguage": ["ko", "en", "ja", "zh", "es"]
     }
     </script>
-  </head>
-  <body class="bg-gray-100">
-    <div id="navbar-container"></div>
+</head>
 
-    <main
-      class="container mx-auto max-w-7xl px-4 md:px-6 lg:px-8 py-8 md:py-12 lg:py-16"
-    >
-      <div
-        class="flex flex-col lg:flex-row items-center justify-between mb-8 md:mb-16 mt-4 md:mt-8"
-      >
-        <div class="lg:w-1/2 lg:pr-12 text-center lg:text-left">
-          <h1
-            class="text-3xl md:text-4xl lg:text-6xl font-bold text-gray-800 mb-4 md:mb-6"
-          >
-            <span>맞춤형 언어학습으로</span><br />
-            <span class="text-[#4B63AC]">완벽하게 마스터하세요</span>
-          </h1>
-          <p
-            class="text-base md:text-lg text-gray-600 mb-6 md:mb-8 px-4 lg:px-0"
-          >
-            원하는 언어를 쉽고 빠르게 학습할 수 있는 맞춤형 언어학습 플랫폼입니다. AI 단어 생성과 단어 북마크 기능으로 나만의 단어장을 체계적으로 관리하고, 학습과 퀴즈, 게임을 통해 단어를 완벽하게 마스터할 수 있습니다.
-          </p>
-          <button
-            id="get-started-btn"
-            class="w-full md:w-auto bg-[#4B63AC] text-white px-6 md:px-8 py-3 rounded-lg hover:bg-[#3A4F8B] transition duration-300 text-base md:text-lg font-semibold"
-          >
-            무료로 시작하기
-          </button>
+<body class="bg-gray-100">
+  <div id="navbar-container"></div>
+
+  <main class="container mx-auto max-w-7xl px-4 md:px-6 lg:px-8 py-8 md:py-12 lg:py-16">
+    <div class="flex flex-col lg:flex-row items-center justify-between mb-8 md:mb-16 mt-4 md:mt-8">
+      <div class="lg:w-1/2 lg:pr-12 text-center lg:text-left">
+        <h1 class="text-3xl md:text-4xl lg:text-6xl font-bold text-gray-800 mb-4 md:mb-6">
+          <span>맞춤형 언어학습으로</span><br />
+          <span class="text-[#4B63AC]">완벽하게 마스터하세요</span>
+        </h1>
+        <p class="text-base md:text-lg text-gray-600 mb-6 md:mb-8 px-4 lg:px-0">
+          원하는 언어를 쉽고 빠르게 학습할 수 있는 맞춤형 언어학습 플랫폼입니다. AI 단어 생성과 단어 북마크 기능으로 나만의 단어장을 체계적으로 관리하고, 학습과 퀴즈, 게임을 통해 단어를 완벽하게
+          마스터할 수 있습니다.
+        </p>
+        <button id="get-started-btn"
+          class="w-full md:w-auto bg-[#4B63AC] text-white px-6 md:px-8 py-3 rounded-lg hover:bg-[#3A4F8B] transition duration-300 text-base md:text-lg font-semibold">
+          무료로 시작하기
+        </button>
+      </div>
+      <div class="lg:w-1/2 mt-8 lg:mt-0 w-full px-4 lg:px-0">
+        <div class="h-64 md:h-80 lg:h-96 rounded-xl overflow-hidden">
+          <picture>
+            <source srcset="../../assets/hero.webp" type="image/webp">
+            <img src="../../assets/hero.jpeg" class="w-full h-full object-cover rounded-xl"
+              alt="LikeVoca 다국어 학습 플랫폼 - 언어 학습을 효과적으로 도와주는 온라인 서비스" loading="lazy" />
+          </picture>
         </div>
-        <div class="lg:w-1/2 mt-8 lg:mt-0 w-full px-4 lg:px-0">
-          <div class="h-64 md:h-80 lg:h-96 rounded-xl overflow-hidden">
-            <picture>
-              <source srcset="../../assets/hero.webp" type="image/webp">
-              <img
-                src="../../assets/hero.jpeg"
-                class="w-full h-full object-cover rounded-xl"
-                alt="LikeVoca 다국어 학습 플랫폼 - 언어 학습을 효과적으로 도와주는 온라인 서비스"
-                loading="lazy"
-              />
-            </picture>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 lg:gap-8 md:mb-16">
+      <!-- 1. 나만의 단어장 -->
+      <div class="bg-[#E6F0FF] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300">
+        <div class="h-auto md:h-56 flex flex-col justify-between space-y-4">
+          <div>
+            <h3 class="text-2xl font-bold text-[#4B63AC] mb-4">나만의 단어장</h3>
+            <div class="text-content-container">
+              <p class="text-gray-700 text-sm lg:text-lg line-clamp-3" id="text-1">개인화된 단어장을 만들고 관리하세요. 학습 진도를 추적하고 복습
+                일정을 설정할 수 있습니다.</p>
+              <button class="text-blue-600 text-sm mt-2 hover:text-blue-800 transition duration-200 show-more-btn"
+                onclick="toggleText(1)" id="btn-1" style="display: none;">
+                더보기
+              </button>
+            </div>
+          </div>
+          <div>
+            <a href="my-word-list.html" class="block">
+              <button
+                class="w-full bg-[#4B63AC] text-white px-6 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300">
+                시작하기
+              </button>
+            </a>
           </div>
         </div>
       </div>
-
-      <div
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 lg:gap-8 md:mb-16"
-      >
-        <!-- 1. 나만의 단어장 -->
-        <div
-          class="bg-[#E6F0FF] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
-        >
-          <div class="h-auto md:h-56 flex flex-col justify-between space-y-4">
-            <div>
-              <h3 class="text-2xl font-bold text-[#4B63AC] mb-4">나만의 단어장</h3>
-              <div class="text-content-container">
-                <p class="text-gray-700 text-sm lg:text-lg line-clamp-3" id="text-1">개인화된 단어장을 만들고 관리하세요. 학습 진도를 추적하고 복습 일정을 설정할 수 있습니다.</p>
-                <button class="text-blue-600 text-sm mt-2 hover:text-blue-800 transition duration-200 show-more-btn" 
-                        onclick="toggleText(1)" id="btn-1" style="display: none;">
-                  더보기
-                </button>
-              </div>
-            </div>
-            <div>
-              <a href="my-word-list.html" class="block">
-                <button
-                  class="w-full bg-[#4B63AC] text-white px-6 py-2 rounded-lg hover:bg-[#3A4F8B] transition duration-300"
-                >
-                  시작하기
-                </button>
-              </a>
+      <!-- 2. 단어장 -->
+      <div class="bg-[#FFF3E0] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300">
+        <div class="h-auto md:h-56 flex flex-col justify-between space-y-4">
+          <div>
+            <h3 class="text-2xl font-bold text-[#E65100] mb-4">단어장</h3>
+            <div class="text-content-container">
+              <p class="text-gray-700 text-sm lg:text-lg line-clamp-3" id="text-2">다양한 언어의 단어와 표현을 검색하고 학습하세요. 실시간 번역과
+                발음 가이드를 제공합니다.</p>
+              <button class="text-blue-600 text-sm mt-2 hover:text-blue-800 transition duration-200 show-more-btn"
+                onclick="toggleText(2)" id="btn-2" style="display: none;">
+                더보기
+              </button>
             </div>
           </div>
-        </div>
-        <!-- 2. 단어장 -->
-        <div
-          class="bg-[#FFF3E0] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
-        >
-          <div class="h-auto md:h-56 flex flex-col justify-between space-y-4">
-            <div>
-              <h3 class="text-2xl font-bold text-[#E65100] mb-4">단어장</h3>
-              <div class="text-content-container">
-                <p class="text-gray-700 text-sm lg:text-lg line-clamp-3" id="text-2">다양한 언어의 단어와 표현을 검색하고 학습하세요. 실시간 번역과 발음 가이드를 제공합니다.</p>
-                <button class="text-blue-600 text-sm mt-2 hover:text-blue-800 transition duration-200 show-more-btn" 
-                        onclick="toggleText(2)" id="btn-2" style="display: none;">
-                  더보기
-                </button>
-              </div>
-            </div>
-            <div>
-              <a href="vocabulary.html" class="block">
-                <button
-                  class="w-full bg-[#E65100] text-white px-6 py-2 rounded-lg hover:bg-[#BF360C] transition duration-300"
-                >
-                  시작하기
-                </button>
-              </a>
-            </div>
-          </div>
-        </div>
-        <!-- 3. AI 단어장 -->
-        <div
-          class="bg-[#E8F5E9] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
-        >
-          <div class="h-auto md:h-56 flex flex-col justify-between space-y-4">
-            <div>
-              <h3 class="text-2xl font-bold text-[#2E7D32] mb-4">AI 단어장</h3>
-              <div class="text-content-container">
-                <p class="text-gray-700 text-sm lg:text-lg line-clamp-3" id="text-3">AI가 추천하는 맞춤형 단어 학습으로 효율적인 어휘 확장을 경험하세요.</p>
-                <button class="text-blue-600 text-sm mt-2 hover:text-blue-800 transition duration-200 show-more-btn" 
-                        onclick="toggleText(3)" id="btn-3" style="display: none;">
-                  더보기
-                </button>
-              </div>
-            </div>
-            <div>
-              <a href="ai-vocabulary.html" class="block">
-                <button
-                  class="w-full bg-[#2E7D32] text-white px-6 py-2 rounded-lg hover:bg-[#1B5E20] transition duration-300"
-                >
-                  시작하기
-                </button>
-              </a>
-            </div>
-          </div>
-        </div>
-        <!-- 4. 언어 학습 -->
-        <div
-          class="bg-[#E0F7FA] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
-        >
-          <div class="h-auto md:h-56 flex flex-col justify-between space-y-4">
-            <div>
-              <h3 class="text-2xl font-bold text-[#0097A7] mb-4">언어 학습</h3>
-              <div class="text-content-container">
-                <p class="text-gray-700 text-sm lg:text-lg line-clamp-3" id="text-4">체계적인 학습 과정으로 언어 실력을 향상시키세요. 단계별 커리큘럼과 개인 맞춤 학습을 제공합니다.</p>
-                <button class="text-blue-600 text-sm mt-2 hover:text-blue-800 transition duration-200 show-more-btn" 
-                        onclick="toggleText(4)" id="btn-4" style="display: none;">
-                  더보기
-                </button>
-              </div>
-            </div>
-            <div>
-              <a href="learning.html" class="block">
-                <button
-                  class="w-full bg-[#0097A7] text-white px-6 py-2 rounded-lg hover:bg-[#00838F] transition duration-300"
-                >
-                  시작하기
-                </button>
-              </a>
-            </div>
-          </div>
-        </div>
-        <!-- 5. 언어 퀴즈 -->
-        <div
-          class="bg-[#FFF8E1] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
-        >
-          <div class="h-auto md:h-56 flex flex-col justify-between space-y-4">
-            <div>
-              <h3 class="text-2xl font-bold text-[#F57C00] mb-4">언어 퀴즈</h3>
-              <div class="text-content-container">
-                <p class="text-gray-700 text-sm lg:text-lg line-clamp-3" id="text-5">재미있는 퀴즈로 학습한 내용을 복습하고 실력을 테스트해보세요.</p>
-                <button class="text-blue-600 text-sm mt-2 hover:text-blue-800 transition duration-200 show-more-btn" 
-                        onclick="toggleText(5)" id="btn-5" style="display: none;">
-                  더보기
-                </button>
-              </div>
-            </div>
-            <div>
-              <a href="quiz.html" class="block">
-                <button
-                  class="w-full bg-[#F57C00] text-white px-6 py-2 rounded-lg hover:bg-[#E65100] transition duration-300"
-                >
-                  시작하기
-                </button>
-              </a>
-            </div>
-          </div>
-        </div>
-        <!-- 6. 언어 게임 -->
-        <div
-          class="bg-[#F3E5F5] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
-        >
-          <div class="h-auto md:h-56 flex flex-col justify-between space-y-4">
-            <div>
-              <h3 class="text-2xl font-bold text-[#9C27B0] mb-4">언어 게임</h3>
-              <div class="text-content-container">
-                <p class="text-gray-700 text-sm lg:text-lg line-clamp-3" id="text-6">게임을 통해 즐겁게 언어를 학습하세요. 다양한 미니게임으로 어휘력과 문법 실력을 향상시킬 수 있습니다.</p>
-                <button class="text-blue-600 text-sm mt-2 hover:text-blue-800 transition duration-200 show-more-btn" 
-                        onclick="toggleText(6)" id="btn-6" style="display: none;">
-                  더보기
-                </button>
-              </div>
-            </div>
-            <div>
-              <a href="games.html" class="block">
-                <button
-                  class="w-full bg-[#9C27B0] text-white px-6 py-2 rounded-lg hover:bg-[#7B1FA2] transition duration-300"
-                >
-                  시작하기
-                </button>
-              </a>
-            </div>
-          </div>
-        </div>
-        <!-- 7. 문의하기 -->
-        <div
-          class="bg-[#E3F2FD] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300"
-        >
-          <div class="h-auto md:h-56 flex flex-col justify-between space-y-4">
-            <div>
-              <h3 class="text-2xl font-bold text-[#1565CD] mb-4">문의하기</h3>
-              <div class="text-content-container">
-                <p class="text-gray-700 text-sm lg:text-lg line-clamp-3" id="text-7">궁금한 점이나 문제가 있으시면 언제든지 문의해주세요. 빠른 시간 내에 답변드리겠습니다.</p>
-                <button class="text-blue-600 text-sm mt-2 hover:text-blue-800 transition duration-200 show-more-btn" 
-                        onclick="toggleText(7)" id="btn-7" style="display: none;">
-                  더보기
-                </button>
-              </div>
-            </div>
-            <div>
-              <a href="inquiry.html" class="block">
-                <button
-                  class="w-full bg-[#1565CD] text-white px-6 py-2 rounded-lg hover:bg-[#0D47A1] transition duration-300"
-                >
-                  문의하기
-                </button>
-              </a>
-            </div>
+          <div>
+            <a href="vocabulary.html" class="block">
+              <button
+                class="w-full bg-[#E65100] text-white px-6 py-2 rounded-lg hover:bg-[#BF360C] transition duration-300">
+                시작하기
+              </button>
+            </a>
           </div>
         </div>
       </div>
-    </main>
+      <!-- 3. AI 단어장 -->
+      <div class="bg-[#E8F5E9] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300">
+        <div class="h-auto md:h-56 flex flex-col justify-between space-y-4">
+          <div>
+            <h3 class="text-2xl font-bold text-[#2E7D32] mb-4">AI 단어장</h3>
+            <div class="text-content-container">
+              <p class="text-gray-700 text-sm lg:text-lg line-clamp-3" id="text-3">AI가 추천하는 맞춤형 단어 학습으로 효율적인 어휘 확장을
+                경험하세요.</p>
+              <button class="text-blue-600 text-sm mt-2 hover:text-blue-800 transition duration-200 show-more-btn"
+                onclick="toggleText(3)" id="btn-3" style="display: none;">
+                더보기
+              </button>
+            </div>
+          </div>
+          <div>
+            <a href="ai-vocabulary.html" class="block">
+              <button
+                class="w-full bg-[#2E7D32] text-white px-6 py-2 rounded-lg hover:bg-[#1B5E20] transition duration-300">
+                시작하기
+              </button>
+            </a>
+          </div>
+        </div>
+      </div>
+      <!-- 4. 언어 학습 -->
+      <div class="bg-[#E0F7FA] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300">
+        <div class="h-auto md:h-56 flex flex-col justify-between space-y-4">
+          <div>
+            <h3 class="text-2xl font-bold text-[#0097A7] mb-4">언어 학습</h3>
+            <div class="text-content-container">
+              <p class="text-gray-700 text-sm lg:text-lg line-clamp-3" id="text-4">체계적인 학습 과정으로 언어 실력을 향상시키세요. 단계별 커리큘럼과
+                개인 맞춤 학습을 제공합니다.</p>
+              <button class="text-blue-600 text-sm mt-2 hover:text-blue-800 transition duration-200 show-more-btn"
+                onclick="toggleText(4)" id="btn-4" style="display: none;">
+                더보기
+              </button>
+            </div>
+          </div>
+          <div>
+            <a href="learning.html" class="block">
+              <button
+                class="w-full bg-[#0097A7] text-white px-6 py-2 rounded-lg hover:bg-[#00838F] transition duration-300">
+                시작하기
+              </button>
+            </a>
+          </div>
+        </div>
+      </div>
+      <!-- 5. 언어 퀴즈 -->
+      <div class="bg-[#FFF8E1] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300">
+        <div class="h-auto md:h-56 flex flex-col justify-between space-y-4">
+          <div>
+            <h3 class="text-2xl font-bold text-[#F57C00] mb-4">언어 퀴즈</h3>
+            <div class="text-content-container">
+              <p class="text-gray-700 text-sm lg:text-lg line-clamp-3" id="text-5">재미있는 퀴즈로 학습한 내용을 복습하고 실력을 테스트해보세요.
+              </p>
+              <button class="text-blue-600 text-sm mt-2 hover:text-blue-800 transition duration-200 show-more-btn"
+                onclick="toggleText(5)" id="btn-5" style="display: none;">
+                더보기
+              </button>
+            </div>
+          </div>
+          <div>
+            <a href="quiz.html" class="block">
+              <button
+                class="w-full bg-[#F57C00] text-white px-6 py-2 rounded-lg hover:bg-[#E65100] transition duration-300">
+                시작하기
+              </button>
+            </a>
+          </div>
+        </div>
+      </div>
+      <!-- 6. 언어 게임 -->
+      <div class="bg-[#F3E5F5] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300">
+        <div class="h-auto md:h-56 flex flex-col justify-between space-y-4">
+          <div>
+            <h3 class="text-2xl font-bold text-[#9C27B0] mb-4">언어 게임</h3>
+            <div class="text-content-container">
+              <p class="text-gray-700 text-sm lg:text-lg line-clamp-3" id="text-6">게임을 통해 즐겁게 언어를 학습하세요. 다양한 미니게임으로 어휘력과
+                문법 실력을 향상시킬 수 있습니다.</p>
+              <button class="text-blue-600 text-sm mt-2 hover:text-blue-800 transition duration-200 show-more-btn"
+                onclick="toggleText(6)" id="btn-6" style="display: none;">
+                더보기
+              </button>
+            </div>
+          </div>
+          <div>
+            <a href="games.html" class="block">
+              <button
+                class="w-full bg-[#9C27B0] text-white px-6 py-2 rounded-lg hover:bg-[#7B1FA2] transition duration-300">
+                시작하기
+              </button>
+            </a>
+          </div>
+        </div>
+      </div>
+      <!-- 7. 문의하기 -->
+      <div class="bg-[#E3F2FD] rounded-xl p-4 md:p-6 shadow-lg hover:shadow-xl transition duration-300">
+        <div class="h-auto md:h-56 flex flex-col justify-between space-y-4">
+          <div>
+            <h3 class="text-2xl font-bold text-[#1565CD] mb-4">문의하기</h3>
+            <div class="text-content-container">
+              <p class="text-gray-700 text-sm lg:text-lg line-clamp-3" id="text-7">궁금한 점이나 문제가 있으시면 언제든지 문의해주세요. 빠른 시간
+                내에 답변드리겠습니다.</p>
+              <button class="text-blue-600 text-sm mt-2 hover:text-blue-800 transition duration-200 show-more-btn"
+                onclick="toggleText(7)" id="btn-7" style="display: none;">
+                더보기
+              </button>
+            </div>
+          </div>
+          <div>
+            <a href="inquiry.html" class="block">
+              <button
+                class="w-full bg-[#1565CD] text-white px-6 py-2 rounded-lg hover:bg-[#0D47A1] transition duration-300">
+                문의하기
+              </button>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
 
-    <!-- Footer 컨테이너 -->
-    <div id="footer-container"></div>
-    
-    <!-- Navbar 스크립트 -->
-    <script src="../../components/js/navbar.js"></script>
-    <!-- Footer 스크립트 -->
-    <script src="../../components/js/footer.js"></script>
-    
-    <!-- Firebase 초기화 -->
-    <script type="module" src="../../js/firebase/firebase-init.js"></script>
-    
-    <!-- 더보기 기능 JavaScript -->
-    <script>
-      // 페이지 로드 시 더보기 버튼 표시 여부 확인
-      document.addEventListener('DOMContentLoaded', function() {
-        checkShowMoreButtons();
-      });
+  <!-- Footer 컨테이너 -->
+  <div id="footer-container"></div>
 
-      // 텍스트 토글 함수
-      function toggleText(id) {
-        const textElement = document.getElementById(`text-${id}`);
+  <!-- Navbar 스크립트 -->
+  <script src="../../components/js/navbar.js"></script>
+  <!-- Footer 스크립트 -->
+  <script src="../../components/js/footer.js"></script>
+
+  <!-- Firebase 초기화 -->
+  <script type="module" src="../../js/firebase/firebase-init.js"></script>
+
+  <!-- 더보기 기능 JavaScript -->
+  <script>
+    // 페이지 로드 시 더보기 버튼 표시 여부 확인
+    document.addEventListener('DOMContentLoaded', function () {
+      checkShowMoreButtons();
+    });
+
+    // 텍스트 토글 함수
+    function toggleText(id) {
+      const textElement = document.getElementById(`text-${id}`);
+      const button = document.getElementById(`btn-${id}`);
+
+      if (textElement.classList.contains('line-clamp-3')) {
+        // 전체 텍스트 보이기
+        textElement.classList.remove('line-clamp-3');
+        button.textContent = '접기';
+      } else {
+        // 3줄로 제한
+        textElement.classList.add('line-clamp-3');
+        button.textContent = '더보기';
+      }
+    }
+
+    // 더보기 버튼 표시 여부 확인 함수
+    function checkShowMoreButtons() {
+      const textElements = document.querySelectorAll('[id^="text-"]');
+
+      textElements.forEach(element => {
+        const id = element.id.split('-')[1];
         const button = document.getElementById(`btn-${id}`);
-        
-        if (textElement.classList.contains('line-clamp-3')) {
-          // 전체 텍스트 보이기
-          textElement.classList.remove('line-clamp-3');
-          button.textContent = '접기';
+
+        // 요소의 실제 높이와 3줄 높이 비교
+        const lineHeight = parseInt(window.getComputedStyle(element).lineHeight);
+        const threeLineHeight = lineHeight * 3;
+
+        if (element.scrollHeight > threeLineHeight) {
+          // 3줄을 넘어가는 경우 더보기 버튼 표시
+          button.style.display = 'block';
         } else {
-          // 3줄로 제한
-          textElement.classList.add('line-clamp-3');
-          button.textContent = '더보기';
+          // 3줄 이하인 경우 더보기 버튼 숨김
+          button.style.display = 'none';
         }
-      }
-
-      // 더보기 버튼 표시 여부 확인 함수
-      function checkShowMoreButtons() {
-        const textElements = document.querySelectorAll('[id^="text-"]');
-        
-        textElements.forEach(element => {
-          const id = element.id.split('-')[1];
-          const button = document.getElementById(`btn-${id}`);
-          
-          // 요소의 실제 높이와 3줄 높이 비교
-          const lineHeight = parseInt(window.getComputedStyle(element).lineHeight);
-          const threeLineHeight = lineHeight * 3;
-          
-          if (element.scrollHeight > threeLineHeight) {
-            // 3줄을 넘어가는 경우 더보기 버튼 표시
-            button.style.display = 'block';
-          } else {
-            // 3줄 이하인 경우 더보기 버튼 숨김
-            button.style.display = 'none';
-          }
-        });
-      }
-
-      // 윈도우 리사이즈 시 더보기 버튼 재확인
-      window.addEventListener('resize', function() {
-        setTimeout(checkShowMoreButtons, 100);
       });
-    </script>
+    }
 
-    <script type="module">
-      import { applyLanguage, updateMetadata, getActiveLanguage } from '../../utils/language-utils.js';
-      
-      document.addEventListener('DOMContentLoaded', async () => {
-        try {
-          // 페이지 로드 시 리디렉션 플래그 정리
-          if (sessionStorage.getItem("redirecting")) {
-            sessionStorage.removeItem("redirecting");
-          }
-          
-          // 네비게이션바 로드 (language-utils.js에서 import된 함수 사용)
-          if (typeof window.loadNavbar === 'function') {
-            await window.loadNavbar();
-          }
-          
-          // Footer 로드
-          if (typeof window.loadFooter === 'function') {
-            await window.loadFooter();
-          } else {
-            console.warn("window.loadNavbar 함수를 찾을 수 없습니다. 직접 로드 시도...");
-            
-            // 직접 네비게이션바 로드
-            try {
-              const response = await fetch('navbar.html');
-              const navbarHTML = await response.text();
-              const navbarContainer = document.getElementById('navbar-container');
-              if (navbarContainer) {
-                navbarContainer.innerHTML = navbarHTML;
-                
-                // navbar.js 스크립트 이미 로드되어 있으므로 초기화만 실행
-                if (typeof window.initializeNavbar === 'function') {
-                  await window.initializeNavbar('ko');
-                } else {
-                  console.warn("initializeNavbar 함수를 찾을 수 없습니다.");
-                }
+    // 윈도우 리사이즈 시 더보기 버튼 재확인
+    window.addEventListener('resize', function () {
+      setTimeout(checkShowMoreButtons, 100);
+    });
+  </script>
+
+  <script type="module">
+    import { applyLanguage, updateMetadata, getActiveLanguage } from '../../utils/language-utils.js';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        // 페이지 로드 시 리디렉션 플래그 정리
+        if (sessionStorage.getItem("redirecting")) {
+          sessionStorage.removeItem("redirecting");
+        }
+
+        // 네비게이션바 로드 (language-utils.js에서 import된 함수 사용)
+        if (typeof window.loadNavbar === 'function') {
+          await window.loadNavbar();
+        }
+
+        // Footer 로드
+        if (typeof window.loadFooter === 'function') {
+          await window.loadFooter();
+        } else {
+          console.warn("window.loadNavbar 함수를 찾을 수 없습니다. 직접 로드 시도...");
+
+          // 직접 네비게이션바 로드
+          try {
+            const response = await fetch('navbar.html');
+            const navbarHTML = await response.text();
+            const navbarContainer = document.getElementById('navbar-container');
+            if (navbarContainer) {
+              navbarContainer.innerHTML = navbarHTML;
+
+              // navbar.js 스크립트 이미 로드되어 있으므로 초기화만 실행
+              if (typeof window.initializeNavbar === 'function') {
+                await window.initializeNavbar('ko');
+              } else {
+                console.warn("initializeNavbar 함수를 찾을 수 없습니다.");
               }
-            } catch (error) {
-              console.error("네비게이션바 직접 로드 실패:", error);
             }
+          } catch (error) {
+            console.error("네비게이션바 직접 로드 실패:", error);
           }
-          
-          // 번역 즉시 적용
-          await applyLanguage();
-          
-          const currentLang = await getActiveLanguage();
-          
-          await updateMetadata('home');
-          
-          // 하드코딩된 페이지이므로 번역 테스트 코드 제거됨
-          
-          // 무료로 시작하기 버튼 이벤트 처리
-          const getStartedBtn = document.getElementById('get-started-btn');
-          if (getStartedBtn) {
-            getStartedBtn.addEventListener('click', async () => {
-              try {
-                // 현재 언어 확인
-                const currentLang = await getActiveLanguage();
-                
-                // Firebase 인증 상태 확인
-                const { onAuthStateChanged } = await import('../../js/firebase/firebase-init.js');
-                const { auth } = await import('../../js/firebase/firebase-init.js');
-                
-                onAuthStateChanged(auth, (user) => {
-                  if (user) {
-                    // 로그인된 사용자 - 나만의 단어장으로 이동
-                    window.location.href = 'my-word-list.html';
-                  } else {
-                    // 로그아웃된 사용자 - 현재 언어의 회원가입 페이지로 이동
-                    window.location.href = 'signup.html';
-                  }
-                });
-              } catch (error) {
-                console.error('인증 상태 확인 중 오류:', error);
-                // 오류 발생 시 현재 언어의 회원가입 페이지로 이동
-                window.location.href = 'signup.html';
-              }
-            });
-          }
-        } catch (error) {
-          console.error('언어 설정 적용 중 오류:', error);
         }
-      });
-    </script>
-  </body>
+
+        // 번역 즉시 적용
+        await applyLanguage();
+
+        const currentLang = await getActiveLanguage();
+
+        await updateMetadata('home');
+
+        // 하드코딩된 페이지이므로 번역 테스트 코드 제거됨
+
+        // 무료로 시작하기 버튼 이벤트 처리
+        const getStartedBtn = document.getElementById('get-started-btn');
+        if (getStartedBtn) {
+          getStartedBtn.addEventListener('click', async () => {
+            try {
+              // 현재 언어 확인
+              const currentLang = await getActiveLanguage();
+
+              // Firebase 인증 상태 확인
+              const { onAuthStateChanged } = await import('../../js/firebase/firebase-init.js');
+              const { auth } = await import('../../js/firebase/firebase-init.js');
+
+              onAuthStateChanged(auth, (user) => {
+                if (user) {
+                  // 로그인된 사용자 - 나만의 단어장으로 이동
+                  window.location.href = 'my-word-list.html';
+                } else {
+                  // 로그아웃된 사용자 - 현재 언어의 회원가입 페이지로 이동
+                  window.location.href = 'signup.html';
+                }
+              });
+            } catch (error) {
+              console.error('인증 상태 확인 중 오류:', error);
+              // 오류 발생 시 현재 언어의 회원가입 페이지로 이동
+              window.location.href = 'signup.html';
+            }
+          });
+        }
+      } catch (error) {
+        console.error('언어 설정 적용 중 오류:', error);
+      }
+    });
+  </script>
+</body>
+
 </html>

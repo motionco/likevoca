@@ -1,108 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LikeVoca - Multilingual Learning Platform</title>
-    <meta
-      name="description"
-      content="Learn languages effectively with LikeVoca's systematic curriculum and intuitive learning system."
-    />
 
-    <!-- 기본 언어별 링크 -->
-    <link rel="alternate" hreflang="ko" href="/ko/" />
-    <link rel="alternate" hreflang="en" href="/en/" />
-    <link rel="alternate" hreflang="ja" href="/ja/" />
-    <link rel="alternate" hreflang="zh" href="/zh/" />
-    <link rel="alternate" hreflang="es" href="/es/" />
-    <link rel="alternate" hreflang="x-default" href="/en/" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LikeVoca - Multilingual Learning Platform</title>
 
-    <script>
-      // 언어 감지 및 리디렉션
-      function detectAndRedirect() {
-        // 사용자가 설정한 언어 확인
-        const userLanguage = localStorage.getItem("userLanguage");
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="152x152" href="/assets/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon.ico" />
 
-        if (userLanguage) {
-          // 사용자가 이미 언어를 설정한 경우
-          redirectToLanguage(userLanguage);
-          return;
-        }
+  <meta name="description"
+    content="Learn languages effectively with LikeVoca's systematic curriculum and intuitive learning system." />
 
-        // 브라우저 언어 감지
-        const browserLanguage = navigator.language || navigator.userLanguage;
-        let targetLanguage = "en"; // 기본값
+  <!-- 기본 언어별 링크 -->
+  <link rel="alternate" hreflang="ko" href="/ko/" />
+  <link rel="alternate" hreflang="en" href="/en/" />
+  <link rel="alternate" hreflang="ja" href="/ja/" />
+  <link rel="alternate" hreflang="zh" href="/zh/" />
+  <link rel="alternate" hreflang="es" href="/es/" />
+  <link rel="alternate" hreflang="x-default" href="/en/" />
 
-        if (browserLanguage.startsWith("ko")) {
-          targetLanguage = "ko";
-        } else if (browserLanguage.startsWith("ja")) {
-          targetLanguage = "ja";
-        } else if (browserLanguage.startsWith("zh")) {
-          targetLanguage = "zh";
-        } else if (browserLanguage.startsWith("es")) {
-          targetLanguage = "es";
-        }
+  <script>
+    // 언어 감지 및 리디렉션
+    function detectAndRedirect() {
+      // 사용자가 설정한 언어 확인
+      const userLanguage = localStorage.getItem("userLanguage");
 
-        // 언어 설정 저장
-        localStorage.setItem("userLanguage", targetLanguage);
-        redirectToLanguage(targetLanguage);
+      if (userLanguage) {
+        // 사용자가 이미 언어를 설정한 경우
+        redirectToLanguage(userLanguage);
+        return;
       }
 
-      function redirectToLanguage(language) {
-        const isDev =
-          window.location.hostname === "localhost" ||
-          window.location.hostname === "127.0.0.1" ||
-          window.location.port === "5595";
+      // 브라우저 언어 감지
+      const browserLanguage = navigator.language || navigator.userLanguage;
+      let targetLanguage = "en"; // 기본값
 
-        if (isDev) {
-          window.location.href = `/locales/${language}/index.html`;
-        } else {
-          window.location.href = `/${language}/`;
-        }
+      if (browserLanguage.startsWith("ko")) {
+        targetLanguage = "ko";
+      } else if (browserLanguage.startsWith("ja")) {
+        targetLanguage = "ja";
+      } else if (browserLanguage.startsWith("zh")) {
+        targetLanguage = "zh";
+      } else if (browserLanguage.startsWith("es")) {
+        targetLanguage = "es";
       }
 
-      // 페이지 로드 시 즉시 리디렉션
-      detectAndRedirect();
-    </script>
-  </head>
-  <body>
-    <div class="text-center mt-12 font-sans">
-      <h1 class="text-3xl font-bold mb-4">LikeVoca</h1>
-      <p class="mb-2">Redirecting to your language...</p>
-      <p class="mb-2">언어별 페이지로 이동 중...</p>
-      <p class="mb-2">言語別ページに移動中...</p>
-      <p class="mb-6">正在跳转到语言页面...</p>
+      // 언어 설정 저장
+      localStorage.setItem("userLanguage", targetLanguage);
+      redirectToLanguage(targetLanguage);
+    }
 
-      <div class="mt-8">
-        <p class="mb-4">
-          If not redirected automatically, please choose your language:
-        </p>
-        <a
-          href="/locales/ko/index.html"
-          class="inline-block mx-2 px-5 py-2 bg-[#4B63AC] text-white no-underline rounded"
-          >한국어</a
-        >
-        <a
-          href="/locales/en/index.html"
-          class="inline-block mx-2 px-5 py-2 bg-[#4B63AC] text-white no-underline rounded"
-          >English</a
-        >
-        <a
-          href="/locales/ja/index.html"
-          class="inline-block mx-2 px-5 py-2 bg-[#4B63AC] text-white no-underline rounded"
-          >日本語</a
-        >
-        <a
-          href="/locales/zh/index.html"
-          class="inline-block mx-2 px-5 py-2 bg-[#4B63AC] text-white no-underline rounded"
-          >中文</a
-        >
-        <a
-          href="/locales/es/index.html"
-          class="inline-block mx-2 px-5 py-2 bg-[#4B63AC] text-white no-underline rounded"
-          >Español</a
-        >
-      </div>
+    function redirectToLanguage(language) {
+      const isDev =
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1" ||
+        window.location.port === "5595";
+
+      if (isDev) {
+        window.location.href = `/locales/${language}/index.html`;
+      } else {
+        window.location.href = `/${language}/`;
+      }
+    }
+
+    // 페이지 로드 시 즉시 리디렉션
+    detectAndRedirect();
+  </script>
+</head>
+
+<body>
+  <div class="text-center mt-12 font-sans">
+    <h1 class="text-3xl font-bold mb-4">LikeVoca</h1>
+    <p class="mb-2">Redirecting to your language...</p>
+    <p class="mb-2">언어별 페이지로 이동 중...</p>
+    <p class="mb-2">言語別ページに移動中...</p>
+    <p class="mb-6">正在跳转到语言页面...</p>
+
+    <div class="mt-8">
+      <p class="mb-4">
+        If not redirected automatically, please choose your language:
+      </p>
+      <a href="/locales/ko/index.html"
+        class="inline-block mx-2 px-5 py-2 bg-[#4B63AC] text-white no-underline rounded">한국어</a>
+      <a href="/locales/en/index.html"
+        class="inline-block mx-2 px-5 py-2 bg-[#4B63AC] text-white no-underline rounded">English</a>
+      <a href="/locales/ja/index.html"
+        class="inline-block mx-2 px-5 py-2 bg-[#4B63AC] text-white no-underline rounded">日本語</a>
+      <a href="/locales/zh/index.html"
+        class="inline-block mx-2 px-5 py-2 bg-[#4B63AC] text-white no-underline rounded">中文</a>
+      <a href="/locales/es/index.html"
+        class="inline-block mx-2 px-5 py-2 bg-[#4B63AC] text-white no-underline rounded">Español</a>
     </div>
-  </body>
+  </div>
+</body>
+
 </html>

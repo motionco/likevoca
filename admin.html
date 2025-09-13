@@ -1,9 +1,18 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🏠 관리자 대시보드 - LikeVoca</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+    <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/assets/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon.ico" />
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -11,26 +20,32 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             transition: all 0.3s ease;
         }
+
         .admin-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         }
+
         .stat-card {
             background: white;
             border-left: 4px solid;
         }
+
         .loading-pulse {
             animation: pulse 2s infinite;
         }
+
         .admin-nav-item {
             transition: all 0.2s ease;
         }
+
         .admin-nav-item:hover {
-            background-color: rgba(255,255,255,0.1);
+            background-color: rgba(255, 255, 255, 0.1);
             transform: translateX(4px);
         }
     </style>
 </head>
+
 <body class="bg-gray-50 min-h-screen">
     <!-- Header -->
     <header class="bg-white shadow-sm border-b sticky top-0 z-50">
@@ -61,7 +76,8 @@
             <i class="fas fa-ban text-6xl text-red-500 mb-4"></i>
             <h2 class="text-2xl font-bold text-gray-900 mb-4">접근 권한이 없습니다</h2>
             <p class="text-gray-600 mb-6">관리자 권한이 필요한 페이지입니다.</p>
-            <button onclick="goToMain()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-200">
+            <button onclick="goToMain()"
+                class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-200">
                 메인으로 돌아가기
             </button>
         </div>
@@ -73,7 +89,8 @@
             <i class="fas fa-spinner fa-spin text-4xl text-indigo-600 mb-4"></i>
             <p class="text-gray-600 mb-4">관리자 권한을 확인하는 중...</p>
             <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
-                <div id="loadingProgress" class="bg-indigo-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                <div id="loadingProgress" class="bg-indigo-600 h-2 rounded-full transition-all duration-300"
+                    style="width: 0%"></div>
             </div>
             <p id="loadingStatus" class="text-sm text-gray-500">Firebase 연결 중...</p>
         </div>
@@ -157,7 +174,8 @@
             </div>
 
             <!-- 개념 관리 -->
-            <div class="admin-card rounded-xl p-6 text-white cursor-pointer" onclick="navigateTo('admin/concepts.html')">
+            <div class="admin-card rounded-xl p-6 text-white cursor-pointer"
+                onclick="navigateTo('admin/concepts.html')">
                 <div class="flex items-center justify-between mb-4">
                     <i class="fas fa-book-open text-3xl"></i>
                     <i class="fas fa-arrow-right text-xl"></i>
@@ -196,7 +214,8 @@
             </div>
 
             <!-- 보안 관리 -->
-            <div class="admin-card rounded-xl p-6 text-white cursor-pointer" onclick="navigateTo('admin/security.html')">
+            <div class="admin-card rounded-xl p-6 text-white cursor-pointer"
+                onclick="navigateTo('admin/security.html')">
                 <div class="flex items-center justify-between mb-4">
                     <i class="fas fa-shield-alt text-3xl"></i>
                     <i class="fas fa-arrow-right text-xl"></i>
@@ -240,22 +259,26 @@
                     <i class="fas fa-bolt text-yellow-600 mr-2"></i>빠른 작업
                 </h2>
                 <div class="grid grid-cols-2 gap-4">
-                    <button onclick="quickAction('backup')" class="admin-nav-item p-4 text-left border border-gray-200 rounded-lg hover:border-blue-300 transition duration-200">
+                    <button onclick="quickAction('backup')"
+                        class="admin-nav-item p-4 text-left border border-gray-200 rounded-lg hover:border-blue-300 transition duration-200">
                         <i class="fas fa-download text-blue-600 mb-2"></i>
                         <div class="font-medium text-gray-900">데이터 백업</div>
                         <div class="text-sm text-gray-600">즉시 백업 실행</div>
                     </button>
-                    <button onclick="quickAction('cleanup')" class="admin-nav-item p-4 text-left border border-gray-200 rounded-lg hover:border-green-300 transition duration-200">
+                    <button onclick="quickAction('cleanup')"
+                        class="admin-nav-item p-4 text-left border border-gray-200 rounded-lg hover:border-green-300 transition duration-200">
                         <i class="fas fa-broom text-green-600 mb-2"></i>
                         <div class="font-medium text-gray-900">DB 정리</div>
                         <div class="text-sm text-gray-600">임시 데이터 삭제</div>
                     </button>
-                    <button onclick="quickAction('broadcast')" class="admin-nav-item p-4 text-left border border-gray-200 rounded-lg hover:border-purple-300 transition duration-200">
+                    <button onclick="quickAction('broadcast')"
+                        class="admin-nav-item p-4 text-left border border-gray-200 rounded-lg hover:border-purple-300 transition duration-200">
                         <i class="fas fa-bullhorn text-purple-600 mb-2"></i>
                         <div class="font-medium text-gray-900">공지 발송</div>
                         <div class="text-sm text-gray-600">전체 알림 전송</div>
                     </button>
-                    <button onclick="quickAction('export')" class="admin-nav-item p-4 text-left border border-gray-200 rounded-lg hover:border-orange-300 transition duration-200">
+                    <button onclick="quickAction('export')"
+                        class="admin-nav-item p-4 text-left border border-gray-200 rounded-lg hover:border-orange-300 transition duration-200">
                         <i class="fas fa-file-export text-orange-600 mb-2"></i>
                         <div class="font-medium text-gray-900">데이터 내보내기</div>
                         <div class="text-sm text-gray-600">CSV/Excel 변환</div>
@@ -269,4 +292,5 @@
     <script type="module" src="js/firebase/firebase-init.js"></script>
     <script type="module" src="admin/js/admin-main.js"></script>
 </body>
+
 </html>
