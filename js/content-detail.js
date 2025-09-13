@@ -379,7 +379,6 @@ function renderContentDetail(version, contentData, language) {
             contentImageUrl: contentImage,
             finalImageUrl: finalImage 
         });
-        console.log('📤 공유 메타데이터 설정:', window.shareMetadata);
     }, 100);
 }
 
@@ -418,7 +417,6 @@ function updateMetaTags(version, contentData, language) {
         const match = version.content.match(imgRegex);
         if (match) {
             imageUrl = match[1];
-            console.log('📷 메타태그용 HTML에서 Firebase 이미지 추출:', imageUrl);
         }
     }
     
@@ -426,11 +424,6 @@ function updateMetaTags(version, contentData, language) {
         imageUrl = 'https://likevoca.com/assets/hero.jpeg';
     }
     
-    console.log('🏷️ 메타태그 업데이트:', {
-        title: title.substring(0, 50),
-        description: description.substring(0, 100),
-        hasHtmlTags: description.includes('<')
-    });
     
     // Title (다양한 플랫폼별 최적화)
     document.title = title;
@@ -480,7 +473,6 @@ function updateMetaTags(version, contentData, language) {
     // LinkedIn 특화 메타태그
     updateMetaTag('og:see_also', url);
     
-    console.log('🌐 소셜 미디어 최적화 메타태그 설정 완료');
     
     // Hreflang 업데이트
     const languages = ['ko', 'en', 'ja', 'zh', 'es'];
@@ -520,12 +512,10 @@ function updateMetaTag(property, content) {
         element = document.createElement('meta');
         element.setAttribute(attributeName, property);
         document.head.appendChild(element);
-        console.log(`📋 메타태그 생성: ${property}`);
     }
     
     // 내용 업데이트
     element.content = content;
-    console.log(`🏷️ 메타태그 업데이트: ${property} = ${content.substring(0, 50)}`);
 }
 
 // 구조화 데이터 업데이트

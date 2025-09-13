@@ -19,7 +19,6 @@ let currentContent = null;
 // URL에서 콘텐츠 ID와 언어 추출 (깔끔한 URL 구조)
 function parseURL() {
     const pathParts = window.location.pathname.split('/').filter(part => part);
-    console.log('🔍 URL 파싱:', { pathname: window.location.pathname, pathParts });
     
     let language = 'ko';
     let contentId = null;
@@ -51,7 +50,6 @@ function parseURL() {
         }
     }
     
-    console.log('✅ URL 파싱 결과:', { contentId, language });
     return { contentId, language };
 }
 
@@ -84,7 +82,6 @@ async function initializeCommunityDetail() {
 
 // 헤더/푸터 컴포넌트 로드 (개선된 버전)
 async function loadComponents() {
-    console.log('🔄 컴포넌트 로드 시작...');
     
     // 우선 백업 네비게이션을 먼저 표시
     addFallbackNavigation();
@@ -102,13 +99,11 @@ async function loadComponents() {
             if (headerResponse.ok) {
                 const headerHTML = await headerResponse.text();
                 document.getElementById('header-placeholder').innerHTML = headerHTML;
-                console.log('✅ 헤더 로드 성공');
                 
                 // 헤더 로드 후 네비게이션 스크립트 실행
                 setTimeout(async () => {
                     if (typeof window.loadNavbar === 'function') {
                         await window.loadNavbar();
-                        console.log('✅ 네비게이션 바 로드 성공');
                     }
                 }, 100);
             } else {
@@ -124,13 +119,11 @@ async function loadComponents() {
             if (footerResponse.ok) {
                 const footerHTML = await footerResponse.text();
                 document.getElementById('footer-placeholder').innerHTML = footerHTML;
-                console.log('✅ 푸터 로드 성공');
                 
                 // 푸터 로드 후 푸터 스크립트 실행
                 setTimeout(async () => {
                     if (typeof window.loadFooter === 'function') {
                         await window.loadFooter();
-                        console.log('✅ 푸터 로드 성공');
                     }
                 }, 100);
             }
@@ -162,7 +155,6 @@ function loadScript(src) {
 
 // 백업 네비게이션 추가 (언어별 다국어 지원)
 function addFallbackNavigation() {
-    console.log('🔧 백업 네비게이션 추가 중...');
     const headerPlaceholder = document.getElementById('header-placeholder');
     
     // 언어별 네비게이션 텍스트
@@ -241,7 +233,6 @@ function addFallbackNavigation() {
             }
         };
         
-        console.log('✅ 백업 네비게이션 추가 완료');
     }
 }
 
@@ -335,8 +326,6 @@ function renderContentDetail(version, contentData, language) {
     // 공유 기능 활성화
     window.contentLoaded = true;
     
-    console.log('✅ 커뮤니티 콘텐츠 렌더링 완료, 공유 기능 활성화');
-    console.log('📤 공유 메타데이터 설정:', window.shareMetadata);
 }
 
 // 메타 태그 동적 업데이트

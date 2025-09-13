@@ -336,11 +336,6 @@ window.shareCurrentPage = function(platform) {
     }
   }
   
-  console.log('📋 페이지 기본 메타데이터:', { 
-    title: currentTitle, 
-    description: currentDescription.substring(0, 100),
-    image: currentImage 
-  });
   
   if (isDetailPage) {
     console.log('🔍 콘텐츠/커뮤니티 상세 페이지 공유 시도');
@@ -356,15 +351,9 @@ window.shareCurrentPage = function(platform) {
     
     // 전역 공유 메타데이터가 있으면 우선 사용 (가장 신뢰할 수 있는 데이터)
     if (window.shareMetadata) {
-      console.log('✅ 전역 공유 메타데이터 사용');
       pageTitle = window.shareMetadata.title + ' - LikeVoca';
       pageDescription = stripHtml(window.shareMetadata.description);
       pageImage = window.shareMetadata.image || currentImage; // Firebase 이미지 이미 currentImage에 반영됨
-      console.log('🎯 메타데이터 기반 공유:', { 
-        title: pageTitle.substring(0, 50), 
-        description: pageDescription.substring(0, 100),
-        image: pageImage 
-      });
     } else if (!window.contentLoaded) {
       // 콘텐츠가 아직 로드되지 않았다면 잠시 대기 (최대 5초)
       const waitCount = window.shareWaitCount || 0;
@@ -418,7 +407,6 @@ window.shareCurrentPage = function(platform) {
     
     // 전역 공유 메타데이터가 있으면 사용, 없으면 페이지 메타태그 사용
     if (window.shareMetadata) {
-      console.log('✅ 커뮤니티 전역 공유 메타데이터 사용');
       pageTitle = window.shareMetadata.title + ' - LikeVoca';
       pageDescription = stripHtml(window.shareMetadata.description);
       pageImage = window.shareMetadata.image || currentImage;
@@ -429,11 +417,6 @@ window.shareCurrentPage = function(platform) {
       pageImage = currentImage;
     }
     
-    console.log('👥 커뮤니티 상세페이지 메타데이터:', { 
-      title: pageTitle.substring(0, 50), 
-      description: pageDescription.substring(0, 100),
-      image: pageImage 
-    });
   } else {
     // 일반 페이지 (홈페이지, 커뮤니티 목록 등)
     console.log('🏠 일반 페이지 공유 시도');
@@ -443,11 +426,6 @@ window.shareCurrentPage = function(platform) {
     pageDescription = stripHtml(currentDescription) || 'LikeVoca - AI 기반 맞춤형 언어학습 플랫폼';
     pageImage = currentImage;
     
-    console.log('📄 일반 페이지 메타데이터:', { 
-      title: pageTitle, 
-      description: pageDescription.substring(0, 100),
-      image: pageImage 
-    });
   }
   
   // 언어별 기본값 설정
@@ -646,7 +624,6 @@ window.shareToKakao = async function(title, description, url) {
     let imageUrl;
     if (window.shareMetadata?.image) {
       imageUrl = window.shareMetadata.image;
-      console.log('✅ 메타데이터에서 이미지 사용');
     } else {
       const ogImage = document.querySelector('meta[property="og:image"]')?.content;
       imageUrl = ogImage || 'https://likevoca.com/assets/hero.jpeg';
@@ -770,7 +747,6 @@ function fallbackCopyURL(url) {
 
 // 소셜 미디어 메타태그 실시간 업데이트 함수
 function updateSocialMetaTags(title, description, url, image) {
-  console.log('🔄 소셜 미디어 메타태그 실시간 업데이트');
   
   // 메타태그를 업데이트하거나 생성하는 헬퍼 함수
   const updateOrCreateMeta = (property, content) => {
@@ -815,12 +791,10 @@ function updateSocialMetaTags(title, description, url, image) {
   updateOrCreateMeta('og:image:height', '630');
   updateOrCreateMeta('og:image:alt', title);
   
-  console.log('✅ 메타태그 업데이트 완료:', { title: title.substring(0, 30), description: description.substring(0, 50), url, image });
 }
 
 // 소셜 미디어 메타태그 검증 함수
 function validateSocialMetaTags(platform) {
-  console.log(`🔍 ${platform} 메타태그 검증`);
   
   const metaTags = {
     'og:title': document.querySelector('meta[property="og:title"]')?.content,
@@ -843,7 +817,6 @@ function validateSocialMetaTags(platform) {
     metaTags['og:image:height'] = document.querySelector('meta[property="og:image:height"]')?.content;
   }
   
-  console.table(metaTags);
   
   // 누락된 중요 태그 확인
   const missingTags = [];
@@ -858,7 +831,6 @@ function validateSocialMetaTags(platform) {
   if (missingTags.length > 0) {
     console.warn(`⚠️ ${platform} 공유에 필요한 메타태그 누락:`, missingTags);
   } else {
-    console.log(`✅ ${platform} 메타태그 검증 통과`);
   }
   
   return missingTags.length === 0;

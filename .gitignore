@@ -8,5 +8,11 @@ desktop.ini
 *.temp
 .env
 
-# Data folder - exclude from git
-# data/
+# Development and local management files
+*.py
+py/
+scripts/
+data/
+docs/
+backup/
+result/
