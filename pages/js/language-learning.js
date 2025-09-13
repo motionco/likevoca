@@ -14,19 +14,25 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 // 기타 유틸리티는 필요시 동적으로 로드
 
-// Firebase 설정 및 초기화
-const firebaseConfig = {
-  apiKey: "AIzaSyC7Zb2gZpG8yRGKVx1l8xIxKJ9N0k2o5A4",
-  authDomain: "likevoca-f9906.firebaseapp.com",
-  projectId: "likevoca-f9906",
-  storageBucket: "likevoca-f9906.appspot.com",
-  messagingSenderId: "644834612157",
-  appId: "1:644834612157:web:8b5c5b5f5e4c4d8a5f5e5f",
-};
+// Firebase 설정을 동적으로 로드
+let app, db, auth;
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+async function initializeFirebase() {
+  try {
+    const response = await fetch('/api/config');
+    const configData = await response.json();
+
+    if (configData.firebase) {
+      app = initializeApp(configData.firebase);
+      db = getFirestore(app);
+      auth = getAuth(app);
+    } else {
+      console.error('Firebase 설정을 가져올 수 없습니다.');
+    }
+  } catch (error) {
+    console.error('Firebase 초기화 실패:', error);
+  }
+}
 
 // 현재 사용자
 let currentUser = null;
@@ -1944,3 +1950,6 @@ function openBulkImportModal(tabName = "concepts") {
 
 // 전역 함수로 설정
 window.openBulkImportModal = openBulkImportModal;
+
+// Firebase 초기화 실행
+initializeFirebase();

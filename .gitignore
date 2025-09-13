@@ -6,7 +6,18 @@ desktop.ini
 .idea/
 *.tmp
 *.temp
+
+# Environment and sensitive files
 .env
+.env.*
+*.env
+config/
+js/.env
+
+# API keys and secrets
+*secret*
+*key*
+*token*
 
 # Development and local management files
 *.py
