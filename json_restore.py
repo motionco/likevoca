@@ -116,7 +116,7 @@ def restore_from_json_log(transaction_id=None):
         print(f"💡 복원 위치: {data_dir}")
         
         # 트랜잭션 로그 동기화
-        from restore import sync_transaction_log_with_current_data
+        from py.restore import sync_transaction_log_with_current_data
         sync_transaction_log_with_current_data()
         
         return True

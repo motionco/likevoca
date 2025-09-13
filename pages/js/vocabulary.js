@@ -722,7 +722,6 @@ async function incrementViewCount(conceptId) {
     
     // 이미 이번 세션에서 조회한 개념이면 카운트하지 않음
     if (viewedConcepts.includes(conceptId)) {
-      console.log(`이미 조회한 개념입니다: ${conceptId}`);
       return;
     }
     
@@ -752,7 +751,6 @@ async function incrementViewCount(conceptId) {
     viewedConcepts.push(conceptId);
     sessionStorage.setItem(sessionKey, JSON.stringify(viewedConcepts));
     
-    console.log(`조회수 증가: ${conceptId}`);
     
   } catch (error) {
     console.error('조회수 업데이트 실패:', error);
@@ -1371,7 +1369,6 @@ async function trackSiteVisit() {
     // 세션 스토리지에 추적 완료 표시
     sessionStorage.setItem(sessionKey, 'true');
     
-    console.log(`사이트 방문 통계 추적 완료: ${today}`);
     
   } catch (error) {
     console.error('사이트 방문 통계 추적 실패:', error);
@@ -1411,7 +1408,6 @@ async function trackConceptView(sourceLanguage, targetLanguage) {
       });
     }
     
-    console.log(`개념 조회 통계 추적: ${languagePair}`);
     
   } catch (error) {
     console.error('개념 조회 통계 추적 실패:', error);
@@ -1454,7 +1450,6 @@ async function trackPageView(pagePath) {
     }
     
     sessionStorage.setItem(sessionKey, 'true');
-    console.log(`페이지 조회 통계 추적: ${pagePath}`);
     
   } catch (error) {
     console.error('페이지 조회 통계 추적 실패:', error);
@@ -1831,11 +1826,9 @@ window.openConceptViewModal = async function (conceptId) {
       return;
     }
 
-    console.log("모달 표시 시작...");
     // 새로운 모달 시스템 사용
     showConceptViewModal(conceptData, sourceLanguage, targetLanguage);
 
-    console.log("모달 열기 완료");
   } catch (error) {
     console.error("개념 상세 보기 모달 열기 중 오류 발생:", error);
     console.error("Error stack:", error.stack);

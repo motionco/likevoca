@@ -612,11 +612,9 @@ async function loadTranslations() {
   try {
     // 이미 번역이 로드되어 있으면 다시 로드하지 않음 (무한루프 방지)
     if (translations && Object.keys(translations).length > 0) {
-      console.log("📋 번역 파일이 이미 로드되어 있음 - 재로드 건너뜀");
       return;
     }
 
-    console.log("📋 번역 파일 로드 시작");
 
     // 현재 경로에 따라 상대 경로 조정
     const currentPath = window.location.pathname;
@@ -710,7 +708,6 @@ async function loadTranslations() {
       },
     };
     window.translations = translations;
-    console.log("🆘 fallback 번역 데이터 사용");
   }
 }
 
@@ -1118,7 +1115,6 @@ async function applyLanguage() {
       }
     });
 
-    console.log(`언어 적용 완료: ${langCode}`);
   } catch (error) {
     console.error("언어 적용 중 오류:", error);
   }
@@ -1528,11 +1524,9 @@ function getI18nText(key, lang = null) {
 function applyI18nToPage(lang = null) {
   try {
     const currentLang = lang || getCurrentUILanguage();
-    console.log("🌐 페이지 번역 적용 시작, 언어:", currentLang);
 
     // data-i18n 속성을 가진 모든 요소 번역
     const elements = document.querySelectorAll("[data-i18n]");
-    console.log("📝 번역 요소 개수:", elements.length);
 
     elements.forEach((element, index) => {
       const key = element.getAttribute("data-i18n");
@@ -1541,9 +1535,6 @@ function applyI18nToPage(lang = null) {
       if (translation && translation !== key) {
         const previousText = element.textContent.trim();
         element.textContent = translation;
-        console.log(
-          `✅ 번역 적용 [${index}]: ${key} -> "${translation}" (이전: "${previousText}")`
-        );
       }
     });
 
@@ -1660,11 +1651,9 @@ async function simpleLanguageSync(language) {
 // 강제 번역 적용 함수
 async function forceApplyTranslations(language) {
   try {
-    console.log("🔧 강제 번역 적용 시작, 언어:", language);
 
     // 모든 data-i18n 속성을 가진 요소 강제 번역
     const elements = document.querySelectorAll("[data-i18n]");
-    console.log(`📝 강제 번역 대상 요소: ${elements.length}개`);
 
     elements.forEach((element, index) => {
       const key = element.getAttribute("data-i18n");

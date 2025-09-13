@@ -78,7 +78,6 @@ function updateDynamicTranslations() {
 function setupLanguageChangeListener() {
   // 언어 변경 이벤트 리스너
   window.addEventListener("languageChanged", async (event) => {
-    console.log("🔄 나만의 단어장: languageChanged 이벤트 수신:", event.detail);
     userLanguage = event.detail.language;
 
     // 환경 언어 변경 시 언어 필터 리셋
