@@ -52,6 +52,10 @@ let userLanguage = "ko";
 let sourceLanguage = "korean"; // 학습 소스 언어
 let targetLanguage = "korean"; // 학습 타겟 언어
 
+// 발음 재생 관련 변수
+let isPlayingPronunciation = false;
+let pronunciationTimeout = null;
+
 // 북마크 지연 해제 시스템
 let pendingUnbookmarks = new Set(); // 해제 대기 중인 북마크 ID들
 let bookmarkChangesPending = false; // 변경사항이 있는지 추적
@@ -606,13 +610,24 @@ function createConceptCard(concept) {
             <h3 class="text-lg font-semibold text-gray-800 mb-1">
               ${displayWord}
             </h3>
-            <p class="text-sm text-gray-500">${
-              targetExpression.pronunciation ||
-              targetExpression.romanization ||
-              sourceExpression.pronunciation ||
-              sourceExpression.romanization ||
-              ""
-            }</p>
+            <div class="flex items-center space-x-2">
+              <p class="text-sm text-gray-500">${
+                targetExpression.pronunciation ||
+                targetExpression.romanization ||
+                sourceExpression.pronunciation ||
+                sourceExpression.romanization ||
+                ""
+              }</p>
+              ${(targetExpression.pronunciation || sourceExpression.pronunciation) ? `
+                <button
+                  class="pronunciation-btn p-1 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                  onclick="event.stopPropagation(); playPronunciation('${displayWord}', '${hasTargetWord ? targetLanguage : sourceLanguage}')"
+                  title="발음 듣기"
+                >
+                  <i class="fas fa-volume-up text-blue-500 text-sm"></i>
+                </button>
+              ` : ''}
+            </div>
           </div>
         </div>
         <div class="flex items-center space-x-2">
@@ -985,10 +1000,19 @@ function showConceptDetailModal(concept) {
                   ${
                     targetExpression.pronunciation ||
                     targetExpression.romanization
-                      ? `<p class="text-blue-100 mt-1">[${
-                          targetExpression.pronunciation ||
-                          targetExpression.romanization
-                        }]</p>`
+                      ? `<div class="flex items-center space-x-2 mt-1">
+                          <p class="text-blue-100">[${
+                            targetExpression.pronunciation ||
+                            targetExpression.romanization
+                          }]</p>
+                          <button
+                            id="modal-pronunciation-btn"
+                            class="pronunciation-btn p-1 rounded-full hover:bg-white hover:bg-opacity-20 transition-colors duration-200"
+                            title="발음 듣기"
+                          >
+                            <i class="fas fa-volume-up text-blue-100 text-sm"></i>
+                          </button>
+                        </div>`
                       : ""
                   }
                 </div>
@@ -1325,6 +1349,19 @@ function showConceptDetailModal(concept) {
     modal.conceptData = concept;
   }
 
+  // 초기 발음 버튼 설정
+  const initialPronunciationBtn = modal?.querySelector("#modal-pronunciation-btn");
+  if (initialPronunciationBtn && targetExpression.word) {
+    initialPronunciationBtn.onclick = (event) => {
+      event.stopPropagation();
+      if (typeof window.playPronunciation === 'function') {
+        window.playPronunciation(targetExpression.word, targetLanguage);
+      } else {
+        console.warn('playPronunciation 함수를 찾을 수 없습니다.');
+      }
+    };
+  }
+
   // 초기 언어탭의 예문 표시
   if (sortedExpressions.length > 0) {
     updateExamplesForLanguage(sortedExpressions[0].language);
@@ -1528,13 +1565,31 @@ function updateHeaderForLanguage(selectedLanguage) {
 
   // 발음 업데이트 (선택된 언어탭에 맞게)
   const pronunciationElement = modal.querySelector("p.text-blue-100");
+  const pronunciationBtn = modal.querySelector("#modal-pronunciation-btn");
+
   if (pronunciationElement) {
     const pronunciation = expression.pronunciation || expression.romanization;
     if (pronunciation) {
       pronunciationElement.textContent = `[${pronunciation}]`;
       pronunciationElement.style.display = "block";
+
+      // 발음 버튼 업데이트
+      if (pronunciationBtn && expression.word) {
+        pronunciationBtn.style.display = "block";
+        pronunciationBtn.onclick = (event) => {
+          event.stopPropagation();
+          if (typeof window.playPronunciation === 'function') {
+            window.playPronunciation(expression.word, selectedLanguage);
+          } else {
+            console.warn('playPronunciation 함수를 찾을 수 없습니다.');
+          }
+        };
+      }
     } else {
       pronunciationElement.style.display = "none";
+      if (pronunciationBtn) {
+        pronunciationBtn.style.display = "none";
+      }
     }
   }
 }
@@ -2123,5 +2178,78 @@ function showMessage(message, type = "info") {
   }, 4000);
 }
 
+// 발음 재생 함수
+function playPronunciation(pronunciationText, language) {
+  try {
+    // Web Speech API 지원 확인
+    if (!('speechSynthesis' in window)) {
+      console.warn('브라우저에서 음성 합성을 지원하지 않습니다.');
+      return;
+    }
+
+    // 이미 재생 중이면 중복 실행 방지
+    if (isPlayingPronunciation) {
+      console.log('발음이 이미 재생 중입니다. 요청이 무시됩니다.');
+      return;
+    }
+
+    // 현재 재생 중인 음성 중지
+    window.speechSynthesis.cancel();
+
+    // 이전 타임아웃 클리어
+    if (pronunciationTimeout) {
+      clearTimeout(pronunciationTimeout);
+    }
+
+    // 재생 상태를 true로 설정
+    isPlayingPronunciation = true;
+
+    // cancel() 후 잠시 대기하여 완전히 정리되도록 함
+    pronunciationTimeout = setTimeout(() => {
+      // SpeechSynthesisUtterance 객체 생성
+      const utterance = new SpeechSynthesisUtterance(pronunciationText);
+
+      // 언어별 설정
+      const languageSettings = {
+        korean: { lang: 'ko-KR', rate: 0.8, pitch: 1.0 },
+        english: { lang: 'en-US', rate: 0.9, pitch: 1.0 },
+        japanese: { lang: 'ja-JP', rate: 0.8, pitch: 1.0 },
+        chinese: { lang: 'zh-CN', rate: 0.8, pitch: 1.0 },
+        spanish: { lang: 'es-ES', rate: 0.9, pitch: 1.0 }
+      };
+
+      const settings = languageSettings[language] || languageSettings.english;
+      utterance.lang = settings.lang;
+      utterance.rate = settings.rate;
+      utterance.pitch = settings.pitch;
+      utterance.volume = 1.0;
+
+      // 오류 처리
+      utterance.onerror = function(event) {
+        console.error('음성 합성 오류:', event.error);
+        isPlayingPronunciation = false; // 오류 시 상태 초기화
+      };
+
+      utterance.onstart = function() {
+        console.log('발음 재생 시작:', pronunciationText);
+      };
+
+      utterance.onend = function() {
+        console.log('발음 재생 완료:', pronunciationText);
+        isPlayingPronunciation = false; // 재생 완료 시 상태 초기화
+      };
+
+      // 음성 재생
+      window.speechSynthesis.speak(utterance);
+
+    }, 100); // 100ms 대기
+
+  } catch (error) {
+    console.error('발음 재생 중 오류 발생:', error);
+    isPlayingPronunciation = false; // 예외 발생 시 상태 초기화
+  }
+}
+
 // 전역 함수로 노출
 window.toggleBookmark = toggleBookmark;
+window.playPronunciation = playPronunciation;

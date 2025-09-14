@@ -193,9 +193,26 @@ export async function showConceptViewModal(
   const pronunciationElement = document.getElementById(
     "concept-view-pronunciation"
   );
+  const pronunciationBtn = document.getElementById("concept-view-pronunciation-btn");
+
   if (pronunciationElement) {
     pronunciationElement.textContent = primaryExpr?.pronunciation || "";
     console.log("🔊 발음 설정:", primaryExpr?.pronunciation || "");
+
+    // 발음이 있으면 발음 버튼 표시하고 이벤트 연결
+    if (primaryExpr?.pronunciation && primaryExpr?.word && pronunciationBtn) {
+      pronunciationBtn.classList.remove("hidden");
+      pronunciationBtn.onclick = (event) => {
+        event.stopPropagation();
+        if (typeof window.playPronunciation === 'function') {
+          window.playPronunciation(primaryExpr.word, currentLanguageCode);
+        } else {
+          console.warn('playPronunciation 함수를 찾을 수 없습니다.');
+        }
+      };
+    } else if (pronunciationBtn) {
+      pronunciationBtn.classList.add("hidden");
+    }
   } else {
     console.warn("concept-view-pronunciation 요소를 찾을 수 없습니다.");
   }
@@ -691,8 +708,25 @@ function updateModalHeader(lang, concept) {
     const pronunciationElement = document.getElementById(
       "concept-view-pronunciation"
     );
+    const pronunciationBtn = document.getElementById("concept-view-pronunciation-btn");
+
     if (pronunciationElement) {
       pronunciationElement.textContent = expression.pronunciation || "";
+
+      // 발음 버튼 업데이트
+      if (expression.pronunciation && expression.word && pronunciationBtn) {
+        pronunciationBtn.classList.remove("hidden");
+        pronunciationBtn.onclick = (event) => {
+          event.stopPropagation();
+          if (typeof window.playPronunciation === 'function') {
+            window.playPronunciation(expression.word, lang);
+          } else {
+            console.warn('playPronunciation 함수를 찾을 수 없습니다.');
+          }
+        };
+      } else if (pronunciationBtn) {
+        pronunciationBtn.classList.add("hidden");
+      }
     }
   }
 
