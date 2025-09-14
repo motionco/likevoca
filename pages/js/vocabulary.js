@@ -392,41 +392,15 @@ function createConceptCard(concept) {
         </div>
         <div class="flex items-center space-x-2">
           ${currentUser ? `
-          <button 
-            class="bookmark-btn p-2 rounded-full hover:bg-gray-100 transition-colors duration-200" 
+          <button
+            class="bookmark-btn p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
             onclick="event.stopPropagation(); toggleBookmark('${conceptId}')"
             data-concept-id="${conceptId}"
             title="북마크"
           >
             <i class="fas fa-bookmark text-gray-400"></i>
           </button>
-          <button 
-            class="like-btn p-2 rounded-full hover:bg-gray-100 transition-colors duration-200" 
-            onclick="event.stopPropagation(); toggleLike('${conceptId}')"
-            data-concept-id="${conceptId}"
-            title="좋아요"
-          >
-            <i class="fas fa-heart text-gray-400"></i>
-            <span class="like-count text-xs ml-1">0</span>
-          </button>
-          <div class="view-count-display p-2 rounded-full hover:bg-gray-100 transition-colors duration-200 cursor-default" title="조회수">
-            <i class="fas fa-eye text-gray-500"></i>
-            <span class="view-count text-xs ml-1">0</span>
-          </div>
-          ` : `
-          <button 
-            class="like-display-btn p-2 rounded-full hover:bg-gray-100 transition-colors duration-200" 
-            onclick="event.stopPropagation(); showLoginPrompt()"
-            title="로그인하여 좋아요하기"
-          >
-            <i class="fas fa-heart text-gray-400"></i>
-            <span class="like-count text-xs ml-1">0</span>
-          </button>
-          <div class="view-count-display p-2 rounded-full hover:bg-gray-100 transition-colors duration-200 cursor-default" title="조회수">
-            <i class="fas fa-eye text-gray-500"></i>
-            <span class="view-count text-xs ml-1">0</span>
-          </div>
-          `}
+          ` : ''}
         <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
           ${getTranslatedDomainCategory(
             conceptInfo.domain,
@@ -457,17 +431,40 @@ function createConceptCard(concept) {
           : ""
       }
       
-      <div class="flex justify-between text-xs text-gray-500 mt-3">
-        <span class="flex items-center">
+      <div class="flex justify-between items-center mt-3">
+        <span class="flex items-center text-xs text-gray-500">
           <i class="fas fa-language mr-1"></i> ${sourceLanguage} → ${targetLanguage}
         </span>
-        <span class="flex items-center">
-          <i class="fas fa-clock mr-1"></i> ${formatDate(
-            concept.metadata?.created_at ||
-              concept.created_at ||
-              concept.timestamp
-          )}
-        </span>
+        <div class="flex items-center space-x-2">
+          ${currentUser ? `
+          <button
+            class="like-btn p-1 rounded-full hover:bg-gray-100 transition-colors duration-200"
+            onclick="event.stopPropagation(); toggleLike('${conceptId}')"
+            data-concept-id="${conceptId}"
+            title="좋아요"
+          >
+            <i class="fas fa-heart text-gray-400 text-sm"></i>
+            <span class="like-count text-xs ml-1">0</span>
+          </button>
+          <div class="view-count-display p-1 rounded-full hover:bg-gray-100 transition-colors duration-200 cursor-default" title="조회수">
+            <i class="fas fa-eye text-gray-500 text-sm"></i>
+            <span class="view-count text-xs ml-1">0</span>
+          </div>
+          ` : `
+          <button
+            class="like-display-btn p-1 rounded-full hover:bg-gray-100 transition-colors duration-200"
+            onclick="event.stopPropagation(); showLoginPrompt()"
+            title="로그인하여 좋아요하기"
+          >
+            <i class="fas fa-heart text-gray-400 text-sm"></i>
+            <span class="like-count text-xs ml-1">0</span>
+          </button>
+          <div class="view-count-display p-1 rounded-full hover:bg-gray-100 transition-colors duration-200 cursor-default" title="조회수">
+            <i class="fas fa-eye text-gray-500 text-sm"></i>
+            <span class="view-count text-xs ml-1">0</span>
+          </div>
+          `}
+        </div>
       </div>
     </div>
   `;
