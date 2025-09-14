@@ -77,10 +77,10 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    // 개념 통계 컬렉션 - 인증된 사용자 읽기, 관리자 쓰기
+    // 개념 통계 컬렉션 - 조회수는 모든 사용자가 읽기/업데이트 가능
     match /concept_stats/{conceptStatId} {
-      allow read: if isAuthenticated();
-      allow create, update: if isAuthenticated();
+      allow read: if true; // 조회수는 공개 정보
+      allow create, update: if true; // 조회수 업데이트는 모든 사용자 허용
       allow delete: if isAdmin();
     }
 

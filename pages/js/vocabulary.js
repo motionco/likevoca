@@ -30,6 +30,17 @@ import {
   getActiveLanguage,
   updateMetadata,
 } from "../../utils/language-utils.js";
+
+// Chrome 확장 프로그램 충돌 방지를 위한 전역 에러 처리
+window.addEventListener('unhandledrejection', event => {
+  // Chrome 확장 프로그램 관련 에러는 무시
+  if (event.reason && event.reason.message &&
+      event.reason.message.includes('message port closed')) {
+    console.warn('Chrome 확장 프로그램 충돌 감지 - 무시함:', event.reason.message);
+    event.preventDefault(); // 에러를 콘솔에 출력하지 않도록 방지
+    return;
+  }
+});
 // 필터 공유 모듈 import
 import {
   VocabularyFilterBuilder,
@@ -370,7 +381,7 @@ function createConceptCard(concept) {
             ${targetExpression.pronunciation ? `
               <button
                 class="pronunciation-btn p-1 rounded-full hover:bg-gray-100 transition-colors duration-200"
-                onclick="event.stopPropagation(); playPronunciation('${targetExpression.pronunciation}', '${targetLanguage}')"
+                onclick="event.stopPropagation(); playPronunciation('${targetExpression.word}', '${targetLanguage}')"
                 title="발음 듣기"
               >
                 <i class="fas fa-volume-up text-blue-500 text-sm"></i>
@@ -764,7 +775,14 @@ async function incrementViewCount(conceptId) {
     
     
   } catch (error) {
-    console.error('조회수 업데이트 실패:', error);
+    // Firebase 권한 에러인 경우 더 자세한 정보 제공
+    if (error.code === 'permission-denied') {
+      console.warn('조회수 업데이트 권한 없음 - Firestore 규칙을 확인하세요:', error);
+    } else if (error.code === 'unavailable') {
+      console.warn('Firebase 서비스 일시 불가 - 네트워크를 확인하세요:', error);
+    } else {
+      console.error('조회수 업데이트 실패:', error);
+    }
     // 조회수 업데이트 실패해도 모달은 정상 동작하도록
   }
 }

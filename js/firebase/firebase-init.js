@@ -6,6 +6,9 @@ import {
 import {
   getFirestore,
   serverTimestamp,
+  connectFirestoreEmulator,
+  enableNetwork,
+  disableNetwork,
 } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 import {
   getStorage
@@ -43,6 +46,17 @@ let app = initializeApp(defaultConfig);
 let auth = getAuth(app);
 let db = getFirestore(app);
 let storage = getStorage(app);
+
+// Firestore 연결 안정성을 위한 네트워크 상태 모니터링
+window.addEventListener('online', () => {
+  console.log('네트워크 연결 복구됨');
+  enableNetwork(db).catch(err => console.warn('네트워크 활성화 실패:', err));
+});
+
+window.addEventListener('offline', () => {
+  console.log('네트워크 연결 끊어짐');
+  disableNetwork(db).catch(err => console.warn('네트워크 비활성화 실패:', err));
+});
 
 // Firebase 초기화 함수
 async function initializeFirebase() {
@@ -83,6 +97,17 @@ async function initializeFirebase() {
       auth = getAuth(app);
       db = getFirestore(app);
       storage = getStorage(app);
+
+      // 새로운 인스턴스에 네트워크 모니터링 재설정
+      window.addEventListener('online', () => {
+        console.log('네트워크 연결 복구됨 (새 인스턴스)');
+        enableNetwork(db).catch(err => console.warn('네트워크 활성화 실패:', err));
+      });
+
+      window.addEventListener('offline', () => {
+        console.log('네트워크 연결 끊어짐 (새 인스턴스)');
+        disableNetwork(db).catch(err => console.warn('네트워크 비활성화 실패:', err));
+      });
     }
 
     console.log("Firebase가 성공적으로 초기화되었습니다.");
