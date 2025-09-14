@@ -361,11 +361,22 @@ function createConceptCard(concept) {
             <h3 class="text-lg font-semibold text-gray-800 mb-1">
               ${targetExpression.word || "N/A"}
             </h3>
-          <p class="text-sm text-gray-500">${
-            targetExpression.pronunciation ||
-            targetExpression.romanization ||
-            ""
-          }</p>
+          <div class="flex items-center space-x-2">
+            <p class="text-sm text-gray-500">${
+              targetExpression.pronunciation ||
+              targetExpression.romanization ||
+              ""
+            }</p>
+            ${targetExpression.pronunciation ? `
+              <button
+                class="pronunciation-btn p-1 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                onclick="event.stopPropagation(); playPronunciation('${targetExpression.pronunciation}', '${targetLanguage}')"
+                title="발음 듣기"
+              >
+                <i class="fas fa-volume-up text-blue-500 text-sm"></i>
+              </button>
+            ` : ''}
+          </div>
           </div>
         </div>
         <div class="flex items-center space-x-2">
@@ -2058,6 +2069,85 @@ function showError(message, details = "") {
     alert(errorMessage);
   }
 }
+
+// 발음 재생 함수
+// 발음 재생 상태 추적 변수
+let isPlayingPronunciation = false;
+let pronunciationTimeout = null;
+
+function playPronunciation(pronunciationText, language) {
+  try {
+    // Web Speech API 지원 확인
+    if (!('speechSynthesis' in window)) {
+      console.warn('브라우저에서 음성 합성을 지원하지 않습니다.');
+      return;
+    }
+
+    // 이미 재생 중이면 중복 실행 방지
+    if (isPlayingPronunciation) {
+      console.log('발음이 이미 재생 중입니다. 요청이 무시됩니다.');
+      return;
+    }
+
+    // 현재 재생 중인 음성 중지
+    window.speechSynthesis.cancel();
+    
+    // 이전 타임아웃 클리어
+    if (pronunciationTimeout) {
+      clearTimeout(pronunciationTimeout);
+    }
+
+    // 재생 상태를 true로 설정
+    isPlayingPronunciation = true;
+
+    // cancel() 후 잠시 대기하여 완전히 정리되도록 함
+    pronunciationTimeout = setTimeout(() => {
+      // SpeechSynthesisUtterance 객체 생성
+      const utterance = new SpeechSynthesisUtterance(pronunciationText);
+
+      // 언어별 설정
+      const languageSettings = {
+        korean: { lang: 'ko-KR', rate: 0.8, pitch: 1.0 },
+        english: { lang: 'en-US', rate: 0.9, pitch: 1.0 },
+        japanese: { lang: 'ja-JP', rate: 0.8, pitch: 1.0 },
+        chinese: { lang: 'zh-CN', rate: 0.8, pitch: 1.0 },
+        spanish: { lang: 'es-ES', rate: 0.9, pitch: 1.0 }
+      };
+
+      const settings = languageSettings[language] || languageSettings.english;
+      utterance.lang = settings.lang;
+      utterance.rate = settings.rate;
+      utterance.pitch = settings.pitch;
+      utterance.volume = 1.0;
+
+      // 오류 처리
+      utterance.onerror = function(event) {
+        console.error('음성 합성 오류:', event.error);
+        isPlayingPronunciation = false; // 오류 시 상태 초기화
+      };
+
+      utterance.onstart = function() {
+        console.log('발음 재생 시작:', pronunciationText);
+      };
+
+      utterance.onend = function() {
+        console.log('발음 재생 완료:', pronunciationText);
+        isPlayingPronunciation = false; // 재생 완료 시 상태 초기화
+      };
+
+      // 음성 재생
+      window.speechSynthesis.speak(utterance);
+      
+    }, 100); // 100ms 대기
+
+  } catch (error) {
+    console.error('발음 재생 중 오류 발생:', error);
+    isPlayingPronunciation = false; // 예외 발생 시 상태 초기화
+  }
+}
+
+// 전역 함수로 설정
+window.playPronunciation = playPronunciation;
 
 // 페이지 초기화 함수
 async function initializePage() {
