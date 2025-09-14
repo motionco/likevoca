@@ -401,12 +401,23 @@ function createConceptCard(concept) {
             <i class="fas fa-bookmark text-gray-400"></i>
           </button>
           ` : ''}
-        <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+        <!-- 데스크탑: 도메인 > 카테고리 -->
+        <span class="hidden md:inline-block text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
           ${getTranslatedDomainCategory(
             conceptInfo.domain,
             conceptInfo.category,
             localStorage.getItem("preferredLanguage") || userLanguage || "ko"
           )}
+        </span>
+        <!-- 모바일: 카테고리만 -->
+        <span class="md:hidden text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+          ${(() => {
+            const lang = localStorage.getItem("preferredLanguage") || userLanguage || "ko";
+            if (typeof window.getI18nText === "function") {
+              return window.getI18nText(`category_${conceptInfo.category}`) || conceptInfo.category;
+            }
+            return conceptInfo.category;
+          })()}
         </span>
         </div>
       </div>
