@@ -285,30 +285,32 @@ export async function showConceptViewModal(
     }
   }
 
-  // 탭 생성 (AI 단어장과 동일한 로직)
+  // 반응형 탭 생성
   const tabsContainer = document.getElementById("language-tabs");
   const contentContainer = document.getElementById("language-content");
 
   if (tabsContainer && contentContainer) {
-    // 탭 버튼들 생성
-    const tabsHTML = orderedLanguages
-      .map((lang, index) => {
-        return `
-          <button 
-            class="py-2 px-4 ${
-              index === 0
-                ? "text-blue-600 border-b-2 border-blue-600 font-medium"
-                : "text-gray-500 hover:text-gray-700"
-            }"
-            onclick="showLanguageTab('${lang}', this)"
-          >
-            ${getLanguageName(lang)}
-          </button>
-        `;
-      })
-      .join("");
+    // 기본 언어들 (대상언어, 원본언어)
+    const primaryLanguages = orderedLanguages.slice(0, 2);
+    // 추가 언어들 (나머지 3개)
+    const additionalLanguages = orderedLanguages.slice(2);
 
-    tabsContainer.innerHTML = `<div class="flex space-x-8">${tabsHTML}</div>`;
+    // 모바일용 드롭다운 HTML
+    const mobileHTML = createMobileLanguageTabs(primaryLanguages, additionalLanguages);
+
+    // 데스크탑용 토글 버튼 HTML
+    const desktopHTML = createDesktopLanguageTabs(primaryLanguages, additionalLanguages);
+
+    tabsContainer.innerHTML = `
+      <!-- 모바일 버전 -->
+      <div class="md:hidden">
+        ${mobileHTML}
+      </div>
+      <!-- 데스크탑 버전 -->
+      <div class="hidden md:block">
+        ${desktopHTML}
+      </div>
+    `;
 
     // 첫 번째 언어 탭 내용 표시
     showLanguageContent(orderedLanguages[0], conceptData);
@@ -1094,6 +1096,229 @@ document.addEventListener("languageChanged", async (event) => {
       const lang = currentTab.getAttribute("onclick").match(/'([^']+)'/)[1];
       showLanguageContent(lang, currentConcept);
     }
+  }
+});
+
+// 모바일용 드롭다운 언어 탭 생성
+function createMobileLanguageTabs(primaryLanguages, additionalLanguages) {
+  // 기본 언어 탭들
+  const primaryTabsHTML = primaryLanguages.map((lang, index) => {
+    return `
+      <button
+        class="py-2 px-4 ${
+          index === 0
+            ? "text-blue-600 border-b-2 border-blue-600 font-medium"
+            : "text-gray-500 hover:text-gray-700"
+        }"
+        onclick="showLanguageTab('${lang}', this)"
+      >
+        ${getLanguageName(lang)}
+      </button>
+    `;
+  }).join("");
+
+  // 추가 언어 드롭다운
+  let dropdownHTML = '';
+  if (additionalLanguages.length > 0) {
+    const dropdownOptions = additionalLanguages.map(lang => `
+      <button
+        class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+        onclick="showLanguageTab('${lang}', this); toggleMobileDropdown(false)"
+      >
+        ${getLanguageName(lang)}
+      </button>
+    `).join("");
+
+    dropdownHTML = `
+      <div class="relative">
+        <button
+          id="mobile-language-dropdown-btn"
+          class="py-2 px-4 text-gray-500 hover:text-gray-700 flex items-center"
+          onclick="toggleMobileDropdown()"
+        >
+          <span>+ 추가 언어</span>
+          <i class="fas fa-chevron-down ml-2 text-xs" id="mobile-dropdown-icon"></i>
+        </button>
+        <div
+          id="mobile-language-dropdown"
+          class="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 min-w-32 hidden"
+        >
+          ${dropdownOptions}
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="flex space-x-4 items-center">
+      ${primaryTabsHTML}
+      ${dropdownHTML}
+    </div>
+  `;
+}
+
+// 데스크탑용 토글 버튼 언어 탭 생성
+function createDesktopLanguageTabs(primaryLanguages, additionalLanguages) {
+  // 기본 언어 탭들
+  const primaryTabsHTML = primaryLanguages.map((lang, index) => {
+    return `
+      <button
+        class="py-2 px-4 ${
+          index === 0
+            ? "text-blue-600 border-b-2 border-blue-600 font-medium"
+            : "text-gray-500 hover:text-gray-700"
+        }"
+        onclick="showLanguageTab('${lang}', this)"
+      >
+        ${getLanguageName(lang)}
+      </button>
+    `;
+  }).join("");
+
+  // 언어 추가 버튼
+  let addLanguageHTML = '';
+  if (additionalLanguages.length > 0) {
+    addLanguageHTML = `
+      <button
+        id="desktop-add-language-btn"
+        class="py-2 px-4 text-gray-500 hover:text-gray-700 flex items-center"
+        onclick="toggleDesktopLanguagePanel()"
+      >
+        <i class="fas fa-plus mr-2"></i>
+        <span>언어 추가</span>
+      </button>
+    `;
+  }
+
+  // 추가된 언어 탭들을 위한 컨테이너
+  const additionalTabsHTML = `
+    <div id="desktop-additional-tabs" class="flex space-x-4 ml-4"></div>
+  `;
+
+  // 언어 선택 패널
+  const languagePanelHTML = additionalLanguages.length > 0 ? `
+    <div
+      id="desktop-language-panel"
+      class="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-md shadow-lg z-10 p-4 hidden"
+      style="min-width: 200px;"
+    >
+      <h4 class="text-sm font-medium text-gray-700 mb-3">추가할 언어 선택:</h4>
+      <div class="space-y-2">
+        ${additionalLanguages.map(lang => `
+          <label class="flex items-center">
+            <input
+              type="checkbox"
+              value="${lang}"
+              class="mr-2 desktop-language-checkbox"
+              onchange="toggleDesktopLanguageTab('${lang}', this.checked)"
+            >
+            <span class="text-sm">${getLanguageName(lang)}</span>
+          </label>
+        `).join("")}
+      </div>
+    </div>
+  ` : '';
+
+  return `
+    <div class="relative">
+      <div class="flex space-x-8 items-center">
+        ${primaryTabsHTML}
+        ${addLanguageHTML}
+        ${additionalTabsHTML}
+      </div>
+      ${languagePanelHTML}
+    </div>
+  `;
+}
+
+// 모바일 드롭다운 토글 함수
+function toggleMobileDropdown(show = null) {
+  const dropdown = document.getElementById("mobile-language-dropdown");
+  const icon = document.getElementById("mobile-dropdown-icon");
+
+  if (!dropdown || !icon) return;
+
+  const isCurrentlyHidden = dropdown.classList.contains("hidden");
+  const shouldShow = show !== null ? show : isCurrentlyHidden;
+
+  if (shouldShow) {
+    dropdown.classList.remove("hidden");
+    icon.classList.remove("fa-chevron-down");
+    icon.classList.add("fa-chevron-up");
+  } else {
+    dropdown.classList.add("hidden");
+    icon.classList.remove("fa-chevron-up");
+    icon.classList.add("fa-chevron-down");
+  }
+}
+
+// 데스크탑 언어 패널 토글 함수
+function toggleDesktopLanguagePanel() {
+  const panel = document.getElementById("desktop-language-panel");
+  if (!panel) return;
+
+  panel.classList.toggle("hidden");
+}
+
+// 데스크탑 언어 탭 토글 함수
+function toggleDesktopLanguageTab(lang, isChecked) {
+  const container = document.getElementById("desktop-additional-tabs");
+  if (!container) return;
+
+  if (isChecked) {
+    // 언어 탭 추가
+    const tabHTML = `
+      <button
+        id="tab-${lang}"
+        class="py-2 px-4 text-gray-500 hover:text-gray-700 flex items-center"
+        onclick="showLanguageTab('${lang}', this)"
+      >
+        <span>${getLanguageName(lang)}</span>
+        <i class="fas fa-times ml-2 text-xs" onclick="event.stopPropagation(); removeDesktopLanguageTab('${lang}')"></i>
+      </button>
+    `;
+    container.insertAdjacentHTML('beforeend', tabHTML);
+  } else {
+    // 언어 탭 제거
+    removeDesktopLanguageTab(lang);
+  }
+}
+
+// 데스크탑 언어 탭 제거 함수
+function removeDesktopLanguageTab(lang) {
+  const tab = document.getElementById(`tab-${lang}`);
+  const checkbox = document.querySelector(`input[value="${lang}"].desktop-language-checkbox`);
+
+  if (tab) tab.remove();
+  if (checkbox) checkbox.checked = false;
+}
+
+// 전역 함수 노출
+window.toggleMobileDropdown = toggleMobileDropdown;
+window.toggleDesktopLanguagePanel = toggleDesktopLanguagePanel;
+window.toggleDesktopLanguageTab = toggleDesktopLanguageTab;
+window.removeDesktopLanguageTab = removeDesktopLanguageTab;
+
+// 외부 클릭으로 드롭다운/패널 닫기
+document.addEventListener('click', (event) => {
+  // 모바일 드롭다운 외부 클릭
+  const mobileDropdown = document.getElementById("mobile-language-dropdown");
+  const mobileBtn = document.getElementById("mobile-language-dropdown-btn");
+
+  if (mobileDropdown && mobileBtn &&
+      !mobileDropdown.contains(event.target) &&
+      !mobileBtn.contains(event.target)) {
+    toggleMobileDropdown(false);
+  }
+
+  // 데스크탑 패널 외부 클릭
+  const desktopPanel = document.getElementById("desktop-language-panel");
+  const desktopBtn = document.getElementById("desktop-add-language-btn");
+
+  if (desktopPanel && desktopBtn &&
+      !desktopPanel.contains(event.target) &&
+      !desktopBtn.contains(event.target)) {
+    desktopPanel.classList.add("hidden");
   }
 });
 
